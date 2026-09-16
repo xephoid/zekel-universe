@@ -23,6 +23,7 @@ There is no application code yet. Commands today are git only. When code lands, 
 ## Where the decisions live
 
 - `docs/design-brief.md` — the product and design brief. Every decision so far is recorded here, marked **DECIDED** or **CONFIRMED**. Read it before proposing UX or architecture; do not re-open settled decisions (bench layout, no following in v1, guests may join but not host, continuous AI slideshow, phone as a later pass, warm-but-flat look).
+- `docs/implementation-plan.md` — the build plan: code layout, data model, how a move flows, milestones M0–M7 with acceptance checks. Work in milestone order; a milestone is done when its check passes.
 - `docs/games/<game>.md` — a designer's reference per game: every component, count, color, turn step, hidden zone, and moment to animate, with the engine as source of truth over the rulebook. Page images sit beside each. Cite these rather than re-deriving game facts.
 - `docs/brand/wordmark.html` — the only brand mark: the word "zekel" with the k drawn as a meeple on its back, orange head, brand green body.
 
