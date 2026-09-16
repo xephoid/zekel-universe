@@ -1,10 +1,15 @@
 # Zekel Universe — implementation plan
 
-Status 2026-09-16: M0 and M1 built and checked; see section 15 for what
-was decided along the way and what remains. The plan turns the decisions in
-`docs/design-brief.md` and the engine's `docs/digital-mode.md` into a build
-order with acceptance checks. It is written to be handed to someone who has
-read those two documents and the four game references in `docs/games/`.
+Status 2026-09-16: M0 and M1 built and checked. M2 (friends, live) is
+built: sign-in by email link, friends and invites with tests, and the
+lobby; its acceptance check (two signed-in browsers at one Cybernoir table,
+neither receiving the other's view) runs in CI as
+`e2e/cybernoir-two-browser.spec.ts`. See section 15 for what was decided
+along the way and what remains. The plan turns
+the decisions in `docs/design-brief.md` and the engine's `docs/digital-mode.md`
+into a build order with acceptance checks. It is written to be handed to
+someone who has read those two documents and the four game references in
+`docs/games/`.
 
 Two rules run through every step. The engine decides every rule; Universe
 never holds a second copy of one. And a decision the printed rules give to a

@@ -60,12 +60,14 @@ pnpm typecheck           # every package
 pnpm test                # unit and integration tests against a scripted fake engine
 pnpm build               # packages, the server, and the web app
 pnpm start               # the built server, which also serves the built web app
-pnpm test:e2e            # a full browser game against a running server (BASE_URL, default :8788)
+pnpm test:e2e            # the browser specs against a running server (BASE_URL, default :8788)
 ```
 
 The engine-client contract tests run against a live engine when `ENGINE_URL`
 and `ENGINE_TOKEN` are set; the Postgres schema test runs when
-`TEST_DATABASE_URL` points at a Postgres database.
+`TEST_DATABASE_URL` points at a Postgres database. The browser specs that
+sign in read the console mailer's outbox, so start the server they run
+against with `E2E_TEST_OUTBOX=1` (never in production; the server refuses).
 
 ## The full stack in Docker
 
