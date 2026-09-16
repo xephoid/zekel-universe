@@ -1,23 +1,32 @@
 // Realtime and the move flow. Every state change becomes one table_events
-// row, fan-out is per seat so views never cross connections, and every
-// turn that passes to a disconnected by-turns seat writes a notification.
+// row; fan-out is per seat so payloads never cross connections; every turn
+// that passes to a disconnected by-turns seat writes a notification.
+//
+// A "flow" is one human action and everything the engine does in reply: the
+// move, any AI turn that follows (as one event per AI move), and the finish
+// when the game ends. Only the last event of a flow carries legal moves, so
+// nothing lights up until the playback of the flow has caught up.
 
-import { eq, and, gt, asc, sql } from 'drizzle-orm';
-import type { DatabaseClient } from './db/index.js';
-import { tables, seats, tableEvents, notifications } from './db/schema.js';
+import { sql, type Kysely } from 'kysely';
+import { EngineError } from '@universe/engine-client';
+import type { AiTurnResult, AppliedMove, MoveArg, NextStep, RulesBriefing as EngineBriefing } from '@universe/engine-client';
+import type { GameOverResult, RulesBriefing, SeatPayload, TableEventKind } from '@universe/shared';
+import type { DB } from './db/schema.js';
+import { isUniqueViolation, parseJson } from './db/index.js';
 import { newId, now, principalLabel, type Principal } from './identity.js';
-import { ownsSeat, toWireEvent, type EventRow } from './events.js';
+import { toWireEvent, type EventRow } from './events.js';
 import type { EngineService } from './engine.js';
-import type { EmailSender } from './email.js';
-import type { TableService } from './tables/service.js';
-import type { TableEventKind } from '@universe/shared';
+import type { Mailer } from './email.js';
+import { seatOwnedBy, type SeatRecord, type TableService } from './tables/service.js';
 
+/** A move the table refused, with the code the browser branches on. */
 export class MoveError extends Error {
   constructor(
     public readonly code: string,
     message: string,
     public readonly reason?: string,
     public readonly lesson?: string,
+    public readonly legalMoves?: Array<{ move_id?: string; description?: string; move: Record<string, unknown> }>,
   ) {
     super(message);
     this.name = 'MoveError';
@@ -25,17 +34,38 @@ export class MoveError extends Error {
 }
 
 /** The realtime layer subscribes here; sockets are not realtime's business. */
-export type EventBroadcast = (tableId: string, event: EventRow, kind: TableEventKind) => void;
+export type EventBroadcast = (tableId: string, event: EventRow) => void;
 
-/** Engine next_step is an OBJECT: { status, active_player_id, instruction }. */
-function isAiNext(nextStep: { status?: string } | null | undefined): boolean {
-  return nextStep?.status === 'ai_to_move';
+const ENVELOPE_KEYS = new Set(['log', 'next_step', 'move_menu', 'rules_briefing']);
+
+/** get_state spreads the view at top level with an envelope; keep the view. */
+function viewOf(state: Record<string, unknown>): Record<string, unknown> {
+  const view: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(state)) if (!ENVELOPE_KEYS.has(k)) view[k] = v;
+  return view;
 }
 
-function moveKind(move: Record<string, unknown>): TableEventKind {
-  const type = String(move.type ?? move.kind ?? move.action ?? '');
+function briefingOf(b: EngineBriefing | undefined | null): RulesBriefing | null {
+  if (!b || !Array.isArray(b.sections) || b.sections.length === 0) return null;
+  return { for_player: b.for_player, sections: b.sections, teach_note: b.teach_note };
+}
+
+function briefingText(b: RulesBriefing | null): string | undefined {
+  if (!b) return undefined;
+  const text = b.sections.map((s) => s.text).filter(Boolean).join('\n\n');
+  return text || undefined;
+}
+
+/** Roll and draw events animate differently; classify from the move and summary. */
+function moveKind(move: Record<string, unknown>, summary: string): TableEventKind {
+  const type = String(move['type'] ?? move['kind'] ?? move['action'] ?? '');
   if (/roll/i.test(type)) return 'roll';
   if (/draw/i.test(type)) return 'draw';
+  if (type === 'resolve_report') {
+    if (/\broll/i.test(summary)) return 'roll';
+    if (/\bdr[ae]w|\bdeal/i.test(summary)) return 'draw';
+    return 'roll';
+  }
   return 'move';
 }
 
@@ -44,15 +74,12 @@ export class Realtime {
   private connectedOwners = new Map<string, Set<string>>(); // tableId -> principal labels
 
   constructor(
-    private db: DatabaseClient,
+    private db: Kysely<DB>,
     private engine: EngineService,
     private tableService: TableService,
-    private email: EmailSender,
+    private mailer: Mailer,
   ) {
-    tableService.onStarted((tableId) => {
-      void this.maybeRunAiOpening(tableId).catch((err) =>
-        console.error(`[realtime] opening AI turn failed for ${tableId}:`, err));
-    });
+    tableService.onStarted((tableId) => this.openTable(tableId));
   }
 
   onBroadcast(fn: EventBroadcast): void {
@@ -72,7 +99,7 @@ export class Realtime {
     if (set.size === 0) this.connectedOwners.delete(tableId);
   }
 
-  private isAnyoneConnected(tableId: string, seat: { userId: string | null; guestId: string | null }): boolean {
+  isAnyoneConnected(tableId: string, seat: { userId: string | null; guestId: string | null }): boolean {
     const set = this.connectedOwners.get(tableId);
     if (!set) return false;
     if (seat.userId && set.has(`user:${seat.userId}`)) return true;
@@ -80,82 +107,148 @@ export class Realtime {
     return false;
   }
 
-  /** The next sequence number for a table (MAX(seq)+1; no count ambiguity). */
-  private nextSeq(tableId: string): number {
-    const row = this.db
-      .select({ max: sql<number | null>`max(${tableEvents.seq})` })
-      .from(tableEvents)
-      .where(eq(tableEvents.tableId, tableId))
-      .get();
-    return (row?.max ?? 0) + 1;
-  }
+  // ---- events -----------------------------------------------------------------
 
-  /** Write one event, push it stripped per seat, attach result for callers. */
-  appendEvent(
+  /**
+   * Write one event with the next sequence number and push it. The number is
+   * assigned inside the insert (MAX+1) and protected by a unique index, so a
+   * concurrent writer on Postgres loses the race and retries instead of
+   * producing a duplicate.
+   */
+  async appendEvent(
     tableId: string,
-    kind: TableEventKind,
-    actorSeatPosition: number | null,
-    summary: string,
-    engineMove: Record<string, unknown> | null,
-    views: Record<string, unknown>,
-  ): EventRow {
-    const event: EventRow = {
-      seq: this.nextSeq(tableId),
-      kind,
-      actorSeatPosition,
-      summary,
-      engineMove,
-      views,
-    };
-    this.db.insert(tableEvents).values({
-      id: newId(),
-      tableId,
-      seq: event.seq,
-      kind,
-      actorSeatPosition,
-      summary,
-      engineMove,
-      views,
-      createdAt: now(),
-    }).run();
-    this.broadcast(tableId, event, kind);
+    input: Omit<EventRow, 'seq' | 'createdAt'>,
+  ): Promise<EventRow> {
+    const id = newId();
+    const createdAt = now();
+    let seq: number | undefined;
+    for (let attempt = 0; attempt < 5 && seq === undefined; attempt++) {
+      try {
+        const result = await sql<{ seq: number }>`
+          INSERT INTO table_events
+            (id, table_id, seq, kind, actor_seat_position, summary, engine_move, payloads,
+             next_actor_position, game_over, rewind_to_seq, created_at)
+          SELECT ${id}, ${tableId}, COALESCE(MAX(seq), 0) + 1, ${input.kind}, ${input.actorSeatPosition},
+            ${input.summary}, ${input.engineMove === null ? null : JSON.stringify(input.engineMove)},
+            ${JSON.stringify(input.payloads)}, ${input.nextActorPosition},
+            ${input.gameOver === null ? null : JSON.stringify(input.gameOver)}, ${input.rewindToSeq}, ${createdAt}
+          FROM table_events WHERE table_id = ${tableId}
+          RETURNING seq
+        `.execute(this.db);
+        seq = Number(result.rows[0]?.seq);
+      } catch (err) {
+        if (!isUniqueViolation(err) || attempt === 4) throw err;
+      }
+    }
+    const event: EventRow = { ...input, seq: seq!, createdAt };
+    this.broadcast(tableId, event);
     return event;
   }
 
-  /** Fetch each digital human seat's view and return keyed by seat position.
-   *  Engine player ids are the strings chosen at create_session. */
-  private async fetchSeatViews(tableId: string): Promise<Record<string, unknown>> {
-    const sessionId = this.tableService.engineSessionId(tableId);
-    const token = this.tableService.hostToken(tableId);
-    const views: Record<string, unknown> = {};
-    for (const seat of this.tableService.getSeats(tableId)) {
-      if (seat.kind !== 'human') continue;
-      const playerId = this.tableService.playerIdFor(tableId, seat.position);
-      views[String(seat.position)] = await this.engine.getState(sessionId, playerId, token);
-    }
-    return views;
-  }
-
   /** Events after a sequence number, for replay on reconnect and REST. */
-  eventsAfter(tableId: string, after: number): EventRow[] {
-    const rows = this.db.select().from(tableEvents)
-      .where(and(eq(tableEvents.tableId, tableId), gt(tableEvents.seq, after)))
-      .orderBy(asc(tableEvents.seq))
-      .all();
+  async eventsAfter(tableId: string, after: number): Promise<EventRow[]> {
+    const rows = await this.db.selectFrom('table_events').selectAll()
+      .where('table_id', '=', tableId)
+      .where('seq', '>', after)
+      .orderBy('seq', 'asc')
+      .execute();
     return rows.map((r) => ({
       seq: r.seq,
-      kind: r.kind,
-      actorSeatPosition: r.actorSeatPosition,
+      kind: r.kind as TableEventKind,
+      actorSeatPosition: r.actor_seat_position,
       summary: r.summary,
-      engineMove: r.engineMove,
-      views: r.views,
+      engineMove: parseJson<Record<string, unknown> | null>(r.engine_move, null),
+      payloads: parseJson<Record<string, SeatPayload>>(r.payloads, {}),
+      nextActorPosition: r.next_actor_position,
+      gameOver: parseJson<GameOverResult | null>(r.game_over, null),
+      rewindToSeq: r.rewind_to_seq,
+      createdAt: r.created_at,
     }));
+  }
+
+  async latestEvent(tableId: string): Promise<EventRow | null> {
+    const all = await this.eventsAfter(tableId, 0);
+    return all.length ? all[all.length - 1]! : null;
+  }
+
+  // ---- per-seat payloads --------------------------------------------------------
+
+  /**
+   * Build every human seat's payload after the engine changed state. Views
+   * come from get_state per seat (or from the snapshots an AI move carries).
+   * When `nextStep` hands the turn to a human, that seat also gets its legal
+   * moves and the numbered menu; everyone else gets an empty menu.
+   */
+  private async seatPayloads(
+    tableId: string,
+    nextStep: NextStep | null | undefined,
+    snapshots?: Record<string, unknown>,
+    briefings?: Record<string, RulesBriefing | null>,
+  ): Promise<{ payloads: Record<string, SeatPayload>; nextActorPosition: number | null }> {
+    const sessionId = await this.tableService.engineSessionId(tableId);
+    const token = await this.tableService.hostToken(tableId);
+    const seats = await this.tableService.getSeats(tableId);
+    const payloads: Record<string, SeatPayload> = {};
+    let nextActorPosition: number | null = null;
+    for (const seat of seats) {
+      if (seat.kind !== 'human') continue;
+      const playerId = seat.enginePlayerId ?? `p${seat.position + 1}`;
+      const payload: SeatPayload = { view: null, legalMoves: [], moveMenu: null, briefing: null, yourTurn: false, playerId };
+      if (snapshots && snapshots[playerId] !== undefined) {
+        payload.view = snapshots[playerId];
+      } else {
+        const state = await this.engine.getState(sessionId, playerId, token);
+        payload.view = viewOf(state as Record<string, unknown>);
+        payload.briefing = briefingOf(state.rules_briefing);
+      }
+      if (briefings?.[playerId]) payload.briefing = briefings[playerId] ?? null;
+      const theirTurn = nextStep?.status === 'human_to_move' && nextStep.active_player_id === playerId;
+      if (theirTurn) {
+        const legal = await this.engine.getLegalMoves(sessionId, playerId, token);
+        payload.legalMoves = legal.legal_moves;
+        payload.moveMenu = (legal.move_menu as SeatPayload['moveMenu']) ?? null;
+        payload.yourTurn = true;
+        payload.briefing ??= briefingOf(legal.rules_briefing);
+        nextActorPosition = seat.position;
+      }
+      payloads[String(seat.position)] = payload;
+    }
+    return { payloads, nextActorPosition };
+  }
+
+  /** Engine AI snapshots key views by player id; a plain record is fine. */
+  private snapshotsOf(step: { player_views?: Record<string, unknown> }): Record<string, unknown> | undefined {
+    const pv = step.player_views;
+    if (!pv || typeof pv !== 'object' || Array.isArray(pv)) return undefined;
+    return pv;
+  }
+
+  // ---- the flows -------------------------------------------------------------------
+
+  /** The table just got its engine session: write the opening state. */
+  private async openTable(tableId: string): Promise<void> {
+    const sessionId = await this.tableService.engineSessionId(tableId);
+    const token = await this.tableService.hostToken(tableId);
+    const seats = await this.tableService.getSeats(tableId);
+    const firstHuman = seats.find((s) => s.kind === 'human');
+    const probe = await this.engine.getState(sessionId, firstHuman?.enginePlayerId ?? 'p1', token);
+    const nextStep = probe.next_step ?? null;
+    if (nextStep?.status === 'ai_to_move' && nextStep.active_player_id) {
+      const { payloads } = await this.seatPayloads(tableId, null);
+      await this.appendEvent(tableId, {
+        kind: 'setup', actorSeatPosition: null, summary: 'The table is set. An AI opens.',
+        engineMove: null, payloads, nextActorPosition: null, gameOver: null, rewindToSeq: null,
+      });
+      await this.runAiTurns(tableId, nextStep.active_player_id);
+      return;
+    }
+    await this.endFlow(tableId, 'setup', null, 'The table is set.', null, nextStep, undefined, undefined, null);
   }
 
   /**
    * The full move flow per the plan: ownership and status check, apply the
    * move, one event for it, an AI turn if the engine says so, and a system
-   * event when the game ends.
+   * event when the game ends. Returns the last sequence number written.
    */
   async handleMove(
     principal: Principal,
@@ -163,175 +256,274 @@ export class Realtime {
     seatPosition: number,
     move: Record<string, unknown>,
   ): Promise<{ lastSeq: number }> {
-    const table = this.tableService.getTable(tableId);
+    const table = await this.tableService.getTable(tableId);
     if (!table) throw new MoveError('no_table', `No table ${tableId}`);
-    if (table.status !== 'playing') {
-      throw new MoveError('not_playing', 'This table is not in play');
-    }
-    const tableSeats = this.tableService.getSeats(tableId);
-    const seat = tableSeats.find((s) => s.position === seatPosition);
-    if (!seat || !ownsSeat(seat, principal)) {
+    if (table.status !== 'playing') throw new MoveError('not_playing', 'This table is not in play');
+    const seats = await this.tableService.getSeats(tableId);
+    const seat = seats.find((s) => s.position === seatPosition);
+    if (!seat || !seatOwnedBy(seat, principal)) {
       throw new MoveError('not_your_seat', 'You do not own that seat');
     }
+    const sessionId = table.engineSessionId!;
+    const token = await this.tableService.hostToken(tableId);
+    const playerId = seat.enginePlayerId ?? `p${seatPosition + 1}`;
 
-    const sessionId = this.tableService.engineSessionId(tableId);
-    const token = this.tableService.hostToken(tableId);
-
-    let applied;
-    const playerId = this.tableService.playerIdFor(tableId, seatPosition);
+    let applied: AppliedMove;
     try {
-      applied = await this.engine.applyMove(sessionId, playerId, token, move);
+      applied = await this.engine.applyMove(sessionId, playerId, token, { move } satisfies MoveArg);
     } catch (err) {
-      // Engine rejections (EngineError) carry reason + lesson + the legal set;
-      // anything else is a genuine failure and goes up as one.
-      if (err instanceof Error && 'reason' in err) {
-        const e = err as { reason?: string; lesson?: string };
-        throw new MoveError('move_rejected', e.reason ?? 'Move rejected', e.reason, e.lesson);
-      }
-      throw err;
+      throw classifyEngineFailure(err);
     }
 
-    // apply_move returns NO player_views — fetch each digital seat's view
-    // with one get_state call per seat, keyed by engine player id strings.
-    const views = await this.fetchSeatViews(tableId);
-    const ev = this.appendEvent(tableId, moveKind(move), seatPosition, applied.state_summary, move, views);
-
-    if (applied.next_step?.status === 'ai_to_move') {
-      await this.runAiTurnCascade(tableId, applied.next_step.active_player_id!);
-    }
-    await this.checkGameOver(tableId);
-    return { lastSeq: ev.seq };
-  }
-
-  /** After a human move, run one AI turn and an event per move, in order.
-   *  run_ai_turn requires the AI seat's player_id; next_step says who's up. */
-  private async runAiTurnCascade(tableId: string, firstAiPlayerId: string): Promise<void> {
-    const sessionId = this.tableService.engineSessionId(tableId);
-    const token = this.tableService.hostToken(tableId);
-    const result = await this.engine.runAiTurn(sessionId, firstAiPlayerId, token);
-    for (const step of result.moves) {
-      const views = step.player_views
-        ? this.viewsBySeatPosition(step.player_views, tableId)
-        : await this.fetchSeatViews(tableId);
-      this.appendEvent(
-        tableId,
-        'ai_move',
-        null,
-        step.state_summary,
-        (step.move_taken as Record<string, unknown> | undefined) ?? null,
-        views,
-      );
-    }
-  }
-
-  /** When a table starts with an AI up (its seats open the game), push turn.
-   *  get_state (host seat) tells us authoritatively via next_step. */
-  private async maybeRunAiOpening(tableId: string): Promise<void> {
-    const sessionId = this.tableService.engineSessionId(tableId);
-    const token = this.tableService.hostToken(tableId);
-    const hostPid = this.hostPlayerId(tableId);
-    const state = await this.engine.getState(sessionId, hostPid, token);
-    const nextStep = state.next_step;
-    if (nextStep?.status !== 'ai_to_move' || !nextStep.active_player_id) return;
-    this.appendEvent(tableId, 'system', null, 'The table opens with an AI turn.', null, {});
-    await this.runAiTurnCascade(tableId, nextStep.active_player_id);
-    await this.checkGameOver(tableId);
-  }
-
-  private hostPlayerId(tableId: string): string {
-    const table = this.tableService.getTable(tableId);
-    const seat = this.tableService.getSeats(tableId).find((s) =>
-      table?.hostUserId ? s.userId === table.hostUserId : s.guestId === table?.hostGuestId);
-    if (!seat) return 'p1';
-    return seat.enginePlayerId ?? `p${seat.position + 1}`;
-  }
-
-  /** Engine move responses key views by player id; re-key by seat position. */
-  private viewsBySeatPosition(
-    playerViews: Record<string, unknown>,
-    tableId: string,
-  ): Record<string, unknown> {
-    const byPosition: Record<string, unknown> = {};
-    const tableSeats = this.tableService.getSeats(tableId);
-    for (const seat of tableSeats) {
-      if (seat.kind !== 'human') continue;
-      if (seat.enginePlayerId && playerViews[seat.enginePlayerId] !== undefined) {
-        byPosition[String(seat.position)] = playerViews[seat.enginePlayerId];
-      }
-    }
-    // If no engine ids are recorded (older session), pass through keys that
-    // already look like seat positions.
-    if (Object.keys(byPosition).length === 0) {
-      for (const [key, view] of Object.entries(playerViews)) {
-        if (/^\d+$/.test(key)) byPosition[key] = view;
-      }
-    }
-    return byPosition;
-  }
-
-  private async checkGameOver(tableId: string): Promise<void> {
-    const sessionId = this.tableService.engineSessionId(tableId);
-    const over = await this.engine.isGameOver(sessionId);
-    if (!over.game_over) return;
-    this.db.update(tables).set({ status: 'finished', finishedAt: now() })
-      .where(eq(tables.id, tableId)).run();
-    const summary = `The game is over. ${over.summary ? String(over.summary) : ''}`.trim();
-    const views = await this.fetchSeatViews(tableId);
-    this.appendEvent(tableId, 'system', null, summary, null, views);
-    // Notify everyone seated that the table finished.
-    for (const seat of this.tableService.getSeats(tableId)) {
-      if (seat.kind !== 'human') continue;
-      this.db.insert(notifications).values({
-        id: newId(),
-        userId: seat.userId,
-        guestId: seat.guestId,
-        kind: 'table_finished',
-        tableId,
-        createdAt: now(),
-      }).run();
-    }
+    const kind = moveKind(move, applied.state_summary);
+    const briefing = briefingOf(applied.rules_briefing);
+    const briefings = briefing ? { [playerId]: briefing } : undefined;
+    const last = await this.continueFlow(tableId, kind, seatPosition, applied.state_summary, move, applied, briefings);
+    return { lastSeq: last.seq };
   }
 
   /**
-   * By-turns: when a turn passes to a seat whose owner is not connected,
-   * write a notification rows (the email hook is a no-op for now).
+   * After a human action (or an opening), react to the engine's next_step:
+   * an AI turn, a game over, or a human's turn. Writes the event for the
+   * action itself first.
    */
-  notifyTurnIfDisconnected(tableId: string, seatPosition: number): void {
-    const table = this.tableService.getTable(tableId);
-    if (!table || table.mode !== 'turns') return;
-    const seat = this.tableService.getSeats(tableId).find((s) => s.position === seatPosition);
-    if (!seat || seat.kind !== 'human') return;
-    if (this.isAnyoneConnected(tableId, seat)) return;
-    this.db.insert(notifications).values({
-      id: newId(),
-      userId: seat.userId,
-      guestId: seat.guestId,
-      kind: 'your_turn',
-      tableId,
-      createdAt: now(),
-    }).run();
-    // The delayed email hook lands later; call shape already in place.
-    void this.email; // used once the hook exists
+  private async continueFlow(
+    tableId: string,
+    kind: TableEventKind,
+    actorSeatPosition: number | null,
+    summary: string,
+    engineMove: Record<string, unknown> | null,
+    applied: AppliedMove,
+    briefings?: Record<string, RulesBriefing | null>,
+  ): Promise<EventRow> {
+    const nextStep = applied.next_step ?? null;
+    const result = await this.resultOf(tableId, applied);
+    if (result) {
+      return this.finishGame(tableId, kind, actorSeatPosition, summary, engineMove, result, briefings);
+    }
+    if (nextStep?.status === 'ai_to_move' && nextStep.active_player_id) {
+      const { payloads } = await this.seatPayloads(tableId, null, undefined, briefings);
+      await this.appendEvent(tableId, {
+        kind, actorSeatPosition, summary, engineMove, payloads,
+        nextActorPosition: null, gameOver: null, rewindToSeq: null,
+      });
+      return this.runAiTurns(tableId, nextStep.active_player_id);
+    }
+    return this.endFlow(tableId, kind, actorSeatPosition, summary, engineMove, nextStep, undefined, briefings, null);
   }
 
-  /** Undo the last engine move and tell every browser to rewind. */
+  /** Write the last event of a flow: views plus legal moves for whoever is up. */
+  private async endFlow(
+    tableId: string,
+    kind: TableEventKind,
+    actorSeatPosition: number | null,
+    summary: string,
+    engineMove: Record<string, unknown> | null,
+    nextStep: NextStep | null,
+    snapshots: Record<string, unknown> | undefined,
+    briefings: Record<string, RulesBriefing | null> | undefined,
+    rewindToSeq: number | null,
+  ): Promise<EventRow> {
+    const { payloads, nextActorPosition } = await this.seatPayloads(tableId, nextStep, snapshots, briefings);
+    const event = await this.appendEvent(tableId, {
+      kind, actorSeatPosition, summary, engineMove, payloads, nextActorPosition, gameOver: null, rewindToSeq,
+    });
+    await this.tableService.setNextActor(tableId, nextActorPosition);
+    if (nextActorPosition !== null) await this.notifyTurnIfDisconnected(tableId, nextActorPosition);
+    return event;
+  }
+
+  /**
+   * Run the AI's whole turn (the engine plays every consecutive AI seat in
+   * one call) and write one event per move, in order, each with the per-seat
+   * snapshots the engine attached. The last move carries legal moves for the
+   * human who is up next.
+   */
+  private async runAiTurns(tableId: string, firstAiPlayerId: string): Promise<EventRow> {
+    const sessionId = await this.tableService.engineSessionId(tableId);
+    const token = await this.tableService.hostToken(tableId);
+    let aiPlayerId: string | null = firstAiPlayerId;
+    let last: EventRow | null = null;
+    // The engine already chains consecutive AI seats; the loop only guards
+    // against an engine that stops early with another AI still up.
+    for (let round = 0; round < 8 && aiPlayerId; round++) {
+      let ai: AiTurnResult;
+      try {
+        ai = await this.engine.runAiTurn(sessionId, aiPlayerId, token);
+      } catch (err) {
+        throw classifyEngineFailure(err);
+      }
+      const result = await this.resultOf(tableId, ai);
+      const nextStep = ai.next_step ?? null;
+      const humanBriefing = briefingOf(ai.rules_briefing);
+      const briefings = humanBriefing && nextStep?.active_player_id
+        ? { [nextStep.active_player_id]: humanBriefing }
+        : undefined;
+      const moves = ai.moves;
+      for (let i = 0; i < moves.length; i++) {
+        const step = moves[i]!;
+        const isLast = i === moves.length - 1;
+        const engineMove = (step.move_taken as Record<string, unknown> | undefined) ?? null;
+        const kind: TableEventKind = 'ai_move';
+        const snapshots = this.snapshotsOf(step);
+        if (!isLast) {
+          const { payloads } = await this.seatPayloads(tableId, null, snapshots);
+          last = await this.appendEvent(tableId, {
+            kind, actorSeatPosition: null, summary: step.state_summary, engineMove, payloads,
+            nextActorPosition: null, gameOver: null, rewindToSeq: null,
+          });
+          continue;
+        }
+        if (result) {
+          last = await this.finishGame(tableId, kind, null, step.state_summary, engineMove, result, briefings, snapshots);
+          return last;
+        }
+        if (nextStep?.status === 'ai_to_move' && nextStep.active_player_id) {
+          const { payloads } = await this.seatPayloads(tableId, null, snapshots);
+          last = await this.appendEvent(tableId, {
+            kind, actorSeatPosition: null, summary: step.state_summary, engineMove, payloads,
+            nextActorPosition: null, gameOver: null, rewindToSeq: null,
+          });
+          aiPlayerId = nextStep.active_player_id;
+          break;
+        }
+        last = await this.endFlow(tableId, kind, null, step.state_summary, engineMove, nextStep, snapshots, briefings, null);
+        return last;
+      }
+      if (moves.length === 0) {
+        if (result) return this.finishGame(tableId, 'system', null, 'The game is over.', null, result, briefings);
+        if (nextStep?.status === 'ai_to_move' && nextStep.active_player_id && nextStep.active_player_id !== aiPlayerId) {
+          aiPlayerId = nextStep.active_player_id;
+          continue;
+        }
+        return this.endFlow(tableId, 'system', null, ai.report_to_human ?? 'The AI passes.', null, nextStep, undefined, briefings, null);
+      }
+      if (nextStep?.status !== 'ai_to_move') break;
+    }
+    return last!;
+  }
+
+  /** The engine reports game over on the move response; fall back to asking. */
+  private async resultOf(tableId: string, r: { game_over?: boolean; result?: unknown }): Promise<GameOverResult | null> {
+    if (r.game_over !== true) return null;
+    const res = r.result as Partial<GameOverResult> | undefined;
+    if (res && Array.isArray(res.winners) && res.scores && typeof res.summary === 'string') {
+      return { winners: res.winners, scores: res.scores, summary: res.summary };
+    }
+    const sessionId = await this.tableService.engineSessionId(tableId);
+    const over = await this.engine.isGameOver(sessionId);
+    if (!over.game_over) return null;
+    return { winners: over.winners ?? [], scores: over.scores ?? {}, summary: over.summary ?? '' };
+  }
+
+  /** Mark the table finished and write the final event with the result. */
+  private async finishGame(
+    tableId: string,
+    kind: TableEventKind,
+    actorSeatPosition: number | null,
+    summary: string,
+    engineMove: Record<string, unknown> | null,
+    result: GameOverResult,
+    briefings?: Record<string, RulesBriefing | null>,
+    snapshots?: Record<string, unknown>,
+  ): Promise<EventRow> {
+    const { payloads } = await this.seatPayloads(tableId, null, snapshots, briefings);
+    const event = await this.appendEvent(tableId, {
+      kind, actorSeatPosition,
+      summary: `${summary} The game is over. ${result.summary}`.trim(),
+      engineMove, payloads, nextActorPosition: null, gameOver: result, rewindToSeq: null,
+    });
+    await this.tableService.markFinished(tableId, result);
+    for (const seat of await this.tableService.getSeats(tableId)) {
+      if (seat.kind !== 'human') continue;
+      await this.db.insertInto('notifications').values({
+        id: newId(), user_id: seat.userId, guest_id: seat.guestId,
+        kind: 'table_finished', table_id: tableId, read: 0, created_at: now(),
+      }).execute();
+    }
+    return event;
+  }
+
+  /**
+   * By turns: when a turn passes to a seat whose owner is not connected,
+   * write a notification. The delayed email nudge is the M3 milestone; the
+   * mailer is wired here so only that step remains.
+   */
+  async notifyTurnIfDisconnected(tableId: string, seatPosition: number): Promise<void> {
+    const table = await this.tableService.getTable(tableId);
+    if (!table || table.mode !== 'turns') return;
+    const seat = (await this.tableService.getSeats(tableId)).find((s) => s.position === seatPosition);
+    if (!seat || seat.kind !== 'human') return;
+    if (this.isAnyoneConnected(tableId, seat)) return;
+    await this.db.insertInto('notifications').values({
+      id: newId(), user_id: seat.userId, guest_id: seat.guestId,
+      kind: 'your_turn', table_id: tableId, read: 0, created_at: now(),
+    }).execute();
+    void this.mailer;
+  }
+
+  /**
+   * Undo: only the seat that made the last human move may take it back, and
+   * only while nobody else has acted since. The engine reverts that move and
+   * the AI moves after it as one unit; the browsers rewind to the restored
+   * views.
+   */
   async handleUndo(principal: Principal, tableId: string): Promise<{ seq: number }> {
-    const table = this.tableService.getTable(tableId);
+    const table = await this.tableService.getTable(tableId);
     if (!table) throw new MoveError('no_table', `No table ${tableId}`);
     if (table.status !== 'playing') throw new MoveError('not_playing', 'This table is not in play');
-    const tableSeats = this.tableService.getSeats(tableId);
-    if (!tableSeats.some((s) => ownsSeat(s, principal))) {
-      throw new MoveError('not_seated', 'You hold no seat at this table');
+    const seats = await this.tableService.getSeats(tableId);
+    const mine = seats.filter((s) => seatOwnedBy(s, principal));
+    if (mine.length === 0) throw new MoveError('not_seated', 'You hold no seat at this table');
+
+    const events = await this.eventsAfter(tableId, 0);
+    const lastHuman = [...events].reverse().find((e) => e.actorSeatPosition !== null && e.kind !== 'undo');
+    if (!lastHuman) throw new MoveError('nothing_to_undo', 'There is no move to take back');
+    const actor = seats.find((s) => s.position === lastHuman.actorSeatPosition);
+    if (!actor || !seatOwnedBy(actor, principal)) {
+      throw new MoveError('not_your_move', 'Only the player who made the last move can take it back');
     }
-    const sessionId = this.tableService.engineSessionId(tableId);
-    const token = this.tableService.hostToken(tableId);
-    await this.engine.undo(sessionId, token);
-    const views = await this.fetchSeatViews(tableId);
-    const ev = this.appendEvent(
-      tableId, 'system', null, 'Move undone — rewinding.', { action: 'undo' }, views,
+
+    const sessionId = table.engineSessionId!;
+    const token = await this.tableService.hostToken(tableId);
+    let undone;
+    try {
+      undone = await this.engine.undo(sessionId, token);
+    } catch (err) {
+      throw classifyEngineFailure(err);
+    }
+    if (!undone.undone) {
+      throw new MoveError('undo_unavailable', undone.message ?? 'That move cannot be taken back');
+    }
+    const nextStep = undone.next_step ?? (await this.engine.getState(sessionId, actor.enginePlayerId ?? 'p1', token)).next_step ?? null;
+    const summary = `${actorName(actor)} took back their move.`;
+    const ev = await this.endFlow(
+      tableId, 'undo', actor.position, summary, { action: 'undo' }, nextStep, undefined, undefined, lastHuman.seq - 1,
     );
     return { seq: ev.seq };
   }
 }
 
-export { toWireEvent };
+function actorName(seat: SeatRecord): string {
+  return `Seat ${seat.position + 1}`;
+}
+
+/**
+ * Only the engine's own rule codes are rejections to show the player;
+ * everything else is a fault reported as such. A lost connection, a schema
+ * mismatch, or an engine bug must never read as a rule the player broke.
+ */
+export function classifyEngineFailure(err: unknown): MoveError {
+  if (err instanceof EngineError) {
+    if (err.isRuleRejection) {
+      return new MoveError('move_rejected', err.message, err.message, err.lesson, err.yourLegalMoves);
+    }
+    if (err.isTransportFault) {
+      return new MoveError('engine_unavailable', 'The rules engine did not answer. Try again in a moment.');
+    }
+    return new MoveError('engine_error', `The rules engine reported a problem: ${err.errorCode}`);
+  }
+  return new MoveError('internal', 'Something went wrong on the server.');
+}
+
+export { toWireEvent, briefingText };

@@ -1,152 +1,197 @@
-// Socket privacy test: two connections owning different seats at one table
-// must each receive only their own seat's view, never the other's.
+// Socket privacy tests: connections owning different seats at one table
+// each receive only their own seat's payload; a socket subscribed to two
+// tables never gets one table's view through the other's seat; a connection
+// without a seat gets nothing; a page on a foreign origin cannot connect.
 
-import { describe, it, expect, afterEach } from 'vitest';
-import { Server as SocketServer } from 'socket.io';
+import { describe, it, expect, afterEach, beforeEach } from 'vitest';
 import { io as ioClient, type Socket as ClientSocket } from 'socket.io-client';
-import { createDatabase, type DatabaseClient } from './db/index.js';
-import { games, users, authSessions } from './db/schema.js';
-import { newId, newToken, hashToken, now, type Principal } from './identity.js';
-import type { EngineService } from './engine.js';
-import { NoopEmailSender } from './email.js';
-import { ConsoleEmailLinker } from './auth.js';
-import { buildApp } from './app.js';
-import type { TableEventWire } from '@universe/shared';
 import type { AddressInfo } from 'node:net';
+import type { Kysely } from 'kysely';
+import type { JoinTableAck, MoveAck, TableEventWire } from '@universe/shared';
+import type { DB } from './db/schema.js';
+import { createDatabase, type DatabaseClient } from './db/index.js';
+import { newId, newToken, hashToken, now, type Principal } from './identity.js';
+import { ConsoleMailer } from './email.js';
+import { buildApp, type UniverseApp } from './app.js';
+import { createSocketServer } from './sockets.js';
+import { FakeEngine } from './test-engine.js';
 
 const SECRET = 'test-secret';
-
-function makeEngine(over: Partial<EngineService> = {}): EngineService {
-  return {
-    async listGames() {
-      return {
-        games: [{
-          game_id: 'g', name: 'G', description: 'd', min_players: 2,
-          max_players: 2, supports_ai: true,
-          has_hidden_information: true, options_schema: {},
-        }],
-      };
-    },
-    async getRules() { return {}; },
-    async createSession({ seats: seatSpecs }: { seats: Array<{ playerId?: string; kind: string }> }) {
-      const recs = seatSpecs.map((s, i) => ({
-        player_id: s.playerId ?? `p${i + 1}`, kind: s.kind as 'human' | 'ai',
-      }));
-      return {
-        session_id: 's1',
-        players_recorded: recs,
-        join: {
-          join_code: 'AB12', host_player_id: recs.find((r) => r.kind === 'human')?.player_id ?? 'p1',
-          host_token: 'tok',
-          open_seats: recs.filter((r) => r.kind === 'human').slice(1).map((r) => r.player_id),
-        },
-      };
-    },
-    async getState(_s: string, playerId?: string) {
-      // Views keyed per-seat by the fetch loop; privacy is about which seat's
-      // view is inside, so give each seat its own marker.
-      return { playerId, secret: playerId === 'p1' ? 'aaa' : 'bbb' };
-    },
-    async getLegalMoves() { return { legal_moves: [] }; },
-    async applyMove(_s: string, _p: string, _t: string | undefined, _m: Record<string, unknown>) {
-      return {
-        applied: true as const,
-        state_summary: 'A moves.',
-        next_step: { status: 'human_to_move' as const, active_player_id: 'p1', instruction: '…' },
-      };
-    },
-    async runAiTurn() { return { moves: [] as never[] }; },
-    async undo() { return { undone: true }; },
-    async isGameOver() { return { game_over: false as const }; },
-    ...over,
-  };
-}
+const ORIGIN = 'http://localhost:5173';
 
 function waitEvent(socket: ClientSocket, name: string): Promise<TableEventWire> {
   return new Promise((resolve) => socket.once(name, resolve));
 }
 
 function connected(socket: ClientSocket): Promise<void> {
-  return new Promise((resolve) => socket.on('connect', () => resolve()));
+  return new Promise((resolve, reject) => {
+    socket.on('connect', () => resolve());
+    socket.on('connect_error', (err) => reject(err));
+  });
 }
 
-describe('per-seat socket views never leak', () => {
-  let db: DatabaseClient;
+describe('socket privacy', () => {
+  let database: DatabaseClient;
+  let db: Kysely<DB>;
+  let universe: UniverseApp;
+  let port: number;
   let sockets: ClientSocket[] = [];
+  const tokens: Record<string, string> = {};
+  const userA: Principal = { kind: 'user', userId: 'user-a' };
+  const userB: Principal = { kind: 'user', userId: 'user-b' };
+  const userC: Principal = { kind: 'user', userId: 'user-c' };
+
+  beforeEach(async () => {
+    database = await createDatabase(':memory:');
+    db = database.db;
+    await db.insertInto('games').values({
+      engine_game_id: 'fractured-fist', name: 'Fractured Fist', designer_name: '', player_count: '2',
+      min_players: 2, max_players: 2, supports_ai: 1, play_time: '', tags: '[]', cover_image: null,
+      description: '', rules_url: null, visibility: 'public',
+    }).execute();
+    for (const userId of ['user-a', 'user-b', 'user-c']) {
+      await db.insertInto('users').values({ id: userId, display_name: userId, avatar_url: null, bio: null, created_at: now() }).execute();
+      const token = newToken();
+      tokens[userId] = token;
+      await db.insertInto('auth_sessions').values({
+        id: newId(), user_id: userId, token_hash: hashToken(token), created_at: now(),
+        expires_at: new Date(Date.now() + 60_000).toISOString(),
+      }).execute();
+    }
+    const io = createSocketServer({ allowedOrigins: [ORIGIN] });
+    universe = buildApp({
+      db, engine: new FakeEngine(), mailer: new ConsoleMailer(), secretKey: SECRET,
+      appOrigin: ORIGIN, allowedOrigins: [ORIGIN], secureCookies: false, io, logger: false,
+    });
+    await universe.fastify.ready();
+    io.attach(universe.fastify.server);
+    await new Promise<void>((res) => universe.fastify.server.listen(0, '127.0.0.1', () => res()));
+    port = (universe.fastify.server.address() as AddressInfo).port;
+  });
 
   afterEach(async () => {
     for (const s of sockets) s.close();
     sockets = [];
+    await universe.fastify.close();
+    await database.close();
   });
 
-  it('two sockets, two seats, two views: no crossing', async () => {
-    db = createDatabase(':memory:');
-    db.insert(games).values({ engineGameId: 'g', name: 'G' }).run();
-
-    // Two signed-in users with session cookies.
-    const tokens: Record<string, string> = {};
-    for (const userId of ['user-a', 'user-b']) {
-      db.insert(users).values({ id: userId, displayName: userId, createdAt: now() }).run();
-      const token = newToken();
-      tokens[userId] = token;
-      db.insert(authSessions).values({
-        id: newId(), userId, tokenHash: hashToken(token), createdAt: now(),
-      }).run();
-    }
-
-    const io = new SocketServer({ transports: ['websocket'] });
-    const universe = buildApp({
-      db,
-      engine: makeEngine(),
-      emailLinker: new ConsoleEmailLinker(),
-      emailSender: new NoopEmailSender(),
-      secretKey: SECRET,
-      io,
+  function client(userId: string, origin: string = ORIGIN): ClientSocket {
+    const s = ioClient(`http://127.0.0.1:${port}`, {
+      extraHeaders: { cookie: `universe_auth=${tokens[userId]}`, origin },
+      transports: ['websocket'],
+      reconnection: false,
     });
-    await universe.fastify.ready();
-    io.attach(universe.fastify.server);
-    await new Promise<void>((res) =>
-      universe.fastify.server.listen(0, '127.0.0.1', () => res()));
-    const port = (universe.fastify.server.address() as AddressInfo).port;
+    sockets.push(s);
+    return s;
+  }
 
-    const userA: Principal = { kind: 'user', userId: 'user-a' };
-    const userB: Principal = { kind: 'user', userId: 'user-b' };
-    const { tableId } = await universe.tableService.createTable(userA, {
-      gameId: 'g', mode: 'live',
+  const join = (s: ClientSocket, tableId: string) =>
+    new Promise<JoinTableAck>((r) => s.emit('join_table', { tableId }, r));
+  const move = (s: ClientSocket, tableId: string, seat: number) =>
+    new Promise<MoveAck>((r) => s.emit('move', { tableId, seat, move: { type: 'pass' } }, r));
+
+  async function twoHumanTable(host: Principal, guest: Principal): Promise<string> {
+    const { tableId } = await universe.tableService.createTable(host, {
+      gameId: 'fractured-fist', mode: 'live',
       seatSpecs: [{ kind: 'human' }, { kind: 'human' }], hostPosition: 0,
     });
-    universe.tableService.joinTable(userB, tableId);
-    await universe.tableService.setReady(userB, tableId, true);
-    await universe.tableService.startTable(userA, tableId);
+    await universe.tableService.joinTable(guest, tableId);
+    await universe.tableService.setReady(guest, tableId, true);
+    await universe.tableService.startTable(host, tableId);
+    return tableId;
+  }
 
-    const sockA = ioClient(`http://127.0.0.1:${port}`, {
-      extraHeaders: { cookie: `universe_auth=${tokens['user-a']}` },
-      transports: ['websocket'],
-    });
-    const sockB = ioClient(`http://127.0.0.1:${port}`, {
-      extraHeaders: { cookie: `universe_auth=${tokens['user-b']}` },
-      transports: ['websocket'],
-    });
-    sockets = [sockA, sockB];
+  it('two sockets, two seats, two views: no crossing', async () => {
+    const tableId = await twoHumanTable(userA, userB);
+    const sockA = client('user-a');
+    const sockB = client('user-b');
     await Promise.all([connected(sockA), connected(sockB)]);
 
-    const joinAck = (s: ClientSocket) =>
-      new Promise<{ ok?: boolean; seats?: number[] }>((r) => s.emit('join_table', { tableId }, r));
-    const [ackA, ackB] = await Promise.all([joinAck(sockA), joinAck(sockB)]);
-    expect(ackA.seats).toEqual([0]);
-    expect(ackB.seats).toEqual([1]);
+    // Joining replays the opening event to each seat.
+    const openA = waitEvent(sockA, 'table_event');
+    const openB = waitEvent(sockB, 'table_event');
+    const [ackA, ackB] = await Promise.all([join(sockA, tableId), join(sockB, tableId)]);
+    expect(ackA).toMatchObject({ ok: true, seats: [0], status: 'playing' });
+    expect(ackB).toMatchObject({ ok: true, seats: [1] });
+    const [oa, ob] = await Promise.all([openA, openB]);
+    expect(oa.view).toMatchObject({ player: 'p1' });
+    expect(ob.view).toMatchObject({ player: 'p2' });
+    expect(oa.yourTurn).toBe(true);
+    expect(ob.yourTurn).toBe(false);
 
-    // user-a moves over the socket; both sockets receive a table_event.
     const gotA = waitEvent(sockA, 'table_event');
     const gotB = waitEvent(sockB, 'table_event');
-    const moveAck = await new Promise<{ ok?: boolean; error?: string }>((r) =>
-      sockA.emit('move', { tableId, seat: 0, move: { action: 'pass' } }, r));
-    expect(moveAck.ok).toBe(true);
-
+    const ack = await move(sockA, tableId, 0);
+    expect(ack).toMatchObject({ ok: true });
     const [evA, evB] = await Promise.all([gotA, gotB]);
-    expect(evA.view).toEqual({ playerId: 'p1', secret: 'aaa' });
-    expect(evB.view).toEqual({ playerId: 'p2', secret: 'bbb' });
-    expect(JSON.stringify(evA)).not.toContain('bbb');
-    expect(JSON.stringify(evB)).not.toContain('aaa');
+    expect(evA.view).toMatchObject({ player: 'p1', hand: ['secret-of-p1'] });
+    expect(evB.view).toMatchObject({ player: 'p2', hand: ['secret-of-p2'] });
+    expect(JSON.stringify(evA)).not.toContain('secret-of-p2');
+    expect(JSON.stringify(evB)).not.toContain('secret-of-p1');
+    // B is up now and only B holds the legal moves.
+    expect(evA.legalMoves).toEqual([]);
+    expect(evB.legalMoves.length).toBeGreaterThan(0);
+  });
+
+  it('one socket at two tables never receives a view for a seat it does not own', async () => {
+    // At table 1, A owns seat 1 (B hosts). At table 2, A owns seat 0.
+    const table1 = await twoHumanTable(userB, userA);
+    const table2 = await twoHumanTable(userA, userC);
+    const sockA = client('user-a');
+    const sockB = client('user-b');
+    await Promise.all([connected(sockA), connected(sockB)]);
+    await join(sockA, table1);
+    await join(sockA, table2);
+    await join(sockB, table1);
+    // drain the replayed opening events
+    await new Promise((r) => setTimeout(r, 50));
+
+    const received: TableEventWire[] = [];
+    sockA.on('table_event', (e: TableEventWire) => received.push(e));
+    // B moves at table 1; A must get seat 1's view there, never seat 0's.
+    const ack = await move(sockB, table1, 0);
+    expect(ack).toMatchObject({ ok: true });
+    await new Promise((r) => setTimeout(r, 50));
+    expect(received).toHaveLength(1);
+    expect(received[0]!.view).toMatchObject({ player: 'p2' });
+    expect(JSON.stringify(received[0])).not.toContain('secret-of-p1');
+  });
+
+  it('a connection without a seat is refused the table and gets no events', async () => {
+    const tableId = await twoHumanTable(userA, userB);
+    const sockC = client('user-c');
+    const sockA = client('user-a');
+    await Promise.all([connected(sockC), connected(sockA)]);
+    const ack = await join(sockC, tableId);
+    expect(ack).toMatchObject({ error: 'not_seated' });
+    await join(sockA, tableId);
+    const received: TableEventWire[] = [];
+    sockC.on('table_event', (e: TableEventWire) => received.push(e));
+    await move(sockA, tableId, 0);
+    await new Promise((r) => setTimeout(r, 50));
+    expect(received).toHaveLength(0);
+    // and it cannot act either
+    expect(await move(sockC, tableId, 0)).toMatchObject({ error: 'not_your_seat' });
+  });
+
+  it('a page on a foreign origin cannot open a socket, even with valid cookies', async () => {
+    const evil = client('user-a', 'https://evil.example');
+    await expect(connected(evil)).rejects.toBeTruthy();
+  });
+
+  it('a connection without cookies is refused', async () => {
+    const s = ioClient(`http://127.0.0.1:${port}`, { transports: ['websocket'], reconnection: false, extraHeaders: { origin: ORIGIN } });
+    sockets.push(s);
+    await expect(connected(s)).rejects.toBeTruthy();
+  });
+
+  it('a rejected move reaches only the mover, through the acknowledgement', async () => {
+    const tableId = await twoHumanTable(userA, userB);
+    const sockA = client('user-a');
+    await connected(sockA);
+    await join(sockA, tableId);
+    const ack = await new Promise<MoveAck>((r) => sockA.emit('move', { tableId, seat: 0, move: { type: 'illegal' } }, r));
+    expect(ack).toMatchObject({ error: 'move_rejected', reason: 'Not now.', lesson: 'Play happens clockwise.' });
   });
 });

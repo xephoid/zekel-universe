@@ -1,14 +1,42 @@
-// Email sending for product mail (its-your-turn nudges, invites). A no-op
-// interface today: the by-turns email hook lands later and only this
-// implementation changes.
+// Email sending behind one thin interface. Sign-in links and by-turns
+// nudges are the only two emails in v0. The provider is a config choice:
+// Resend when RESEND_API_KEY is set, the console otherwise.
 
-export interface EmailSender {
-  send(to: string, subject: string, body: string): Promise<void>;
+export interface Mail {
+  to: string;
+  subject: string;
+  text: string;
 }
 
-export class NoopEmailSender implements EmailSender {
-  async send(to: string, subject: string, body: string): Promise<void> {
+export interface Mailer {
+  send(mail: Mail): Promise<void>;
+}
+
+/** Development mailer: prints the mail so anyone can complete the flow. */
+export class ConsoleMailer implements Mailer {
+  public sent: Mail[] = [];
+  async send(mail: Mail): Promise<void> {
+    this.sent.push(mail);
     // eslint-disable-next-line no-console
-    console.log(`[email] would send to ${to}: ${subject}\n${body}`);
+    console.log(`[mail] to ${mail.to}: ${mail.subject}\n${mail.text}`);
+  }
+}
+
+/** Resend transport over its HTTP API. */
+export class ResendMailer implements Mailer {
+  constructor(private apiKey: string, private from: string) {}
+
+  async send(mail: Mail): Promise<void> {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${this.apiKey}`,
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({ from: this.from, to: [mail.to], subject: mail.subject, text: mail.text }),
+    });
+    if (!res.ok) {
+      throw new Error(`Resend refused the mail: ${res.status} ${await res.text()}`);
+    }
   }
 }

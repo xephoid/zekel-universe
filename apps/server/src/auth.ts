@@ -1,50 +1,68 @@
-// Auth module: passwordless sign-in by email link, behind a small interface
-// so the provider can be swapped without touching routes. The dev
-// implementation logs the sign-in link to the console instead of sending it.
+// Passwordless sign-in by email link. Tokens are random, stored hashed in
+// the database with a short expiry, and consumed on first use. Issuing is
+// rate limited per address and per client so the endpoint cannot be used to
+// spam an inbox.
 
-import { createHash, randomBytes } from 'node:crypto';
+import type { Kysely } from 'kysely';
+import type { DB } from './db/schema.js';
+import { newId, newToken, hashToken, now } from './identity.js';
 
-/** Sends the sign-in link with the given token to a person's email address. */
-export interface EmailLinker {
-  sendSignInLink(email: string, url: string): Promise<void>;
-}
+export const LINK_TTL_MS = 15 * 60 * 1000;
+export const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 
-/** Development linker: prints the link so anyone can complete the flow. */
-export class ConsoleEmailLinker implements EmailLinker {
-  async sendSignInLink(email: string, url: string): Promise<void> {
-    // eslint-disable-next-line no-console
-    console.log(`[auth] sign-in link for ${email}: ${url}`);
-  }
-}
-
-// Pending email-link requests, kept in memory: fine at one-dyno scale and
-// for development. A durable store replaces this when the volume asks for it.
-interface PendingLink {
-  tokenHash: string;
-  email: string;
-  expiresAt: number;
-}
-
-const pending = new Map<string, PendingLink>();
-const TTL_MS = 15 * 60 * 1000;
-
-export function issueLinkToken(email: string): string {
-  const token = randomBytes(32).toString('base64url');
-  const record: PendingLink = {
-    tokenHash: createHash('sha256').update(token).digest('hex'),
+/** Issue a sign-in token for an address; returns the raw token to email. */
+export async function issueSignInLink(db: Kysely<DB>, email: string): Promise<string> {
+  const token = newToken();
+  await db.insertInto('sign_in_links').values({
+    id: newId(),
+    token_hash: hashToken(token),
     email,
-    expiresAt: Date.now() + TTL_MS,
-  };
-  pending.set(record.tokenHash, record);
+    created_at: now(),
+    expires_at: new Date(Date.now() + LINK_TTL_MS).toISOString(),
+  }).execute();
   return token;
 }
 
-/** Returns the email a token was issued to, consuming it. */
-export function consumeLinkToken(token: string): string | null {
-  const hash = createHash('sha256').update(token).digest('hex');
-  const record = pending.get(hash);
-  if (!record) return null;
-  pending.delete(hash);
-  if (record.expiresAt < Date.now()) return null;
-  return record.email;
+/** Returns the email a token was issued to, consuming it; null when invalid. */
+export async function consumeSignInLink(db: Kysely<DB>, token: string): Promise<string | null> {
+  const hash = hashToken(token);
+  const row = await db.selectFrom('sign_in_links')
+    .select(['id', 'email', 'expires_at'])
+    .where('token_hash', '=', hash)
+    .executeTakeFirst();
+  if (!row) return null;
+  await db.deleteFrom('sign_in_links').where('id', '=', row.id).execute();
+  if (new Date(row.expires_at).getTime() < Date.now()) return null;
+  return row.email;
+}
+
+/** Drop expired links and sessions; called opportunistically. */
+export async function sweepExpired(db: Kysely<DB>): Promise<void> {
+  const cutoff = now();
+  await db.deleteFrom('sign_in_links').where('expires_at', '<', cutoff).execute();
+  await db.deleteFrom('auth_sessions').where('expires_at', '<', cutoff).execute();
+}
+
+/**
+ * A small sliding-window rate limiter kept in memory. One dyno serves the
+ * first instance, so this is enough; a shared store replaces it when the
+ * server scales past one process.
+ */
+export class RateLimiter {
+  private hits = new Map<string, number[]>();
+
+  constructor(private limit: number, private windowMs: number) {}
+
+  /** Records a hit and returns false when the key is over its limit. */
+  allow(key: string, at: number = Date.now()): boolean {
+    const since = at - this.windowMs;
+    const list = (this.hits.get(key) ?? []).filter((t) => t > since);
+    if (list.length >= this.limit) {
+      this.hits.set(key, list);
+      return false;
+    }
+    list.push(at);
+    this.hits.set(key, list);
+    return true;
+  }
 }

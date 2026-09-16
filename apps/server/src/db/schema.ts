@@ -1,122 +1,164 @@
-// Database schema. Written against Drizzle's SQLite dialect so local
-// development runs on better-sqlite3. Column types are chosen to map onto
-// Postgres types (text, integer, boolean, json, timestamp) so a pg-backed
-// schema file can be generated from the same definitions when the production
-// driver is swapped in by config.
+// Database row types for Kysely. One schema serves SQLite (local, tests)
+// and Postgres (production): every column uses a type both understand.
+// Booleans are integers 0/1, JSON is text, timestamps are ISO-8601 text.
+// Column names are snake_case as stored; the code maps to camelCase at the
+// edges where it matters.
 
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+export interface UsersTable {
+  id: string;
+  display_name: string;
+  avatar_url: string | null;
+  bio: string | null;
+  created_at: string;
+}
 
-export const users = sqliteTable('users', {
-  id: text('id').primaryKey(),
-  displayName: text('display_name').notNull(),
-  avatarUrl: text('avatar_url'),
-  bio: text('bio'),
-  createdAt: text('created_at').notNull(),
-});
+export interface IdentitiesTable {
+  id: string;
+  user_id: string;
+  provider: string; // 'email', later 'google', 'github', ...
+  provider_subject: string; // e.g. the email address
+}
 
-export const identities = sqliteTable('identities', {
-  id: text('id').primaryKey(),
-  userId: text('user_id').notNull().references(() => users.id),
-  provider: text('provider').notNull(), // 'email', later 'google', 'github', ...
-  providerSubject: text('provider_subject').notNull(), // e.g. the email address
-});
+export interface AuthSessionsTable {
+  id: string;
+  user_id: string;
+  token_hash: string; // sha256 of the cookie token
+  created_at: string;
+  expires_at: string;
+}
 
-export const authSessions = sqliteTable('auth_sessions', {
-  id: text('id').primaryKey(),
-  userId: text('user_id').notNull().references(() => users.id),
-  tokenHash: text('token_hash').notNull(), // sha256 of the cookie token
-  createdAt: text('created_at').notNull(),
-});
+export interface GuestsTable {
+  id: string;
+  token_hash: string; // sha256 of the cookie token
+  display_name: string;
+  created_at: string;
+  upgraded_to_user_id: string | null;
+}
 
-export const guests = sqliteTable('guests', {
-  id: text('id').primaryKey(),
-  tokenHash: text('token_hash').notNull(), // sha256 of the cookie token
-  displayName: text('display_name').notNull(),
-  createdAt: text('created_at').notNull(),
-  upgradedToUserId: text('upgraded_to_user_id').references(() => users.id),
-});
+/** Pending passwordless sign-in links. Consumed on first use, expire fast. */
+export interface SignInLinksTable {
+  id: string;
+  token_hash: string;
+  email: string;
+  created_at: string;
+  expires_at: string;
+}
 
-export const friendships = sqliteTable('friendships', {
-  id: text('id').primaryKey(),
-  requesterId: text('requester_id').notNull().references(() => users.id),
-  addresseeId: text('addressee_id').notNull().references(() => users.id),
-  status: text('status').notNull(), // 'pending' | 'accepted'
-  createdAt: text('created_at').notNull(),
-});
+export interface FriendshipsTable {
+  id: string;
+  requester_id: string;
+  addressee_id: string;
+  status: string; // 'pending' | 'accepted'
+  created_at: string;
+}
 
-export const games = sqliteTable('games', {
-  engineGameId: text('engine_game_id').primaryKey(),
-  name: text('name').notNull(),
-  designerName: text('designer_name').notNull().default(''),
-  playerCount: text('player_count').notNull().default(''),
-  playTime: text('play_time').notNull().default(''),
-  tags: text('tags', { mode: 'json' }).$type<string[]>().notNull().default([]),
-  coverImage: text('cover_image'),
-  description: text('description').notNull().default(''),
-  rulesUrl: text('rules_url'),
-  visibility: text('visibility').notNull().default('public'), // 'public' | 'unlisted'
-});
+export interface GamesTable {
+  engine_game_id: string;
+  name: string;
+  designer_name: string;
+  player_count: string;
+  min_players: number;
+  max_players: number;
+  supports_ai: number;
+  play_time: string;
+  tags: string; // JSON string[]
+  cover_image: string | null;
+  description: string;
+  rules_url: string | null;
+  visibility: string; // 'public' | 'unlisted'
+}
 
-export const gameUpdates = sqliteTable('game_updates', {
-  id: text('id').primaryKey(),
-  gameId: text('game_id').notNull().references(() => games.engineGameId),
-  title: text('title').notNull(),
-  body: text('body').notNull(),
-  postedAt: text('posted_at').notNull(),
-});
+export interface GameUpdatesTable {
+  id: string;
+  game_id: string;
+  title: string;
+  body: string;
+  posted_at: string;
+}
 
-export const tables = sqliteTable('tables', {
-  id: text('id').primaryKey(),
-  gameId: text('game_id').notNull(),
-  hostUserId: text('host_user_id'),
-  hostGuestId: text('host_guest_id'),
-  mode: text('mode').notNull(), // 'live' | 'turns'
-  status: text('status').notNull().default('lobby'), // 'lobby' | 'playing' | 'finished'
-  engineSessionId: text('engine_session_id'),
-  encryptedHostToken: text('encrypted_host_token'),
-  createdAt: text('created_at').notNull(),
-  finishedAt: text('finished_at'),
-});
+export interface TablesTable {
+  id: string;
+  game_id: string;
+  host_user_id: string | null;
+  host_guest_id: string | null;
+  mode: string; // 'live' | 'turns'
+  status: string; // 'lobby' | 'playing' | 'finished'
+  engine_session_id: string | null;
+  encrypted_host_token: string | null;
+  options: string; // JSON: the game's own setup options
+  next_actor_position: number | null;
+  result: string | null; // JSON GameOverResult once finished
+  created_at: string;
+  finished_at: string | null;
+}
 
-export const seats = sqliteTable('seats', {
-  id: text('id').primaryKey(),
-  tableId: text('table_id').notNull().references(() => tables.id),
-  position: integer('position').notNull(),
-  kind: text('kind').notNull(), // 'human' | 'ai'
-  userId: text('user_id'),
-  guestId: text('guest_id'),
-  aiDifficulty: text('ai_difficulty'),
-  enginePlayerId: text('engine_player_id'),
-  setupChoices: text('setup_choices', { mode: 'json' }).$type<Record<string, unknown>>().notNull().default({}),
-  ready: integer('ready', { mode: 'boolean' }).notNull().default(false),
-});
+export interface SeatsTable {
+  id: string;
+  table_id: string;
+  position: number;
+  kind: string; // 'human' | 'ai'
+  user_id: string | null;
+  guest_id: string | null;
+  ai_difficulty: string | null;
+  engine_player_id: string | null;
+  ready: number;
+}
 
-export const invites = sqliteTable('invites', {
-  id: text('id').primaryKey(),
-  tableId: text('table_id').notNull().references(() => tables.id),
-  fromUserId: text('from_user_id').notNull(),
-  toUserId: text('to_user_id').notNull(),
-  status: text('status').notNull().default('pending'), // 'pending' | 'accepted' | 'declined'
-});
+export interface InvitesTable {
+  id: string;
+  table_id: string;
+  from_user_id: string;
+  to_user_id: string;
+  status: string; // 'pending' | 'accepted' | 'declined'
+}
 
-export const tableEvents = sqliteTable('table_events', {
-  id: text('id').primaryKey(),
-  tableId: text('table_id').notNull().references(() => tables.id),
-  seq: integer('seq').notNull(),
-  kind: text('kind').notNull(), // 'setup' | 'move' | 'ai_move' | 'roll' | 'draw' | 'system'
-  actorSeatPosition: integer('actor_seat_position'),
-  summary: text('summary').notNull().default(''),
-  engineMove: text('engine_move', { mode: 'json' }).$type<Record<string, unknown> | null>(),
-  views: text('views', { mode: 'json' }).$type<Record<string, unknown>>().notNull().default({}),
-  createdAt: text('created_at').notNull(),
-});
+/**
+ * The playback feed and the log. `payloads` holds every seat's private
+ * payload keyed by seat position; the server sends each connection only its
+ * own seat's entry.
+ */
+export interface TableEventsTable {
+  id: string;
+  table_id: string;
+  seq: number;
+  kind: string;
+  actor_seat_position: number | null;
+  summary: string;
+  engine_move: string | null; // JSON
+  payloads: string; // JSON Record<seatPosition, SeatPayload>
+  next_actor_position: number | null;
+  game_over: string | null; // JSON GameOverResult
+  rewind_to_seq: number | null;
+  created_at: string;
+}
 
-export const notifications = sqliteTable('notifications', {
-  id: text('id').primaryKey(),
-  userId: text('user_id'),
-  guestId: text('guest_id'),
-  kind: text('kind').notNull(), // 'your_turn' | 'invite' | 'table_finished'
-  tableId: text('table_id').references(() => tables.id),
-  read: integer('read', { mode: 'boolean' }).notNull().default(false),
-  createdAt: text('created_at').notNull(),
-});
+export interface NotificationsTable {
+  id: string;
+  user_id: string | null;
+  guest_id: string | null;
+  kind: string; // 'your_turn' | 'invite' | 'table_finished'
+  table_id: string | null;
+  read: number;
+  created_at: string;
+}
+
+export interface SchemaVersionTable {
+  version: number;
+}
+
+export interface DB {
+  users: UsersTable;
+  identities: IdentitiesTable;
+  auth_sessions: AuthSessionsTable;
+  guests: GuestsTable;
+  sign_in_links: SignInLinksTable;
+  friendships: FriendshipsTable;
+  games: GamesTable;
+  game_updates: GameUpdatesTable;
+  tables: TablesTable;
+  seats: SeatsTable;
+  invites: InvitesTable;
+  table_events: TableEventsTable;
+  notifications: NotificationsTable;
+  schema_version: SchemaVersionTable;
+}
