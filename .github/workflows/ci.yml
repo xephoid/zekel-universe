@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  # Typecheck and unit-test every package in the pnpm workspace.
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test
+
+  # Run the engine-client contract tests against a real engine in Docker.
+  # The engine image builds from the sibling zekel repo, checked out beside
+  # this one to match infra/docker-compose.yml's build context (../zekel).
+  engine-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out universe
+        uses: actions/checkout@v4
+        with:
+          path: zekel-universe
+      - name: Check out the engine repo as a sibling
+        uses: actions/checkout@v4
+        with:
+          repository: xephoid/zekel
+          path: zekel
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: zekel-universe/pnpm-lock.yaml
+      - name: Install workspace
+        working-directory: zekel-universe
+        run: pnpm install --frozen-lockfile
+      - name: Start the engine
+        working-directory: zekel-universe
+        env:
+          ENGINE_TOKEN: ci-contract-token
+          SECRET_KEY: ci-secret
+        run: |
+          docker compose -f infra/docker-compose.yml up -d --build engine
+          docker compose -f infra/docker-compose.yml ps
+      - name: Run contract tests
+        working-directory: zekel-universe
+        env:
+          ENGINE_URL: http://localhost:8787/mcp
+          ENGINE_TOKEN: ci-contract-token
+        run: pnpm --filter @universe/engine-client test
+      - name: Engine logs on failure
+        if: failure()
+        working-directory: zekel-universe
+        run: docker compose -f infra/docker-compose.yml logs engine
+      - name: Tear down
+        if: always()
+        working-directory: zekel-universe
+        run: docker compose -f infra/docker-compose.yml down -v
