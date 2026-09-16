@@ -102,6 +102,7 @@ jobs:
           APP_ORIGIN: http://localhost:8788
           DATABASE_URL: sqlite:./e2e.db
           PORT: 8788
+          E2E_TEST_OUTBOX: '1'
         run: |
           pnpm build
           (node apps/server/dist/index.js > server.log 2>&1 &)

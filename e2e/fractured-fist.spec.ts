@@ -51,9 +51,14 @@ test('a guest plays Fractured Fist against the AI from Play now to the end scree
   await page.getByRole('button', { name: 'Start the game' }).click();
 
   // The table: our move first, at the fastest pace (which still dwells).
+  // Once playback has settled the pace control lives in the settings sheet.
   await expect(page).toHaveURL(/\/table\//);
   await expect(page.getByText(/^Your move/)).toBeVisible({ timeout: 30_000 });
-  await page.getByRole('button', { name: '2×' }).click();
+  await page.getByRole('button', { name: 'Settings' }).click();
+  const settings = page.getByRole('dialog', { name: 'Settings' });
+  await settings.getByRole('button', { name: '2×' }).click();
+  await settings.getByRole('button', { name: 'Close' }).click();
+  await expect(settings).toBeHidden();
   await expect(page.locator('.table-bench .zk-card').first()).toBeVisible();
 
   // Take back the very first move, then carry on.

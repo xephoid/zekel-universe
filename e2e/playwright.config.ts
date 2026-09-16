@@ -14,6 +14,9 @@ export default defineConfig({
   reporter: [['list'], ['html', { outputFolder: 'report', open: 'never' }]],
   use: {
     baseURL: process.env.BASE_URL ?? 'http://localhost:8788',
+    // A click that never finds a stable, uncovered target must fail with a
+    // trace, not wait for the whole test timeout.
+    actionTimeout: 30 * 1000,
     trace: 'retain-on-failure',
     video: 'retain-on-failure',
     viewport: { width: 1440, height: 900 },
