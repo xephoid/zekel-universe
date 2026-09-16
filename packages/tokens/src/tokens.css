@@ -1,5 +1,5 @@
-// CSS variables mirroring src/index.ts. Import once in the web app and Storybook.
-// Sources of truth: packages/tokens/src/index.ts — keep the two in sync.
+/* CSS variables mirroring src/index.ts. Import once in the web app.
+   Source of truth: packages/tokens/src/index.ts — keep the two in sync. */
 :root {
   --brand-green: #3E7C4F;
   --brand-orange: #E8862E;
@@ -11,6 +11,7 @@
   --accent: #3E7C4F;
   --border: #DDD3C4;
   --card: #FDFBF7;
+  --card-back: #5B6B7A;
   --danger: #B4452F;
   --highlight: #FFD97A;
 
@@ -25,12 +26,18 @@
 
   --shadow-sm: 0 1px 0 rgba(43,38,32,0.12);
   --shadow-md: 0 2px 0 rgba(43,38,32,0.14);
+  /* a moving thing lifts: its shadow grows while it travels */
+  --shadow-lift: 0 10px 18px rgba(43,38,32,0.28);
 
   --motion-fast: 120ms;
   --motion-normal: 240ms;
   --motion-slow: 480ms;
   --motion-slide: 360ms;
+  --motion-flip: 320ms;
+  --motion-drop: 420ms;
+  --motion-tumble: 640ms;
   --motion-easing: cubic-bezier(0.3, 0.8, 0.4, 1);
+  --motion-settle: cubic-bezier(0.2, 0.9, 0.3, 1.2);
 }
 
 [data-theme='dark'] {
@@ -41,11 +48,13 @@
   --accent: #5FA873;
   --border: #453E34;
   --card: #2C2721;
+  --card-back: #3E4A57;
+  --shadow-lift: 0 10px 18px rgba(0,0,0,0.5);
 }
 
+/* Reduced motion: movement becomes a fade and TIMING STAYS THE SAME, so the
+   pacing of a turn is preserved. The primitives read this flag and swap their
+   translate/rotate keyframes for opacity keyframes of equal duration. */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
+  :root { --motion-reduced: 1; }
 }

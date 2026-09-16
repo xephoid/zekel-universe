@@ -34,6 +34,19 @@ export interface EngineErrorDetails {
   [key: string]: unknown;
 }
 
+/**
+ * The engine's own recoverable move codes (zekel src/mcp/tools.ts
+ * RECOVERABLE_MOVE_ERRORS). A rejection with one of these is a rule the
+ * player ran into and is shown as such; every other failure is a fault.
+ */
+export const RULE_REJECTION_CODES = new Set([
+  'ILLEGAL_MOVE',
+  'NOT_YOUR_TURN',
+  'AMBIGUOUS_MOVE',
+  'INVALID_MOVE_SHAPE',
+  'GAME_OVER',
+]);
+
 export class EngineError extends Error {
   constructor(
     public errorCode: string,
@@ -42,6 +55,16 @@ export class EngineError extends Error {
   ) {
     super(message);
     this.name = 'EngineError';
+  }
+
+  /** True when this is a rule the player ran into, not a fault. */
+  get isRuleRejection(): boolean {
+    return RULE_REJECTION_CODES.has(this.errorCode);
+  }
+
+  /** True when the engine could not be reached or answered outside its contract. */
+  get isTransportFault(): boolean {
+    return this.errorCode.startsWith('engine_');
   }
 
   /** The engine's error code (ILLEGAL_MOVE, NOT_YOUR_TURN, ...). */
@@ -365,6 +388,11 @@ export interface SeatConfig {
   teaching?: boolean;
 }
 
+/** How a move is named to apply_move: the full object, or a move_id from a
+ *  fresh get_legal_moves. Explicit so a game move that happens to carry a
+ *  `moveId` key can never be mistaken for the id form. */
+export type MoveArg = { move: Record<string, unknown> } | { moveId: string };
+
 export type NextStepLike = NextStep | null | undefined;
 
 export function nextStepIsAi(nextStep: NextStepLike): boolean {
@@ -399,7 +427,12 @@ function raiseIfError(raw: RawToolResult, parsed: unknown): void {
   const p = (parsed ?? {}) as Record<string, unknown>;
   const code = typeof p['error_code'] === 'string' ? p['error_code'] : 'ENGINE_ERROR';
   const message = typeof p['message'] === 'string' ? p['message'] : JSON.stringify(parsed);
-  throw new EngineError(code, message, p['details'] as EngineErrorDetails | undefined);
+  // The engine puts `recovery` (next_step, hint, your_legal_moves) beside
+  // `details`, not inside it (zekel failMove). Fold it in so callers have
+  // one place to look.
+  const details = (p['details'] ?? {}) as EngineErrorDetails;
+  const recovery = p['recovery'] as EngineErrorDetails['recovery'] | undefined;
+  throw new EngineError(code, message, recovery ? { ...details, recovery } : details);
 }
 
 export interface EngineClientOptions {
@@ -408,29 +441,56 @@ export interface EngineClientOptions {
 }
 
 export class EngineClient {
-  private client: Client;
-  private transport: StreamableHTTPClientTransport;
-  private connected: Promise<void> | null = null;
+  private client: Client | null = null;
+  private connecting: Promise<Client> | null = null;
 
-  constructor(private opts: EngineClientOptions) {
-    this.transport = new StreamableHTTPClientTransport(new URL(opts.url), {
+  constructor(private opts: EngineClientOptions) {}
+
+  /**
+   * Connect on first use. A failed attempt is NOT cached: the next call tries
+   * again with a fresh transport, so an engine hiccup at boot does not
+   * disable the client until a restart.
+   */
+  private ensureConnected(): Promise<Client> {
+    if (this.client) return Promise.resolve(this.client);
+    if (this.connecting) return this.connecting;
+    const client = new Client({ name: 'zekel-universe', version: '0.0.1' });
+    const transport = new StreamableHTTPClientTransport(new URL(this.opts.url), {
       requestInit: {
-        headers: { authorization: `Bearer ${opts.bearerToken}` },
+        headers: { authorization: `Bearer ${this.opts.bearerToken}` },
       },
     });
-    this.client = new Client({ name: 'zekel-universe', version: '0.0.1' });
-  }
-
-  private async ensureConnected(): Promise<void> {
-    if (!this.connected) {
-      this.connected = this.client.connect(this.transport).then(() => undefined);
-    }
-    return this.connected;
+    this.connecting = client
+      .connect(transport)
+      .then(() => {
+        this.client = client;
+        this.connecting = null;
+        transport.onclose = () => {
+          if (this.client === client) this.client = null;
+        };
+        return client;
+      })
+      .catch((err: unknown) => {
+        this.connecting = null;
+        throw new EngineError(
+          'engine_unreachable',
+          `Could not connect to the engine at ${this.opts.url}: ${(err as Error).message}`,
+        );
+      });
+    return this.connecting;
   }
 
   private async call<T>(tool: string, args: Record<string, unknown>, schema: z.ZodType<T>): Promise<T> {
-    await this.ensureConnected();
-    const raw = (await this.client.callTool({ name: tool, arguments: args })) as RawToolResult;
+    const client = await this.ensureConnected();
+    let raw: RawToolResult;
+    try {
+      raw = (await client.callTool({ name: tool, arguments: args })) as RawToolResult;
+    } catch (err) {
+      // A transport failure mid-call: drop the connection so the next call
+      // reconnects, and report it as a fault, never as a rule.
+      if (this.client === client) this.client = null;
+      throw new EngineError('engine_call_failed', `Engine call ${tool} failed: ${(err as Error).message}`);
+    }
     const parsed = extractJson(raw);
     raiseIfError(raw, parsed);
     const validated = schema.safeParse(parsed);
@@ -500,10 +560,9 @@ export class EngineClient {
     sessionId: string,
     playerId: string,
     token: string | undefined,
-    move: Record<string, unknown> | { moveId: string },
+    arg: MoveArg,
   ): Promise<AppliedMove> {
-    const moveArg =
-      'moveId' in move ? { move_id: move.moveId } : { move: move as Record<string, unknown> };
+    const moveArg = 'moveId' in arg ? { move_id: arg.moveId } : { move: arg.move };
     return this.call('apply_move', {
       session_id: sessionId,
       player_id: playerId,
@@ -593,9 +652,8 @@ export class EngineClient {
   }
 
   async close(): Promise<void> {
-    if (this.connected) {
-      await this.client.close();
-      this.connected = null;
-    }
+    const client = this.client;
+    this.client = null;
+    if (client) await client.close();
   }
 }
