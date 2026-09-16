@@ -69,6 +69,8 @@ export interface BuildAppOptions {
   secureCookies: boolean;
   io?: SocketServer; // injected in tests; created by index.ts in production
   logger?: boolean;
+  /** abuse limits, lowered in tests */
+  limits?: { guestsPerIp?: number; tablesPerPrincipal?: number };
 }
 
 export interface UniverseApp {
@@ -100,6 +102,8 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
   const tableService = new TableService(db, opts.engine, opts.secretKey);
   const realtime = new Realtime(db, opts.engine, tableService, opts.mailer);
   const linkLimiter = new RateLimiter(5, 15 * 60 * 1000);
+  const guestLimiter = new RateLimiter(opts.limits?.guestsPerIp ?? 30, 15 * 60 * 1000);
+  const tableLimiter = new RateLimiter(opts.limits?.tablesPerPrincipal ?? 30, 60 * 60 * 1000);
   const referenceCache = new Map<string, GameReferenceResponse>();
 
   // ---- identity helpers ------------------------------------------------
@@ -119,10 +123,10 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     if (guestToken) {
       const guest = await db.selectFrom('guests').select(['id', 'upgraded_to_user_id'])
         .where('token_hash', '=', hashToken(guestToken)).executeTakeFirst();
-      if (guest) {
-        if (guest.upgraded_to_user_id) return { kind: 'user', userId: guest.upgraded_to_user_id };
-        return { kind: 'guest', guestId: guest.id };
-      }
+      // An upgraded guest's token is spent: its seats moved to the user, and
+      // the token itself never acts as the user (that is the auth cookie's
+      // job, and signing out must end it).
+      if (guest && !guest.upgraded_to_user_id) return { kind: 'guest', guestId: guest.id };
     }
     return null;
   }
@@ -154,6 +158,23 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     }
   });
 
+  // Security headers on every response; private API answers are never
+  // cached by a shared cache. The policy allows the built app's own scripts,
+  // inline styles (React style props), same-origin data, and the socket.
+  app.addHook('onSend', async (req, reply) => {
+    reply.header('X-Content-Type-Options', 'nosniff');
+    reply.header('X-Frame-Options', 'DENY');
+    reply.header('Referrer-Policy', 'same-origin');
+    reply.header('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+    if (req.url.startsWith('/api/')) {
+      reply.header('Cache-Control', 'no-store');
+    } else {
+      reply.header('Content-Security-Policy',
+        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; " +
+        "font-src 'self' data:; connect-src 'self' ws: wss:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
+    }
+  });
+
   app.setErrorHandler((err: unknown, _req, reply) => {
     if (err instanceof HttpError) return reply.code(err.statusCode).send({ error: err.code, message: err.message });
     if (err instanceof TableError) return reply.code(400).send({ error: err.code, message: err.message });
@@ -176,6 +197,9 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     }
     if (existing?.kind === 'user') {
       return reply.code(409).send({ error: 'already_signed_in' });
+    }
+    if (!guestLimiter.allow(`ip:${req.ip}`)) {
+      return reply.code(429).send({ error: 'too_many_requests', message: 'Try again in a few minutes.' });
     }
     const body = (req.body ?? {}) as { displayName?: string };
     const id = newId();
@@ -291,6 +315,8 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     const token = req.cookies[AUTH_COOKIE];
     if (token) await db.deleteFrom('auth_sessions').where('token_hash', '=', hashToken(token)).execute();
     reply.clearCookie(AUTH_COOKIE, { path: '/' });
+    // The guest cookie that was upgraded into this account is spent too.
+    reply.clearCookie(GUEST_COOKIE, { path: '/' });
     return { ok: true };
   });
 
@@ -426,6 +452,9 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
 
   app.post('/api/tables', async (req): Promise<CreateTableResponse> => {
     const p = await requirePrincipal(req);
+    if (!tableLimiter.allow(p.kind === 'user' ? `user:${p.userId}` : `guest:${p.guestId}`)) {
+      throw new HttpError(429, 'too_many_requests', 'You have opened many tables recently. Try again later.');
+    }
     const body = (req.body ?? {}) as Partial<CreateTableRequest>;
     if (!body.gameId || !body.mode || !Array.isArray(body.seats) || body.hostPosition === undefined) {
       throw new HttpError(400, 'bad_request', 'gameId, mode, seats and hostPosition are required');

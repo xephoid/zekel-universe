@@ -72,6 +72,18 @@ function moveKind(move: Record<string, unknown>, summary: string): TableEventKin
 export class Realtime {
   private broadcast: EventBroadcast = () => {};
   private connectedOwners = new Map<string, Set<string>>(); // tableId -> principal labels
+  private tableLocks = new Map<string, Promise<unknown>>();
+
+  /** Run one table's mutation at a time; a second call waits for the first. */
+  private serialized<T>(tableId: string, work: () => Promise<T>): Promise<T> {
+    const previous = this.tableLocks.get(tableId) ?? Promise.resolve();
+    const run = previous.catch(() => undefined).then(work);
+    this.tableLocks.set(tableId, run);
+    void run.catch(() => undefined).finally(() => {
+      if (this.tableLocks.get(tableId) === run) this.tableLocks.delete(tableId);
+    });
+    return run;
+  }
 
   constructor(
     private db: Kysely<DB>,
@@ -250,7 +262,16 @@ export class Realtime {
    * move, one event for it, an AI turn if the engine says so, and a system
    * event when the game ends. Returns the last sequence number written.
    */
-  async handleMove(
+  handleMove(
+    principal: Principal,
+    tableId: string,
+    seatPosition: number,
+    move: Record<string, unknown>,
+  ): Promise<{ lastSeq: number }> {
+    return this.serialized(tableId, () => this.applyHumanMove(principal, tableId, seatPosition, move));
+  }
+
+  private async applyHumanMove(
     principal: Principal,
     tableId: string,
     seatPosition: number,
@@ -468,7 +489,11 @@ export class Realtime {
    * the AI moves after it as one unit; the browsers rewind to the restored
    * views.
    */
-  async handleUndo(principal: Principal, tableId: string): Promise<{ seq: number }> {
+  handleUndo(principal: Principal, tableId: string): Promise<{ seq: number }> {
+    return this.serialized(tableId, () => this.applyUndo(principal, tableId));
+  }
+
+  private async applyUndo(principal: Principal, tableId: string): Promise<{ seq: number }> {
     const table = await this.tableService.getTable(tableId);
     if (!table) throw new MoveError('no_table', `No table ${tableId}`);
     if (table.status !== 'playing') throw new MoveError('not_playing', 'This table is not in play');

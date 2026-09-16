@@ -23,15 +23,15 @@ export async function issueSignInLink(db: Kysely<DB>, email: string): Promise<st
   return token;
 }
 
-/** Returns the email a token was issued to, consuming it; null when invalid. */
+/** Returns the email a token was issued to, consuming it; null when invalid.
+ *  The delete is the check: exactly one concurrent redemption can win. */
 export async function consumeSignInLink(db: Kysely<DB>, token: string): Promise<string | null> {
   const hash = hashToken(token);
-  const row = await db.selectFrom('sign_in_links')
-    .select(['id', 'email', 'expires_at'])
+  const row = await db.deleteFrom('sign_in_links')
     .where('token_hash', '=', hash)
+    .returning(['email', 'expires_at'])
     .executeTakeFirst();
   if (!row) return null;
-  await db.deleteFrom('sign_in_links').where('id', '=', row.id).execute();
   if (new Date(row.expires_at).getTime() < Date.now()) return null;
   return row.email;
 }
