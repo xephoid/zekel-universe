@@ -295,17 +295,17 @@ and it is the only brand mark that exists. Open
 [docs/brand/wordmark.html](brand/wordmark.html) in a browser to see it at its
 original size, scaled up, in light and dark, and with the meeple alone.
 
-What it is: the word **zekel** set in Bricolage Grotesque 700, tight
+What it is: the word **zekel** set in Google Slackey, tight
 letter-spacing, in the brand green. The **k is replaced by a meeple** (the
 little wooden person from board games) **lying on its back**, head to the left,
 legs to the right, so its outline reads as a k. The meeple is built from five
 rounded shapes: a round head, a wide shoulder bar, a body, and two splayed legs.
-The head alone is the action orange; the rest is the brand green. In dark theme
-the body becomes cream and the head becomes the brighter orange.
+The whole meeple is the action orange — head, body, and legs alike. In dark
+theme the letters become cream and the meeple becomes the brighter orange.
 
-The upright meeple on its own, with its orange head, is a natural app icon and
+The upright meeple on its own, all orange, is a natural app icon and
 favicon. The designer may redraw the mark properly as vector art and should
-keep the idea: the meeple is the k, the head is the one spot of orange.
+keep the idea: the meeple is the k, drawn entire in the one spot of orange.
 
 ## Design system to start from
 

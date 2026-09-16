@@ -3,17 +3,16 @@
 <head>
 <meta charset="utf-8">
 <title>zekel wordmark</title>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Slackey&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
   /* The zekel wordmark, lifted verbatim from the engine's debug client
-     (zekel/src/server/debugPage.ts). The word "zekel" set in Bricolage
-     Grotesque 700, with the k replaced by a meeple lying on its back:
-     head to the left, legs to the right. The head is the action orange;
-     everything else is the brand green. Only the font size changes here so
-     it can be seen large. */
+     (zekel/src/server/debugPage.ts). The word "zekel" set in Google Slackey
+     400, with the k replaced by a meeple lying on its back:
+     head to the left, legs to the right. The whole meeple is the action
+     orange. Only the font size changes here so it can be seen large. */
   :root {
     --bg: #f7f1e6; --brand: #1f4d3a; --mark-head: #e0762b; --text-muted: rgba(28,26,23,.6);
-    --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+    --font-display: 'Slackey', system-ui, sans-serif;
     --font-body: 'IBM Plex Sans', system-ui, sans-serif;
   }
   .dark { --bg: #1a221c; --brand: #f3ead9; --mark-head: #ff8a3d; --text-muted: rgba(243,234,217,.6); }
@@ -22,10 +21,10 @@
   .label { font-size: 13px; color: var(--text-muted); }
 
   /* --- the mark, at the original 24px --- */
-  .wordmark { display: inline-flex; align-items: center; gap: 1px; font: 700 24px var(--font-display); letter-spacing: -.02em; color: var(--brand); }
+  .wordmark { display: inline-flex; align-items: center; gap: 1px; font: 400 24px var(--font-display); letter-spacing: -.02em; color: var(--brand); }
   .meeple { display: inline-block; width: 20px; height: 20px; position: relative; transform: rotate(-90deg); margin: 0 1px; }
-  .meeple span { position: absolute; background: var(--brand); }
-  .meeple .hd { left: 50%; top: 0; width: 34%; height: 34%; transform: translateX(-50%); border-radius: 50%; background: var(--mark-head); }
+  .meeple span { position: absolute; background: var(--mark-head); }
+  .meeple .hd { left: 50%; top: 0; width: 34%; height: 34%; transform: translateX(-50%); border-radius: 50%; }
   .meeple .sh { left: 0; top: 28%; width: 100%; height: 24%; border-radius: 999px; }
   .meeple .bd { left: 50%; top: 40%; width: 48%; height: 36%; transform: translateX(-50%); border-radius: 3px 3px 1px 1px; }
   .meeple .l1 { left: 14%; bottom: 0; width: 32%; height: 38%; border-radius: 3px; transform: rotate(14deg); transform-origin: top center; }
