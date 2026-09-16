@@ -1,6 +1,7 @@
 # Zekel Universe — implementation plan
 
-Status 2026-09-15: a plan, nothing built. It turns the decisions in
+Status 2026-09-16: M0 and M1 built and checked; see section 15 for what
+was decided along the way and what remains. The plan turns the decisions in
 `docs/design-brief.md` and the engine's `docs/digital-mode.md` into a build
 order with acceptance checks. It is written to be handed to someone who has
 read those two documents and the four game references in `docs/games/`.
@@ -371,3 +372,57 @@ Start with Resend. Switching later is a config change, not a code change.
 **Still open**
 
 - Which hosted text-to-speech voice, when voice work begins after v0.
+
+## 15. Decisions made while building (2026-09-16)
+
+The first build pass took the plan to M0 and M1 and made the M2 backend
+honest. Each item below was agreed before the work started.
+
+- **Scope of the pass.** M0 and M1 complete and checked (a guest plays a
+  full game of Fractured Fist against the AI in a browser test; the built
+  server starts under Node; compose runs the stack), every privacy and
+  security fix from the implementation review, and the M2 backend contracts
+  (lobby, join, ready, two-human privacy with a passing test). M3 to M6
+  follow in later passes.
+- **Undo.** Only the seat that made the last human move may take it back,
+  and only while nobody else has acted since. The engine reverts that move
+  and the AI moves after it as one unit; the browsers receive a rewind
+  event with the restored views.
+- **Spectators.** Not in v0. Joining a table's socket room requires a seat;
+  spectator links wait for M5, when the engine's public view (an MCP
+  resource today, not a tool) gets a proper path.
+- **Engine changes.** None in this pass. The server fetches each game's
+  reference data from the engine once and serves it to the browser; a label
+  drops any number the engine does not publish (Cybernoir's evidence
+  thresholds, for one).
+- **Database.** Kysely instead of Drizzle, because one schema has to run on
+  SQLite locally and Postgres in production and Drizzle needs a schema per
+  dialect. Booleans are integers and JSON is text so both agree. The
+  engine's own Postgres session store stays engine-side work.
+- **Sign-in.** Email links only for now, with tokens in the database, a
+  short expiry, single use, a rate limit, secure cookies in production,
+  session expiry and sign-out. The token travels in the URL fragment and is
+  posted by the landing page. Google, GitHub and Discord wait for client
+  ids. Resend is the mail provider by configuration; the console otherwise.
+- **Primitive contract.** The engine's component interfaces (`CardData`,
+  `CardZoneData`, `TableauData`, `BagData`, `TrackData`, `PoolData`,
+  `GridData`, `MapData`) are the base; Universe adds only optional fields
+  (a card's art and subtitle, a map node's roads, a tableau's active label).
+- **Catalog.** No allowlist: every game the engine lists appears, with the
+  designer of record and storefront copy set for the four Zekel Games titles.
+- **Browser tests.** Playwright, with a CI job that plays a full game
+  against the engine in Docker.
+- **Motion.** One FLIP root for the whole table; identical cards get stable
+  instance ids in the browser so the card that was tapped is the card that
+  flies. Reduced motion becomes fades with the same timing.
+- **Commits.** Small commits by area.
+
+Still open from this pass:
+
+- The engine's Postgres session store (section 13) before the first Heroku
+  deploy.
+- Warble Way Galaxy, Sweetlands Imperium and Cybernoir 2127 glue modules
+  compile against the new primitive contract and pass fixture tests, but
+  have not been played through (M4).
+- By-turns email nudges, friends and invites, the storefront, and the phone
+  pass (M3, M5, M6).
