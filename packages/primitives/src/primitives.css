@@ -1,0 +1,213 @@
+/* Motion keyframes and the shared looks for the eight primitives. Colors
+   come from the tokens CSS variables; game colors from --zekel-c-* variables
+   the table sets from the game's palette. */
+
+/* tokens drop from above and settle with a little weight */
+@keyframes zk-drop {
+  0% { transform: translateY(-28px) scale(0.92); opacity: 1; }
+  70% { transform: translateY(3px) scale(1.02); }
+  100% { transform: translateY(0) scale(1); }
+}
+/* dice tumble and settle */
+@keyframes zk-tumble {
+  0% { transform: rotate(0deg) translateY(-10px) scale(1.1); }
+  30% { transform: rotate(160deg) translateY(4px) scale(1.05); }
+  60% { transform: rotate(300deg) translateY(-3px); }
+  85% { transform: rotate(350deg) translateY(1px); }
+  100% { transform: rotate(360deg) translateY(0); }
+}
+/* the only fade in the language: what movement becomes under reduced motion */
+@keyframes zk-fade {
+  from { opacity: 0.15; }
+  to { opacity: 1; }
+}
+/* a lit part breathes so the eye finds it */
+@keyframes zk-breathe {
+  0%, 100% { box-shadow: 0 0 0 3px var(--highlight); }
+  50% { box-shadow: 0 0 0 5px var(--highlight); }
+}
+
+.zk-lift { box-shadow: var(--shadow-lift) !important; }
+
+.zk-lit {
+  cursor: pointer;
+  outline: none;
+  animation: zk-breathe 1400ms ease-in-out infinite;
+}
+.zk-lit:focus-visible { box-shadow: 0 0 0 4px var(--accent) !important; animation: none; }
+
+/* card */
+.zk-card {
+  position: relative;
+  width: var(--zekel-card-w, 76px);
+  height: var(--zekel-card-h, 104px);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 11px;
+  line-height: 1.15;
+  user-select: none;
+  display: inline-block;
+  vertical-align: top;
+  perspective: 600px;
+  will-change: transform;
+}
+.zk-card-flipper {
+  position: absolute; inset: 0;
+  transform-style: preserve-3d;
+  transition: transform var(--motion-flip, 320ms) var(--motion-easing, ease);
+}
+.zk-card-flipper.down { transform: rotateY(180deg); }
+.zk-card-face, .zk-card-back {
+  position: absolute; inset: 0;
+  backface-visibility: hidden;
+  border-radius: var(--radius-md);
+  border: 1.5px solid rgba(0,0,0,0.35);
+  box-shadow: var(--shadow-sm);
+  padding: 6px 6px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  overflow: hidden;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+.zk-card-back {
+  transform: rotateY(180deg);
+  background: repeating-linear-gradient(45deg, var(--card-back), var(--card-back) 6px, rgba(0,0,0,0.12) 6px, rgba(0,0,0,0.12) 12px);
+  color: rgba(255,255,255,0.8);
+  text-align: center; justify-content: center; align-items: center;
+}
+.zk-card-art { width: 100%; height: 44px; object-fit: cover; border-radius: var(--radius-sm); }
+.zk-card-label { font-weight: 700; overflow-wrap: anywhere; }
+.zk-card-sub { font-size: 10px; opacity: 0.9; }
+.zk-card-badges { display: flex; flex-wrap: wrap; gap: 2px; }
+.zk-card-badge { background: rgba(0,0,0,0.35); border-radius: 6px; padding: 0 4px; font-size: 9px; }
+.zk-card-count { align-self: flex-end; font-weight: 700; font-size: 12px; }
+.zk-card.r90 .zk-card-flipper { transform: rotate(90deg); }
+.zk-card.r180 .zk-card-flipper { transform: rotate(180deg); }
+.zk-card.r270 .zk-card-flipper { transform: rotate(270deg); }
+.zk-card.r90 .zk-card-flipper.down { transform: rotate(90deg) rotateY(180deg); }
+
+/* card zone */
+.zk-zone { display: inline-flex; flex-direction: column; gap: 4px; min-width: 60px; vertical-align: top; }
+.zk-zone-label { font-size: 12px; font-weight: 600; color: var(--fg-muted); }
+.zk-zone-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: flex-start; }
+.zk-zone-fan { display: flex; padding-left: 0; }
+.zk-zone-fan .zk-card { margin-left: -30px; transition: margin var(--motion-fast), transform var(--motion-fast); }
+.zk-zone-fan .zk-card:first-child { margin-left: 0; }
+.zk-zone-fan .zk-card:hover, .zk-zone-fan .zk-card:focus-within { transform: translateY(-8px) !important; z-index: 5; }
+.zk-zone-pile { position: relative; display: inline-block; width: var(--zekel-card-w, 76px); height: var(--zekel-card-h, 104px); }
+.zk-zone-pile .zk-card { position: absolute; top: 0; left: 0; }
+.zk-zone-depth {
+  position: absolute; right: -8px; top: -8px; z-index: 6;
+  background: var(--fg); color: var(--bg); border-radius: 10px;
+  font-size: 11px; font-weight: 700; padding: 1px 7px; box-shadow: var(--shadow-sm);
+}
+.zk-zone-empty {
+  opacity: 0.6; font-size: 12px; color: var(--fg-muted);
+  border: 1.5px dashed var(--border); border-radius: var(--radius-md);
+  width: var(--zekel-card-w, 76px); height: var(--zekel-card-h, 104px);
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* tableau */
+.zk-tableau {
+  border: 2px solid var(--border); border-left-width: 8px;
+  border-radius: var(--radius-lg); padding: 10px 12px;
+  background: var(--card); min-width: 160px; box-shadow: var(--shadow-sm);
+  display: flex; flex-direction: column; gap: 6px;
+}
+.zk-tableau.active { box-shadow: 0 0 0 2px var(--accent); }
+.zk-tableau-title { font-family: var(--font-display); font-weight: 700; font-size: 15px; display: flex; gap: 8px; align-items: center; }
+.zk-tableau-turn { font-size: 10px; background: var(--accent); color: #fff; border-radius: 8px; padding: 1px 7px; font-family: var(--font-body); }
+.zk-stat { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; }
+.zk-stat b { font-variant-numeric: tabular-nums; }
+.zk-meter { height: 6px; border-radius: 3px; background: var(--border); overflow: hidden; margin: 1px 0 3px; }
+.zk-meter > div { height: 100%; background: var(--accent); transition: width var(--motion-slide) var(--motion-easing); }
+.zk-tableau-slot { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+
+/* bag */
+.zk-bag-wrap { display: inline-flex; gap: 10px; align-items: flex-start; flex-wrap: wrap; }
+.zk-bag {
+  width: 64px; height: 72px; position: relative; text-align: center;
+  border-radius: 14% 14% 46% 46% / 8% 8% 60% 60%;
+  border: 2px solid rgba(0,0,0,0.35);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: 700; font-size: 16px; text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+}
+.zk-bag::before {
+  content: ''; position: absolute; top: -7px; left: 18%; right: 18%;
+  height: 10px; background: inherit; border: 2px solid rgba(0,0,0,0.35); border-radius: 40%;
+}
+.zk-bag-status { font-size: 11px; font-weight: 700; text-transform: uppercase; border-radius: 8px; padding: 1px 8px; display: inline-block; margin-top: 4px; background: var(--border); }
+.zk-bag-status.busted { background: var(--danger); color: #fff; }
+.zk-chips { display: flex; flex-wrap: wrap; gap: 4px; max-width: 160px; }
+.zk-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; border: 1px solid var(--border); border-radius: 10px; padding: 1px 6px 1px 2px; }
+.zk-swatch { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid rgba(0,0,0,0.4); display: inline-block; }
+
+/* track */
+.zk-track { display: flex; flex-wrap: wrap; gap: 2px 8px; align-items: flex-end; padding-top: 20px; }
+.zk-track-space { position: relative; width: 40px; text-align: center; }
+.zk-track-cell {
+  width: 34px; height: 34px; margin: 0 auto; border-radius: 50%;
+  border: 2px solid var(--border); background: var(--bg-raised);
+  display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600;
+}
+.zk-track-space.filled .zk-track-cell { background: var(--brand-orange); color: #fff; }
+.zk-track-idx { font-size: 9px; color: var(--fg-muted); margin-top: 1px; }
+.zk-track-pieces { position: absolute; top: -8px; left: 0; right: 0; display: flex; justify-content: center; gap: 2px; }
+.zk-pawn { width: 13px; height: 13px; border-radius: 50% 50% 40% 40%; border: 1.5px solid rgba(0,0,0,0.5); box-shadow: var(--shadow-sm); }
+.zk-track-marker { position: absolute; top: -20px; left: 0; right: 0; font-size: 9px; font-weight: 700; }
+.zk-track-marker::after { content: '▼'; display: block; font-size: 8px; }
+.zk-track-loop { align-self: center; font-size: 18px; opacity: 0.6; padding-bottom: 12px; }
+
+/* pool */
+.zk-pool { display: inline-flex; flex-direction: column; gap: 4px; }
+.zk-pool-items { display: flex; flex-wrap: wrap; gap: 6px; }
+.zk-pool-item { display: inline-flex; align-items: center; gap: 5px; border: 1.5px solid var(--border); border-radius: 12px; padding: 2px 9px 2px 4px; font-size: 12px; background: var(--bg-raised); }
+.zk-pool-item b { font-variant-numeric: tabular-nums; }
+.zk-pool-tokens { display: inline-flex; gap: 2px; }
+.zk-token { width: 10px; height: 10px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.4); }
+
+/* grid */
+.zk-grid { display: grid; gap: 1px; background: var(--border); border: 2px solid var(--border); border-radius: 4px; width: fit-content; }
+.zk-grid-cell { width: var(--zekel-cell, 36px); height: var(--zekel-cell, 36px); background: var(--bg-raised); position: relative; display: flex; align-items: center; justify-content: center; }
+.zk-piece {
+  width: 76%; height: 76%; border-radius: 50%; border: 2px solid rgba(0,0,0,0.5);
+  color: #fff; font-size: 10px; font-weight: 700; text-shadow: 0 1px 1px rgba(0,0,0,0.6);
+  display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm);
+}
+.zk-piece + .zk-piece { margin-left: -60%; transform: translate(30%, -30%) scale(0.8); }
+.zk-ruler { font-size: 8px; color: var(--fg-muted); position: absolute; top: 1px; left: 2px; }
+
+/* map */
+.zk-map { position: relative; width: 100%; border-radius: var(--radius-lg); background: var(--bg-raised); border: 2px solid var(--border); overflow: hidden; }
+.zk-map-node { position: absolute; transform: translate(-50%, -50%); text-align: center; }
+.zk-map-blob {
+  border-radius: 46% 54% 52% 48% / 55% 47% 53% 45%;
+  border: 2.5px solid rgba(0,0,0,0.45); margin: 0 auto;
+  display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 2px;
+  box-shadow: inset 0 0 14px rgba(0,0,0,0.18);
+}
+.zk-map-name { font-size: 11px; font-weight: 700; margin-top: 3px; color: var(--fg); text-shadow: 0 1px 3px var(--bg); white-space: nowrap; }
+.zk-map-badges { display: flex; gap: 2px; justify-content: center; }
+.zk-map-road { position: absolute; height: 3px; background: var(--border); transform-origin: 0 50%; opacity: 0.8; border-radius: 2px; }
+
+/* die */
+.zk-die {
+  width: 40px; height: 40px; border-radius: 8px; background: #fff; color: #222;
+  border: 2px solid rgba(0,0,0,0.5); display: grid; grid-template-columns: repeat(3, 1fr);
+  padding: 5px; box-shadow: var(--shadow-md);
+}
+.zk-die.rolling { animation: zk-tumble var(--motion-tumble, 640ms) var(--motion-settle, ease-out); }
+.zk-pip { width: 7px; height: 7px; border-radius: 50%; background: #222; margin: auto; visibility: hidden; }
+.zk-pip.on { visibility: visible; }
+
+/* Reduced motion: movement becomes a fade, timing stays the same. The FlipRoot
+   handles flights in code; these swap the keyframes for their fade twins. */
+@media (prefers-reduced-motion: reduce) {
+  [data-motion] .zk-die.rolling { animation-name: zk-fade; }
+  [data-motion] .zk-card-flipper { transition-property: opacity; }
+  [data-motion] .zk-lit { animation: none; box-shadow: 0 0 0 4px var(--highlight); }
+}
+[data-motion='reduced'] .zk-die.rolling { animation-name: zk-fade; }
+[data-motion='reduced'] .zk-card-flipper { transition-property: opacity; }
+[data-motion='reduced'] .zk-lit { animation: none; box-shadow: 0 0 0 4px var(--highlight); }
