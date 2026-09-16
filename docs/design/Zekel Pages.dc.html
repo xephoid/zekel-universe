@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>body{margin:0}a{color:#1f4d3a}a:hover{color:#e0762b}@keyframes zk-fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}</style>
+</helmet>
+<div style="width:1440px;height:900px;background:#f7f1e6;color:#1c1a17;font-family:'IBM Plex Sans',sans-serif;display:flex;flex-direction:column;overflow:hidden;border-radius:12px;position:relative" data-screen-label="{{ screenLabel }}">
+  <!-- nav -->
+  <div style="height:60px;flex:none;display:flex;align-items:center;gap:28px;padding:0 40px;background:#fff;border-bottom:1px solid rgba(28,26,23,.1)">
+    <button onClick="{{ goHome }}" style="display:inline-flex;align-items:center;gap:1px;font:700 24px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:#1f4d3a;background:none;border:none;padding:0;cursor:pointer">ze<span style="display:inline-block;width:20px;height:20px;position:relative;transform:rotate(-90deg);margin:0 1px"><span style="position:absolute;left:50%;top:0;width:34%;height:34%;transform:translateX(-50%);border-radius:50%;background:#e0762b"></span><span style="position:absolute;left:0;top:28%;width:100%;height:24%;border-radius:999px;background:#1f4d3a"></span><span style="position:absolute;left:50%;top:40%;width:48%;height:36%;transform:translateX(-50%);border-radius:3px 3px 1px 1px;background:#1f4d3a"></span><span style="position:absolute;left:14%;bottom:0;width:32%;height:38%;border-radius:3px;transform:rotate(14deg);transform-origin:top center;background:#1f4d3a"></span><span style="position:absolute;right:14%;bottom:0;width:32%;height:38%;border-radius:3px;transform:rotate(-14deg);transform-origin:top center;background:#1f4d3a"></span></span>el</button>
+    <div style="display:flex;gap:22px;font-size:14px;font-weight:500">
+      <button onClick="{{ goHome }}" style="background:none;border:none;padding:0;cursor:pointer;font:500 14px 'IBM Plex Sans',sans-serif;color:{{ navBrowse }}">Browse</button>
+      <button onClick="{{ goHome }}" style="background:none;border:none;padding:0;cursor:pointer;font:500 14px 'IBM Plex Sans',sans-serif;color:#6b655b;display:flex;align-items:center;gap:6px">My tables<span style="font:600 11px 'IBM Plex Mono',monospace;background:#fbe3d2;color:#7a3a12;padding:1px 6px;border-radius:999px">1</span></button>
+      <span style="color:#6b655b">Designers</span>
+    </div>
+    <div style="flex:1;max-width:420px;height:36px;border-radius:8px;background:#efe7d8;display:flex;align-items:center;padding:0 12px;color:#6b655b;font-size:13px;margin-left:auto">Search games, designers, tags</div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:32px;height:32px;border-radius:50%;background:#f5a623;border:2px solid #1c1a17;display:grid;place-items:center;font:600 13px 'IBM Plex Mono',monospace">M</div>
+      <span style="font-size:14px;font-weight:500">Maya</span>
+    </div>
+  </div>
+
+  <div style="flex:1;overflow:auto;min-height:0">
+    <!-- ================= HOME ================= -->
+    <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:32px 40px 56px;display:flex;flex-direction:column;gap:40px;animation:zk-fadein .25s ease-out">
+        <sc-if value="{{ true }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;align-items:baseline;gap:12px"><span style="font:700 26px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em">My tables</span><span style="font-size:13px;color:#6b655b">One is waiting on you.</span></div>
+            <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:14px">
+              <button onClick="{{ goTable }}" style="text-align:left;display:flex;gap:16px;padding:16px;border-radius:12px;background:#fff;border:2px solid #e0762b;box-shadow:0 1px 2px rgba(28,26,23,.06),0 4px 12px rgba(28,26,23,.06);cursor:pointer;font-family:'IBM Plex Sans',sans-serif;color:#1c1a17">
+                <div style="width:84px;height:84px;border-radius:8px;background:#f5a623;flex:none;display:grid;place-items:center;font:700 34px 'Bricolage Grotesque',sans-serif;color:#1c1a17">S</div>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">
+                  <span style="font-size:12px;font-weight:600;color:#7a3a12;background:#fbe3d2;padding:2px 8px;border-radius:999px;align-self:flex-start">Your move</span>
+                  <div style="font:700 18px 'Bricolage Grotesque',sans-serif">Sweetlands Imperium</div>
+                  <div style="font-size:13px;color:#6b655b">Round 6 · with Sam, Fudge (AI), Cheesecake (AI) · Sam moved 2 hours ago</div>
+                </div>
+                <div style="align-self:center;height:40px;padding:0 18px;border-radius:8px;background:#e0762b;color:#fff;font-weight:600;font-size:14px;display:grid;place-items:center">Take your turn</div>
+              </button>
+              <div style="display:flex;gap:14px;padding:16px;border-radius:12px;background:#fff;border:1px solid rgba(28,26,23,.1)">
+                <div style="width:56px;height:56px;border-radius:8px;background:#1f2a44;flex:none;display:grid;place-items:center;font:700 24px 'Bricolage Grotesque',sans-serif;color:#fff">C</div>
+                <div style="display:flex;flex-direction:column;gap:4px;min-width:0"><span style="font-size:12px;color:#6b655b">In progress</span><div style="font:700 15px 'Bricolage Grotesque',sans-serif">Cybernoir 2127</div><div style="font-size:12px;color:#6b655b">Waiting on Priya · by turns</div></div>
+              </div>
+              <div style="display:flex;gap:14px;padding:16px;border-radius:12px;background:#fff;border:1px solid rgba(28,26,23,.1)">
+                <div style="width:56px;height:56px;border-radius:8px;background:#b3261e;flex:none;display:grid;place-items:center;font:700 24px 'Bricolage Grotesque',sans-serif;color:#fff">F</div>
+                <div style="display:flex;flex-direction:column;gap:4px;min-width:0;flex:1"><span style="font-size:12px;color:#6b655b">Invitation from Leo</span><div style="font:700 15px 'Bricolage Grotesque',sans-serif">Fractured Fist</div><div style="display:flex;gap:6px;margin-top:2px"><span style="font-size:12px;font-weight:600;color:#1f4d3a;text-decoration:underline">Join</span><span style="font-size:12px;color:#6b655b">·</span><span style="font-size:12px;color:#6b655b">Decline</span></div></div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <div style="display:grid;grid-template-columns:1fr 340px;gap:40px;align-items:start">
+          <div style="display:flex;flex-direction:column;gap:36px;min-width:0">
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div style="font:700 26px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em">Featured</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                <sc-for list="{{ featured }}" as="g" hint-placeholder-count="2">
+                  <button onClick="{{ g.open }}" style="text-align:left;padding:0;border:none;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 2px rgba(28,26,23,.06),0 4px 12px rgba(28,26,23,.06);cursor:pointer;font-family:'IBM Plex Sans',sans-serif;color:#1c1a17;display:flex;flex-direction:column" style-hover="box-shadow:0 8px 24px rgba(28,26,23,.14)">
+                    <div style="height:200px;background:{{ g.hex }};display:flex;align-items:flex-end;justify-content:space-between;padding:14px 16px;box-sizing:border-box"><span style="font:700 64px 'Bricolage Grotesque',sans-serif;color:{{ g.onHex }};line-height:1;letter-spacing:-.03em">{{ g.initial }}</span><span style="font:500 11px 'IBM Plex Mono',monospace;color:{{ g.onHex }};opacity:.7">cover art</span></div>
+                    <div style="padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px">
+                      <div style="font:700 20px 'Bricolage Grotesque',sans-serif;letter-spacing:-.01em">{{ g.name }}</div>
+                      <div style="font-size:13px;color:#6b655b">by {{ g.designer }} · {{ g.players }} · {{ g.time }}</div>
+                      <div style="font-size:13px;line-height:1.45;margin-top:2px">{{ g.blurb }}</div>
+                    </div>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                <span style="font:700 26px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;margin-right:8px">Newest</span>
+                <sc-for list="{{ filters }}" as="f" hint-placeholder-count="5"><span style="height:30px;padding:0 12px;border-radius:999px;border:1px solid rgba(28,26,23,.14);background:{{ f.bg }};color:{{ f.fg }};font-size:13px;font-weight:500;display:inline-flex;align-items:center;gap:6px">{{ f.name }}<span style="font-size:10px;opacity:.7">▾</span></span></sc-for>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+                <sc-for list="{{ newest }}" as="g" hint-placeholder-count="4">
+                  <button onClick="{{ g.open }}" style="text-align:left;padding:0;border:none;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 2px rgba(28,26,23,.06),0 4px 12px rgba(28,26,23,.06);cursor:pointer;font-family:'IBM Plex Sans',sans-serif;color:#1c1a17;display:flex;flex-direction:column" style-hover="box-shadow:0 8px 24px rgba(28,26,23,.14)">
+                    <div style="aspect-ratio:1;background:{{ g.hex }};display:flex;align-items:flex-end;justify-content:space-between;padding:12px;box-sizing:border-box"><span style="font:700 44px 'Bricolage Grotesque',sans-serif;color:{{ g.onHex }};line-height:1;letter-spacing:-.03em">{{ g.initial }}</span><span style="font:500 10px 'IBM Plex Mono',monospace;color:{{ g.onHex }};opacity:.7">cover art</span></div>
+                    <div style="padding:12px 14px 14px;display:flex;flex-direction:column;gap:4px">
+                      <div style="font:700 16px 'Bricolage Grotesque',sans-serif">{{ g.name }}</div>
+                      <div style="font-size:12px;color:#6b655b">by {{ g.designer }}</div>
+                      <div style="font-size:12px;color:#6b655b">{{ g.players }} · {{ g.time }}</div>
+                    </div>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+          <!-- feed -->
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="font:700 20px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em">Updates</div>
+            <sc-for list="{{ feed }}" as="u" hint-placeholder-count="4">
+              <div style="display:flex;gap:12px;padding:14px 0;border-top:1px solid rgba(28,26,23,.1)">
+                <div style="width:36px;height:36px;border-radius:8px;background:{{ u.hex }};flex:none;display:grid;place-items:center;font:700 16px 'Bricolage Grotesque',sans-serif;color:{{ u.onHex }}">{{ u.initial }}</div>
+                <div style="display:flex;flex-direction:column;gap:3px;min-width:0"><div style="font-size:12px;color:#6b655b"><span style="font-weight:600;color:#1c1a17">{{ u.who }}</span> · {{ u.game }} · {{ u.when }}</div><div style="font-size:14px;line-height:1.4">{{ u.text }}</div></div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ================= GAME PAGE ================= -->
+    <sc-if value="{{ isGameish }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:28px 40px 56px;display:flex;flex-direction:column;gap:32px;animation:zk-fadein .25s ease-out">
+        <button onClick="{{ goHome }}" style="align-self:flex-start;background:none;border:none;padding:0;cursor:pointer;font:500 13px 'IBM Plex Sans',sans-serif;color:#6b655b">‹ Browse</button>
+        <div style="display:grid;grid-template-columns:420px 1fr;gap:40px;align-items:start">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="aspect-ratio:1;border-radius:12px;background:#f5a623;display:flex;align-items:flex-end;justify-content:space-between;padding:20px;box-sizing:border-box;box-shadow:0 1px 2px rgba(28,26,23,.06),0 4px 12px rgba(28,26,23,.06)"><span style="font:700 120px 'Bricolage Grotesque',sans-serif;color:#1c1a17;line-height:1;letter-spacing:-.04em">S</span><span style="font:500 12px 'IBM Plex Mono',monospace;color:#1c1a17;opacity:.7">cover art</span></div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+              <sc-for list="{{ shots }}" as="s" hint-placeholder-count="4"><div style="aspect-ratio:4/3;border-radius:6px;background:{{ s.bg }};border:1px solid rgba(28,26,23,.1);display:grid;place-items:center;font:500 10px 'IBM Plex Mono',monospace;color:#6b655b">{{ s.label }}</div></sc-for>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:18px">
+            <div>
+              <div style="font:700 44px 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;line-height:1.05">Sweetlands Imperium</div>
+              <div style="font-size:15px;color:#6b655b;margin-top:8px">by <button onClick="{{ goProfile }}" style="background:none;border:none;padding:0;cursor:pointer;font:500 15px 'IBM Plex Sans',sans-serif;color:#1f4d3a;text-decoration:underline">Confectionery Games</button></div>
+            </div>
+            <div style="display:flex;gap:10px">
+              <span style="height:30px;padding:0 12px;border-radius:999px;background:#efe7d8;font-size:13px;font-weight:500;display:inline-flex;align-items:center">2–5 players</span>
+              <span style="height:30px;padding:0 12px;border-radius:999px;background:#efe7d8;font-size:13px;font-weight:500;display:inline-flex;align-items:center">60–90 min</span>
+              <span style="height:30px;padding:0 12px;border-radius:999px;background:#efe7d8;font-size:13px;font-weight:500;display:inline-flex;align-items:center">Area control</span>
+              <span style="height:30px;padding:0 12px;border-radius:999px;background:#efe7d8;font-size:13px;font-weight:500;display:inline-flex;align-items:center">Cards</span>
+            </div>
+            <div style="font-size:16px;line-height:1.55;max-width:620px">Four candy kingdoms, a shared deck of Intel, and a dragon in the castle at the center. Move your Leader, Knight and Ambassador around the ring by color, collect taxes from rivals who wander into your region, and be the first to five points.</div>
+            <div style="display:flex;gap:12px;margin-top:6px">
+              <button onClick="{{ playNow }}" style="height:52px;padding:0 26px;border-radius:12px;border:none;background:#e0762b;color:#fff;font:600 16px 'IBM Plex Sans',sans-serif;cursor:pointer;box-shadow:0 3px 0 #c9662a" style-hover="background:#c9662a" style-active="transform:translateY(2px);box-shadow:none">Play now</button>
+              <button onClick="{{ playFriends }}" style="height:52px;padding:0 22px;border-radius:12px;border:2px solid #1f4d3a;background:transparent;color:#1f4d3a;font:600 16px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:#e6efe9">Play with friends</button>
+            </div>
+            <div style="font-size:13px;color:#6b655b">Play now starts a table against the AI right away. No account needed. <a href="#" style="color:#1f4d3a">Read the rules</a></div>
+          </div>
+        </div>
+        <div style="max-width:760px;display:flex;flex-direction:column;gap:6px">
+          <div style="font:700 22px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;margin-bottom:8px">Updates from Confectionery Games</div>
+          <sc-for list="{{ devlog }}" as="d" hint-placeholder-count="3">
+            <div style="display:grid;grid-template-columns:110px 1fr;gap:16px;padding:16px 0;border-top:1px solid rgba(28,26,23,.1)">
+              <div style="font:500 12px 'IBM Plex Mono',monospace;color:#6b655b;padding-top:3px">{{ d.when }}</div>
+              <div><div style="font-weight:600;font-size:15px">{{ d.title }}</div><div style="font-size:14px;line-height:1.5;color:#1c1a17;margin-top:4px">{{ d.text }}</div></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ================= TABLE SETUP ================= -->
+    <sc-if value="{{ isSetup }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:28px 40px 56px;display:grid;grid-template-columns:1fr 360px;gap:40px;align-items:start;animation:zk-fadein .25s ease-out">
+        <div style="display:flex;flex-direction:column;gap:28px;max-width:720px">
+          <div>
+            <button onClick="{{ goGame }}" style="background:none;border:none;padding:0;cursor:pointer;font:500 13px 'IBM Plex Sans',sans-serif;color:#6b655b">‹ Sweetlands Imperium</button>
+            <div style="font:700 36px 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;margin-top:10px">Set up the table</div>
+          </div>
+          <!-- seats -->
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:center;justify-content:space-between"><span style="font:700 18px 'Bricolage Grotesque',sans-serif">Seats</span>
+              <div style="display:flex;align-items:center;gap:4px;background:#fff;border:1px solid rgba(28,26,23,.14);border-radius:8px;padding:2px">
+                <button onClick="{{ fewer }}" style="width:32px;height:30px;border:none;background:transparent;font:600 16px 'IBM Plex Mono',monospace;cursor:pointer;color:#1c1a17;border-radius:6px" style-hover="background:#efe7d8">−</button>
+                <span style="font:600 14px 'IBM Plex Mono',monospace;min-width:80px;text-align:center">{{ seatCount }} players</span>
+                <button onClick="{{ more }}" style="width:32px;height:30px;border:none;background:transparent;font:600 16px 'IBM Plex Mono',monospace;cursor:pointer;color:#1c1a17;border-radius:6px" style-hover="background:#efe7d8">+</button>
+              </div>
+            </div>
+            <sc-for list="{{ seatRows }}" as="s" hint-placeholder-count="4">
+              <div style="display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:12px;background:#fff;border:1px solid rgba(28,26,23,.1)">
+                <div style="width:36px;height:36px;border-radius:50%;background:{{ s.hex }};border:2px solid #1c1a17;display:grid;place-items:center;font:600 13px 'IBM Plex Mono',monospace;color:{{ s.ink }}">{{ s.initial }}</div>
+                <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px">{{ s.name }}</div><div style="font-size:12px;color:#6b655b">{{ s.sub }}</div></div>
+                <sc-if value="{{ s.editable }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex;background:#efe7d8;border-radius:8px;padding:2px">
+                    <button onClick="{{ s.setAI }}" style="height:30px;padding:0 12px;border:none;border-radius:6px;background:{{ s.aiBg }};color:{{ s.aiFg }};font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;box-shadow:{{ s.aiShadow }}">AI</button>
+                    <button onClick="{{ s.setFriend }}" style="height:30px;padding:0 12px;border:none;border-radius:6px;background:{{ s.frBg }};color:{{ s.frFg }};font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;box-shadow:{{ s.frShadow }}">Friend</button>
+                  </div>
+                  <sc-if value="{{ s.isAI }}" hint-placeholder-val="{{ true }}">
+                    <div style="display:flex;gap:4px">
+                      <sc-for list="{{ s.levels }}" as="l" hint-placeholder-count="3"><button onClick="{{ l.set }}" style="height:30px;padding:0 10px;border-radius:999px;border:1px solid {{ l.line }};background:{{ l.bg }};color:{{ l.fg }};font:500 12px 'IBM Plex Sans',sans-serif;cursor:pointer">{{ l.name }}</button></sc-for>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ s.isFriend }}" hint-placeholder-val="{{ false }}">
+                    <span style="font-size:13px;color:#6b655b">Invite from the lobby</span>
+                  </sc-if>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <!-- pace -->
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <span style="font:700 18px 'Bricolage Grotesque',sans-serif">Live or by turns</span>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <button onClick="{{ setLive }}" style="text-align:left;padding:14px 16px;border-radius:12px;background:#fff;border:2px solid {{ liveLine }};cursor:pointer;font-family:'IBM Plex Sans',sans-serif;color:#1c1a17"><div style="font-weight:600;font-size:14px">Live</div><div style="font-size:13px;color:#6b655b;margin-top:3px">Everyone plays now, in one sitting.</div></button>
+              <button onClick="{{ setTurns }}" style="text-align:left;padding:14px 16px;border-radius:12px;background:#fff;border:2px solid {{ turnsLine }};cursor:{{ turnsCursor }};opacity:{{ turnsOpacity }};font-family:'IBM Plex Sans',sans-serif;color:#1c1a17"><div style="font-weight:600;font-size:14px">By turns</div><div style="font-size:13px;color:#6b655b;margin-top:3px">{{ turnsSub }}</div></button>
+            </div>
+          </div>
+          <!-- game's own choices -->
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div><span style="font:700 18px 'Bricolage Grotesque',sans-serif">Your kingdom</span><span style="font-size:13px;color:#6b655b;margin-left:10px">Sweetlands asks every player to pick one.</span></div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+              <sc-for list="{{ kingdoms }}" as="k" hint-placeholder-count="4">
+                <button onClick="{{ k.pick }}" style="text-align:left;padding:14px;border-radius:12px;background:#fff;border:2px solid {{ k.line }};cursor:pointer;font-family:'IBM Plex Sans',sans-serif;color:#1c1a17;display:flex;flex-direction:column;gap:10px;box-shadow:{{ k.shadow }}">
+                  <div style="width:40px;height:40px;border-radius:50%;background:{{ k.hex }};border:2px solid #1c1a17"></div>
+                  <div><div style="font-weight:600;font-size:14px">{{ k.name }}</div><div style="font-size:12px;color:#6b655b;margin-top:2px;line-height:1.35">{{ k.perk }}</div></div>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+        <!-- summary -->
+        <div style="position:sticky;top:0;display:flex;flex-direction:column;gap:14px;padding:18px;border-radius:12px;background:#fff;border:1px solid rgba(28,26,23,.1);box-shadow:0 1px 2px rgba(28,26,23,.06),0 4px 12px rgba(28,26,23,.06)">
+          <div style="display:flex;gap:12px;align-items:center"><div style="width:48px;height:48px;border-radius:8px;background:#f5a623;display:grid;place-items:center;font:700 22px 'Bricolage Grotesque',sans-serif">S</div><div><div style="font:700 16px 'Bricolage Grotesque',sans-serif">Sweetlands Imperium</div><div style="font-size:12px;color:#6b655b">{{ summaryLine }}</div></div></div>
+          <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;border-top:1px solid rgba(28,26,23,.1);padding-top:12px">
+            <sc-for list="{{ summarySeats }}" as="s" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:8px"><span style="width:10px;height:10px;border-radius:50%;background:{{ s.hex }};border:1.5px solid #1c1a17"></span><span style="flex:1">{{ s.name }}</span><span style="color:#6b655b">{{ s.sub }}</span></div></sc-for>
+          </div>
+          <button onClick="{{ startTable }}" style="height:52px;border-radius:12px;border:none;background:{{ startBg }};color:{{ startFg }};font:600 16px 'IBM Plex Sans',sans-serif;cursor:pointer;box-shadow:0 3px 0 {{ startShadow }}" style-hover="filter:brightness(.95)" style-active="transform:translateY(2px);box-shadow:none">{{ startLabel }}</button>
+          <div style="font-size:12px;color:#6b655b;text-align:center">{{ startHint }}</div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ================= LOBBY ================= -->
+    <sc-if value="{{ isLobby }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:28px 40px 56px;display:grid;grid-template-columns:1fr 360px;gap:40px;align-items:start;animation:zk-fadein .25s ease-out">
+        <div style="display:flex;flex-direction:column;gap:24px;max-width:720px">
+          <div>
+            <button onClick="{{ goSetup }}" style="background:none;border:none;padding:0;cursor:pointer;font:500 13px 'IBM Plex Sans',sans-serif;color:#6b655b">‹ Table setup</button>
+            <div style="font:700 36px 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;margin-top:10px">Waiting for the table to fill</div>
+            <div style="font-size:15px;color:#6b655b;margin-top:6px">{{ lobbySub }}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <sc-for list="{{ lobbySeats }}" as="s" hint-placeholder-count="4">
+              <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:12px;background:{{ s.bg }};border:{{ s.border }};animation:zk-fadein .3s ease-out">
+                <div style="width:40px;height:40px;border-radius:50%;background:{{ s.hex }};border:2px {{ s.avatarBorder }} #1c1a17;display:grid;place-items:center;font:600 14px 'IBM Plex Mono',monospace;color:{{ s.ink }}">{{ s.initial }}</div>
+                <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:15px;color:{{ s.nameColor }}">{{ s.name }}</div><div style="font-size:12px;color:#6b655b">{{ s.sub }}</div></div>
+                <span style="font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;background:{{ s.tagBg }};color:{{ s.tagFg }}">{{ s.tag }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:12px;align-items:center">
+            <button onClick="{{ toggleReady }}" style="height:44px;padding:0 20px;border-radius:12px;border:2px solid #1f4d3a;background:{{ readyBg }};color:{{ readyFg }};font:600 15px 'IBM Plex Sans',sans-serif;cursor:pointer">{{ readyLabel }}</button>
+            <button onClick="{{ beginGame }}" style="height:44px;padding:0 24px;border-radius:12px;border:none;background:{{ beginBg }};color:{{ beginFg }};font:600 15px 'IBM Plex Sans',sans-serif;cursor:{{ beginCursor }};box-shadow:0 3px 0 {{ beginShadow }}">Start the game</button>
+            <span style="font-size:13px;color:#6b655b">{{ beginHint }}</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;flex-direction:column;gap:10px;padding:18px;border-radius:12px;background:#fff;border:1px solid rgba(28,26,23,.1)">
+            <div style="font:700 16px 'Bricolage Grotesque',sans-serif">Invite link</div>
+            <div style="display:flex;gap:6px"><div style="flex:1;height:38px;border-radius:8px;background:#efe7d8;display:flex;align-items:center;padding:0 12px;font:500 12px 'IBM Plex Mono',monospace;color:#1c1a17;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">zekel.games/t/sweet-castle-42</div><button onClick="{{ copyLink }}" style="height:38px;padding:0 14px;border-radius:8px;border:none;background:#1f4d3a;color:#fff;font:600 13px 'IBM Plex Sans',sans-serif;cursor:pointer">{{ copyLabel }}</button></div>
+            <div style="font-size:12px;color:#6b655b">Anyone with the link takes an open seat. They can play as a guest.</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;padding:18px;border-radius:12px;background:#fff;border:1px solid rgba(28,26,23,.1)">
+            <div style="font:700 16px 'Bricolage Grotesque',sans-serif;margin-bottom:6px">Invite friends</div>
+            <sc-for list="{{ friends }}" as="f" hint-placeholder-count="4">
+              <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid rgba(28,26,23,.08)">
+                <div style="position:relative;width:32px;height:32px;border-radius:50%;background:{{ f.hex }};border:2px solid #1c1a17;display:grid;place-items:center;font:600 12px 'IBM Plex Mono',monospace;color:{{ f.ink }}">{{ f.initial }}<span style="position:absolute;right:-2px;bottom:-2px;width:10px;height:10px;border-radius:50%;background:{{ f.dot }};border:2px solid #fff"></span></div>
+                <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">{{ f.name }}</div><div style="font-size:11px;color:#6b655b">{{ f.status }}</div></div>
+                <button onClick="{{ f.invite }}" style="height:30px;padding:0 12px;border-radius:8px;border:1px solid {{ f.btnLine }};background:{{ f.btnBg }};color:{{ f.btnFg }};font:500 12px 'IBM Plex Sans',sans-serif;cursor:pointer">{{ f.btn }}</button>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ================= PROFILE ================= -->
+    <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:28px 40px 56px;display:grid;grid-template-columns:1fr 360px;gap:40px;align-items:start;animation:zk-fadein .25s ease-out">
+        <div style="display:flex;flex-direction:column;gap:32px">
+          <div style="display:flex;gap:24px;align-items:center">
+            <div style="width:112px;height:112px;border-radius:50%;background:#f5a623;border:3px solid #1c1a17;display:grid;place-items:center;font:700 44px 'Bricolage Grotesque',sans-serif;color:#1c1a17">C</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;align-items:center;gap:12px"><span style="font:700 40px 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;line-height:1">Confectionery Games</span><span style="font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;background:#dde9e1;color:#1f4d3a">Designer</span></div>
+              <div style="font-size:15px;line-height:1.5;max-width:560px;color:#1c1a17">Two people in Lisbon making sugary games about sharp politics. Sweetlands Imperium is our first; the sequel is in playtest.</div>
+              <div style="display:flex;gap:18px;font-size:13px;color:#6b655b"><span><span style="font:600 14px 'IBM Plex Mono',monospace;color:#1c1a17">1,284</span> tables played</span><span><span style="font:600 14px 'IBM Plex Mono',monospace;color:#1c1a17">2</span> games</span><span><span style="font:600 14px 'IBM Plex Mono',monospace;color:#1c1a17">318</span> followers</span></div>
+            </div>
+            <button style="margin-left:auto;align-self:flex-start;height:40px;padding:0 18px;border-radius:8px;border:2px solid #1f4d3a;background:transparent;color:#1f4d3a;font:600 14px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:#e6efe9">Follow</button>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="font:700 22px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em">Games</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+              <button onClick="{{ goGame }}" style="text-align:left;padding:0;border:none;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 2px rgba(28,26,23,.06),0 4px 12px rgba(28,26,23,.06);cursor:pointer;font-family:'IBM Plex Sans',sans-serif;color:#1c1a17;display:flex" style-hover="box-shadow:0 8px 24px rgba(28,26,23,.14)">
+                <div style="width:140px;flex:none;background:#f5a623;display:flex;align-items:flex-end;padding:12px;box-sizing:border-box"><span style="font:700 48px 'Bricolage Grotesque',sans-serif;line-height:1;letter-spacing:-.03em">S</span></div>
+                <div style="padding:14px 16px;display:flex;flex-direction:column;gap:6px;flex:1"><div style="font:700 18px 'Bricolage Grotesque',sans-serif">Sweetlands Imperium</div><div style="font-size:13px;color:#6b655b">2–5 players · 60–90 min</div><div style="font-size:13px;line-height:1.4">Four candy kingdoms fight for the castle.</div><div style="margin-top:auto;font-size:13px;font-weight:600;color:#1f4d3a">Play now ›</div></div>
+              </button>
+              <div style="text-align:left;padding:0;background:#fff;border-radius:12px;overflow:hidden;border:2px dashed rgba(28,26,23,.14);display:flex;opacity:.8">
+                <div style="width:140px;flex:none;background:#efe7d8;display:flex;align-items:flex-end;padding:12px;box-sizing:border-box"><span style="font:700 48px 'Bricolage Grotesque',sans-serif;line-height:1;letter-spacing:-.03em;color:#6b655b">N</span></div>
+                <div style="padding:14px 16px;display:flex;flex-direction:column;gap:6px"><div style="font:700 18px 'Bricolage Grotesque',sans-serif">Nougat Wars</div><div style="font-size:13px;color:#6b655b">In playtest · not yet public</div><div style="font-size:13px;line-height:1.4">Follow to hear when it opens.</div></div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;max-width:760px">
+            <div style="font:700 22px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;margin-bottom:8px">Updates</div>
+            <sc-for list="{{ devlog }}" as="d" hint-placeholder-count="3">
+              <div style="display:grid;grid-template-columns:110px 1fr;gap:16px;padding:16px 0;border-top:1px solid rgba(28,26,23,.1)">
+                <div style="font:500 12px 'IBM Plex Mono',monospace;color:#6b655b;padding-top:3px">{{ d.when }}</div>
+                <div><div style="font-weight:600;font-size:15px">{{ d.title }}</div><div style="font-size:14px;line-height:1.5;margin-top:4px">{{ d.text }}</div></div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <!-- your own side: friends -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;flex-direction:column;gap:6px;padding:18px;border-radius:12px;background:#fff;border:1px solid rgba(28,26,23,.1)">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><span style="font:700 16px 'Bricolage Grotesque',sans-serif">Your friends</span><span style="font-size:12px;color:#6b655b">2 online</span></div>
+            <sc-for list="{{ friends }}" as="f" hint-placeholder-count="4">
+              <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid rgba(28,26,23,.08)">
+                <div style="position:relative;width:32px;height:32px;border-radius:50%;background:{{ f.hex }};border:2px solid #1c1a17;display:grid;place-items:center;font:600 12px 'IBM Plex Mono',monospace;color:{{ f.ink }}">{{ f.initial }}<span style="position:absolute;right:-2px;bottom:-2px;width:10px;height:10px;border-radius:50%;background:{{ f.dot }};border:2px solid #fff"></span></div>
+                <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">{{ f.name }}</div><div style="font-size:11px;color:#6b655b">{{ f.status }}</div></div>
+                <button onClick="{{ goSetupFriends }}" style="height:30px;padding:0 12px;border-radius:8px;border:1px solid rgba(28,26,23,.14);background:#fff;color:#1c1a17;font:500 12px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:#efe7d8">Invite to a table</button>
+              </div>
+            </sc-for>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 0 2px;border-top:1px solid rgba(28,26,23,.08)">
+              <div style="width:32px;height:32px;border-radius:50%;background:#29adff;border:2px solid #1c1a17;display:grid;place-items:center;font:600 12px 'IBM Plex Mono',monospace">J</div>
+              <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">Jonas wants to be friends</div></div>
+              <button style="height:30px;padding:0 12px;border-radius:8px;border:none;background:#1f4d3a;color:#fff;font:600 12px 'IBM Plex Sans',sans-serif;cursor:pointer">Accept</button>
+              <button style="height:30px;padding:0 8px;border-radius:8px;border:none;background:transparent;color:#6b655b;font:500 12px 'IBM Plex Sans',sans-serif;cursor:pointer">Ignore</button>
+            </div>
+          </div>
+          <div style="font-size:12px;color:#6b655b;line-height:1.5;padding:0 4px">This is a designer's profile as it looks to a signed-in visitor. Your friends list rides along on the right and stays put on every profile.</div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ================= SIGN-IN (over the game page) ================= -->
+    <sc-if value="{{ isSignin }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;z-index:20;background:rgba(28,26,23,.4);display:grid;place-items:center;animation:zk-fadein .2s ease-out">
+        <div style="width:420px;background:#fff;border-radius:12px;box-shadow:0 8px 30px rgba(28,26,23,.25);padding:28px;display:flex;flex-direction:column;gap:18px;position:relative">
+          <button onClick="{{ goGame }}" style="position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:8px;border:none;background:transparent;color:#6b655b;font-size:18px;cursor:pointer" style-hover="background:#efe7d8">×</button>
+          <div style="display:inline-flex;align-items:center;gap:1px;font:700 28px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:#1f4d3a">ze<span style="display:inline-block;width:24px;height:24px;position:relative;transform:rotate(-90deg);margin:0 1px"><span style="position:absolute;left:50%;top:0;width:34%;height:34%;transform:translateX(-50%);border-radius:50%;background:#e0762b"></span><span style="position:absolute;left:0;top:28%;width:100%;height:24%;border-radius:999px;background:#1f4d3a"></span><span style="position:absolute;left:50%;top:40%;width:48%;height:36%;transform:translateX(-50%);border-radius:3px 3px 1px 1px;background:#1f4d3a"></span><span style="position:absolute;left:14%;bottom:0;width:32%;height:38%;border-radius:3px;transform:rotate(14deg);transform-origin:top center;background:#1f4d3a"></span><span style="position:absolute;right:14%;bottom:0;width:32%;height:38%;border-radius:3px;transform:rotate(-14deg);transform-origin:top center;background:#1f4d3a"></span></span>el</div>
+          <div><div style="font:700 24px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em">Sign in to play with friends</div><div style="font-size:14px;color:#6b655b;margin-top:6px;line-height:1.5">No password. Pick one and we'll bring you straight back to this table.</div></div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <sc-for list="{{ providers }}" as="p" hint-placeholder-count="3"><button onClick="{{ p.go }}" style="height:46px;border-radius:8px;border:1px solid rgba(28,26,23,.16);background:#fff;color:#1c1a17;font:500 14px 'IBM Plex Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:12px;padding:0 16px" style-hover="background:#f7f1e6"><span style="width:20px;height:20px;border-radius:50%;background:{{ p.hex }};display:inline-block"></span>Continue with {{ p.name }}</button></sc-for>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;color:#6b655b;font-size:12px"><span style="flex:1;height:1px;background:rgba(28,26,23,.1)"></span>or<span style="flex:1;height:1px;background:rgba(28,26,23,.1)"></span></div>
+          <div style="display:flex;gap:8px"><div style="flex:1;height:46px;border-radius:8px;border:1px solid rgba(28,26,23,.16);background:#fff;display:flex;align-items:center;padding:0 14px;color:#6b655b;font-size:14px">you@example.com</div><button onClick="{{ goSetupFriends }}" style="height:46px;padding:0 16px;border-radius:8px;border:none;background:#1f4d3a;color:#fff;font:600 14px 'IBM Plex Sans',sans-serif;cursor:pointer">Email me a link</button></div>
+          <div style="font-size:12px;color:#6b655b;line-height:1.5">Just want to try it? <button onClick="{{ playNow }}" style="background:none;border:none;padding:0;font:600 12px 'IBM Plex Sans',sans-serif;color:#1f4d3a;cursor:pointer;text-decoration:underline">Play the AI as a guest</button>, no account needed.</div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ================= END OF GAME (over the table) ================= -->
+    <sc-if value="{{ isEnd }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;z-index:5;overflow:hidden">
+        <div style="filter:saturate(.7);pointer-events:none"><dc-import name="Sweetlands Table" theme="light" layout="bench" hint-size="1440px,900px" style="width:1440px;height:900px"></dc-import></div>
+        <div style="position:absolute;inset:0;background:rgba(28,26,23,.45);display:grid;place-items:center;animation:zk-fadein .3s ease-out">
+          <div style="width:520px;background:#fff;border-radius:12px;box-shadow:0 8px 30px rgba(28,26,23,.3);padding:28px 30px;display:flex;flex-direction:column;gap:20px">
+            <div><div style="font:500 12px 'IBM Plex Mono',monospace;color:#6b655b">Sweetlands Imperium · round 9</div><div style="font:700 36px 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;line-height:1.05;margin-top:4px">Sam takes the castle.</div><div style="font-size:14px;color:#6b655b;margin-top:6px">Princess Jellybean reached five points. You finished second, one point short.</div></div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <sc-for list="{{ results }}" as="r" hint-placeholder-count="4">
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;background:{{ r.bg }}">
+                  <span style="font:600 13px 'IBM Plex Mono',monospace;color:#6b655b;width:16px">{{ r.place }}</span>
+                  <div style="width:30px;height:30px;border-radius:50%;background:{{ r.hex }};border:2px solid #1c1a17;display:grid;place-items:center;font:600 12px 'IBM Plex Mono',monospace;color:{{ r.ink }}">{{ r.initial }}</div>
+                  <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px">{{ r.name }}</div><div style="font-size:12px;color:#6b655b">{{ r.sub }}</div></div>
+                  <span style="font:600 20px 'IBM Plex Mono',monospace;color:{{ r.ptsColor }}">{{ r.pts }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:10px">
+              <button onClick="{{ goSetup }}" style="height:46px;padding:0 20px;border-radius:12px;border:none;background:#e0762b;color:#fff;font:600 15px 'IBM Plex Sans',sans-serif;cursor:pointer;box-shadow:0 3px 0 #c9662a" style-hover="background:#c9662a">Play again, same table</button>
+              <button style="height:46px;padding:0 18px;border-radius:12px;border:2px solid #1f4d3a;background:transparent;color:#1f4d3a;font:600 15px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:#e6efe9">Share result</button>
+              <button onClick="{{ goGame }}" style="height:46px;padding:0 12px;border-radius:12px;border:none;background:transparent;color:#6b655b;font:500 15px 'IBM Plex Sans',sans-serif;cursor:pointer;margin-left:auto" style-hover="color:#1c1a17">Game page</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ================= VOICE / LISTEN MODE (over the table, dark) ================= -->
+    <sc-if value="{{ isVoice }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;z-index:5;background:#1a221c;color:#f3ead9;display:flex;flex-direction:column;animation:zk-fadein .3s ease-out">
+        <div style="height:48px;display:flex;align-items:center;gap:20px;padding:0 20px;background:#232e26;border-bottom:1px solid rgba(243,234,217,.12);flex:none">
+          <div style="display:inline-flex;align-items:center;gap:1px;font:700 24px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:#f3ead9">ze<span style="display:inline-block;width:20px;height:20px;position:relative;transform:rotate(-90deg);margin:0 1px"><span style="position:absolute;left:50%;top:0;width:34%;height:34%;transform:translateX(-50%);border-radius:50%;background:#ff8a3d"></span><span style="position:absolute;left:0;top:28%;width:100%;height:24%;border-radius:999px;background:#f3ead9"></span><span style="position:absolute;left:50%;top:40%;width:48%;height:36%;transform:translateX(-50%);border-radius:3px 3px 1px 1px;background:#f3ead9"></span><span style="position:absolute;left:14%;bottom:0;width:32%;height:38%;border-radius:3px;transform:rotate(14deg);transform-origin:top center;background:#f3ead9"></span><span style="position:absolute;right:14%;bottom:0;width:32%;height:38%;border-radius:3px;transform:rotate(-14deg);transform-origin:top center;background:#f3ead9"></span></span>el</div>
+          <div style="width:1px;height:20px;background:rgba(243,234,217,.12)"></div>
+          <div style="font-weight:600;font-size:14px">Warble Way Galaxy</div>
+          <div style="font:12px 'IBM Plex Mono',monospace;color:#b1ac9f">Chapter 2 · The Drift</div>
+          <div style="flex:1"></div>
+          <button onClick="{{ goTable }}" style="height:32px;padding:0 12px;border-radius:8px;border:1px solid rgba(243,234,217,.2);background:#2f4a3a;color:#f3ead9;font:600 13px 'IBM Plex Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:50%;background:#ff8a3d"></span>Voice on · show the table</button>
+          <button style="height:32px;padding:0 12px;border-radius:8px;border:1px solid rgba(243,234,217,.12);background:transparent;color:#f3ead9;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer">Settings</button>
+          <button style="height:32px;padding:0 12px;border-radius:8px;border:none;background:transparent;color:#b1ac9f;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer">Leave</button>
+        </div>
+        <div style="flex:1;display:grid;grid-template-columns:1fr 420px;min-height:0">
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;padding:40px">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+              <div style="width:120px;height:120px;border-radius:50%;background:{{ micBg }};border:3px solid {{ micLine }};display:grid;place-items:center;box-shadow:{{ micShadow }};transition:all .3s"><div style="display:flex;gap:5px;align-items:center;height:40px"><sc-for list="{{ bars }}" as="b" hint-placeholder-count="5"><span style="width:6px;height:{{ b.h }}px;border-radius:3px;background:{{ b.bg }};transition:height .25s"></span></sc-for></div></div>
+              <div style="font:700 26px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em">{{ micLabel }}</div>
+              <div style="font-size:14px;color:#b1ac9f">{{ micSub }}</div>
+            </div>
+            <div style="width:100%;max-width:640px;padding:22px 24px;border-radius:12px;background:#232e26;border:2px solid #9bb08a;display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;align-items:center;gap:10px"><span style="font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;background:#5a2c10;color:#fbe3d2">Your move</span><span style="font:12px 'IBM Plex Mono',monospace;color:#b1ac9f">Say a number or the move</span></div>
+              <div style="font-size:17px;line-height:1.5">The hull groans. Vesper wants to vent the cargo bay to kill the fire; Odalys says the crates are worth more than the bay.</div>
+              <div style="display:flex;flex-direction:column;gap:6px;margin-top:2px">
+                <sc-for list="{{ moves }}" as="m" hint-placeholder-count="3">
+                  <button onClick="{{ m.say }}" style="text-align:left;display:flex;gap:14px;align-items:center;padding:12px 14px;border-radius:8px;background:{{ m.bg }};border:1px solid {{ m.line }};color:#f3ead9;font:15px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:#2f4a3a"><span style="font:600 14px 'IBM Plex Mono',monospace;color:#9bb08a;width:18px">{{ m.n }}</span><span style="flex:1">{{ m.text }}</span><span style="font:12px 'IBM Plex Mono',monospace;color:#b1ac9f">{{ m.check }}</span></button>
+                </sc-for>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px"><button onClick="{{ replayNarr }}" style="height:40px;padding:0 16px;border-radius:8px;border:1px solid rgba(243,234,217,.2);background:transparent;color:#f3ead9;font:500 14px 'IBM Plex Sans',sans-serif;cursor:pointer">Say that again</button><button style="height:40px;padding:0 16px;border-radius:8px;border:1px solid rgba(243,234,217,.2);background:transparent;color:#f3ead9;font:500 14px 'IBM Plex Sans',sans-serif;cursor:pointer">Read the sheet</button><button style="height:40px;padding:0 16px;border-radius:8px;border:1px solid rgba(243,234,217,.2);background:transparent;color:#f3ead9;font:500 14px 'IBM Plex Sans',sans-serif;cursor:pointer">Undo</button></div>
+          </div>
+          <div style="border-left:1px solid rgba(243,234,217,.12);background:#232e26;display:flex;flex-direction:column;min-height:0">
+            <div style="padding:14px 18px;border-bottom:1px solid rgba(243,234,217,.12);display:flex;align-items:center;justify-content:space-between"><span style="font-weight:600;font-size:13px">Transcript</span><span style="font:11px 'IBM Plex Mono',monospace;color:#b1ac9f">live · read along</span></div>
+            <div style="flex:1;overflow:auto;padding:14px 18px;display:flex;flex-direction:column;gap:14px">
+              <sc-for list="{{ transcript }}" as="t" hint-placeholder-count="5">
+                <div style="display:flex;flex-direction:column;gap:3px;align-items:{{ t.align }};animation:zk-fadein .25s ease-out">
+                  <span style="font:11px 'IBM Plex Mono',monospace;color:#b1ac9f">{{ t.who }}</span>
+                  <div style="max-width:88%;padding:10px 12px;border-radius:10px;background:{{ t.bg }};color:{{ t.fg }};font-size:14px;line-height:1.45">{{ t.text }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ================= TABLE ================= -->
+    <sc-if value="{{ isTable }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;z-index:5">
+        <dc-import name="Sweetlands Table" theme="light" layout="bench" hint-size="1440px,900px" style="width:1440px;height:900px"></dc-import>
+        <button onClick="{{ goHome }}" style="position:absolute;top:8px;right:14px;height:32px;padding:0 12px;border-radius:8px;border:none;background:#1f4d3a;color:#fff;font:600 12px 'IBM Plex Sans',sans-serif;cursor:pointer;z-index:10">‹ Back to pages</button>
+      </div>
+    </sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;start&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;home&quot;,&quot;game&quot;,&quot;setup&quot;,&quot;lobby&quot;,&quot;signin&quot;,&quot;profile&quot;,&quot;end&quot;,&quot;voice&quot;],&quot;default&quot;:&quot;home&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Pages&quot;}}">
+const GAMES=[
+ {id:'sweet',name:'Sweetlands Imperium',designer:'Confectionery Games',players:'2–5 players',time:'60–90 min',hex:'#f5a623',onHex:'#1c1a17',initial:'S',blurb:'Four candy kingdoms fight for the castle. Move by color, tax your rivals, race to five points.'},
+ {id:'cyber',name:'Cybernoir 2127',designer:'Halcyon Press',players:'2 players',time:'30–45 min',hex:'#1f2a44',onHex:'#f3ead9',initial:'C',blurb:'A detective and a fugitive across 19 city locations. One hidden hideout, narrowed down clue by clue.'},
+ {id:'fist',name:'Fractured Fist',designer:'Kōdō Table',players:'2 players',time:'20 min',hex:'#b3261e',onHex:'#fff',initial:'F',blurb:'A card-driven duel. Read your rival\'s stance, spend the right cards, break their guard.'},
+ {id:'warble',name:'Warble Way Galaxy',designer:'Lantern & Loom',players:'1 player',time:'45 min',hex:'#7e4fc9',onHex:'#fff',initial:'W',blurb:'A crew, a ship, and a narrator. Roll for every gamble, and play it with your eyes closed.'}];
+const KING=[{name:'Milkshake',title:'Arch Duchess of Milkshake',hex:'#f5a623',ink:'#1c1a17',perk:'Never pays taxes.'},{name:'Fudge',title:'General Fudge',hex:'#8b5a2b',ink:'#fff',perk:'Rolls one extra die in battle.'},{name:'Jellybean',title:'Princess Jellybean',hex:'#9013fe',ink:'#fff',perk:'Starts with a sugar cube.'},{name:'Cheesecake',title:'Grand Vizier Cheesecake',hex:'#f0f0f0',ink:'#1c1a17',perk:'Draws one extra Intel each turn.'}];
+const FRIENDS=[{name:'Sam',hex:'#9013fe',ink:'#fff',online:true},{name:'Priya',hex:'#29adff',ink:'#1c1a17',online:true},{name:'Leo',hex:'#00e436',ink:'#1c1a17',online:false},{name:'Noor',hex:'#ff77a8',ink:'#1c1a17',online:false}];
+class Component extends DCLogic{
+ state={screen:null,seats:4,kinds:['ai','ai','ai'],levels:['medium','easy','hard'],mode:'live',kingdom:0,ready:false,joined:[],invited:[],copied:false,voice:{state:'listening',picked:null,transcript:[{who:'Table',text:'Chapter two. The Drift. Your ship is the Warble; your crew is Vesper and Odalys. Hull 6, cargo 3 crates.'},{who:'You',text:'Read the sheet.'},{who:'Table',text:'Grit 2, Nerve 1, Charm 3. Two crew, both rested. No injuries.'},{who:'Table',text:'A fire starts in the cargo bay. Vesper wants to vent it; Odalys says the crates are worth more. Three options: say a number.'}]}};
+ screen(){return this.state.screen||this.props.start||'home';}
+ go(screen){clearTimeout(this.t1);this.setState({screen});}
+ componentDidMount(){if((this.props.start||'home')==='lobby')this.setState({kinds:['friend','ai','ai']});}
+ say(i,text){clearTimeout(this.t2);clearTimeout(this.t3);this.setState(st=>({voice:{state:'heard',picked:i,transcript:[...st.voice.transcript,{who:'You',text}]}}));
+  this.t2=setTimeout(()=>this.setState(st=>({voice:{...st.voice,state:'thinking'}})),900);
+  this.t3=setTimeout(()=>this.setState(st=>({voice:{state:'listening',picked:null,transcript:[...st.voice.transcript,{who:'Table',text:['You vent the bay. The fire dies with a long hiss. Odalys says nothing for a while. Cargo: zero. Hull: holding.','Vesper rolls Grit: 4 and 2. The fire is out, and so is Vesper, for a day. Cargo saved.','You roll Nerve: 1. The bay seals. Then it doesn\'t. Lose 2 hull; the crates burn anyway.'][i]}]}})),2600);}
+ componentWillUnmount(){clearTimeout(this.t1);}
+ toLobby(){this.setState({screen:'lobby',ready:false,joined:[]});this.t1=setTimeout(()=>this.setState({joined:['Sam']}),2600);}
+ renderVals(){const s=this.state,sc=this.screen();
+  const open=()=>this.go('game');
+  const featured=GAMES.slice(0,2).map(g=>({...g,open}));const newest=[GAMES[3],GAMES[2],GAMES[0],GAMES[1]].map(g=>({...g,open}));
+  const filters=[{name:'Players',bg:'#fff',fg:'#1c1a17'},{name:'Play time',bg:'#fff',fg:'#1c1a17'},{name:'Tags',bg:'#fff',fg:'#1c1a17'},{name:'Solo-friendly',bg:'#1f4d3a',fg:'#fff'}];
+  const feed=[{who:'Confectionery Games',game:'Sweetlands Imperium',when:'2h',text:'The AI now bluffs at the castle gate. Medium and hard both learned it.',hex:'#f5a623',onHex:'#1c1a17',initial:'S'},{who:'Lantern & Loom',game:'Warble Way Galaxy',when:'yesterday',text:'New narrator voice for the Drift chapter. Voice-only run is 45 minutes end to end.',hex:'#7e4fc9',onHex:'#fff',initial:'W'},{who:'Zekel',game:'',when:'3d',text:'By-turns tables now nudge you by email when it has been your move for a day.',hex:'#1f4d3a',onHex:'#fff',initial:'z'},{who:'Halcyon Press',game:'Cybernoir 2127',when:'5d',text:'Rules clarified: the Fugitive may not double back through a location the Detective has searched.',hex:'#1f2a44',onHex:'#f3ead9',initial:'C'}];
+  const shots=['Board','Hand','Roll','Castle'].map((l,i)=>({label:l,bg:['#efe7d8','#e6efe9','#fbe3d2','#efe7d8'][i]}));
+  const devlog=[{when:'Sep 12, 2026',title:'The AI bluffs now',text:'Medium and hard AIs will sit a Knight on the road one space short of the gate and wait for you to commit first.'},{when:'Aug 30, 2026',title:'Five-player tables',text:'The fifth kingdom, Nougat, is live. Boards with five seats use the wide ring.'},{when:'Aug 3, 2026',title:'Sweetlands is on Zekel',text:'The full game, all four kingdoms, with AI from easy to hard. Thanks for the year of playtests.'}];
+  // setup
+  const n=s.seats;const kinds=s.kinds.slice(0,n-1),levels=s.levels.slice(0,n-1);const anyFriend=kinds.includes('friend');
+  const kd=KING[s.kingdom];const others=KING.filter((_,i)=>i!==s.kingdom);
+  const seg=(on)=>on?{bg:'#fff',fg:'#1c1a17',shadow:'0 1px 2px rgba(28,26,23,.12)'}:{bg:'transparent',fg:'#6b655b',shadow:'none'};
+  const seatRows=[{hex:kd.hex,ink:kd.ink,initial:'M',name:'Maya (you)',sub:kd.title,editable:false},...kinds.map((k,i)=>{const K=others[i];const a=seg(k==='ai'),f=seg(k==='friend');return{hex:K.hex,ink:K.ink,initial:k==='ai'?'AI':'?',name:k==='ai'?K.title+' · AI':'Open seat',sub:k==='ai'?'Plays as '+K.name:'A friend picks '+K.name+' or another kingdom',editable:true,isAI:k==='ai',isFriend:k==='friend',aiBg:a.bg,aiFg:a.fg,aiShadow:a.shadow,frBg:f.bg,frFg:f.fg,frShadow:f.shadow,setAI:()=>this.setState(st=>{const c=[...st.kinds];c[i]='ai';return{kinds:c};}),setFriend:()=>this.setState(st=>{const c=[...st.kinds];c[i]='friend';return{kinds:c,mode:st.mode};}),levels:['easy','medium','hard'].map(l=>({name:l[0].toUpperCase()+l.slice(1),bg:levels[i]===l?'#dde9e1':'#fff',fg:levels[i]===l?'#1f4d3a':'#6b655b',line:levels[i]===l?'#1f4d3a':'rgba(28,26,23,.14)',set:()=>this.setState(st=>{const c=[...st.levels];c[i]=l;return{levels:c};})}))};})];
+  const mode=anyFriend?s.mode:'live';
+  const kingdoms=KING.map((k,i)=>({...k,line:i===s.kingdom?'#1f4d3a':'rgba(28,26,23,.1)',shadow:i===s.kingdom?'0 0 0 3px #e6efe9':'none',pick:()=>this.setState({kingdom:i})}));
+  const summarySeats=seatRows.map(r=>({hex:r.hex,name:r.name.replace(' · AI',''),sub:r.editable?(r.isAI?'AI':'friend'):'you'}));
+  const friendsNeeded=kinds.filter(k=>k==='friend').length;
+  // lobby
+  const joined=s.joined;const openSeats=kinds.map((k,i)=>({k,i})).filter(x=>x.k==='friend');
+  const lobbySeats=[{hex:kd.hex,ink:kd.ink,initial:'M',name:'Maya (you)',sub:kd.title+' · host',tag:s.ready?'Ready':'Not ready',tagBg:s.ready?'#dde9e1':'#efe7d8',tagFg:s.ready?'#1f4d3a':'#6b655b',bg:'#fff',border:'1px solid rgba(28,26,23,.1)',avatarBorder:'solid',nameColor:'#1c1a17'},
+   ...kinds.map((k,i)=>{const K=others[i];if(k==='ai')return{hex:K.hex,ink:K.ink,initial:'AI',name:K.title,sub:'AI · '+levels[i],tag:'Ready',tagBg:'#dde9e1',tagFg:'#1f4d3a',bg:'#fff',border:'1px solid rgba(28,26,23,.1)',avatarBorder:'solid',nameColor:'#1c1a17'};
+    const idx=openSeats.findIndex(x=>x.i===i);const who=joined[idx];if(who){const F=FRIENDS.find(f=>f.name===who);return{hex:F.hex,ink:F.ink,initial:F.name[0],name:F.name,sub:'Picked '+K.name+' · just arrived',tag:'Ready',tagBg:'#dde9e1',tagFg:'#1f4d3a',bg:'#fff',border:'1px solid rgba(28,26,23,.1)',avatarBorder:'solid',nameColor:'#1c1a17'};}
+    return{hex:'transparent',ink:'#6b655b',initial:'?',name:'Open seat',sub:'Waiting for someone to take it',tag:'Empty',tagBg:'transparent',tagFg:'#6b655b',bg:'transparent',border:'2px dashed rgba(28,26,23,.2)',avatarBorder:'dashed',nameColor:'#6b655b'};})];
+  const allIn=joined.length>=openSeats.length;const canStart=allIn&&s.ready;
+  const friends=FRIENDS.map(f=>{const inv=s.invited.includes(f.name),here=joined.includes(f.name);return{...f,initial:f.name[0],dot:f.online?'#00e436':'#c9c2b4',status:here?'At the table':f.online?'Online':'Last seen 2d ago',btn:here?'Joined':inv?'Invited':'Invite',btnBg:here?'#dde9e1':inv?'#efe7d8':'#fff',btnFg:here?'#1f4d3a':'#1c1a17',btnLine:here?'#dde9e1':'rgba(28,26,23,.14)',invite:()=>{if(here||inv)return;this.setState(st=>({invited:[...st.invited,f.name]}));if(f.online)setTimeout(()=>this.setState(st=>st.joined.includes(f.name)||st.joined.length>=openSeats.length?{}:{joined:[...st.joined,f.name]}),1800);}};});
+  const results=[{place:'1',hex:'#9013fe',ink:'#fff',initial:'J',name:'Sam',sub:'Princess Jellybean · took the castle',pts:'5',ptsColor:'#1f4d3a',bg:'#e6efe9'},{place:'2',hex:'#f5a623',ink:'#1c1a17',initial:'M',name:'Maya (you)',sub:'Arch Duchess of Milkshake',pts:'4',ptsColor:'#7a3a12',bg:'#fbe3d2'},{place:'3',hex:'#8b5a2b',ink:'#fff',initial:'F',name:'General Fudge',sub:'AI · medium',pts:'2',ptsColor:'#1c1a17',bg:'transparent'},{place:'4',hex:'#f0f0f0',ink:'#1c1a17',initial:'C',name:'Grand Vizier Cheesecake',sub:'AI · easy',pts:'1',ptsColor:'#1c1a17',bg:'transparent'}];
+  const providers=[{name:'Google',hex:'#e0762b'},{name:'GitHub',hex:'#1c1a17'},{name:'Discord',hex:'#7e4fc9'}].map(p=>({...p,go:()=>this.setState({screen:'setup',kinds:['friend','ai','ai']})}));
+  const v=s.voice;const micStates={listening:{label:'Listening',sub:'Speak when you\'re ready. Say "options" to hear the moves.',bg:'#2f4a3a',line:'#9bb08a',shadow:'0 0 0 10px rgba(155,176,138,.15)',bars:[14,26,38,22,16],barBg:'#9bb08a'},heard:{label:'Heard you',sub:'"Vent the bay"',bg:'#5a2c10',line:'#ff8a3d',shadow:'0 0 0 10px rgba(255,138,61,.15)',bars:[10,10,10,10,10],barBg:'#ff8a3d'},thinking:{label:'Thinking',sub:'Vesper rolls for it.',bg:'#232e26',line:'#b1ac9f',shadow:'none',bars:[8,16,8,16,8],barBg:'#b1ac9f'}}[v.state];
+  const moves=[{n:'1',text:'Vent the cargo bay. Lose the crates, kill the fire.',check:'no roll'},{n:'2',text:'Fight the fire by hand with Vesper.',check:'Grit · 2 dice'},{n:'3',text:'Trust Odalys. Seal the bay and hope.',check:'Nerve · 1 die'}].map((m,i)=>({...m,bg:v.picked===i?'#2f4a3a':'transparent',line:v.picked===i?'#9bb08a':'rgba(243,234,217,.12)',say:()=>this.say(i,m.text)}));
+  const transcript=v.transcript.map(t=>({...t,align:t.who==='You'?'flex-end':'flex-start',bg:t.who==='You'?'#5a2c10':'#2c3a30',fg:'#f3ead9'}));
+  return{screenLabel:sc,isHome:sc==='home',isGame:sc==='game',isGameish:sc==='game'||sc==='signin',isProfile:sc==='profile',isSignin:sc==='signin',isEnd:sc==='end',isVoice:sc==='voice',goProfile:()=>this.go('profile'),goSetupFriends:()=>this.setState({screen:'setup',kinds:['friend','ai','ai']}),results,providers,
+   micBg:micStates.bg,micLine:micStates.line,micShadow:micStates.shadow,micLabel:micStates.label,micSub:micStates.sub,bars:micStates.bars.map(h=>({h,bg:micStates.barBg})),moves,transcript,replayNarr:()=>this.setState(st=>({voice:{...st.voice,transcript:[...st.voice.transcript,{who:'Table',text:'The hull groans. Vesper wants to vent the cargo bay to kill the fire; Odalys says the crates are worth more than the bay. Three options.'}]}})),isSetup:sc==='setup',isLobby:sc==='lobby',isTable:sc==='table',navBrowse:sc==='home'?'#1c1a17':'#6b655b',
+   goHome:()=>this.go('home'),goGame:()=>this.go('game'),goSetup:()=>this.go('setup'),goTable:()=>this.go('table'),
+   featured,newest,filters,feed,shots,devlog,
+   playNow:()=>this.setState({screen:'setup',kinds:['ai','ai','ai'],mode:'live'}),playFriends:()=>this.setState({screen:'signin'}),
+   seatCount:n,fewer:()=>this.setState(st=>({seats:Math.max(2,st.seats-1)})),more:()=>this.setState(st=>({seats:Math.min(4,st.seats+1)})),seatRows,
+   setLive:()=>this.setState({mode:'live'}),setTurns:()=>{if(anyFriend)this.setState({mode:'turns'});},liveLine:mode==='live'?'#1f4d3a':'rgba(28,26,23,.1)',turnsLine:mode==='turns'?'#1f4d3a':'rgba(28,26,23,.1)',turnsCursor:anyFriend?'pointer':'default',turnsOpacity:anyFriend?1:.5,turnsSub:anyFriend?'Play whenever. We notify you when it is your move.':'Needs at least one friend at the table.',
+   kingdoms,summaryLine:n+' players · '+(mode==='live'?'live':'by turns')+' · you play '+kd.name,summarySeats,
+   startTable:()=>anyFriend?this.toLobby():this.go('table'),startBg:'#e0762b',startFg:'#fff',startShadow:'#c9662a',startLabel:anyFriend?'Open the lobby':'Start the table',startHint:anyFriend?friendsNeeded+' open seat'+(friendsNeeded>1?'s':'')+' to fill before the game begins.':'Against the AI, the game starts right away.',
+   lobbySub:mode==='turns'?'By turns: the game begins on its own once every seat is taken.':'Live: everyone plays now. Start when the seats are full and ready.',lobbySeats,
+   toggleReady:()=>this.setState(st=>({ready:!st.ready})),readyLabel:s.ready?'Ready ✓':'I\'m ready',readyBg:s.ready?'#1f4d3a':'transparent',readyFg:s.ready?'#fff':'#1f4d3a',
+   beginGame:()=>{if(canStart)this.go('table');},beginBg:canStart?'#e0762b':'#efe7d8',beginFg:canStart?'#fff':'#6b655b',beginCursor:canStart?'pointer':'default',beginShadow:canStart?'#c9662a':'transparent',beginHint:canStart?'':allIn?'Mark yourself ready to start.':'Waiting on '+(openSeats.length-joined.length)+' seat'+(openSeats.length-joined.length>1?'s':''),
+   copyLink:()=>{this.setState({copied:true});setTimeout(()=>this.setState({copied:false}),1500);},copyLabel:s.copied?'Copied':'Copy',friends};}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:var(--brand)}a:hover{color:var(--action)}
+@keyframes zk-pop{0%{transform:translate(-50%,-50%) scale(.4);opacity:0}100%{transform:translate(-50%,-50%) scale(1);opacity:1}}
+@keyframes zk-pulse{0%,100%{box-shadow:0 0 0 3px var(--hl),0 0 0 8px rgba(155,176,138,.25)}50%{box-shadow:0 0 0 4px var(--hl),0 0 0 14px rgba(155,176,138,.05)}}
+@keyframes zk-tumble{0%{transform:rotate(0) translateY(-18px)}40%{transform:rotate(200deg) translateY(4px)}70%{transform:rotate(340deg) translateY(-3px)}100%{transform:rotate(360deg) translateY(0)}}
+@keyframes zk-fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes zk-fly{0%{translate:330px -90px;scale:.7;opacity:0}25%{opacity:1}100%{translate:0 0;scale:1;opacity:1}}
+</style>
+</helmet>
+<div style="{{ rootStyle }}" data-screen-label="Sweetlands table">
+  <!-- top bar -->
+  <div style="height:48px;display:flex;align-items:center;gap:20px;padding:0 20px;background:var(--surface);border-bottom:1px solid var(--line);font-family:'IBM Plex Sans',sans-serif;color:var(--text);flex:none">
+    <div style="display:inline-flex;align-items:center;gap:1px;font:700 24px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:var(--mark)">ze<span style="display:inline-block;width:20px;height:20px;position:relative;transform:rotate(-90deg);margin:0 1px"><span style="position:absolute;left:50%;top:0;width:34%;height:34%;transform:translateX(-50%);border-radius:50%;background:var(--markhead)"></span><span style="position:absolute;left:0;top:28%;width:100%;height:24%;border-radius:999px;background:var(--mark)"></span><span style="position:absolute;left:50%;top:40%;width:48%;height:36%;transform:translateX(-50%);border-radius:3px 3px 1px 1px;background:var(--mark)"></span><span style="position:absolute;left:14%;bottom:0;width:32%;height:38%;border-radius:3px;transform:rotate(14deg);transform-origin:top center;background:var(--mark)"></span><span style="position:absolute;right:14%;bottom:0;width:32%;height:38%;border-radius:3px;transform:rotate(-14deg);transform-origin:top center;background:var(--mark)"></span></span>el</div>
+    <div style="width:1px;height:20px;background:var(--line)"></div>
+    <div style="font-weight:600;font-size:14px">Sweetlands Imperium</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted)">Round {{ round }}</div>
+    <div style="flex:1;display:flex;justify-content:center">
+      <div style="display:flex;align-items:center;gap:8px;padding:5px 12px;border-radius:999px;background:{{ turnPill.bg }};color:{{ turnPill.fg }};font-size:13px;font-weight:600">
+        <span style="width:8px;height:8px;border-radius:50%;background:currentColor"></span>{{ turnPill.text }}
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center">
+      <button onClick="{{ undo }}" style="height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--text);font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;opacity:{{ undoOpacity }}" style-hover="background:var(--surface2)">Undo</button>
+      <button style="height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--text);font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:var(--surface2)">Settings</button>
+      <button style="height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--text);font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:var(--surface2)">Voice</button>
+      <button onClick="{{ toggleTheme }}" title="Theme" style="height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--text);font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:var(--surface2)">{{ themeLabel }}</button>
+      <button style="height:32px;padding:0 12px;border-radius:8px;border:none;background:transparent;color:var(--muted);font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="color:var(--danger)">Leave</button>
+    </div>
+  </div>
+
+  <div style="flex:1;display:flex;min-height:0">
+    <!-- play column -->
+    <div style="flex:1;display:flex;flex-direction:column;min-width:0;min-height:0;padding:14px 16px 0 16px;gap:12px">
+      <sc-if value="{{ isRail }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;gap:12px;align-items:stretch;flex:none">
+          <sc-for list="{{ opponents }}" as="o" hint-placeholder-count="3">
+            <div style="flex:1;display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;background:var(--surface);border:1px solid var(--line);box-shadow:{{ o.shadow }};font-family:'IBM Plex Sans',sans-serif;color:var(--text);outline:{{ o.outline }}">
+              <div style="width:36px;height:36px;border-radius:50%;background:{{ o.hex }};border:2px solid var(--ink);display:grid;place-items:center;font:600 14px 'IBM Plex Mono',monospace;color:{{ o.ink }}">{{ o.initial }}</div>
+              <div style="flex:1;min-width:0">
+                <div style="font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ o.full }}</div>
+                <div style="display:flex;gap:6px;align-items:center;margin-top:3px"><span style="font-size:11px;padding:1px 7px;border-radius:999px;background:{{ o.tagBg }};color:{{ o.tagFg }};font-weight:600">{{ o.tag }}</span><span style="font-size:11px;color:var(--muted)">{{ o.status }}</span></div>
+              </div>
+              <div style="display:flex;gap:14px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted)">
+                <div style="text-align:center"><div style="font-size:16px;color:var(--text);font-weight:600">{{ o.hand }}</div>hand</div>
+                <div style="text-align:center"><div style="font-size:16px;color:var(--text);font-weight:600">{{ o.influence }}</div>infl</div>
+                <div style="text-align:center"><div style="font-size:16px;color:var(--text);font-weight:600">{{ o.sugar }}</div>sugar</div>
+                <div style="text-align:center"><div style="font-size:16px;color:var(--brand);font-weight:600">{{ o.points }}</div>pts</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- board -->
+      <div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;position:relative">
+        <div style="height:100%;aspect-ratio:14/11;position:relative;background:var(--boardbg);border-radius:12px;box-shadow:var(--shadow);padding:10px;box-sizing:border-box">
+          <div style="position:relative;width:100%;height:100%">
+            <div style="display:grid;grid-template-columns:repeat(14,1fr);grid-template-rows:repeat(11,1fr);gap:3px;width:100%;height:100%">
+              <sc-for list="{{ cells }}" as="c" hint-placeholder-count="0">
+                <div onClick="{{ c.onClick }}" style="grid-row:{{ c.gr }};grid-column:{{ c.gc }};position:relative;border-radius:6px;background:{{ c.bg }};border:{{ c.border }};box-sizing:border-box;cursor:{{ c.cursor }};animation:{{ c.anim }};transition:box-shadow .2s;box-shadow:{{ c.shadow }}">
+                  <span style="position:absolute;top:3px;left:4px;right:4px;font:500 9px 'IBM Plex Mono',monospace;color:{{ c.labelColor }};line-height:1.2">{{ c.label }}</span>
+                  <span style="position:absolute;inset:0;display:grid;place-items:center;font:600 {{ c.glyphSize }} 'IBM Plex Mono',monospace;color:{{ c.glyphColor }};text-align:center;line-height:1.1;padding:2px">{{ c.glyph }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <!-- pieces -->
+            <sc-for list="{{ pieces }}" as="p" hint-placeholder-count="0">
+              <div onClick="{{ p.onClick }}" onMouseEnter="{{ p.onEnter }}" onMouseLeave="{{ p.onLeave }}" style="position:absolute;left:{{ p.x }}%;top:{{ p.y }}%;width:{{ p.size }}px;height:{{ p.size }}px;margin-left:{{ p.dx }}px;margin-top:{{ p.dy }}px;transform:translate(-50%,-50%) scale({{ p.scale }});border-radius:50%;background:{{ p.hex }};border:2px solid var(--ink);box-shadow:{{ p.shadow }};display:grid;place-items:center;font:600 12px 'IBM Plex Mono',monospace;color:{{ p.ink }};transition:left .17s ease-in-out,top .17s ease-in-out,transform .17s,box-shadow .17s;pointer-events:{{ p.pe }};cursor:{{ p.cursor }};z-index:{{ p.z }};animation:{{ p.anim }};opacity:{{ p.opacity }}">{{ p.letter }}</div>
+            </sc-for>
+            <!-- legal-move ghosts -->
+            <sc-for list="{{ ghosts }}" as="g" hint-placeholder-count="0">
+              <div onClick="{{ g.onClick }}" style="position:absolute;left:{{ g.x }}%;top:{{ g.y }}%;transform:translate(-50%,-50%);margin-left:{{ g.dx }}px;z-index:20;cursor:pointer;animation:zk-pop .18s ease-out;pointer-events:{{ ghostPe }}">
+                <div style="width:30px;height:30px;border-radius:50%;background:var(--surface);border:2px dashed var(--brand);display:grid;place-items:center;font:600 12px 'IBM Plex Mono',monospace;color:var(--brand);animation:zk-pulse 1.4s infinite" style-hover="background:var(--hlbg)">{{ g.letter }}</div>
+                <div style="position:absolute;top:32px;left:50%;transform:translateX(-50%);white-space:nowrap;font:600 10px 'IBM Plex Sans',sans-serif;color:var(--surface);background:var(--brand);padding:1px 6px;border-radius:4px">{{ g.tag }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- AI slideshow caption -->
+        <sc-if value="{{ slideshowOn }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:50%;bottom:18px;transform:translateX(-50%);width:560px;background:var(--surface);color:var(--text);border-radius:12px;box-shadow:var(--shadowlg);border:1px solid var(--line);padding:12px 14px 10px;font-family:'IBM Plex Sans',sans-serif;animation:zk-fadein .25s ease-out;z-index:30">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:28px;height:28px;border-radius:50%;background:#8b5a2b;border:2px solid var(--ink);display:grid;place-items:center;font:600 12px 'IBM Plex Mono',monospace;color:#fff">F</div>
+              <div style="flex:1;font-size:14px;line-height:1.35" key="{{ slide.idx }}">{{ slide.caption }}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:10px">
+              <div style="display:flex;gap:4px;flex:1">
+                <sc-for list="{{ slideDots }}" as="d" hint-placeholder-count="4"><div style="width:{{ d.w }}px;height:4px;border-radius:2px;background:{{ d.bg }};transition:width .2s"></div></sc-for>
+              </div>
+              <button onClick="{{ slower }}" style="height:26px;padding:0 10px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--text);font:500 12px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:var(--surface2)">Slower</button>
+              <span style="font:500 12px 'IBM Plex Mono',monospace;color:var(--muted);min-width:34px;text-align:center">{{ paceLabel }}</span>
+              <button onClick="{{ faster }}" style="height:26px;padding:0 10px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--text);font:500 12px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:var(--surface2)">Faster</button>
+              <button onClick="{{ replay }}" style="height:26px;padding:0 10px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--text);font:500 12px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:var(--surface2)">Replay last</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- step prompt / action ask -->
+        <sc-if value="{{ promptOn }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:50%;bottom:18px;transform:translateX(-50%);display:flex;align-items:center;gap:10px;background:var(--surface);color:var(--text);border-radius:12px;box-shadow:var(--shadowlg);border:1px solid var(--line);padding:10px 12px 10px 16px;font:14px 'IBM Plex Sans',sans-serif;animation:zk-fadein .2s ease-out;z-index:30;white-space:nowrap">
+            <span>{{ prompt.text }}</span>
+            <sc-if value="{{ prompt.yesNo }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ answerYes }}" style="height:32px;padding:0 14px;border-radius:8px;border:none;background:var(--action);color:#fff;font:600 13px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:var(--actionh)">{{ prompt.yes }}</button>
+              <button onClick="{{ answerNo }}" style="height:32px;padding:0 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--text);font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:var(--surface2)">{{ prompt.no }}</button>
+            </sc-if>
+            <sc-if value="{{ prompt.single }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ answerSingle }}" style="height:32px;padding:0 14px;border-radius:8px;border:none;background:var(--action);color:#fff;font:600 13px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:var(--actionh)">{{ prompt.singleLabel }}</button>
+            </sc-if>
+            <sc-if value="{{ prompt.cancel }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ cancelPlay }}" style="height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--muted);font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:var(--surface2)">Cancel</button>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <!-- lesson -->
+        <sc-if value="{{ lessonOn }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;right:16px;top:14px;width:240px;background:var(--brand);color:#fff;border-radius:12px;padding:12px 14px;font:13px/1.4 'IBM Plex Sans',sans-serif;box-shadow:var(--shadowlg);animation:zk-fadein .25s ease-out;z-index:30">
+            <div style="font-weight:600;margin-bottom:4px">Junction</div>
+            Your unit would pass the first purple space of its region. From there it can stay on the ring or turn onto the road toward the Candy Castle.
+            <button onClick="{{ dismissLesson }}" style="display:block;margin-top:8px;padding:0;background:none;border:none;color:#fff;font:600 12px 'IBM Plex Sans',sans-serif;cursor:pointer;text-decoration:underline">Got it</button>
+          </div>
+        </sc-if>
+
+        <!-- roll / draw -->
+        <sc-if value="{{ rollOn }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;display:grid;place-items:center;background:var(--scrim);border-radius:12px;z-index:40">
+            <div style="width:420px;background:var(--surface);color:var(--text);border-radius:12px;box-shadow:var(--shadowlg);padding:20px 22px;font-family:'IBM Plex Sans',sans-serif;animation:zk-fadein .25s ease-out">
+              <div style="font:700 20px 'Bricolage Grotesque',sans-serif;letter-spacing:-.01em">{{ roll.title }}</div>
+              <div style="font-size:13px;color:var(--muted);margin-top:2px">{{ roll.sub }}</div>
+              <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;margin:18px 0 14px">
+                <div>
+                  <div style="font-size:12px;color:var(--muted);margin-bottom:6px">{{ roll.leftName }}</div>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap;min-height:36px">
+                    <sc-for list="{{ roll.left }}" as="d" hint-placeholder-count="3"><div style="width:36px;height:36px;border-radius:8px;background:var(--surface2);border:1px solid var(--line);display:grid;place-items:center;font:600 16px 'IBM Plex Mono',monospace;color:var(--text);animation:{{ d.anim }}">{{ d.face }}</div></sc-for>
+                  </div>
+                  <div style="font:600 24px 'IBM Plex Mono',monospace;margin-top:8px">{{ roll.leftTotal }}</div>
+                </div>
+                <div style="font:600 13px 'IBM Plex Mono',monospace;color:var(--muted)">vs</div>
+                <div style="text-align:right">
+                  <div style="font-size:12px;color:var(--muted);margin-bottom:6px">{{ roll.rightName }}</div>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;min-height:36px">
+                    <sc-for list="{{ roll.right }}" as="d" hint-placeholder-count="5"><div style="width:36px;height:36px;border-radius:8px;background:var(--surface2);border:1px solid var(--line);display:grid;place-items:center;font:600 16px 'IBM Plex Mono',monospace;color:var(--text);animation:{{ d.anim }}">{{ d.face }}</div></sc-for>
+                  </div>
+                  <div style="font:600 24px 'IBM Plex Mono',monospace;margin-top:8px">{{ roll.rightTotal }}</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                <div style="font-size:14px;font-weight:600;color:{{ roll.resultColor }}">{{ roll.result }}</div>
+                <button onClick="{{ roll.onPress }}" style="height:44px;padding:0 22px;border-radius:12px;border:none;background:var(--action);color:#fff;font:600 15px 'IBM Plex Sans',sans-serif;cursor:pointer;box-shadow:0 3px 0 var(--actionh)" style-hover="background:var(--actionh)" style-active="transform:translateY(2px);box-shadow:none">{{ roll.button }}</button>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+
+      <!-- bottom: your tableau, hand, piles -->
+      <div style="height:176px;flex:none;display:flex;gap:12px;align-items:stretch;padding-bottom:14px">
+        <div style="width:290px;flex:none;border-radius:12px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);padding:12px 14px;font-family:'IBM Plex Sans',sans-serif;color:var(--text);display:flex;flex-direction:column;gap:8px;outline:{{ youOutline }}">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:32px;height:32px;border-radius:50%;background:#f5a623;border:2px solid var(--ink);display:grid;place-items:center;font:600 13px 'IBM Plex Mono',monospace;color:#1c1a17">M</div>
+            <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Arch Duchess of Milkshake</div><div style="font-size:11px;color:var(--muted)">You · Region 1 · never pays taxes</div></div>
+            <span style="font-size:11px;padding:1px 7px;border-radius:999px;background:var(--youbg);color:var(--youfg);font-weight:600">You</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted)">
+            <div><div style="font-size:18px;font-weight:600;color:var(--brand)">{{ you.points }}<span style="font-size:11px;color:var(--muted)">/5</span></div>points</div>
+            <div><div style="font-size:18px;font-weight:600;color:var(--text)">{{ you.influence }}<span style="font-size:11px;color:var(--muted)">/5</span></div>influence</div>
+            <div><div style="font-size:18px;font-weight:600;color:var(--text)">{{ you.sugar }}</div>sugar</div>
+            <div><div style="font-size:18px;font-weight:600;color:var(--text)">{{ you.tax }}<span style="font-size:11px;color:var(--muted)">/3</span></div>home tax</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:auto">
+            <span style="font-size:11px;color:var(--muted);margin-right:2px">Tokens</span>
+            <div style="width:16px;height:16px;border-radius:50%;background:#29adff;border:1.5px solid var(--ink)"></div>
+            <div style="width:16px;height:16px;border-radius:50%;background:#00e436;border:1.5px solid var(--ink)"></div>
+            <div style="flex:1"></div>
+            <sc-for list="{{ steps }}" as="s" hint-placeholder-count="4"><span style="font-size:11px;padding:2px 8px;border-radius:999px;background:{{ s.bg }};color:{{ s.fg }};font-weight:{{ s.weight }}">{{ s.name }}</span></sc-for>
+          </div>
+        </div>
+
+        <!-- hand fan -->
+        <div style="flex:1;position:relative;min-width:0;display:flex;align-items:flex-end;justify-content:center">
+          <div style="position:absolute;top:0;left:0;font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">Your hand · {{ handCount }}</div>
+          <sc-for list="{{ hand }}" as="k" hint-placeholder-count="5">
+            <div onClick="{{ k.onClick }}" style="width:96px;height:136px;margin:0 -10px;border-radius:8px;background:var(--cardface);border:1px solid var(--line);box-shadow:{{ k.shadow }};transform:rotate({{ k.rot }}deg) translateY({{ k.ty }}px);transform-origin:50% 120%;cursor:pointer;position:relative;overflow:hidden;transition:transform .18s,box-shadow .18s;outline:{{ k.outline }};outline-offset:2px;font-family:'IBM Plex Sans',sans-serif;animation:{{ k.anim }};display:flex;flex-direction:column;box-sizing:border-box" style-hover="transform:translateY(-14px);box-shadow:0 10px 22px rgba(0,0,0,.18)">
+              <div style="padding:9px 9px 8px;display:flex;flex-direction:column;gap:6px;flex:1;min-height:0;box-sizing:border-box">
+                <div style="display:flex;gap:4px"><sc-for list="{{ k.chips }}" as="ch" hint-placeholder-count="1"><div style="width:34px;height:34px;border-radius:{{ ch.radius }};background:{{ k.hex }};border:1.5px {{ ch.borderStyle }} var(--ink);display:grid;place-items:center;font:600 13px 'IBM Plex Mono',monospace;color:#1c1a17">{{ ch.glyph }}</div></sc-for></div>
+                <div style="font:700 12px/1.1 'Bricolage Grotesque',sans-serif;color:var(--text);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">{{ k.name }}</div>
+                <div style="font-size:10.5px;color:var(--muted);line-height:1.25;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">{{ k.desc }}</div>
+                <div style="font:500 9.5px 'IBM Plex Mono',monospace;color:var(--muted);margin-top:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ k.reads }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- deck, discard, end turn -->
+        <div style="width:250px;flex:none;display:flex;gap:12px;align-items:stretch">
+          <div style="flex:1;border-radius:12px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);padding:10px 12px;display:flex;flex-direction:column;gap:8px;font-family:'IBM Plex Sans',sans-serif;color:var(--text)">
+            <div style="display:flex;gap:10px;flex:1">
+              <div onClick="{{ drawIfOwed }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:{{ drawCursor }}">
+                <div style="width:44px;height:62px;border-radius:6px;background:var(--cardback);border:1px solid var(--ink);box-shadow:2px 2px 0 var(--surface2),4px 4px 0 var(--line);display:grid;place-items:center;font:600 11px 'IBM Plex Mono',monospace;color:var(--text);outline:{{ deckOutline }};outline-offset:3px;animation:{{ deckAnim }}">{{ deckCount }}</div>
+                <span style="font:500 10px 'IBM Plex Mono',monospace;color:var(--muted)">Intel deck</span>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+                <div style="width:44px;height:62px;border-radius:6px;background:var(--cardface);border:1px solid var(--line);overflow:hidden;transform:rotate({{ discardRot }}deg);transition:transform .2s;box-shadow:var(--shadow)">
+                  <div style="height:24px;background:{{ discardTop.hex }}"></div>
+                  <div style="font:600 9px 'IBM Plex Sans',sans-serif;color:var(--text);padding:4px 4px 0;line-height:1.2">{{ discardTop.name }}</div>
+                </div>
+                <span style="font:500 10px 'IBM Plex Mono',monospace;color:var(--muted)">Discard · {{ discardCount }}</span>
+              </div>
+            </div>
+            <button onClick="{{ endTurn }}" style="height:36px;border-radius:8px;border:none;background:{{ endTurnBg }};color:{{ endTurnFg }};font:600 13px 'IBM Plex Sans',sans-serif;cursor:pointer;box-shadow:0 2px 0 {{ endTurnShadow }}" style-hover="filter:brightness(.95)" style-active="transform:translateY(1px);box-shadow:none">{{ endTurnLabel }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- side rail -->
+    <div style="width:{{ railWidth }}px;flex:none;border-left:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;min-height:0;font-family:'IBM Plex Sans',sans-serif;color:var(--text)">
+      <sc-if value="{{ isRail }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;gap:2px;padding:10px 12px 0;border-bottom:1px solid var(--line)">
+          <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
+            <button onClick="{{ t.onClick }}" style="height:34px;padding:0 12px;border:none;background:transparent;color:{{ t.fg }};font:600 13px 'IBM Plex Sans',sans-serif;cursor:pointer;border-bottom:2px solid {{ t.line }};margin-bottom:-1px">{{ t.name }}</button>
+          </sc-for>
+          <div style="flex:1"></div>
+          <button style="height:34px;padding:0 8px;border:none;background:transparent;color:var(--muted);font:500 12px 'IBM Plex Mono',monospace;cursor:pointer">Collapse ›</button>
+        </div>
+        <sc-if value="{{ tabLog }}" hint-placeholder-val="{{ true }}">
+          <div style="flex:1;overflow:auto;padding:10px 14px;display:flex;flex-direction:column;gap:2px">
+            <sc-for list="{{ log }}" as="e" hint-placeholder-count="6">
+              <div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px;line-height:1.4;animation:zk-fadein .25s ease-out">
+                <span style="width:8px;height:8px;border-radius:50%;background:{{ e.hex }};border:1.5px solid var(--ink);flex:none;margin-top:5px"></span>
+                <span style="flex:1;color:{{ e.fg }}">{{ e.text }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ tabRules }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:14px;font-size:13px;line-height:1.45">
+            <div><div style="font:700 15px 'Bricolage Grotesque',sans-serif;margin-bottom:6px">Colors</div>
+              <sc-for list="{{ legend }}" as="l" hint-placeholder-count="6">
+                <div style="display:flex;align-items:center;gap:10px;padding:5px 0"><span style="width:18px;height:18px;border-radius:4px;background:{{ l.hex }};border:1px solid var(--ink)"></span><span style="font-weight:600;width:64px">{{ l.name }}</span><span style="color:var(--muted)">{{ l.text }}</span></div>
+              </sc-for>
+            </div>
+            <div><div style="font:700 15px 'Bricolage Grotesque',sans-serif;margin-bottom:6px">Your turn</div>Recall any units home, draw Intel for your Ambassador's distance, play exactly one card or token (or pass for +1 influence), then spend influence: 1 for a token, 3 for a sugar cube.</div>
+            <div><div style="font:700 15px 'Bricolage Grotesque',sans-serif;margin-bottom:6px">Winning</div>First to 5 points. Public objectives are worth 3, 3, 3, 1 and 1; your secret objective is worth 2.</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ tabChat }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;display:flex;flex-direction:column;padding:14px;gap:10px">
+            <div style="flex:1;display:grid;place-items:center;color:var(--muted);font-size:13px;text-align:center">Only Sam can hear you here.<br>The AI seats don't read chat.</div>
+            <div style="height:38px;border-radius:8px;border:1px solid var(--line);background:var(--surface2);display:flex;align-items:center;padding:0 12px;color:var(--muted);font-size:13px">Say something to Sam</div>
+          </div>
+        </sc-if>
+        <!-- shared: point track + objectives -->
+        <div style="border-top:1px solid var(--line);padding:12px 14px;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;justify-content:space-between"><span style="font:600 12px 'IBM Plex Sans',sans-serif">Points</span><span style="font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">first to 5</span></div>
+          <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:4px">
+            <sc-for list="{{ track }}" as="t" hint-placeholder-count="6">
+              <div style="height:34px;border-radius:6px;background:var(--surface2);border:1px solid var(--line);position:relative;display:flex;align-items:center;justify-content:center;gap:2px;flex-wrap:wrap;padding:2px">
+                <span style="position:absolute;top:1px;left:4px;font:500 9px 'IBM Plex Mono',monospace;color:var(--muted)">{{ t.n }}</span>
+                <sc-for list="{{ t.markers }}" as="m" hint-placeholder-count="0"><span style="width:12px;height:12px;border-radius:50%;background:{{ m.hex }};border:1.5px solid var(--ink)"></span></sc-for>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between"><span style="font:600 12px 'IBM Plex Sans',sans-serif">Public objectives</span><span style="font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">scored once each</span></div>
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <sc-for list="{{ objectives }}" as="ob" hint-placeholder-count="5">
+              <div style="display:flex;align-items:center;gap:8px;font-size:12px;padding:3px 0">
+                <span style="font:600 11px 'IBM Plex Mono',monospace;color:var(--brand);width:14px">{{ ob.pts }}</span>
+                <span style="flex:1;color:var(--text)">{{ ob.text }}</span>
+                <span style="display:flex;gap:3px">
+                  <sc-for list="{{ ob.marks }}" as="m" hint-placeholder-count="4"><span style="width:12px;height:12px;border-radius:50%;background:{{ m.hex }};border:1.5px solid {{ m.line }};opacity:{{ m.op }}"></span></sc-for>
+                </span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isBench }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:14px 14px 0;display:flex;flex-direction:column;gap:8px">
+          <div style="font:600 12px 'IBM Plex Sans',sans-serif;color:var(--muted)">Seats</div>
+          <sc-for list="{{ opponents }}" as="o" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:var(--bg);border:1px solid var(--line);outline:{{ o.outline }}">
+              <div style="width:32px;height:32px;border-radius:50%;background:{{ o.hex }};border:2px solid var(--ink);display:grid;place-items:center;font:600 13px 'IBM Plex Mono',monospace;color:{{ o.ink }}">{{ o.initial }}</div>
+              <div style="flex:1;min-width:0">
+                <div style="font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ o.full }}</div>
+                <div style="display:flex;gap:6px;align-items:center;margin-top:2px"><span style="font-size:11px;padding:1px 7px;border-radius:999px;background:{{ o.tagBg }};color:{{ o.tagFg }};font-weight:600">{{ o.tag }}</span><span style="font-size:11px;color:var(--muted)">{{ o.status }}</span></div>
+              </div>
+              <div style="display:flex;gap:10px;font:500 11px 'IBM Plex Mono',monospace;color:var(--muted);text-align:center">
+                <div><div style="font-size:15px;color:var(--text);font-weight:600">{{ o.hand }}</div>hand</div>
+                <div><div style="font-size:15px;color:var(--text);font-weight:600">{{ o.influence }}</div>infl</div>
+                <div><div style="font-size:15px;color:var(--brand);font-weight:600">{{ o.points }}</div>pts</div>
+              </div>
+            </div>
+          </sc-for>
+          <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-top:6px">
+            <sc-for list="{{ track }}" as="t" hint-placeholder-count="6">
+              <div style="height:30px;border-radius:6px;background:var(--bg);border:1px solid var(--line);position:relative;display:flex;align-items:center;justify-content:center;gap:2px;flex-wrap:wrap;padding:2px">
+                <span style="position:absolute;top:1px;left:4px;font:500 9px 'IBM Plex Mono',monospace;color:var(--muted)">{{ t.n }}</span>
+                <sc-for list="{{ t.markers }}" as="m" hint-placeholder-count="0"><span style="width:11px;height:11px;border-radius:50%;background:{{ m.hex }};border:1.5px solid var(--ink)"></span></sc-for>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:14px 14px 6px;border-top:1px solid var(--line);margin-top:12px">
+          <span style="font:600 12px 'IBM Plex Sans',sans-serif">Log</span>
+          <span style="font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">·</span>
+          <button onClick="{{ showRules }}" style="border:none;background:none;padding:0;font:500 12px 'IBM Plex Sans',sans-serif;color:var(--brand);cursor:pointer;text-decoration:underline">Rules</button>
+          <button style="border:none;background:none;padding:0;font:500 12px 'IBM Plex Sans',sans-serif;color:var(--brand);cursor:pointer;text-decoration:underline">Chat</button>
+        </div>
+        <div style="flex:1;overflow:auto;padding:0 14px 12px;display:flex;flex-direction:column;gap:2px;min-height:0">
+          <sc-for list="{{ log }}" as="e" hint-placeholder-count="6">
+            <div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px;line-height:1.4;animation:zk-fadein .25s ease-out">
+              <span style="width:8px;height:8px;border-radius:50%;background:{{ e.hex }};border:1.5px solid var(--ink);flex:none;margin-top:5px"></span>
+              <span style="flex:1;color:{{ e.fg }}">{{ e.text }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;'light'|'dark'&quot;,&quot;section&quot;:&quot;Table&quot;},&quot;layout&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;rail&quot;,&quot;bench&quot;],&quot;default&quot;:&quot;rail&quot;,&quot;tsType&quot;:&quot;'rail'|'bench'&quot;,&quot;section&quot;:&quot;Table&quot;}}">
+const COLORS=['red','orange','yellow','green','blue','purple'];
+const HEX={red:'#ff004d',orange:'#ffa300',yellow:'#ffec27',green:'#00e436',blue:'#29adff',purple:'#7e4fc9'};
+const ON_HEX={red:'#fff',orange:'#1c1a17',yellow:'#1c1a17',green:'#1c1a17',blue:'#1c1a17',purple:'#fff'};
+const ACTION={red:'Battle',orange:'Gain influence',yellow:'Collect taxes',green:'Push',blue:'Collect Intel',purple:'Enter the castle'};
+const DESC={red:'Capture a rival or hit the foe.',orange:'+1 to +3 by distance.',yellow:'Rivals at home pay tax.',green:'Or discard: unlimited plays.',blue:'Draw by Ambassador range.',purple:'From the road or gate.'};
+const READS={red:'Knight',orange:'Leader',yellow:'home region',green:'any unit',blue:'Ambassador',purple:'Leader / Knight'};
+const REG={
+ 1:{name:'Milkshake',full:'Arch Duchess of Milkshake',hex:'#f5a623',ink:'#1c1a17',start:[11,4],ring:[[11,3],[10,3],[10,4],[10,5],[11,5],[11,6],[10,7],[10,8],[10,9],[11,9],[11,10],[11,11]],road:[[10,6,'↑'],[9,6,'↑'],[9,7,'→'],[9,8,'→'],[8,8,'↑'],[7,8,'↑']],treat:[11,2,'Milkshake'],rnd:[11,7,'Cupcake']},
+ 2:{name:'Fudge',full:'General Fudge',hex:'#8b5a2b',ink:'#fff',start:[11,13],ring:[[11,12],[10,12],[10,13],[9,13],[8,13],[8,12],[6,12],[6,13],[5,13],[4,12],[3,12],[2,12]],road:[[8,11,'←'],[8,10,'←'],[7,10,'↑'],[6,10,'↑'],[5,10,'↑'],[5,9,'←']],treat:[7,12,'Fudge'],rnd:[4,13,'Gummy Bear']},
+ 3:{name:'Jellybean',full:'Princess Jellybean',hex:'#9013fe',ink:'#fff',start:[1,11],ring:[[2,11],[2,10],[1,10],[1,9],[1,8],[2,8],[2,6],[1,6],[1,5],[1,3],[1,2],[2,2]],road:[[3,8,'↓'],[3,7,'←'],[3,6,'←'],[4,6,'↓'],[4,7,'→'],[4,8,'→']],treat:[2,7,'Jellybean'],rnd:[1,4,'Ice Cream']},
+ 4:{name:'Cheesecake',full:'Grand Vizier Cheesecake',hex:'#f0f0f0',ink:'#1c1a17',start:[3,1],ring:[[3,2],[4,2],[4,1],[5,1],[6,1],[6,2],[8,2],[8,1],[9,1],[10,0],[11,0],[11,1]],road:[[6,3,'→'],[6,4,'→'],[7,4,'↓'],[7,5,'→'],[6,5,'↑'],[6,6,'→']],treat:[7,2,'Cheesecake'],rnd:[9,0,'Chocolate Bar']}
+};
+const THEMES={
+ light:{'--mark':'#1f4d3a','--markhead':'#e0762b','--bg':'#f7f1e6','--surface':'#ffffff','--surface2':'#efe7d8','--text':'#1c1a17','--muted':'#6b655b','--brand':'#1f4d3a','--action':'#e0762b','--actionh':'#c9662a','--hl':'#1f4d3a','--hlbg':'#e6efe9','--youbg':'#fbe3d2','--youfg':'#7a3a12','--aibg':'#dde9e1','--aifg':'#1f4d3a','--danger':'#b3261e','--line':'rgba(28,26,23,.12)','--ink':'#1c1a17','--boardbg':'#ffffff','--cardface':'#fffdf8','--cardback':'#efe7d8','--scrim':'rgba(28,26,23,.35)','--shadow':'0 1px 2px rgba(28,26,23,.06),0 4px 12px rgba(28,26,23,.06)','--shadowlg':'0 8px 30px rgba(28,26,23,.18)'},
+ dark:{'--mark':'#f3ead9','--markhead':'#ff8a3d','--bg':'#1a221c','--surface':'#232e26','--surface2':'#2c3a30','--text':'#f3ead9','--muted':'#b1ac9f','--brand':'#9bb08a','--action':'#ff8a3d','--actionh':'#e2792f','--hl':'#9bb08a','--hlbg':'#2f4a3a','--youbg':'#5a2c10','--youfg':'#fbe3d2','--aibg':'#1f4d3a','--aifg':'#dde9e1','--danger':'#ff7b6b','--line':'rgba(243,234,217,.12)','--ink':'#0f150f','--boardbg':'#2a352d','--cardface':'#2f3b32','--cardback':'#3a4a3f','--scrim':'rgba(0,0,0,.5)','--shadow':'0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.3)','--shadowlg':'0 8px 30px rgba(0,0,0,.5)'}
+};
+const coord=p=>{const R=REG[p.r];if(p.kind==='ring')return R.ring[p.i];if(p.kind==='road')return R.road[p.i];if(p.kind==='start')return R.start;if(p.kind==='castle')return [6,8];return R.start;};
+const colorOf=p=>(p.kind==='ring'||p.kind==='road')?COLORS[p.i%6]:null;
+const nextRing=p=>{if(p.kind==='start')return{kind:'ring',r:p.r,i:0};if(p.kind==='ring')return p.i<11?{kind:'ring',r:p.r,i:p.i+1}:{kind:'ring',r:p.r%4+1,i:0};return null;};
+const treatOpts=(u,name)=>{let tile;for(const r in REG)if(REG[r].rnd[2]===name)tile=REG[r].rnd;if(!tile||!(u.pos.kind==='ring'||u.pos.kind==='start'))return[];let cur=u.pos;const path=[];for(let n=0;n<48;n++){cur=nextRing(cur);path.push(cur);const c=coord(cur);if(Math.abs(c[0]-tile[0])+Math.abs(c[1]-tile[1])===1){const end={kind:'treat',r:cur.r,i:0,row:tile[0],col:tile[1]};path.push(end);return[{pos:end,path,tag:'treat'}];}}return[];};
+const same=(a,b)=>a&&b&&a.kind===b.kind&&a.r===b.r&&a.i===b.i;
+const dist=(home,r)=>((r-home)+4)%4;
+class Component extends DCLogic{
+ state={theme:null,tab:'log',round:6,phase:'recall',sel:null,ghosts:[],cands:[],hover:null,locked:null,moving:null,lesson:false,lessonSeen:false,prompt:{text:'Recall step: send any of your units home before you draw?',yesNo:true,yes:'Choose units',no:'Keep them out'},roll:null,slideshow:null,pace:1,undoStack:[],deckAnim:false,drawOwed:0,
+  you:{points:2,influence:3,sugar:3,tax:1},
+  opp:[{r:2,tag:'AI · medium',status:'up next',hand:4,influence:2,sugar:4,points:1},{r:3,tag:'Sam',status:'online',hand:3,influence:4,sugar:2,points:3},{r:4,tag:'AI · easy',status:'',hand:5,influence:1,sugar:3,points:1}],
+  units:[{id:'1L',f:1,t:'L',pos:{kind:'ring',r:1,i:3}},{id:'1K',f:1,t:'K',pos:{kind:'ring',r:2,i:1}},{id:'1A',f:1,t:'A',pos:{kind:'ring',r:1,i:8}},
+   {id:'2L',f:2,t:'L',pos:{kind:'start',r:2}},{id:'2K',f:2,t:'K',pos:{kind:'road',r:2,i:2}},{id:'2A',f:2,t:'A',pos:{kind:'ring',r:3,i:4}},
+   {id:'3L',f:3,t:'L',pos:{kind:'ring',r:3,i:2}},{id:'3K',f:3,t:'K',pos:{kind:'ring',r:2,i:3}},{id:'3A',f:3,t:'A',pos:{kind:'ring',r:4,i:1}},
+   {id:'4L',f:4,t:'L',pos:{kind:'ring',r:4,i:4}},{id:'4K',f:4,t:'K',pos:{kind:'road',r:4,i:3}},{id:'4A',f:4,t:'A',pos:{kind:'ring',r:1,i:1}}],
+  hand:[{id:'c1',color:'red'},{id:'c2',color:'blue'},{id:'c4',color:'orange',double:true},{id:'c5',treat:'Gummy Bear'}],
+  deck:61,discard:[{color:'yellow'}],
+  log:[{f:3,text:'Sam plays Yellow. Cheesecake\'s Ambassador pays 1 influence in taxes.'},{f:3,text:'Sam raises Region 3 tax to 2.'},{f:4,text:'Cheesecake plays Purple. Knight steps onto the road.'},{f:2,text:'General Fudge plays Red. Knight moves to the road; no rival to fight.'},{f:0,text:'Round 6. Most sugar cubes: General Fudge is first player.'},{f:0,text:'Your move.'}]};
+ theme(){return this.state.theme||this.props.theme||'light';}
+ layout(){return this.props.layout||'bench';}
+ push(entry){this.setState(s=>({log:[...s.log,entry]}));}
+ snapshot(){const s=this.state;return{units:JSON.parse(JSON.stringify(s.units)),hand:s.hand,discard:s.discard,deck:s.deck,you:{...s.you},log:s.log};}
+ options(u,color){const ci=COLORS.indexOf(color);const out=[];const p=u.pos;
+  if(p.kind==='ring'||p.kind==='start'){let cur=p,path=[],passJ=(p.kind==='ring'&&p.i===5);for(let n=0;n<13;n++){cur=nextRing(cur);if(!cur)break;path.push(cur);if(cur.kind==='ring'&&cur.i===5&&cur.r===p.r)passJ=true;if(colorOf(cur)===color)break;}
+   if(path.length&&colorOf(path[path.length-1])===color)out.push({pos:path[path.length-1],path,tag:passJ?'ring':''});
+   if(passJ){const jr=p.r;const pre=[];if(!(p.kind==='ring'&&p.i===5)){let c=p;while(true){c=nextRing(c);pre.push(c);if(c.kind==='ring'&&c.i===5&&c.r===jr)break;}}const rp=[];for(let k=0;k<=ci;k++)rp.push({kind:'road',r:jr,i:k});out.push({pos:rp[rp.length-1],path:[...pre,...rp],tag:'road'});}}
+  else if(p.kind==='road'){if(ci>p.i){const rp=[];for(let k=p.i+1;k<=ci;k++)rp.push({kind:'road',r:p.r,i:k});out.push({pos:rp[rp.length-1],path:rp,tag:''});}else if(color==='purple'&&p.i===5)out.push({pos:{kind:'castle',r:p.r,i:0},path:[{kind:'castle',r:p.r,i:0}],tag:'castle'});}
+  return out;}
+ pick(card){if(this.state.phase!=='idle'&&this.state.phase!=='pickUnit')return;if(this.state.slideshow)return;
+  const mine=this.state.units.filter(u=>u.f===1);let road=false;
+  const cands=mine.map(u=>{const opts=card.treat?treatOpts(u,card.treat):this.options(u,card.color);opts.forEach((o,k,arr)=>{if(o.tag==='road')road=true;o.dx=arr.length>1?(k?14:-14):0;});return{unit:u,opts};}).filter(c=>c.opts.length);
+  this.setState(s=>({phase:'pickUnit',sel:card,cands,hover:null,locked:null,ghosts:[],lesson:road&&!s.lessonSeen,lessonSeen:s.lessonSeen||road,prompt:{text:cands.length?'Choose a unit to move. Hover to preview.':'No unit can reach a '+(card.treat?card.treat+' tile':card.color+' space')+'.',cancel:true}}));}
+ pickUnit(c){if(c.opts.length===1)this.go({unit:c.unit,...c.opts[0]});else this.setState({locked:c.unit.id,prompt:{text:'Stay on the ring or take the road?',cancel:true}});}
+ go(g){const card=this.state.sel;const snap=this.snapshot();this.setState(s=>({phase:'moving',ghosts:[],cands:[],hover:null,locked:null,lesson:false,prompt:null,undoStack:[...s.undoStack,snap],moving:g.unit.id}));
+  const path=g.path;let k=0;const step=()=>{if(k>=path.length){this.setState({moving:null});this.afterMove(card,g);return;}const p=path[k++];this.setState(s=>({units:s.units.map(u=>u.id===g.unit.id?{...u,pos:p}:u)}));setTimeout(step,170);};step();}
+ afterMove(card,g){const u=g.unit;const name={L:'Leader',K:'Knight',A:'Ambassador'}[u.t];
+  if(card.treat){this.finish(card,'You play '+card.treat+'. '+name+' walks the ring to the tile, safe from taxes.');return;}
+  const col=card.color;this.push({f:1,text:'You play '+(card.double?'double ':'')+col+'. '+name+' moves to the next '+col+' space'+(g.tag?' by the '+g.tag:'')+'.'});
+  this.setState({phase:'ask',pendingUnit:u.id,prompt:{text:'Take the '+col+' action: '+ACTION[col].toLowerCase()+'?',yesNo:true,yes:'Yes',no:'Skip'}});}
+ yes(){const s=this.state;const card=s.sel;const u=s.units.find(x=>x.id===s.pendingUnit);const col=card.color;const r=u.pos.r;
+  if(col==='red'){const foe=s.units.find(x=>x.f!==1&&x.t==='K'&&x.pos.r===r&&x.pos.kind!=='start');if(u.t==='K'&&foe){this.setState({prompt:null,roll:{vs:foe,title:'Knight vs Knight',sub:'Sugar cubes are the dice. Faces 0 0 0 1 2 3. Ties go to the defender.',leftName:'You · 3 cubes',rightName:REG[foe.f].name+' · '+s.opp.find(o=>o.r===foe.f).sugar+' cubes',left:[],right:[],button:'Roll',result:'',stage:0}});return;}
+   const victim=s.units.find(x=>x.f!==1&&x.t!=='K'&&x.pos.r===r&&x.pos.kind!=='start');if(u.t==='K'&&victim){const vn=victim.t==='L'?'Leader':'Ambassador';this.setState(st=>({units:st.units.map(x=>x.id===victim.id?{...x,pos:{kind:'start',r:x.f}}:x),you:victim.t==='L'?{...st.you,points:st.you.points+1}:st.you}));this.finish(card,'Capture! '+REG[victim.f].name+'\'s '+vn+' is sent home'+(victim.t==='L'?'. +1 point.':'.'));return;}
+   this.finish(card,'No rival in reach. The battle action fizzles.');return;}
+  if(col==='orange'){const g=u.t==='L'?(u.pos.kind==='castle'?5:[0,1,2,3][dist(1,r)]):0;this.setState(st=>({you:{...st.you,influence:Math.min(5,st.you.influence+g)}}));this.finish(card,g?'+'+g+' influence: Leader is '+dist(1,r)+' region'+(dist(1,r)>1?'s':'')+' from home.':'No influence: only the Leader gathers it.');return;}
+  if(col==='blue'){const n=u.t==='A'?[1,2,3,2][dist(1,r)]:0;if(!n){this.finish(card,'No Intel: only the Ambassador collects it.');return;}this.setState({phase:'draw',drawOwed:n,prompt:{text:'Draw '+n+' Intel cards.',cancel:false}});return;}
+  if(col==='yellow'){const payers=s.units.filter(x=>x.f!==1&&x.pos.r===1&&(x.pos.kind==='ring'||x.pos.kind==='road'));const got=payers.length*s.you.tax;this.setState(st=>({you:{...st.you,influence:Math.min(5,st.you.influence+got)}}));this.finish(card,got?REG[payers[0].f].name+' pays '+got+' influence in taxes.':'No rivals in Region 1. Nothing to collect.');return;}
+  if(col==='green'){this.finish(card,'Pushed on.');return;}
+  if(col==='purple'){if(u.pos.kind==='castle'){this.finish(card,'Your '+(u.t==='K'?'Knight':'Leader')+' is in the Candy Castle.');return;}this.finish(card,'Not at the castle gate yet.');return;}}
+ finish(card,text){if(text)this.push({f:1,text});this.setState(s=>({phase:'idle',sel:null,pendingUnit:null,prompt:null,hand:s.hand.filter(c=>c.id!==card.id),discard:[...s.discard,card]}));}
+ doRoll(){const s=this.state,R=s.roll;if(R.stage===1){this.finish(s.sel,null);this.setState({roll:null});return;}
+  const face=()=>[0,0,0,1,2,3][Math.floor(Math.random()*6)];const l=Array.from({length:3},face);const oppS=s.opp.find(o=>o.r===R.vs.f).sugar;const r=Array.from({length:oppS},face);const lt=l.reduce((a,b)=>a+b,0),rt=r.reduce((a,b)=>a+b,0);const win=lt>rt;
+  this.setState({roll:{...R,left:l.map(f=>({face:f,anim:'zk-tumble .5s ease-out'})),right:r.map(f=>({face:f,anim:'zk-tumble .6s ease-out'})),leftTotal:lt,rightTotal:rt,result:win?'You win. Their Knight is sent home.':'Defender holds. Your Knight stays put.',resultColor:win?'var(--brand)':'var(--danger)',button:'Continue',stage:1}});
+  if(win)this.setState(st=>({units:st.units.map(x=>x.id===R.vs.id?{...x,pos:{kind:'start',r:x.f}}:x)}));this.push({f:1,text:'Battle: you roll '+lt+', '+REG[R.vs.f].name+' rolls '+rt+'. '+(win?'Their Knight goes home.':'Tie or loss; defender holds.')});}
+ draw(){const s=this.state;if(s.phase!=='draw')return;const n=s.drawOwed;const pool=['red','orange','yellow','green','blue','purple'];const news=Array.from({length:n},(_,k)=>({id:'d'+Date.now()+k,color:pool[Math.floor(Math.random()*6)],fresh:true}));this.setState(st=>({deck:st.deck-n,hand:[...st.hand,...news],deckAnim:true}));clearTimeout(this.freshTimer);this.freshTimer=setTimeout(()=>this.setState(st=>({deckAnim:false,hand:st.hand.map(c=>c.fresh?{...c,fresh:false}:c)})),900);
+  if(s.sel){this.finish(s.sel,'You draw '+n+' Intel.');}else{this.push({f:1,text:'You draw '+n+' Intel.'});this.setState({phase:'idle',prompt:null,drawOwed:0});}}
+ undo(){const s=this.state;if(!s.undoStack.length||s.slideshow||s.phase==='moving')return;const snap=s.undoStack[s.undoStack.length-1];this.setState(st=>({...snap,undoStack:st.undoStack.slice(0,-1),phase:snap.phase||'idle',sel:null,ghosts:[],cands:snap.cands||[],hover:null,locked:null,prompt:snap.prompt||null,roll:null}));}
+ cancel(){this.setState({phase:'idle',sel:null,ghosts:[],cands:[],hover:null,locked:null,prompt:null,lesson:false});}
+ // The turn opens on the two steps the player owns before Play: Recall (a real decision, even when the answer is "nobody") and the Draw button for turn-start Intel. Nothing here resolves on its own.
+ beginTurn(){this.setState({phase:'recall',sel:null,cands:[],ghosts:[],hover:null,locked:null,prompt:{text:'Recall step: send any of your units home before you draw?',yesNo:true,yes:'Choose units',no:'Keep them out'}});}
+ recallStart(){const mine=this.state.units.filter(u=>u.f===1&&u.pos.kind!=='start');if(!mine.length){this.toDraw();return;}this.setState({phase:'recallPick',cands:mine.map(u=>({unit:u,opts:[]})),hover:null,locked:null,prompt:{text:'Tap a unit to send it home.',single:true,singleLabel:'Done recalling'}});}
+ recallUnit(u){const snap={...this.snapshot(),phase:'recallPick',prompt:this.state.prompt,cands:this.state.cands};const name={L:'Leader',K:'Knight',A:'Ambassador'}[u.t];this.setState(s=>({undoStack:[...s.undoStack,snap],units:s.units.map(x=>x.id===u.id?{...x,pos:{kind:'start',r:1}}:x),cands:s.cands.filter(c=>c.unit.id!==u.id),hover:null,prompt:s.cands.length>1?s.prompt:{text:'All your units are home.',single:true,singleLabel:'Done recalling'}}));this.push({f:1,text:'You recall your '+name+' home.'});}
+ toDraw(){const amb=this.state.units.find(u=>u.id==='1A');const d=dist(1,amb.pos.r);const n=[1,2,3,2][d];this.setState({phase:'draw',drawOwed:n,sel:null,cands:[],hover:null,locked:null,prompt:{text:'Draw '+n+' Intel: your Ambassador is '+(d?d+' region'+(d>1?'s':'')+' from home':'at home')+'.',cancel:false}});}
+ endTurn(){if(this.state.phase!=='idle'||this.state.slideshow)return;this.push({f:1,text:'You end your turn.'});
+  const slides=[{caption:'General Fudge plays Blue. The Ambassador slides to the next blue space in Region 3.',move:{id:'2A',color:'blue'}},{caption:'Fudge collects Intel: 2 cards, one region from home.',fx:s=>({opp:s.opp.map(o=>o.r===2?{...o,hand:o.hand+2}:o)})},{caption:'Fudge plays Purple on the road. The Knight advances to the castle gate.',move:{id:'2K',color:'purple'}},{caption:'Fudge spends 3 influence on a sugar cube. Four dice now.',fx:s=>({opp:s.opp.map(o=>o.r===2?{...o,influence:0,sugar:o.sugar+1}:o)})}];
+  this.setState({slideshow:{slides,idx:-1},undoStack:[]});this.runSlide(0);}
+ runSlide(i){const ss=this.state.slideshow;if(!ss)return;if(i>=ss.slides.length){this.setState(s=>({slideshow:null,round:s.round,opp:s.opp.map(o=>o.r===2?{...o,status:'done'}:o)}));this.push({f:2,text:'General Fudge ends their turn.'});this.push({f:0,text:'Your move.'});this.beginTurn();return;}
+  const sl=ss.slides[i];this.setState({slideshow:{...ss,idx:i}});
+  if(sl.move){const u=this.state.units.find(x=>x.id===sl.move.id);this.slideStart=this.slideStart||{};this.slideStart[u.id]=u.pos;const opts=this.options(u,sl.move.color);const o=opts[0];if(o){let k=0;const path=o.path;const step=()=>{if(k>=path.length)return;const p=path[k++];this.setState(s=>({units:s.units.map(x=>x.id===u.id?{...x,pos:p}:x)}));setTimeout(step,170*this.state.pace);};setTimeout(step,300);}}
+  if(sl.fx)this.setState(sl.fx);this.push({f:2,text:sl.caption});
+  this.slideTimer=setTimeout(()=>this.runSlide(i+1),2400*this.state.pace);}
+ replay(){const ss=this.state.slideshow;if(!ss)return;clearTimeout(this.slideTimer);const i=Math.max(0,ss.idx);const sl=ss.slides[i];if(sl.move){this.setState(s=>({units:s.units.map(x=>x.id===sl.move.id?{...x,pos:this.slideStart[sl.move.id]||x.pos}:x)}));}this.runSlide(i);}
+ componentWillUnmount(){clearTimeout(this.slideTimer);clearTimeout(this.freshTimer);}
+ renderVals(){const s=this.state;const T=THEMES[this.theme()];const isRail=this.layout()==='rail';const isBench=!isRail;
+  const rootStyle={...T,width:'1440px',height:'900px',display:'flex',flexDirection:'column',background:'var(--bg)',fontFamily:"'IBM Plex Sans',sans-serif",overflow:'hidden',borderRadius:'12px',boxSizing:'border-box',position:'relative'};
+  // cells
+  const cells=[];const focus=s.cands.find(c=>c.unit.id===(s.locked||s.hover));const liveGhosts=focus?focus.opts.map(o=>({unit:focus.unit,...o})):[];const ghostAt=(row,col)=>liveGhosts.some(g=>{const c=g.pos.kind==='treat'?[g.pos.row,g.pos.col]:coord(g.pos);return c[0]===row&&c[1]===col;});
+  for(const rk in REG){const R=REG[rk];const mk=(row,col,extra)=>{const hot=ghostAt(row,col);cells.push({gr:row,gc:col+1,cursor:'default',border:'1px solid var(--ink)',shadow:hot?'0 0 0 3px var(--hlbg),0 0 0 5px var(--hl)':'none',anim:'none',labelColor:'rgba(0,0,0,.65)',glyphColor:'rgba(0,0,0,.7)',glyphSize:'14px',...extra});};
+   R.ring.forEach((c,i)=>mk(c[0],c[1],{bg:HEX[COLORS[i%6]],label:rk,glyph:i===5?'•':'',glyphSize:'9px',glyphColor:'rgba(255,255,255,.7)',labelColor:COLORS[i%6]==='purple'||COLORS[i%6]==='red'?'rgba(255,255,255,.85)':'rgba(0,0,0,.65)'}));
+   R.road.forEach((c,i)=>mk(c[0],c[1],{bg:HEX[COLORS[i]],label:'',glyph:c[2],glyphSize:'16px',glyphColor:COLORS[i]==='purple'||COLORS[i]==='red'?'rgba(255,255,255,.9)':'rgba(0,0,0,.75)'}));
+   mk(R.start[0],R.start[1],{bg:'var(--surface2)',border:'1px solid var(--line)',label:'',glyph:'start '+rk,glyphSize:'9px',glyphColor:'var(--muted)'});
+   mk(R.treat[0],R.treat[1],{bg:'var(--surface)',border:'1px solid var(--line)',label:'',glyph:R.treat[2],glyphSize:'8px',glyphColor:'var(--text)'});
+   mk(R.rnd[0],R.rnd[1],{bg:'transparent',border:'1.5px dashed var(--muted)',label:'?',labelColor:'var(--muted)',glyph:R.rnd[2],glyphSize:'8px',glyphColor:'var(--text)'});}
+  const holder=s.units.find(u=>u.pos.kind==='castle');
+  cells.push({gr:'5 / span 2',gc:'8 / span 2',bg:'var(--surface2)',border:'2px solid '+(holder?REG[holder.f].hex:'var(--ink)'),cursor:'default',shadow:'inset 0 0 0 4px var(--boardbg)',anim:'none',label:'Candy Castle · Dragon · 5 dice',glyph:'',glyphSize:'10px',glyphColor:'var(--text)',labelColor:'var(--text)'});
+  // pieces
+  const groups={};const pieces=s.units.map(u=>{const c=u.pos.kind==='treat'?[u.pos.row,u.pos.col]:coord(u.pos);const key=c.join(',');groups[key]=(groups[key]||0);const k=groups[key]++;const mv=s.moving===u.id;const cand=s.cands.find(x=>x.unit.id===u.id);const dim=(s.phase==='pickUnit'||s.phase==='recallPick')&&!cand;const hot=cand&&(s.hover===u.id||s.locked===u.id);return{x:(c[1]+.5)/14*100,y:(c[0]-.5)/11*100,size:26,dx:k*7-4,dy:-k*7+2,scale:mv||hot?1.2:1,hex:REG[u.f].hex,ink:REG[u.f].ink,letter:u.t,z:mv||hot?15:(cand?12:5+k),shadow:mv?'0 10px 14px rgba(0,0,0,.35)':(hot?'0 0 0 3px var(--surface),0 0 0 5px var(--action),0 6px 10px rgba(0,0,0,.3)':'0 1px 2px rgba(0,0,0,.35)'),anim:cand&&!hot?'zk-pulse 1.4s infinite':'none',pe:cand?'auto':'none',cursor:cand?'pointer':'default',opacity:dim?.55:1,onClick:cand?(s.phase==='recallPick'?()=>this.recallUnit(u):()=>this.pickUnit(cand)):null,onEnter:cand?()=>this.setState({hover:u.id}):null,onLeave:cand?()=>this.setState({hover:null}):null};});
+  pieces.push({x:(8+.5)/14*100-3.6,y:(6-.5)/11*100-1.5,size:34,dx:0,dy:0,scale:1,hex:'#b3261e',ink:'#fff',letter:'D',z:6,shadow:'0 2px 4px rgba(0,0,0,.4)',anim:'none',pe:'none',cursor:'default',opacity:1});
+  const ghosts=liveGhosts.map(g=>{const c=g.pos.kind==='treat'?[g.pos.row,g.pos.col]:coord(g.pos);return{x:(c[1]+.5)/14*100,y:(c[0]-.5)/11*100,dx:g.dx||0,letter:g.unit.t,tag:g.tag,onClick:()=>this.go(g)};});
+  const opponents=s.opp.map(o=>{const R=REG[o.r];const active=s.slideshow&&o.r===2;return{...o,full:R.full,hex:R.hex,ink:R.ink,initial:R.name[0],tagBg:o.tag.startsWith('AI')?'var(--aibg)':'var(--surface2)',tagFg:o.tag.startsWith('AI')?'var(--aifg)':'var(--text)',status:active?'taking their turn':o.status,outline:active?'2px solid var(--action)':'none',shadow:'var(--shadow)'};});
+  const hand=s.hand.map((k,i,arr)=>{const n=arr.length;const mid=(n-1)/2;const selected=s.sel&&s.sel.id===k.id;const hex=k.treat?'#ffd6e0':HEX[k.color];return{onClick:()=>this.pick(k),rot:(i-mid)*5,ty:Math.abs(i-mid)*5+(selected?-18:0),shadow:selected?'0 12px 24px rgba(0,0,0,.22)':'0 2px 6px rgba(0,0,0,.12)',outline:selected?'3px solid var(--hl)':(s.phase==='idle'&&!s.slideshow?'2px solid var(--hlbg)':'none'),hex,onHex:k.treat?'#1c1a17':ON_HEX[k.color],name:k.treat?k.treat:(k.color[0].toUpperCase()+k.color.slice(1)+(k.double?' ×2':'')),chips:k.treat?[{radius:'50%',borderStyle:'dashed',glyph:'?'}]:(k.double?[{radius:'7px',borderStyle:'solid',glyph:''},{radius:'7px',borderStyle:'solid',glyph:''}]:[{radius:'7px',borderStyle:'solid',glyph:''}]),badge:k.double?'×2':'',action:k.treat?'Treat space':(k.double?{red:'Battle',orange:'Influence',yellow:'Taxes',green:'Push',blue:'Intel',purple:'Castle'}[k.color]+' ×2':ACTION[k.color]),desc:k.treat?'Any unit, straight there.':(k.double?'Two moves, same unit.':DESC[k.color]),reads:k.treat?'any unit':READS[k.color],anim:k.fresh?'zk-fly .5s cubic-bezier(.2,.8,.2,1) '+(arr.filter((c,j)=>c.fresh&&j<i).length*.09)+'s both':'none'};});
+  const top=s.discard[s.discard.length-1];const discardTop=top?{hex:top.treat?'#ffd6e0':HEX[top.color],name:top.treat||top.color[0].toUpperCase()+top.color.slice(1)}:{hex:'transparent',name:''};
+  const tabs=['log','rules','chat'].map(t=>({name:t[0].toUpperCase()+t.slice(1),fg:s.tab===t?'var(--text)':'var(--muted)',line:s.tab===t?'var(--brand)':'transparent',onClick:()=>this.setState({tab:t})}));
+  const log=[...s.log].reverse().map(e=>({text:e.text,hex:e.f?REG[e.f].hex:'var(--surface2)',fg:e.f===0?'var(--muted)':'var(--text)'}));
+  const legend=COLORS.map(c=>({name:c[0].toUpperCase()+c.slice(1),hex:HEX[c],text:ACTION[c]}));
+  const pts={1:s.you.points,2:s.opp[0].points,3:s.opp[1].points,4:s.opp[2].points};
+  const track=[0,1,2,3,4,5].map(n=>({n,markers:Object.keys(pts).filter(f=>pts[f]===n).map(f=>({hex:REG[f].hex}))}));
+  const objDefs=[['3','Unit in each rival region on matching colors',[]],['3','Unit in each rival region on treats',[]],['3','Defeat the foe in the castle',[]],['1','Capture a Leader',[3,1]],['1','Leader in the castle, one full round',[3]]];
+  const objectives=objDefs.map(o=>({pts:o[0],text:o[1],marks:[1,2,3,4].map(f=>({hex:REG[f].hex,line:o[2].includes(f)?'var(--ink)':'var(--line)',op:o[2].includes(f)?1:.25}))}));
+  const ph=s.phase;const stepName=s.slideshow?'':(ph==='recall'||ph==='recallPick')?'Recall':(ph==='draw'&&!s.sel)?'Draw':'Play';const steps=['Recall','Draw','Play','Influence'].map(n=>({name:n,bg:n===stepName?'var(--brand)':'var(--surface2)',fg:n===stepName?'#fff':'var(--muted)',weight:n===stepName?600:500}));
+  const ss=s.slideshow;const slide=ss&&ss.idx>=0?{idx:ss.idx,caption:ss.slides[ss.idx].caption}:{idx:0,caption:''};
+  const slideDots=ss?ss.slides.map((_,i)=>({w:i===ss.idx?22:10,bg:i<=ss.idx?'var(--brand)':'var(--line)'})):[];
+  const turnPill=ss?{bg:'var(--aibg)',fg:'var(--aifg)',text:'General Fudge is taking their turn'}:{bg:'var(--youbg)',fg:'var(--youfg)',text:'Your move · '+stepName+' step'};
+  const roll=s.roll?{...s.roll,onPress:()=>this.doRoll(),leftTotal:s.roll.leftTotal==null?'':s.roll.leftTotal,rightTotal:s.roll.rightTotal==null?'':s.roll.rightTotal}:{left:[],right:[]};
+  return{rootStyle,round:s.round,turnPill,undo:()=>this.undo(),undoOpacity:s.undoStack.length?1:.45,toggleTheme:()=>this.setState({theme:this.theme()==='light'?'dark':'light'}),themeLabel:this.theme()==='light'?'Dark':'Light',
+   isRail,isBench,railWidth:isRail?380:420,opponents,cells,pieces,ghosts,ghostPe:s.locked?'auto':'none',
+   slideshowOn:!!ss,slide,slideDots,slower:()=>this.setState(st=>({pace:Math.min(3,st.pace*1.5)})),faster:()=>this.setState(st=>({pace:Math.max(.4,st.pace/1.5)})),replay:()=>this.replay(),paceLabel:(1/s.pace).toFixed(1).replace('.0','')+'×',
+   promptOn:!!s.prompt&&!ss,prompt:s.prompt||{},answerYes:()=>ph==='recall'?this.recallStart():this.yes(),answerNo:()=>ph==='recall'?this.toDraw():this.finish(s.sel,'You skip the action.'),answerSingle:()=>this.toDraw(),cancelPlay:()=>this.cancel(),
+   lessonOn:s.lesson,dismissLesson:()=>this.setState({lesson:false}),
+   rollOn:!!s.roll,roll,
+   you:s.you,youOutline:!ss&&(ph==='idle'||ph==='recall'||ph==='recallPick'||ph==='draw')?'2px solid var(--action)':'none',steps,hand,handCount:s.hand.length,
+   deckCount:s.deck,deckOutline:s.phase==='draw'?'3px solid var(--hl)':'none',deckAnim:s.phase==='draw'?'zk-pulse 1.4s infinite':'none',drawIfOwed:()=>this.draw(),drawCursor:s.phase==='draw'?'pointer':'default',
+   discardTop,discardCount:s.discard.length,discardRot:((s.discard.length*37)%9)-4,
+   endTurn:()=>this.endTurn(),endTurnLabel:ss?'Waiting…':'End turn',endTurnBg:ss||s.phase!=='idle'?'var(--surface2)':'var(--action)',endTurnFg:ss||s.phase!=='idle'?'var(--muted)':'#fff',endTurnShadow:ss||s.phase!=='idle'?'transparent':'var(--actionh)',
+   tabs,tabLog:s.tab==='log',tabRules:s.tab==='rules',tabChat:s.tab==='chat',showRules:()=>{},log,legend,track,objectives};}
+}
+</script>
+</body>
+</html>

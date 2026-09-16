@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:var(--brand)}a:hover{color:var(--action)}
+@keyframes zk-pulse{0%,100%{box-shadow:0 0 0 3px var(--hl),0 0 0 8px rgba(155,176,138,.25)}50%{box-shadow:0 0 0 4px var(--hl),0 0 0 14px rgba(155,176,138,.05)}}
+</style>
+</helmet>
+<div style="{{ rootStyle }}" data-screen-label="Primitives">
+
+  <!-- header -->
+  <div style="display:flex;flex-direction:column;gap:10px;max-width:880px">
+    <div style="font:600 12px 'IBM Plex Mono',monospace;color:var(--muted)">Component sheet</div>
+    <div style="font:700 40px 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;line-height:1.05;color:var(--text)">The eight primitives</div>
+    <div style="font-size:15px;line-height:1.55;color:var(--text)">Every game board on this platform is composed from these eight parts and nothing else. Design them once, with their states and their motion, and every game inherits them. The Sweetlands table on this canvas is a composition of them; the last section says which part is which. The field lists under each one are the exact data the engine hands the component today, so the design and the code agree on what a card or a track is.</div>
+    <div style="display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:var(--muted)">
+      <span><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--hlbg);border:2px solid var(--hl);vertical-align:-2px;margin-right:6px"></span>legal move: a state on the part itself, never a separate overlay</span>
+      <span><span style="display:inline-block;width:12px;height:12px;border-radius:3px;border:2px solid var(--action);vertical-align:-2px;margin-right:6px"></span>selected</span>
+      <span><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--surface2);opacity:.45;vertical-align:-2px;margin-right:6px"></span>disabled</span>
+    </div>
+  </div>
+
+  <!-- ================= 1 CARD ================= -->
+  <div style="display:grid;grid-template-columns:300px minmax(0,1fr);gap:32px;padding-top:28px;border-top:1px solid var(--line)">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:baseline;gap:10px"><span style="font:600 12px 'IBM Plex Mono',monospace;color:var(--muted)">1</span><span style="font:700 24px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:var(--text)">Card</span></div>
+      <div style="font-size:14px;line-height:1.5;color:var(--text)">One physical card. A face with a name, a color chip and text; a back when face down. The single most reused part.</div>
+      <div style="font:500 12px/1.7 'IBM Plex Mono',monospace;color:var(--muted);background:var(--surface2);border-radius:8px;padding:10px 12px">label<br>id<br>colorKey<br>face: up | down<br>rotation: 0 | 90 | 180 | 270<br>count<br>badges[]</div>
+      <div style="font-size:13px;line-height:1.5;color:var(--muted)"><span style="font-weight:600;color:var(--text)">Motion.</span> A card never appears in place. It leaves a pile and arrives in a zone, 300–500 ms, lifting its shadow while it travels. Face changes are a flip.</div>
+    </div>
+    <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end">
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:center">
+        <div style="width:96px;height:136px;border-radius:8px;background:var(--cardface);border:1px solid var(--line);box-shadow:0 2px 6px rgba(0,0,0,.12);padding:9px;box-sizing:border-box;display:flex;flex-direction:column;gap:6px"><div style="width:34px;height:34px;border-radius:7px;background:#29adff;border:1.5px solid var(--ink)"></div><div style="font:700 12px/1.1 'Bricolage Grotesque',sans-serif;color:var(--text)">Blue</div><div style="font-size:10.5px;color:var(--muted);line-height:1.25">Draw by Ambassador range.</div><div style="font:500 9.5px 'IBM Plex Mono',monospace;color:var(--muted);margin-top:auto">Ambassador</div></div>
+        <span style="font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">resting</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:center">
+        <div style="width:96px;height:136px;border-radius:8px;background:var(--cardface);border:1px solid var(--line);box-shadow:0 2px 6px rgba(0,0,0,.12);outline:2px solid var(--hlbg);outline-offset:2px;padding:9px;box-sizing:border-box;display:flex;flex-direction:column;gap:6px"><div style="width:34px;height:34px;border-radius:7px;background:#ff004d;border:1.5px solid var(--ink)"></div><div style="font:700 12px/1.1 'Bricolage Grotesque',sans-serif;color:var(--text)">Red</div><div style="font-size:10.5px;color:var(--muted);line-height:1.25">Capture a rival or hit the foe.</div><div style="font:500 9.5px 'IBM Plex Mono',monospace;color:var(--muted);margin-top:auto">Knight</div></div>
+        <span style="font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">playable</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:center">
+        <div style="width:96px;height:136px;border-radius:8px;background:var(--cardface);border:1px solid var(--line);box-shadow:0 12px 24px rgba(0,0,0,.22);outline:3px solid var(--hl);outline-offset:2px;transform:translateY(-10px);padding:9px;box-sizing:border-box;display:flex;flex-direction:column;gap:6px"><div style="display:flex;gap:4px"><div style="width:34px;height:34px;border-radius:7px;background:#ffa300;border:1.5px solid var(--ink)"></div><div style="width:34px;height:34px;border-radius:7px;background:#ffa300;border:1.5px solid var(--ink)"></div></div><div style="font:700 12px/1.1 'Bricolage Grotesque',sans-serif;color:var(--text)">Orange ×2</div><div style="font-size:10.5px;color:var(--muted);line-height:1.25">Two moves, same unit.</div><div style="font:500 9.5px 'IBM Plex Mono',monospace;color:var(--muted);margin-top:auto">Leader</div></div>
+        <span style="font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">selected</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:center">
+        <div style="width:96px;height:136px;border-radius:8px;background:var(--cardface);border:1px solid var(--line);opacity:.45;padding:9px;box-sizing:border-box;display:flex;flex-direction:column;gap:6px"><div style="width:34px;height:34px;border-radius:7px;background:#00e436;border:1.5px solid var(--ink)"></div><div style="font:700 12px/1.1 'Bricolage Grotesque',sans-serif;color:var(--text)">Green</div><div style="font-size:10.5px;color:var(--muted);line-height:1.25">No unit can reach a green space.</div></div>
+        <span style="font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">disabled</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:center">
+        <div style="width:96px;height:136px;border-radius:8px;background:var(--cardback);border:1px solid var(--ink);box-shadow:0 2px 6px rgba(0,0,0,.12);display:grid;place-items:center;position:relative"><div style="width:60px;height:96px;border-radius:6px;border:1.5px solid var(--line)"></div><span style="position:absolute;right:6px;bottom:6px;font:600 11px 'IBM Plex Mono',monospace;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:999px;padding:1px 7px">×3</span></div>
+        <span style="font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">face down · count</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:center;width:136px">
+        <div style="width:96px;height:136px;border-radius:8px;background:var(--cardface);border:1px solid var(--line);box-shadow:0 2px 6px rgba(0,0,0,.12);transform:rotate(90deg);padding:9px;box-sizing:border-box;display:flex;flex-direction:column;gap:6px"><div style="width:34px;height:34px;border-radius:7px;background:#7e4fc9;border:1.5px solid var(--ink)"></div><div style="font:700 12px/1.1 'Bricolage Grotesque',sans-serif;color:var(--text)">Purple</div><div style="display:flex;gap:4px;margin-top:auto"><span style="font:600 9px 'IBM Plex Mono',monospace;background:var(--tagbg);color:var(--tagfg);border-radius:999px;padding:1px 6px">used</span></div></div>
+        <span style="font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">rotation 90 · badge</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 2 CARD ZONE ================= -->
+  <div style="display:grid;grid-template-columns:300px minmax(0,1fr);gap:32px;padding-top:28px;border-top:1px solid var(--line)">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:baseline;gap:10px"><span style="font:600 12px 'IBM Plex Mono',monospace;color:var(--muted)">2</span><span style="font:700 24px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:var(--text)">Card zone</span></div>
+      <div style="font-size:14px;line-height:1.5;color:var(--text)">How cards sit together. A row is a market or a landscape. A fan is a hand. A pile is a deck or a discard, top card showing, depth as a count. A hidden pile shows only its count.</div>
+      <div style="font:500 12px/1.7 'IBM Plex Mono',monospace;color:var(--muted);background:var(--surface2);border-radius:8px;padding:10px 12px">label<br>mode: row | fan | pile<br>cards[]: Card<br>countOnly</div>
+      <div style="font-size:13px;line-height:1.5;color:var(--muted)"><span style="font-weight:600;color:var(--text)">Motion.</span> A card entering a fan makes the fan re-space around it. A pile's depth count ticks. Nothing fades in.</div>
+    </div>
+    <div style="display:flex;gap:28px;flex-wrap:wrap;align-items:flex-end">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;gap:8px;padding:10px;border-radius:12px;background:var(--surface);border:1px solid var(--line)">
+          <div style="width:64px;height:90px;border-radius:6px;background:var(--cardface);border:1px solid var(--line);padding:6px;box-sizing:border-box"><div style="width:22px;height:22px;border-radius:5px;background:#ffec27;border:1.5px solid var(--ink)"></div><div style="font:700 10px 'Bricolage Grotesque',sans-serif;color:var(--text);margin-top:5px">Yellow</div></div>
+          <div style="width:64px;height:90px;border-radius:6px;background:var(--cardface);border:1px solid var(--line);padding:6px;box-sizing:border-box"><div style="width:22px;height:22px;border-radius:5px;background:#29adff;border:1.5px solid var(--ink)"></div><div style="font:700 10px 'Bricolage Grotesque',sans-serif;color:var(--text);margin-top:5px">Blue</div></div>
+          <div style="width:64px;height:90px;border-radius:6px;background:var(--cardface);border:1px solid var(--line);outline:2px solid var(--hlbg);outline-offset:1px;padding:6px;box-sizing:border-box"><div style="width:22px;height:22px;border-radius:50%;background:#ffd6e0;border:1.5px dashed var(--ink)"></div><div style="font:700 10px 'Bricolage Grotesque',sans-serif;color:var(--text);margin-top:5px">Gummy Bear</div></div>
+        </div>
+        <span style="font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">row</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:flex-end;justify-content:center;height:150px;padding:0 24px">
+          <div style="width:72px;height:102px;margin:0 -8px;border-radius:6px;background:var(--cardface);border:1px solid var(--line);box-shadow:0 2px 6px rgba(0,0,0,.12);transform:rotate(-10deg) translateY(10px);transform-origin:50% 120%"></div>
+          <div style="width:72px;height:102px;margin:0 -8px;border-radius:6px;background:var(--cardface);border:1px solid var(--line);box-shadow:0 2px 6px rgba(0,0,0,.12);transform:rotate(-5deg) translateY(5px);transform-origin:50% 120%"></div>
+          <div style="width:72px;height:102px;margin:0 -8px;border-radius:6px;background:var(--cardface);border:1px solid var(--line);box-shadow:0 2px 6px rgba(0,0,0,.12);transform-origin:50% 120%"></div>
+          <div style="width:72px;height:102px;margin:0 -8px;border-radius:6px;background:var(--cardface);border:1px solid var(--line);box-shadow:0 2px 6px rgba(0,0,0,.12);transform:rotate(5deg) translateY(5px);transform-origin:50% 120%"></div>
+          <div style="width:72px;height:102px;margin:0 -8px;border-radius:6px;background:var(--cardface);border:1px solid var(--line);box-shadow:0 2px 6px rgba(0,0,0,.12);transform:rotate(10deg) translateY(10px);transform-origin:50% 120%"></div>
+        </div>
+        <span style="font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">fan · rotation (i − mid) × 5°, drop |i − mid| × 5 px, overlap −10 px</span>
+      </div>
+      <div style="display:flex;gap:22px;align-items:flex-end">
+        <div style="display:flex;flex-direction:column;gap:6px;align-items:center">
+          <div style="width:44px;height:62px;border-radius:6px;background:var(--cardback);border:1px solid var(--ink);box-shadow:2px 2px 0 var(--surface2),4px 4px 0 var(--line);display:grid;place-items:center;font:600 11px 'IBM Plex Mono',monospace;color:var(--text)">61</div>
+          <span style="font:500 10px 'IBM Plex Mono',monospace;color:var(--muted)">pile · hidden</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;align-items:center">
+          <div style="width:44px;height:62px;border-radius:6px;background:var(--cardface);border:1px solid var(--line);overflow:hidden;transform:rotate(-3deg);box-shadow:var(--shadow)"><div style="height:24px;background:#ffec27"></div><div style="font:600 9px 'IBM Plex Sans',sans-serif;color:var(--text);padding:4px 4px 0">Yellow</div></div>
+          <span style="font:500 10px 'IBM Plex Mono',monospace;color:var(--muted)">pile · top up</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;align-items:center">
+          <div style="width:44px;height:62px;border-radius:6px;background:var(--cardback);border:1px solid var(--ink);outline:3px solid var(--hl);outline-offset:3px;display:grid;place-items:center;font:600 11px 'IBM Plex Mono',monospace;color:var(--text);animation:zk-pulse 1.4s infinite">61</div>
+          <span style="font:500 10px 'IBM Plex Mono',monospace;color:var(--muted)">pile · Draw owed</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 3 TABLEAU ================= -->
+  <div style="display:grid;grid-template-columns:300px minmax(0,1fr);gap:32px;padding-top:28px;border-top:1px solid var(--line)">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:baseline;gap:10px"><span style="font:600 12px 'IBM Plex Mono',monospace;color:var(--muted)">3</span><span style="font:700 24px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:var(--text)">Tableau</span></div>
+      <div style="font-size:14px;line-height:1.5;color:var(--text)">A player's board. A titled panel with stat rows, a meter when a maximum is known, and slots for nested zones: a hand, a bag, the player's own tracks. Nesting is how a seat gets composed.</div>
+      <div style="font:500 12px/1.7 'IBM Plex Mono',monospace;color:var(--muted);background:var(--surface2);border-radius:8px;padding:10px 12px">label<br>owner<br>active<br>stats[]: label, value, max<br>nested: Card zone · Bag · Track · Pool</div>
+      <div style="font-size:13px;line-height:1.5;color:var(--muted)"><span style="font-weight:600;color:var(--text)">Motion.</span> Numbers tick rather than jump. Meters fill. The active seat's outline turns on when its turn starts.</div>
+    </div>
+    <div style="display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:290px;border-radius:12px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);padding:12px 14px;display:flex;flex-direction:column;gap:8px;outline:2px solid var(--action);outline-offset:0">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:32px;height:32px;border-radius:50%;background:#f5a623;border:2px solid var(--ink);display:grid;place-items:center;font:600 13px 'IBM Plex Mono',monospace;color:#1c1a17">M</div>
+            <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px;color:var(--text)">Arch Duchess of Milkshake</div><div style="font-size:11px;color:var(--muted)">You · Region 1 · never pays taxes</div></div>
+            <span style="font-size:11px;padding:1px 7px;border-radius:999px;background:var(--youbg);color:var(--youfg);font-weight:600">You</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted)">
+            <div><div style="font-size:18px;font-weight:600;color:var(--brand)">2<span style="font-size:11px;color:var(--muted)">/5</span></div>points<div style="height:3px;border-radius:2px;background:var(--surface2);margin-top:4px"><div style="width:40%;height:100%;border-radius:2px;background:var(--brand)"></div></div></div>
+            <div><div style="font-size:18px;font-weight:600;color:var(--text)">3<span style="font-size:11px;color:var(--muted)">/5</span></div>influence<div style="height:3px;border-radius:2px;background:var(--surface2);margin-top:4px"><div style="width:60%;height:100%;border-radius:2px;background:var(--text)"></div></div></div>
+            <div><div style="font-size:18px;font-weight:600;color:var(--text)">3</div>sugar</div>
+            <div><div style="font-size:18px;font-weight:600;color:var(--text)">1<span style="font-size:11px;color:var(--muted)">/3</span></div>home tax<div style="height:3px;border-radius:2px;background:var(--surface2);margin-top:4px"><div style="width:33%;height:100%;border-radius:2px;background:var(--text)"></div></div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;padding-top:4px;border-top:1px solid var(--line)">
+            <span style="font-size:11px;color:var(--muted);margin-right:2px">Pool</span>
+            <div style="width:16px;height:16px;border-radius:50%;background:#29adff;border:1.5px solid var(--ink)"></div>
+            <div style="width:16px;height:16px;border-radius:50%;background:#00e436;border:1.5px solid var(--ink)"></div>
+            <span style="font:500 10px 'IBM Plex Mono',monospace;color:var(--muted);margin-left:auto">nested zone slot</span>
+          </div>
+        </div>
+        <span style="font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">full · active seat (your panel on the table)</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:300px;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:var(--bg);border:1px solid var(--line)">
+          <div style="width:32px;height:32px;border-radius:50%;background:#8b5a2b;border:2px solid var(--ink);display:grid;place-items:center;font:600 13px 'IBM Plex Mono',monospace;color:#fff">F</div>
+          <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px;color:var(--text)">General Fudge</div><div style="display:flex;gap:6px;align-items:center;margin-top:2px"><span style="font-size:11px;padding:1px 7px;border-radius:999px;background:var(--aibg);color:var(--aifg);font-weight:600">AI · medium</span></div></div>
+          <div style="display:flex;gap:10px;font:500 11px 'IBM Plex Mono',monospace;color:var(--muted);text-align:center"><div><div style="font-size:15px;color:var(--text);font-weight:600">4</div>hand</div><div><div style="font-size:15px;color:var(--text);font-weight:600">2</div>infl</div><div><div style="font-size:15px;color:var(--brand);font-weight:600">1</div>pts</div></div>
+        </div>
+        <span style="font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">compact · another seat (the bench column)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 4 BAG ================= -->
+  <div style="display:grid;grid-template-columns:300px minmax(0,1fr);gap:32px;padding-top:28px;border-top:1px solid var(--line)">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:baseline;gap:10px"><span style="font:600 12px 'IBM Plex Mono',monospace;color:var(--muted)">4</span><span style="font:700 24px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:var(--text)">Bag</span></div>
+      <div style="font-size:14px;line-height:1.5;color:var(--text)">A push-your-luck draw bag. The bag with its count, the known contents as chips if the rules allow, the chips pulled so far in a row, and a state: drawing, busted, or stopped. None of the four public games use it yet; it exists for the games that will.</div>
+      <div style="font:500 12px/1.7 'IBM Plex Mono',monospace;color:var(--muted);background:var(--surface2);border-radius:8px;padding:10px 12px">label<br>owner<br>count<br>contents[]: label, count, colorKey<br>revealRow[]: Card<br>status</div>
+      <div style="font-size:13px;line-height:1.5;color:var(--muted)"><span style="font-weight:600;color:var(--text)">Motion.</span> A pulled chip rises out of the bag and drops into the reveal row. Busted shakes the bag once.</div>
+    </div>
+    <div style="display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;gap:16px;align-items:center;padding:14px 16px;border-radius:12px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow)">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+            <div style="width:14px;height:10px;border-radius:4px 4px 0 0;background:var(--ink)"></div>
+            <div style="width:64px;height:58px;border-radius:12px 12px 26px 26px;background:var(--surface2);border:2px solid var(--ink);display:grid;place-items:center;font:600 16px 'IBM Plex Mono',monospace;color:var(--text);margin-top:-6px">11</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:11px;color:var(--muted)">Known contents</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;max-width:190px">
+              <span style="display:inline-flex;align-items:center;gap:4px;font:600 11px 'IBM Plex Mono',monospace;color:var(--text)"><span style="width:14px;height:14px;border-radius:50%;background:#ff004d;border:1.5px solid var(--ink)"></span>4</span>
+              <span style="display:inline-flex;align-items:center;gap:4px;font:600 11px 'IBM Plex Mono',monospace;color:var(--text)"><span style="width:14px;height:14px;border-radius:50%;background:#29adff;border:1.5px solid var(--ink)"></span>3</span>
+              <span style="display:inline-flex;align-items:center;gap:4px;font:600 11px 'IBM Plex Mono',monospace;color:var(--text)"><span style="width:14px;height:14px;border-radius:50%;background:#ffec27;border:1.5px solid var(--ink)"></span>3</span>
+              <span style="display:inline-flex;align-items:center;gap:4px;font:600 11px 'IBM Plex Mono',monospace;color:var(--text)"><span style="width:14px;height:14px;border-radius:50%;background:var(--ink);border:1.5px solid var(--ink)"></span>1</span>
+            </div>
+            <div style="font-size:11px;color:var(--muted)">Pulled this turn</div>
+            <div style="display:flex;gap:6px"><span style="width:22px;height:22px;border-radius:50%;background:#29adff;border:1.5px solid var(--ink)"></span><span style="width:22px;height:22px;border-radius:50%;background:#ff004d;border:1.5px solid var(--ink)"></span><span style="width:22px;height:22px;border-radius:50%;border:1.5px dashed var(--muted)"></span></div>
+          </div>
+          <span style="align-self:flex-start;font-size:11px;padding:2px 8px;border-radius:999px;background:var(--youbg);color:var(--youfg);font-weight:600">drawing</span>
+        </div>
+        <span style="font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">status: drawing · busted · stopped</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 5 TRACK ================= -->
+  <div style="display:grid;grid-template-columns:300px minmax(0,1fr);gap:32px;padding-top:28px;border-top:1px solid var(--line)">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:baseline;gap:10px"><span style="font:600 12px 'IBM Plex Mono',monospace;color:var(--muted)">5</span><span style="font:700 24px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:var(--text)">Track</span></div>
+      <div style="font-size:14px;line-height:1.5;color:var(--text)">A line or a ring of spaces. A score track, a progress track, a round marker. Spaces can be filled, can hold pieces, and can have markers pointing at them from above. A ring closes with a return arrow.</div>
+      <div style="font:500 12px/1.7 'IBM Plex Mono',monospace;color:var(--muted);background:var(--surface2);border-radius:8px;padding:10px 12px">label<br>cyclic<br>spaces[]: index, label, filled, pieces[]<br>markers[]: label, colorKey, at</div>
+      <div style="font-size:13px;line-height:1.5;color:var(--muted)"><span style="font-weight:600;color:var(--text)">Motion.</span> A piece hops one space per beat, never teleports to its total. A marker slides.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;gap:6px;align-items:flex-end">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:2px;width:34px"><span style="font:600 9px 'IBM Plex Mono',monospace;color:var(--muted)">first</span><span style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--ink)"></span></div>
+          <div style="width:34px"></div><div style="width:34px"></div><div style="width:34px"></div><div style="width:34px"></div><div style="width:34px"></div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <div style="width:34px;height:34px;border-radius:6px;background:var(--surface2);border:1px solid var(--line);position:relative;display:flex;align-items:center;justify-content:center;gap:2px;flex-wrap:wrap;padding:2px;box-sizing:border-box"><span style="position:absolute;top:1px;left:4px;font:500 9px 'IBM Plex Mono',monospace;color:var(--muted)">0</span></div>
+          <div style="width:34px;height:34px;border-radius:6px;background:var(--surface2);border:1px solid var(--line);position:relative;display:flex;align-items:center;justify-content:center;gap:2px;flex-wrap:wrap;padding:2px;box-sizing:border-box"><span style="position:absolute;top:1px;left:4px;font:500 9px 'IBM Plex Mono',monospace;color:var(--muted)">1</span><span style="width:12px;height:12px;border-radius:50%;background:#8b5a2b;border:1.5px solid var(--ink)"></span><span style="width:12px;height:12px;border-radius:50%;background:#f0f0f0;border:1.5px solid var(--ink)"></span></div>
+          <div style="width:34px;height:34px;border-radius:6px;background:var(--surface2);border:1px solid var(--line);position:relative;display:flex;align-items:center;justify-content:center;gap:2px;flex-wrap:wrap;padding:2px;box-sizing:border-box"><span style="position:absolute;top:1px;left:4px;font:500 9px 'IBM Plex Mono',monospace;color:var(--muted)">2</span><span style="width:12px;height:12px;border-radius:50%;background:#f5a623;border:1.5px solid var(--ink)"></span></div>
+          <div style="width:34px;height:34px;border-radius:6px;background:var(--surface2);border:1px solid var(--line);position:relative;display:flex;align-items:center;justify-content:center;gap:2px;flex-wrap:wrap;padding:2px;box-sizing:border-box"><span style="position:absolute;top:1px;left:4px;font:500 9px 'IBM Plex Mono',monospace;color:var(--muted)">3</span><span style="width:12px;height:12px;border-radius:50%;background:#9013fe;border:1.5px solid var(--ink)"></span></div>
+          <div style="width:34px;height:34px;border-radius:6px;background:var(--hlbg);border:1px solid var(--hl);position:relative;display:flex;align-items:center;justify-content:center;padding:2px;box-sizing:border-box"><span style="position:absolute;top:1px;left:4px;font:500 9px 'IBM Plex Mono',monospace;color:var(--muted)">4</span></div>
+          <div style="width:34px;height:34px;border-radius:6px;background:var(--surface2);border:1px solid var(--line);position:relative;display:flex;align-items:center;justify-content:center;padding:2px;box-sizing:border-box"><span style="position:absolute;top:1px;left:4px;font:500 9px 'IBM Plex Mono',monospace;color:var(--muted)">5</span></div>
+        </div>
+        <span style="font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">line · pieces on spaces · a filled space · a marker pointing from above</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;gap:6px;align-items:center">
+          <div style="width:28px;height:28px;border-radius:6px;background:var(--surface2);border:1px solid var(--line)"></div><div style="width:28px;height:28px;border-radius:6px;background:var(--surface2);border:1px solid var(--line)"></div><div style="width:28px;height:28px;border-radius:6px;background:var(--surface2);border:1px solid var(--line);display:grid;place-items:center"><span style="width:10px;height:10px;border-radius:50%;background:#f5a623;border:1.5px solid var(--ink)"></span></div><div style="width:28px;height:28px;border-radius:6px;background:var(--surface2);border:1px solid var(--line)"></div><div style="width:28px;height:28px;border-radius:6px;background:var(--surface2);border:1px solid var(--line)"></div>
+          <span style="font:600 14px 'IBM Plex Mono',monospace;color:var(--muted);margin-left:4px">↺</span>
+        </div>
+        <span style="font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">cyclic · the last space returns to the first</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 6 POOL ================= -->
+  <div style="display:grid;grid-template-columns:300px minmax(0,1fr);gap:32px;padding-top:28px;border-top:1px solid var(--line)">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:baseline;gap:10px"><span style="font:600 12px 'IBM Plex Mono',monospace;color:var(--muted)">6</span><span style="font:700 24px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:var(--text)">Pool</span></div>
+      <div style="font-size:14px;line-height:1.5;color:var(--text)">A supply of counted things: resource chips with quantities. The shared supply in the middle of the table, or a player's own stash inside their tableau.</div>
+      <div style="font:500 12px/1.7 'IBM Plex Mono',monospace;color:var(--muted);background:var(--surface2);border-radius:8px;padding:10px 12px">label<br>items[]: label, count, colorKey</div>
+      <div style="font-size:13px;line-height:1.5;color:var(--muted)"><span style="font-weight:600;color:var(--text)">Motion.</span> A chip flies from the supply to the tableau that gained it, and the count ticks down as it leaves. Spent chips fly back.</div>
+    </div>
+    <div style="display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;gap:14px;padding:12px 16px;border-radius:12px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow)">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:26px;height:26px;border-radius:50%;background:#ff004d;border:2px solid var(--ink)"></div><span style="font:600 12px 'IBM Plex Mono',monospace;color:var(--text)">4</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:26px;height:26px;border-radius:50%;background:#ffa300;border:2px solid var(--ink)"></div><span style="font:600 12px 'IBM Plex Mono',monospace;color:var(--text)">3</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:26px;height:26px;border-radius:50%;background:#ffec27;border:2px solid var(--ink)"></div><span style="font:600 12px 'IBM Plex Mono',monospace;color:var(--text)">4</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:26px;height:26px;border-radius:50%;background:#00e436;border:2px solid var(--ink)"></div><span style="font:600 12px 'IBM Plex Mono',monospace;color:var(--text)">2</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:26px;height:26px;border-radius:50%;background:#29adff;border:2px solid var(--ink)"></div><span style="font:600 12px 'IBM Plex Mono',monospace;color:var(--text)">4</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:26px;height:26px;border-radius:50%;background:#7e4fc9;border:2px solid var(--ink);opacity:.35"></div><span style="font:600 12px 'IBM Plex Mono',monospace;color:var(--muted)">0</span></div>
+          <div style="width:1px;background:var(--line)"></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:26px;height:26px;border-radius:6px;background:var(--surface2);border:2px solid var(--ink)"></div><span style="font:600 12px 'IBM Plex Mono',monospace;color:var(--text)">7</span></div>
+        </div>
+        <span style="font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">the Intel token supply and the sugar cubes · an empty item stays visible, dimmed</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 7 GRID ================= -->
+  <div style="display:grid;grid-template-columns:300px minmax(0,1fr);gap:32px;padding-top:28px;border-top:1px solid var(--line)">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:baseline;gap:10px"><span style="font:600 12px 'IBM Plex Mono',monospace;color:var(--muted)">7</span><span style="font:700 24px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:var(--text)">Grid</span></div>
+      <div style="font-size:14px;line-height:1.5;color:var(--text)">A square-cell board. Cells carry a terrain color; pieces are round tokens with an initial and small badges. A legal destination is a state on the cell and shows a ghost of the piece that would land there.</div>
+      <div style="font:500 12px/1.7 'IBM Plex Mono',monospace;color:var(--muted);background:var(--surface2);border-radius:8px;padding:10px 12px">label<br>extent: minX, minY, maxX, maxY<br>cells[]: x, y, terrain, pieces[]<br>pieces[]: label, colorKey, badges[]<br>coordinates</div>
+      <div style="font-size:13px;line-height:1.5;color:var(--muted)"><span style="font-weight:600;color:var(--text)">Motion.</span> A piece slides cell by cell along its path, about 170 ms per cell, scaled up and shadowed while it moves. Ghosts pop in and pulse.</div>
+    </div>
+    <div style="display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="position:relative;padding:10px;border-radius:12px;background:var(--boardbg);box-shadow:var(--shadow)">
+          <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;width:230px">
+            <div style="height:43px;border-radius:6px;background:#ff004d;border:1px solid var(--ink)"></div><div style="height:43px;border-radius:6px;background:#ffa300;border:1px solid var(--ink)"></div><div style="height:43px;border-radius:6px;background:#ffec27;border:1px solid var(--ink)"></div><div style="height:43px;border-radius:6px;background:#00e436;border:1px solid var(--ink)"></div><div style="height:43px;border-radius:6px;background:#29adff;border:1px solid var(--ink)"></div>
+            <div style="height:43px;border-radius:6px;background:var(--surface2);border:1px solid var(--line)"></div><div style="height:43px;border-radius:6px;background:var(--surface2);border:1px solid var(--line)"></div><div style="height:43px;border-radius:6px;background:#7e4fc9;border:1px solid var(--ink);box-shadow:0 0 0 3px var(--hlbg),0 0 0 5px var(--hl)"></div><div style="height:43px;border-radius:6px;background:var(--surface2);border:1px solid var(--line)"></div><div style="height:43px;border-radius:6px;background:var(--surface2);border:1px solid var(--line)"></div>
+            <div style="height:43px;border-radius:6px;background:#ff004d;border:1px solid var(--ink)"></div><div style="height:43px;border-radius:6px;background:var(--surface2);border:1px solid var(--line)"></div><div style="height:43px;border-radius:6px;background:var(--surface2);border:1px solid var(--line)"></div><div style="height:43px;border-radius:6px;background:var(--surface2);border:1px solid var(--line)"></div><div style="height:43px;border-radius:6px;background:#ffa300;border:1px solid var(--ink)"></div>
+          </div>
+          <!-- pieces -->
+          <div style="position:absolute;left:33px;top:33px;width:26px;height:26px;border-radius:50%;background:#f5a623;border:2px solid var(--ink);display:grid;place-items:center;font:600 12px 'IBM Plex Mono',monospace;color:#1c1a17;box-shadow:0 1px 2px rgba(0,0,0,.35);transform:translate(-50%,-50%)">L</div>
+          <div style="position:absolute;left:40px;top:26px;width:26px;height:26px;border-radius:50%;background:#8b5a2b;border:2px solid var(--ink);display:grid;place-items:center;font:600 12px 'IBM Plex Mono',monospace;color:#fff;box-shadow:0 1px 2px rgba(0,0,0,.35);transform:translate(-50%,-50%)">K</div>
+          <div style="position:absolute;left:218px;top:125px;width:26px;height:26px;border-radius:50%;background:#9013fe;border:2px solid var(--ink);display:grid;place-items:center;font:600 12px 'IBM Plex Mono',monospace;color:#fff;box-shadow:0 0 0 3px var(--surface),0 0 0 5px var(--action),0 6px 10px rgba(0,0,0,.3);transform:translate(-50%,-50%) scale(1.2)">A</div>
+          <div style="position:absolute;left:125px;top:79px;transform:translate(-50%,-50%)"><div style="width:30px;height:30px;border-radius:50%;background:var(--surface);border:2px dashed var(--brand);display:grid;place-items:center;font:600 12px 'IBM Plex Mono',monospace;color:var(--brand);animation:zk-pulse 1.4s infinite">A</div><div style="position:absolute;top:32px;left:50%;transform:translateX(-50%);white-space:nowrap;font:600 10px 'IBM Plex Sans',sans-serif;color:var(--surface);background:var(--brand);padding:1px 6px;border-radius:4px">road</div></div>
+        </div>
+        <span style="font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">terrain cells · stacked pieces offset 7 px · selected piece · legal-move ghost with a tag</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 8 MAP ================= -->
+  <div style="display:grid;grid-template-columns:300px minmax(0,1fr);gap:32px;padding-top:28px;border-top:1px solid var(--line)">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:baseline;gap:10px"><span style="font:600 12px 'IBM Plex Mono',monospace;color:var(--muted)">8</span><span style="font:700 24px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:var(--text)">Map</span></div>
+      <div style="font-size:14px;line-height:1.5;color:var(--text)">A positional board. Named regions placed at points on a background, pieces stacked on regions. Cybernoir's 19 locations are a map. The real Sweetlands board of 80 spaces is one too.</div>
+      <div style="font:500 12px/1.7 'IBM Plex Mono',monospace;color:var(--muted);background:var(--surface2);border-radius:8px;padding:10px 12px">label<br>aspect<br>nodes[]: id, label, x%, y%, colorKey, size, badges[]<br>nodes[].pieces[]: label, colorKey, count</div>
+      <div style="font-size:13px;line-height:1.5;color:var(--muted)"><span style="font-weight:600;color:var(--text)">Motion.</span> A piece travels from region to region along a straight or routed path. Hidden pieces are drawn as a count on the region, never as a ghost.</div>
+    </div>
+    <div style="display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="position:relative;width:420px;height:230px;border-radius:12px;background:var(--boardbg);box-shadow:var(--shadow)">
+          <div style="position:absolute;left:14%;top:30%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:64px;height:44px;border-radius:22px;background:var(--surface2);border:1px solid var(--line);display:grid;place-items:center;position:relative"><span style="position:absolute;left:18px;top:10px;width:22px;height:22px;border-radius:50%;background:#1f6e8c;border:2px solid var(--ink);display:grid;place-items:center;font:600 10px 'IBM Plex Mono',monospace;color:#fff">D</span></div><span style="font:600 10px 'IBM Plex Sans',sans-serif;color:var(--text)">Precinct 9</span></div>
+          <div style="position:absolute;left:44%;top:26%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:64px;height:44px;border-radius:22px;background:var(--surface2);border:1px solid var(--line)"></div><span style="font:600 10px 'IBM Plex Sans',sans-serif;color:var(--text)">Neon Row</span></div>
+          <div style="position:absolute;left:76%;top:34%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:64px;height:44px;border-radius:22px;background:var(--surface2);border:1px solid var(--line);opacity:.45;position:relative"><span style="position:absolute;inset:0;display:grid;place-items:center;font:600 10px 'IBM Plex Mono',monospace;color:var(--muted)">crossed off</span></div><span style="font:600 10px 'IBM Plex Sans',sans-serif;color:var(--muted)">The Docks</span></div>
+          <div style="position:absolute;left:30%;top:72%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:64px;height:44px;border-radius:22px;background:var(--hlbg);border:1px solid var(--hl);box-shadow:0 0 0 3px var(--hlbg),0 0 0 5px var(--hl)"></div><span style="font:600 10px 'IBM Plex Sans',sans-serif;color:var(--text)">Old Hive</span></div>
+          <div style="position:absolute;left:62%;top:74%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:64px;height:44px;border-radius:22px;background:var(--surface2);border:1px solid var(--line);display:grid;place-items:center"><span style="font:600 11px 'IBM Plex Mono',monospace;background:var(--tagbg);color:var(--tagfg);border-radius:999px;padding:1px 7px">×2 hidden</span></div><span style="font:600 10px 'IBM Plex Sans',sans-serif;color:var(--text)">Boonies Gate</span></div>
+        </div>
+        <span style="font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">regions at percent coordinates · a piece on a region · a legal destination · a crossed-off region · hidden pieces as a count</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= INTERACTION + THEMING ================= -->
+  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px;padding-top:28px;border-top:1px solid var(--line)">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font:700 20px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:var(--text)">One way to touch everything</div>
+      <div style="font-size:14px;line-height:1.55;color:var(--text)">Every primitive tells the table the same thing when tapped: which kind of part, which id, which label. The table decides what the tap means; the part never does. Legal-move highlighting, selection, and disabled are states the table sets on the part. There is no separate hit layer over the board.</div>
+      <div style="font:500 12px/1.7 'IBM Plex Mono',monospace;color:var(--muted);background:var(--surface2);border-radius:8px;padding:10px 12px">select → { component, id, label }</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font:700 20px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:var(--text)">Games bring colors, not parts</div>
+      <div style="font-size:14px;line-height:1.55;color:var(--text)">A primitive never hard-codes a game's colors. Each card, piece, cell, and region carries a color key; the game supplies a palette that maps keys to colors, and the primitives read it. Sweetlands maps its six space colors and five factions; Cybernoir maps stamp red and glacier blue; a new game maps its own and gets the whole set for free.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)"><span style="display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:6px;background:var(--surface2)"><span style="width:12px;height:12px;border-radius:3px;background:#ff004d"></span>red</span><span style="display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:6px;background:var(--surface2)"><span style="width:12px;height:12px;border-radius:3px;background:#f5a623"></span>milkshake</span><span style="display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:6px;background:var(--surface2)"><span style="width:12px;height:12px;border-radius:3px;background:#1f6e8c"></span>detective</span><span style="display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:6px;background:var(--surface2)"><span style="width:12px;height:12px;border-radius:3px;background:#b3222a"></span>stamp</span></div>
+    </div>
+  </div>
+
+  <!-- ================= MAPPING ================= -->
+  <div style="display:flex;flex-direction:column;gap:14px;padding-top:28px;border-top:1px solid var(--line)">
+    <div style="font:700 20px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:var(--text)">On the Sweetlands table, which part is which</div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;font-size:13px;line-height:1.45;color:var(--text)">
+      <div style="padding:12px 14px;border-radius:12px;background:var(--surface);border:1px solid var(--line)"><div style="font:600 11px 'IBM Plex Mono',monospace;color:var(--muted);margin-bottom:4px">Grid</div>The board, its colored spaces, the roads, and the castle. The pieces and the legal-move ghosts are the grid's own. (The real board is a Map of 80 regions; the draft draws it as a grid.)</div>
+      <div style="padding:12px 14px;border-radius:12px;background:var(--surface);border:1px solid var(--line)"><div style="font:600 11px 'IBM Plex Mono',monospace;color:var(--muted);margin-bottom:4px">Card zone · fan</div>Your hand, bottom center.</div>
+      <div style="padding:12px 14px;border-radius:12px;background:var(--surface);border:1px solid var(--line)"><div style="font:600 11px 'IBM Plex Mono',monospace;color:var(--muted);margin-bottom:4px">Card zone · pile</div>The Intel deck (hidden, count only, pulses when a Draw is owed) and the discard (top card face up).</div>
+      <div style="padding:12px 14px;border-radius:12px;background:var(--surface);border:1px solid var(--line)"><div style="font:600 11px 'IBM Plex Mono',monospace;color:var(--muted);margin-bottom:4px">Tableau</div>Your panel at bottom left, with a Pool nested in it for your tokens. Each other seat in the bench column is a compact tableau.</div>
+      <div style="padding:12px 14px;border-radius:12px;background:var(--surface);border:1px solid var(--line)"><div style="font:600 11px 'IBM Plex Mono',monospace;color:var(--muted);margin-bottom:4px">Track</div>The points track in the bench column, 0 to 5, with every seat's marker.</div>
+      <div style="padding:12px 14px;border-radius:12px;background:var(--surface);border:1px solid var(--line)"><div style="font:600 11px 'IBM Plex Mono',monospace;color:var(--muted);margin-bottom:4px">Card</div>Every Intel card in the hand, the discard top, and the card faces sheet on the overview.</div>
+      <div style="padding:12px 14px;border-radius:12px;background:var(--surface);border:1px solid var(--line)"><div style="font:600 11px 'IBM Plex Mono',monospace;color:var(--muted);margin-bottom:4px">Not a primitive</div>The Roll (dice in the battle modal), the Draw prompt, the lesson popup, the slideshow caption, and the top bar are table chrome. They are the same on every game and live above the board.</div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":3260},"theme":{"editor":"enum","options":["light","dark"],"default":"light","tsType":"&#39;light&#39;|&#39;dark&#39;","section":"Sheet"}}'>
+const THEMES={
+ light:{'--bg':'#f7f1e6','--surface':'#ffffff','--surface2':'#efe7d8','--text':'#1c1a17','--muted':'#6b655b','--brand':'#1f4d3a','--action':'#e0762b','--actionh':'#c9662a','--hl':'#1f4d3a','--hlbg':'#e6efe9','--youbg':'#fbe3d2','--youfg':'#7a3a12','--aibg':'#dde9e1','--aifg':'#1f4d3a','--tagbg':'#efe7d8','--tagfg':'#4a4438','--danger':'#b3261e','--line':'rgba(28,26,23,.12)','--ink':'#1c1a17','--boardbg':'#ffffff','--cardface':'#fffdf8','--cardback':'#efe7d8','--shadow':'0 1px 2px rgba(28,26,23,.06),0 4px 12px rgba(28,26,23,.06)'},
+ dark:{'--bg':'#1a221c','--surface':'#232e26','--surface2':'#2c3a30','--text':'#f3ead9','--muted':'#b1ac9f','--brand':'#9bb08a','--action':'#ff8a3d','--actionh':'#e2792f','--hl':'#9bb08a','--hlbg':'#2f4a3a','--youbg':'#5a2c10','--youfg':'#fbe3d2','--aibg':'#1f4d3a','--aifg':'#dde9e1','--tagbg':'#2e3b31','--tagfg':'#cfd8c6','--danger':'#ff7b6b','--line':'rgba(243,234,217,.12)','--ink':'#0f150f','--boardbg':'#2a352d','--cardface':'#2f3b32','--cardback':'#3a4a3f','--shadow':'0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.3)'}
+};
+class Component extends DCLogic{
+ renderVals(){const T=THEMES[this.props.theme||'light'];
+  return{rootStyle:{...T,width:'1440px',minHeight:'3260px',boxSizing:'border-box',padding:'48px 56px 64px',display:'flex',flexDirection:'column',gap:'28px',background:'var(--bg)',fontFamily:"'IBM Plex Sans',sans-serif",borderRadius:'12px',position:'relative'}};}
+}
+</script>
+</body>
+</html>

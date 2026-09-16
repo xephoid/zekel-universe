@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#ebe3d4}a{color:#1f4d3a}a:hover{color:#e0762b}</style>
+</helmet>
+<section style="padding:48px 56px 24px;font-family:'IBM Plex Sans',sans-serif;color:#1c1a17;display:flex;flex-direction:column;gap:32px;border-bottom:1px solid rgba(28,26,23,.12)" data-screen-label="Turn 3">
+  <div style="max-width:720px">
+    <div style="font:700 30px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:#1f4d3a">Sign-in · profile · end of game · listen mode</div>
+    <div style="font-size:15px;line-height:1.5;color:#6b655b;margin-top:8px">Same linked flow. Play with friends now asks for sign-in over the game page; the designer name opens their profile; End of game sits over the finished table; listen mode is the Warble Way voice table.</div>
+  </div>
+  <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start">
+    <div id="3a" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px"><span style="font:600 12px 'IBM Plex Mono',monospace;background:#1f4d3a;color:#fff;padding:3px 8px;border-radius:6px">3a</span><span style="font-weight:600;font-size:14px">Sign-in</span><span style="font-size:13px;color:#6b655b">— passwordless, over the page that asked for it; guest escape hatch at the bottom</span></div>
+      <dc-import name="Zekel Pages" start="signin" hint-size="1440px,900px" style="width:1440px;height:900px;box-shadow:0 20px 60px rgba(28,26,23,.18);border-radius:12px"></dc-import>
+    </div>
+    <div id="3b" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px"><span style="font:600 12px 'IBM Plex Mono',monospace;background:#1f4d3a;color:#fff;padding:3px 8px;border-radius:6px">3b</span><span style="font-weight:600;font-size:14px">Designer profile</span><span style="font-size:13px;color:#6b655b">— storefront: games, updates; your friends list with invite-to-a-table</span></div>
+      <dc-import name="Zekel Pages" start="profile" hint-size="1440px,900px" style="width:1440px;height:900px;box-shadow:0 20px 60px rgba(28,26,23,.18);border-radius:12px"></dc-import>
+    </div>
+  </div>
+  <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start">
+    <div id="3c" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px"><span style="font:600 12px 'IBM Plex Mono',monospace;background:#1f4d3a;color:#fff;padding:3px 8px;border-radius:6px">3c</span><span style="font-weight:600;font-size:14px">End of game</span><span style="font-size:13px;color:#6b655b">— final table behind; play again, share, game page</span></div>
+      <dc-import name="Zekel Pages" start="end" hint-size="1440px,900px" style="width:1440px;height:900px;box-shadow:0 20px 60px rgba(28,26,23,.18);border-radius:12px"></dc-import>
+    </div>
+    <div id="3d" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px"><span style="font:600 12px 'IBM Plex Mono',monospace;background:#1f4d3a;color:#fff;padding:3px 8px;border-radius:6px">3d</span><span style="font-weight:600;font-size:14px">Listen mode (voice on)</span><span style="font-size:13px;color:#6b655b">— mic state, your-move cue with the numbered moves, transcript; click a move to hear it play out</span></div>
+      <dc-import name="Zekel Pages" start="voice" hint-size="1440px,900px" style="width:1440px;height:900px;box-shadow:0 20px 60px rgba(28,26,23,.18);border-radius:12px"></dc-import>
+    </div>
+  </div>
+</section>
+<section style="padding:48px 56px 24px;font-family:'IBM Plex Sans',sans-serif;color:#1c1a17;display:flex;flex-direction:column;gap:32px;border-bottom:1px solid rgba(28,26,23,.12)" data-screen-label="Turn 2">
+  <div style="max-width:720px">
+    <div style="font:700 30px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:#1f4d3a">Pages · home → game → setup → lobby → table</div>
+    <div style="font-size:15px;line-height:1.5;color:#6b655b;margin-top:8px">Every frame is the same linked flow, each opened on a different page. Home is resume-first. Click through any of them. Game covers are flat placeholders for art. Designer names are invented.</div>
+  </div>
+  <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start">
+    <div id="2b" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px"><span style="font:600 12px 'IBM Plex Mono',monospace;background:#1f4d3a;color:#fff;padding:3px 8px;border-radius:6px">2b</span><span style="font-weight:600;font-size:14px">Home</span><span style="font-size:13px;color:#6b655b">— My tables on top when a turn is pending; “Take your turn” opens the table</span></div>
+      <dc-import name="Zekel Pages" start="home" home="resume" hint-size="1440px,900px" style="width:1440px;height:900px;box-shadow:0 20px 60px rgba(28,26,23,.18);border-radius:12px"></dc-import>
+    </div>
+  </div>
+  <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start">
+    <div id="2c" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px"><span style="font:600 12px 'IBM Plex Mono',monospace;background:#1f4d3a;color:#fff;padding:3px 8px;border-radius:6px">2c</span><span style="font-weight:600;font-size:14px">Game page</span><span style="font-size:13px;color:#6b655b">— Play now (AI, no account) vs Play with friends; devlog below</span></div>
+      <dc-import name="Zekel Pages" start="game" hint-size="1440px,900px" style="width:1440px;height:900px;box-shadow:0 20px 60px rgba(28,26,23,.18);border-radius:12px"></dc-import>
+    </div>
+    <div id="2d" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px"><span style="font:600 12px 'IBM Plex Mono',monospace;background:#1f4d3a;color:#fff;padding:3px 8px;border-radius:6px">2d</span><span style="font-weight:600;font-size:14px">Table setup</span><span style="font-size:13px;color:#6b655b">— seats, AI difficulty, live/by turns, the game's own kingdom choice</span></div>
+      <dc-import name="Zekel Pages" start="setup" hint-size="1440px,900px" style="width:1440px;height:900px;box-shadow:0 20px 60px rgba(28,26,23,.18);border-radius:12px"></dc-import>
+    </div>
+  </div>
+  <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start">
+    <div id="2e" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px"><span style="font:600 12px 'IBM Plex Mono',monospace;background:#1f4d3a;color:#fff;padding:3px 8px;border-radius:6px">2e</span><span style="font-weight:600;font-size:14px">Lobby</span><span style="font-size:13px;color:#6b655b">— invite Sam and he arrives; ready up, then Start</span></div>
+      <dc-import name="Zekel Pages" start="lobby" hint-size="1440px,900px" style="width:1440px;height:900px;box-shadow:0 20px 60px rgba(28,26,23,.18);border-radius:12px"></dc-import>
+    </div>
+  </div>
+</section>
+<section style="padding:48px 56px;font-family:'IBM Plex Sans',sans-serif;color:#1c1a17;display:flex;flex-direction:column;gap:32px" data-screen-label="Turn 1">
+  <div style="max-width:720px">
+    <div style="display:flex;align-items:baseline;gap:14px"><span style="display:inline-flex;align-items:center;gap:2px;font:700 48px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:#1f4d3a">ze<span style="display:inline-block;width:40px;height:40px;position:relative;transform:rotate(-90deg);margin:0 2px"><span style="position:absolute;left:50%;top:0;width:34%;height:34%;transform:translateX(-50%);border-radius:50%;background:#e0762b"></span><span style="position:absolute;left:0;top:28%;width:100%;height:24%;border-radius:999px;background:#1f4d3a"></span><span style="position:absolute;left:50%;top:40%;width:48%;height:36%;transform:translateX(-50%);border-radius:3px 3px 1px 1px;background:#1f4d3a"></span><span style="position:absolute;left:14%;bottom:0;width:32%;height:38%;border-radius:3px;transform:rotate(14deg);transform-origin:top center;background:#1f4d3a"></span><span style="position:absolute;right:14%;bottom:0;width:32%;height:38%;border-radius:3px;transform:rotate(-14deg);transform-origin:top center;background:#1f4d3a"></span></span>el</span><span style="font:700 30px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:#6b655b">the table, desktop</span></div>
+    <div style="font-size:15px;line-height:1.5;color:#6b655b;margin-top:8px">Sweetlands Imperium, round 6, your turn. It opens on the Recall step (send units home, or keep them out), then a Draw button for your turn-start Intel, then Play: click a card in your hand to see where each of your units would land, click a ghost to move, answer the action prompt. Undo is live. End turn plays General Fudge's move as a slideshow with a pace control. Red on a rival Knight opens the Roll; Blue opens the Draw.</div>
+  </div>
+
+  <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start">
+    <div id="1c" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px"><span style="font:600 12px 'IBM Plex Mono',monospace;background:#1f4d3a;color:#fff;padding:3px 8px;border-radius:6px">1c</span><span style="font-weight:600;font-size:14px">Bench layout · light</span><span style="font-size:13px;color:#6b655b">— seats, points and log stacked in one 420 px column</span></div>
+      <dc-import name="Sweetlands Table" theme="light" layout="bench" hint-size="1440px,900px" style="width:1440px;height:900px;box-shadow:0 20px 60px rgba(28,26,23,.18);border-radius:12px"></dc-import>
+    </div>
+    <div id="1d" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px"><span style="font:600 12px 'IBM Plex Mono',monospace;background:#1f4d3a;color:#fff;padding:3px 8px;border-radius:6px">1d</span><span style="font-weight:600;font-size:14px">Bench layout · dark</span></div>
+      <dc-import name="Sweetlands Table" theme="dark" layout="bench" hint-size="1440px,900px" style="width:1440px;height:900px;box-shadow:0 20px 60px rgba(28,26,23,.25);border-radius:12px"></dc-import>
+    </div>
+  </div>
+
+  <!-- card faces -->
+  <div id="1e" style="display:flex;flex-direction:column;gap:12px">
+    <div style="display:flex;align-items:center;gap:10px"><span style="font:600 12px 'IBM Plex Mono',monospace;background:#1f4d3a;color:#fff;padding:3px 8px;border-radius:6px">1e</span><span style="font-weight:600;font-size:14px">Intel card faces · Chip</span><span style="font-size:13px;color:#6b655b">— single, double and treat, both themes.</span></div>
+    <div style="display:flex;gap:24px;flex-wrap:wrap">
+      <sc-for list="{{ faceThemes }}" as="ft" hint-placeholder-count="2">
+        <div style="background:{{ ft.bg }};border-radius:12px;padding:24px;display:flex;gap:36px;box-shadow:0 12px 40px rgba(28,26,23,.14)">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="font:600 12px 'IBM Plex Mono',monospace;color:{{ ft.muted }}">A colored chip like the board space it sends you to</div>
+            <div style="display:flex;gap:12px">
+              <div style="width:110px;height:156px;border-radius:8px;background:{{ ft.face }};border:1px solid {{ ft.line }};box-shadow:0 2px 6px rgba(0,0,0,.12);position:relative;padding:10px;box-sizing:border-box;display:flex;flex-direction:column;gap:8px">
+                <div style="width:40px;height:40px;border-radius:8px;background:#ff004d;border:1.5px solid #1c1a17"></div>
+                <div style="font:700 15px 'Bricolage Grotesque',sans-serif;color:{{ ft.text }}">Red</div>
+                <div style="font-size:11px;color:{{ ft.muted }};line-height:1.3">Move a unit to the next red space. Knight: battle.</div>
+              </div>
+              <div style="width:110px;height:156px;border-radius:8px;background:{{ ft.face }};border:1px solid {{ ft.line }};box-shadow:0 2px 6px rgba(0,0,0,.12);position:relative;padding:10px;box-sizing:border-box;display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;gap:4px"><div style="width:40px;height:40px;border-radius:8px;background:#ffa300;border:1.5px solid #1c1a17"></div><div style="width:40px;height:40px;border-radius:8px;background:#ffa300;border:1.5px solid #1c1a17"></div></div>
+                <div style="font:700 15px 'Bricolage Grotesque',sans-serif;color:{{ ft.text }}">Orange ×2</div>
+                <div style="font-size:11px;color:{{ ft.muted }};line-height:1.3">Two orange moves, same unit. Leader: influence.</div>
+              </div>
+              <div style="width:110px;height:156px;border-radius:8px;background:{{ ft.face }};border:1px solid {{ ft.line }};box-shadow:0 2px 6px rgba(0,0,0,.12);position:relative;padding:10px;box-sizing:border-box;display:flex;flex-direction:column;gap:8px">
+                <div style="width:40px;height:40px;border-radius:50%;background:#ffd6e0;border:1.5px dashed #1c1a17;display:grid;place-items:center;font:600 14px 'IBM Plex Mono',monospace;color:#1c1a17">?</div>
+                <div style="font:700 15px 'Bricolage Grotesque',sans-serif;color:{{ ft.text }}">Gummy Bear</div>
+                <div style="font-size:11px;color:{{ ft.muted }};line-height:1.3">Any unit straight to the Gummy Bear tile.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic{
+ renderVals(){return{faceThemes:[{bg:'#f7f1e6',face:'#fffdf8',line:'rgba(28,26,23,.14)',text:'#1c1a17',muted:'#6b655b'},{bg:'#1a221c',face:'#2f3b32',line:'rgba(243,234,217,.14)',text:'#f3ead9',muted:'#b1ac9f'}]};}
+}
+</script>
+</body>
+</html>
