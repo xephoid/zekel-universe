@@ -8,7 +8,7 @@ This repository currently holds the design work:
 
 - `docs/design-brief.md` — the design brief and the decisions made so far
 - `docs/games/` — a designer's reference for each of the first four games
-- `docs/design/` — the design canvas working files and the original draft
+- `docs/design/` — the design canvas working files
 - `docs/brand/` — the wordmark
 
 Licensed under Apache 2.0. See `LICENSE`.
