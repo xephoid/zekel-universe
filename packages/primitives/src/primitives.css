@@ -23,8 +23,8 @@
 }
 /* a lit part breathes so the eye finds it */
 @keyframes zk-breathe {
-  0%, 100% { box-shadow: 0 0 0 3px var(--highlight); }
-  50% { box-shadow: 0 0 0 5px var(--highlight); }
+  0%, 100% { box-shadow: 0 0 0 3px var(--lit, var(--highlight)); }
+  50% { box-shadow: 0 0 0 5px var(--lit, var(--highlight)); }
 }
 
 .zk-lift { box-shadow: var(--shadow-lift) !important; }
@@ -206,8 +206,8 @@
 @media (prefers-reduced-motion: reduce) {
   [data-motion] .zk-die.rolling { animation-name: zk-fade; }
   [data-motion] .zk-card-flipper { transition-property: opacity; }
-  [data-motion] .zk-lit { animation: none; box-shadow: 0 0 0 4px var(--highlight); }
+  [data-motion] .zk-lit { animation: none; box-shadow: 0 0 0 4px var(--lit, var(--highlight)); }
 }
 [data-motion='reduced'] .zk-die.rolling { animation-name: zk-fade; }
 [data-motion='reduced'] .zk-card-flipper { transition-property: opacity; }
-[data-motion='reduced'] .zk-lit { animation: none; box-shadow: 0 0 0 4px var(--highlight); }
+[data-motion='reduced'] .zk-lit { animation: none; box-shadow: 0 0 0 4px var(--lit, var(--highlight)); }

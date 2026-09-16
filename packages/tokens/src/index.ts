@@ -5,36 +5,40 @@
 export const tokens = {
   color: {
     brand: {
-      green: '#3E7C4F',
-      orange: '#E8862E', // meeple head in the wordmark
+      green: '#1F4D3A',
+      orange: '#E0762B', // the all-orange meeple in the wordmark
+      orangeHover: '#C9662A',
     },
     // Light theme (default)
-    bg: '#F5F0E8',        // warm paper
-    bgRaised: '#FDFBF7',
-    fg: '#2B2620',
+    bg: '#F7F1E6',        // warm paper
+    bgRaised: '#FFFEFA',
+    fg: '#1C1A17',
     fgMuted: '#6E6558',
-    accent: '#3E7C4F',
+    accent: '#1F4D3A',
     border: '#DDD3C4',
-    card: '#FDFBF7',
+    card: '#FFFEFA',
     cardBack: '#5B6B7A',
     // Dark theme
     dark: {
-      bg: '#221E19',
-      bgRaised: '#2C2721',
-      fg: '#EFE8DC',
-      fgMuted: '#A79B89',
-      accent: '#5FA873',
-      border: '#453E34',
-      card: '#2C2721',
+      bg: '#1A221C',
+      bgRaised: '#232E26',
+      fg: '#F3EAD9',
+      fgMuted: '#B1AC9F',
+      accent: '#9BB08A',
+      border: '#3A443C',
+      card: '#232E26',
       cardBack: '#3E4A57',
+      orange: '#FF8A3D',
     },
-    danger: '#B4452F',
-    highlight: '#FFD97A', // lit-part glow for legal moves
+    danger: '#B3261E',
+    highlight: '#E6EFE9', // selection and turn-pill glow
+    lit: '#E0762B', // legal-move ring, light theme (dark: the brighter orange)
   },
   font: {
-    body: "'Nunito', system-ui, sans-serif",
-    display: "'Fredoka', 'Nunito', system-ui, sans-serif",
-    mono: "ui-monospace, 'Cascadia Code', monospace",
+    body: "'IBM Plex Sans', system-ui, sans-serif",
+    display: "'Bricolage Grotesque', 'IBM Plex Sans', system-ui, sans-serif",
+    wordmark: "'Slackey', system-ui, sans-serif",
+    mono: "'IBM Plex Mono', ui-monospace, monospace",
   },
   radius: { sm: '4px', md: '8px', lg: '14px', round: '999px' },
   shadow: {

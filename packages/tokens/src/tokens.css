@@ -1,33 +1,38 @@
 /* CSS variables mirroring src/index.ts. Import once in the web app.
-   Source of truth: packages/tokens/src/index.ts — keep the two in sync. */
+   Source of truth: packages/tokens/src/index.ts — keep the two in sync.
+   Palette and type follow docs/design-brief.md's "Design system to start
+   from" (the engine's debug client palette, IBM Plex faces). */
 :root {
-  --brand-green: #3E7C4F;
-  --brand-orange: #E8862E;
+  --brand-green: #1F4D3A;
+  --brand-orange: #E0762B;
+  --brand-orange-hover: #C9662A;
 
-  --bg: #F5F0E8;
-  --bg-raised: #FDFBF7;
-  --fg: #2B2620;
+  --bg: #F7F1E6;
+  --bg-raised: #FFFEFA;
+  --fg: #1C1A17;
   --fg-muted: #6E6558;
-  --accent: #3E7C4F;
+  --accent: #1F4D3A;
   --border: #DDD3C4;
-  --card: #FDFBF7;
+  --card: #FFFEFA;
   --card-back: #5B6B7A;
-  --danger: #B4452F;
-  --highlight: #FFD97A;
+  --danger: #B3261E;
+  --highlight: #E6EFE9;
+  --lit: #E0762B; /* legal-move ring: the action orange */
 
-  --font-body: 'Nunito', system-ui, sans-serif;
-  --font-display: 'Fredoka', 'Nunito', system-ui, sans-serif;
-  --font-mono: ui-monospace, 'Cascadia Code', monospace;
+  --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-display: 'Bricolage Grotesque', 'IBM Plex Sans', system-ui, sans-serif;
+  --font-wordmark: 'Slackey', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 14px;
   --radius-round: 999px;
 
-  --shadow-sm: 0 1px 0 rgba(43,38,32,0.12);
-  --shadow-md: 0 2px 0 rgba(43,38,32,0.14);
+  --shadow-sm: 0 1px 0 rgba(28,26,23,0.12);
+  --shadow-md: 0 2px 0 rgba(28,26,23,0.14);
   /* a moving thing lifts: its shadow grows while it travels */
-  --shadow-lift: 0 10px 18px rgba(43,38,32,0.28);
+  --shadow-lift: 0 10px 18px rgba(28,26,23,0.28);
 
   --motion-fast: 120ms;
   --motion-normal: 240ms;
@@ -41,14 +46,19 @@
 }
 
 [data-theme='dark'] {
-  --bg: #221E19;
-  --bg-raised: #2C2721;
-  --fg: #EFE8DC;
-  --fg-muted: #A79B89;
-  --accent: #5FA873;
-  --border: #453E34;
-  --card: #2C2721;
+  --bg: #1A221C;
+  --bg-raised: #232E26;
+  --fg: #F3EAD9;
+  --fg-muted: #B1AC9F;
+  --accent: #9BB08A;
+  --border: #3A443C;
+  --card: #232E26;
   --card-back: #3E4A57;
+  --danger: #FF7B6B;
+  --highlight: #2E3A32;
+  --lit: #FF8A3D;
+  --brand-orange: #FF8A3D;
+  --brand-orange-hover: #E0762B;
   --shadow-lift: 0 10px 18px rgba(0,0,0,0.5);
 }
 

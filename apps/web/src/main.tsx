@@ -1,3 +1,4 @@
+import './fonts.css';
 import '@universe/tokens/css';
 import '@universe/primitives/css';
 import './app.css';
