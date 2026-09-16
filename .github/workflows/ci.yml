@@ -6,26 +6,55 @@ on:
   pull_request:
 
 jobs:
-  # Typecheck and unit-test every package in the pnpm workspace.
+  # Build every package, typecheck, unit-test, and prove the built server
+  # starts under plain Node.
   build-test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: universe
+          POSTGRES_USER: universe
+          POSTGRES_PASSWORD: universe
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U universe -d universe"
+          --health-interval 5s --health-timeout 3s --health-retries 20
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
         with:
-          version: 10
+          version: 10.19.0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm typecheck
-      - run: pnpm test
+      - run: pnpm build
+      - run: pnpm -r typecheck
+      - name: Unit tests (SQLite, plus the Postgres schema and sequencing test)
+        env:
+          TEST_DATABASE_URL: postgres://universe:universe@localhost:5432/universe
+        run: pnpm -r test
+      - name: The built server starts with Node and answers
+        env:
+          NODE_ENV: production
+          SECRET_KEY: ci-secret
+          ENGINE_TOKEN: ci-token
+          ENGINE_URL: http://127.0.0.1:1/mcp
+          APP_ORIGIN: http://localhost:8788
+          DATABASE_URL: postgres://universe:universe@localhost:5432/universe
+          PORT: 8788
+        run: |
+          node apps/server/dist/index.js &
+          for i in $(seq 1 30); do curl -sf http://localhost:8788/api/games >/dev/null && break; sleep 1; done
+          curl -sf http://localhost:8788/api/games
+          kill %1
 
-  # Run the engine-client contract tests against a real engine in Docker.
-  # The engine image builds from the sibling zekel repo, checked out beside
-  # this one to match infra/docker-compose.yml's build context (../zekel).
-  engine-contract:
+  # Against a real engine in Docker: the engine-client contract tests, then
+  # a full browser game of Fractured Fist through the built server.
+  engine-contract-and-e2e:
     runs-on: ubuntu-latest
     steps:
       - name: Check out universe
@@ -39,7 +68,7 @@ jobs:
           path: zekel
       - uses: pnpm/action-setup@v4
         with:
-          version: 10
+          version: 10.19.0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -53,6 +82,7 @@ jobs:
         env:
           ENGINE_TOKEN: ci-contract-token
           SECRET_KEY: ci-secret
+          POSTGRES_PASSWORD: ci-postgres
         run: |
           docker compose -f infra/docker-compose.yml up -d --build engine
           docker compose -f infra/docker-compose.yml ps
@@ -61,11 +91,42 @@ jobs:
         env:
           ENGINE_URL: http://localhost:8787/mcp
           ENGINE_TOKEN: ci-contract-token
-        run: pnpm --filter @universe/engine-client test
-      - name: Engine logs on failure
+        run: pnpm build:packages && pnpm --filter @universe/engine-client test
+      - name: Build and start the server
+        working-directory: zekel-universe
+        env:
+          NODE_ENV: production
+          SECRET_KEY: ci-secret
+          ENGINE_TOKEN: ci-contract-token
+          ENGINE_URL: http://localhost:8787/mcp
+          APP_ORIGIN: http://localhost:8788
+          DATABASE_URL: sqlite:./e2e.db
+          PORT: 8788
+        run: |
+          pnpm build
+          (node apps/server/dist/index.js > server.log 2>&1 &)
+          for i in $(seq 1 30); do curl -sf http://localhost:8788/api/games >/dev/null && break; sleep 1; done
+      - name: Install Playwright
+        working-directory: zekel-universe
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Play a full game in the browser
+        working-directory: zekel-universe
+        env:
+          BASE_URL: http://localhost:8788
+        run: pnpm test:e2e
+      - name: Logs on failure
         if: failure()
         working-directory: zekel-universe
-        run: docker compose -f infra/docker-compose.yml logs engine
+        run: |
+          docker compose -f infra/docker-compose.yml logs engine || true
+          cat server.log || true
+      - name: Upload the browser report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: zekel-universe/e2e/report
+          if-no-files-found: ignore
       - name: Tear down
         if: always()
         working-directory: zekel-universe

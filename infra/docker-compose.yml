@@ -1,21 +1,24 @@
-# Local dev and test stack for Zekel Universe.
+# Local dev and test stack for Zekel Universe: the engine in HTTP mode, the
+# server with the web app built in, and Postgres, as in production.
 #
 # The engine image builds from a sibling checkout of the zekel engine repo,
 # so clone both repos side by side:
 #
 #   code/
-#     zekel/           <- https://github.com/... the engine
+#     zekel/           <- the engine
 #     zekel-universe/  <- this repo
 #
 # Then, from this repo root:
 #
 #   cp .env.example .env   # fill in values
-#   docker compose -f infra/docker-compose.yml up
+#   docker compose -f infra/docker-compose.yml up --build
+#
+# Paths below are relative to this file (infra/).
 
 services:
   engine:
     build:
-      context: ../zekel
+      context: ../../zekel
       dockerfile: ../zekel-universe/infra/engine.Dockerfile
     environment:
       MCP_TRANSPORT: http
@@ -34,44 +37,44 @@ services:
       retries: 20
       start_period: 10s
 
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: universe
+      POSTGRES_USER: universe
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U universe -d universe"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
   server:
     build:
       context: ..
       dockerfile: infra/server.Dockerfile
     environment:
+      NODE_ENV: production
       PORT: 8788
       ENGINE_URL: http://engine:8787/mcp
       ENGINE_TOKEN: ${ENGINE_TOKEN:?Set ENGINE_TOKEN in .env}
       SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY in .env}
-      DATABASE_URL: sqlite:/data/dev.db
+      DATABASE_URL: postgres://universe:${POSTGRES_PASSWORD}@postgres:5432/universe
+      APP_ORIGIN: ${APP_ORIGIN:-http://localhost:8788}
       EMAIL_FROM: ${EMAIL_FROM:-no-reply@example.com}
-    volumes:
-      - server-data:/data
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
     ports:
       - "8788:8788"
     depends_on:
       engine:
         condition: service_healthy
-
-  # Production will move the server off SQLite and onto Postgres.
-  # Uncomment when the production profile lands:
-  #
-  # postgres:
-  #   image: postgres:16-alpine
-  #   profiles: ["production"]
-  #   environment:
-  #     POSTGRES_DB: universe
-  #     POSTGRES_USER: universe
-  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
-  #   volumes:
-  #     - pg-data:/var/lib/postgresql/data
-  #   ports:
-  #     - "5432:5432"
-  #
-  # and point the server at it with:
-  #   DATABASE_URL: postgres://universe:${POSTGRES_PASSWORD}@postgres:5432/universe
+      postgres:
+        condition: service_healthy
 
 volumes:
   engine-sessions:
-  server-data:
-  # pg-data:
+  pg-data:

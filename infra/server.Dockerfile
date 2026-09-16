@@ -1,38 +1,48 @@
-# Builds the Universe pnpm workspace: apps/web static files plus the
-# apps/server API, both served by the server process.
-# Build context is the repo root (see infra/docker-compose.yml).
+# Builds the Universe pnpm workspace: the web app's static files plus the
+# server, both served by the server process. Build context is the repo
+# root (see infra/docker-compose.yml).
 
-FROM node:22-alpine AS build
+FROM node:22-bookworm-slim AS build
 WORKDIR /app
+RUN corepack enable && corepack prepare pnpm@10.19.0 --activate
 
-RUN corepack enable
+# Manifests first so the dependency layer caches.
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml tsconfig.base.json ./
+COPY apps/server/package.json apps/server/
+COPY apps/web/package.json apps/web/
+COPY packages/shared/package.json packages/shared/
+COPY packages/tokens/package.json packages/tokens/
+COPY packages/engine-client/package.json packages/engine-client/
+COPY packages/primitives/package.json packages/primitives/
+RUN pnpm install --frozen-lockfile
 
-COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
-COPY tsconfig.base.json ./
 COPY packages ./packages
 COPY apps ./apps
-
-RUN pnpm install --frozen-lockfile
-# Builds apps/web to apps/web/dist (vite build) and apps/server to
-# apps/server/dist (tsc). Each package owns its own build script.
+# Builds every package to dist/, then apps/web to apps/web/dist (vite) and
+# apps/server to apps/server/dist (tsc).
 RUN pnpm build
 
-FROM node:22-alpine
+FROM node:22-bookworm-slim
 WORKDIR /app
 ENV NODE_ENV=production
+RUN corepack enable && corepack prepare pnpm@10.19.0 --activate
 
-RUN corepack enable
-
+# Production dependencies only, with the workspace links intact.
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
-COPY apps/server/package.json ./apps/server/package.json
-
-# Install the server's production deps only. The engine client is a
-# workspace package, so it comes along as source.
+COPY apps/server/package.json apps/server/
+COPY apps/web/package.json apps/web/
+COPY packages/shared/package.json packages/shared/
+COPY packages/tokens/package.json packages/tokens/
+COPY packages/engine-client/package.json packages/engine-client/
+COPY packages/primitives/package.json packages/primitives/
 RUN pnpm install --frozen-lockfile --prod
 
-COPY packages ./packages
-COPY --from=build /app/apps/server/dist ./apps/server/dist
-COPY --from=build /app/apps/web/dist ./apps/web/dist
+COPY --from=build /app/packages/shared/dist packages/shared/dist
+COPY --from=build /app/packages/tokens/dist packages/tokens/dist
+COPY --from=build /app/packages/engine-client/dist packages/engine-client/dist
+COPY --from=build /app/packages/primitives/dist packages/primitives/dist
+COPY --from=build /app/apps/server/dist apps/server/dist
+COPY --from=build /app/apps/web/dist apps/web/dist
 
 EXPOSE 8788
 CMD ["node", "apps/server/dist/index.js"]
