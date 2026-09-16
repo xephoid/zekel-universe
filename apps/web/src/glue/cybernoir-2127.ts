@@ -65,7 +65,11 @@ export const cybernoirGlue: GlueModule = {
     if (!shapeHas(view, 'phase', 'board', 'detective', 'hacker')) return null;
     const role = asStr(view['role'], '');
     const played = new Set(asArr(view['board']).map((b) => asStr(b)));
-    const hideout = asStr(view['hideout'], '');
+    // The hideout is a name when the engine names it, or a description
+    // (borough, population, affiliation) that marks no single node.
+    const hideoutRaw = view['hideout'];
+    const hideout = asStr(hideoutRaw, '');
+    const hideoutDesc = isObj(hideoutRaw) ? hideoutRaw : null;
 
     const locs = locations(input.reference, view);
     const boroughs = [...new Set(locs.map((l) => l.borough))];
@@ -137,6 +141,7 @@ export const cybernoirGlue: GlueModule = {
     ];
     const hakStats: NonNullable<TableauData['stats']> = [
       { label: 'Action points', value: asNum(hak['ap']) },
+      ...(role === 'hacker' && hideoutDesc ? [{ label: 'Safehouse', value: [asStr(hideoutDesc['borough']), asStr(hideoutDesc['affiliation'])].filter((x) => x && x !== 'none').map(words).join(' · ') || 'hidden' }] : []),
       { label: 'Contacts deck', value: asNum(hak['contacts_deck_size']) },
       { label: 'Hand', value: asNum(hak['hand_size']) },
       { label: 'Safehouse burned', value: view['safehouse_burned'] ? 'yes' : 'no' },

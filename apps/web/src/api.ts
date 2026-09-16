@@ -2,8 +2,8 @@
 // response shape the server changes fails to compile here.
 
 import type {
-  ApiError, CreateTableRequest, CreateTableResponse, GameReferenceResponse, GameResponse, GamesResponse,
-  MeResponse, MyTablesResponse, TableEventsResponse, TableResponse,
+  ApiError, CreateTableRequest, CreateTableResponse, FriendsResponse, GameReferenceResponse, GameResponse, GamesResponse,
+  InvitesResponse, MeResponse, MyTablesResponse, TableEventsResponse, TableResponse,
 } from '@universe/shared';
 
 export class ApiRequestError extends Error {
@@ -52,6 +52,19 @@ export const api = {
   joinTable: (id: string) => post<{ seatPosition: number }>(`/api/tables/${encodeURIComponent(id)}/join`),
   setReady: (id: string, ready: boolean) => post<{ position: number; ready: boolean }>(`/api/tables/${encodeURIComponent(id)}/ready`, { ready }),
   startTable: (id: string) => post<{ tableId: string; status: string }>(`/api/tables/${encodeURIComponent(id)}/start`),
+
+  friends: () => req<FriendsResponse>('/api/friends'),
+  sendFriendRequest: (email: string) => post<{ ok: true; accepted: boolean; userId: string }>('/api/friends/requests', { email }),
+  acceptFriendRequest: (id: string) => post<{ ok: true }>(`/api/friends/requests/${encodeURIComponent(id)}/accept`),
+  deleteFriendRequest: (id: string) => req<{ ok: true }>(`/api/friends/requests/${encodeURIComponent(id)}`, { method: 'DELETE' }),
+  unfriend: (userId: string) => req<{ ok: true }>(`/api/friends/${encodeURIComponent(userId)}`, { method: 'DELETE' }),
+
+  invites: () => req<InvitesResponse>('/api/invites'),
+  tableInvites: (id: string) => req<InvitesResponse>(`/api/tables/${encodeURIComponent(id)}/invites`),
+  inviteToTable: (id: string, target: { email: string } | { userId: string }) =>
+    post<{ ok: true; inviteId: string }>(`/api/tables/${encodeURIComponent(id)}/invites`, target),
+  acceptInvite: (id: string) => post<{ ok: true; tableId: string }>(`/api/invites/${encodeURIComponent(id)}/accept`),
+  declineInvite: (id: string) => post<{ ok: true }>(`/api/invites/${encodeURIComponent(id)}/decline`),
 };
 
 /**

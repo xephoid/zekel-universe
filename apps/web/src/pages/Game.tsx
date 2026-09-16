@@ -4,6 +4,7 @@ import type { GameCatalogEntry, GameReferenceResponse } from '@universe/shared';
 import { api } from '../api';
 import { useSession } from '../session';
 import { Nav } from './Nav';
+import { Cover } from './Home';
 
 export function GamePage() {
   const { id = '' } = useParams();
@@ -27,27 +28,36 @@ export function GamePage() {
     <div>
       <Nav />
       <div className="page">
-        {game.coverImage
-          ? <img src={game.coverImage} alt="" style={{ maxWidth: 480, borderRadius: 'var(--radius-lg)' }} />
-          : <div className="cover" style={{ maxWidth: 480, aspectRatio: '16/9', borderRadius: 'var(--radius-lg)', background: 'linear-gradient(135deg, var(--brand-green), var(--brand-orange))', display: 'grid', placeItems: 'center', color: '#fff', fontFamily: 'var(--font-display)', fontSize: 34 }}>{game.name}</div>}
-        <h1 style={{ marginTop: 16 }}>{game.name}</h1>
-        <p className="muted">
-          {game.designerName ? <>by {game.designerName} · </> : null}{game.playerCount} players{game.playTime ? ` · ${game.playTime}` : ''}
-        </p>
-        <p>{game.description}</p>
-        <div style={{ display: 'flex', gap: 12, marginTop: 16, flexWrap: 'wrap' }}>
-          {game.supportsAi && <Link to={`/games/${game.engineGameId}/setup`} className="btn big">Play now</Link>}
-          {game.maxPlayers >= 2 && <Link to={friendsHref} className="btn secondary big">Play with friends</Link>}
+        <Link to="/" className="muted" style={{ fontSize: 13 }}>‹ Browse</Link>
+        <div className="game-hero">
+          <div className="game-hero-left">
+            <Cover game={game} size="large" />
+          </div>
+          <div className="game-hero-right">
+            <h1>{game.name}</h1>
+            <p className="muted">
+              {game.designerName ? <>by {game.designerName} · </> : null}{game.playerCount} players{game.playTime ? ` · ${game.playTime}` : ''}
+            </p>
+            {game.tags.length > 0 && (
+              <div className="chip-row">{game.tags.map((t) => <span key={t} className="chip">{t}</span>)}</div>
+            )}
+            <p className="game-desc">{game.description}</p>
+            <div className="game-actions">
+              {game.supportsAi && <Link to={`/games/${game.engineGameId}/setup`} className="btn big pressable">Play now</Link>}
+              {game.maxPlayers >= 2 && <Link to={friendsHref} className="btn secondary big">Play with friends</Link>}
+            </div>
+            <p className="muted" style={{ fontSize: 13 }}>Play now starts a table against the AI right away. No account needed.</p>
+            {game.rulesUrl && <p><a href={game.rulesUrl} target="_blank" rel="noreferrer">Read the rules</a></p>}
+          </div>
         </div>
-        {game.rulesUrl && <p style={{ marginTop: 16 }}><a href={game.rulesUrl} target="_blank" rel="noreferrer">Read the rules</a></p>}
         {reference && (
           <details style={{ marginTop: 20 }}>
             <summary style={{ cursor: 'pointer', fontFamily: 'var(--font-display)' }}>The rules</summary>
             <div className="rules-text" style={{ marginTop: 8 }}>{reference.rules}</div>
           </details>
         )}
-        <h2 style={{ marginTop: 28 }}>Updates</h2>
-        <p className="muted">No updates from the designer yet.</p>
+        <h2 style={{ marginTop: 28 }}>Updates from {game.designerName || 'the designer'}</h2>
+        <p className="muted">No updates yet.</p>
       </div>
     </div>
   );

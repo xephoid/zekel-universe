@@ -20,8 +20,15 @@ button { font-family: inherit; }
   padding: 10px 24px; border-bottom: 1px solid var(--border);
   background: var(--bg-raised);
 }
-.topnav .brand { font-family: var(--font-display); color: var(--brand-green); font-weight: 700; font-size: 22px; text-decoration: none; letter-spacing: -0.5px; }
-.topnav .brand .meeple { color: var(--brand-orange); }
+.topnav .brand { font-family: var(--font-wordmark); color: var(--brand-green); font-weight: 400; font-size: 22px; text-decoration: none; letter-spacing: -0.5px; }
+/* The k as the all-orange meeple on its back, per docs/brand/wordmark.html */
+.topnav .brand .meeple { display: inline-block; width: 20px; height: 20px; position: relative; transform: rotate(-90deg); margin: 0 1px; vertical-align: middle; }
+.topnav .brand .meeple span { position: absolute; background: var(--brand-orange); }
+.topnav .brand .meeple .hd { left: 50%; top: 0; width: 34%; height: 34%; transform: translateX(-50%); border-radius: 50%; }
+.topnav .brand .meeple .sh { left: 0; top: 28%; width: 100%; height: 24%; border-radius: 999px; }
+.topnav .brand .meeple .bd { left: 50%; top: 40%; width: 48%; height: 36%; transform: translateX(-50%); border-radius: 3px 3px 1px 1px; }
+.topnav .brand .meeple .l1 { left: 14%; bottom: 0; width: 32%; height: 38%; border-radius: 3px; transform: rotate(14deg); transform-origin: top center; }
+.topnav .brand .meeple .l2 { right: 14%; bottom: 0; width: 32%; height: 38%; border-radius: 3px; transform: rotate(-14deg); transform-origin: top center; }
 .topnav .spacer { flex: 1; }
 .topnav a { color: var(--fg); text-decoration: none; }
 
@@ -29,10 +36,57 @@ button { font-family: inherit; }
 .game-card {
   display: block;
   background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg);
-  padding: 14px; box-shadow: var(--shadow-sm); cursor: pointer; color: inherit; text-decoration: none;
+  box-shadow: var(--shadow-sm); cursor: pointer; color: inherit; text-decoration: none; overflow: hidden;
 }
 .game-card:hover { border-color: var(--accent); }
-.game-card .cover { width: 100%; aspect-ratio: 16/9; border-radius: var(--radius-md); background: linear-gradient(135deg, var(--brand-green), var(--brand-orange)); margin-bottom: 10px; display: grid; place-items: center; color: #fff; font-family: var(--font-display); font-size: 26px; text-align: center; padding: 8px; }
+.card-body { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 6px; }
+.card-title { font-family: var(--font-display); font-weight: 700; font-size: 18px; }
+.card-title.small { font-size: 15px; }
+.card-sub { font-size: 13px; }
+.card-sub.small { font-size: 12px; }
+.card-blurb { font-size: 13px; line-height: 1.45; margin-top: 2px; }
+/* flat placeholder covers from the canvas: one color field, giant initial */
+.gpcover { position: relative; display: flex; align-items: flex-end; justify-content: space-between; padding: 14px 16px; }
+.gpcover.large { height: 200px; border-radius: 0; }
+.gpcover.small { aspect-ratio: 1; }
+.gpcover .initial { font-family: var(--font-display); font-weight: 700; font-size: 64px; line-height: 1; letter-spacing: -0.03em; }
+.gpcover.small .initial { font-size: 44px; }
+.gpcover .tag { font-family: var(--font-mono); font-size: 11px; opacity: 0.7; }
+.featured-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+.newest-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px; }
+.row-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; }
+.row-head h2 { margin: 0; }
+section { margin-bottom: 32px; }
+/* My tables: resume-first block matching the canvas */
+.my-tables-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.my-card {
+  display: flex; gap: 16px; padding: 16px; border-radius: 12px; background: var(--card);
+  border: 1px solid var(--border); color: inherit; text-decoration: none; align-items: stretch;
+}
+.my-card.waiting { border: 2px solid var(--brand-orange); box-shadow: var(--shadow-md); }
+.my-card .my-cover {
+  width: 84px; flex: none; border-radius: 8px; display: grid; place-items: center;
+  font-family: var(--font-display); font-weight: 700; font-size: 34px; color: #fff;
+}
+.my-card.hero .my-cover { width: 84px; }
+.my-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.my-action {
+  align-self: center; padding: 0 18px; height: 40px; border-radius: 8px; background: var(--brand-orange);
+  color: #fff; font-weight: 600; font-size: 14px; display: grid; place-items: center; flex: none;
+}
+.chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { padding: 3px 10px; border-radius: var(--radius-round); border: 1px solid var(--border); background: var(--bg-raised); font-size: 13px; }
+/* Game page hero per the canvas */
+.game-hero { display: grid; grid-template-columns: minmax(300px, 420px) 1fr; gap: 40px; align-items: start; margin-top: 16px; }
+.game-hero-left .gpcover.large { aspect-ratio: 1; height: auto; border-radius: 12px; box-shadow: var(--shadow-md); }
+.game-hero-left .gpcover.large .initial { font-size: 120px; }
+.game-hero-right { display: flex; flex-direction: column; gap: 14px; }
+.game-hero-right h1 { font-size: 44px; letter-spacing: -0.02em; line-height: 1.05; margin: 0; }
+.game-desc { line-height: 1.5; max-width: 560px; }
+.game-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn.pressable { box-shadow: 0 3px 0 var(--brand-orange-hover); }
+.btn.pressable:hover { background: var(--brand-orange-hover); }
+.btn.pressable:active { transform: translateY(2px); box-shadow: none; }
 .badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: var(--radius-round); background: var(--brand-orange); color: #fff; }
 
 .btn {
@@ -74,13 +128,28 @@ button { font-family: inherit; }
 /* THE TABLE: bench layout */
 .table-shell { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 .table-topbar {
-  display: flex; align-items: center; gap: 10px; padding: 6px 14px;
-  background: var(--bg-raised); border-bottom: 1px solid var(--border); min-height: 46px;
+  display: flex; align-items: center; gap: 14px; padding: 6px 16px;
+  background: var(--bg-raised); border-bottom: 1px solid var(--border); min-height: 48px;
 }
-.table-topbar .title { font-family: var(--font-display); font-weight: 700; font-size: 18px; }
-.table-topbar .turn { font-size: 13px; color: var(--fg-muted); }
-.table-topbar .turn.mine { color: var(--accent); font-weight: 700; }
-.table-topbar .spacer { flex: 1; }
+.table-topbar .title { font-weight: 600; font-size: 14px; }
+.table-topbar .round-note { font-family: var(--font-mono); font-size: 12px; color: var(--fg-muted); }
+.table-topbar .spacer.center { flex: 1; display: flex; justify-content: center; }
+.turn-pill {
+  display: inline-flex; align-items: center; gap: 8px; padding: 5px 14px;
+  border-radius: var(--radius-round); background: var(--bg-raised); border: 1px solid var(--border);
+  font-size: 13px; font-weight: 600; color: var(--fg-muted);
+}
+.turn-pill.mine { background: var(--highlight); color: var(--accent); border-color: transparent; }
+.turn-pill .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.chip-btn {
+  height: 32px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--bg-raised); color: var(--fg); font: 500 13px var(--font-body);
+  cursor: pointer; text-decoration: none; display: inline-flex; align-items: center;
+}
+.chip-btn:hover { background: var(--bg); }
+.chip-btn:disabled { opacity: 0.45; cursor: default; }
+.chip-btn.leave { border: none; background: transparent; color: var(--fg-muted); }
+.chip-btn.leave:hover { color: var(--danger); }
 .table-main { display: flex; flex: 1; min-height: 0; }
 .table-board { flex: 1; overflow: auto; padding: 14px 16px; display: flex; flex-direction: column; gap: 14px; position: relative; }
 .table-board .zones { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
@@ -93,13 +162,22 @@ button { font-family: inherit; }
   border-top: 1px solid var(--border); background: var(--bg-raised);
   padding: 10px 16px; display: flex; gap: 18px; align-items: flex-end; overflow-x: auto; min-height: 150px;
 }
-.caption {
-  font-family: var(--font-display); font-size: 17px; background: var(--card);
-  border-radius: var(--radius-md); padding: 8px 14px; box-shadow: var(--shadow-md);
-  align-self: center; max-width: 720px; text-align: center;
-  position: sticky; top: 0; z-index: 20;
+/* The slideshow/caption card from the canvas: actor chip + caption + controls */
+.caption-card {
+  display: flex; align-items: center; gap: 12px; align-self: center;
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  box-shadow: var(--shadow-md); padding: 10px 14px; max-width: 640px;
+  position: sticky; top: 0; z-index: 20; animation: zk-fadein .25s ease-out;
 }
-.caption.pending { color: var(--fg-muted); }
+@keyframes zk-fadein { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.caption-card.pending .caption-text { color: var(--fg-muted); }
+.caption-text { font-size: 14px; line-height: 1.4; }
+.caption-controls { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.actor-chip { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13px; white-space: nowrap; }
+.actor-chip .avatar {
+  width: 28px; height: 28px; border-radius: 50%; border: 2px solid rgba(28,26,23,0.8);
+  display: grid; place-items: center; font: 600 12px var(--font-mono);
+}
 .roll-button {
   align-self: center; font-size: 26px; padding: 22px 40px; border-radius: var(--radius-round);
   box-shadow: 0 6px 0 rgba(43,38,32,0.25); animation: zk-breathe 1400ms ease-in-out infinite;

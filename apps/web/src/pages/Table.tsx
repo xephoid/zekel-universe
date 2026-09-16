@@ -20,6 +20,26 @@ import { useSession } from '../session';
 
 const LESSONS_KEY = 'universe:lessons';
 
+function hueOf(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  return h % 360;
+}
+
+/** Small color-dot avatar + name chip carried by the caption card, as in the
+ *  canvas slideshow card. */
+function ActorChip({ seat, you }: { seat?: { displayName: string | null; kind: string }; you: boolean }) {
+  if (!seat) return null;
+  const name = seat.displayName ?? (seat.kind === 'ai' ? 'AI' : 'Player');
+  const hue = hueOf(name);
+  return (
+    <span className="actor-chip">
+      <span className="avatar" style={{ background: `hsl(${hue}, 46%, 52%)`, color: `hsl(${hue}, 46%, 96%)` }}>{name.slice(0, 1)}</span>
+      {you ? 'You' : name}
+    </span>
+  );
+}
+
 export function TablePage() {
   const { id = '' } = useParams();
   const nav = useNavigate();
@@ -147,23 +167,38 @@ export function TablePage() {
     <FlipRoot viewKey={state.tick} className="table-shell" style={paletteVars(plan?.palette)} reducedMotion={reduced}>
       <div className="table-topbar">
         <span className="title">{plan?.title ?? table?.table.gameName ?? 'Table'}</span>
-        <span className={`turn${yourTurn ? ' mine' : ''}`} aria-live="polite">{turnLabel}{plan?.status ? ` · ${plan.status}` : ''}</span>
-        <span className="spacer" />
+        {plan?.status && <span className="round-note" aria-hidden="true">{plan.status}</span>}
+        <span className="spacer center">
+          <span className={`turn-pill${yourTurn ? ' mine' : ''}`} aria-live="polite">
+            <span className="dot" />{turnLabel}
+          </span>
+        </span>
         {!t.connected && table && <span className="muted" style={{ fontSize: 12 }}>reconnecting…</span>}
-        <PaceControl pace={playback.pace} setPace={playback.setPace} />
-        <button className="btn secondary small" onClick={playback.replayLast} title="Replay the last move" disabled={!current}>Replay</button>
-        <button className="btn secondary small" onClick={() => void undo()} disabled={!table || table.table.status !== 'playing'}>Undo</button>
-        <button className="btn secondary small" onClick={() => setSheet('rules')}>Rules</button>
-        <button className="btn secondary small" onClick={() => setSheet('settings')} aria-label="Settings">⚙</button>
-        <button className="btn secondary small" onClick={() => setSideOpen((v) => !v)} aria-label="Toggle the side column">☰</button>
-        <Link className="btn secondary small" to="/">Leave</Link>
+        <button className="chip-btn" onClick={() => void undo()} disabled={!table || table.table.status !== 'playing'}>Undo</button>
+        <button className="chip-btn" onClick={() => setSheet('rules')}>Rules</button>
+        <button className="chip-btn" onClick={() => setSheet('settings')}>Settings</button>
+        <button className="chip-btn" onClick={() => setSideOpen((v) => !v)} aria-label="Toggle the side column">{sideOpen ? 'Hide panel' : 'Panel'}</button>
+        <Link className="chip-btn leave" to="/">Leave</Link>
       </div>
 
       <div className="table-main">
         <div className="table-board">
-          {current
-            ? <div className={`caption${state.done ? '' : ' pending'}`} aria-live="polite">{current.summary}</div>
-            : <div className="caption pending">{t.error ?? 'Setting the table…'}</div>}
+          {result === null && (
+            <div className={`caption-card${state.done ? '' : ' pending'}`} aria-live="polite">
+              {current?.actorSeatPosition !== null && current?.actorSeatPosition !== undefined && table ? (
+                <ActorChip seat={table.seats.find((s) => s.position === current.actorSeatPosition)} you={yourTurn} />
+              ) : null}
+              <div className="caption-text">
+                {current ? current.summary : (t.error ?? 'Setting the table…')}
+                {!state.done && (
+                  <div className="caption-controls">
+                    <PaceControl pace={playback.pace} setPace={playback.setPace} />
+                    <button className="chip-btn" onClick={playback.replayLast} disabled={!current}>Replay last</button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
           {dice && dice.length > 0 && (
             <div className="dice-row">{dice.map((d, i) => <Die key={i} value={d} rollKey={current?.seq} />)}</div>
           )}
