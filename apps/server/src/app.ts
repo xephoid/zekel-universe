@@ -10,9 +10,9 @@ import path from 'node:path';
 import type { Server as SocketServer, Socket } from 'socket.io';
 import type { Kysely } from 'kysely';
 import type {
-  CreateTableRequest, CreateTableResponse, GameCatalogEntry, GameReferenceResponse, GameResponse,
-  GamesResponse, JoinTableAck, JoinTableMessage, MeResponse, MoveAck, MoveMessage, MyTablesResponse,
-  SeatSummary, TableEventsResponse, TableResponse, TableStatus, TableSummary, UndoAck, UndoMessage,
+  CreateTableRequest, CreateTableResponse, FriendsResponse, GameCatalogEntry, GameReferenceResponse, GameResponse,
+  GamesResponse, InvitesResponse, JoinTableAck, JoinTableMessage, MeResponse, MoveAck, MoveMessage, MyTablesResponse,
+  SeatSummary, TableEventsResponse, TableInvite, TableResponse, TableStatus, TableSummary, UndoAck, UndoMessage,
 } from '@universe/shared';
 import { SOCKET_EVENTS } from '@universe/shared';
 
@@ -70,7 +70,10 @@ export interface BuildAppOptions {
   io?: SocketServer; // injected in tests; created by index.ts in production
   logger?: boolean;
   /** abuse limits, lowered in tests */
-  limits?: { guestsPerIp?: number; tablesPerPrincipal?: number };
+  limits?: { guestsPerIp?: number; tablesPerPrincipal?: number; lookupsPerUser?: number; linksPerIp?: number };
+  /** Test-only: expose the ConsoleMailer's outbox at /api/test/outbox.
+   *  Must never be set in production (index.ts enforces). */
+  testOutbox?: boolean;
 }
 
 export interface UniverseApp {
@@ -101,7 +104,11 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
 
   const tableService = new TableService(db, opts.engine, opts.secretKey);
   const realtime = new Realtime(db, opts.engine, tableService, opts.mailer);
+  // Sign-in links: a small budget per address (it is that person's inbox)
+  // and a larger one per client address, since one office or one test run
+  // signs in more than one person.
   const linkLimiter = new RateLimiter(5, 15 * 60 * 1000);
+  const linkIpLimiter = new RateLimiter(opts.limits?.linksPerIp ?? 30, 15 * 60 * 1000);
   const guestLimiter = new RateLimiter(opts.limits?.guestsPerIp ?? 30, 15 * 60 * 1000);
   const tableLimiter = new RateLimiter(opts.limits?.tablesPerPrincipal ?? 30, 60 * 60 * 1000);
   const referenceCache = new Map<string, GameReferenceResponse>();
@@ -186,6 +193,17 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     return reply.code(500).send({ error: 'internal', message: 'Something went wrong on the server.' });
   });
 
+  // Test-only outbox: lets e2e tests read sign-in links the console mailer
+  // "sent". It exists only when asked for and only with a ConsoleMailer —
+  // a real provider's mail is not recoverable here.
+  if (opts.testOutbox) {
+    const m = opts.mailer as { sent?: { to: string; subject: string; text: string }[] };
+    if (!Array.isArray(m.sent)) {
+      throw new Error('testOutbox requires the ConsoleMailer');
+    }
+    app.get('/api/test/outbox', async () => ({ mails: m.sent }));
+  }
+
   // ---- people ------------------------------------------------------------
 
   app.post('/api/guests', async (req, reply) => {
@@ -252,7 +270,7 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return reply.code(400).send({ error: 'email_required' });
     }
-    if (!linkLimiter.allow(`email:${email}`) || !linkLimiter.allow(`ip:${req.ip}`)) {
+    if (!linkLimiter.allow(`email:${email}`) || !linkIpLimiter.allow(`ip:${req.ip}`)) {
       return reply.code(429).send({ error: 'too_many_requests', message: 'Try again in a few minutes.' });
     }
     await sweepExpired(db);
@@ -317,6 +335,227 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     reply.clearCookie(AUTH_COOKIE, { path: '/' });
     // The guest cookie that was upgraded into this account is spent too.
     reply.clearCookie(GUEST_COOKIE, { path: '/' });
+    return { ok: true };
+  });
+
+  // ---- friends -----------------------------------------------------------
+  // Friends are signed-in users only (guests have no stable identity to
+  // address). A request is addressed by the friend's sign-in email; that is
+  // deliberately the one discovery channel in v0, and it is rate limited so
+  // it cannot be trawled. Accepting a request when the other side already
+  // asked turns both rows into one accepted friendship.
+
+  async function requireUser(req: FastifyRequest): Promise<{ userId: string }> {
+    const p = await requirePrincipal(req);
+    if (p.kind !== 'user') throw new HttpError(403, 'sign_in_required', 'Friends need an account. Sign in first.');
+    return { userId: p.userId };
+  }
+
+  async function userByEmail(email: string) {
+    const identity = await db.selectFrom('identities').select('user_id')
+      .where('provider', '=', 'email').where('provider_subject', '=', email).executeTakeFirst();
+    if (!identity) return undefined;
+    return db.selectFrom('users').select(['id', 'display_name']).where('id', '=', identity.user_id).executeTakeFirst();
+  }
+
+  async function friendshipBetween(a: string, b: string) {
+    return db.selectFrom('friendships').selectAll()
+      .where(({ eb, or, and }) => or([
+        and([eb('requester_id', '=', a), eb('addressee_id', '=', b)]),
+        and([eb('requester_id', '=', b), eb('addressee_id', '=', a)]),
+      ])).executeTakeFirst();
+  }
+
+  // One budget for every lookup of another account by email address (friend
+  // requests and invites): the answer says whether an address has an account,
+  // so the budget is what stops trawling.
+  const lookupLimiter = new RateLimiter(opts.limits?.lookupsPerUser ?? 20, 15 * 60 * 1000);
+
+  app.get('/api/friends', async (req) => {
+    const { userId } = await requireUser(req);
+    const rows = await db.selectFrom('friendships').selectAll()
+      .where(({ eb, or }) => or([eb('requester_id', '=', userId), eb('addressee_id', '=', userId)]))
+      .execute();
+    const otherIds = rows.map((r) => (r.requester_id === userId ? r.addressee_id : r.requester_id));
+    const users = otherIds.length
+      ? await db.selectFrom('users').select(['id', 'display_name']).where('id', 'in', otherIds).execute()
+      : [];
+    const nameOf = (id: string) => users.find((u) => u.id === id)?.display_name ?? 'Player';
+    const friends: FriendsResponse['friends'] = [];
+    const incoming: FriendsResponse['incoming'] = [];
+    const outgoing: FriendsResponse['outgoing'] = [];
+    for (const r of rows) {
+      const other = r.requester_id === userId ? r.addressee_id : r.requester_id;
+      if (r.status === 'accepted') {
+        friends.push({ userId: other, displayName: nameOf(other), since: r.created_at });
+      } else if (r.requester_id === userId) {
+        outgoing.push({ id: r.id, userId: other, displayName: nameOf(other), createdAt: r.created_at });
+      } else {
+        incoming.push({ id: r.id, userId: other, displayName: nameOf(other), createdAt: r.created_at });
+      }
+    }
+    return { friends, incoming, outgoing } satisfies FriendsResponse;
+  });
+
+  app.post('/api/friends/requests', async (req, reply) => {
+    const { userId } = await requireUser(req);
+    if (!lookupLimiter.allow(`user:${userId}`)) {
+      throw new HttpError(429, 'too_many_requests', 'Try again in a few minutes.');
+    }
+    const body = (req.body ?? {}) as { email?: string };
+    const email = body.email?.trim().toLowerCase();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new HttpError(400, 'email_required');
+    const other = await userByEmail(email);
+    if (!other) return reply.code(404).send({ error: 'no_user', message: 'No account with that address. They may still join by lobby link.' });
+    if (other.id === userId) return reply.code(400).send({ error: 'cannot_friend_self' });
+    const existing = await friendshipBetween(userId, other.id);
+    if (existing) {
+      if (existing.status === 'accepted') return reply.code(409).send({ error: 'already_friends' });
+      if (existing.requester_id === userId) return reply.code(409).send({ error: 'already_requested' });
+      // Cross-request: they asked first, so this accepts.
+      await db.updateTable('friendships').set({ status: 'accepted' }).where('id', '=', existing.id).execute();
+      return { ok: true, accepted: true, userId: other.id };
+    }
+    await db.insertInto('friendships').values({
+      id: newId(), requester_id: userId, addressee_id: other.id, status: 'pending', created_at: now(),
+    }).execute();
+    return { ok: true, accepted: false, userId: other.id };
+  });
+
+  app.post('/api/friends/requests/:id/accept', async (req) => {
+    const { userId } = await requireUser(req);
+    const { id } = req.params as { id: string };
+    const row = await db.selectFrom('friendships').selectAll().where('id', '=', id).executeTakeFirst();
+    if (!row || row.addressee_id !== userId || row.status !== 'pending') throw new HttpError(404, 'no_request');
+    await db.updateTable('friendships').set({ status: 'accepted' }).where('id', '=', id).execute();
+    return { ok: true };
+  });
+
+  // Decline an incoming request, cancel an outgoing one, or end a friendship:
+  // one delete, checked to involve the caller on its own side.
+  app.delete('/api/friends/requests/:id', async (req) => {
+    const { userId } = await requireUser(req);
+    const { id } = req.params as { id: string };
+    const row = await db.selectFrom('friendships').selectAll().where('id', '=', id).executeTakeFirst();
+    if (!row) throw new HttpError(404, 'no_request');
+    const mine = row.addressee_id === userId || row.requester_id === userId;
+    if (!mine) throw new HttpError(404, 'no_request');
+    await db.deleteFrom('friendships').where('id', '=', id).execute();
+    return { ok: true };
+  });
+
+  app.delete('/api/friends/:userId', async (req) => {
+    const { userId } = await requireUser(req);
+    const { userId: otherId } = req.params as { userId: string };
+    const row = await friendshipBetween(userId, otherId);
+    if (!row || row.status !== 'accepted') throw new HttpError(404, 'no_friendship');
+    await db.deleteFrom('friendships').where('id', '=', row.id).execute();
+    return { ok: true };
+  });
+
+  // ---- invites -------------------------------------------------------------
+  // An invite names a table and an account. The recipient accepts to take an
+  // open seat (the same path as joining by link) or declines. Anyone seated
+  // at the table can invite while it is in the lobby.
+
+  async function inviteToWire(row: { id: string; table_id: string; from_user_id: string; to_user_id: string; status: string }, includeTo: boolean): Promise<TableInvite> {
+    const [table, from, to] = await Promise.all([
+      db.selectFrom('tables').selectAll().where('id', '=', row.table_id).executeTakeFirst(),
+      db.selectFrom('users').select(['display_name']).where('id', '=', row.from_user_id).executeTakeFirst(),
+      db.selectFrom('users').select(['display_name']).where('id', '=', row.to_user_id).executeTakeFirst(),
+    ]);
+    const game = table
+      ? await db.selectFrom('games').select('name').where('engine_game_id', '=', table.game_id).executeTakeFirst()
+      : null;
+    return {
+      id: row.id,
+      tableId: row.table_id,
+      gameName: game?.name ?? table?.game_id ?? 'A table',
+      fromDisplayName: from?.display_name ?? 'A player',
+      ...(includeTo ? { toDisplayName: to?.display_name ?? 'A player' } : {}),
+      status: row.status as TableInvite['status'],
+    };
+  }
+
+  app.post('/api/tables/:id/invites', async (req, reply) => {
+    const { userId } = await requireUser(req);
+    const { id: tableId } = req.params as { id: string };
+    const body = (req.body ?? {}) as { email?: string; userId?: string };
+    const email = body.email?.trim().toLowerCase();
+    if (!email && !body.userId) throw new HttpError(400, 'email_required');
+    const table = await tableService.getTable(tableId);
+    if (!table) throw new HttpError(404, 'no_table');
+    if (table.status !== 'lobby') throw new HttpError(400, 'already_started', 'This table has already started; share a spectator link later.');
+    const mine = (await tableService.getSeats(tableId)).find((s) => s.userId === userId);
+    if (!mine) throw new HttpError(403, 'not_seated', 'Only players at this table can invite to it');
+    if (email && !lookupLimiter.allow(`user:${userId}`)) {
+      throw new HttpError(429, 'too_many_requests', 'Try again in a few minutes.');
+    }
+    let to: { id: string; display_name: string } | undefined;
+    if (body.userId) {
+      // Inviting by id is for friends picked from a list: the user id alone
+      // must not be a discovery channel, so only an accepted friend resolves.
+      const f = await friendshipBetween(userId, body.userId);
+      if (!f || f.status !== 'accepted') return reply.code(404).send({ error: 'no_user' });
+      to = await db.selectFrom('users').select(['id', 'display_name']).where('id', '=', body.userId).executeTakeFirst();
+    } else {
+      to = await userByEmail(email!);
+    }
+    if (!to) return reply.code(404).send({ error: 'no_user', message: 'No account with that address. The lobby link works for them instead.' });
+    if (to.id === userId) return reply.code(400).send({ error: 'cannot_invite_self' });
+    const seats = await tableService.getSeats(tableId);
+    if (seats.some((s) => s.userId === to.id)) return reply.code(409).send({ error: 'already_seated', message: 'They already have a seat at this table.' });
+    if (!seats.some((s) => s.kind === 'human' && !s.userId && !s.guestId)) {
+      return reply.code(409).send({ error: 'table_full', message: 'No open seats at this table.' });
+    }
+    const existing = await db.selectFrom('invites').selectAll()
+      .where('table_id', '=', tableId).where('to_user_id', '=', to.id).where('status', '=', 'pending').executeTakeFirst();
+    if (existing) return reply.code(409).send({ error: 'already_invited' });
+    const inviteId = newId();
+    await db.insertInto('invites').values({ id: inviteId, table_id: tableId, from_user_id: userId, to_user_id: to.id, status: 'pending' }).execute();
+    await db.insertInto('notifications').values({
+      id: newId(), user_id: to.id, guest_id: null, kind: 'invite', table_id: tableId, read: 0, created_at: now(),
+    }).execute();
+    return { ok: true, inviteId };
+  });
+
+  app.get('/api/tables/:id/invites', async (req) => {
+    const { userId } = await requireUser(req);
+    const { id: tableId } = req.params as { id: string };
+    const mine = (await tableService.getSeats(tableId)).find((s) => s.userId === userId);
+    if (!mine) throw new HttpError(403, 'not_seated');
+    const rows = await db.selectFrom('invites').selectAll().where('table_id', '=', tableId).execute();
+    const invites: TableInvite[] = [];
+    for (const r of rows) invites.push(await inviteToWire(r, true));
+    return { invites } satisfies InvitesResponse;
+  });
+
+  app.get('/api/invites', async (req) => {
+    const { userId } = await requireUser(req);
+    const rows = await db.selectFrom('invites').selectAll()
+      .where('to_user_id', '=', userId).where('status', '=', 'pending').execute();
+    const invites: TableInvite[] = [];
+    for (const r of rows) invites.push(await inviteToWire(r, false));
+    return { invites } satisfies InvitesResponse;
+  });
+
+  app.post('/api/invites/:id/accept', async (req) => {
+    const { userId } = await requireUser(req);
+    const { id } = req.params as { id: string };
+    const row = await db.selectFrom('invites').selectAll().where('id', '=', id).executeTakeFirst();
+    if (!row || row.to_user_id !== userId || row.status !== 'pending') throw new HttpError(404, 'no_invite');
+    // Accepting is joining: an open seat is taken or it fails the same way.
+    await tableService.joinTable({ kind: 'user', userId }, row.table_id);
+    await db.updateTable('invites').set({ status: 'accepted' }).where('id', '=', id).execute();
+    return { ok: true, tableId: row.table_id };
+  });
+
+  app.post('/api/invites/:id/decline', async (req) => {
+    const { userId } = await requireUser(req);
+    const { id } = req.params as { id: string };
+    const row = await db.selectFrom('invites').selectAll().where('id', '=', id).executeTakeFirst();
+    if (!row || row.to_user_id !== userId || row.status !== 'pending') throw new HttpError(404, 'no_invite');
+    await db.updateTable('invites').set({ status: 'declined' }).where('id', '=', id).execute();
     return { ok: true };
   });
 

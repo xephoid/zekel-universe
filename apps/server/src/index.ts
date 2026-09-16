@@ -16,6 +16,12 @@ async function main(): Promise<void> {
   const mailer = config.resendApiKey
     ? new ResendMailer(config.resendApiKey, config.emailFrom)
     : new ConsoleMailer();
+  // The e2e stack needs to read the sign-in link the console mailer logs.
+  // The outbox route exists only outside production and only on demand.
+  const testOutbox = process.env.E2E_TEST_OUTBOX === '1';
+  if (testOutbox && config.isProduction) {
+    throw new Error('E2E_TEST_OUTBOX must never be set in production.');
+  }
   const app = buildApp({
     db: database.db,
     engine,
@@ -25,6 +31,7 @@ async function main(): Promise<void> {
     allowedOrigins: config.allowedOrigins,
     secureCookies: config.isProduction,
     io,
+    testOutbox,
   });
 
   await app.fastify.ready();

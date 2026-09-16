@@ -5,7 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import type { Kysely } from 'kysely';
 import type {
-  CreateTableResponse, GameReferenceResponse, GameResponse, GamesResponse, MeResponse, MyTablesResponse,
+  CreateTableResponse, FriendsResponse, GameReferenceResponse, GameResponse, GamesResponse, InvitesResponse, MeResponse, MyTablesResponse,
   TableEventsResponse, TableResponse,
 } from '@universe/shared';
 import type { DB } from './db/schema.js';
@@ -187,6 +187,188 @@ describe('REST', () => {
     expect(after.user).toBeNull();
   });
 
+  async function signIn(email: string): Promise<string> {
+    await app.fastify.inject({ method: 'POST', url: '/api/auth/email/link', headers: { origin: ORIGIN }, payload: { email } });
+    const url = /https?:\/\/\S+/.exec(mailer.sent[mailer.sent.length - 1]!.text)![0];
+    const token = decodeURIComponent(url.split('#token=')[1]!);
+    const done = await app.fastify.inject({ method: 'POST', url: '/api/auth/email/complete', headers: { origin: ORIGIN }, payload: { token } });
+    expect(done.statusCode).toBe(200);
+    return cookieOf(done, 'universe_auth');
+  }
+
+  it('friend requests: send, accept, list both sides, then remove', async () => {
+    const a = await signIn('ana@example.com');
+    const b = await signIn('bo@example.com');
+
+    // Guests cannot use friends at all.
+    const g = await guest();
+    expect((await app.fastify.inject({ method: 'GET', url: '/api/friends', headers: { cookie: g } })).statusCode).toBe(403);
+
+    // Unknown address does not leak existence beyond a plain no.
+    const nope = await app.fastify.inject({ method: 'POST', url: '/api/friends/requests', headers: { origin: ORIGIN, cookie: a }, payload: { email: 'ghost@example.com' } });
+    expect(nope.statusCode).toBe(404);
+    expect((await app.fastify.inject({ method: 'POST', url: '/api/friends/requests', headers: { origin: ORIGIN, cookie: a }, payload: { email: 'ana@example.com' } })).statusCode).toBe(400);
+
+    const sent = await app.fastify.inject({ method: 'POST', url: '/api/friends/requests', headers: { origin: ORIGIN, cookie: a }, payload: { email: 'BO@example.com' } });
+    expect(sent.statusCode).toBe(200);
+    // Sending twice is a conflict, not a second row.
+    expect((await app.fastify.inject({ method: 'POST', url: '/api/friends/requests', headers: { origin: ORIGIN, cookie: a }, payload: { email: 'bo@example.com' } })).statusCode).toBe(409);
+
+    const aList = (await app.fastify.inject({ method: 'GET', url: '/api/friends', headers: { cookie: a } })).json<FriendsResponse>();
+    expect(aList.friends).toHaveLength(0);
+    expect(aList.outgoing).toHaveLength(1);
+    expect(aList.outgoing[0]!.displayName).toBe('bo');
+    const bList = (await app.fastify.inject({ method: 'GET', url: '/api/friends', headers: { cookie: b } })).json<FriendsResponse>();
+    expect(bList.incoming).toHaveLength(1);
+    expect(bList.incoming[0]!.displayName).toBe('ana');
+
+    // The requester cannot accept their own request.
+    expect((await app.fastify.inject({ method: 'POST', url: `/api/friends/requests/${bList.incoming[0]!.id}/accept`, headers: { origin: ORIGIN, cookie: a } })).statusCode).toBe(404);
+
+    const accept = await app.fastify.inject({ method: 'POST', url: `/api/friends/requests/${bList.incoming[0]!.id}/accept`, headers: { origin: ORIGIN, cookie: b } });
+    expect(accept.statusCode).toBe(200);
+    const aAfter = (await app.fastify.inject({ method: 'GET', url: '/api/friends', headers: { cookie: a } })).json<FriendsResponse>();
+    expect(aAfter.friends).toHaveLength(1);
+    expect(aAfter.friends[0]!.displayName).toBe('bo');
+    expect(aAfter.outgoing).toHaveLength(0);
+    // Already friends: re-requesting is a conflict both ways.
+    expect((await app.fastify.inject({ method: 'POST', url: '/api/friends/requests', headers: { origin: ORIGIN, cookie: b }, payload: { email: 'ana@example.com' } })).statusCode).toBe(409);
+
+    // Unfriend, then a cross-request self-accepts.
+    expect((await app.fastify.inject({ method: 'DELETE', url: `/api/friends/${aAfter.friends[0]!.userId}`, headers: { origin: ORIGIN, cookie: a } })).statusCode).toBe(200);
+    await app.fastify.inject({ method: 'POST', url: '/api/friends/requests', headers: { origin: ORIGIN, cookie: a }, payload: { email: 'bo@example.com' } });
+    const cross = await app.fastify.inject({ method: 'POST', url: '/api/friends/requests', headers: { origin: ORIGIN, cookie: b }, payload: { email: 'ana@example.com' } });
+    expect(cross.json()).toMatchObject({ ok: true, accepted: true });
+    const rows = await db.selectFrom('friendships').selectAll().execute();
+    expect(rows).toHaveLength(1);
+    expect(rows[0]!.status).toBe('accepted');
+
+    // Decline path: cancel + recreate + decline deletes the request.
+    await app.fastify.inject({ method: 'DELETE', url: `/api/friends/${aAfter.friends[0]!.userId}`, headers: { origin: ORIGIN, cookie: a } });
+    await app.fastify.inject({ method: 'POST', url: '/api/friends/requests', headers: { origin: ORIGIN, cookie: a }, payload: { email: 'bo@example.com' } });
+    const bList2 = (await app.fastify.inject({ method: 'GET', url: '/api/friends', headers: { cookie: b } })).json<FriendsResponse>();
+    expect((await app.fastify.inject({ method: 'DELETE', url: `/api/friends/requests/${bList2.incoming[0]!.id}`, headers: { origin: ORIGIN, cookie: b } })).statusCode).toBe(200);
+    const aFinal = (await app.fastify.inject({ method: 'GET', url: '/api/friends', headers: { cookie: a } })).json<FriendsResponse>();
+    expect(aFinal.outgoing).toHaveLength(0);
+    expect(aFinal.friends).toHaveLength(0);
+  });
+
+  it('table invites: invite by email, accept into a seat, decline path, edge cases', async () => {
+    const host = await signIn('host@example.com');
+    const friend = await signIn('pal@example.com');
+    const stranger = await signIn('third@example.com');
+
+    const created = await app.fastify.inject({
+      method: 'POST', url: '/api/tables', headers: { origin: ORIGIN, cookie: host },
+      payload: { gameId: 'fractured-fist', mode: 'live', seats: [{ kind: 'human' }, { kind: 'human' }], hostPosition: 0 },
+    });
+    expect(created.statusCode).toBe(200);
+    const { tableId } = created.json<CreateTableResponse>();
+
+    // A guest cannot invite; a non-seated user cannot invite.
+    const g = await guest();
+    expect((await app.fastify.inject({ method: 'POST', url: `/api/tables/${tableId}/invites`, headers: { origin: ORIGIN, cookie: g }, payload: { email: 'pal@example.com' } })).statusCode).toBe(403);
+    expect((await app.fastify.inject({ method: 'POST', url: `/api/tables/${tableId}/invites`, headers: { origin: ORIGIN, cookie: stranger }, payload: { email: 'pal@example.com' } })).statusCode).toBe(403);
+
+    const invited = await app.fastify.inject({ method: 'POST', url: `/api/tables/${tableId}/invites`, headers: { origin: ORIGIN, cookie: host }, payload: { email: 'PAL@example.com' } });
+    expect(invited.statusCode).toBe(200);
+    const { inviteId } = invited.json<{ inviteId: string }>();
+    // duplicate invite is a conflict
+    expect((await app.fastify.inject({ method: 'POST', url: `/api/tables/${tableId}/invites`, headers: { origin: ORIGIN, cookie: host }, payload: { email: 'pal@example.com' } })).statusCode).toBe(409);
+    // unknown address
+    expect((await app.fastify.inject({ method: 'POST', url: `/api/tables/${tableId}/invites`, headers: { origin: ORIGIN, cookie: host }, payload: { email: 'nobody@example.com' } })).statusCode).toBe(404);
+
+    // The recipient sees it with game + inviter names; a notification row landed.
+    const list = (await app.fastify.inject({ method: 'GET', url: '/api/invites', headers: { cookie: friend } })).json<InvitesResponse>();
+    expect(list.invites).toHaveLength(1);
+    expect(list.invites[0]).toMatchObject({ id: inviteId, tableId, gameName: 'Fractured Fist', fromDisplayName: 'host', status: 'pending' });
+    const notes = await db.selectFrom('notifications').selectAll().where('table_id', '=', tableId).execute();
+    expect(notes).toHaveLength(1);
+    expect(notes[0]!.kind).toBe('invite');
+
+    // The host's view lists who was invited; the third user sees nothing.
+    expect((await app.fastify.inject({ method: 'GET', url: `/api/tables/${tableId}/invites`, headers: { cookie: stranger } })).statusCode).toBe(403);
+    const hostList = (await app.fastify.inject({ method: 'GET', url: `/api/tables/${tableId}/invites`, headers: { cookie: host } })).json<InvitesResponse>();
+    expect(hostList.invites[0]!.toDisplayName).toBe('pal');
+
+    // The third user cannot accept someone else's invite.
+    expect((await app.fastify.inject({ method: 'POST', url: `/api/invites/${inviteId}/accept`, headers: { origin: ORIGIN, cookie: stranger } })).statusCode).toBe(404);
+
+    // Decline, then a fresh invite, then accept into the open seat.
+    expect((await app.fastify.inject({ method: 'POST', url: `/api/invites/${inviteId}/decline`, headers: { origin: ORIGIN, cookie: friend } })).statusCode).toBe(200);
+    expect((await app.fastify.inject({ method: 'POST', url: `/api/invites/${inviteId}/accept`, headers: { origin: ORIGIN, cookie: friend } })).statusCode).toBe(404);
+    const again = await app.fastify.inject({ method: 'POST', url: `/api/tables/${tableId}/invites`, headers: { origin: ORIGIN, cookie: host }, payload: { email: 'pal@example.com' } });
+    const accept = await app.fastify.inject({ method: 'POST', url: `/api/invites/${again.json<{ inviteId: string }>().inviteId}/accept`, headers: { origin: ORIGIN, cookie: friend } });
+    expect(accept.statusCode).toBe(200);
+
+    const table = (await app.fastify.inject({ method: 'GET', url: `/api/tables/${tableId}`, headers: { cookie: friend } })).json<TableResponse>();
+    expect(table.mySeats).toEqual([1]);
+    expect(table.seats.map((s) => s.displayName)).toEqual(['host', 'pal']);
+    // No seats left: another invite fails.
+    expect((await app.fastify.inject({ method: 'POST', url: `/api/tables/${tableId}/invites`, headers: { origin: ORIGIN, cookie: host }, payload: { email: 'third@example.com' } })).statusCode).toBe(409);
+    // The pending list is now empty for the recipient.
+    expect((await app.fastify.inject({ method: 'GET', url: '/api/invites', headers: { cookie: friend } })).json<InvitesResponse>().invites).toHaveLength(0);
+  });
+
+  it('invites by userId only resolve for accepted friends', async () => {
+    const host = await signIn('h2@example.com');
+    const pal = await signIn('p2@example.com');
+    const meRow = (await app.fastify.inject({ method: 'GET', url: '/api/me', headers: { cookie: pal } })).json<MeResponse>();
+    const palId = meRow.user!.id;
+
+    const created = await app.fastify.inject({
+      method: 'POST', url: '/api/tables', headers: { origin: ORIGIN, cookie: host },
+      payload: { gameId: 'fractured-fist', mode: 'live', seats: [{ kind: 'human' }, { kind: 'human' }], hostPosition: 0 },
+    });
+    const { tableId } = created.json<CreateTableResponse>();
+
+    // Not a friend: id alone must not resolve.
+    expect((await app.fastify.inject({ method: 'POST', url: `/api/tables/${tableId}/invites`, headers: { origin: ORIGIN, cookie: host }, payload: { userId: palId } })).statusCode).toBe(404);
+
+    // Friend them, then the same id works.
+    await app.fastify.inject({ method: 'POST', url: '/api/friends/requests', headers: { origin: ORIGIN, cookie: host }, payload: { email: 'p2@example.com' } });
+    const list = (await app.fastify.inject({ method: 'GET', url: '/api/friends', headers: { cookie: pal } })).json<FriendsResponse>();
+    await app.fastify.inject({ method: 'POST', url: `/api/friends/requests/${list.incoming[0]!.id}/accept`, headers: { origin: ORIGIN, cookie: pal } });
+    const ok = await app.fastify.inject({ method: 'POST', url: `/api/tables/${tableId}/invites`, headers: { origin: ORIGIN, cookie: host }, payload: { userId: palId } });
+    expect(ok.statusCode).toBe(200);
+    const mine = (await app.fastify.inject({ method: 'GET', url: '/api/invites', headers: { cookie: pal } })).json<InvitesResponse>();
+    expect(mine.invites).toHaveLength(1);
+  });
+
+  it('address lookups share one budget across friend requests and email invites', async () => {
+    await app.fastify.close();
+    app = buildApp({
+      db, engine, mailer, secretKey: 's', appOrigin: ORIGIN, allowedOrigins: [ORIGIN],
+      secureCookies: false, logger: false, limits: { lookupsPerUser: 3 },
+    });
+    await app.fastify.ready();
+    await app.refreshCatalog();
+    const host = await signIn('h3@example.com');
+    const pal = await signIn('p3@example.com');
+    const palId = (await app.fastify.inject({ method: 'GET', url: '/api/me', headers: { cookie: pal } })).json<MeResponse>().user!.id;
+    const created = await app.fastify.inject({
+      method: 'POST', url: '/api/tables', headers: { origin: ORIGIN, cookie: host },
+      payload: { gameId: 'fractured-fist', mode: 'live', seats: [{ kind: 'human' }, { kind: 'human' }], hostPosition: 0 },
+    });
+    const { tableId } = created.json<CreateTableResponse>();
+    const invite = (email: string) => app.fastify.inject({ method: 'POST', url: `/api/tables/${tableId}/invites`, headers: { origin: ORIGIN, cookie: host }, payload: { email } });
+    const ask = (email: string) => app.fastify.inject({ method: 'POST', url: '/api/friends/requests', headers: { origin: ORIGIN, cookie: host }, payload: { email } });
+
+    // Two misses through invites and one through a friend request use the
+    // budget; a fourth lookup of either kind is refused before it answers.
+    expect((await invite('nobody-1@example.com')).statusCode).toBe(404);
+    expect((await invite('nobody-2@example.com')).statusCode).toBe(404);
+    expect((await ask('nobody-3@example.com')).statusCode).toBe(404);
+    expect((await invite('p3@example.com')).statusCode).toBe(429);
+    expect((await ask('p3@example.com')).statusCode).toBe(429);
+    // The budget is per user: the other account still has its own.
+    expect((await app.fastify.inject({ method: 'POST', url: '/api/friends/requests', headers: { origin: ORIGIN, cookie: pal }, payload: { email: 'h3@example.com' } })).statusCode).toBe(200);
+    // Inviting an accepted friend by id is not a lookup and is not charged.
+    const list = (await app.fastify.inject({ method: 'GET', url: '/api/friends', headers: { cookie: host } })).json<FriendsResponse>();
+    await app.fastify.inject({ method: 'POST', url: `/api/friends/requests/${list.incoming[0]!.id}/accept`, headers: { origin: ORIGIN, cookie: host } });
+    expect((await app.fastify.inject({ method: 'POST', url: `/api/tables/${tableId}/invites`, headers: { origin: ORIGIN, cookie: host }, payload: { userId: palId } })).statusCode).toBe(200);
+  });
+
   it('rate limits sign-in links per address', async () => {
     let last = 200;
     for (let i = 0; i < 6; i++) {
@@ -197,8 +379,51 @@ describe('REST', () => {
     expect(mailer.sent).toHaveLength(5);
   });
 
+  it('rate limits sign-in links per client address with its own, larger budget', async () => {
+    await app.fastify.close();
+    app = buildApp({
+      db, engine, mailer, secretKey: 's', appOrigin: ORIGIN, allowedOrigins: [ORIGIN],
+      secureCookies: false, logger: false, limits: { linksPerIp: 2 },
+    });
+    await app.fastify.ready();
+    const ask = (email: string, ip?: string) => app.fastify.inject({
+      method: 'POST', url: '/api/auth/email/link', headers: { origin: ORIGIN, ...(ip ? { 'x-forwarded-for': ip } : {}) }, payload: { email },
+    });
+    expect((await ask('one@example.com')).statusCode).toBe(200);
+    expect((await ask('two@example.com')).statusCode).toBe(200);
+    expect((await ask('three@example.com')).statusCode).toBe(429);
+    expect(mailer.sent).toHaveLength(2);
+  });
+
   it('rejects an address that is not an email', async () => {
     const res = await app.fastify.inject({ method: 'POST', url: '/api/auth/email/link', headers: { origin: ORIGIN }, payload: { email: 'nope' } });
     expect(res.statusCode).toBe(400);
+  });
+
+  it('test outbox is off by default and on demand, exposing the mailed links', async () => {
+    // Off on a normal build.
+    expect((await app.fastify.inject({ method: 'GET', url: '/api/test/outbox' })).statusCode).toBe(404);
+
+    // On when asked for (e2e stack), with the console mailer's mail visible.
+    const mailer2 = new ConsoleMailer();
+    const app2 = buildApp({
+      db, engine, mailer: mailer2, secretKey: 's', appOrigin: ORIGIN, allowedOrigins: [ORIGIN],
+      secureCookies: false, logger: false, testOutbox: true,
+    });
+    await app2.fastify.ready();
+    await app2.fastify.inject({ method: 'POST', url: '/api/auth/email/link', headers: { origin: ORIGIN }, payload: { email: 'out@example.com' } });
+    const out = await app2.fastify.inject({ method: 'GET', url: '/api/test/outbox' });
+    expect(out.statusCode).toBe(200);
+    const { mails } = out.json<{ mails: { to: string; text: string }[] }>();
+    expect(mails).toHaveLength(1);
+    expect(mails[0]!.to).toBe('out@example.com');
+    expect(mails[0]!.text).toContain('/signin/complete#token=');
+    await app2.fastify.close();
+
+    // It refuses to pair with a non-console mailer.
+    expect(() => buildApp({
+      db, engine, mailer: { send: async () => {} }, secretKey: 's', appOrigin: ORIGIN,
+      allowedOrigins: [ORIGIN], secureCookies: false, logger: false, testOutbox: true,
+    })).toThrow(/ConsoleMailer/);
   });
 });

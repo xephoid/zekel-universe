@@ -24,6 +24,47 @@ export interface MeResponse {
   guest: Guest | null;
 }
 
+// ---- friends ------------------------------------------------------------------
+
+export interface Friend {
+  userId: string;
+  displayName: string;
+  since: string;
+}
+
+export interface FriendRequest {
+  id: string;
+  /** The other side's user id and name: the requester for incoming, the
+   *  addressee for outgoing. */
+  userId: string;
+  displayName: string;
+  createdAt: string;
+}
+
+/** GET /api/friends */
+export interface FriendsResponse {
+  friends: Friend[];
+  incoming: FriendRequest[];
+  outgoing: FriendRequest[];
+}
+
+// ---- table invites ------------------------------------------------------------
+
+export interface TableInvite {
+  id: string;
+  tableId: string;
+  gameName: string;
+  fromDisplayName: string;
+  /** Set only on lists the inviter reads. */
+  toDisplayName?: string;
+  status: 'pending' | 'accepted' | 'declined';
+}
+
+/** GET /api/invites (recipient view) and GET /api/tables/:id/invites (host view) */
+export interface InvitesResponse {
+  invites: TableInvite[];
+}
+
 // ---- catalog ----------------------------------------------------------------
 
 export interface GameCatalogEntry {
