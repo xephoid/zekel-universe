@@ -1,166 +1,235 @@
-// THE TABLE. Bench layout from the brief: slim top bar (game name, pace
-// control, undo, menu), center board, your hand along the bottom as a bench,
-// opponents stacked in the ~420px side column. A per-game glue module maps
-// the seat view onto primitives; unknown views render a JSON inspector.
+// THE TABLE. The bench layout from the brief: a slim top bar (game name,
+// turn indicator, undo, settings, leave), the board in the center, the
+// player's own hand along the bottom, and a side column that stacks the
+// other seats, the points track and the log, with rules one tap away.
+//
+// A per-game glue module maps the seat's view onto primitives; the engine's
+// legal moves light the parts you can touch. Every submission goes through
+// submitMove() with the trigger that caused it (see glue/agency.ts).
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import type { GameTable } from '@universe/shared';
-import type { Socket } from 'socket.io-client';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import type { LegalMove } from '@universe/shared';
+import { Die, FlipRoot, paletteVars, useSystemReducedMotion, type SelectEvent } from '@universe/primitives';
+import { glueFor, submitMove, type GlueInput } from '../glue';
+import { JsonInspector, ZoneRenderer } from '../glue/ZoneRenderer';
+import { useTable } from '../table/useTable';
+import { Briefings, EndPanel, Log, MoveMenuList, NoticeToast, PaceControl, Sheet, lessonsOf, type Lesson, type Notice } from '../table/parts';
 import { api } from '../api';
-import { connectTable } from '../socket';
-import { usePlaybackQueue } from '../playback/usePlaybackQueue';
-import type { Pace } from '../playback/PlaybackQueue';
-import { glueFor, type LegalMove, type SelectEvent } from '../glue';
-import { ZoneRenderer, JsonInspector } from '../glue/ZoneRenderer';
+import { useSession } from '../session';
 
-interface Briefing { id: string; title: string; body: string }
-interface Toast { reason: string; lesson?: string }
+const LESSONS_KEY = 'universe:lessons';
 
 export function TablePage() {
   const { id = '' } = useParams();
-  const [table, setTable] = useState<GameTable | null>(null);
-  const [legalMoves, setLegalMoves] = useState<LegalMove[]>([]);
-  const [briefings, setBriefings] = useState<Briefing[]>([]);
-  const [toast, setToast] = useState<Toast | null>(null);
+  const nav = useNavigate();
+  const session = useSession();
+  const t = useTable(id, !!session.me);
+  const { playback, table } = t;
+  const state = playback.state;
+  const current = state.current;
+
+  const [notice, setNotice] = useState<Notice | null>(null);
+  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [seenLessons] = useState(() => new Set<string>());
+  const [lessonsOn, setLessonsOn] = useState(() => { try { return localStorage.getItem(LESSONS_KEY) !== 'off'; } catch { return true; } });
   const [sideOpen, setSideOpen] = useState(true);
-  const socketRef = useRef<Socket | null>(null);
+  const [sheet, setSheet] = useState<'rules' | 'settings' | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [playAgainBusy, setPlayAgainBusy] = useState(false);
+  const [showEnd, setShowEnd] = useState(true);
+  const lastTap = useRef<{ x: number; y: number } | null>(null);
+  const memory = useRef(new Map<string, unknown>());
+  const reduced = useSystemReducedMotion();
 
-  const playback = usePlaybackQueue(1);
-  const { state } = playback;
-
-  useEffect(() => { api.table(id).then(setTable).catch(() => {}); }, [id]);
-
-  // On (re)connect/resume: fetch events after the last seq we showed and
-  // resume the queue, then subscribe to the live socket.
-  useEffect(() => {
-    let cancelled = false;
-    api.tableEvents(id, state.lastSeq).then((events) => {
-      if (!cancelled && events.length) playback.resumeFrom(events);
-    }).catch(() => {});
-    const socket = connectTable(id, {
-      onEvent: (e) => {
-        playback.push(e);
-        // Rules briefings ride on events (engine briefing field).
-        const briefing = (e as unknown as Record<string, unknown>)['briefing'] as { id?: string; title?: string; body?: string } | undefined;
-        if (briefing?.id) {
-          setBriefings((b) => b.some((x) => x.id === briefing.id) ? b : [...b, { id: briefing.id!, title: briefing.title ?? 'Rule', body: briefing.body ?? '' }]);
-        }
-      },
-      onRejected: (r) => setToast(r),
-    });
-    socketRef.current = socket;
-    return () => { cancelled = true; socket.disconnect(); };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
-
-  const gameId = table?.gameId ?? '';
+  const gameId = table?.table.gameId ?? '';
   const glue = gameId ? glueFor(gameId) : null;
-  const plan = glue?.plan({ view: state.view, previous: state.previousView, legalMoves, onSelect: () => {} });
+  const myPlayerId = current?.playerId ?? null;
+  const legalMoves: LegalMove[] = state.done && current?.yourTurn ? current.legalMoves : [];
+  const yourTurn = !!current?.yourTurn && state.done;
 
-  // Legal moves arrive with table state / turn changes (server push or fetch).
+  // Rules lessons ride on events; the first time a rule matters it appears
+  // next to the board and never again.
   useEffect(() => {
-    if (state.current) {
-      const lm = (state.current as unknown as Record<string, unknown>)['legal_moves'];
-      if (Array.isArray(lm)) setLegalMoves(lm as LegalMove[]);
-    }
-  }, [state.current]);
+    if (!current?.briefing || !lessonsOn) return;
+    const fresh = lessonsOf(current.briefing).filter((l) => !seenLessons.has(l.id));
+    if (fresh.length === 0) return;
+    for (const l of fresh) seenLessons.add(l.id);
+    setLessons((prev) => [...prev, ...fresh]);
+  }, [current?.briefing, lessonsOn, seenLessons]);
 
-  const submitMove = useCallback((move: LegalMove) => {
-    socketRef.current?.emit('move', { seat: 0, move: move.move });
-  }, []);
+  const input: GlueInput = useMemo(() => ({
+    view: state.view,
+    previous: state.previousView,
+    legalMoves,
+    playerId: myPlayerId,
+    reference: t.reference,
+    seq: current?.seq ?? 0,
+    engineMove: current?.engineMove ?? null,
+    actorPlayerId: current?.actorSeatPosition === null || current?.actorSeatPosition === undefined
+      ? null
+      : `p${current.actorSeatPosition + 1}`,
+    memory: memory.current,
+  }), [state.view, state.previousView, legalMoves, myPlayerId, t.reference, current]);
+
+  const plan = useMemo(() => (glue ? glue.plan(input) : null), [glue, input]);
+  const lit = useMemo(() => (glue && yourTurn ? glue.litParts(input) : []), [glue, input, yourTurn]);
+  const resolveReport = glue && yourTurn ? glue.resolveReportMove(legalMoves) : null;
+  const dice = current && (current.kind === 'roll') && glue?.diceFor
+    ? glue.diceFor({ engineMove: current.engineMove, summary: current.summary, view: current.view })
+    : null;
+
+  const send = useCallback(async (trigger: 'tap' | 'resolve_report_button', move: Record<string, unknown>) => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      const ack = await submitMove(trigger, move, legalMoves, (m) => t.move(m));
+      if (ack && 'error' in ack && ack.error) {
+        setNotice({
+          kind: ack.error === 'move_rejected' ? 'rule' : 'fault',
+          reason: ack.reason ?? ack.error,
+          lesson: ack.lesson,
+          at: ack.error === 'move_rejected' && trigger === 'tap' ? lastTap.current ?? undefined : undefined,
+        });
+      }
+    } finally {
+      setBusy(false);
+    }
+  }, [busy, legalMoves, t]);
 
   const onSelect = useCallback((sel: SelectEvent) => {
     if (!glue) return;
-    const mv = glue.moveForSelect(sel, legalMoves);
-    if (mv) submitMove(mv);
-  }, [glue, legalMoves, submitMove]);
+    const mv = glue.moveForSelect(sel, input);
+    if (mv) void send('tap', mv.move);
+  }, [glue, input, send]);
 
-  const lit = glue?.litParts(state.view, legalMoves) ?? [];
-  const resolveReport = glue?.resolveReportMove(legalMoves) ?? null;
+  const undo = useCallback(async () => {
+    const ack = await t.undo();
+    if ('error' in ack && ack.error) setNotice({ kind: ack.error.startsWith('engine') || ack.error === 'internal' ? 'fault' : 'rule', reason: ack.message ?? ack.error });
+  }, [t]);
+
+  const playAgain = useCallback(async () => {
+    if (!table) return;
+    setPlayAgainBusy(true);
+    try {
+      const res = await api.createTable({
+        gameId: table.table.gameId,
+        mode: table.table.mode,
+        seats: table.seats.map((s) => (s.kind === 'ai' ? { kind: 'ai' as const, aiDifficulty: s.aiDifficulty ?? undefined } : { kind: 'human' as const })),
+        hostPosition: t.mySeat ?? 0,
+        options: (memory.current.get('options') as Record<string, unknown> | undefined) ?? {},
+      });
+      nav(res.status === 'lobby' ? `/table/${res.tableId}/lobby` : `/table/${res.tableId}`);
+    } catch (e) {
+      setNotice({ kind: 'fault', reason: (e as Error).message });
+    } finally {
+      setPlayAgainBusy(false);
+    }
+  }, [table, t.mySeat, nav]);
+
+  const result = current?.gameOver ?? table?.table.status === 'finished' ? (current?.gameOver ?? null) : null;
+  const turnLabel = !table ? '' : table.table.status === 'finished' ? 'Game over'
+    : !state.done ? 'Playing back…'
+    : current?.yourTurn ? 'Your move'
+    : current?.nextActorPosition === null || current?.nextActorPosition === undefined ? 'The AI is thinking…'
+    : `Waiting on ${table.seats.find((s) => s.position === current.nextActorPosition)?.displayName ?? 'the other player'}`;
+
+  if (t.error && !table) {
+    return (
+      <div className="page">
+        <p className="error">{t.error}</p>
+        <Link to="/">Back home</Link>
+      </div>
+    );
+  }
 
   return (
-    <div className="table-shell">
-      {/* top bar */}
+    <FlipRoot viewKey={state.tick} className="table-shell" style={paletteVars(plan?.palette)} reducedMotion={reduced}>
       <div className="table-topbar">
-        <strong style={{ fontFamily: 'var(--font-display)' }}>{plan?.title ?? gameId ?? 'Table'}</strong>
-        <span style={{ color: 'var(--fg-muted)', fontSize: 13 }}>
-          {state.current ? `#${state.current.seq} — ${state.current.summary}` : 'waiting for the first event…'}
-        </span>
-        <span style={{ flex: 1 }} />
+        <span className="title">{plan?.title ?? table?.table.gameName ?? 'Table'}</span>
+        <span className={`turn${yourTurn ? ' mine' : ''}`} aria-live="polite">{turnLabel}{plan?.status ? ` · ${plan.status}` : ''}</span>
+        <span className="spacer" />
+        {!t.connected && table && <span className="muted" style={{ fontSize: 12 }}>reconnecting…</span>}
         <PaceControl pace={playback.pace} setPace={playback.setPace} />
-        <button className="btn secondary" onClick={playback.replayFromStart} title="Replay from start">⟲</button>
-        <button className="btn secondary" onClick={() => socketRef.current?.emit('move', { seat: 0, move: { type: 'undo' } })}>Undo</button>
-        <button className="btn secondary" onClick={() => setSideOpen((v) => !v)}>☰</button>
+        <button className="btn secondary small" onClick={playback.replayLast} title="Replay the last move" disabled={!current}>Replay</button>
+        <button className="btn secondary small" onClick={() => void undo()} disabled={!table || table.table.status !== 'playing'}>Undo</button>
+        <button className="btn secondary small" onClick={() => setSheet('rules')}>Rules</button>
+        <button className="btn secondary small" onClick={() => setSheet('settings')} aria-label="Settings">⚙</button>
+        <button className="btn secondary small" onClick={() => setSideOpen((v) => !v)} aria-label="Toggle the side column">☰</button>
+        <Link className="btn secondary small" to="/">Leave</Link>
       </div>
 
-      {/* center board + side column */}
       <div className="table-main">
         <div className="table-board">
-          {state.current && <div className="caption">{state.current.summary}</div>}
+          {current
+            ? <div className={`caption${state.done ? '' : ' pending'}`} aria-live="polite">{current.summary}</div>
+            : <div className="caption pending">{t.error ?? 'Setting the table…'}</div>}
+          {dice && dice.length > 0 && (
+            <div className="dice-row">{dice.map((d, i) => <Die key={i} value={d} rollKey={current?.seq} />)}</div>
+          )}
           {plan
-            ? plan.board.map((z) => <ZoneRenderer key={String(z.data['id'])} zone={z} lit={lit} palette={plan.palette} onSelect={onSelect} />)
+            ? <div className="zones">{plan.board.map((z) => <ZoneRenderer key={z.id} zone={z} lit={lit} onSelect={onSelect} />)}</div>
             : state.view
               ? <JsonInspector value={state.view} />
-              : <p style={{ color: 'var(--fg-muted)' }}>Connecting to the table…</p>}
+              : null}
           {resolveReport && (
-            <button className="btn big" style={{ alignSelf: 'center' }} onClick={() => submitMove(resolveReport)}>
-              🎲 Roll / Draw
+            <button className="btn big roll-button" onClick={() => void send('resolve_report_button', resolveReport.move)} disabled={busy}>
+              {/draw|deal/i.test(resolveReport.description ?? '') ? 'Draw' : 'Roll'}
             </button>
           )}
-          {/* the numbered move menu, always available; voice reads this later */}
-          <details className="move-menu" open={plan == null}>
-            <summary>Moves ({legalMoves.length})</summary>
-            <ol>
-              {legalMoves.map((m, i) => (
-                <li key={m.move_id ?? String(i)} onClick={() => submitMove(m)}>{m.description ?? m.move_id}</li>
-              ))}
-            </ol>
-          </details>
-        </div>
-        {sideOpen && (
-          <div className="table-side">
-            {briefings.map((b) => (
-              <div key={b.id} className="briefing-card">
-                <strong>{b.title}</strong>
-                <p style={{ margin: '4px 0', fontSize: 14 }}>{b.body}</p>
-                <button className="btn secondary" onClick={() => setBriefings((x) => x.filter((y) => y.id !== b.id))}>Got it</button>
+          {yourTurn && <MoveMenuList menu={current?.moveMenu ?? null} legalMoves={legalMoves} onPick={(m) => void send('tap', m.move)} disabled={busy} open={lit.length === 0} />}
+          {result && showEnd && table && (
+            <div className="sheet-backdrop" role="presentation">
+              <div className="sheet" role="dialog" aria-label="Game over">
+                <button className="btn secondary small close" onClick={() => setShowEnd(false)} aria-label="Look at the final table">✕</button>
+                <EndPanel result={result} seats={table.seats} myPlayerId={myPlayerId} gameId={gameId} onPlayAgain={() => void playAgain()} playAgainBusy={playAgainBusy} />
               </div>
-            ))}
-            {plan?.side.map((z) => <ZoneRenderer key={String(z.data['id'])} zone={z} lit={lit} palette={plan.palette} onSelect={onSelect} />)}
-          </div>
-        )}
-      </div>
-
-      {/* the bench: your hand along the bottom */}
-      <div className="table-bench">
-        {plan?.bench.map((z) => <ZoneRenderer key={String(z.data['id'])} zone={z} lit={lit} palette={plan.palette} onSelect={onSelect} />)}
-      </div>
-
-      {toast && (
-        <div className="toast" role="alert">
-          <strong>Not a legal move:</strong> {toast.reason}
-          {toast.lesson && <p style={{ margin: '6px 0 0', fontSize: 14, color: 'var(--fg-muted)' }}>{toast.lesson}</p>}
-          <button className="btn secondary" style={{ marginTop: 8 }} onClick={() => setToast(null)}>OK</button>
+            </div>
+          )}
         </div>
-      )}
-    </div>
-  );
-}
+        <div className={`table-side${sideOpen ? '' : ' collapsed'}`}>
+          {sideOpen && (
+            <>
+              <Briefings lessons={lessons} onDismiss={(lid) => setLessons((ls) => ls.filter((l) => l.id !== lid))} />
+              {plan?.side.map((z) => <ZoneRenderer key={z.id} zone={z} lit={lit} onSelect={onSelect} />)}
+              {plan?.points && <ZoneRenderer zone={plan.points} lit={lit} onSelect={onSelect} />}
+              <Log events={state.applied} currentSeq={current?.seq ?? null} />
+            </>
+          )}
+        </div>
+      </div>
 
-function PaceControl({ pace, setPace }: { pace: Pace; setPace: (p: Pace) => void }) {
-  return (
-    <span>
-      {([0.5, 1, 2, 'instant'] as const).map((p) => (
-        <button
-          key={String(p)}
-          className="btn secondary"
-          style={{ marginRight: 4, padding: '4px 8px', fontWeight: pace === p ? 700 : 400 }}
-          onClick={() => setPace(p)}
-        >
-          {p === 'instant' ? '⏩' : `${p}×`}
-        </button>
-      ))}
-    </span>
+      <div className="table-bench" onClickCapture={(e) => { lastTap.current = { x: e.clientX, y: e.clientY }; }}>
+        {plan?.bench.map((z) => <ZoneRenderer key={z.id} zone={z} lit={lit} onSelect={onSelect} />)}
+      </div>
+
+      <NoticeToast notice={notice} onClose={() => setNotice(null)} />
+
+      {sheet === 'rules' && (
+        <Sheet title="Rules" onClose={() => setSheet(null)}>
+          {t.reference ? <div className="rules-text">{t.reference.rules}</div> : <p className="muted">Loading…</p>}
+        </Sheet>
+      )}
+      {sheet === 'settings' && (
+        <Sheet title="Settings" onClose={() => setSheet(null)}>
+          <div className="field">
+            <span className="label">Playback pace</span>
+            <PaceControl pace={playback.pace} setPace={playback.setPace} />
+          </div>
+          <div className="field">
+            <label><input type="checkbox" checked={lessonsOn} onChange={(e) => { setLessonsOn(e.target.checked); try { localStorage.setItem(LESSONS_KEY, e.target.checked ? 'on' : 'off'); } catch { /* ignore */ } }} /> Show rules lessons the first time a rule matters</label>
+          </div>
+          <div className="field">
+            <span className="label">Theme</span>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {(['light', 'dark'] as const).map((th) => (
+                <button key={th} className="btn secondary small" onClick={() => { document.documentElement.dataset['theme'] = th; try { localStorage.setItem('universe:theme', th); } catch { /* ignore */ } }}>{th}</button>
+              ))}
+            </div>
+          </div>
+          <p className="muted" style={{ fontSize: 13 }}>Reduced motion follows your system setting: movement becomes a fade and the timing stays the same.</p>
+        </Sheet>
+      )}
+    </FlipRoot>
   );
 }

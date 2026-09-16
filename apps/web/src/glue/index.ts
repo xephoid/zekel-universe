@@ -16,6 +16,6 @@ export function glueFor(gameId: string): GlueModule | null {
 }
 
 export { fracturedFistGlue, warbleWayGlue, sweetlandsGlue, cybernoirGlue };
-export type { GlueModule, TablePlan, Zone } from './types';
-export { classifyMoves, isAutoSubmitAllowed, movesEqual } from './agency';
-export type { LegalMove, SelectEvent } from './primitiveTree';
+export type { GlueModule, GlueInput, TablePlan, Zone, SetupField, LegalMove, SelectEvent } from './types';
+export { classifyMoves, isSubmissionAllowed, movesEqual, submitMove, submissionLog } from './agency';
+export type { SubmissionTrigger } from './agency';

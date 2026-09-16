@@ -1,15 +1,14 @@
-// Warble Way Galaxy glue — character tableau, crew row, ship tableau,
-// tracks for XP/level and ship damage, credits pool, travel deck pile,
-// ruin grid. Solo with no hidden zones; the doc mapping (docs/games/
-// warble-way-galaxy.md) is the contract, and view.ts is the shape:
-//   view = { phase, pending, character {…abilities…credits…}, crew[],
-//     ship {damage…parts}, items[], habit t, journey {legs}, space_combat,
-//     ruin { board_rows, party, attackers } , travel_deck, result, … }
+// Warble Way Galaxy glue: the character tableau, the crew row, the ship,
+// items, the travel deck pile, the ruin grid, and the journey. Solo with no
+// hidden zones (zekel src/games/warble-way-galaxy/views.ts). Every number
+// shown comes from the view: crew capacity from ship.capacity, level
+// progress from xp_to_next_level, the season finish lines from
+// season_endings. Nothing here knows a threshold.
 
-import type { CardData, TablePlan, Zone } from './zoneData';
-import type { GlueModule, GlueInput } from './types';
-import { asArr, asNum, asStr, isObj, shapeHas } from './types';
-import type { LegalMove, SelectEvent } from './primitiveTree';
+import type { CardData, GridData, TableauData } from '@universe/primitives';
+import type { GameReferenceResponse } from '@universe/shared';
+import type { GlueModule, GlueInput, LegalMove, SelectEvent, SetupField, TablePlan, Zone } from './types';
+import { asArr, asNum, asStr, isObj, shapeHas, words } from './types';
 
 const PALETTE: Record<string, string> = {
   ship: '#4a6fa5',
@@ -19,22 +18,19 @@ const PALETTE: Record<string, string> = {
   credits: '#e6a23c',
   wall: '#2b2620',
   pit: '#8a8578',
+  party: '#3E7C4F',
+  attacker: '#b4452f',
+  item: '#c9a227',
 };
 
-const DAMAGE_STEPS = ['P', 'U', 'D', 'H']; // Pristine, Used, Damaged, Hobbled
-
-function damageIndex(step: unknown): number {
-  const s = asStr(step).toUpperCase();
-  return Math.max(0, DAMAGE_STEPS.findIndex((d) => s.startsWith(d)));
-}
-
 function crewCard(c: unknown, i: number): CardData {
-  if (!isObj(c)) return { id: `ww:crew:${i}`, title: 'crew' };
+  if (!isObj(c)) return { id: `ww:crew:${i}`, label: 'crew', colorKey: 'crew' };
   const anger = asNum(c['anger_tokens']);
   return {
-    id: `ww:crew:${i}`,
-    title: asStr(c['name'], 'crew'),
-    subtitle: `${asStr(c['race'])}${anger > 0 ? ` · anger ×${anger}` : ''}`,
+    id: `ww:crew:${asStr(c['name'], String(i))}`,
+    label: asStr(c['name'], 'crew'),
+    subtitle: asStr(c['race']) || undefined,
+    badges: anger > 0 ? [`anger ×${anger}`] : [],
     colorKey: 'crew',
   };
 }
@@ -43,152 +39,142 @@ function crewCard(c: unknown, i: number): CardData {
 function ruinGrid(ruin: Record<string, unknown>): Zone | null {
   const rows = asArr(ruin['board_rows']);
   if (rows.length === 0) return null;
-  const cells: { x: number; y: number; occupant?: string; colorKey?: string; label?: string }[] = [];
-  const glyphColor: Record<string, string> = { '#': 'wall', '~': 'pit' };
+  const cells: GridData['cells'] = [];
+  let maxX = 0;
   rows.forEach((r, y) => {
-    const glyphs = asStr(r).replace(/^row \d+:\s*/, '').split(/\s+/);
+    const glyphs = asStr(r).replace(/^row \d+:\s*/, '').trim().split(/\s+/);
+    maxX = Math.max(maxX, glyphs.length - 1);
     glyphs.forEach((g, x) => {
-      if (g === '.') return;
-      const cell: { x: number; y: number; occupant?: string; colorKey?: string; label?: string } = { x, y };
-      if (glyphColor[g]) cell.colorKey = glyphColor[g];
-      else if (/^[a-z0-9]$/i.test(g)) cell.occupant = g; // party digits, attacker letters
-      else cell.label = g; // S G I B A icons
-      cells.push(cell);
+      if (g === '.' || g === '') return;
+      if (g === '#') cells.push({ x, y, terrain: 'wall' });
+      else if (g === '~') cells.push({ x, y, terrain: 'pit' });
+      else if (/^\d$/.test(g)) cells.push({ x, y, pieces: [{ label: g, colorKey: 'party' }] });
+      else if (/^[a-z]$/i.test(g)) cells.push({ x, y, pieces: [{ label: g, colorKey: 'attacker' }] });
+      else cells.push({ x, y, pieces: [{ label: g, colorKey: 'item' }] });
     });
   });
   return {
-    kind: 'grid',
-    label: `Ruin ${asStr(ruin['map'])} — round ${asNum(ruin['round'], 1)}`,
-    data: { id: 'ww:ruin', width: 9, height: 9, cells },
+    kind: 'grid', id: 'ww:ruin',
+    data: {
+      label: `Ruin ${asStr(ruin['map'])} · round ${asNum(ruin['round'], 1)}`,
+      extent: { minX: 0, minY: 0, maxX, maxY: rows.length - 1 },
+      cells,
+    },
   };
 }
 
 export const warbleWayGlue: GlueModule = {
   gameId: 'warble-way-galaxy',
+  title: 'Warble Way Galaxy',
 
   plan(input: GlueInput): TablePlan | null {
     const { view } = input;
     if (!shapeHas(view, 'phase')) return null;
     if (!('travel_deck' in view) && !('character' in view) && !('ship' in view)) return null;
-    void input.legalMoves;
 
     const char = isObj(view['character']) ? view['character'] : null;
     const ship = isObj(view['ship']) ? view['ship'] : null;
     const travel = isObj(view['travel_deck']) ? view['travel_deck'] : null;
     const journey = isObj(view['journey']) ? view['journey'] : null;
-    const ruin = isObj(view['ruin']) ? (view['ruin'] as Record<string, unknown>) : null;
+    const ruin = isObj(view['ruin']) ? view['ruin'] : null;
+    const endings = isObj(view['season_endings']) ? view['season_endings'] : {};
 
     const bench: Zone[] = [];
+    const side: Zone[] = [];
+    const board: Zone[] = [];
+
     if (char) {
       const abilities = isObj(char['abilities']) ? char['abilities'] : {};
-      bench.push({
-        kind: 'tableau',
-        label: `${asStr(char['name'], 'You')} — level ${asNum(char['level'], 1)}`,
-        data: {
-          id: 'ww:character', colorKey: 'character',
-          stats: {
-            credits: asNum(char['credits']),
-            xp: asNum(char['xp']),
-            xpToNext: asNum(char['xp_to_next_level']),
-            wounded: char['wounded'] ? 'yes' : 'no',
-            dread: asNum(char['dread']),
-            ...Object.fromEntries(
-              Object.entries(abilities).map(([k, v]) => [
-                k.toUpperCase(),
-                isObj(v) ? asNum(v['effective'], asNum(v['natural'])) : asNum(v),
-              ]),
-            ),
-          },
-          zones: [],
-        },
+      const xp = asNum(char['xp']);
+      const toNext = asNum(char['xp_to_next_level']);
+      const stats: NonNullable<TableauData['stats']> = [
+        { label: 'Level', value: asNum(char['level'], 1) },
+        { label: 'XP to next level', value: xp, max: toNext > 0 ? xp + toNext : undefined },
+        { label: 'Credits', value: asNum(char['credits']) },
+        { label: 'Dread', value: asNum(char['dread']) },
+        { label: 'Wounded', value: char['wounded'] ? 'yes' : 'no' },
+        ...Object.entries(abilities).map(([k, v]) => ({
+          label: isObj(v) ? asStr(v['name'], k.toUpperCase()) : k.toUpperCase(),
+          value: isObj(v) ? asNum(v['effective'], asNum(v['natural'])) : asNum(v),
+        })),
+      ];
+      side.push({
+        kind: 'tableau', id: 'ww:character',
+        data: { label: asStr(char['name'], 'You'), owner: 'character', active: true, stats },
       });
+      // The finish lines, as the engine spells them out.
+      const endingStats = Object.entries(endings).map(([k, v]) => ({ label: words(k), value: asStr(v, String(v)) }));
+      if (endingStats.length > 0) {
+        side.push({ kind: 'tableau', id: 'ww:season', data: { label: 'Season', stats: endingStats } });
+      }
     }
     const crew = asArr(view['crew']);
+    const capacity = ship ? asNum(ship['capacity']) : 0;
     if (crew.length > 0 || asNum(view['unnamed_crew']) > 0) {
+      const extra = asNum(view['unnamed_crew']);
       bench.push({
-        kind: 'card-zone',
-        label: `Crew (${crew.length}/${asNum(ship?.['capacity'], 5)})${asNum(view['unnamed_crew']) ? ` +${asNum(view['unnamed_crew'])} bodies` : ''}`,
-        data: { id: 'ww:crew', kind: 'row', cards: crew.map(crewCard) },
+        kind: 'card-zone', id: 'ww:crew',
+        data: {
+          label: `Crew${capacity ? ` (${crew.length}/${capacity})` : ` (${crew.length})`}${extra ? ` +${extra} unnamed` : ''}`,
+          mode: 'row', cards: crew.map(crewCard),
+        },
       });
     }
     const items = asArr(view['items']);
     if (items.length > 0) {
       bench.push({
-        kind: 'card-zone',
-        label: 'Items',
+        kind: 'card-zone', id: 'ww:items',
         data: {
-          id: 'ww:items', kind: 'fan',
+          label: 'Items', mode: 'fan',
           cards: items.map((it, i) => {
             const o = isObj(it) ? it : {};
             return {
               id: asStr(o['id'], `ww:item:${i}`),
-              title: asStr(o['name'], 'item'),
-              subtitle: `${asStr(o['type'])}${o['consumed'] ? ' · used' : ''}`,
+              label: asStr(o['name'], 'item'),
+              subtitle: asStr(o['type']) || undefined,
+              badges: o['consumed'] ? ['used'] : [],
+              colorKey: 'item',
             };
           }),
         },
       });
     }
-
-    const board: Zone[] = [];
     if (ship) {
-      board.push({
-        kind: 'track',
-        label: `Ship: ${asStr(ship['name'], 'ship')} — damage`,
+      side.push({
+        kind: 'tableau', id: 'ww:ship',
         data: {
-          id: 'ww:damage', length: 4,
-          markers: { ship: damageIndex(ship['damage']) },
-          colorKey: 'ship',
+          label: `Ship: ${asStr(ship['name'], 'ship')}`, owner: 'ship',
+          stats: [
+            { label: 'Damage', value: asStr(ship['damage'], String(ship['damage'] ?? '')) },
+            ...(capacity ? [{ label: 'Capacity', value: capacity }] : []),
+          ],
         },
-      });
-    }
-    if (char) {
-      board.push({
-        kind: 'track',
-        label: `Level ${asNum(char['level'], 1)} (pips at 6/12/24/48 XP)`,
-        data: {
-          id: 'ww:xp', length: 48,
-          markers: { xp: Math.min(47, asNum(char['xp'])) },
-          colorKey: 'character',
-        },
-      });
-      board.push({
-        kind: 'pool',
-        label: 'Credits (−300 cliff · 6,000 finish)',
-        data: { id: 'ww:credits', tokens: { credits: asNum(char['credits']) } },
       });
     }
     if (travel) {
+      const discard = asArr(travel['discard']).map((x) => asStr(x));
       board.push({
-        kind: 'card-zone',
-        label: 'Travel deck',
+        kind: 'card-zone', id: 'ww:travel-draw',
+        data: { label: 'Travel deck', mode: 'pile', countOnly: asNum(travel['cards_in_draw_pile']) },
+      });
+      board.push({
+        kind: 'card-zone', id: 'ww:travel-discard', arriveFrom: 'ww:travel-draw',
         data: {
-          id: 'ww:travel', kind: 'row',
-          cards: [
-            { id: 'ww:draw', title: 'Draw pile', count: asNum(travel['cards_in_draw_pile']), faceDown: true },
-            {
-              id: 'ww:discard', title: 'Discard',
-              subtitle: asArr(travel['discard']).length ? `top: ${asStr(asArr(travel['discard']).at(-1))}` : undefined,
-              count: asNum(travel['cards_in_discard']),
-            },
-          ],
+          label: 'Discard', mode: 'pile',
+          cards: discard.map((c, i) => ({ id: `ww:travel:${i}:${c}`, label: c, colorKey: 'ship' })),
         },
       });
     }
     if (journey && asArr(journey['legs']).length > 0) {
       const legs = asArr(journey['legs']);
       board.push({
-        kind: 'tableau',
-        label: 'Journey',
+        kind: 'track', id: 'ww:journey',
         data: {
-          id: 'ww:journey', colorKey: 'ship',
-          stats: Object.fromEntries(
-            legs.map((l, i) => {
-              const o = isObj(l) ? l : {};
-              return [`leg ${i + 1}`, `${asStr(o['position'])}: ${asNum(o['cards_remaining'])} cards left`];
-            }),
-          ),
-          zones: [],
+          label: 'Journey',
+          spaces: legs.map((l, i) => {
+            const o = isObj(l) ? l : {};
+            return { index: i + 1, label: `${asNum(o['cards_remaining'])}`, filled: asStr(o['position']) === 'current' };
+          }),
         },
       });
     }
@@ -199,43 +185,65 @@ export const warbleWayGlue: GlueModule = {
     const habitat = isObj(view['habitat']) ? view['habitat'] : null;
     if (habitat) {
       board.push({
-        kind: 'track',
-        label: `Galaxy — you are at Habitat #${asNum(habitat['number'], 1)} ${asStr(habitat['name'])}`,
+        kind: 'tableau', id: 'ww:habitat',
         data: {
-          id: 'ww:galaxy', length: 3,
-          markers: { you: asNum(habitat['number'], 1) - 1 },
-          colorKey: 'character',
+          label: `Habitat ${asNum(habitat['number'], 1)}: ${asStr(habitat['name'])}`,
+          stats: [
+            { label: 'Shop', value: asArr(habitat['shop']).length },
+            { label: 'Cantina', value: asArr(habitat['cantina']).length },
+            { label: 'Missions', value: asArr(habitat['missions']).length },
+          ],
         },
       });
     }
-
-    return { board, bench, side: [], palette: PALETTE, title: 'Warble Way Galaxy' };
+    const status = `${words(asStr(view['phase']))}${isObj(view['pending']) ? ` · ${words(asStr((view['pending'] as Record<string, unknown>)['kind']))}` : ''}`;
+    return { board, bench, side, palette: PALETTE, title: 'Warble Way Galaxy', status };
   },
 
-  litParts(_view: unknown, legalMoves: LegalMove[]): string[] {
+  litParts(input: GlueInput): string[] {
     const lit: string[] = [];
-    for (const m of legalMoves) {
+    for (const m of input.legalMoves) {
       const t = asStr(m.move['type']);
-      // Items that can be used/equipped light up by item id.
       const itemId = m.move['item_id'];
       if ((t === 'use_item' || t === 'equip') && typeof itemId === 'string') lit.push(itemId);
-      // Ruin cell moves light the destination cell.
       const cell = m.move['to_cell'] ?? m.move['cell'];
-      if (typeof cell === 'string') lit.push(`ww:ruin:${cell}`);
+      if (typeof cell === 'string') {
+        const [x, y] = cell.split(',').map((n) => Number(n.trim()));
+        if (Number.isFinite(x) && Number.isFinite(y)) lit.push(`ww:ruin:${x},${y}`);
+      }
     }
-    return lit;
+    return [...new Set(lit)];
   },
 
-  moveForSelect(sel: SelectEvent, legalMoves: LegalMove[]): LegalMove | null {
+  moveForSelect(sel: SelectEvent, input: GlueInput): LegalMove | null {
+    const cell = /^ww:ruin:(\d+),(\d+)$/.exec(sel.id);
     return (
-      legalMoves.find((m) => sel.id === (m.move['item_id'] as string)) ??
-      legalMoves.find((m) => sel.id === `ww:ruin:${asStr(m.move['to_cell'] ?? m.move['cell'])}`) ??
+      input.legalMoves.find((m) => sel.id === (m.move['item_id'] as string)) ??
+      (cell ? input.legalMoves.find((m) => {
+        const c = asStr(m.move['to_cell'] ?? m.move['cell']).replace(/\s+/g, '');
+        return c === `${cell[1]},${cell[2]}`;
+      }) : undefined) ??
       null
     );
   },
 
   resolveReportMove(legalMoves: LegalMove[]): LegalMove | null {
     return legalMoves.find((m) => m.move['type'] === 'resolve_report') ?? null;
+  },
+
+  setupFields(_reference: GameReferenceResponse): SetupField[] {
+    // Character creation is a checklist step the engine offers as legal
+    // moves once the session exists; the table presents it there.
+    return [];
+  },
+
+  diceFor(event) {
+    const m = event.engineMove;
+    const dice = m && Array.isArray(m['dice']) ? m['dice'] : null;
+    if (dice) return dice.map((d) => asNum(d)).filter((n) => n > 0);
+    const found = /rolled?\s+(\d(?:\s*[,+]\s*\d)*)/i.exec(event.summary);
+    if (!found) return null;
+    return found[1]!.split(/[,+]/).map((s) => Number(s.trim())).filter((n) => n >= 1 && n <= 6);
   },
 };
 

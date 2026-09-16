@@ -1,57 +1,85 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { api } from '../api';
-import { Nav } from './Home';
+// Table setup: seats, AI levels, live or by turns, and the game's own
+// choices. Universe never defaults one of the game's setup choices: each is
+// a field the player fills in, and nothing is preselected.
 
-// Setup: seats, AI difficulty, mode — plus every choice from the game's own
-// checklist the engine lists. Universe NEVER defaults one of the game's setup
-// choices: each is a field the player fills in. The checklist comes from the
-// server (it asked the engine); while offline we show the structural fields.
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import type { GameCatalogEntry, GameReferenceResponse, SeatSpec, TableMode } from '@universe/shared';
+import { api, ApiRequestError } from '../api';
+import { glueFor, type SetupField } from '../glue';
+import { useSession } from '../session';
+import { Nav } from './Nav';
 
-interface ChecklistChoice {
-  key: string;
-  label: string;
-  options?: string[];
-  kind?: 'text' | 'number' | 'choice';
-}
+const AI_LEVELS = ['easy', 'medium', 'hard'] as const;
+type SeatChoice = `ai:${(typeof AI_LEVELS)[number]}` | 'friend';
 
 export function SetupPage() {
   const { id = '' } = useParams();
+  const [params] = useSearchParams();
   const nav = useNavigate();
-  const [checklist, setChecklist] = useState<ChecklistChoice[]>([]);
-  const [values, setValues] = useState<Record<string, string>>({});
-  const [seats, setSeats] = useState('2');
-  const [aiDifficulty, setAiDifficulty] = useState('medium');
-  const [mode, setMode] = useState<'live' | 'turns' | ''>(''); // never defaulted
+  const session = useSession();
+  const [game, setGame] = useState<GameCatalogEntry | null>(null);
+  const [reference, setReference] = useState<GameReferenceResponse | null>(null);
+  const [seats, setSeats] = useState<SeatChoice[]>([]);
+  const [mode, setMode] = useState<TableMode | ''>('');
+  const [values, setValues] = useState<Record<string, string[]>>({});
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
-    // The server relays the engine's setup checklist for this game.
-    fetch(`/api/games/${id}/setup-checklist`)
-      .then((r) => (r.ok ? r.json() : []))
-      .then((c: ChecklistChoice[]) => setChecklist(c))
-      .catch(() => setChecklist([]));
-  }, [id]);
+    api.game(id).then((r) => {
+      setGame(r.game);
+      const others = Math.max(0, r.game.minPlayers - 1);
+      const wantFriends = params.get('friends') === '1';
+      setSeats(Array.from({ length: others }, (_, i) => (wantFriends && i === 0 ? 'friend' : 'ai:medium')));
+    }).catch((e) => setErr((e as Error).message));
+    api.reference(id).then(setReference).catch((e) => setErr((e as Error).message));
+  }, [id, params]);
 
-  const allAnswered = checklist.every((c) => (values[c.key] ?? '') !== '');
+  const glue = glueFor(id);
+  const fields: SetupField[] = useMemo(() => (reference && glue ? glue.setupFields(reference) : []), [reference, glue]);
+  const friendSeats = seats.filter((s) => s === 'friend').length;
+  const aiOnly = friendSeats === 0;
+  const canAddSeat = game ? seats.length + 1 < game.maxPlayers : false;
+  const canRemoveSeat = game ? seats.length + 1 > game.minPlayers : false;
+
+  const fieldsAnswered = fields.every((f) => {
+    const v = values[f.key] ?? [];
+    return f.kind === 'multi' ? v.length === (f.pick ?? 1) : v.length === 1;
+  });
+
+  function toggle(field: SetupField, value: string) {
+    setValues((prev) => {
+      const cur = prev[field.key] ?? [];
+      if (field.kind === 'choice') return { ...prev, [field.key]: [value] };
+      if (cur.includes(value)) return { ...prev, [field.key]: cur.filter((x) => x !== value) };
+      if (cur.length >= (field.pick ?? 1)) return prev;
+      return { ...prev, [field.key]: [...cur, value] };
+    });
+  }
 
   async function start() {
-    if (!mode) { setErr('Choose live or by turns.'); return; }
-    if (!allAnswered) { setErr('Answer each of the game\'s setup choices — they are real decisions, not defaulted.'); return; }
+    if (!game) return;
+    if (!aiOnly && !mode) { setErr('Choose live or by turns.'); return; }
+    if (!fieldsAnswered) { setErr("Answer each of the game's own choices. They are real decisions, not defaults."); return; }
+    if (!aiOnly && !session.signedIn) { setErr('Sign in to open a table with friends.'); return; }
     setBusy(true);
+    setErr(null);
     try {
-      await api.createGuest().catch(() => null);
-      const table = await api.createTable({
-        gameId: id,
-        seats: Number(seats),
-        aiDifficulty,
-        mode,
-        setupChoices: values,
+      const seatSpecs: SeatSpec[] = [{ kind: 'human' }, ...seats.map((s): SeatSpec =>
+        s === 'friend' ? { kind: 'human' } : { kind: 'ai', aiDifficulty: s.slice(3) })];
+      const options: Record<string, unknown> = {};
+      for (const f of fields) options[f.key] = f.kind === 'multi' ? values[f.key] ?? [] : (values[f.key] ?? [])[0];
+      const res = await api.createTable({
+        gameId: game.engineGameId,
+        mode: aiOnly ? 'live' : (mode as TableMode),
+        seats: seatSpecs,
+        hostPosition: 0,
+        options,
       });
-      nav(table.status === 'lobby' ? `/table/${table.id}/lobby` : `/table/${table.id}`);
+      nav(res.status === 'lobby' ? `/table/${res.tableId}/lobby` : `/table/${res.tableId}`);
     } catch (e) {
-      setErr(String(e));
+      setErr(e instanceof ApiRequestError ? e.message : String(e));
     } finally {
       setBusy(false);
     }
@@ -60,53 +88,63 @@ export function SetupPage() {
   return (
     <div>
       <Nav />
-      <div className="page" style={{ maxWidth: 560 }}>
+      <div className="page" style={{ maxWidth: 680 }}>
         <h1>Set up your table</h1>
-        {err && <p style={{ color: 'var(--danger)' }}>{err}</p>}
+        {game && <p className="muted"><Link to={`/games/${game.engineGameId}`}>{game.name}</Link> · {game.playerCount} players</p>}
+        {err && <p className="error" role="alert">{err}</p>}
 
-        <div className="field">
-          <label>Seats (including you)</label>
-          <select value={seats} onChange={(e) => setSeats(e.target.value)}>
-            {[2, 3, 4, 5].map((n) => <option key={n} value={n}>{n}</option>)}
-          </select>
-        </div>
-        <div className="field">
-          <label>AI difficulty</label>
-          <select value={aiDifficulty} onChange={(e) => setAiDifficulty(e.target.value)}>
-            {['easy', 'medium', 'hard', 'search'].map((d) => <option key={d} value={d}>{d}</option>)}
-          </select>
-        </div>
-        <div className="field">
-          <label>Live or by turns</label>
-          <select value={mode} onChange={(e) => setMode(e.target.value as 'live' | 'turns')}>
-            <option value="">— choose —</option>
-            <option value="live">Live (everyone plays now)</option>
-            <option value="turns">By turns (notify me when it's my move)</option>
-          </select>
-        </div>
-
-        <h2 style={{ marginTop: 24 }}>The game's own choices</h2>
-        {checklist.length === 0 && (
-          <p style={{ color: 'var(--fg-muted)' }}>
-            The engine's checklist for this game appears here when the server is up.
-          </p>
-        )}
-        {checklist.map((c) => (
-          <div className="field" key={c.key}>
-            <label>{c.label}</label>
-            {c.options ? (
-              <select value={values[c.key] ?? ''} onChange={(e) => setValues({ ...values, [c.key]: e.target.value })}>
-                <option value="">— choose —</option>
-                {c.options.map((o) => <option key={o} value={o}>{o}</option>)}
-              </select>
-            ) : (
-              <input value={values[c.key] ?? ''} onChange={(e) => setValues({ ...values, [c.key]: e.target.value })} />
-            )}
+        <h2 style={{ marginTop: 20 }}>Seats</h2>
+        <div className="seat-row"><strong>Seat 1</strong><span>{session.displayName || 'You'} (you)</span></div>
+        {seats.map((s, i) => (
+          <div className="seat-row" key={i}>
+            <strong>Seat {i + 2}</strong>
+            <select aria-label={`Seat ${i + 2}`} value={s} onChange={(e) => setSeats(seats.map((x, j) => (j === i ? (e.target.value as SeatChoice) : x)))}>
+              {game?.supportsAi && AI_LEVELS.map((l) => <option key={l} value={`ai:${l}`}>AI · {l}</option>)}
+              <option value="friend">A friend (open seat)</option>
+            </select>
+            {canRemoveSeat && <button className="btn secondary small" onClick={() => setSeats(seats.filter((_, j) => j !== i))}>Remove</button>}
           </div>
         ))}
+        {canAddSeat && <button className="btn secondary small" style={{ marginTop: 8 }} onClick={() => setSeats([...seats, 'ai:medium'])}>Add a seat</button>}
+        {!aiOnly && !session.signedIn && (
+          <p className="muted">Playing with friends needs an account. <Link to={`/signin?next=${encodeURIComponent(location.pathname + location.search)}`}>Sign in</Link> and come back; guests can still join your table by link.</p>
+        )}
 
-        <button className="btn big" disabled={busy} onClick={start} style={{ marginTop: 16 }}>
-          {busy ? 'Starting…' : 'Start the table'}
+        <h2 style={{ marginTop: 24 }}>Live or by turns</h2>
+        {aiOnly ? (
+          <p className="muted">A table against only AI is always live.</p>
+        ) : (
+          <div className="radio-row" role="radiogroup" aria-label="Live or by turns">
+            <label><input type="radio" name="mode" checked={mode === 'live'} onChange={() => setMode('live')} /> Live: everyone plays now</label>
+            <label><input type="radio" name="mode" checked={mode === 'turns'} onChange={() => setMode('turns')} /> By turns: each player is told when it is their move</label>
+          </div>
+        )}
+
+        {fields.length > 0 && <h2 style={{ marginTop: 24 }}>The game's own choices</h2>}
+        {fields.map((f) => {
+          const picked = values[f.key] ?? [];
+          return (
+            <div className="field" key={f.key}>
+              <span className="label">{f.label}{f.kind === 'multi' ? ` (${picked.length} of ${f.pick})` : ''}</span>
+              {f.help && <span className="muted" style={{ fontSize: 13 }}>{f.help}</span>}
+              <div className="choice-grid" role="group" aria-label={f.label}>
+                {f.options.map((o) => {
+                  const on = picked.includes(o.value);
+                  return (
+                    <label key={o.value} className={`choice${on ? ' picked' : ''}`}>
+                      <input type={f.kind === 'multi' ? 'checkbox' : 'radio'} name={f.key} aria-label={o.label} checked={on} onChange={() => toggle(f, o.value)} />
+                      <span><strong>{o.label}</strong>{o.hint && <div className="hint">{o.hint}</div>}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+        {reference === null && game && <p className="muted">Loading the game's setup choices…</p>}
+
+        <button className="btn big" disabled={busy || !game || !reference} onClick={start} style={{ marginTop: 16 }}>
+          {busy ? 'Starting…' : aiOnly ? 'Start the game' : 'Open the lobby'}
         </button>
       </div>
     </div>

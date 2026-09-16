@@ -1,17 +1,67 @@
+// The table socket. One connection per browser tab; a table subscribes
+// with its last-seen sequence number and the server replays what it missed,
+// so a reconnect resumes the playback queue with no gap.
+
 import { io, type Socket } from 'socket.io-client';
-import type { TableEventWire } from '@universe/shared';
+import { SOCKET_EVENTS } from '@universe/shared';
+import type { JoinTableAck, MoveAck, TableEventWire, UndoAck } from '@universe/shared';
 
 export interface TableSocketHandlers {
   onEvent: (e: TableEventWire) => void;
-  onRejected: (r: { reason: string; lesson?: string }) => void;
+  /** called on every (re)connect, before re-joining; returns the last seq shown */
+  lastSeenSeq: () => number;
+  onJoined?: (ack: JoinTableAck) => void;
+  onConnectionChange?: (connected: boolean) => void;
 }
 
-/** Joins the table room; reconnects automatically (Socket.IO resumes with
- *  the last-seen sequence — the queue resumes from the events fetch). */
-export function connectTable(tableId: string, h: TableSocketHandlers): Socket {
-  const socket = io({ withCredentials: true });
-  socket.emit('join_table', { tableId });
-  socket.on('event', h.onEvent);
-  socket.on('rejected', h.onRejected);
-  return socket;
+export interface TableConnection {
+  move(seat: number, move: Record<string, unknown>): Promise<MoveAck>;
+  undo(): Promise<UndoAck>;
+  close(): void;
+}
+
+let shared: Socket | null = null;
+
+function socket(): Socket {
+  if (!shared) shared = io({ withCredentials: true, autoConnect: true });
+  return shared;
+}
+
+/** Test hook: use a fake socket instead of a real connection. */
+export function useFakeSocket(fake: Socket | null): void {
+  shared = fake;
+}
+
+export function connectTable(tableId: string, h: TableSocketHandlers): TableConnection {
+  const s = socket();
+  const onEvent = (e: TableEventWire) => h.onEvent(e);
+  const join = () => {
+    s.emit(SOCKET_EVENTS.joinTable, { tableId, lastSeenSeq: h.lastSeenSeq() }, (ack: JoinTableAck) => h.onJoined?.(ack));
+  };
+  const onConnect = () => { h.onConnectionChange?.(true); join(); };
+  const onDisconnect = () => h.onConnectionChange?.(false);
+  s.on(SOCKET_EVENTS.tableEvent, onEvent);
+  s.on('connect', onConnect);
+  s.on('disconnect', onDisconnect);
+  if (s.connected) onConnect();
+  return {
+    move: (seat, move) => new Promise<MoveAck>((resolve) => {
+      s.timeout(20_000).emit(SOCKET_EVENTS.move, { tableId, seat, move }, (err: Error | null, ack?: MoveAck) => {
+        if (err || !ack) resolve({ error: 'engine_unavailable', reason: 'The table did not answer. Check your connection.' });
+        else resolve(ack);
+      });
+    }),
+    undo: () => new Promise<UndoAck>((resolve) => {
+      s.timeout(20_000).emit(SOCKET_EVENTS.undo, { tableId }, (err: Error | null, ack?: UndoAck) => {
+        if (err || !ack) resolve({ error: 'engine_unavailable', message: 'The table did not answer.' });
+        else resolve(ack);
+      });
+    }),
+    close: () => {
+      s.off(SOCKET_EVENTS.tableEvent, onEvent);
+      s.off('connect', onConnect);
+      s.off('disconnect', onDisconnect);
+      s.emit(SOCKET_EVENTS.leaveTable, { tableId });
+    },
+  };
 }

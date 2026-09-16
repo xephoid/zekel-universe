@@ -7,30 +7,53 @@ export interface PlaybackApi {
   pace: Pace;
   setPace: (p: Pace) => void;
   push: (e: TableEventWire) => void;
-  replayFromStart: () => void;
+  seed: (e: TableEventWire) => void;
+  replayLast: () => void;
   resumeFrom: (events: TableEventWire[]) => void;
+  lastSeq: () => number;
+}
+
+const PACE_KEY = 'universe:pace';
+
+function storedPace(): Pace {
+  try {
+    const v = Number(localStorage.getItem(PACE_KEY));
+    if (v === 0.5 || v === 1 || v === 2) return v;
+  } catch { /* storage unavailable */ }
+  return 1;
 }
 
 /** React wrapper over PlaybackQueue. One instance per table route mount. */
-export function usePlaybackQueue(initialPace: Pace = 1): PlaybackApi {
+export function usePlaybackQueue(): PlaybackApi {
   const queueRef = useRef<PlaybackQueue | null>(null);
-  if (!queueRef.current) queueRef.current = new PlaybackQueue();
+  if (!queueRef.current) {
+    queueRef.current = new PlaybackQueue();
+    queueRef.current.setPace(storedPace());
+  }
   const queue = queueRef.current;
 
   const [state, setState] = useState<PlaybackState>(queue.snapshot);
-  const [pace, setPaceState] = useState<Pace>(initialPace);
+  const [pace, setPaceState] = useState<Pace>(queue.getPace());
 
   useEffect(() => {
     const unsub = queue.subscribe(setState);
-    return () => { unsub(); queue.dispose(); };
+    return () => { unsub(); };
   }, [queue]);
+
+  useEffect(() => () => queue.dispose(), [queue]);
 
   return useMemo(() => ({
     state,
     pace,
-    setPace: (p: Pace) => { setPaceState(p); queue.setPace(p); },
+    setPace: (p: Pace) => {
+      setPaceState(p);
+      queue.setPace(p);
+      try { localStorage.setItem(PACE_KEY, String(p)); } catch { /* storage unavailable */ }
+    },
     push: (e: TableEventWire) => queue.push(e),
-    replayFromStart: () => queue.replayFromStart(),
+    seed: (e: TableEventWire) => queue.seed(e),
+    replayLast: () => queue.replayLast(),
     resumeFrom: (events: TableEventWire[]) => queue.resumeFrom(events),
+    lastSeq: () => queue.snapshot.lastSeq,
   }), [state, pace, queue]);
 }

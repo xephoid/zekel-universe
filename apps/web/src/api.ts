@@ -1,22 +1,66 @@
-import type { GameCatalogEntry, GameTable, TableEventWire } from '@universe/shared';
+// The REST client. Every call is typed by the shared wire contract, so a
+// response shape the server changes fails to compile here.
+
+import type {
+  ApiError, CreateTableRequest, CreateTableResponse, GameReferenceResponse, GameResponse, GamesResponse,
+  MeResponse, MyTablesResponse, TableEventsResponse, TableResponse,
+} from '@universe/shared';
+
+export class ApiRequestError extends Error {
+  constructor(public status: number, public code: string, message: string) {
+    super(message);
+    this.name = 'ApiRequestError';
+  }
+}
 
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
+  // The JSON content type goes only with a body: a bodiless POST with that
+  // header is a malformed request to the server.
   const res = await fetch(path, {
-    headers: { 'content-type': 'application/json' },
     credentials: 'include',
     ...init,
+    headers: { ...(init?.body !== undefined ? { 'content-type': 'application/json' } : {}), ...(init?.headers ?? {}) },
   });
-  if (!res.ok) throw new Error(`${path} → ${res.status}`);
+  if (!res.ok) {
+    let body: ApiError | null = null;
+    try { body = (await res.json()) as ApiError; } catch { /* not json */ }
+    throw new ApiRequestError(res.status, body?.error ?? 'request_failed', body?.message ?? `${path} failed (${res.status})`);
+  }
   return (await res.json()) as T;
 }
 
+const post = <T>(path: string, body?: unknown) =>
+  req<T>(path, { method: 'POST', body: body === undefined ? undefined : JSON.stringify(body) });
+
 export const api = {
-  games: () => req<GameCatalogEntry[]>('/api/games'),
-  game: (id: string) => req<GameCatalogEntry>(`/api/games/${id}`),
-  myTables: () => req<GameTable[]>('/api/my-tables'),
-  table: (id: string) => req<GameTable>(`/api/tables/${id}`),
-  tableEvents: (id: string, after: number) => req<TableEventWire[]>(`/api/tables/${id}/events?after=${after}`),
-  createTable: (body: unknown) => req<GameTable>('/api/tables', { method: 'POST', body: JSON.stringify(body) }),
-  createGuest: () => req<{ id: string }>('/api/guests', { method: 'POST' }),
-  signInEmail: (email: string) => req<{ ok: boolean }>('/api/auth/email-link', { method: 'POST', body: JSON.stringify({ email }) }),
+  me: () => req<MeResponse>('/api/me'),
+  createGuest: () => post<{ guest: MeResponse['guest'] }>('/api/guests'),
+  updateMe: (displayName: string, bio?: string) => req<{ ok: true }>('/api/me', { method: 'PATCH', body: JSON.stringify({ displayName, bio }) }),
+  signInEmail: (email: string) => post<{ ok: true }>('/api/auth/email/link', { email }),
+  completeSignIn: (token: string) => post<{ ok: true; userId: string }>('/api/auth/email/complete', { token }),
+  signOut: () => post<{ ok: true }>('/api/auth/signout'),
+
+  games: () => req<GamesResponse>('/api/games'),
+  game: (id: string) => req<GameResponse>(`/api/games/${encodeURIComponent(id)}`),
+  reference: (id: string) => req<GameReferenceResponse>(`/api/games/${encodeURIComponent(id)}/reference`),
+
+  myTables: () => req<MyTablesResponse>('/api/my-tables'),
+  table: (id: string) => req<TableResponse>(`/api/tables/${encodeURIComponent(id)}`),
+  tableEvents: (id: string, after: number) =>
+    req<TableEventsResponse>(`/api/tables/${encodeURIComponent(id)}/events?after=${after}`),
+  createTable: (body: CreateTableRequest) => post<CreateTableResponse>('/api/tables', body),
+  joinTable: (id: string) => post<{ seatPosition: number }>(`/api/tables/${encodeURIComponent(id)}/join`),
+  setReady: (id: string, ready: boolean) => post<{ position: number; ready: boolean }>(`/api/tables/${encodeURIComponent(id)}/ready`, { ready }),
+  startTable: (id: string) => post<{ tableId: string; status: string }>(`/api/tables/${encodeURIComponent(id)}/start`),
 };
+
+/**
+ * Make sure this browser has a principal: a guest is created on first
+ * visit, silently, so Play now works with no account. Never a wall.
+ */
+export async function ensurePrincipal(): Promise<MeResponse> {
+  const me = await api.me();
+  if (me.user || me.guest) return me;
+  const created = await api.createGuest();
+  return { user: null, guest: created.guest };
+}

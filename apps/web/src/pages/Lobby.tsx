@@ -1,59 +1,89 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import type { GameTable, Seat } from '@universe/shared';
-import { api } from '../api';
-import { Nav } from './Home';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import type { TableResponse } from '@universe/shared';
+import { api, ApiRequestError } from '../api';
+import { useSession } from '../session';
+import { Nav } from './Nav';
 
 export function LobbyPage() {
   const { id = '' } = useParams();
   const nav = useNavigate();
-  const [table, setTable] = useState<GameTable | null>(null);
-  const [seats, setSeats] = useState<Seat[]>([]);
+  const session = useSession();
+  const [data, setData] = useState<TableResponse | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    const load = () => {
-      api.table(id).then(setTable).catch(() => {});
-      fetch(`/api/tables/${id}/seats`).then((r) => (r.ok ? r.json() : [])).then(setSeats).catch(() => {});
+    if (!session.me) return;
+    let stop = false;
+    const load = async () => {
+      try {
+        let d = await api.table(id);
+        // Anyone with the link takes an open seat, no account needed.
+        if (d.mySeats.length === 0 && d.table.status === 'lobby') {
+          await api.joinTable(id).catch(() => {});
+          d = await api.table(id);
+        }
+        if (!stop) { setData(d); setErr(null); }
+      } catch (e) {
+        if (!stop) setErr(e instanceof ApiRequestError ? e.message : String(e));
+      }
     };
-    load();
+    void load();
     const t = setInterval(load, 2500);
-    return () => clearInterval(t);
-  }, [id]);
+    return () => { stop = true; clearInterval(t); };
+  }, [id, session.me]);
 
   useEffect(() => {
-    if (table?.status === 'playing') nav(`/table/${id}`);
-  }, [table?.status, id, nav]);
+    if (data?.table.status === 'playing' || data?.table.status === 'finished') nav(`/table/${id}`);
+  }, [data?.table.status, id, nav]);
 
   const inviteLink = `${window.location.origin}/table/${id}/lobby`;
-  const isHost = true; // ownership comes from the session cookie; server enforces
+  const mine = data?.seats.find((s) => s.mine);
+  const humans = data?.seats.filter((s) => s.kind === 'human') ?? [];
+  const allReady = humans.length > 0 && humans.every((s) => s.taken && s.ready);
+
+  async function act(fn: () => Promise<unknown>) {
+    try { await fn(); setData(await api.table(id)); setErr(null); } catch (e) { setErr(e instanceof ApiRequestError ? e.message : String(e)); }
+  }
 
   return (
     <div>
       <Nav />
       <div className="page" style={{ maxWidth: 620 }}>
-        <h1>Lobby — {table?.gameId ?? '…'}</h1>
-        <p style={{ color: 'var(--fg-muted)' }}>Mode: {table?.mode}. Share the link; friends take open seats, no account needed.</p>
+        <h1>Lobby · {data?.table.gameName ?? '…'}</h1>
+        {data && <p className="muted">{data.table.mode === 'turns' ? 'By turns: the game starts itself when every seat is taken.' : 'Live: the host starts when everyone is ready.'}</p>}
+        {err && <p className="error">{err}</p>}
         <div className="field">
           <label>Invite link</label>
-          <input readOnly value={inviteLink} onFocus={(e) => e.target.select()} />
+          <div style={{ display: 'flex', gap: 8 }}>
+            <input readOnly value={inviteLink} onFocus={(e) => e.target.select()} style={{ flex: 1 }} />
+            <button className="btn secondary" onClick={() => { void navigator.clipboard?.writeText(inviteLink); setCopied(true); }}>{copied ? 'Copied' : 'Copy'}</button>
+          </div>
         </div>
         <h2>Seats</h2>
-        <ul>
-          {seats.map((s) => (
-            <li key={s.id}>
-              Seat {s.position + 1} — {s.kind}{s.ready ? ' · ready' : ' · waiting'}
-            </li>
-          ))}
-        </ul>
-        {isHost && (
-          <button
-            className="btn big"
-            disabled={!seats.every((s) => s.ready)}
-            onClick={() => fetch(`/api/tables/${id}/start`, { method: 'POST' })}
-          >
-            Everyone's ready — start
-          </button>
-        )}
+        {data?.seats.map((s) => (
+          <div className="seat-row" key={s.position}>
+            <strong>Seat {s.position + 1}</strong>
+            <span style={{ flex: 1 }}>
+              {s.kind === 'ai' ? s.displayName : s.taken ? `${s.displayName ?? 'Player'}${s.mine ? ' (you)' : ''}` : <span className="muted">open</span>}
+            </span>
+            <span className="muted">{s.kind === 'ai' ? '' : !s.taken ? 'waiting for a player' : s.ready ? 'ready' : 'not ready'}</span>
+          </div>
+        ))}
+        <div style={{ display: 'flex', gap: 12, marginTop: 16, flexWrap: 'wrap' }}>
+          {mine && data?.table.mode === 'live' && (
+            <button className="btn secondary" onClick={() => act(() => api.setReady(id, !mine.ready))}>
+              {mine.ready ? 'Not ready yet' : "I'm ready"}
+            </button>
+          )}
+          {data?.table.hostIsMe && data.table.mode === 'live' && (
+            <button className="btn" disabled={!allReady} onClick={() => act(() => api.startTable(id))}>
+              {allReady ? 'Everyone is ready: start' : 'Waiting for everyone'}
+            </button>
+          )}
+          <Link className="btn secondary" to="/">Back home</Link>
+        </div>
       </div>
     </div>
   );
