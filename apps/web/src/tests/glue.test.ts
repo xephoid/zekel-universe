@@ -1,10 +1,15 @@
-// Glue mapping tests with fixture views matching the engine's documented
-// view shape for each game (docs/games/<game>.md + engine views.ts).
+// Glue mapping tests with fixture views matching the engine's REAL view
+// shape for each game (zekel src/games/<id>/views.ts). Legal move fixtures
+// follow the engine's LegalMove shape: { move_id, description, move }.
 
 import { describe, expect, it } from 'vitest';
 import { GLUES } from '../glue';
 import { SPACES, JUNCTION_ROADS } from '../glue/sweetlands-board';
 
+// zekel/src/games/fractured-fist/views.ts getPlayerView: phase, round,
+// active_player_id, player_order, players_done_this_round, players Record
+// keyed by pid, winners, scores, result_summary. Hands/discards/played are
+// string[] of card IDS.
 const FF_VIEW = {
   phase: 'technique',
   round: 2,
@@ -22,20 +27,23 @@ const FF_VIEW = {
     },
     p2: {
       kind: 'tracked', stamina: 7, max_stamina: 7, deck_size: 9, hand_size: 5,
-      discard_size: 1, played: [], damage_queued: 0, defense_queued: 1,
-      actions: 1, channels: 1, spirit: 2, refine_pending: 0, misstep_count: 3,
-      starting_hand_size: 5, focus_reloads_this_turn: 0, supply: { attack: 5 },
+      discard_size: 1, discard: ['block'], played: [], damage_queued: 0,
+      defense_queued: 1, actions: 1, channels: 1, spirit: 2, refine_pending: 0,
+      misstep_count: 3, starting_hand_size: 5, focus_reloads_this_turn: 0,
+      supply: { attack: 5 },
     },
   },
   winners: [], scores: {}, result_summary: null,
 };
 
 const FF_MOVES = [
-  { id: 'play-2-quicken', description: 'Play Quicken (hand[2])', move: { type: 'play_card', hand_index: 2 } },
-  { id: 'buy-attack', description: 'Buy Attack', move: { type: 'buy_card', card_id: 'attack' } },
-  { id: 'advance-phase', description: 'Advance to Channel phase', move: { type: 'advance_phase' } },
+  // play_card carries card_id + hand_index (zekel fractured-fist types.ts).
+  { move_id: 'play-2', description: 'Play Quicken (hand[2])', move: { type: 'play_card', card_id: 'quicken', hand_index: 2 } },
+  { move_id: 'buy-attack', description: 'Buy Attack', move: { type: 'buy_card', card_id: 'attack' } },
+  { move_id: 'advance-phase', description: 'Advance to Channel phase', move: { type: 'advance_phase' } },
 ];
 
+// zekel/src/games/warble-way-galaxy/views.ts getView output.
 const WW_VIEW = {
   phase: 'habitat',
   pending: { kind: 'research_roll' },
@@ -62,6 +70,10 @@ const WW_VIEW = {
   stat_reference: {}, lore_refs: [], result: null,
 };
 
+// zekel/src/games/sweetlands-imperium/views.ts getPlayerView: game_id, phase,
+// round, active_player_id, first_player_id, taxes, foe, castle_occupant_id,
+// intel_deck_count, intel_discard_count, random_treat_placement, players
+// (ARRAY, intel_tokens = string[] of kinds) + your_hand for the viewing seat.
 const SL_VIEW = {
   game_id: 'sweetlands-imperium',
   phase: 'play', round: 1, active_player_id: 's1', first_player_id: 's1',
@@ -71,7 +83,7 @@ const SL_VIEW = {
   players: [
     {
       player_id: 's1', kind: 'human', faction: 'milkshake', faction_name: 'Arch Duchess of Milkshake',
-      home_region: 1, points: 1, influence: 2, sugar_cubes: 3, intel_tokens: { red: 1 },
+      home_region: 1, points: 1, influence: 2, sugar_cubes: 3, intel_tokens: ['red'],
       hand_count: 3,
       units: { leader: 'region 1 start', knight: 'region 1 ring space 2 (yellow)', ambassador: 'off-board' },
       unit_locations: {
@@ -90,21 +102,23 @@ const SL_VIEW = {
   your_secret_objectives: ['so1'], your_turn_step: 'move',
 };
 
+// zekel/src/games/cybernoir-2127/views.ts hacker player view: the 19 real
+// location names come from data/index.ts (transcribed in the glue).
 const CN_VIEW = {
   phase: 'play', turn: 3, activePlayerId: 'det', playerOrder: ['det', 'hak'],
   pending: null, endgame_triggered: false, endgame_reason: null,
-  board: ['Neon Plaza', 'Glass Arcade'],
-  informants_facedown_count: 1, informants_revealed: [{ person: 'Ada' }],
-  jail: { slot_1_booked: ['Kilgore'], slot_2_processing: [], slot_3_release_pending_then_freed: [] },
+  board: ['Dark City Central Station', 'Xistential Club'],
+  informants_facedown_count: 1, informants_revealed: [{ person: 'Anansi the Spider' }],
+  jail: { slot_1_booked: ['Blackice'], slot_2_processing: [], slot_3_release_pending_then_freed: [] },
   truthful_clues: { weapon: 'not revolver' }, truthful_values: {},
   negative_clues: ['not Ada'], safehouse_burned: false, hideout_card_removed: false,
-  evidence: { weapon: null, witnesses: ['Moth'], motive_set_1: [], motive_set_2: [], motive_set_3: [], motive_set_4: [] },
+  evidence: { weapon: null, witnesses: ['Eddie the Doorman'], motive_set_1: [], motive_set_2: [], motive_set_3: [], motive_set_4: [] },
   contacts_discard: ['The Weapon'],
-  detective: { location_deck_size: 12, location_hand_size: 3, location_discard: ['Dust Fields'], poi_deck_size: 30, mid_game_guess_spent: false, location_played_this_turn: null, upkeep_paid: true, ap: 3, overclock_used: false },
-  hacker: { contacts_deck_size: 20, contacts_discard_size: 1, hand_size: 4, ap: 2, overclock_used: false },
+  detective: { location_deck_size: 12, location_hand_size: 3, location_discard: ['Shipyard'], poi_deck_size: 30, mid_game_guess_spent: false, location_played_this_turn: null, upkeep_paid: true, ap: 3, overclock_used: false },
+  hacker: { contacts_deck_size: 20, contacts_discard_size: 1, hand_size: 2, ap: 2, overclock_used: false },
   overclock_draws_owed: 0, overclock_draw_timing: null,
   role: 'hacker',
-  hand: ['Ada', 'The Weapon'],
+  hand: ['Blackice', 'The Weapon'],
   hideout: 'The Junction',
   evidence_detail: {},
 };
@@ -125,8 +139,8 @@ describe('fractured-fist glue', () => {
     expect(lit).not.toContain('advance-phase');
   });
   it('maps a click back to the move', () => {
-    expect(g.moveForSelect({ component: 'card', id: 'p:p1:hand:2', label: 'Quicken' }, FF_MOVES)?.id).toBe('play-2-quicken');
-    expect(g.moveForSelect({ component: 'card', id: 'p:p1:supply:attack', label: 'Attack' }, FF_MOVES)?.id).toBe('buy-attack');
+    expect(g.moveForSelect({ component: 'card', id: 'p:p1:hand:2', label: 'Quicken' }, FF_MOVES)?.move_id).toBe('play-2');
+    expect(g.moveForSelect({ component: 'card', id: 'p:p1:supply:attack', label: 'Attack' }, FF_MOVES)?.move_id).toBe('buy-attack');
   });
   it('has no resolve_report (no dice in this game)', () => {
     expect(g.resolveReportMove(FF_MOVES)).toBeNull();
@@ -141,8 +155,8 @@ describe('warble-way-galaxy glue', () => {
     expect(plan.board.map((z) => String(z.data['id']))).toEqual(expect.arrayContaining(['ww:damage', 'ww:ruin', 'ww:travel', 'ww:galaxy']));
   });
   it('surfaces the Roll button only for resolve_report', () => {
-    const moves = [{ id: 'r', description: 'Roll 3d6 + SNE', move: { type: 'resolve_report' } }];
-    expect(g.resolveReportMove(moves)?.id).toBe('r');
+    const moves = [{ move_id: 'r', description: 'Roll 3d6 + SNE', move: { type: 'resolve_report' } }];
+    expect(g.resolveReportMove(moves)?.move_id).toBe('r');
   });
 });
 
@@ -177,10 +191,16 @@ describe('cybernoir-2127 glue', () => {
     const map = plan.board.find((z) => z.kind === 'map')!;
     const regions = (map.data as { regions: { id: string; occupant?: string }[] }).regions;
     expect(regions).toHaveLength(19);
-    expect(regions.find((r) => r.id === 'cn:loc:neon-plaza')!.occupant).toBe('played');
+    expect(regions.find((r) => r.id === 'cn:loc:dark-city-central-station')!.occupant).toBe('played');
     expect(regions.find((r) => r.id === 'cn:loc:the-junction')!.occupant).toBe('safehouse');
     expect(plan.bench.some((z) => String(z.data['id']) === 'cn:hand')).toBe(true);
     expect(plan.bench.some((z) => String(z.data['id']) === 'cn:hacker')).toBe(true);
+  });
+  it('lights locations named by play_location moves', () => {
+    const moves = [
+      { move_id: 'pl', description: 'Play Dark City Central Station', move: { type: 'play_location', location_name: 'Dark City Central Station' } },
+    ];
+    expect(g.litParts(CN_VIEW, moves)).toContain('cn:loc:dark-city-central-station');
   });
 });
 

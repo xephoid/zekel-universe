@@ -1,8 +1,13 @@
 // Sweetlands Imperium glue — the 80-space ring board with four junction
 // roads, per-seat tableaux, Intel deck/discard piles, the points track and
-// the token pool (sugar cubes + influence). View shape per the engine's
-// views.ts: shared fields plus your_hand/your_secret_objectives/your_turn_step
-// for the owning seat; units as the UnitLocation union under unit_locations.
+// the token pool (sugar cubes + influence). Real player-view shape per the
+// engine's views.ts (zekel src/games/sweetlands-imperium/views.ts): shared
+// fields plus your_hand/your_secret_objectives/your_turn_step for the owning
+// seat; players is an ARRAY of { player_id, faction, points, influence,
+// sugar_cubes, intel_tokens: string[], hand_count, units (prose),
+// unit_locations (raw UnitLocation union), … }; board topology uses the
+// engine's own data/board.ts region ids and coordinates, transcribed in
+// sweetlands-board.ts.
 
 import type { CardData, MapRegionData, TablePlan, Zone } from './zoneData';
 import type { GlueModule, GlueInput } from './types';
@@ -200,8 +205,7 @@ export const sweetlandsGlue: GlueModule = {
 
   litParts(view: unknown, legalMoves: LegalMove[]): string[] {
     const lit: string[] = [];
-    const handSize = Array.isArray(view) ? 0 : (isObj(view) && Array.isArray(view['your_hand']) ? (view['your_hand'] as unknown[]).length : 0);
-    void handSize;
+    void view;
     for (const m of legalMoves) {
       const t = asStr(m.move['type']);
       if (t === 'play_intel' && typeof m.move['hand_index'] === 'number') {

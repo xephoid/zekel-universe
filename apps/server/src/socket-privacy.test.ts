@@ -18,31 +18,46 @@ const SECRET = 'test-secret';
 
 function makeEngine(over: Partial<EngineService> = {}): EngineService {
   return {
-    async listGames() { return { games: [{ id: 'g', name: 'G', player_counts: [2] }] }; },
-    async getRules() { return {}; },
-    async createSession() {
+    async listGames() {
       return {
-        session_id: 's1',
-        host_token: 'tok',
-        seats: [
-          { position: 0, player_id: 'p0' },
-          { position: 1, player_id: 'p1' },
-        ],
+        games: [{
+          game_id: 'g', name: 'G', description: 'd', min_players: 2,
+          max_players: 2, supports_ai: true,
+          has_hidden_information: true, options_schema: {},
+        }],
       };
     },
-    async getState(_s: string, playerId?: string) { return { playerId }; },
-    async getLegalMoves() { return {}; },
+    async getRules() { return {}; },
+    async createSession({ seats: seatSpecs }: { seats: Array<{ playerId?: string; kind: string }> }) {
+      const recs = seatSpecs.map((s, i) => ({
+        player_id: s.playerId ?? `p${i + 1}`, kind: s.kind as 'human' | 'ai',
+      }));
+      return {
+        session_id: 's1',
+        players_recorded: recs,
+        join: {
+          join_code: 'AB12', host_player_id: recs.find((r) => r.kind === 'human')?.player_id ?? 'p1',
+          host_token: 'tok',
+          open_seats: recs.filter((r) => r.kind === 'human').slice(1).map((r) => r.player_id),
+        },
+      };
+    },
+    async getState(_s: string, playerId?: string) {
+      // Views keyed per-seat by the fetch loop; privacy is about which seat's
+      // view is inside, so give each seat its own marker.
+      return { playerId, secret: playerId === 'p1' ? 'aaa' : 'bbb' };
+    },
+    async getLegalMoves() { return { legal_moves: [] }; },
     async applyMove(_s: string, _p: string, _t: string | undefined, _m: Record<string, unknown>) {
       return {
-        ok: true as const,
-        summary: 'A moves.',
-        player_views: { p0: { secret: 'aaa' }, p1: { secret: 'bbb' } },
-        next_step: null,
+        applied: true as const,
+        state_summary: 'A moves.',
+        next_step: { status: 'human_to_move' as const, active_player_id: 'p1', instruction: '…' },
       };
     },
     async runAiTurn() { return { moves: [] as never[] }; },
-    async undo() { return {}; },
-    async isGameOver() { return { over: false as const }; },
+    async undo() { return { undone: true }; },
+    async isGameOver() { return { game_over: false as const }; },
     ...over,
   };
 }
@@ -129,8 +144,8 @@ describe('per-seat socket views never leak', () => {
     expect(moveAck.ok).toBe(true);
 
     const [evA, evB] = await Promise.all([gotA, gotB]);
-    expect(evA.view).toEqual({ secret: 'aaa' });
-    expect(evB.view).toEqual({ secret: 'bbb' });
+    expect(evA.view).toEqual({ playerId: 'p1', secret: 'aaa' });
+    expect(evB.view).toEqual({ playerId: 'p2', secret: 'bbb' });
     expect(JSON.stringify(evA)).not.toContain('bbb');
     expect(JSON.stringify(evB)).not.toContain('aaa');
   });

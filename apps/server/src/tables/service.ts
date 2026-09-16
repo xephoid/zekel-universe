@@ -126,6 +126,7 @@ export class TableService {
     const session = await this.engine.createSession({
       gameId: table.gameId,
       seats: tableSeats.map((s) => ({
+        playerId: `p${s.position + 1}`,
         kind: s.kind as 'human' | 'ai',
         table: s.kind === 'human' ? ('digital' as const) : undefined,
         difficulty: s.aiDifficulty ?? undefined,
@@ -133,28 +134,26 @@ export class TableService {
       options: tableSeats[0]?.setupChoices ?? {},
       hostPlayerId: `p${hostPosition + 1}`,
     });
-    for (const engineSeat of session.seats ?? []) {
-      const seat = tableSeats.find((s) => s.position === engineSeat.position);
-      if (seat && engineSeat.player_id) {
+    // create_session echoes players_recorded; engine ids are p(position+1)
+    // here by construction, but store what the engine actually recorded.
+    for (const rec of session.players_recorded ?? []) {
+      const m = /^p(\d+)$/.exec(rec.player_id);
+      if (!m) continue;
+      const seat = tableSeats.find((s) => s.position === Number(m[1]) - 1);
+      if (seat) {
         this.db.update(seats)
-          .set({ enginePlayerId: engineSeat.player_id })
+          .set({ enginePlayerId: rec.player_id })
           .where(eq(seats.id, seat.id)).run();
       }
     }
-    if (session.host_token) {
-      this.db.update(tables).set({
-        engineSessionId: session.session_id,
-        encryptedHostToken: encryptToken(session.host_token, this.secretKey),
-      }).where(eq(tables.id, tableId)).run();
-    } else {
-      // Token comes back on the session; if absent, use the per-seat token of
-      // the host seat (the engine hands one per player).
-      const hostToken = session.seats?.find((s) => s.position === hostPosition)?.token ?? null;
-      this.db.update(tables).set({
-        engineSessionId: session.session_id,
-        encryptedHostToken: hostToken ? encryptToken(hostToken, this.secretKey) : null,
-      }).where(eq(tables.id, tableId)).run();
-    }
+    // Multi-device join tokens live under session.join ({join_code,
+    // host_player_id, host_token, open_seats}) — only present with ≥2 human
+    // seats. Solo-vs-AI gets no token; Universe acts unauthenticated there.
+    const hostToken = session.join?.host_token ?? null;
+    this.db.update(tables).set({
+      engineSessionId: session.session_id,
+      encryptedHostToken: hostToken ? encryptToken(hostToken, this.secretKey) : null,
+    }).where(eq(tables.id, tableId)).run();
     this.emitStarted(tableId);
   }
 
@@ -238,12 +237,11 @@ export class TableService {
     }
   }
 
-  /** Decrypt the stored engine host token for this table. */
-  hostToken(tableId: string): string {
+  /** Decrypt the stored engine host token for this table (null when the
+   *  engine session issues none — solo-vs-AI has no multi-device auth). */
+  hostToken(tableId: string): string | undefined {
     const table = this.getTable(tableId);
-    if (!table?.encryptedHostToken) {
-      throw new TableError('no_session', 'Table has no engine session yet');
-    }
+    if (!table?.encryptedHostToken) return undefined;
     return decryptToken(table.encryptedHostToken, this.secretKey);
   }
 

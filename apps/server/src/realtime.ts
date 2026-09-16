@@ -27,8 +27,9 @@ export class MoveError extends Error {
 /** The realtime layer subscribes here; sockets are not realtime's business. */
 export type EventBroadcast = (tableId: string, event: EventRow, kind: TableEventKind) => void;
 
-function isAiNext(nextStep: string | null | undefined): boolean {
-  return !!nextStep && /ai/i.test(nextStep);
+/** Engine next_step is an OBJECT: { status, active_player_id, instruction }. */
+function isAiNext(nextStep: { status?: string } | null | undefined): boolean {
+  return nextStep?.status === 'ai_to_move';
 }
 
 function moveKind(move: Record<string, unknown>): TableEventKind {
@@ -121,14 +122,15 @@ export class Realtime {
     return event;
   }
 
-  /** Fetch each digital human seat's view and return keyed by seat position. */
+  /** Fetch each digital human seat's view and return keyed by seat position.
+   *  Engine player ids are the strings chosen at create_session. */
   private async fetchSeatViews(tableId: string): Promise<Record<string, unknown>> {
     const sessionId = this.tableService.engineSessionId(tableId);
     const token = this.tableService.hostToken(tableId);
     const views: Record<string, unknown> = {};
     for (const seat of this.tableService.getSeats(tableId)) {
       if (seat.kind !== 'human') continue;
-      const playerId = seat.enginePlayerId ?? `p${seat.position + 1}`;
+      const playerId = this.tableService.playerIdFor(tableId, seat.position);
       views[String(seat.position)] = await this.engine.getState(sessionId, playerId, token);
     }
     return views;
@@ -176,46 +178,38 @@ export class Realtime {
     const token = this.tableService.hostToken(tableId);
 
     let applied;
-    const playerId = seat.enginePlayerId ?? `p${seatPosition + 1}`;
+    const playerId = this.tableService.playerIdFor(tableId, seatPosition);
     try {
       applied = await this.engine.applyMove(sessionId, playerId, token, move);
     } catch (err) {
-      // Engine error responses carry the reason and lesson; anything else is
-      // a genuine failure and goes up as one.
+      // Engine rejections (EngineError) carry reason + lesson + the legal set;
+      // anything else is a genuine failure and goes up as one.
       if (err instanceof Error && 'reason' in err) {
         const e = err as { reason?: string; lesson?: string };
         throw new MoveError('move_rejected', e.reason ?? 'Move rejected', e.reason, e.lesson);
       }
       throw err;
     }
-    if (applied.ok === false) {
-      throw new MoveError('move_rejected', applied.reason ?? 'Move rejected', applied.reason, applied.lesson);
-    }
 
-    // Prefer views returned with the move; fall back to one call per seat.
-    let views: Record<string, unknown> = {};
-    if (applied.player_views) {
-      views = this.viewsBySeatPosition(applied.player_views, tableId);
-    } else {
-      views = await this.fetchSeatViews(tableId);
-    }
-    const ev = this.appendEvent(tableId, moveKind(move), seatPosition, applied.summary ?? '', move, views);
+    // apply_move returns NO player_views — fetch each digital seat's view
+    // with one get_state call per seat, keyed by engine player id strings.
+    const views = await this.fetchSeatViews(tableId);
+    const ev = this.appendEvent(tableId, moveKind(move), seatPosition, applied.state_summary, move, views);
 
-    if (isAiNext(applied.next_step)) {
-      await this.runAiTurnCascade(tableId);
+    if (applied.next_step?.status === 'ai_to_move') {
+      await this.runAiTurnCascade(tableId, applied.next_step.active_player_id!);
     }
     await this.checkGameOver(tableId);
     return { lastSeq: ev.seq };
   }
 
-  /** After a human move, run one AI turn and an event per move, in order. */
-  private async runAiTurnCascade(tableId: string): Promise<void> {
+  /** After a human move, run one AI turn and an event per move, in order.
+   *  run_ai_turn requires the AI seat's player_id; next_step says who's up. */
+  private async runAiTurnCascade(tableId: string, firstAiPlayerId: string): Promise<void> {
     const sessionId = this.tableService.engineSessionId(tableId);
     const token = this.tableService.hostToken(tableId);
-    // run_ai_turn acts as the host: the engine plays whichever AI is up.
-    const hostPlayerId = this.hostPlayerId(tableId);
-    const result = await this.engine.runAiTurn(sessionId, hostPlayerId, token);
-    for (const step of result.moves ?? []) {
+    const result = await this.engine.runAiTurn(sessionId, firstAiPlayerId, token);
+    for (const step of result.moves) {
       const views = step.player_views
         ? this.viewsBySeatPosition(step.player_views, tableId)
         : await this.fetchSeatViews(tableId);
@@ -223,32 +217,24 @@ export class Realtime {
         tableId,
         'ai_move',
         null,
-        step.summary ?? '',
-        step.move ?? null,
+        step.state_summary,
+        (step.move_taken as Record<string, unknown> | undefined) ?? null,
         views,
       );
     }
   }
 
-  /** When a table starts with an AI up (its seats open the game), push turn. */
+  /** When a table starts with an AI up (its seats open the game), push turn.
+   *  get_state (host seat) tells us authoritatively via next_step. */
   private async maybeRunAiOpening(tableId: string): Promise<void> {
-    // Ask the engine for the digital seats' state; the summary of the first
-    // legal-move response says whose turn it is. Cheap version: try to run
-    // an AI turn only when the engine session reports one due. We check by
-    // looking at the session state for a "turn" field naming an AI seat.
     const sessionId = this.tableService.engineSessionId(tableId);
-    const state = await this.engine.getState(sessionId);
-    const currentRaw = (state as Record<string, unknown>).current_player
-      ?? (state as Record<string, unknown>).turn;
-    if (currentRaw === undefined || currentRaw === null) return;
-    const current = String(currentRaw);
-    const aiSeats = this.tableService.getSeats(tableId).filter((s) => s.kind === 'ai');
-    const isAiDue = aiSeats.some((s) =>
-      current === String(s.position) ||
-      (s.enginePlayerId !== null && current === s.enginePlayerId));
-    if (!isAiDue) return;
+    const token = this.tableService.hostToken(tableId);
+    const hostPid = this.hostPlayerId(tableId);
+    const state = await this.engine.getState(sessionId, hostPid, token);
+    const nextStep = state.next_step;
+    if (nextStep?.status !== 'ai_to_move' || !nextStep.active_player_id) return;
     this.appendEvent(tableId, 'system', null, 'The table opens with an AI turn.', null, {});
-    await this.runAiTurnCascade(tableId);
+    await this.runAiTurnCascade(tableId, nextStep.active_player_id);
     await this.checkGameOver(tableId);
   }
 
@@ -286,10 +272,10 @@ export class Realtime {
   private async checkGameOver(tableId: string): Promise<void> {
     const sessionId = this.tableService.engineSessionId(tableId);
     const over = await this.engine.isGameOver(sessionId);
-    if (!over.over) return;
+    if (!over.game_over) return;
     this.db.update(tables).set({ status: 'finished', finishedAt: now() })
       .where(eq(tables.id, tableId)).run();
-    const summary = `The game is over. ${over.result ? JSON.stringify(over.result) : ''}`.trim();
+    const summary = `The game is over. ${over.summary ? String(over.summary) : ''}`.trim();
     const views = await this.fetchSeatViews(tableId);
     this.appendEvent(tableId, 'system', null, summary, null, views);
     // Notify everyone seated that the table finished.

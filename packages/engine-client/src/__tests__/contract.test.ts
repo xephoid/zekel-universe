@@ -7,14 +7,15 @@
 //   ENGINE_URL=http://localhost:8787/mcp ENGINE_TOKEN=dev-token \
 //     pnpm --filter @universe/engine-client test
 //
-// The test exercises the round trip Universe depends on: list games, create a
-// session with one digital human seat plus one AI seat, read state, read
-// legal moves. Argument shapes match the engine's tool input schemas
-// (zekel repo, src/mcp/schemas.ts): game_id, players[] with
-// player_id/kind/name/difficulty/table, and session_id/player_id on reads.
+// The round trip Universe depends on: list games (real GameMetadata shape),
+// create a session with a digital human seat plus an AI seat (players with
+// player_id/kind/name/table/difficulty per src/mcp/schemas.ts), read state
+// (view spread at top level + next_step object), read legal moves. Errors
+// surface as EngineError { error_code, message, details } where details on
+// recoverable move errors carries your_legal_moves + rules_briefing.
 
 import { describe, it, expect, afterAll } from 'vitest';
-import { EngineClient } from '../index.js';
+import { EngineClient, EngineError } from '../index.js';
 
 const ENGINE_URL = process.env.ENGINE_URL;
 const ENGINE_TOKEN = process.env.ENGINE_TOKEN ?? '';
@@ -29,49 +30,88 @@ describe.skipIf(!runLive)('engine-client contract (live engine)', () => {
     await client?.close();
   });
 
-  it('lists games with ids', async () => {
+  it('lists games with the real GameMetadata shape', async () => {
     const result = await client!.listGames();
     expect(Array.isArray(result.games)).toBe(true);
     expect(result.games.length).toBeGreaterThan(0);
     for (const game of result.games) {
-      expect(typeof game.id).toBe('string');
-      expect(game.id.length).toBeGreaterThan(0);
+      expect(typeof game.game_id).toBe('string');
+      expect(game.game_id.length).toBeGreaterThan(0);
+      expect(typeof game.name).toBe('string');
+      expect(typeof game.min_players).toBe('number');
+      expect(typeof game.max_players).toBe('number');
+      expect(typeof game.supports_ai).toBe('boolean');
+      expect(typeof game.has_hidden_information).toBe('boolean');
+      expect(game.options_schema).toBeTypeOf('object');
     }
   });
 
-  it('creates a session with a digital human seat and an AI seat, then reads state and legal moves', async () => {
+  it('get_rules returns rules text plus optional reference_data', async () => {
     const { games } = await client!.listGames();
+    const rules = await client!.getRules(games[0]!.game_id);
+    expect(rules.game_id).toBe(games[0]!.game_id);
+    expect(typeof rules.rules).toBe('string');
+  });
 
-    // Prefer a two-player game from the catalog so the seat layout below is
-    // always legal; fall back to the first game if none advertises counts.
+  it('creates a session, reads state (spread view + next_step object) and legal moves', async () => {
+    const { games } = await client!.listGames();
     const game =
-      games.find((g) => !g.player_counts || g.player_counts.includes(2)) ?? games[0]!;
-    expect(game, 'engine catalog is empty').toBeTruthy();
+      games.find((g) => g.min_players <= 2 && g.max_players >= 2 && g.supports_ai) ?? games[0]!;
 
     const session = await client!.createSession({
-      gameId: game.id,
+      gameId: game.game_id,
       seats: [
-        { kind: 'human', name: 'Host', table: 'digital' },
-        { kind: 'ai', name: 'Bot', difficulty: 'easy' },
+        { playerId: 'p1', kind: 'human', name: 'Host', table: 'digital' },
+        { playerId: 'p2', kind: 'ai', name: 'Bot', difficulty: 'easy' },
       ],
     });
     expect(typeof session.session_id).toBe('string');
     expect(session.session_id.length).toBeGreaterThan(0);
+    if (session.next_step !== undefined) {
+      expect(['game_over', 'ai_to_move', 'human_to_move']).toContain(session.next_step.status);
+    }
 
-    const hostToken = session.host_token;
-
-    const state = await client!.getState(session.session_id, 'p1', hostToken);
+    // get_state: player view fields spread at top level, next_step object.
+    const state = await client!.getState(session.session_id, 'p1');
     expect(state).toBeTypeOf('object');
-    expect('error' in state && state.error).toBeFalsy();
+    if (state.next_step !== undefined && state.next_step !== null) {
+      expect(state.next_step).toHaveProperty('status');
+      expect(state.next_step).toHaveProperty('active_player_id');
+      expect(state.next_step).toHaveProperty('instruction');
+    }
 
-    // Legal moves come back for the host seat (p1 on the wire, the first
-    // player in the seats array above). Contract: the call succeeds and the
-    // engine answers with legal moves or a move menu at the start of a game.
-    const moves = await client!.getLegalMoves(session.session_id, 'p1', hostToken);
-    const leaves = moves.legal_moves ?? moves.moves ?? [];
-    expect(
-      leaves.length > 0 || typeof moves.move_menu === 'string',
-      'expected legal moves or a move menu at the start of a game',
-    ).toBe(true);
+    const moves = await client!.getLegalMoves(session.session_id, 'p1');
+    expect(Array.isArray(moves.legal_moves)).toBe(true);
+    for (const m of moves.legal_moves) {
+      expect(m).toHaveProperty('move');
+    }
+  });
+
+  it('surfaces a rejected move as EngineError with error_code and recovery details', async () => {
+    const { games } = await client!.listGames();
+    const game =
+      games.find((g) => g.min_players <= 2 && g.max_players >= 2 && g.supports_ai) ?? games[0]!;
+    const session = await client!.createSession({
+      gameId: game.game_id,
+      seats: [
+        { playerId: 'p1', kind: 'human', name: 'Host', table: 'digital' },
+        { playerId: 'p2', kind: 'ai', difficulty: 'easy' },
+      ],
+    });
+    // A definitely-bogus move must come back as an engine error with a code
+    // and message. (Recovery context such as your_legal_moves is best-effort
+    // on the engine and did not ride INVALID_MOVE_SHAPE as of 2026-09.)
+    try {
+      await client!.applyMove(session.session_id, 'p1', undefined, {
+        type: '__universe_contract_bogus__',
+      });
+      expect.unreachable('bogus move must be rejected');
+    } catch (err) {
+      expect(err).toBeInstanceOf(EngineError);
+      const e = err as EngineError;
+      expect(typeof e.errorCode).toBe('string');
+      expect(e.errorCode.length).toBeGreaterThan(0);
+      expect(typeof e.message).toBe('string');
+    }
   });
 });

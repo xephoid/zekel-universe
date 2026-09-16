@@ -112,8 +112,8 @@ export function TablePage() {
           <details className="move-menu" open={plan == null}>
             <summary>Moves ({legalMoves.length})</summary>
             <ol>
-              {legalMoves.map((m) => (
-                <li key={m.id} onClick={() => submitMove(m)}>{m.description}</li>
+              {legalMoves.map((m, i) => (
+                <li key={m.move_id ?? String(i)} onClick={() => submitMove(m)}>{m.description ?? m.move_id}</li>
               ))}
             </ol>
           </details>

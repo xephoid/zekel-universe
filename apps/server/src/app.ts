@@ -198,19 +198,20 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
   async function refreshCatalog(): Promise<number> {
     const listed = await opts.engine.listGames();
     for (const g of listed.games) {
+      const playerCount = g.min_players === g.max_players
+        ? String(g.min_players)
+        : `${g.min_players}–${g.max_players}`;
       const existing = opts.db.select().from(games)
-        .where(eq(games.engineGameId, g.id)).get();
+        .where(eq(games.engineGameId, g.game_id)).get();
       if (existing) {
         opts.db.update(games)
-          .set({ name: g.name ?? existing.name,
-                 playerCount: g.player_counts
-                   ? `${g.player_counts[0]}+` : existing.playerCount })
-          .where(eq(games.engineGameId, g.id)).run();
+          .set({ name: g.name ?? existing.name, playerCount })
+          .where(eq(games.engineGameId, g.game_id)).run();
       } else {
         opts.db.insert(games).values({
-          engineGameId: g.id,
-          name: g.name ?? g.id,
-          playerCount: g.player_counts ? `${g.player_counts[0]}+` : '',
+          engineGameId: g.game_id,
+          name: g.name ?? g.game_id,
+          playerCount,
         }).run();
       }
     }

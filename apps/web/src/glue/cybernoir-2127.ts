@@ -1,54 +1,68 @@
 // Cybernoir 2127 glue — a map of 19 locations in three boroughs, two very
 // different tableaux (Detective case board / Hacker contacts), the evidence
-// row, jail track and the clue tokens. View shape per the engine's views.ts:
-// public fields plus role/location_hand/informants for the Detective, or
-// role/hand/hideout/evidence_detail for the Hacker.
+// row, jail track and the clue tokens. View shape per the engine's views.ts
+// (zekel src/games/cybernoir-2127/views.ts): public fields (phase, turn,
+// activePlayerId, playerOrder, pending, board (played location names),
+// informants_*, jail slots, truthful_*/negative clues, safehouse_burned,
+// evidence {weapon, witnesses, motive_set_1..4}, contacts_discard, detective
+// {location_*_size, ap, overclock_used, …}, hacker {contacts_*, hand_size,
+// ap, overclock_used}, overclock_draws_*) plus role/location_hand/informants
+// for the Detective, or role/hand/hideout/evidence_detail for the Hacker.
+// Location names/boroughs transcribed from the engine's data/index.ts
+// (LOCATIONS); the docs/games map names are stale and must not be used.
 
 import type { CardData, MapRegionData, TablePlan, Zone } from './zoneData';
 import type { GlueModule, GlueInput } from './types';
 import { asArr, asNum, asStr, isObj, shapeHas } from './types';
 import type { LegalMove, SelectEvent } from './primitiveTree';
 
-// The 19 locations, from docs/games/cybernoir-2127.md "The map" (6 Downtown,
-// 6 Hive, 7 Boonies). Positions are hand-placed by borough on a 100×100 plane.
-const LOCATIONS: { name: string; borough: 'downtown' | 'hive' | 'boonies'; x: number; y: number; faction: string }[] = [
-  { name: 'Neon Plaza', borough: 'downtown', x: 15, y: 15, faction: 'none' },
-  { name: 'OmniSuperUltra Tower', borough: 'downtown', x: 35, y: 10, faction: 'omnisuperultra' },
-  { name: 'Glass Arcade', borough: 'downtown', x: 55, y: 18, faction: 'shizuoka' },
-  { name: 'The Stacks', borough: 'downtown', x: 25, y: 30, faction: 'none' },
-  { name: 'Rain Market', borough: 'downtown', x: 45, y: 32, faction: 'chimera' },
-  { name: 'Kestrel Station', borough: 'downtown', x: 65, y: 28, faction: 'none' },
-  { name: 'The Warrens', borough: 'hive', x: 15, y: 55, faction: 'crimson' },
-  { name: 'Static Court', borough: 'hive', x: 32, y: 50, faction: 'none' },
-  { name: 'Blackout Row', borough: 'hive', x: 48, y: 58, faction: 'crimson' },
-  { name: 'The Undernet', borough: 'hive', x: 28, y: 68, faction: 'iceden' },
-  { name: 'Hollow Market', borough: 'hive', x: 45, y: 72, faction: 'none' },
-  { name: 'Doppler Clinic', borough: 'hive', x: 62, y: 62, faction: 'iceden' },
-  { name: 'Dust Fields', borough: 'boonies', x: 78, y: 78, faction: 'none' },
-  { name: 'Relay Spires', borough: 'boonies', x: 88, y: 60, faction: 'omnisuperultra' },
-  { name: 'The Salt Flats', borough: 'boonies', x: 70, y: 88, faction: 'none' },
-  { name: 'Crawlspace', borough: 'boonies', x: 84, y: 40, faction: 'shizuoka' },
-  { name: 'Wreckfield', borough: 'boonies', x: 92, y: 85, faction: 'chimera' },
-  { name: 'Old Power Plant', borough: 'boonies', x: 60, y: 84, faction: 'none' },
-  { name: 'The Junction', borough: 'boonies', x: 72, y: 55, faction: 'iceden' },
+// The 19 real locations (zekel src/games/cybernoir-2127/data/index.ts):
+// borough field is 'downtown' | 'the_hive' | 'boonies'; affiliations
+// corp_1/corp_2/gang_1..3; coordinates hand-placed by borough on 100×100.
+type Borough = 'downtown' | 'the_hive' | 'boonies';
+interface Loc { name: string; borough: Borough; aff: string; x: number; y: number }
+
+const LOCATIONS: Loc[] = [
+  // downtown
+  { name: 'OmniSuperUltra Corporate Office #beebee', borough: 'downtown', aff: 'corp_1', x: 20, y: 8 },
+  { name: 'Shizuoka Megamall', borough: 'downtown', aff: 'corp_2', x: 55, y: 12 },
+  { name: 'Dark City Central Station', borough: 'downtown', aff: 'none', x: 38, y: 18 },
+  { name: 'The Back Alley', borough: 'downtown', aff: 'gang_1', x: 12, y: 26 },
+  { name: 'Xistential Club', borough: 'downtown', aff: 'gang_2', x: 30, y: 32 },
+  { name: 'Sewers', borough: 'downtown', aff: 'gang_3', x: 62, y: 28 },
+  // the Hive
+  { name: 'Platinum Extraluxx Apartments Unit 1337x', borough: 'the_hive', aff: 'corp_1', x: 10, y: 46 },
+  { name: 'Suburb Tower #2013', borough: 'the_hive', aff: 'corp_2', x: 34, y: 50 },
+  { name: 'Nature Reserve #42', borough: 'the_hive', aff: 'gang_2', x: 22, y: 60 },
+  { name: 'Resident Block #8008315', borough: 'the_hive', aff: 'gang_3', x: 48, y: 58 },
+  { name: "Dirty Mel's", borough: 'the_hive', aff: 'gang_1', x: 38, y: 66 },
+  { name: 'Garbage Dump', borough: 'the_hive', aff: 'none', x: 58, y: 64 },
+  // boonies
+  { name: 'Shipyard', borough: 'boonies', aff: 'corp_1', x: 80, y: 46 },
+  { name: 'Trailer Towers', borough: 'boonies', aff: 'none', x: 90, y: 64 },
+  { name: 'Warehouse', borough: 'boonies', aff: 'corp_2', x: 72, y: 62 },
+  { name: 'The Junction', borough: 'boonies', aff: 'gang_1', x: 82, y: 76 },
+  { name: 'Tower Furnace', borough: 'boonies', aff: 'gang_2', x: 66, y: 78 },
+  { name: 'Junktown', borough: 'boonies', aff: 'gang_3', x: 92, y: 86 },
+  { name: 'Little Ghana', borough: 'boonies', aff: 'none', x: 60, y: 90 },
 ];
 
 const PALETTE: Record<string, string> = {
   detective: '#b3222a',
   hacker: '#1f6e8c',
   none: '#6b6f76',
-  omnisuperultra: '#1c2a5e',
-  shizuoka: '#0e7c6b',
-  iceden: '#1f6e8c',
-  crimson: '#7a1220',
-  chimera: '#5a3d8a',
+  corp_1: '#1c2a5e',
+  corp_2: '#0e7c6b',
+  gang_1: '#1f6e8c',
+  gang_2: '#7a1220',
+  gang_3: '#5a3d8a',
   downtown: '#4a4e57',
-  hive: '#7a4a12',
+  the_hive: '#7a4a12',
   boonies: '#6e6558',
 };
 
 function locId(name: string): string {
-  return `cn:loc:${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+  return `cn:loc:${name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '')}`;
 }
 
 function playedSet(board: unknown[]): Set<string> {
@@ -82,7 +96,7 @@ export const cybernoirGlue: GlueModule = {
       { kind: 'map', label: 'Cybernoir 2127 — the city', data: { id: 'cn:map', regions } },
     ];
 
-    // Jail track: three slots.
+    // Jail track: three named slots (booked / processing / release pending).
     const jail = isObj(view['jail']) ? view['jail'] : {};
     board.push({
       kind: 'track',
@@ -98,7 +112,7 @@ export const cybernoirGlue: GlueModule = {
       },
     });
 
-    // Clue pools.
+    // NOT tokens (negative clues) — the hacker's denials handed to the det.
     const neg = asArr(view['negative_clues']);
     board.push({
       kind: 'pool',
@@ -191,10 +205,20 @@ export const cybernoirGlue: GlueModule = {
   litParts(_view: unknown, legalMoves: LegalMove[]): string[] {
     const lit: string[] = [];
     for (const m of legalMoves) {
-      const loc = asStr(m.move['location'] ?? m.move['location_name']);
+      const t = asStr(m.move['type']);
+      // Location-targeting moves name the printed location: play_location,
+      // guess_location, final_guess (location_name); board_discard_choice
+      // (target_location); burn_choice (new_location_name).
+      const loc = asStr(
+        m.move['location_name'] ?? m.move['target_location'] ?? m.move['new_location_name'],
+      );
       if (loc) lit.push(locId(loc));
       if (typeof m.move['hand_index'] === 'number') lit.push(`cn:hand:${m.move['hand_index']}`);
-      if (typeof m.move['informant_index'] === 'number') lit.push(`cn:informant:${m.move['informant_index']}`);
+      // informant targets are named by their ordinal string ('first', 'second'…)
+      const inf = asStr(m.move['target_informant']);
+      if ((t === 'reveal_informant' || t === 'informant_removal_choice') && inf) {
+        lit.push(`cn:informant:${inf}`);
+      }
     }
     return [...new Set(lit)];
   },
@@ -202,18 +226,22 @@ export const cybernoirGlue: GlueModule = {
   moveForSelect(sel: SelectEvent, legalMoves: LegalMove[]): LegalMove | null {
     return (
       legalMoves.find((m) => {
-        const loc = asStr(m.move['location'] ?? m.move['location_name']);
+        const loc = asStr(
+          m.move['location_name'] ?? m.move['target_location'] ?? m.move['new_location_name'],
+        );
         if (loc && locId(loc) === sel.id) return true;
         const hand = /cn:hand:(\d+)$/.exec(sel.id);
         if (hand && m.move['hand_index'] === Number(hand[1])) return true;
-        const inf = /cn:informant:(\d+)$/.exec(sel.id);
-        if (inf && m.move['informant_index'] === Number(inf[1])) return true;
+        const inf = /cn:informant:(.+)$/.exec(sel.id);
+        if (inf && m.move['target_informant'] === inf[1]) return true;
         return false;
       }) ?? null
     );
   },
 
   resolveReportMove(legalMoves: LegalMove[]): LegalMove | null {
+    // Cybernoir resolves its report-style pendings through typed choices
+    // (report_hideout, block_decide, clue_reveal, …), handled by menu rows.
     return legalMoves.find((m) => m.move['type'] === 'resolve_report') ?? null;
   },
 };

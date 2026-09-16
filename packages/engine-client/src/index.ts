@@ -4,92 +4,386 @@ import { z } from 'zod';
 
 /**
  * The only file in Universe that knows MCP tool names and result parsing.
- * The engine returns JSON inside text blocks; we parse and validate with zod
- * and raise typed errors. One client instance per server process (the engine
- * holds per-connection transports in memory).
+ * The engine returns JSON inside text blocks (isError+content[0].text on
+ * failures); we parse and validate with zod and raise typed errors. One
+ * client instance per server process (the engine holds per-connection
+ * transports in memory).
+ *
+ * Wire shapes mirror zekel src/mcp/tools.ts + schemas.ts + nextStep.ts:
+ *  - errors: { isError: true, content[0].text = JSON { error_code, message, details? } }
+ *  - details on recoverable move errors carries { next_step, your_legal_moves,
+ *    rules_briefing, hint } under `recovery` (failMove) or `details`.
+ *  - next_step is an OBJECT: { status: 'game_over'|'ai_to_move'|'human_to_move',
+ *    active_player_id: string|null, instruction: string }.
+ *  - get_state returns the player view SPREAD at top level plus
+ *    { log, scoreboard, next_step, move_menu?, rules_briefing? }.
+ * move_menu is a structured MoveMenu (entries with keys/labels/move_ids).
  */
+
+/** The engine's error payload fields (zekel src/core/errors.ts GameError.toJSON). */
+export interface EngineErrorDetails {
+  next_step?: NextStep;
+  your_legal_moves?: LegalMove[];
+  rules_briefing?: RulesBriefing;
+  hint?: string;
+  recovery?: {
+    next_step?: NextStep;
+    your_legal_moves?: LegalMove[];
+    hint?: string;
+  };
+  [key: string]: unknown;
+}
 
 export class EngineError extends Error {
   constructor(
-    public code: string,
+    public errorCode: string,
     message: string,
-    public reason?: string,
-    public lesson?: string,
+    public details?: EngineErrorDetails,
   ) {
     super(message);
     this.name = 'EngineError';
   }
+
+  /** The engine's error code (ILLEGAL_MOVE, NOT_YOUR_TURN, ...). */
+  get code(): string {
+    return this.errorCode;
+  }
+
+  /** Short rejection reason for display (`message` from the engine). */
+  get reason(): string {
+    return this.message;
+  }
+
+  /** The teaching lesson the engine attached to the rejection, if any. */
+  get lesson(): string | undefined {
+    return briefingText(this.details?.rules_briefing);
+  }
+
+  /** The legal moves the engine returned with a recoverable rejection. */
+  get yourLegalMoves(): LegalMove[] | undefined {
+    return this.details?.your_legal_moves ?? this.details?.recovery?.your_legal_moves;
+  }
+
+  /** The next_step the engine returned with a recoverable rejection. */
+  get nextStep(): NextStep | undefined {
+    return this.details?.next_step ?? this.details?.recovery?.next_step;
+  }
 }
+
+export interface RulesBriefingSection {
+  id: string;
+  title: string;
+  text: string;
+}
+
+export interface RulesBriefing {
+  for_player?: string;
+  sections?: RulesBriefingSection[];
+  teach_note?: string;
+}
+
+function briefingText(b: RulesBriefing | undefined): string | undefined {
+  if (!b || !Array.isArray(b.sections)) return undefined;
+  const text = b.sections.map((s) => s.text).filter(Boolean).join('\n\n');
+  return text || undefined;
+}
+
+// ---- schemas ---------------------------------------------------------------
 
 const jsonRecord = z.record(z.unknown());
 
-const legalMoveSchema = z.object({
+/** zekel core/game.ts NextStep — an OBJECT, never a string. */
+export const nextStepSchema = z.object({
+  status: z.enum(['game_over', 'ai_to_move', 'human_to_move']),
+  active_player_id: z.string().nullable(),
+  instruction: z.string(),
+}).passthrough();
+
+/** zekel core/game.ts LegalMove<Move>. */
+export const legalMoveSchema = z.object({
   move_id: z.string().optional(),
   description: z.string().optional(),
   move: jsonRecord,
 }).passthrough();
 
+/** zekel core/game.ts MoveMenu / MoveMenuEntry — the numbered menu is a
+ *  STRUCTURED object (nested categories, leaves carry move_id), not a string. */
+export const moveMenuEntrySchema: z.ZodType<unknown> = z.lazy(() =>
+  z.object({
+    key: z.string(),
+    label: z.string(),
+    move_id: z.string().optional(),
+    count: z.number().optional(),
+    group_by: z.string().optional(),
+    submenu: z.array(moveMenuEntrySchema).optional(),
+  }).passthrough(),
+);
+
+export const moveMenuSchema = z.object({
+  prompt: z.string(),
+  entries: z.array(moveMenuEntrySchema),
+  total_moves: z.number().optional(),
+  collapsed: z.boolean().optional(),
+  free_text_hint: z.string().optional(),
+  how_to_use: z.string().optional(),
+}).passthrough();
+
+const rulesBriefingSchema = z.object({
+  for_player: z.string().optional(),
+  sections: z.array(z.object({
+    id: z.string(),
+    title: z.string(),
+    text: z.string(),
+  }).passthrough()).optional(),
+  teach_note: z.string().optional(),
+}).passthrough();
+
+/** zekel core/game.ts toGameMetadata. */
+export const gameMetadataSchema = z.object({
+  game_id: z.string(),
+  name: z.string(),
+  description: z.string(),
+  min_players: z.number(),
+  max_players: z.number(),
+  supports_ai: z.boolean(),
+  has_hidden_information: z.boolean(),
+  options_schema: jsonRecord,
+}).passthrough();
+
+export const listGamesSchema = z.object({
+  games: z.array(gameMetadataSchema),
+}).passthrough();
+
+export const getRulesSchema = z.object({
+  game_id: z.string(),
+  rules: z.string(),
+  rules_sections: z.array(z.object({ id: z.string(), title: z.string() }).passthrough()).optional(),
+  reference_data: z.unknown().optional(),
+  move_schema: z.unknown().optional(),
+  balance_axes: z.array(z.unknown()).optional(),
+}).passthrough();
+
+const playerRecordedSchema = z.object({
+  player_id: z.string(),
+  kind: z.string(),
+  table: z.string().optional(),
+  name: z.string().optional(),
+  difficulty: z.string().optional(),
+  strategy: z.string().optional(),
+}).passthrough();
+
+const joinInfoSchema = z.object({
+  join_code: z.string(),
+  host_player_id: z.string(),
+  host_token: z.string(),
+  open_seats: z.array(z.string()),
+  instructions: z.string().optional(),
+}).passthrough();
+
+export const createSessionSchema = z.object({
+  session_id: z.string(),
+  game_id: z.string().optional(),
+  active_player_id: z.string().optional(),
+  players_recorded: z.array(playerRecordedSchema).optional(),
+  initial_state_uri: z.string().optional(),
+  next_step: nextStepSchema.optional(),
+  setup_checklist: z.array(z.unknown()).optional(),
+  naming_reminder: z.string().optional(),
+  difficulty_reminder: z.string().optional(),
+  all_ai_reminder: z.string().optional(),
+  rules_briefing: rulesBriefingSchema.optional(),
+  /** Present when the session has ≥2 human seats (multi-device). Carries
+   *  join_code, host_player_id, host_token, open_seats. */
+  join: joinInfoSchema.optional(),
+  agent_guidance: z.string().optional(),
+  session_start_guidance: z.string().optional(),
+  guidance: z.string().optional(),
+}).passthrough();
+
 export const legalMovesResultSchema = z.object({
-  legal_moves: z.array(legalMoveSchema).optional(),
-  moves: z.array(legalMoveSchema).optional(),
-  move_menu: z.string().optional(),
+  session_id: z.string().optional(),
+  player_id: z.string().optional(),
+  is_their_turn: z.boolean().optional(),
+  legal_moves: z.array(legalMoveSchema),
+  must_move: z.boolean().optional(),
+  move_menu: moveMenuSchema.optional(),
+  unavailable_moves: z.array(z.unknown()).optional(),
+  unavailable_note: z.string().optional(),
+  rules_briefing: rulesBriefingSchema.optional(),
+  next_step: nextStepSchema.optional(),
+  how_to_apply: z.string().optional(),
 }).passthrough();
 
 export const appliedMoveSchema = z.object({
-  ok: z.boolean().optional(),
-  summary: z.string().optional(),
-  move: jsonRecord.optional(),
-  player_views: z.record(z.unknown()).optional(),
-  next_step: z.string().nullable().optional(),
-  briefing: z.string().optional(),
-  reason: z.string().optional(),
-  lesson: z.string().optional(),
+  session_id: z.string().optional(),
+  applied: z.literal(true),
+  state_summary: z.string(),
+  report_to_human: z.string().optional(),
+  next_active_player_id: z.string().optional(),
+  next_step: nextStepSchema.optional(),
+  move_menu: moveMenuSchema.optional(),
+  game_over: z.boolean().optional(),
+  result: z.unknown().optional(),
+  rules_briefing: rulesBriefingSchema.optional(),
 }).passthrough();
 
+/** One played move inside a run_ai_turn / get_ai_move result. */
 export const aiTurnStepSchema = z.object({
-  summary: z.string().optional(),
-  move: jsonRecord.optional(),
+  player_id: z.string(),
+  move_taken: z.unknown().optional(),
+  narration: z.string().optional(),
+  state_summary: z.string(),
+  /** One view per digital human seat, keyed by PLAYER_ID. */
   player_views: z.record(z.unknown()).optional(),
 }).passthrough();
 
 export const aiTurnResultSchema = z.object({
-  moves: z.array(aiTurnStepSchema).optional(),
-  done: z.boolean().optional(),
-  next_step: z.string().nullable().optional(),
+  session_id: z.string().optional(),
+  moves_played: z.number().optional(),
+  moves: z.array(aiTurnStepSchema),
+  report_to_human: z.string().optional(),
+  next_active_player_id: z.string().optional(),
+  next_step: nextStepSchema.optional(),
+  move_menu: moveMenuSchema.optional(),
+  game_over: z.boolean().optional(),
+  result: z.unknown().optional(),
+  rules_briefing: rulesBriefingSchema.optional(),
+  warning: z.string().optional(),
 }).passthrough();
 
-const gameInfoSchema = z.object({
-  id: z.string(),
-  name: z.string().optional(),
-  player_counts: z.array(z.number()).optional(),
+/** get_ai_move (single step) result. */
+export const aiMoveResultSchema = z.object({
+  session_id: z.string().optional(),
+  player_id: z.string().optional(),
+  move_taken: z.unknown().optional(),
+  narration: z.string().optional(),
+  state_summary: z.string(),
+  report_to_human: z.string().optional(),
+  next_active_player_id: z.string().optional(),
+  next_step: nextStepSchema.optional(),
+  game_over: z.boolean().optional(),
+  result: z.unknown().optional(),
 }).passthrough();
 
-export const listGamesSchema = z.object({
-  games: z.array(gameInfoSchema),
+/** get_state: the player view spread at top level plus these envelope fields. */
+export const getStateSchema = z.object({
+  log: z.array(z.unknown()).optional(),
+  scoreboard: z.unknown().optional(),
+  next_step: nextStepSchema.optional(),
+  move_menu: moveMenuSchema.nullable().optional(),
+  rules_briefing: rulesBriefingSchema.optional(),
 }).passthrough();
 
-export const sessionSchema = z.object({
+export const gameOverSchema = z.object({
+  game_over: z.boolean(),
+  winners: z.array(z.string()).optional(),
+  scores: z.record(z.number()).optional(),
+  summary: z.string().optional(),
+}).passthrough();
+
+export const undoResultSchema = z.object({
+  session_id: z.string().optional(),
+  undone: z.boolean(),
+  actions_reverted: z.number().optional(),
+  undo_remaining: z.number().optional(),
+  restored_active_player_id: z.string().optional(),
+  next_step: nextStepSchema.optional(),
+  game_over: z.boolean().optional(),
+  message: z.string().optional(),
+}).passthrough();
+
+export const joinSessionSchema = z.object({
   session_id: z.string(),
-  host_token: z.string().optional(),
-  seats: z.array(z.object({
-    position: z.number(),
-    player_id: z.string().optional(),
-    token: z.string().optional(),
-  }).passthrough()).optional(),
+  game_id: z.string().optional(),
+  player_id: z.string(),
+  claim_token: z.string(),
+  next_step: nextStepSchema.optional(),
+  instructions: z.string().optional(),
 }).passthrough();
 
+export const releaseSeatSchema = z.object({
+  session_id: z.string(),
+  released_player_id: z.string(),
+  multi_device: z.boolean().optional(),
+  next_step: nextStepSchema.optional(),
+  report_to_human: z.string().optional(),
+}).passthrough();
+
+export const reassignSeatSchema = z.object({
+  session_id: z.string(),
+  player_id: z.string(),
+  claim_token: z.string(),
+  next_step: nextStepSchema.optional(),
+  instructions: z.string().optional(),
+}).passthrough();
+
+export const setPreferencesSchema = z.object({
+  session_id: z.string().optional(),
+  player_id: z.string().optional(),
+  preferences: jsonRecord.optional(),
+  note: z.string().optional(),
+}).passthrough();
+
+export const suggestMoveSchema = z.object({
+  session_id: z.string().optional(),
+  player_id: z.string().optional(),
+  suggested_move: jsonRecord,
+  narration: z.string().optional(),
+}).passthrough();
+
+export type NextStep = z.infer<typeof nextStepSchema>;
+export type LegalMove = z.infer<typeof legalMoveSchema>;
+export type GameMetadata = z.infer<typeof gameMetadataSchema>;
+export type ListGamesResult = z.infer<typeof listGamesSchema>;
+export type GetRulesResult = z.infer<typeof getRulesSchema>;
+export type CreateSessionResult = z.infer<typeof createSessionSchema>;
 export type LegalMovesResult = z.infer<typeof legalMovesResultSchema>;
 export type AppliedMove = z.infer<typeof appliedMoveSchema>;
+export type AiTurnStep = z.infer<typeof aiTurnStepSchema>;
 export type AiTurnResult = z.infer<typeof aiTurnResultSchema>;
-export type SessionInfo = z.infer<typeof sessionSchema>;
-export type ListGamesResult = z.infer<typeof listGamesSchema>;
+export type AiMoveResult = z.infer<typeof aiMoveResultSchema>;
+export type GetStateResult = z.infer<typeof getStateSchema> & Record<string, unknown>;
+export type GameOverResult = z.infer<typeof gameOverSchema>;
+export type UndoResult = z.infer<typeof undoResultSchema>;
+export type JoinSessionResult = z.infer<typeof joinSessionSchema>;
+export type ReleaseSeatResult = z.infer<typeof releaseSeatSchema>;
+export type ReassignSeatResult = z.infer<typeof reassignSeatSchema>;
+export type SetPreferencesResult = z.infer<typeof setPreferencesSchema>;
+export type SuggestMoveResult = z.infer<typeof suggestMoveSchema>;
 
-function extractJson(result: { content?: unknown[] }): unknown {
+/** Back-compat alias: the session info TableService consumes. */
+export type SessionInfo = CreateSessionResult;
+/** Player config Universe passes to create_session. */
+export interface SeatConfig {
+  kind: 'human' | 'ai';
+  /** Engine player id; assigned by SeatConfig order (p1, p2, …) when omitted. */
+  playerId?: string;
+  name?: string;
+  difficulty?: string;
+  strategy?: string;
+  table?: 'physical' | 'digital';
+  teaching?: boolean;
+}
+
+export type NextStepLike = NextStep | null | undefined;
+
+export function nextStepIsAi(nextStep: NextStepLike): boolean {
+  return nextStep?.status === 'ai_to_move';
+}
+
+// ---- transport plumbing ------------------------------------------------------
+
+interface RawToolResult {
+  isError?: boolean;
+  content?: Array<{ type?: string; text?: string }>;
+}
+
+function extractJson(result: RawToolResult): unknown {
   const content = result.content;
   if (!Array.isArray(content) || content.length === 0) {
     throw new EngineError('engine_empty_result', 'Engine returned no content');
   }
-  const first = content[0] as { type?: string; text?: string };
+  const first = content[0];
   if (first?.type !== 'text' || typeof first.text !== 'string') {
     throw new EngineError('engine_bad_content', 'Engine content is not a text block');
   }
@@ -100,19 +394,12 @@ function extractJson(result: { content?: unknown[] }): unknown {
   }
 }
 
-function checkError(parsed: unknown): void {
-  if (parsed && typeof parsed === 'object') {
-    const p = parsed as Record<string, unknown>;
-    if (p.error) {
-      const code = typeof p.error === 'string' ? p.error : 'engine_error';
-      throw new EngineError(
-        code,
-        String(p.message ?? p.error),
-        p.reason as string | undefined,
-        p.lesson as string | undefined,
-      );
-    }
-  }
+function raiseIfError(raw: RawToolResult, parsed: unknown): void {
+  if (raw.isError !== true) return;
+  const p = (parsed ?? {}) as Record<string, unknown>;
+  const code = typeof p['error_code'] === 'string' ? p['error_code'] : 'ENGINE_ERROR';
+  const message = typeof p['message'] === 'string' ? p['message'] : JSON.stringify(parsed);
+  throw new EngineError(code, message, p['details'] as EngineErrorDetails | undefined);
 }
 
 export interface EngineClientOptions {
@@ -143,9 +430,9 @@ export class EngineClient {
 
   private async call<T>(tool: string, args: Record<string, unknown>, schema: z.ZodType<T>): Promise<T> {
     await this.ensureConnected();
-    const raw = await this.client.callTool({ name: tool, arguments: args });
-    const parsed = extractJson(raw as { content?: unknown[] });
-    checkError(parsed);
+    const raw = (await this.client.callTool({ name: tool, arguments: args })) as RawToolResult;
+    const parsed = extractJson(raw);
+    raiseIfError(raw, parsed);
     const validated = schema.safeParse(parsed);
     if (!validated.success) {
       throw new EngineError(
@@ -156,73 +443,153 @@ export class EngineClient {
     return validated.data;
   }
 
+  // ---- the 16 engine tools ---------------------------------------------------
+
   listGames(): Promise<ListGamesResult> {
     return this.call('list_games', {}, listGamesSchema);
   }
 
-  getRules(gameId: string): Promise<Record<string, unknown>> {
-    return this.call('get_rules', { game_id: gameId }, z.record(z.unknown()));
+  getRules(gameId: string, topic?: string): Promise<GetRulesResult> {
+    return this.call('get_rules', { game_id: gameId, ...(topic !== undefined ? { topic } : {}) }, getRulesSchema);
   }
 
   createSession(args: {
     gameId: string;
-    seats: Array<{ kind: 'human' | 'ai'; name?: string; table?: 'physical' | 'digital'; difficulty?: string }>;
+    seats: SeatConfig[];
     options?: Record<string, unknown>;
     hostPlayerId?: string;
-  }): Promise<SessionInfo> {
-    // Engine arg shapes (zekel src/mcp/schemas.ts): player_id, kind, name,
-    // difficulty, table per seat. player_id is required there, so we assign
-    // seat positions here (p1, p2, ...) — callers only pick kinds.
+  }): Promise<CreateSessionResult> {
+    // Engine arg shapes (zekel src/mcp/schemas.ts playerConfigSchema):
+    // player_id is required per seat. Universe assigns p1…pN by seat position
+    // when the caller doesn't pick ids; engine player ids are these strings.
+    const players = args.seats.map((seat, i) => ({
+      player_id: seat.playerId ?? `p${i + 1}`,
+      kind: seat.kind,
+      ...(seat.name !== undefined ? { name: seat.name } : {}),
+      ...(seat.kind === 'ai' && seat.difficulty !== undefined ? { difficulty: seat.difficulty } : {}),
+      ...(seat.kind === 'ai' && seat.strategy !== undefined ? { strategy: seat.strategy } : {}),
+      ...(seat.kind === 'human' && seat.table !== undefined ? { table: seat.table } : {}),
+      ...(seat.kind === 'human' && seat.teaching !== undefined ? { teaching: seat.teaching } : {}),
+    }));
     return this.call('create_session', {
       game_id: args.gameId,
-      players: args.seats.map((seat, i) => ({
-        player_id: `p${i + 1}`,
-        kind: seat.kind,
-        name: seat.name,
-        table: seat.kind === 'human' ? seat.table : undefined,
-        difficulty: seat.kind === 'ai' ? seat.difficulty : undefined,
-      })),
-      options: args.options,
-      host_player_id: args.hostPlayerId,
-    }, sessionSchema);
+      players,
+      ...(args.options !== undefined ? { options: args.options } : {}),
+      ...(args.hostPlayerId !== undefined ? { host_player_id: args.hostPlayerId } : {}),
+    }, createSessionSchema);
   }
 
-  getState(sessionId: string, playerId?: string, token?: string): Promise<Record<string, unknown>> {
+  getState(sessionId: string, playerId: string, token?: string): Promise<GetStateResult> {
     return this.call('get_state', {
       session_id: sessionId,
       player_id: playerId,
-      auth_token: token,
-    }, z.record(z.unknown()));
+      ...(token !== undefined ? { auth_token: token } : {}),
+    }, getStateSchema) as Promise<GetStateResult>;
   }
 
   getLegalMoves(sessionId: string, playerId: string, token?: string): Promise<LegalMovesResult> {
     return this.call('get_legal_moves', {
       session_id: sessionId,
       player_id: playerId,
-      auth_token: token,
+      ...(token !== undefined ? { auth_token: token } : {}),
     }, legalMovesResultSchema);
   }
 
-  applyMove(sessionId: string, playerId: string, token: string | undefined, move: Record<string, unknown>): Promise<AppliedMove> {
+  /** Apply by full move object OR by move_id from a fresh get_legal_moves. */
+  applyMove(
+    sessionId: string,
+    playerId: string,
+    token: string | undefined,
+    move: Record<string, unknown> | { moveId: string },
+  ): Promise<AppliedMove> {
+    const moveArg =
+      'moveId' in move ? { move_id: move.moveId } : { move: move as Record<string, unknown> };
     return this.call('apply_move', {
       session_id: sessionId,
       player_id: playerId,
-      auth_token: token,
-      move,
+      ...moveArg,
+      ...(token !== undefined ? { auth_token: token } : {}),
     }, appliedMoveSchema);
   }
 
   runAiTurn(sessionId: string, playerId: string, token?: string): Promise<AiTurnResult> {
-    return this.call('run_ai_turn', { session_id: sessionId, player_id: playerId, auth_token: token }, aiTurnResultSchema);
+    return this.call('run_ai_turn', {
+      session_id: sessionId,
+      player_id: playerId,
+      ...(token !== undefined ? { auth_token: token } : {}),
+    }, aiTurnResultSchema);
   }
 
-  undo(sessionId: string, token?: string): Promise<Record<string, unknown>> {
-    return this.call('undo', { session_id: sessionId, auth_token: token }, z.record(z.unknown()));
+  getAiMove(sessionId: string, playerId: string, token?: string): Promise<AiMoveResult> {
+    return this.call('get_ai_move', {
+      session_id: sessionId,
+      player_id: playerId,
+      ...(token !== undefined ? { auth_token: token } : {}),
+    }, aiMoveResultSchema);
   }
 
-  isGameOver(sessionId: string): Promise<{ over?: boolean; result?: unknown } & Record<string, unknown>> {
-    return this.call('is_game_over', { session_id: sessionId },
-      z.object({ over: z.boolean().optional(), result: z.unknown().optional() }).passthrough());
+  suggestMove(sessionId: string, playerId: string, token?: string): Promise<SuggestMoveResult> {
+    return this.call('suggest_move', {
+      session_id: sessionId,
+      player_id: playerId,
+      ...(token !== undefined ? { auth_token: token } : {}),
+    }, suggestMoveSchema);
+  }
+
+  autoReport(sessionId: string, playerId: string, token?: string): Promise<Record<string, unknown>> {
+    return this.call('auto_report', {
+      session_id: sessionId,
+      player_id: playerId,
+      ...(token !== undefined ? { auth_token: token } : {}),
+    }, z.object({ report_move: jsonRecord }).passthrough());
+  }
+
+  undo(sessionId: string, token?: string): Promise<UndoResult> {
+    return this.call('undo', {
+      session_id: sessionId,
+      ...(token !== undefined ? { auth_token: token } : {}),
+    }, undoResultSchema);
+  }
+
+  isGameOver(sessionId: string): Promise<GameOverResult> {
+    return this.call('is_game_over', { session_id: sessionId }, gameOverSchema);
+  }
+
+  joinSession(joinCode: string, name?: string): Promise<JoinSessionResult> {
+    return this.call('join_session', {
+      join_code: joinCode,
+      ...(name !== undefined ? { name } : {}),
+    }, joinSessionSchema);
+  }
+
+  releaseSeat(sessionId: string, playerId: string, token?: string): Promise<ReleaseSeatResult> {
+    return this.call('release_seat', {
+      session_id: sessionId,
+      player_id: playerId,
+      ...(token !== undefined ? { auth_token: token } : {}),
+    }, releaseSeatSchema);
+  }
+
+  reassignSeat(sessionId: string, playerId: string, token?: string): Promise<ReassignSeatResult> {
+    return this.call('reassign_seat', {
+      session_id: sessionId,
+      player_id: playerId,
+      ...(token !== undefined ? { auth_token: token } : {}),
+    }, reassignSeatSchema);
+  }
+
+  setSessionPreferences(
+    sessionId: string,
+    playerId: string,
+    preferences: { teaching?: boolean },
+    token?: string,
+  ): Promise<SetPreferencesResult> {
+    return this.call('set_session_preferences', {
+      session_id: sessionId,
+      player_id: playerId,
+      preferences,
+      ...(token !== undefined ? { auth_token: token } : {}),
+    }, setPreferencesSchema);
   }
 
   async close(): Promise<void> {

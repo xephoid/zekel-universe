@@ -4,9 +4,10 @@
 // importing the packages directly is fine too, these are re-exports kept flat
 // to keep glue tests independent of the sibling packages' build state.
 
+/** zekel core/game.ts LegalMove: move_id + description ride the `move`. */
 export interface LegalMove {
-  id: string;
-  description: string;
+  move_id?: string;
+  description?: string;
   move: Record<string, unknown>;
 }
 

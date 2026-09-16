@@ -8,25 +8,39 @@
 import type {
   AppliedMove,
   AiTurnResult,
+  CreateSessionResult,
+  GameOverResult,
+  GetStateResult,
+  LegalMovesResult,
   ListGamesResult,
-  SessionInfo,
+  NextStep,
+  SeatConfig,
 } from '@universe/engine-client';
 
-export interface EngineService {
+export type EngineService = {
   listGames(): Promise<ListGamesResult>;
-  getRules(gameId: string): Promise<Record<string, unknown>>;
+  getRules(gameId: string, topic?: string): Promise<Record<string, unknown>>;
   createSession(args: {
     gameId: string;
-    seats: Array<{ kind: 'human' | 'ai'; name?: string; table?: 'physical' | 'digital'; difficulty?: string }>;
+    seats: SeatConfig[];
     options?: Record<string, unknown>;
     hostPlayerId?: string;
-  }): Promise<SessionInfo>;
-  getState(sessionId: string, playerId?: string, token?: string): Promise<Record<string, unknown>>;
-  getLegalMoves(sessionId: string, playerId: string, token?: string): Promise<unknown>;
-  applyMove(sessionId: string, playerId: string, token: string | undefined, move: Record<string, unknown>): Promise<AppliedMove>;
+  }): Promise<CreateSessionResult>;
+  getState(sessionId: string, playerId: string, token?: string): Promise<GetStateResult>;
+  getLegalMoves(sessionId: string, playerId: string, token?: string): Promise<LegalMovesResult>;
+  applyMove(
+    sessionId: string,
+    playerId: string,
+    token: string | undefined,
+    move: Record<string, unknown> | { moveId: string },
+  ): Promise<AppliedMove>;
   runAiTurn(sessionId: string, playerId: string, token?: string): Promise<AiTurnResult>;
   undo(sessionId: string, token?: string): Promise<Record<string, unknown>>;
-  isGameOver(sessionId: string): Promise<{ over?: boolean; result?: unknown } & Record<string, unknown>>;
+  isGameOver(sessionId: string): Promise<GameOverResult>;
+};
+
+export function nextStepIsAi(nextStep: NextStep | null | undefined): boolean {
+  return nextStep?.status === 'ai_to_move';
 }
 
 export class EngineRejectedMove extends Error {
