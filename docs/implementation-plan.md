@@ -60,8 +60,8 @@ infra/
   docker-compose.yml   engine + server + web + postgres, one command
 ```
 
-**apps/server.** Fastify. REST for everything a page loads, websockets for
-everything that changes while a page is open. Postgres through Drizzle, with
+**apps/server.** Fastify. REST for everything a page loads, Socket.IO for
+everything that changes while a page is open, one room per table. Postgres through Drizzle, with
 SQLite for local development through the same schema. Passwordless sign-in
 (Google, GitHub, Discord, and email links) through a self-hostable library.
 Holds the engine's bearer token and every session's host token; the browser
@@ -194,26 +194,22 @@ page's My tables block reads from notifications and tables. The engine
 persists the session, so nothing is lost between visits. The server keeps no
 game state of its own beyond the events.
 
-## 8. Voice and listen mode
+## 8. Voice and listen mode — after v0
 
-Listen mode is the normal table with visuals collapsed, per the brief.
+**DECIDED:** voice is out of v0. The listen-mode design in the brief stands,
+and nothing in v0 may make it harder later, but no voice work happens until
+the milestones below are done. Two things v0 keeps ready for it: the numbered
+move menu from the engine is always available on the table as a list, and
+every table event carries the engine's summary text, which is what will be
+read aloud.
 
-- The browser streams the microphone to the speech-to-text provider using a
-  short-lived token the server hands out. The provider's key never reaches the
-  browser.
-- Text becomes a move in two stages. First, a matcher on the server compares
-  the words against the numbered menu and the printed names in the legal
-  moves: a number, a card name, "roll", "draw", "undo", "options". This is
-  free and instant and covers most turns. Second, when nothing matches
-  cleanly, a Claude agent is asked, with the legal moves and the transcript
-  as context, and it may only return one of those moves or a question back to
-  the player. It has no engine tools and no tokens. It cannot act on any seat.
-- The engine's summaries and the game's own narration voice are read aloud.
-  Text-to-speech starts with the browser's built-in voices and moves to a
-  hosted voice when the first game proves the flow. Every spoken turn states
-  what is owed: how many dice, for what, against what number.
-- The screen shows the microphone state, the transcript, the numbered moves,
-  and a large "your move" cue, and works with a screen reader.
+When voice comes, the shape is: the browser streams the microphone to a
+speech-to-text provider using a short-lived token from the server; a matcher
+on the server compares words against the numbered menu and printed names
+first; a Claude fallback with no engine tools may only return one of the legal
+moves or a question; text-to-speech reads the summaries in the game's own
+voice. That design is recorded here so it is not re-invented, not so it is
+started.
 
 ## 9. The primitives and the first glue modules
 
@@ -231,7 +227,8 @@ seat's view onto a primitive tree and maps legal moves onto lit parts:
    played row. Simplest, and the only game with no report pendings at all.
 2. **Warble Way Galaxy.** A tableau for the character, crew, and ship; tracks
    for level and damage; a pool for credits; a pile for the travel deck; a grid
-   for the ruin. Roll and Draw buttons. This is also the first voice game.
+   for the ruin. Roll and Draw buttons. Solo and with no hidden zones, so it is
+   the simplest game with dice.
 3. **Sweetlands Imperium.** The board as a map of 80 regions with the four
    junction roads, per the reference; tableaux per seat; the Intel piles; the
    points track; the token pool. Draw buttons and the Knight battle roll.
@@ -272,19 +269,17 @@ every browser, restart the server, return, and the table resumes correctly.
 and Draw buttons, dice and card animations, Sweetlands art in place. *Check:*
 the Sweetlands 80-space map matches the reference document space for space.
 
-**M5 — Voice.** Listen mode on Warble Way: streaming speech-to-text, the menu
-matcher, the Claude fallback wrapped to one seat, text-to-speech. *Check:* a
-full Warble Way game played with the screen covered.
-
-**M6 — Storefront.** Home with featured, newest, updates, browse and search.
+**M5 — Storefront.** Home with featured, newest, updates, browse and search.
 Game pages with covers, screenshots, rules link, devlog. Designer profile
 for Zekel Games. Spectator links using the public view. *Check:* a shared
 game link lands a stranger in a playing game in under a minute with no
 account.
 
-**M7 — Phone.** The later pass from the brief: portrait layouts, the hand as
+**M6 — Phone.** The later pass from the brief: portrait layouts, the hand as
 a drawer, pinch-zoom boards, thumb-sized targets, Sweetlands first because it
 is hardest. *Check:* every game playable end to end at 390 pixels wide.
+
+M0 through M6 is v0. Voice (section 8) comes after.
 
 ## 11. Testing
 
@@ -303,18 +298,42 @@ is hardest. *Check:* every game playable end to end at 390 pixels wide.
 
 ## 12. Deployment
 
-One machine at first. Compose runs the engine in HTTP mode with a bearer
-token and MongoDB or SQLite persistence, the server, the web app behind the
-server, and Postgres. The engine is one process, which is what its in-memory
-transports require. Secrets come from the environment and never from the
-repository. When the public engine repository and package exist, the compose
-file pulls the published image or package instead of a local checkout.
+**DECIDED:** the first public instance runs on Heroku. Locally, compose runs
+the same pieces: the engine in HTTP mode with a bearer token, the server with
+the web app built into it, and Postgres.
+
+Heroku shapes three things:
+
+- **Two apps, one dyno each.** The engine is its own Heroku app on a single
+  dyno, because its per-connection transports live in memory and cannot be
+  spread across dynos. The Universe server is a second app, also one dyno at
+  first, serving the built web app as static files. Websockets work on Heroku
+  without special configuration.
+- **No disk.** Heroku's filesystem is wiped on every restart and dynos
+  restart at least daily, so neither app may keep anything on disk. The
+  engine's SQLite store is out; its session store must be a database. The
+  engine supports MongoDB today, which means a MongoDB Atlas instance
+  alongside Heroku Postgres, two databases for one product. The better path
+  is a Postgres session store in the engine (section 13) so one Heroku
+  Postgres add-on serves both apps.
+- **Secrets are config vars.** The engine's bearer token, the sign-in
+  provider keys, the email key, and the database URLs are Heroku config
+  vars, never in the repository. The engine app's URL is private to the
+  Universe app; nothing else needs to reach it.
+
+When the public engine repository exists, the engine app deploys from it
+directly.
 
 ## 13. Things the engine may still need
 
 None of these block M1. Each is a small change on the engine side when the
 milestone that wants it arrives.
 
+- **A Postgres session store**, so the engine and Universe share one Heroku
+  Postgres add-on instead of adding a MongoDB service. The engine already has
+  a store interface with SQLite and MongoDB behind it, and its own guidance
+  asks that SQL stay portable, so this is a third small file. Wanted by M0's
+  first deploy, not by local development.
 - A human move's response could carry per-seat views the way an AI turn does,
   saving Universe one call per seat per move. M2 decides whether it matters.
 - The engine returns JSON in text blocks. A typed HTTP layer over the same
@@ -323,12 +342,32 @@ milestone that wants it arrives.
 - A per-game view schema would let a generic renderer replace hand-written
   glue for simple games. Not before four glue modules exist to learn from.
 
-## 14. Open decisions
+## 14. Decisions made and still open
 
-- Which email provider for sign-in links and by-turns nudges.
-- Which hosted text-to-speech voice, once the browser's built-in voices have
-  proven the flow.
-- Where the first public instance is hosted.
-- Whether Universe's realtime layer uses plain websockets or a library with
-  rooms and reconnection built in. Plain websockets are the default until a
-  need appears.
+**Realtime: a library. DECIDED.** Socket.IO. It gives rooms (one per table),
+automatic reconnection with the client's last-seen sequence number so the
+event queue resumes cleanly, and a fallback transport where websockets are
+blocked. One dyno needs no extra adapter; if the server ever scales past
+one, Socket.IO's Postgres or Redis adapter carries rooms across dynos. The
+main alternative, a game-server framework with its own room and state model,
+would duplicate what the engine and the events table already do.
+
+**Email: sending goes through one thin interface; the provider is a config
+choice.** Sign-in links and by-turns nudges are the only two emails in v0.
+The server uses Nodemailer-style transport so any provider with SMTP or a
+simple API works, which matters for people self-hosting an open-source
+project. For the first instance, three reasonable providers:
+
+- **Resend.** Simplest developer experience, a generous free tier, React
+  email templates if wanted, a Heroku-friendly API. The default suggestion.
+- **Postmark.** The strongest deliverability reputation for transactional
+  mail, which sign-in links depend on. Slightly more setup, paid from the
+  start beyond a small trial.
+- **Amazon SES.** Cheapest at volume and no vendor lock, but the most setup
+  and the worst first-day experience.
+
+Start with Resend. Switching later is a config change, not a code change.
+
+**Still open**
+
+- Which hosted text-to-speech voice, when voice work begins after v0.

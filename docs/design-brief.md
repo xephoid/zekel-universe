@@ -160,7 +160,8 @@ For a table with friends, before the game starts.
 
 **CONFIRMED:** voice is a toggle on the normal table, and turning it on
 collapses the visuals into a listen-mode layout rather than sending the player
-to a separate mode.
+to a separate mode. **DECIDED:** voice is not part of v0. The design stands
+for later; see the implementation plan.
 
 The listen-mode layout shows very little: the microphone state (listening,
 heard you, thinking), a live transcript of what the player said and what the
