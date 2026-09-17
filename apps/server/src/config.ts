@@ -19,6 +19,10 @@ export interface ServerConfig {
   isProduction: boolean;
   /** Resend API key; when unset, sign-in links are logged instead of sent. */
   resendApiKey: string | null;
+  /** By turns: how long a player is away and up before the email nudge. */
+  turnNudgeDelayMs: number;
+  /** How often the server looks for due nudges; 0 turns the timer off. */
+  turnNudgeSweepMs: number;
 }
 
 // A 32-byte key used only when SECRET_KEY is unset in development.
@@ -55,6 +59,13 @@ export function loadDotEnv(env: NodeJS.ProcessEnv = process.env, from: string = 
   }
 }
 
+function nonNegative(raw: string | undefined, fallback: number): number {
+  if (raw === undefined || raw === '') return fallback;
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n < 0) throw new Error(`Expected a non-negative number of milliseconds, got ${JSON.stringify(raw)}`);
+  return n;
+}
+
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): ServerConfig {
   const isProduction = env.NODE_ENV === 'production';
   if (isProduction) {
@@ -84,5 +95,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ServerConfig {
     allowedOrigins: [...new Set([appOrigin, ...extra, ...devOrigins])],
     isProduction,
     resendApiKey: env.RESEND_API_KEY ?? null,
+    turnNudgeDelayMs: nonNegative(env.TURN_NUDGE_DELAY_MS, 10 * 60 * 1000),
+    turnNudgeSweepMs: nonNegative(env.TURN_NUDGE_SWEEP_MS, 60 * 1000),
   };
 }

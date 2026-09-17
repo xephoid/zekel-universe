@@ -23,7 +23,7 @@ export interface DatabaseClient {
 }
 
 /** Bump when the DDL below changes in a way an existing database cannot absorb. */
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 export function parseDatabaseUrl(url: string): { dialect: DatabaseDialect; target: string } {
   const trimmed = url.trim();
@@ -174,9 +174,17 @@ const TABLES: string[] = [
     kind text NOT NULL,
     table_id text REFERENCES tables(id),
     read integer NOT NULL DEFAULT 0,
-    created_at text NOT NULL
+    created_at text NOT NULL,
+    emailed_at text
   )`,
 ];
+
+/** Statements that take a database from version N-1 to N. Both dialects
+ *  must accept each one; the DDL above already describes the latest shape
+ *  for a fresh database. */
+const MIGRATIONS: Record<number, string[]> = {
+  3: ['ALTER TABLE notifications ADD COLUMN emailed_at text'],
+};
 
 async function migrate(db: Kysely<DB>): Promise<void> {
   // A database from before the schema_version table exists cannot be
@@ -194,13 +202,23 @@ async function migrate(db: Kysely<DB>): Promise<void> {
   const row = await db.selectFrom('schema_version').select('version').executeTakeFirst();
   if (!row) {
     await db.insertInto('schema_version').values({ version: SCHEMA_VERSION }).execute();
-  } else if (row.version !== SCHEMA_VERSION) {
-    // There are no deployments yet, so the schema is recreated rather than
-    // migrated. Delete the local database file and start again.
+  } else if (row.version > SCHEMA_VERSION) {
     throw new Error(
-      `Database schema version ${row.version} does not match ${SCHEMA_VERSION}. ` +
-        'Delete the local database (or drop the Postgres schema) and restart.',
+      `Database schema version ${row.version} is newer than this server's ${SCHEMA_VERSION}. ` +
+        'Run the newer server, or delete the local database and restart.',
     );
+  } else if (row.version < SCHEMA_VERSION) {
+    for (let v = row.version + 1; v <= SCHEMA_VERSION; v++) {
+      const steps = MIGRATIONS[v];
+      if (!steps) {
+        throw new Error(
+          `Database schema version ${row.version} cannot be upgraded to ${SCHEMA_VERSION}. ` +
+            'Delete the local database (or drop the Postgres schema) and restart.',
+        );
+      }
+      for (const statement of steps) await sql.raw(statement).execute(db);
+      await db.updateTable('schema_version').set({ version: v }).execute();
+    }
   }
 }
 
@@ -211,13 +229,23 @@ export async function createDatabase(databaseUrl: string): Promise<DatabaseClien
     if (target !== ':memory:') sqlite.pragma('journal_mode = WAL');
     sqlite.pragma('foreign_keys = ON');
     const db = new Kysely<DB>({ dialect: new SqliteDialect({ database: sqlite }) });
-    await migrate(db);
+    await migrateOrClose(db);
     return { db, dialect, close: async () => { await db.destroy(); } };
   }
   const pool = new pg.Pool({ connectionString: target, max: 8 });
   const db = new Kysely<DB>({ dialect: new PostgresDialect({ pool }) });
-  await migrate(db);
+  await migrateOrClose(db);
   return { db, dialect, close: async () => { await db.destroy(); } };
+}
+
+/** A database that refuses to migrate must not stay open behind the error. */
+async function migrateOrClose(db: Kysely<DB>): Promise<void> {
+  try {
+    await migrate(db);
+  } catch (err) {
+    await db.destroy().catch(() => undefined);
+    throw err;
+  }
 }
 
 /** True when an insert failed on a unique constraint, on either driver. */

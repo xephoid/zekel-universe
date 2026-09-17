@@ -90,6 +90,8 @@ export class Realtime {
     private engine: EngineService,
     private tableService: TableService,
     private mailer: Mailer,
+    /** the site's public origin, for the link in a nudge email */
+    private opts: { appOrigin: string } = { appOrigin: 'http://localhost:5173' },
   ) {
     tableService.onStarted((tableId) => this.openTable(tableId));
   }
@@ -467,8 +469,9 @@ export class Realtime {
 
   /**
    * By turns: when a turn passes to a seat whose owner is not connected,
-   * write a notification. The delayed email nudge is the M3 milestone; the
-   * mailer is wired here so only that step remains.
+   * write a notification (one unread per owner and table; a second pass to
+   * the same absent player adds nothing). The email nudge follows later
+   * from `sendDueNudges` if the owner is still away and still up.
    */
   async notifyTurnIfDisconnected(tableId: string, seatPosition: number): Promise<void> {
     const table = await this.tableService.getTable(tableId);
@@ -476,11 +479,107 @@ export class Realtime {
     const seat = (await this.tableService.getSeats(tableId)).find((s) => s.position === seatPosition);
     if (!seat || seat.kind !== 'human') return;
     if (this.isAnyoneConnected(tableId, seat)) return;
+    const pending = await this.db.selectFrom('notifications').select('id')
+      .where('table_id', '=', tableId).where('kind', '=', 'your_turn').where('read', '=', 0)
+      .where(seat.userId ? 'user_id' : 'guest_id', '=', seat.userId ?? seat.guestId)
+      .executeTakeFirst();
+    if (pending) return;
     await this.db.insertInto('notifications').values({
       id: newId(), user_id: seat.userId, guest_id: seat.guestId,
-      kind: 'your_turn', table_id: tableId, read: 0, created_at: now(),
+      kind: 'your_turn', table_id: tableId, read: 0, created_at: now(), emailed_at: null,
     }).execute();
-    void this.mailer;
+  }
+
+  /** Opening the table answers its notifications: mark this owner's read. */
+  async markNotificationsRead(tableId: string, p: Principal): Promise<void> {
+    await this.db.updateTable('notifications').set({ read: 1 })
+      .where('table_id', '=', tableId).where('read', '=', 0)
+      .where(p.kind === 'user' ? 'user_id' : 'guest_id', '=', p.kind === 'user' ? p.userId : p.guestId)
+      .execute();
+  }
+
+  /**
+   * The email nudge: every unread your-turn notification older than the
+   * delay gets one email, provided the table is still in play, the turn is
+   * still that player's, they are still not connected, and they have an
+   * address (guests have none). Returns how many were sent. Called on a
+   * timer by the app and directly by tests.
+   */
+  async sendDueNudges(delayMs: number, at: number = Date.now()): Promise<number> {
+    const cutoff = new Date(at - delayMs).toISOString();
+    const due = await this.db.selectFrom('notifications').selectAll()
+      .where('kind', '=', 'your_turn').where('read', '=', 0).where('emailed_at', 'is', null)
+      .where('created_at', '<=', cutoff).where('table_id', 'is not', null)
+      .orderBy('created_at', 'asc')
+      .execute();
+    let sent = 0;
+    for (const note of due) {
+      const tableId = note.table_id!;
+      const table = await this.tableService.getTable(tableId);
+      if (!table || table.status !== 'playing' || table.nextActorPosition === null) continue;
+      const seat = (await this.tableService.getSeats(tableId)).find((s) => s.position === table.nextActorPosition);
+      if (!seat || seat.userId !== note.user_id || seat.guestId !== note.guest_id) continue;
+      if (this.isAnyoneConnected(tableId, seat)) continue;
+      if (!note.user_id) continue;
+      const identity = await this.db.selectFrom('identities').select('provider_subject')
+        .where('user_id', '=', note.user_id).where('provider', '=', 'email').executeTakeFirst();
+      if (!identity) continue;
+      const game = await this.db.selectFrom('games').select('name')
+        .where('engine_game_id', '=', table.gameId).executeTakeFirst();
+      const name = game?.name ?? 'your game';
+      // Mark first so a slow mailer cannot send twice from two sweeps.
+      await this.db.updateTable('notifications').set({ emailed_at: now() }).where('id', '=', note.id).execute();
+      await this.mailer.send({
+        to: identity.provider_subject,
+        subject: `Your move in ${name}`,
+        text: `It is your turn at your ${name} table on zekel universe.\n\n${this.opts.appOrigin}/table/${tableId}\n\nYou get one of these per turn, only while you are away from the table.`,
+      });
+      sent += 1;
+    }
+    return sent;
+  }
+
+  /**
+   * After a restart, a table can be stuck between events: the engine has a
+   * next step but the last event hands the turn to nobody. Ask the engine and
+   * write what is missing (an AI turn, a human's turn, or the finish). Safe
+   * to call on every table open; it does nothing when the events are whole.
+   */
+  resumeTable(tableId: string): Promise<boolean> {
+    return this.serialized(tableId, () => this.resumeIfStuck(tableId));
+  }
+
+  private async resumeIfStuck(tableId: string): Promise<boolean> {
+    const table = await this.tableService.getTable(tableId);
+    if (!table || table.status !== 'playing' || !table.engineSessionId) return false;
+    const last = await this.latestEvent(tableId);
+    if (!last || last.gameOver) return false;
+    const seats = await this.tableService.getSeats(tableId);
+    const firstHuman = seats.find((s) => s.kind === 'human');
+    const token = await this.tableService.hostToken(tableId);
+    const state = await this.engine.getState(table.engineSessionId, firstHuman?.enginePlayerId ?? 'p1', token);
+    const nextStep = state.next_step ?? null;
+    if (nextStep?.status === 'human_to_move') {
+      // Whole when the last event already hands the turn to the player the
+      // engine is waiting for.
+      const expected = seats.find((s) => s.position === last.nextActorPosition);
+      const expectedPlayer = expected ? (expected.enginePlayerId ?? `p${expected.position + 1}`) : null;
+      if (expectedPlayer === nextStep.active_player_id) return false;
+      await this.endFlow(tableId, 'system', null, 'Play resumes.', null, nextStep, undefined, undefined, null);
+      return true;
+    }
+    if (nextStep?.status === 'game_over') {
+      const over = await this.engine.isGameOver(table.engineSessionId);
+      if (!over.game_over) return false;
+      const result: GameOverResult = { winners: over.winners ?? [], scores: over.scores ?? {}, summary: over.summary ?? '' };
+      await this.finishGame(tableId, 'system', null, 'Play resumes.', null, result);
+      return true;
+    }
+    if (nextStep?.status === 'ai_to_move' && nextStep.active_player_id) {
+      await this.runAiTurns(tableId, nextStep.active_player_id);
+      return true;
+    }
+    return false;
   }
 
   /**

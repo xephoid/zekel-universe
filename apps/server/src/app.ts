@@ -71,6 +71,9 @@ export interface BuildAppOptions {
   logger?: boolean;
   /** abuse limits, lowered in tests */
   limits?: { guestsPerIp?: number; tablesPerPrincipal?: number; lookupsPerUser?: number; linksPerIp?: number };
+  /** By-turns email nudges: how long a player must be away and up before
+   *  the email goes, and how often the server looks (0 disables the timer). */
+  turnNudge?: { delayMs: number; sweepMs: number };
   /** Test-only: expose the ConsoleMailer's outbox at /api/test/outbox.
    *  Must never be set in production (index.ts enforces). */
   testOutbox?: boolean;
@@ -85,6 +88,8 @@ export interface UniverseApp {
   principalFromCookies(cookieHeader: string | undefined): Promise<Principal | null>;
   /** Reload the game catalog from the engine (also done on startup). */
   refreshCatalog(): Promise<number>;
+  /** Send the by-turns email nudges that are due (also done on a timer). */
+  sendDueNudges(): Promise<number>;
 }
 
 class HttpError extends Error {
@@ -103,7 +108,17 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
   const db = opts.db;
 
   const tableService = new TableService(db, opts.engine, opts.secretKey);
-  const realtime = new Realtime(db, opts.engine, tableService, opts.mailer);
+  const realtime = new Realtime(db, opts.engine, tableService, opts.mailer, { appOrigin: opts.appOrigin });
+
+  // By turns: a player who is away when their turn comes gets one email
+  // after a delay, so a quick return never draws one.
+  const nudge = opts.turnNudge ?? { delayMs: 10 * 60 * 1000, sweepMs: 60 * 1000 };
+  const sendDueNudges = () => realtime.sendDueNudges(nudge.delayMs);
+  if (nudge.sweepMs > 0) {
+    const timer = setInterval(() => { sendDueNudges().catch((err) => app.log.error(err)); }, nudge.sweepMs);
+    timer.unref?.();
+    app.addHook('onClose', async () => { clearInterval(timer); });
+  }
   // Sign-in links: a small budget per address (it is that person's inbox)
   // and a larger one per client address, since one office or one test run
   // signs in more than one person.
@@ -839,6 +854,11 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
           const missed = await realtime.eventsAfter(tableId, Number(msg.lastSeenSeq ?? 0) || 0);
           for (const e of missed) socket.emit(SOCKET_EVENTS.tableEvent, toWireEvent(e, mine[0]!.position));
           respond({ ok: true, seats: mine.map((s) => s.position), status: table.status as TableStatus });
+          // Being here answers this table's notifications; and if a restart
+          // left the table between events, the engine's next step is written
+          // now and reaches this socket like any other event.
+          await realtime.markNotificationsRead(tableId, principal);
+          realtime.resumeTable(tableId).catch((err) => app.log.error(err));
         } catch (err) {
           app.log.error(err);
           respond({ error: 'internal' });
@@ -906,5 +926,5 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     });
   }
 
-  return { fastify: app, io, tableService, realtime, principalFromCookies, refreshCatalog };
+  return { fastify: app, io, tableService, realtime, principalFromCookies, refreshCatalog, sendDueNudges };
 }

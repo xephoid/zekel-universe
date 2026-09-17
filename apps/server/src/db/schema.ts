@@ -140,6 +140,8 @@ export interface NotificationsTable {
   table_id: string | null;
   read: number;
   created_at: string;
+  /** when the by-turns email nudge for this notification went out */
+  emailed_at: string | null;
 }
 
 export interface SchemaVersionTable {

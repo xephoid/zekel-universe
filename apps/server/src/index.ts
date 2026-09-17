@@ -32,6 +32,7 @@ async function main(): Promise<void> {
     secureCookies: config.isProduction,
     io,
     testOutbox,
+    turnNudge: { delayMs: config.turnNudgeDelayMs, sweepMs: config.turnNudgeSweepMs },
   });
 
   await app.fastify.ready();
