@@ -3,7 +3,7 @@
 // rendered-table test (table.test.tsx) proves the page obeys it.
 
 import { describe, expect, it } from 'vitest';
-import { classifyMoves, isSubmissionAllowed, submitMove, submissionLog } from '../glue';
+import { classifyMoves, isSubmissionAllowed, submitMove, submissionLog, completesTemplate } from '../glue';
 import type { LegalMove } from '../glue';
 
 const two: LegalMove[] = [
@@ -26,6 +26,22 @@ describe('agency policy', () => {
     expect(isSubmissionAllowed('undo', { type: 'undo' }, two)).toBe(true);
     expect(isSubmissionAllowed('undo', { type: 'end_turn' }, two)).toBe(false);
   });
+  it('a form submits only a completion of a listed template: the asked keys change, every other key stays', () => {
+    const template = { type: 'create_character', character_name: '', race: 'human', ship_name: '', method: 'recommended', scores: {} };
+    const listed = [{ move_id: 'c', description: 'FILL IN', move: template }];
+    const ctx = { template, editableKeys: ['character_name', 'race', 'ship_name', 'scores', 'disposition'] };
+    const done = { ...template, character_name: 'Zara', race: 'grull', ship_name: 'Wasp', scores: { SWA: 3 }, disposition: 'brash' };
+    expect(isSubmissionAllowed('form', done, listed, ctx)).toBe(true);
+    // Not listed, a fixed key changed, an invented key, or no context: refused.
+    expect(isSubmissionAllowed('form', done, [], ctx)).toBe(false);
+    expect(isSubmissionAllowed('form', { ...done, method: 'archetype' }, listed, ctx)).toBe(false);
+    expect(isSubmissionAllowed('form', { ...done, credits: 9999 }, listed, ctx)).toBe(false);
+    expect(isSubmissionAllowed('form', done, listed)).toBe(false);
+    // And a tap can never send a template as listed once it is a form's job.
+    expect(completesTemplate(done, template, ctx.editableKeys)).toBe(true);
+    expect(completesTemplate({ type: 'other' }, template, ctx.editableKeys)).toBe(false);
+  });
+
   it('there is no sole-legal-move or timer trigger at all', () => {
     // A single legal move still waits for the person.
     const only: LegalMove[] = [{ move_id: 'x', description: 'Ack', move: { type: 'acknowledge' } }];

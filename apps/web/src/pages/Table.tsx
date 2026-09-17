@@ -11,10 +11,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import type { LegalMove } from '@universe/shared';
 import { Die, FlipRoot, paletteVars, useSystemReducedMotion, type SelectEvent } from '@universe/primitives';
-import { glueFor, submitMove, type GlueInput } from '../glue';
+import { glueFor, submitMove, type GlueInput, formForMove, movesForSelect } from '../glue';
+import type { MoveForm, FormContext } from '../glue';
 import { JsonInspector, ZoneRenderer } from '../glue/ZoneRenderer';
 import { useTable } from '../table/useTable';
-import { Briefings, EndPanel, Log, MoveMenuList, NoticeToast, PaceControl, Sheet, lessonsOf, type Lesson, type Notice } from '../table/parts';
+import { Briefings, EndPanel, Log, MoveChooser, MoveFormSheet, MoveMenuList, NoticeToast, PaceControl, Sheet, lessonsOf, type Lesson, type Notice } from '../table/parts';
 import { api } from '../api';
 import { useSession } from '../session';
 
@@ -55,6 +56,8 @@ export function TablePage() {
   const [lessonsOn, setLessonsOn] = useState(() => { try { return localStorage.getItem(LESSONS_KEY) !== 'off'; } catch { return true; } });
   const [sideOpen, setSideOpen] = useState(true);
   const [sheet, setSheet] = useState<'rules' | 'settings' | null>(null);
+  const [chooser, setChooser] = useState<LegalMove[] | null>(null);
+  const [form, setForm] = useState<MoveForm | null>(null);
   const [busy, setBusy] = useState(false);
   const [playAgainBusy, setPlayAgainBusy] = useState(false);
   const [showEnd, setShowEnd] = useState(true);
@@ -99,11 +102,13 @@ export function TablePage() {
     ? glue.diceFor({ engineMove: current.engineMove, summary: current.summary, view: current.view })
     : null;
 
-  const send = useCallback(async (trigger: 'tap' | 'resolve_report_button', move: Record<string, unknown>) => {
+  const send = useCallback(async (trigger: 'tap' | 'resolve_report_button' | 'form', move: Record<string, unknown>, formContext?: FormContext) => {
     if (busy) return;
     setBusy(true);
+    setChooser(null);
+    setForm(null);
     try {
-      const ack = await submitMove(trigger, move, legalMoves, (m) => t.move(m));
+      const ack = await submitMove(trigger, move, legalMoves, (m) => t.move(m), formContext);
       if (ack && 'error' in ack && ack.error) {
         setNotice({
           kind: ack.error === 'move_rejected' ? 'rule' : 'fault',
@@ -117,11 +122,23 @@ export function TablePage() {
     }
   }, [busy, legalMoves, t]);
 
+  // One listed move is sent on the tap; a template move asks its questions
+  // first; a tap that could mean several moves asks which.
+  const pick = useCallback((mv: LegalMove) => {
+    const f = formForMove(glue, mv, input);
+    if (f) { setChooser(null); setForm(f); return; }
+    void send('tap', mv.move);
+  }, [glue, input, send]);
+
   const onSelect = useCallback((sel: SelectEvent) => {
     if (!glue) return;
-    const mv = glue.moveForSelect(sel, input);
-    if (mv) void send('tap', mv.move);
-  }, [glue, input, send]);
+    const options = movesForSelect(glue, sel, input);
+    if (options.length === 1) pick(options[0]!);
+    else if (options.length > 1) setChooser(options);
+  }, [glue, input, pick]);
+
+  // A new event closes any chooser or form: their moves may no longer exist.
+  useEffect(() => { setChooser(null); setForm(null); }, [current?.seq]);
 
   const undo = useCallback(async () => {
     const ack = await t.undo();
@@ -212,7 +229,7 @@ export function TablePage() {
               {/draw|deal/i.test(resolveReport.description ?? '') ? 'Draw' : 'Roll'}
             </button>
           )}
-          {yourTurn && <MoveMenuList menu={current?.moveMenu ?? null} legalMoves={legalMoves} onPick={(m) => void send('tap', m.move)} disabled={busy} open={lit.length === 0} />}
+          {yourTurn && <MoveMenuList menu={current?.moveMenu ?? null} legalMoves={legalMoves} onPick={pick} disabled={busy} open={lit.length === 0} />}
           {result && showEnd && table && (
             <div className="sheet-backdrop" role="presentation">
               <div className="sheet" role="dialog" aria-label="Game over">
@@ -239,6 +256,16 @@ export function TablePage() {
       </div>
 
       <NoticeToast notice={notice} onClose={() => setNotice(null)} />
+
+      {chooser && yourTurn && <MoveChooser moves={chooser} onPick={pick} onClose={() => setChooser(null)} disabled={busy} />}
+      {form && yourTurn && (
+        <MoveFormSheet
+          form={form}
+          disabled={busy}
+          onClose={() => setForm(null)}
+          onSend={(move) => void send('form', move, { template: form.template.move, editableKeys: form.editableKeys })}
+        />
+      )}
 
       {sheet === 'rules' && (
         <Sheet title="Rules" onClose={() => setSheet(null)}>

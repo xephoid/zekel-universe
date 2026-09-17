@@ -14,23 +14,23 @@ interface Props {
 export function ZoneRenderer({ zone, lit, onSelect }: Props) {
   switch (zone.kind) {
     case 'card-zone':
-      return <CardZone id={zone.id} data={zone.data} lit={lit} onSelect={onSelect} arriveFrom={zone.arriveFrom} />;
+      return <CardZone id={zone.id} data={zone.data} lit={lit} onSelect={onSelect} arriveFrom={zone.arriveFrom} className="zone zone-card-zone" />;
     case 'tableau':
       return (
-        <Tableau id={zone.id} data={zone.data}>
+        <Tableau id={zone.id} data={zone.data} className="zone zone-tableau">
           {zone.children?.map((z) => <ZoneRenderer key={z.id} zone={z} lit={lit} onSelect={onSelect} />)}
         </Tableau>
       );
     case 'bag':
-      return <Bag id={zone.id} data={zone.data} lit={lit} onSelect={onSelect} />;
+      return <Bag id={zone.id} data={zone.data} lit={lit} onSelect={onSelect} className="zone zone-bag" />;
     case 'track':
-      return <Track id={zone.id} data={zone.data} lit={lit} onSelect={onSelect} />;
+      return <Track id={zone.id} data={zone.data} lit={lit} onSelect={onSelect} className="zone zone-track" />;
     case 'pool':
-      return <Pool id={zone.id} data={zone.data} lit={lit} onSelect={onSelect} />;
+      return <Pool id={zone.id} data={zone.data} lit={lit} onSelect={onSelect} className="zone zone-pool" />;
     case 'grid':
-      return <Grid id={zone.id} data={zone.data} lit={lit} onSelect={onSelect} />;
+      return <Grid id={zone.id} data={zone.data} lit={lit} onSelect={onSelect} className="zone zone-grid" />;
     case 'map':
-      return <Map id={zone.id} data={zone.data} lit={lit} onSelect={onSelect} />;
+      return <Map id={zone.id} data={zone.data} lit={lit} onSelect={onSelect} className="zone zone-map" />;
   }
 }
 

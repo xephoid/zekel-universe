@@ -5,13 +5,23 @@
 //   1. a person's tap on a lit part or a numbered menu row,
 //   2. the Roll/Draw button the person pressed, which submits only a
 //      resolve_report,
-//   3. an undo the person pressed.
+//   3. an undo the person pressed,
+//   4. a form the person filled in and sent, which completes one template
+//      move the engine listed: every field the form did not ask about is the
+//      template's, and every answer is the person's.
 // Nothing else ever submits. The table test renders the page with a fake
 // socket and asserts no submission happens without a simulated tap.
 
 import type { LegalMove } from '@universe/shared';
 
-export type SubmissionTrigger = 'tap' | 'resolve_report_button' | 'undo';
+export type SubmissionTrigger = 'tap' | 'resolve_report_button' | 'undo' | 'form';
+
+/** What a form submission completes: the listed template and the keys the
+ *  person was asked about. */
+export interface FormContext {
+  template: Record<string, unknown>;
+  editableKeys: string[];
+}
 
 export interface Submission {
   trigger: SubmissionTrigger;
@@ -29,8 +39,15 @@ export function isSubmissionAllowed(
   trigger: SubmissionTrigger,
   move: Record<string, unknown>,
   legalMoves: LegalMove[],
+  form?: FormContext,
 ): boolean {
   switch (trigger) {
+    case 'form':
+      // The template must be one the engine listed, the move must keep every
+      // key the form did not ask about exactly as the template had it, and
+      // it must not invent keys beyond the template's and the form's.
+      if (!form || !legalMoves.some((m) => movesEqual(m.move, form.template))) return false;
+      return completesTemplate(move, form.template, form.editableKeys);
     case 'tap':
       // A person tapped a lit part or a numbered menu row: the move must be
       // one the engine listed.
@@ -43,6 +60,23 @@ export function isSubmissionAllowed(
     case 'undo':
       return move['type'] === 'undo';
   }
+}
+
+/** True when `move` is `template` with only `editableKeys` changed or added. */
+export function completesTemplate(
+  move: Record<string, unknown>,
+  template: Record<string, unknown>,
+  editableKeys: string[],
+): boolean {
+  const editable = new Set(editableKeys);
+  for (const k of Object.keys(template)) {
+    if (editable.has(k)) continue;
+    if (!(k in move) || JSON.stringify(move[k]) !== JSON.stringify(template[k])) return false;
+  }
+  for (const k of Object.keys(move)) {
+    if (!(k in template) && !editable.has(k)) return false;
+  }
+  return true;
 }
 
 export function movesEqual(a: Record<string, unknown>, b: Record<string, unknown>): boolean {
@@ -61,8 +95,9 @@ export async function submitMove<T>(
   move: Record<string, unknown>,
   legalMoves: LegalMove[],
   send: (move: Record<string, unknown>) => Promise<T>,
+  form?: FormContext,
 ): Promise<T | null> {
-  if (!isSubmissionAllowed(trigger, move, legalMoves)) {
+  if (!isSubmissionAllowed(trigger, move, legalMoves, form)) {
     // eslint-disable-next-line no-console
     console.warn('[agency] refused a submission', trigger, move);
     return null;

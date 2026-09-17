@@ -68,6 +68,33 @@ export interface SetupField {
   pick?: number;
 }
 
+/** One question a template move asks the player before it can be sent. */
+export type FormField =
+  | { kind: 'text'; key: string; label: string; help?: string; placeholder?: string; maxLength?: number }
+  | { kind: 'number'; key: string; label: string; help?: string; min?: number; max?: number }
+  | { kind: 'choice'; key: string; label: string; help?: string; options: Array<{ value: string; label: string; hint?: string }> }
+  | { kind: 'multi'; key: string; label: string; help?: string; options: Array<{ value: string; label: string; hint?: string }>; pick: number };
+
+/**
+ * A legal move the engine lists as a template ("FILL IN the values the
+ * player chose"): the table asks these questions and sends the completed
+ * move only when the player presses the form's button. Nothing is
+ * preselected; a default the engine put in the template is a placeholder,
+ * never an answer.
+ */
+export interface MoveForm {
+  title: string;
+  help?: string;
+  fields: FormField[];
+  /** the template this form completes */
+  template: LegalMove;
+  /** top-level move keys the answers may set or replace */
+  editableKeys: string[];
+  /** the move from the answers, or null while any answer is missing */
+  build(answers: Record<string, unknown>): Record<string, unknown> | null;
+  submitLabel?: string;
+}
+
 export interface GlueModule {
   gameId: string;
   title: string;
@@ -78,6 +105,12 @@ export interface GlueModule {
   litParts(input: GlueInput): string[];
   /** Given a tap on a lit part, the legal move it submits, or null. */
   moveForSelect(sel: SelectEvent, input: GlueInput): LegalMove | null;
+  /** Every legal move a tap on this part could mean. One means send it;
+   *  several means the table asks which (a chooser). Defaults to moveForSelect. */
+  movesForSelect?(sel: SelectEvent, input: GlueInput): LegalMove[];
+  /** The questions a template move asks before it can be sent, or null for a
+   *  move that is complete as listed. */
+  formFor?(move: LegalMove, input: GlueInput): MoveForm | null;
   /** Roll/Draw appears iff a legal move is a resolve_report */
   resolveReportMove(legalMoves: LegalMove[]): LegalMove | null;
   /** The game's own setup choices, from the engine's options schema and reference data. */

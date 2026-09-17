@@ -218,3 +218,15 @@ section { margin-bottom: 32px; }
 
 .gallery section { margin: 24px 0; padding: 16px; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--card); }
 .gallery .row { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
+
+/* choosers and forms for template moves */
+.chooser { list-style: none; padding: 0; margin: 12px 0 0; display: flex; flex-direction: column; gap: 8px; }
+.chooser button { width: 100%; text-align: left; white-space: normal; line-height: 1.35; }
+.move-form { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
+.move-form fieldset { border: 0; padding: 0; margin: 0; }
+.move-form .radio-row { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+.form-help { margin: 4px 0 0; }
+
+/* a map or a grid is the board: it takes the whole row, other zones share one */
+.zones .zone-grid { flex: 1 1 100%; width: 100%; min-width: 0; }
+.zones .zone-map { flex: 1 1 100%; width: 100%; min-width: 0; max-width: min(760px, calc(125vh - 380px)); margin: 0 auto; }

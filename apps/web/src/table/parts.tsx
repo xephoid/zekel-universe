@@ -5,6 +5,7 @@
 import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import type { GameOverResult, LegalMove, MoveMenu, MoveMenuEntry, RulesBriefing, SeatSummary, TableEventWire } from '@universe/shared';
+import type { MoveForm } from '../glue';
 import { PACES, type Pace } from '../playback/PlaybackQueue';
 
 export function PaceControl({ pace, setPace }: { pace: Pace; setPace: (p: Pace) => void }) {
@@ -16,6 +17,97 @@ export function PaceControl({ pace, setPace }: { pace: Pace; setPace: (p: Pace) 
         </button>
       ))}
     </span>
+  );
+}
+
+/** A tap that could mean several moves: the engine's own descriptions, one
+ *  button each. The player picks; nothing is chosen for them. */
+export function MoveChooser({ moves, onPick, onClose, disabled }: {
+  moves: LegalMove[]; onPick: (m: LegalMove) => void; onClose: () => void; disabled: boolean;
+}) {
+  return (
+    <Sheet title="Which move?" onClose={onClose}>
+      <ol className="chooser">
+        {moves.map((m, i) => (
+          <li key={m.move_id ?? i}>
+            <button className="btn secondary" disabled={disabled} onClick={() => onPick(m)}>{m.description ?? m.move_id ?? 'move'}</button>
+          </li>
+        ))}
+      </ol>
+    </Sheet>
+  );
+}
+
+/** A template move's questions. The Send button is live only once every
+ *  answer is in; the answers start empty, whatever the template held. */
+export function MoveFormSheet({ form, onSend, onClose, disabled }: {
+  form: MoveForm; onSend: (move: Record<string, unknown>) => void; onClose: () => void; disabled: boolean;
+}) {
+  const [answers, setAnswers] = useState<Record<string, unknown>>({});
+  const built = form.build(answers);
+  const set = (key: string, value: unknown) => setAnswers((a) => ({ ...a, [key]: value }));
+  const toggle = (key: string, value: string, pick: number) => setAnswers((a) => {
+    const cur = Array.isArray(a[key]) ? (a[key] as string[]) : [];
+    if (cur.includes(value)) return { ...a, [key]: cur.filter((x) => x !== value) };
+    if (cur.length >= pick) return a;
+    return { ...a, [key]: [...cur, value] };
+  });
+  return (
+    <Sheet title={form.title} onClose={onClose}>
+      {form.help && <p className="muted form-help">{form.help}</p>}
+      <form className="move-form" onSubmit={(e) => { e.preventDefault(); if (built) onSend(built); }}>
+        {form.fields.map((f) => {
+          if (f.kind === 'text') {
+            return (
+              <label key={f.key} className="field">
+                <span className="label">{f.label}</span>
+                <input type="text" maxLength={f.maxLength} placeholder={f.placeholder} value={typeof answers[f.key] === 'string' ? (answers[f.key] as string) : ''} onChange={(e) => set(f.key, e.target.value)} />
+                {f.help && <span className="muted">{f.help}</span>}
+              </label>
+            );
+          }
+          if (f.kind === 'number') {
+            return (
+              <label key={f.key} className="field">
+                <span className="label">{f.label}</span>
+                <input type="number" min={f.min} max={f.max} value={typeof answers[f.key] === 'string' ? (answers[f.key] as string) : ''} onChange={(e) => set(f.key, e.target.value)} />
+                {f.help && <span className="muted">{f.help}</span>}
+              </label>
+            );
+          }
+          if (f.kind === 'choice') {
+            return (
+              <fieldset key={f.key} className="field">
+                <legend className="label">{f.label}</legend>
+                <div className="radio-row">
+                  {f.options.map((o) => (
+                    <label key={o.value} title={o.hint}>
+                      <input type="radio" name={f.key} aria-label={o.label} checked={answers[f.key] === o.value} onChange={() => set(f.key, o.value)} /> {o.label}
+                    </label>
+                  ))}
+                </div>
+                {f.help && <span className="muted">{f.help}</span>}
+              </fieldset>
+            );
+          }
+          const picked = Array.isArray(answers[f.key]) ? (answers[f.key] as string[]) : [];
+          return (
+            <fieldset key={f.key} className="field">
+              <legend className="label">{f.label} ({picked.length} of {f.pick})</legend>
+              <div className="radio-row">
+                {f.options.map((o) => (
+                  <label key={o.value} title={o.hint}>
+                    <input type="checkbox" aria-label={o.label} checked={picked.includes(o.value)} onChange={() => toggle(f.key, o.value, f.pick)} /> {o.label}
+                  </label>
+                ))}
+              </div>
+              {f.help && <span className="muted">{f.help}</span>}
+            </fieldset>
+          );
+        })}
+        <button className="btn" type="submit" disabled={disabled || !built}>{form.submitLabel ?? 'Send'}</button>
+      </form>
+    </Sheet>
   );
 }
 
@@ -33,8 +125,12 @@ export function MoveMenuList({ menu, legalMoves, onPick, disabled, open }: {
       <summary>Moves ({legalMoves.length}){menu?.prompt ? ` · ${menu.prompt}` : ''}</summary>
       {path.length > 0 && <button className="btn secondary small" onClick={() => setPath(path.slice(0, -1))}>← back</button>}
       <ol>
-        {rows.map((e) => {
-          const leaf = e.move_id ? byId.get(e.move_id) : undefined;
+        {rows.map((e, i) => {
+          // A leaf names its move by id; some games list moves without ids,
+          // so fall back to the description, then to the row's position.
+          const leaf = (e.move_id ? byId.get(e.move_id) : undefined)
+            ?? (!e.submenu ? legalMoves.find((m) => m.description === e.label) : undefined)
+            ?? (!e.submenu && !menu ? legalMoves[i] : undefined);
           return (
             <li key={e.key + (e.move_id ?? e.label)}>
               <button disabled={disabled} onClick={() => {
