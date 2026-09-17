@@ -1,6 +1,12 @@
 # Zekel Universe — implementation plan
 
-Status 2026-09-17: M0 through M3 built and checked. M2 (friends, live):
+Status 2026-09-17: M0 through M4 built and checked. M4 (two more games):
+Sweetlands Imperium and Warble Way Galaxy played through against the live
+engine in CI (`e2e/sweetlands.spec.ts`, `e2e/warble-way.spec.ts`), the
+Sweetlands board checked space for space against the reference document
+(`apps/web/src/tests/glue.test.ts`), Roll and Draw buttons, choosers and
+forms for moves the engine lists as templates, and the Sweetlands art in
+place. M2 (friends, live):
 sign-in by email link, friends and invites with tests, and the lobby; its
 acceptance check (two signed-in browsers at one Cybernoir table, neither
 receiving the other's view) runs in CI as
@@ -351,6 +357,10 @@ milestone that wants it arrives.
   turn out to be a maintenance burden.
 - A per-game view schema would let a generic renderer replace hand-written
   glue for simple games. Not before four glue modules exist to learn from.
+- **A faction choice per seat in Sweetlands** (and, generally, per-seat
+  setup choices): today one `assign_setup_choices` move assigns every seat,
+  so at a table with friends one player picks for all. Wanted before
+  Sweetlands with friends; M4 records the limitation.
 
 ## 14. Decisions made and still open
 
@@ -443,11 +453,38 @@ Decided in the M3 pass (2026-09-17):
   with one statement list per version; a database from a newer server is
   refused, never rewritten.
 
+Decided in the M4 pass (2026-09-17):
+
+- **Template moves become forms.** Some legal moves the engine lists are
+  skeletons with blanks or with a convenience default ("edit to each
+  human's choice"). The table never sends one as listed: a glue describes
+  the questions (`formFor`), the table asks them with nothing preselected,
+  and the completed move goes through the agency policy's `form` trigger,
+  which checks that the answers changed only the asked-for keys of a listed
+  template. A generic form covers blanks the glue does not describe.
+- **A tap that could mean several moves asks which.** Sweetlands names
+  moves by card id, and one card can mean many moves (unit, action, ring or
+  road). The chooser shows the engine's own descriptions, one button each.
+- **Battles on a digital seat.** The engine change of this pass: a digital
+  human seat has no dice, so a knight's battle with the castle foe is rolled
+  by the server when the player presses the move, as for an AI; physical
+  seats keep declaring their roll. Sweetlands legal moves now carry ids, and
+  Warble Way's reference data lists the races and archetype cards. All
+  three are in the engine's commit "Digital seats: the server rolls a
+  Sweetlands foe battle…".
+- **Sugar dice are not d6.** Sweetlands battles report both totals in the
+  log; the pip dice on the table are for Warble Way's d6.
+- **Faction assignment at a multi-human table.** The engine offers one move
+  that assigns every seat, so the seat that presses it picks for everyone.
+  Against AI that is the host's decision to make; with friends it is not.
+  An engine change (a faction choice per seat) is wanted before Sweetlands
+  with friends leaves v0; recorded in section 13.
+
 Still open:
 
 - The engine's Postgres session store (section 13) before the first Heroku
   deploy.
-- Warble Way Galaxy, Sweetlands Imperium and Cybernoir 2127 glue modules
-  compile against the new primitive contract and pass fixture tests, but
-  have not been played through (M4).
+- Cybernoir 2127's glue compiles against the primitive contract and passes
+  fixture tests and the two-human privacy spec, but a full game has not been
+  played through in the browser.
 - The storefront and the phone pass (M5, M6).

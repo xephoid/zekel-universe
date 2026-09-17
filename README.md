@@ -4,14 +4,18 @@ A website where people play board games in the browser against AI opponents or w
 
 The games are run by a separate rules engine, zekel. Universe draws the table, moves the pieces, and talks to the player. It never decides a rule.
 
-## What works today (v0, milestones M0 to M3)
+## What works today (v0, milestones M0 to M4)
 
 A guest opens a game page, presses Play now, makes the game's own setup
 choices, and plays a complete game of Fractured Fist against the AI in the
 browser: legal moves light up the parts they touch, the numbered move menu is
 always there as a fallback, AI turns play back as a paced slideshow with
 replay and undo, rules lessons appear the first time a rule matters, and the
-end screen shows the result over the final table. Signed-in players open
+end screen shows the result over the final table. Sweetlands Imperium plays
+on its 80-space board with the faction portraits and treat art, and Warble
+Way Galaxy runs its season solo: every setup choice is asked in a form, a
+tap that could mean several moves asks which, and every die and every card
+waits for the Roll or Draw button. Signed-in players open
 tables with friends by link, invite, or friends list, and play live with
 each browser receiving only its own seat's private state, or by turns: the
 table starts itself when its seats fill, a player who is away when their
