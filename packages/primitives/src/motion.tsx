@@ -98,6 +98,14 @@ export function FlipRoot({ viewKey, reducedMotion, children, className, style }:
     const ms = slideMs();
     const ease = easing();
     const firstMeasure = prevRects.current.size === 0;
+    // A hidden document gets no animation frames: an animation started now
+    // would leave every moved part displaced until the tab is seen again.
+    // Record the new positions and let the next visible change animate.
+    if (typeof document !== 'undefined' && document.hidden) {
+      for (const el of elements) next.set(el.dataset.flipId!, rectOf(el));
+      prevRects.current = next;
+      return;
+    }
 
     for (const el of elements) {
       const id = el.dataset.flipId!;

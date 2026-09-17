@@ -154,7 +154,9 @@ export function Tableau({ id, data, className, style, children }: PrimitiveProps
     >
       {(data.label || data.active) && (
         <div className="zk-tableau-title">
-          {data.owner && <span className="zk-swatch" style={{ background: accent }} />}
+          {data.artUrl
+            ? <img className="zk-portrait" src={data.artUrl} alt="" style={{ borderColor: accent }} />
+            : data.owner && <span className="zk-swatch" style={{ background: accent }} />}
           <span>{data.label}</span>
           {data.active && <span className="zk-tableau-turn">{data.activeLabel ?? 'their turn'}</span>}
         </div>
@@ -391,6 +393,7 @@ export function Map({ id, data, lit, onSelect, className, style }: PrimitiveProp
                 role={lp.role} tabIndex={lp.tabIndex} onClick={lp.onClick} onKeyDown={lp.onKeyDown}
                 aria-label={n.label}
               >
+                {n.artUrl && <img className="zk-map-art" src={n.artUrl} alt="" />}
                 {(n.pieces ?? []).map((p) => (
                   <span key={p.label} className="zk-piece" data-flip-id={`${id}:piece:${p.label}`}
                     style={{ width: 16, height: 16, background: themeColor(p.colorKey ?? p.label), fontSize: 8 }} title={p.label}>

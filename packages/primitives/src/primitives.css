@@ -117,6 +117,8 @@
 }
 .zk-tableau.active { box-shadow: 0 0 0 2px var(--accent); }
 .zk-tableau-title { font-family: var(--font-display); font-weight: 700; font-size: 15px; display: flex; gap: 8px; align-items: center; }
+.zk-portrait { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); flex: none; }
+.zk-map-art { position: absolute; inset: 15%; width: 70%; height: 70%; object-fit: contain; pointer-events: none; }
 .zk-tableau-turn { font-size: 10px; background: var(--accent); color: #fff; border-radius: 8px; padding: 1px 7px; font-family: var(--font-body); }
 .zk-stat { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; }
 .zk-stat b { font-variant-numeric: tabular-nums; }
@@ -182,6 +184,7 @@
 .zk-map { position: relative; width: 100%; border-radius: var(--radius-lg); background: var(--bg-raised); border: 2px solid var(--border); overflow: hidden; }
 .zk-map-node { position: absolute; transform: translate(-50%, -50%); text-align: center; }
 .zk-map-blob {
+  position: relative;
   border-radius: 46% 54% 52% 48% / 55% 47% 53% 45%;
   border: 2.5px solid rgba(0,0,0,0.45); margin: 0 auto;
   display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 2px;

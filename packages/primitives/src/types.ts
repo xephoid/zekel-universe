@@ -38,6 +38,8 @@ export interface TableauData {
   stats?: { label: string; value: string | number; max?: number }[];
   /** Universe addition: what the active badge says (default "their turn"). */
   activeLabel?: string;
+  /** Universe addition: a portrait for the owner, shown beside the title. */
+  artUrl?: string;
 }
 
 /** <zekel-bag>: a push-your-luck draw bag. */
@@ -107,6 +109,8 @@ export interface MapNode {
   size?: number;
   badges?: string[];
   pieces?: { label: string; colorKey?: string; count?: number }[];
+  /** Universe addition: art drawn inside the node (a treat, a landmark). */
+  artUrl?: string;
   /** Universe addition: node ids this node connects to by a road. */
   roadsTo?: string[];
 }
