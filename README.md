@@ -4,7 +4,14 @@ A website where people play board games in the browser against AI opponents or w
 
 The games are run by a separate rules engine, zekel. Universe draws the table, moves the pieces, and talks to the player. It never decides a rule.
 
-## What works today (v0, milestones M0 to M4)
+## What works today (v0, milestones M0 to M5)
+
+The home page has featured and newest games, the designers' updates in one
+feed, and browsing by player count, play time and tag with search. A game
+page carries the designer's devlog and a link to the rules as the engine
+states them; each designer has a profile. Any table has a share link that
+lets anyone watch it: the engine's public view, whose turn it is, and the
+log, with no seat and no way to act.
 
 A guest opens a game page, presses Play now, makes the game's own setup
 choices, and plays a complete game of Fractured Fist against the AI in the

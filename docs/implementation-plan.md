@@ -1,6 +1,11 @@
 # Zekel Universe — implementation plan
 
-Status 2026-09-17: M0 through M4 built and checked. M4 (two more games):
+Status 2026-09-17: M0 through M5 built and checked. M5 (storefront): home
+with featured, newest, the updates feed, browse and search; game pages with
+the devlog and the rules; the designer profile for Zekel Games; watch links
+using the engine's public view. Its acceptance check (a stranger with a game
+link is playing in under a minute with no account) runs in CI as
+`e2e/storefront.spec.ts`. M4 (two more games):
 Sweetlands Imperium and Warble Way Galaxy played through against the live
 engine in CI (`e2e/sweetlands.spec.ts`, `e2e/warble-way.spec.ts`), the
 Sweetlands board checked space for space against the reference document
@@ -480,11 +485,39 @@ Decided in the M4 pass (2026-09-17):
   An engine change (a faction choice per seat) is wanted before Sweetlands
   with friends leaves v0; recorded in section 13.
 
+Decided in the M5 pass (2026-09-17):
+
+- **Storefront content lives in the server.** The designer of record, the
+  player-facing copy and the designer's updates are checked-in content
+  (`apps/server/src/storefront.ts`), seeded into `games` and `game_updates`
+  at startup and served by `/api/updates`, `/api/games/:id/updates` and
+  `/api/designers/:slug`. A designer dashboard that edits them is later
+  work; the navigation has its place ("Designers").
+- **Browsing runs in the browser.** The catalog is small; search and the
+  three filters (players, play time, tag) work over the list the server
+  sent. Play-time buckets come from the catalog's own strings.
+- **Watching is the engine's public view.** `GET /api/tables/:id/watch`
+  needs no account and returns the engine's public view (its resource
+  `game://{game}/sessions/{session}`, hidden information omitted by the
+  engine), the seats by display name and the log of event summaries. It
+  never reads a seat's payload. The page polls every three seconds and
+  draws the board with the same glue and no seat of its own. The engine is
+  asked at most once every two seconds per table. A watcher has no socket
+  and no seat: the M2 rule stands.
+- **Screenshots wait.** The brief's game page lists screenshots; none exist
+  yet, and a placeholder image would be a fake. The layout takes them when
+  the storefront gets real cover art.
+- **Rules on their own page.** `/games/:id/rules` shows the engine's rules
+  text, which is the rules the table enforces; a designer's printed rulebook
+  link sits beside it when one is set.
+
 Still open:
 
 - The engine's Postgres session store (section 13) before the first Heroku
   deploy.
+- Cover art and screenshots for the four games (M5's layout is ready for
+  them).
 - Cybernoir 2127's glue compiles against the primitive contract and passes
   fixture tests and the two-human privacy spec, but a full game has not been
   played through in the browser.
-- The storefront and the phone pass (M5, M6).
+- The phone pass (M6).
