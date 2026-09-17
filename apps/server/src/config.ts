@@ -23,6 +23,8 @@ export interface ServerConfig {
   turnNudgeDelayMs: number;
   /** How often the server looks for due nudges; 0 turns the timer off. */
   turnNudgeSweepMs: number;
+  /** Guest accounts one client address may create in 15 minutes. */
+  guestsPerIp: number;
 }
 
 // A 32-byte key used only when SECRET_KEY is unset in development.
@@ -97,5 +99,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ServerConfig {
     resendApiKey: env.RESEND_API_KEY ?? null,
     turnNudgeDelayMs: nonNegative(env.TURN_NUDGE_DELAY_MS, 10 * 60 * 1000),
     turnNudgeSweepMs: nonNegative(env.TURN_NUDGE_SWEEP_MS, 60 * 1000),
+    guestsPerIp: nonNegative(env.GUESTS_PER_IP, 30),
   };
 }

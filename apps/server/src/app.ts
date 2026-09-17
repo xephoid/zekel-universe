@@ -12,8 +12,7 @@ import type { Kysely } from 'kysely';
 import type {
   CreateTableRequest, CreateTableResponse, FriendsResponse, GameCatalogEntry, GameReferenceResponse, GameResponse,
   GamesResponse, InvitesResponse, JoinTableAck, JoinTableMessage, MeResponse, MoveAck, MoveMessage, MyTablesResponse,
-  SeatSummary, TableEventsResponse, TableInvite, TableResponse, TableStatus, TableSummary, UndoAck, UndoMessage,
-} from '@universe/shared';
+  SeatSummary, TableEventsResponse, TableInvite, TableResponse, TableStatus, TableSummary, UndoAck, UndoMessage, GameUpdate, UpdatesResponse, DesignerResponse, WatchResponse } from '@universe/shared';
 import { SOCKET_EVENTS } from '@universe/shared';
 
 import type { DB } from './db/schema.js';
@@ -31,31 +30,7 @@ export const AUTH_COOKIE = 'universe_auth';
 export const GUEST_COOKIE = 'universe_guest';
 const GUEST_COOKIE_MAX_AGE_S = 60 * 60 * 24 * 365;
 
-/** The designer of record for the four Zekel Games titles (brief, DECIDED),
- *  with the storefront copy from docs/games. The engine's own descriptions
- *  are written for the agent that runs a physical table, not for players. */
-const ZEKEL_GAMES: Record<string, { description: string; playTime: string; tags: string[] }> = {
-  'fractured-fist': {
-    description: "A two-player card fight. Start with a small, weak deck, buy better techniques as you go, and knock your opponent's stamina from 7 to 0. Ten to twenty rounds.",
-    playTime: '10–20 min',
-    tags: ['deck-building', 'duel', 'two players'],
-  },
-  'cybernoir-2127': {
-    description: 'A two-player detective duel in a neon city: the Detective chases leads across nineteen locations while the Hacker hides the truth.',
-    playTime: '30–45 min',
-    tags: ['deduction', 'duel', 'two players'],
-  },
-  'warble-way-galaxy': {
-    description: 'A solo space adventure: build a character, gather a crew, travel the galaxy, and chase one of four season endings.',
-    playTime: '45–90 min',
-    tags: ['solo', 'adventure', 'dice'],
-  },
-  'sweetlands-imperium': {
-    description: 'Area control for two to five players on an 80-space candy kingdom: move your leader, knight and ambassador, play Intel, and hold the castle.',
-    playTime: '45–75 min',
-    tags: ['area control', 'strategy'],
-  },
-};
+import { DESIGNERS, ZEKEL_GAMES, ZEKEL_UPDATES } from './storefront.js';
 
 export interface BuildAppOptions {
   db: Kysely<DB>;
@@ -591,7 +566,22 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
       description: g.description,
       rulesUrl: g.rules_url,
       visibility: g.visibility === 'unlisted' ? 'unlisted' : 'public',
+      designerSlug: Object.values(DESIGNERS).find((d) => d.name === g.designer_name)?.slug ?? null,
     };
+  }
+
+  function updateEntry(u: DB['game_updates'], gameName: string): GameUpdate {
+    return { id: u.id, gameId: u.game_id, gameName, title: u.title, body: u.body, postedAt: u.posted_at };
+  }
+
+  /** Updates newest first, with their game's name; optionally one game's. */
+  async function listUpdates(gameId?: string, limit = 50): Promise<GameUpdate[]> {
+    let q = db.selectFrom('game_updates').innerJoin('games', 'games.engine_game_id', 'game_updates.game_id')
+      .select(['game_updates.id', 'game_updates.game_id', 'game_updates.title', 'game_updates.body', 'game_updates.posted_at', 'games.name'])
+      .orderBy('game_updates.posted_at', 'desc').limit(limit);
+    if (gameId) q = q.where('game_updates.game_id', '=', gameId);
+    const rows = await q.execute();
+    return rows.map((r) => updateEntry({ id: r.id, game_id: r.game_id, title: r.title, body: r.body, posted_at: r.posted_at }, r.name));
   }
 
   // Refresh the catalog from the engine's list; the extra fields stay local.
@@ -611,16 +601,17 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
         supports_ai: g.supports_ai ? 1 : 0,
       };
       const own = ZEKEL_GAMES[g.game_id];
+      const designerName = own ? DESIGNERS[own.designer]?.name ?? '' : '';
       if (existing) {
         await db.updateTable('games').set({
           ...shared,
-          ...(own ? { designer_name: 'Zekel Games', description: own.description, play_time: own.playTime, tags: JSON.stringify(own.tags) } : {}),
+          ...(own ? { designer_name: designerName, description: own.description, play_time: own.playTime, tags: JSON.stringify(own.tags) } : {}),
         }).where('engine_game_id', '=', g.game_id).execute();
       } else {
         await db.insertInto('games').values({
           engine_game_id: g.game_id,
           ...shared,
-          designer_name: own ? 'Zekel Games' : '',
+          designer_name: designerName,
           play_time: own?.playTime ?? '',
           tags: JSON.stringify(own?.tags ?? []),
           cover_image: null,
@@ -630,8 +621,87 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
         }).execute();
       }
     }
+    // The designer's posts, once each; a game the engine no longer lists
+    // keeps no posts.
+    const known = new Set(listed.games.map((g) => g.game_id));
+    for (const u of ZEKEL_UPDATES) {
+      if (!known.has(u.gameId)) continue;
+      const have = await db.selectFrom('game_updates').select('id').where('id', '=', u.id).executeTakeFirst();
+      if (have) continue;
+      await db.insertInto('game_updates').values({ id: u.id, game_id: u.gameId, title: u.title, body: u.body, posted_at: u.postedAt }).execute();
+    }
     return listed.games.length;
   }
+
+  // ---- storefront ---------------------------------------------------------------
+
+  app.get('/api/updates', async (req): Promise<UpdatesResponse> => {
+    const q = req.query as { limit?: string };
+    const limit = Math.max(1, Math.min(100, Number(q.limit) || 20));
+    return { updates: await listUpdates(undefined, limit) };
+  });
+
+  app.get('/api/games/:id/updates', async (req): Promise<UpdatesResponse> => {
+    const { id } = req.params as { id: string };
+    const g = await db.selectFrom('games').select('engine_game_id').where('engine_game_id', '=', id).executeTakeFirst();
+    if (!g) throw new HttpError(404, 'no_game');
+    return { updates: await listUpdates(id) };
+  });
+
+  app.get('/api/designers/:slug', async (req): Promise<DesignerResponse> => {
+    const { slug } = req.params as { slug: string };
+    const designer = DESIGNERS[slug];
+    if (!designer) throw new HttpError(404, 'no_designer');
+    const rows = await db.selectFrom('games').selectAll().where('designer_name', '=', designer.name).orderBy('name', 'asc').execute();
+    const games = rows.map(catalogEntry);
+    const updates = (await listUpdates()).filter((u) => games.some((g) => g.engineGameId === u.gameId));
+    return { designer, games, updates };
+  });
+
+  // Anyone with a table's link may watch it: the engine's public view (it
+  // omits hidden information), the seats by display name, and the log of
+  // event summaries. No seat's payload is ever read here, and the engine is
+  // asked at most once every two seconds per table.
+  const watchCache = new Map<string, { at: number; seq: number; view: unknown }>();
+  app.get('/api/tables/:id/watch', async (req, reply): Promise<WatchResponse> => {
+    const { id } = req.params as { id: string };
+    const table = await tableService.getTable(id);
+    if (!table) throw new HttpError(404, 'no_table');
+    const seats = await tableService.getSeats(id);
+    const names = await displayNamesFor(seats);
+    const game = await db.selectFrom('games').select('name').where('engine_game_id', '=', table.gameId).executeTakeFirst();
+    const events = await realtime.eventsAfter(id, 0);
+    const last = events[events.length - 1];
+    let view: unknown = null;
+    if (table.engineSessionId && last) {
+      const cached = watchCache.get(id);
+      if (cached && cached.seq === last.seq && Date.now() - cached.at < 2000) {
+        view = cached.view;
+      } else {
+        try {
+          view = await opts.engine.getPublicView(table.gameId, table.engineSessionId);
+        } catch (err) {
+          app.log.warn(err);
+          throw new HttpError(503, 'engine_unavailable', 'The rules engine did not answer. Try again in a moment.');
+        }
+        watchCache.set(id, { at: Date.now(), seq: last.seq, view });
+      }
+    }
+    void reply.header('cache-control', 'no-store');
+    return {
+      table: {
+        id: table.id, gameId: table.gameId, gameName: game?.name ?? table.gameId, mode: table.mode, status: table.status,
+        nextActorPosition: table.nextActorPosition, result: table.result,
+      },
+      seats: seats.map((s) => ({
+        position: s.position, kind: s.kind, aiDifficulty: s.aiDifficulty,
+        displayName: s.kind === 'ai' ? `AI${s.aiDifficulty ? ` (${s.aiDifficulty})` : ''}` : names.get(s.position) ?? null,
+      })),
+      view,
+      log: events.slice(-40).reverse().map((e) => ({ seq: e.seq, kind: e.kind, summary: e.summary, actorSeatPosition: e.actorSeatPosition, createdAt: e.createdAt })),
+      seq: last?.seq ?? 0,
+    };
+  });
 
   app.get('/api/games', async (): Promise<GamesResponse> => {
     const rows = await db.selectFrom('games').selectAll().orderBy('name', 'asc').execute();

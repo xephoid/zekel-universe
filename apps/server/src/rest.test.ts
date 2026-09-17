@@ -6,8 +6,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import type { Kysely } from 'kysely';
 import type {
   CreateTableResponse, FriendsResponse, GameReferenceResponse, GameResponse, GamesResponse, InvitesResponse, MeResponse, MyTablesResponse,
-  TableEventsResponse, TableResponse,
-} from '@universe/shared';
+  TableEventsResponse, TableResponse, UpdatesResponse, DesignerResponse, WatchResponse } from '@universe/shared';
 import type { DB } from './db/schema.js';
 import { createDatabase, type DatabaseClient } from './db/index.js';
 import { ConsoleMailer } from './email.js';
@@ -367,6 +366,50 @@ describe('REST', () => {
     const list = (await app.fastify.inject({ method: 'GET', url: '/api/friends', headers: { cookie: host } })).json<FriendsResponse>();
     await app.fastify.inject({ method: 'POST', url: `/api/friends/requests/${list.incoming[0]!.id}/accept`, headers: { origin: ORIGIN, cookie: host } });
     expect((await app.fastify.inject({ method: 'POST', url: `/api/tables/${tableId}/invites`, headers: { origin: ORIGIN, cookie: host }, payload: { userId: palId } })).statusCode).toBe(200);
+  });
+
+  it("storefront: the updates feed, a game's devlog, and the designer profile come from the seeded posts", async () => {
+    const feed = (await app.fastify.inject({ method: 'GET', url: '/api/updates?limit=2' })).json<UpdatesResponse>();
+    // The fake engine lists only Fractured Fist, so only its posts seed.
+    expect(feed.updates.length).toBeGreaterThan(0);
+    expect(feed.updates.length).toBeLessThanOrEqual(2);
+    expect(feed.updates.every((u) => u.gameName === 'Fractured Fist' && u.title.length > 0)).toBe(true);
+    const ff = (await app.fastify.inject({ method: 'GET', url: '/api/games/fractured-fist/updates' })).json<UpdatesResponse>();
+    expect(ff.updates.length).toBeGreaterThan(0);
+    expect(ff.updates.every((u) => u.gameId === 'fractured-fist')).toBe(true);
+    expect((await app.fastify.inject({ method: 'GET', url: '/api/games/nope/updates' })).statusCode).toBe(404);
+    const d = (await app.fastify.inject({ method: 'GET', url: '/api/designers/zekel-games' })).json<DesignerResponse>();
+    expect(d.designer.name).toBe('Zekel Games');
+    expect(d.games.map((g) => g.engineGameId)).toContain('fractured-fist');
+    expect(d.games.every((g) => g.designerSlug === 'zekel-games')).toBe(true);
+    expect(d.updates.length).toBeGreaterThan(0);
+    expect((await app.fastify.inject({ method: 'GET', url: '/api/designers/nobody' })).statusCode).toBe(404);
+    // Seeding twice posts nothing twice.
+    const before = feed.updates.length;
+    await app.refreshCatalog();
+    expect((await app.fastify.inject({ method: 'GET', url: '/api/updates?limit=2' })).json<UpdatesResponse>().updates).toHaveLength(before);
+  });
+
+  it("watch: anyone with the link gets the public view, the seats and the log, never a seat's payload", async () => {
+    const cookie = await guest();
+    const created = await app.fastify.inject({
+      method: 'POST', url: '/api/tables', headers: { origin: ORIGIN, cookie },
+      payload: { gameId: 'fractured-fist', mode: 'live', seats: [{ kind: 'human' }, { kind: 'ai' }], hostPosition: 0 },
+    });
+    const { tableId } = created.json<CreateTableResponse>();
+    // No cookie at all: a stranger with the link.
+    const res = await app.fastify.inject({ method: 'GET', url: `/api/tables/${tableId}/watch` });
+    expect(res.statusCode).toBe(200);
+    expect(res.headers['cache-control']).toBe('no-store');
+    const w = res.json<WatchResponse>();
+    expect(w.table.gameName).toBe('Fractured Fist');
+    expect(w.seats.map((s) => s.kind)).toEqual(['human', 'ai']);
+    expect(w.view).toMatchObject({ public: true });
+    expect(res.body).not.toContain('secret-of-p1');
+    expect(res.body).not.toContain('legalMoves');
+    expect(w.log[0]!.summary).toBe('The table is set.');
+    expect(w.seq).toBe(1);
+    expect((await app.fastify.inject({ method: 'GET', url: '/api/tables/nope/watch' })).statusCode).toBe(404);
   });
 
   it('rate limits sign-in links per address', async () => {
