@@ -103,6 +103,9 @@ jobs:
           DATABASE_URL: sqlite:./e2e.db
           PORT: 8788
           E2E_TEST_OUTBOX: '1'
+          # The by-turns spec waits for the nudge email: no delay, look every second.
+          TURN_NUDGE_DELAY_MS: '0'
+          TURN_NUDGE_SWEEP_MS: '1000'
         run: |
           pnpm build
           (node apps/server/dist/index.js > server.log 2>&1 &)

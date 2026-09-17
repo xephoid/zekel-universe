@@ -4,36 +4,9 @@
 // makes is a tap on a lit card or a click on the numbered menu; nothing is
 // submitted by the page on its own.
 
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
+import { makeMove } from './helpers';
 
-/** Tap a lit card in the bench when there is one; else pick from the menu. */
-async function makeMove(page: Page): Promise<'tap' | 'menu' | null> {
-  const lit = page.locator('.table-bench .zk-card.zk-lit');
-  if (await lit.count()) {
-    await lit.first().click();
-    return 'tap';
-  }
-  const menu = page.locator('.move-menu');
-  if (!(await menu.isVisible())) return null;
-  if (!(await menu.evaluate((el) => (el as HTMLDetailsElement).open))) await menu.locator('summary').click();
-  const buttons = menu.locator('ol button');
-  const labels = await buttons.allTextContents();
-  // Prefer buying, then moving the turn along, so the game advances and the
-  // deck grows; card plays are taken by tap above.
-  const order = [/^Buy /i, /^Refine/i, /^Skip/i, /^Advance/i, /^End turn/i];
-  for (const re of order) {
-    const i = labels.findIndex((l) => re.test(l));
-    if (i >= 0) {
-      await buttons.nth(i).click();
-      return 'menu';
-    }
-  }
-  if (labels.length > 0) {
-    await buttons.first().click();
-    return 'menu';
-  }
-  return null;
-}
 
 test('a guest plays Fractured Fist against the AI from Play now to the end screen', async ({ page }) => {
   await page.goto('/');

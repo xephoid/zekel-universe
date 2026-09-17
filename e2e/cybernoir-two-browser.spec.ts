@@ -4,22 +4,8 @@
 // exactly what the socket sends) and against the rendered table.
 // Needs the full stack: engine + server on BASE_URL with E2E_TEST_OUTBOX=1.
 
-import { test, expect, type Browser, type Page } from '@playwright/test';
-import { readSignInLink, toBase } from './helpers';
-
-async function signIn(browser: Browser, email: string, baseURL: string): Promise<Page> {
-  const context = await browser.newContext();
-  const page = await context.newPage();
-  await page.goto('/signin');
-  await page.getByLabel('Email').fill(email);
-  await page.getByRole('button', { name: 'Email me a sign-in link' }).click();
-  await expect(page.getByText(/Link sent to/)).toBeVisible();
-  const link = toBase(await readSignInLink(page.request, email), baseURL);
-  await page.goto(link);
-  await expect(page).toHaveURL(/\/$/, { timeout: 20_000 });
-  await expect(page.locator('.topnav a[href="/profile"]')).toBeVisible();
-  return page;
-}
+import { test, expect, type Page } from '@playwright/test';
+import { signIn } from './helpers';
 
 /** The event feed as this browser sees it: the same per-seat filtering the
  *  socket applies, so a leak here or on the socket is one bug. */
