@@ -1,16 +1,23 @@
 // Sweetlands Imperium glue: the 80-space ring board with four junction
-// roads, per-seat tableaux, the Intel deck and discard piles, the points
-// track and the token pool. View shape per the engine (zekel
-// src/games/sweetlands-imperium/views.ts): shared fields plus your_hand,
-// your_secret_objectives and your_turn_step for the owning seat; players is
-// an ARRAY. Board geometry comes from docs/games/sweetlands-imperium.md
-// (sweetlands-board.ts); points to win comes from the engine's reference
-// data when it publishes one.
+// roads, per-seat tableaux with the faction portraits, the Intel deck and
+// discard piles, the points track and the token pool. View shape per the
+// engine (zekel src/games/sweetlands-imperium/views.ts): shared fields plus
+// your_hand, your_secret_objectives and your_turn_step for the owning seat;
+// players is an ARRAY. Board geometry comes from
+// docs/games/sweetlands-imperium.md (sweetlands-board.ts); faction names,
+// treats and points to win come from the engine's reference data.
+//
+// Moves name cards by cardId, never by hand position, and one card can mean
+// many moves (which unit, take the action or not, ring or road): a tap on
+// the card opens the chooser with exactly the engine's own descriptions.
+// Template moves (assign every seat a faction, pick the Intel to discard,
+// pick a treat slot) become forms; nothing in them is preselected.
 
 import type { CardData, MapNode, TableauData } from '@universe/primitives';
 import type { GameReferenceResponse } from '@universe/shared';
-import type { GlueModule, GlueInput, LegalMove, SelectEvent, SetupField, TablePlan, Zone } from './types';
+import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, SelectEvent, SetupField, TablePlan, Zone } from './types';
 import { asArr, asNum, asStr, isObj, shapeHas, words } from './types';
+import { answerList, answerText } from './forms';
 import { SPACES, REGION_FACTION, SPACE_COLORS, TREATS, BOARD } from './sweetlands-board';
 
 const PALETTE: Record<string, string> = {
@@ -21,10 +28,39 @@ const PALETTE: Record<string, string> = {
   cheesecake: REGION_FACTION[4]!.color,
   nomads: '#2c2c2c',
   castle: '#f0d9b5',
+  foe: '#7a1f1f',
   treat: '#f7c8d8',
   sugar: '#ffffff',
   influence: '#9013fe',
+  tax: '#c9a227',
 };
+
+/** The printed art, by the engine's treat and faction ids. Each faction's
+ *  page carries its regional treat (-1) and the random treat drawn beside
+ *  it (-2); the Nomads' page carries the quiche and the tomato. */
+const TREAT_ART: Record<string, string> = {
+  milkshake: '/art/sweetlands/treat-milkshake-1.png',
+  ice_cream: '/art/sweetlands/treat-milkshake-2.png',
+  fudge: '/art/sweetlands/treat-fudge-1.png',
+  chocolate_bar: '/art/sweetlands/treat-fudge-2.png',
+  jellybean: '/art/sweetlands/treat-jellybean-1.png',
+  gummy_bear: '/art/sweetlands/treat-jellybean-2.png',
+  cheesecake: '/art/sweetlands/treat-cheesecake-1.png',
+  cupcake: '/art/sweetlands/treat-cheesecake-2.png',
+  quiche: '/art/sweetlands/treat-quiche-1.png',
+  tomato: '/art/sweetlands/treat-quiche-2.png',
+};
+const PORTRAIT: Record<string, string> = {
+  milkshake: '/art/sweetlands/sweet-milkshake.jpg',
+  fudge: '/art/sweetlands/sweet-fudge.jpg',
+  jellybean: '/art/sweetlands/sweet-jellybean.jpg',
+  cheesecake: '/art/sweetlands/sweet-cheesecake.jpg',
+  nomads: '/art/sweetlands/sweet-quiche.jpg',
+};
+/** Each region's own treat, as printed on the board (docs/games). */
+const REGION_TREAT: Record<number, string> = { 1: 'milkshake', 2: 'fudge', 3: 'jellybean', 4: 'cheesecake' };
+
+const UNITS = ['leader', 'knight', 'ambassador'] as const;
 
 interface UnitLocation {
   zone: 'offboard' | 'start' | 'ring' | 'road' | 'castle' | 'treat';
@@ -51,6 +87,25 @@ function factionColorKey(faction: unknown): string {
   return 'nomads';
 }
 
+interface RefFaction { id: string; name: string; region: number | null; color: string; ability: string }
+
+function referenceFactions(reference: GameReferenceResponse | null): RefFaction[] {
+  const rd = reference?.referenceData;
+  if (!isObj(rd)) return [];
+  return asArr(rd['factions']).flatMap((f) => {
+    if (!isObj(f) || typeof f['id'] !== 'string') return [];
+    return [{
+      id: f['id'], name: asStr(f['name'], words(f['id'])),
+      region: typeof f['region'] === 'number' ? f['region'] : null,
+      color: asStr(f['color']), ability: asStr(f['ability']),
+    }];
+  });
+}
+
+function factionName(id: string, reference: GameReferenceResponse | null): string {
+  return referenceFactions(reference).find((f) => f.id === id)?.name ?? words(id);
+}
+
 function intelCard(c: unknown, fallbackId: string): CardData {
   if (!isObj(c)) return { id: fallbackId, label: 'card' };
   const id = asStr(c['card_id'], fallbackId);
@@ -58,8 +113,7 @@ function intelCard(c: unknown, fallbackId: string): CardData {
   const color = asStr(c['color']);
   const treat = asStr(c['treat']);
   if (kind === 'treat') {
-    const art = treat.toLowerCase().replace(/\s+/g, '-');
-    return { id: `sl:card:${id}`, label: treat || 'Treat', subtitle: 'Treat', artUrl: `/art/sweetlands/treat-${art}-1.png`, colorKey: 'treat' };
+    return { id: `sl:card:${id}`, label: words(treat || 'treat'), subtitle: 'Treat', artUrl: TREAT_ART[treat], colorKey: 'treat' };
   }
   return {
     id: `sl:card:${id}`,
@@ -79,6 +133,16 @@ const pct = (col: number, row: number) => ({
   y: ((row - 1) / (BOARD.rows - 1)) * 88 + 6,
 });
 
+function myPlayer(view: Record<string, unknown>, me: string | null): Record<string, unknown> | null {
+  const p = asArr(view['players']).find((x) => isObj(x) && x['player_id'] === me);
+  return isObj(p) ? p : null;
+}
+
+function cardIdOf(m: LegalMove): string | null {
+  const id = m.move['cardId'];
+  return typeof id === 'string' ? id : null;
+}
+
 export const sweetlandsGlue: GlueModule = {
   gameId: 'sweetlands-imperium',
   title: 'Sweetlands Imperium',
@@ -91,49 +155,61 @@ export const sweetlandsGlue: GlueModule = {
     if (players.length === 0) return null;
     const me = input.playerId;
     const toWin = pointsToWin(input.reference);
+    const phase = asStr(view['phase']);
 
-    // --- the 80-region map; units as pieces on nodes ------------------------
+    // --- the 80-space map; units as pieces on nodes --------------------------
     const pieces = new Map<string, MapNode['pieces']>();
     for (const p of players) {
       if (!isObj(p)) continue;
       const ck = factionColorKey(p['faction']);
+      const pid = asStr(p['player_id']);
       const locs = isObj(p['unit_locations']) ? p['unit_locations'] : {};
       for (const [unit, loc] of Object.entries(locs)) {
         const sid = locToSpaceId(loc);
         if (!sid) continue;
         const list = pieces.get(sid) ?? [];
-        list!.push({ label: `${ck}:${unit}`, colorKey: ck });
+        // The label's first letter is the glyph (L, K, A); the seat keeps two
+        // players' pieces apart even before factions are assigned.
+        list!.push({ label: `${unit} (${pid})`, colorKey: ck });
         pieces.set(sid, list);
       }
     }
     const castleOcc = asStr(view['castle_occupant_id']);
     const placement = isObj(view['random_treat_placement']) ? view['random_treat_placement'] : {};
+    const foe = isObj(view['foe']) ? view['foe'] : null;
 
     const nodes: MapNode[] = SPACES.map((s) => {
       const node: MapNode = {
         id: s.id,
-        label: s.zone === 'ring' ? '' : s.zone === 'road' ? '' : words(REGION_FACTION[s.region]!.colorKey),
+        label: '',
         ...pct(s.col, s.row),
         colorKey: s.color ?? REGION_FACTION[s.region]!.colorKey,
-        size: s.zone === 'treat' ? 1.1 : 0.7,
+        size: s.zone === 'treat' ? 1.15 : 0.7,
         pieces: pieces.get(s.id) ?? [],
         roadsTo: s.zone === 'ring' && s.index === 5 ? [`r${s.region}-road-0`] : s.zone === 'road' && s.index < 5 ? [`r${s.region}-road-${s.index + 1}`] : [],
       };
-      if (s.zone === 'treat' && s.index === 1) {
-        node.label = asStr(placement[String(s.region)], '?');
+      if (s.zone === 'treat') {
+        const treat = s.index === 0 ? REGION_TREAT[s.region]! : asStr(placement[String(s.region)]);
+        node.label = treat ? words(treat) : '?';
         node.colorKey = 'treat';
+        node.artUrl = TREAT_ART[treat];
       }
       return node;
     });
+    const occupant = players.find((p) => isObj(p) && p['player_id'] === castleOcc);
     nodes.push({
       id: 'castle', label: 'Candy Castle', x: 50, y: 53, colorKey: 'castle', size: 1.6,
-      pieces: castleOcc ? [{ label: castleOcc, colorKey: factionColorKey(players.find((p) => isObj(p) && p['player_id'] === castleOcc && p['faction'])) }] : [],
+      pieces: [
+        ...(foe && asStr(foe['type']) && foe['defeated'] !== true ? [{ label: `foe:${asStr(foe['type'])}`, colorKey: 'foe' }] : []),
+        ...(castleOcc ? [{ label: castleOcc, colorKey: factionColorKey(isObj(occupant) ? occupant['faction'] : null) }] : []),
+      ],
+      badges: foe ? [foe['defeated'] === true ? `${words(asStr(foe['type']))} defeated` : words(asStr(foe['type']))] : [],
       roadsTo: ['r1-road-5', 'r2-road-5', 'r3-road-5', 'r4-road-5'],
     });
     for (const r of [1, 2, 3, 4] as const) {
       nodes.push({
         id: `r${r}-start`,
-        label: `${words(REGION_FACTION[r]!.colorKey)} start`,
+        label: `${factionName(REGION_FACTION[r]!.colorKey, input.reference).split(' ').pop()} start`,
         ...pct(TREATS[r]!.start[1]!, TREATS[r]!.start[0]!),
         colorKey: REGION_FACTION[r]!.colorKey,
         pieces: pieces.get(`r${r}-start`) ?? [],
@@ -166,62 +242,167 @@ export const sweetlandsGlue: GlueModule = {
         { label: 'Hand', value: asNum(p['hand_count']) },
         ...Object.entries(units).map(([u, where]) => ({ label: words(u), value: asStr(where, 'off-board') })),
       ];
+      const label = p['faction'] ? asStr(p['faction_name'], words(ck)) : `${pid} (no faction yet)`;
       const tableau: Zone = {
         kind: 'tableau', id: `sl:p:${pid}`,
-        data: { label: `${asStr(p['faction_name'], words(ck))}${pid === me ? ' (you)' : ''}`, owner: ck, active: pid === activePid, stats },
+        data: {
+          label: `${label}${pid === me ? ' (you)' : ''}`, owner: ck, active: pid === activePid, stats,
+          artUrl: p['faction'] ? PORTRAIT[ck] : undefined,
+        },
       };
-      pointsSpaces[asNum(p['points'])]?.pieces.push({ label: ck, colorKey: ck });
+      pointsSpaces[asNum(p['points'])]?.pieces.push({ label: `${ck} (${pid})`, colorKey: ck });
       if (pid === me) bench.push(tableau); else side.push(tableau);
     }
-    const tokens: Zone = {
-      kind: 'pool', id: 'sl:tokens',
-      data: {
-        label: 'Your tokens',
-        items: (() => {
-          const mine = players.find((p) => isObj(p) && p['player_id'] === me);
-          if (!isObj(mine)) return [];
-          return [
+    const taxes = isObj(view['taxes']) ? view['taxes'] : null;
+    if (taxes) {
+      side.push({
+        kind: 'track', id: 'sl:taxes',
+        data: {
+          label: 'Taxes by region',
+          spaces: ([1, 2, 3, 4] as const).map((r) => ({
+            index: r, label: `${factionName(REGION_FACTION[r]!.colorKey, input.reference).split(' ').pop()}: ${asNum(taxes[String(r)])}`,
+            pieces: Array.from({ length: asNum(taxes[String(r)]) }, () => ({ label: 'tax', colorKey: 'tax' })),
+          })),
+        },
+      });
+    }
+    const mine = myPlayer(view, me);
+    if (mine) {
+      bench.push({
+        kind: 'pool', id: 'sl:tokens',
+        data: {
+          label: 'Your tokens',
+          items: [
             { label: 'sugar', count: asNum(mine['sugar_cubes']), colorKey: 'sugar' },
             { label: 'influence', count: asNum(mine['influence']), colorKey: 'influence' },
-          ];
-        })(),
-      },
-    };
-    if (me) bench.push(tokens);
+            ...asArr(mine['intel_tokens']).map((t) => ({ label: `${asStr(t)} Intel`, count: 1, colorKey: asStr(t) })),
+          ],
+        },
+      });
+    }
     if (Array.isArray(view['your_hand'])) {
       bench.push({
         kind: 'card-zone', id: 'sl:hand', arriveFrom: 'sl:intel-deck',
         data: { label: 'Your Intel', mode: 'fan', cards: (view['your_hand'] as unknown[]).map((c, i) => intelCard(c, `sl:hand:${i}`)) },
       });
     }
+    const secrets = asArr(view['your_secret_objectives']).map((x) => asStr(x)).filter(Boolean);
+    if (secrets.length > 0) {
+      bench.push({
+        kind: 'card-zone', id: 'sl:secrets',
+        data: { label: 'Your secret objectives', mode: 'row', cards: secrets.map((s) => ({ id: `sl:secret:${s}`, label: words(s), subtitle: 'Secret', colorKey: 'treat' })) },
+      });
+    }
     const points: Zone = { kind: 'track', id: 'sl:points', data: { label: 'Points', spaces: pointsSpaces } };
-    const status = `Round ${asNum(view['round'], 1)} · ${words(asStr(view['phase']))}${asStr(view['your_turn_step']) ? ` · ${words(asStr(view['your_turn_step']))}` : ''}`;
+    const step = asStr(view['your_turn_step']);
+    const status = phase.startsWith('setup')
+      ? `Setup · ${words(phase.replace(/^setup_/, ''))}`
+      : `Round ${asNum(view['round'], 1)} · ${words(phase)}${step ? ` · ${words(step)}` : ''}`;
     return { board, bench, side, points, palette: PALETTE, title: 'Sweetlands Imperium', status };
   },
 
   litParts(input: GlueInput): string[] {
     const lit: string[] = [];
-    const hand = shapeHas(input.view, 'your_hand') ? asArr(input.view['your_hand']) : [];
+    const home = isObj(input.view) ? asNum(myPlayer(input.view, input.playerId)?.['home_region']) : 0;
     for (const m of input.legalMoves) {
       const t = asStr(m.move['type']);
-      if (t === 'play_intel' && typeof m.move['hand_index'] === 'number') {
-        const c = hand[m.move['hand_index']];
-        lit.push(isObj(c) ? `sl:card:${asStr(c['card_id'], `sl:hand:${m.move['hand_index']}`)}` : `sl:hand:${m.move['hand_index']}`);
-      }
-      const dest = m.move['destination'];
-      const sid = locToSpaceId(dest);
-      if (sid) lit.push(sid);
+      const cardId = cardIdOf(m);
+      if (t === 'play_intel' && cardId) lit.push(`sl:card:${cardId}`);
+      if (t === 'play_token') lit.push('sl:tokens');
+      if (t === 'choose_foe') lit.push('castle');
+      if (t === 'recall' && home) lit.push(`r${home}-start`);
     }
     return [...new Set(lit)];
   },
 
   moveForSelect(sel: SelectEvent, input: GlueInput): LegalMove | null {
-    const hand = shapeHas(input.view, 'your_hand') ? asArr(input.view['your_hand']) : [];
-    const idx = hand.findIndex((c, i) => (isObj(c) ? `sl:card:${asStr(c['card_id'], `sl:hand:${i}`)}` : `sl:hand:${i}`) === sel.id);
-    if (idx >= 0) {
-      return input.legalMoves.find((m) => m.move['type'] === 'play_intel' && m.move['hand_index'] === idx) ?? null;
+    const all = sweetlandsGlue.movesForSelect!(sel, input);
+    return all.length === 1 ? all[0]! : null;
+  },
+
+  movesForSelect(sel: SelectEvent, input: GlueInput): LegalMove[] {
+    const card = /^sl:card:(.+)$/.exec(sel.id);
+    if (card) return input.legalMoves.filter((m) => m.move['type'] === 'play_intel' && cardIdOf(m) === card[1]);
+    if (sel.id === 'sl:tokens') return input.legalMoves.filter((m) => m.move['type'] === 'play_token');
+    if (sel.id === 'castle') return input.legalMoves.filter((m) => m.move['type'] === 'choose_foe');
+    if (/^r\d-start$/.test(sel.id)) return input.legalMoves.filter((m) => m.move['type'] === 'recall');
+    return [];
+  },
+
+  formFor(move: LegalMove, input: GlueInput): MoveForm | null {
+    const t = asStr(move.move['type']);
+    const view = isObj(input.view) ? input.view : {};
+    if (t === 'assign_setup_choices') {
+      // Every seat chooses a faction; the template's default map is not an answer.
+      const players = asArr(view['players']).filter(isObj);
+      const factions = referenceFactions(input.reference)
+        .filter((f) => players.length === 5 ? true : f.id !== 'nomads');
+      const options = factions.map((f) => ({ value: f.id, label: f.name, hint: f.ability }));
+      const fields: FormField[] = players.map((p) => {
+        const pid = asStr(p['player_id']);
+        const who = pid === input.playerId ? 'you' : p['kind'] === 'ai' ? 'AI' : 'friend';
+        return { kind: 'choice', key: `seat.${pid}`, label: `${pid} (${who})`, options };
+      });
+      return {
+        title: 'Choose factions',
+        help: 'Each seat plays one faction. Pick for every seat at this table; no two seats share a faction.',
+        fields,
+        template: move,
+        editableKeys: ['selections'],
+        submitLabel: 'Seat the factions',
+        build(answers) {
+          const selections: Record<string, string> = {};
+          for (const p of players) {
+            const pid = asStr(p['player_id']);
+            const v = answerText(answers, `seat.${pid}`);
+            if (!v) return null;
+            selections[pid] = v;
+          }
+          if (new Set(Object.values(selections)).size !== players.length) return null;
+          return { ...move.move, selections };
+        },
+      };
     }
-    return input.legalMoves.find((m) => locToSpaceId(m.move['destination']) === sel.id) ?? null;
+    if (t === 'play_intel' && 'treatRegion' in move.move) {
+      const regions = ([1, 2, 3, 4] as const).map((r) => ({ value: String(r), label: `Region ${r}: ${factionName(REGION_FACTION[r]!.colorKey, input.reference)}` }));
+      return {
+        title: 'Which treat space?',
+        help: move.description,
+        fields: [
+          { kind: 'choice', key: 'treatRegion', label: 'Region', options: regions },
+          { kind: 'choice', key: 'treatSlot', label: 'Slot', options: [{ value: 'regional', label: "The region's own treat" }, { value: 'random', label: 'The random treat slot' }] },
+        ],
+        template: move,
+        editableKeys: ['treatRegion', 'treatSlot'],
+        build(answers) {
+          const region = answerText(answers, 'treatRegion');
+          const slot = answerText(answers, 'treatSlot');
+          if (!region || !slot) return null;
+          return { ...move.move, treatRegion: Number(region), treatSlot: slot };
+        },
+      };
+    }
+    if (t === 'discard_for_color') {
+      const need = asArr(move.move['cardIds']).length;
+      const hand = asArr(view['your_hand']).filter(isObj);
+      const options = hand.map((c, i) => {
+        const card = intelCard(c, `sl:hand:${i}`);
+        return { value: asStr(c['card_id'], `sl:hand:${i}`), label: `${card.label} (${card.subtitle ?? ''})` };
+      });
+      return {
+        title: `Discard ${need} Intel for ${words(asStr(move.move['color']))}`,
+        help: move.description,
+        fields: [{ kind: 'multi', key: 'cardIds', label: `Pick the ${need} cards to discard`, options, pick: need }],
+        template: move,
+        editableKeys: ['cardIds'],
+        build(answers) {
+          const ids = answerList(answers, 'cardIds');
+          if (ids.length !== need) return null;
+          return { ...move.move, cardIds: ids };
+        },
+      };
+    }
+    return null;
   },
 
   resolveReportMove(legalMoves: LegalMove[]): LegalMove | null {
@@ -229,14 +410,17 @@ export const sweetlandsGlue: GlueModule = {
   },
 
   setupFields(_reference: GameReferenceResponse): SetupField[] {
-    // Faction picks are checklist steps the engine offers as legal moves.
+    // Factions, the foe and the secret objectives are chosen at the table,
+    // where the engine offers them as legal moves.
     return [];
   },
 
-  diceFor(event) {
-    const found = /rolled?\s+(?:a\s+)?(\d)/i.exec(event.summary);
-    return found ? [Number(found[1])] : null;
+  diceFor() {
+    // Sugar dice are totals of 0-3 faces, not d6 pips; the summary carries
+    // both totals ("(7 vs 4)") and the log shows it.
+    return null;
   },
 };
 
+export { UNITS as SWEETLANDS_UNITS, TREAT_ART as SWEETLANDS_TREAT_ART };
 export default sweetlandsGlue;
