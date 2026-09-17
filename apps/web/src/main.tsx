@@ -8,6 +8,9 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { SessionProvider } from './session';
 import { HomePage } from './pages/Home';
 import { GamePage } from './pages/Game';
+import { RulesPage } from './pages/Rules';
+import { DesignerPage, DesignersPage } from './pages/Designer';
+import { WatchPage } from './pages/Watch';
 import { SetupPage } from './pages/Setup';
 import { LobbyPage } from './pages/Lobby';
 import { TablePage } from './pages/Table';
@@ -20,6 +23,10 @@ const router = createBrowserRouter([
   { path: '/', element: <HomePage /> },
   { path: '/games/:id', element: <GamePage /> },
   { path: '/games/:id/setup', element: <SetupPage /> },
+  { path: '/games/:id/rules', element: <RulesPage /> },
+  { path: '/designers', element: <DesignersPage /> },
+  { path: '/designers/:slug', element: <DesignerPage /> },
+  { path: '/table/:id/watch', element: <WatchPage /> },
   { path: '/table/:id/lobby', element: <LobbyPage /> },
   { path: '/table/:id', element: <TablePage /> },
   { path: '/profile', element: <ProfilePage /> },

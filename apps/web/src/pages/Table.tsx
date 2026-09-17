@@ -57,6 +57,7 @@ export function TablePage() {
   const [sideOpen, setSideOpen] = useState(true);
   const [sheet, setSheet] = useState<'rules' | 'settings' | null>(null);
   const [chooser, setChooser] = useState<LegalMove[] | null>(null);
+  const [shared, setShared] = useState(false);
   const [form, setForm] = useState<MoveForm | null>(null);
   const [busy, setBusy] = useState(false);
   const [playAgainBusy, setPlayAgainBusy] = useState(false);
@@ -194,6 +195,7 @@ export function TablePage() {
         <button className="chip-btn" onClick={() => void undo()} disabled={!table || table.table.status !== 'playing'}>Undo</button>
         <button className="chip-btn" onClick={() => setSheet('rules')}>Rules</button>
         <button className="chip-btn" onClick={() => setSheet('settings')}>Settings</button>
+        <button className="chip-btn" onClick={() => { void navigator.clipboard?.writeText(`${window.location.origin}/table/${id}/watch`); setShared(true); }} title="Anyone with the link can watch this table">{shared ? 'Link copied' : 'Share'}</button>
         <button className="chip-btn" onClick={() => setSideOpen((v) => !v)} aria-label="Toggle the side column">{sideOpen ? 'Hide panel' : 'Panel'}</button>
         <Link className="chip-btn leave" to="/">Leave</Link>
       </div>

@@ -3,8 +3,7 @@
 
 import type {
   ApiError, CreateTableRequest, CreateTableResponse, FriendsResponse, GameReferenceResponse, GameResponse, GamesResponse,
-  InvitesResponse, MeResponse, MyTablesResponse, TableEventsResponse, TableResponse,
-} from '@universe/shared';
+  InvitesResponse, MeResponse, MyTablesResponse, TableEventsResponse, TableResponse, UpdatesResponse, DesignerResponse, WatchResponse } from '@universe/shared';
 
 export class ApiRequestError extends Error {
   constructor(public status: number, public code: string, message: string) {
@@ -43,6 +42,10 @@ export const api = {
   games: () => req<GamesResponse>('/api/games'),
   game: (id: string) => req<GameResponse>(`/api/games/${encodeURIComponent(id)}`),
   reference: (id: string) => req<GameReferenceResponse>(`/api/games/${encodeURIComponent(id)}/reference`),
+  updates: (limit = 20) => req<UpdatesResponse>(`/api/updates?limit=${limit}`),
+  gameUpdates: (id: string) => req<UpdatesResponse>(`/api/games/${encodeURIComponent(id)}/updates`),
+  designer: (slug: string) => req<DesignerResponse>(`/api/designers/${encodeURIComponent(slug)}`),
+  watch: (id: string) => req<WatchResponse>(`/api/tables/${encodeURIComponent(id)}/watch`),
 
   myTables: () => req<MyTablesResponse>('/api/my-tables'),
   table: (id: string) => req<TableResponse>(`/api/tables/${encodeURIComponent(id)}`),

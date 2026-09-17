@@ -1,20 +1,20 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import type { GameCatalogEntry, GameReferenceResponse } from '@universe/shared';
+import type { GameCatalogEntry, GameUpdate } from '@universe/shared';
 import { api } from '../api';
 import { useSession } from '../session';
 import { Nav } from './Nav';
-import { Cover } from './Home';
+import { Cover, UpdateCard } from './Home';
 
 export function GamePage() {
   const { id = '' } = useParams();
   const session = useSession();
   const [game, setGame] = useState<GameCatalogEntry | null>(null);
-  const [reference, setReference] = useState<GameReferenceResponse | null>(null);
+  const [updates, setUpdates] = useState<GameUpdate[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
   useEffect(() => {
     api.game(id).then((r) => setGame(r.game)).catch((e) => setErr((e as Error).message));
-    api.reference(id).then(setReference).catch(() => setReference(null));
+    api.gameUpdates(id).then((r) => setUpdates(r.updates)).catch(() => setUpdates([]));
   }, [id]);
 
   if (err) return (<div><Nav /><div className="page"><p className="error">{err}</p></div></div>);
@@ -36,7 +36,10 @@ export function GamePage() {
           <div className="game-hero-right">
             <h1>{game.name}</h1>
             <p className="muted">
-              {game.designerName ? <>by {game.designerName} · </> : null}{game.playerCount} players{game.playTime ? ` · ${game.playTime}` : ''}
+              {game.designerName
+                ? <>by {game.designerSlug ? <Link to={`/designers/${game.designerSlug}`}>{game.designerName}</Link> : game.designerName} · </>
+                : null}
+              {game.playerCount} players{game.playTime ? ` · ${game.playTime}` : ''}
             </p>
             {game.tags.length > 0 && (
               <div className="chip-row">{game.tags.map((t) => <span key={t} className="chip">{t}</span>)}</div>
@@ -47,17 +50,16 @@ export function GamePage() {
               {game.maxPlayers >= 2 && <Link to={friendsHref} className="btn secondary big">Play with friends</Link>}
             </div>
             <p className="muted" style={{ fontSize: 13 }}>Play now starts a table against the AI right away. No account needed.</p>
-            {game.rulesUrl && <p><a href={game.rulesUrl} target="_blank" rel="noreferrer">Read the rules</a></p>}
+            <p>
+              <Link to={`/games/${game.engineGameId}/rules`}>Read the rules</Link>
+              {game.rulesUrl && <> · <a href={game.rulesUrl} target="_blank" rel="noreferrer">The printed rulebook</a></>}
+            </p>
           </div>
         </div>
-        {reference && (
-          <details style={{ marginTop: 20 }}>
-            <summary style={{ cursor: 'pointer', fontFamily: 'var(--font-display)' }}>The rules</summary>
-            <div className="rules-text" style={{ marginTop: 8 }}>{reference.rules}</div>
-          </details>
-        )}
         <h2 style={{ marginTop: 28 }}>Updates from {game.designerName || 'the designer'}</h2>
-        <p className="muted">No updates yet.</p>
+        {updates === null ? <p className="muted">Loading…</p>
+          : updates.length === 0 ? <p className="muted">No updates yet.</p>
+          : <div className="updates">{updates.map((u) => <UpdateCard key={u.id} u={u} showGame={false} />)}</div>}
       </div>
     </div>
   );

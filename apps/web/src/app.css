@@ -230,3 +230,14 @@ section { margin-bottom: 32px; }
 /* a map or a grid is the board: it takes the whole row, other zones share one */
 .zones .zone-grid { flex: 1 1 100%; width: 100%; min-width: 0; }
 .zones .zone-map { flex: 1 1 100%; width: 100%; min-width: 0; max-width: min(760px, calc(125vh - 380px)); margin: 0 auto; }
+
+/* the storefront: browsing, the updates feed, watching */
+.browse-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 4px 0 8px; }
+.browse-row .search { flex: 1 1 240px; min-width: 0; }
+.updates { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.update-card { background: var(--bg-raised); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px 16px; }
+.update-card h3 { margin: 4px 0 6px; font-size: 16px; }
+.update-card .card-blurb { margin: 0; }
+.plain-list { list-style: none; padding: 0; margin: 0; }
+.chip-btn.watching { background: var(--lit); color: var(--bg); cursor: default; }
+.watch-shell .table-board { padding-bottom: 24px; }
