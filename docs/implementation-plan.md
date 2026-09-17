@@ -1,11 +1,15 @@
 # Zekel Universe — implementation plan
 
-Status 2026-09-16: M0 and M1 built and checked. M2 (friends, live) is
-built: sign-in by email link, friends and invites with tests, and the
-lobby; its acceptance check (two signed-in browsers at one Cybernoir table,
-neither receiving the other's view) runs in CI as
-`e2e/cybernoir-two-browser.spec.ts`. See section 15 for what was decided
-along the way and what remains. The plan turns
+Status 2026-09-17: M0 through M3 built and checked. M2 (friends, live):
+sign-in by email link, friends and invites with tests, and the lobby; its
+acceptance check (two signed-in browsers at one Cybernoir table, neither
+receiving the other's view) runs in CI as
+`e2e/cybernoir-two-browser.spec.ts`. M3 (by turns): the mode at setup,
+self-starting tables, notifications with one email nudge, My tables, and
+resuming a table after a reload or a server restart; the browser half runs
+in CI as `e2e/by-turns.spec.ts` and the restart half as the server's
+`by-turns.test.ts`. See section 15 for what was decided along the way and
+what remains. The plan turns
 the decisions in `docs/design-brief.md` and the engine's `docs/digital-mode.md`
 into a build order with acceptance checks. It is written to be handed to
 someone who has read those two documents and the four game references in
@@ -422,12 +426,28 @@ honest. Each item below was agreed before the work started.
   flies. Reduced motion becomes fades with the same timing.
 - **Commits.** Small commits by area.
 
-Still open from this pass:
+Decided in the M3 pass (2026-09-17):
+
+- **The nudge.** One email per turn, sent only after the player has been
+  away and up for a delay (ten minutes by default, `TURN_NUDGE_DELAY_MS`),
+  and only if they are still away and still up when the server looks (every
+  minute, `TURN_NUDGE_SWEEP_MS`). Coming back to the table answers the
+  notification, so a quick return never draws an email. Guests have no
+  address and get no email; they see My tables like everyone else.
+- **Resume.** The server keeps no game state in memory that matters. On
+  every table open it compares the last event with the engine's next step
+  and writes whatever a restart lost: an AI turn that never ran, a move
+  whose event was never written, or a finish. The browser resumes from the
+  last event it saved and replays the rest.
+- **Schema changes.** From version 3 on, the database migrates in place
+  with one statement list per version; a database from a newer server is
+  refused, never rewritten.
+
+Still open:
 
 - The engine's Postgres session store (section 13) before the first Heroku
   deploy.
 - Warble Way Galaxy, Sweetlands Imperium and Cybernoir 2127 glue modules
   compile against the new primitive contract and pass fixture tests, but
   have not been played through (M4).
-- By-turns email nudges, friends and invites, the storefront, and the phone
-  pass (M3, M5, M6).
+- The storefront and the phone pass (M5, M6).

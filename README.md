@@ -4,19 +4,22 @@ A website where people play board games in the browser against AI opponents or w
 
 The games are run by a separate rules engine, zekel. Universe draws the table, moves the pieces, and talks to the player. It never decides a rule.
 
-## What works today (v0, milestones M0 and M1)
+## What works today (v0, milestones M0 to M3)
 
 A guest opens a game page, presses Play now, makes the game's own setup
 choices, and plays a complete game of Fractured Fist against the AI in the
 browser: legal moves light up the parts they touch, the numbered move menu is
 always there as a fallback, AI turns play back as a paced slideshow with
 replay and undo, rules lessons appear the first time a rule matters, and the
-end screen shows the result over the final table. Sign-in by email link,
-lobbies for tables with friends, and live two-human play work on the server
-and in the browser but have not yet had their own browser-driven acceptance
-pass. See [the implementation plan](docs/implementation-plan.md) for the
-milestones and [the implementation issues](implementation-issues.md) for the
-review that drove this pass.
+end screen shows the result over the final table. Signed-in players open
+tables with friends by link, invite, or friends list, and play live with
+each browser receiving only its own seat's private state, or by turns: the
+table starts itself when its seats fill, a player who is away when their
+turn comes gets one email, My tables on the home page brings them back, and
+a table picks up where it was after a reload or a server restart. See [the
+implementation plan](docs/implementation-plan.md) for the milestones and
+[the implementation issues](implementation-issues.md) for the review that
+drove the first pass.
 
 ## Getting started
 
@@ -68,6 +71,8 @@ and `ENGINE_TOKEN` are set; the Postgres schema test runs when
 `TEST_DATABASE_URL` points at a Postgres database. The browser specs that
 sign in read the console mailer's outbox, so start the server they run
 against with `E2E_TEST_OUTBOX=1` (never in production; the server refuses).
+The by-turns spec waits for the nudge email, so that server also needs
+`TURN_NUDGE_DELAY_MS=0` and `TURN_NUDGE_SWEEP_MS=1000`, as CI sets them.
 
 ## The full stack in Docker
 
