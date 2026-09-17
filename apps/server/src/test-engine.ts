@@ -220,6 +220,12 @@ export class FakeEngine implements EngineService {
     return { undone: true, next_step: this.nextStep(s) };
   }
 
+  /** The public view: every human's view minus its hand, plus a marker. */
+  async getPublicView(_gameId: string, sessionId: string): Promise<unknown> {
+    const s = this.session(sessionId);
+    return { public: true, moves: s.moves, active: s.active, players: this.humans(s).map((h) => ({ player: h, hand_size: 1 })) };
+  }
+
   async isGameOver(sessionId: string): Promise<GameOverResult> {
     const s = this.session(sessionId);
     return s.over ? { game_over: true, ...s.over } : { game_over: false };

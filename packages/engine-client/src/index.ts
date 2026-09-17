@@ -503,6 +503,30 @@ export class EngineClient {
     return validated.data;
   }
 
+  /**
+   * The engine's public view of a session: the resource
+   * game://{game_id}/sessions/{session_id}, hidden information omitted by
+   * the engine itself. What a spectator sees.
+   */
+  async getPublicView(gameId: string, sessionId: string): Promise<unknown> {
+    const client = await this.ensureConnected();
+    const uri = `game://${encodeURIComponent(gameId)}/sessions/${encodeURIComponent(sessionId)}`;
+    let result: { contents: Array<{ text?: string; mimeType?: string }> };
+    try {
+      result = (await client.readResource({ uri })) as typeof result;
+    } catch (err) {
+      if (this.client === client) this.client = null;
+      throw new EngineError('engine_call_failed', `Engine resource ${uri} failed: ${(err as Error).message}`);
+    }
+    const text = result.contents.find((c) => typeof c.text === 'string')?.text;
+    if (text === undefined) throw new EngineError('engine_contract_violation', `Resource ${uri} returned no text`);
+    try {
+      return JSON.parse(text) as unknown;
+    } catch {
+      throw new EngineError('engine_contract_violation', `Resource ${uri} returned invalid JSON`);
+    }
+  }
+
   // ---- the 16 engine tools ---------------------------------------------------
 
   listGames(): Promise<ListGamesResult> {

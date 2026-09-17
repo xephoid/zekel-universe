@@ -81,6 +81,52 @@ export interface GameCatalogEntry {
   description: string;
   rulesUrl: string | null;
   visibility: 'public' | 'unlisted';
+  /** the designer's profile slug, when the designer has a profile */
+  designerSlug: string | null;
+}
+
+/** A designer's post about a game: the devlog on the game page, the feed on home. */
+export interface GameUpdate {
+  id: string;
+  gameId: string;
+  gameName: string;
+  title: string;
+  body: string;
+  postedAt: string;
+}
+
+/** GET /api/updates and GET /api/games/:id/updates */
+export interface UpdatesResponse {
+  updates: GameUpdate[];
+}
+
+/** GET /api/designers/:slug */
+export interface DesignerResponse {
+  designer: { slug: string; name: string; bio: string };
+  games: GameCatalogEntry[];
+  updates: GameUpdate[];
+}
+
+/**
+ * GET /api/tables/:id/watch: what anyone with the link may see of a table.
+ * The view is the engine's public view (hidden information omitted by the
+ * engine); the log is the event summaries. No seat's private payload.
+ */
+export interface WatchResponse {
+  table: {
+    id: string;
+    gameId: string;
+    gameName: string;
+    mode: TableMode;
+    status: TableStatus;
+    nextActorPosition: number | null;
+    result: GameOverResult | null;
+  };
+  seats: Array<{ position: number; kind: 'human' | 'ai'; displayName: string | null; aiDifficulty: string | null }>;
+  view: unknown;
+  log: Array<{ seq: number; kind: TableEventKind; summary: string; actorSeatPosition: number | null; createdAt: string }>;
+  /** the last event's sequence number, so a watcher knows when to redraw */
+  seq: number;
 }
 
 /** GET /api/games */

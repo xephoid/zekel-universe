@@ -37,4 +37,6 @@ export type EngineService = {
   runAiTurn(sessionId: string, playerId: string, token?: string): Promise<AiTurnResult>;
   undo(sessionId: string, token?: string): Promise<UndoResult>;
   isGameOver(sessionId: string): Promise<GameOverResult>;
+  /** the engine's public view of a session, for spectators */
+  getPublicView(gameId: string, sessionId: string): Promise<unknown>;
 };
