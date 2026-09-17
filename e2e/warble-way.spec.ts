@@ -66,7 +66,8 @@ test('Warble Way: the character is the player\'s to create, and dice and cards w
 
   // Take a mission to launch into space, then draw and roll only by pressing.
   await expect(page.locator('.turn-pill')).toHaveText(/^Your move/, { timeout: 30_000 });
-  expect(await tryRow(page, rows.filter({ hasText: /^Take the .* mission/ }).first())).toBe(true);
+  // A plain check mission (not the ruins one, whose setup is a longer form).
+  expect(await tryRow(page, rows.filter({ hasText: /^Take the [A-Z]{3} \d+ mission/ }).first())).toBe(true);
 
   let draws = 0;
   let rolls = 0;
@@ -89,8 +90,14 @@ test('Warble Way: the character is the player\'s to create, and dice and cards w
     // way forward the menu offers, else any row the engine accepts.
     const dialog = page.getByRole('dialog');
     if (await dialog.count()) {
-      await dialog.locator('.chooser button, button[type=submit]').first().click();
-      await expect(log(page)).not.toHaveText(before ?? '', { timeout: 30_000 });
+      const pickRow = dialog.locator('.chooser button').first();
+      if (await pickRow.count()) {
+        await pickRow.click();
+        await expect(log(page)).not.toHaveText(before ?? '', { timeout: 30_000 });
+      } else {
+        // A form this explorer cannot answer: close it and take another road.
+        await dialog.getByRole('button', { name: 'Close' }).click();
+      }
       continue;
     }
     const prefer = [/^Decline/i, /^Skip/i, /^Leave/i, /^Continue|^End/i, /^Depart/i, /^Take the .* mission/i, /^Evade|^Flee/i];
