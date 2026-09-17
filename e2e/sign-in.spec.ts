@@ -13,7 +13,7 @@ test('a guest signs in by email link and keeps their table', async ({ page, base
   //    something to carry over into the account.
   await page.goto('/');
   await page.getByRole('link', { name: /Fractured Fist/ }).first().click();
-  await expect(page.getByRole('heading', { name: 'Fractured Fist' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Fractured Fist', level: 1 })).toBeVisible();
   await page.getByRole('link', { name: 'Play now' }).click();
   await expect(page.getByText('Choose the 7 techniques in play')).toBeVisible();
   const boxes = page.getByRole('group', { name: /Choose the 7 techniques/ }).getByRole('checkbox');
