@@ -11,7 +11,7 @@ import { makeMove } from './helpers';
 test('a guest plays Fractured Fist against the AI from Play now to the end screen', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('link', { name: /Fractured Fist/ }).first().click();
-  await expect(page.getByRole('heading', { name: 'Fractured Fist' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Fractured Fist', level: 1 })).toBeVisible();
   await page.getByRole('link', { name: 'Play now' }).click();
 
   // The game's own choice: exactly seven techniques, nothing preselected.
@@ -20,7 +20,7 @@ test('a guest plays Fractured Fist against the AI from Play now to the end scree
   await expect(boxes.first()).toBeVisible();
   for (const b of await boxes.all()) await expect(b).not.toBeChecked();
   for (let i = 0; i < 7; i++) await boxes.nth(i).check();
-  await expect(page.getByText('(7 of 7)')).toBeVisible();
+  await expect(page.getByText(/7 of 7/)).toBeVisible();
   await page.getByRole('button', { name: 'Start the game' }).click();
 
   // The table: our move first, at the fastest pace (which still dwells).
@@ -67,5 +67,5 @@ test('a guest plays Fractured Fist against the AI from Play now to the end scree
   // The end screen offers the three actions from the brief.
   await expect(dialog.getByRole('button', { name: 'Play again' })).toBeVisible();
   await expect(dialog.getByRole('button', { name: 'Share the result' })).toBeVisible();
-  await expect(dialog.getByRole('link', { name: 'Back to the game page' })).toBeVisible();
+  await expect(dialog.getByRole('link', { name: 'Game page' })).toBeVisible();
 });

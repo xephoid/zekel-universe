@@ -35,7 +35,7 @@ async function tryRow(page: Page, row: ReturnType<Page['locator']>): Promise<boo
 
 test('Warble Way: the character is the player\'s to create, and dice and cards wait for the button', async ({ page }) => {
   await page.goto('/games/warble-way-galaxy/setup');
-  await expect(page.getByRole('heading', { name: 'Set up your table' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Set up the table' })).toBeVisible();
   await page.getByRole('button', { name: 'Start the game' }).click();
   await expect(page).toHaveURL(/\/table\//, { timeout: 20_000 });
   await expect(page.locator('.turn-pill')).toHaveText(/^Your move/, { timeout: 30_000 });

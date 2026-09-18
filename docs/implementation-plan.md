@@ -511,6 +511,31 @@ Decided in the M5 pass (2026-09-17):
   text, which is the rules the table enforces; a designer's printed rulebook
   link sits beside it when one is set.
 
+Design pass (2026-09-17), after a review found the pages had drifted from
+the canvas:
+
+- **The canvas is the measure.** Every page now follows
+  `docs/design/Zekel Pages.dc.html` in its own numbers: the 60px white bar
+  with Browse, My tables (with the count of turns waiting), Designers, the
+  search field and who you are; pages 40px in from the edge; home as My
+  tables, then Featured and Newest with the filter chips beside the
+  heading, and the updates feed in a 340px column; the game page's 420px
+  cover with four screenshot slots, the chips, the two buttons and the
+  devlog as a dated list; setup with seat rows, the player-count stepper,
+  Live and By turns as cards and a sticky summary; the lobby with tagged
+  seat rows and the invite cards; sign-in as a card over the page; the
+  profile with the big avatar and the friends column; the end of the game
+  as the results card. The table's bar carries the wordmark, the game, the
+  round and the turn pill as `Sweetlands Table.dc.html` draws it.
+- **Shared pieces.** The wordmark, the avatar circle and the cover
+  placeholder live in `apps/web/src/ui.tsx`; the tokens gained the canvas's
+  hairline, chip, badge and card-shadow values so no page needs a literal.
+- **What still differs, on purpose.** The canvas draws the Sweetlands board
+  as a grid of colored squares; the table draws it with the map primitive
+  (blobs and roads), the composition the primitives sheet chose. The hand
+  is a row of larger cards, not a rotated fan. The sign-in card offers email
+  only, since v0 has no other provider.
+
 Still open:
 
 - The engine's Postgres session store (section 13) before the first Heroku

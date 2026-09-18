@@ -19,8 +19,8 @@ async function menuRow(page: Page, pattern: RegExp) {
 
 test('Sweetlands: the player makes every setup choice, draws with the button, and plays a card through the chooser', async ({ page }) => {
   await page.goto('/games/sweetlands-imperium/setup');
-  await expect(page.getByRole('heading', { name: 'Set up your table' })).toBeVisible();
-  await expect(page.getByRole('combobox', { name: 'Seat 2' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Set up the table' })).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Seat 2' })).toBeVisible();
   await page.getByRole('button', { name: 'Start the game' }).click();
   await expect(page).toHaveURL(/\/table\//, { timeout: 20_000 });
   await expect(page.locator('.turn-pill')).toHaveText(/^Your move/, { timeout: 30_000 });

@@ -34,9 +34,9 @@ test('a by-turns table: self-start, one nudge email to the absent player, back t
 
   // The host opens a Fractured Fist table by turns with one friend seat.
   await a.goto('/games/fractured-fist/setup');
-  await expect(a.getByRole('heading', { name: 'Set up your table' })).toBeVisible();
-  await a.getByRole('combobox', { name: 'Seat 2' }).selectOption('friend');
-  await a.getByRole('radio', { name: /By turns/ }).check();
+  await expect(a.getByRole('heading', { name: 'Set up the table' })).toBeVisible();
+  await a.getByRole('group', { name: 'Seat 2' }).getByRole('button', { name: 'Friend' }).click();
+  await a.getByRole('radio', { name: /^By turns/ }).click();
   const boxes = a.getByRole('group', { name: /Choose the 7 techniques/ }).getByRole('checkbox');
   for (let i = 0; i < 7; i++) await boxes.nth(i).check();
   await a.getByRole('button', { name: 'Open the lobby' }).click();

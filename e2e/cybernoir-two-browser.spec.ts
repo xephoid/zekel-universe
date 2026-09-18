@@ -23,10 +23,10 @@ test('two signed-in humans at one Cybernoir table, each seeing only their own pr
 
   // Host sets up a two-human live table (Cybernoir has exactly two seats).
   await a.goto('/games/cybernoir-2127/setup');
-  await expect(a.getByRole('heading', { name: 'Set up your table' })).toBeVisible();
+  await expect(a.getByRole('heading', { name: 'Set up the table' })).toBeVisible();
   // Seat 2 defaults to an AI; make it an open seat for a friend.
-  await a.getByRole('combobox', { name: 'Seat 2' }).selectOption('friend');
-  await a.getByRole('radio', { name: /Live:/ }).check();
+  await a.getByRole('group', { name: 'Seat 2' }).getByRole('button', { name: 'Friend' }).click();
+  await a.getByRole('radio', { name: /^Live/ }).click();
   await a.getByRole('button', { name: 'Open the lobby' }).click();
   await expect(a).toHaveURL(/\/table\/[^/]+\/lobby/, { timeout: 20_000 });
   const lobbyPath = new URL(a.url()).pathname;
