@@ -11,12 +11,18 @@ export const tokens = {
     },
     // Light theme (default)
     bg: '#F7F1E6',        // warm paper
-    bgRaised: '#FFFEFA',
+    bgRaised: '#FFFFFF',
     fg: '#1C1A17',
-    fgMuted: '#6E6558',
+    fgMuted: '#6B655B',
     accent: '#1F4D3A',
     border: '#DDD3C4',
-    card: '#FFFEFA',
+    line: 'rgba(28,26,23,0.10)', // the canvas's hairline
+    chip: '#EFE7D8',             // filter chips, inline fields
+    card: '#FFFFFF',
+    youBg: '#FBE3D2',            // "Your move"
+    youFg: '#7A3A12',
+    accentTint: '#E6EFE9',
+    accentTint2: '#DDE9E1',
     cardBack: '#5B6B7A',
     // Dark theme
     dark: {
@@ -45,6 +51,9 @@ export const tokens = {
     // flat look: shadows are small and warm, never blurry-gray
     sm: '0 1px 0 rgba(43,38,32,0.12)',
     md: '0 2px 0 rgba(43,38,32,0.14)',
+    card: '0 1px 2px rgba(28,26,23,0.06), 0 4px 12px rgba(28,26,23,0.06)',
+    cardHover: '0 8px 24px rgba(28,26,23,0.14)',
+    pop: '0 8px 30px rgba(28,26,23,0.25)',
     lift: '0 10px 18px rgba(43,38,32,0.28)',
   },
   motion: {
