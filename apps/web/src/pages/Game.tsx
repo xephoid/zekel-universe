@@ -1,10 +1,15 @@
+// The game page, as the canvas draws it: the cover with four screenshot
+// slots, the name, the designer (a link to their profile), the chips, the
+// description, Play now and Play with friends, and the devlog below.
+
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import type { GameCatalogEntry, GameUpdate } from '@universe/shared';
 import { api } from '../api';
 import { useSession } from '../session';
 import { Nav } from './Nav';
-import { Cover, UpdateCard } from './Home';
+import { DevlogItem } from './Home';
+import { Cover, playersLabel } from '../ui';
 
 export function GamePage() {
   const { id = '' } = useParams();
@@ -27,39 +32,47 @@ export function GamePage() {
   return (
     <div>
       <Nav />
-      <div className="page">
-        <Link to="/" className="muted" style={{ fontSize: 13 }}>‹ Browse</Link>
+      <div className="page stack loose" style={{ paddingTop: 28 }}>
+        <Link to="/" className="crumb">‹ Browse</Link>
         <div className="game-hero">
           <div className="game-hero-left">
             <Cover game={game} size="large" />
+            <div className="shots" aria-label="Screenshots">
+              {[1, 2, 3, 4].map((n) => <div key={n}>screenshot {n}</div>)}
+            </div>
           </div>
           <div className="game-hero-right">
-            <h1>{game.name}</h1>
-            <p className="muted">
-              {game.designerName
-                ? <>by {game.designerSlug ? <Link to={`/designers/${game.designerSlug}`}>{game.designerName}</Link> : game.designerName} · </>
-                : null}
-              {game.playerCount} players{game.playTime ? ` · ${game.playTime}` : ''}
-            </p>
-            {game.tags.length > 0 && (
-              <div className="chip-row">{game.tags.map((t) => <span key={t} className="chip">{t}</span>)}</div>
-            )}
+            <div>
+              <h1>{game.name}</h1>
+              <div className="byline">
+                {game.designerName
+                  ? <>by {game.designerSlug ? <Link to={`/designers/${game.designerSlug}`}>{game.designerName}</Link> : game.designerName}</>
+                  : 'a game on the zekel engine'}
+              </div>
+            </div>
+            <div className="chip-row">
+              <span className="chip">{playersLabel(game.playerCount)}</span>
+              {game.playTime && <span className="chip">{game.playTime}</span>}
+              {game.tags.map((t) => <span key={t} className="chip">{t}</span>)}
+            </div>
             <p className="game-desc">{game.description}</p>
             <div className="game-actions">
-              {game.supportsAi && <Link to={`/games/${game.engineGameId}/setup`} className="btn big pressable">Play now</Link>}
-              {game.maxPlayers >= 2 && <Link to={friendsHref} className="btn secondary big">Play with friends</Link>}
+              {game.supportsAi && <Link to={`/games/${game.engineGameId}/setup`} className="btn big">Play now</Link>}
+              {game.maxPlayers >= 2 && <Link to={friendsHref} className="btn big secondary">Play with friends</Link>}
             </div>
-            <p className="muted" style={{ fontSize: 13 }}>Play now starts a table against the AI right away. No account needed.</p>
-            <p>
+            <p className="note" style={{ fontSize: 13 }}>
+              Play now starts a table against the AI right away. No account needed.{' '}
               <Link to={`/games/${game.engineGameId}/rules`}>Read the rules</Link>
               {game.rulesUrl && <> · <a href={game.rulesUrl} target="_blank" rel="noreferrer">The printed rulebook</a></>}
             </p>
           </div>
         </div>
-        <h2 style={{ marginTop: 28 }}>Updates from {game.designerName || 'the designer'}</h2>
-        {updates === null ? <p className="muted">Loading…</p>
-          : updates.length === 0 ? <p className="muted">No updates yet.</p>
-          : <div className="updates">{updates.map((u) => <UpdateCard key={u.id} u={u} showGame={false} />)}</div>}
+        <div className="devlog">
+          <h2>Updates from {game.designerName || 'the designer'}</h2>
+          {updates === null ? <p className="muted">Loading…</p>
+            : updates.length === 0 ? <p className="muted">No updates yet.</p>
+            : updates.map((u) => <DevlogItem key={u.id} u={u} />)}
+        </div>
       </div>
     </div>
   );

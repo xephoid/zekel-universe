@@ -20,8 +20,8 @@ export function RulesPage() {
   return (
     <div>
       <Nav />
-      <div className="page" style={{ maxWidth: 760 }}>
-        <Link to={`/games/${id}`} className="muted" style={{ fontSize: 13 }}>‹ {game?.name ?? 'The game'}</Link>
+      <div className="page narrow stack" style={{ paddingTop: 28 }}>
+        <Link to={`/games/${id}`} className="crumb">‹ {game?.name ?? 'The game'}</Link>
         <h1>{game ? `${game.name}: the rules` : 'The rules'}</h1>
         {err && <p className="error">{err}</p>}
         {game?.rulesUrl && <p><a href={game.rulesUrl} target="_blank" rel="noreferrer">The printed rulebook</a></p>}
