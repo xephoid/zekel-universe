@@ -18,6 +18,7 @@ import { useTable } from '../table/useTable';
 import { Briefings, EndPanel, Log, MoveChooser, MoveFormSheet, MoveMenuList, NoticeToast, PaceControl, Sheet, lessonsOf, type Lesson, type Notice } from '../table/parts';
 import { api } from '../api';
 import { useSession } from '../session';
+import { Wordmark } from '../ui';
 
 const LESSONS_KEY = 'universe:lessons';
 
@@ -184,6 +185,8 @@ export function TablePage() {
   return (
     <FlipRoot viewKey={state.tick} className="table-shell" style={paletteVars(plan?.palette)} reducedMotion={reduced}>
       <div className="table-topbar">
+        <Link to="/" className="brand" aria-label="zekel home" style={{ textDecoration: 'none', display: 'inline-flex' }}><Wordmark size={24} /></Link>
+        <span className="divider" />
         <span className="title">{plan?.title ?? table?.table.gameName ?? 'Table'}</span>
         {plan?.status && <span className="round-note" aria-hidden="true">{plan.status}</span>}
         <span className="spacer center">
@@ -191,13 +194,15 @@ export function TablePage() {
             <span className="dot" />{turnLabel}
           </span>
         </span>
-        {!t.connected && table && <span className="muted" style={{ fontSize: 12 }}>reconnecting…</span>}
-        <button className="chip-btn" onClick={() => void undo()} disabled={!table || table.table.status !== 'playing'}>Undo</button>
-        <button className="chip-btn" onClick={() => setSheet('rules')}>Rules</button>
-        <button className="chip-btn" onClick={() => setSheet('settings')}>Settings</button>
-        <button className="chip-btn" onClick={() => { void navigator.clipboard?.writeText(`${window.location.origin}/table/${id}/watch`); setShared(true); }} title="Anyone with the link can watch this table">{shared ? 'Link copied' : 'Share'}</button>
-        <button className="chip-btn" onClick={() => setSideOpen((v) => !v)} aria-label="Toggle the side column">{sideOpen ? 'Hide panel' : 'Panel'}</button>
-        <Link className="chip-btn leave" to="/">Leave</Link>
+        <div className="actions">
+          {!t.connected && table && <span className="muted" style={{ fontSize: 12 }}>reconnecting…</span>}
+          <button className="chip-btn" onClick={() => void undo()} disabled={!table || table.table.status !== 'playing'}>Undo</button>
+          <button className="chip-btn" onClick={() => setSheet('rules')}>Rules</button>
+          <button className="chip-btn" onClick={() => setSheet('settings')}>Settings</button>
+          <button className="chip-btn" onClick={() => { void navigator.clipboard?.writeText(`${window.location.origin}/table/${id}/watch`); setShared(true); }} title="Anyone with the link can watch this table">{shared ? 'Link copied' : 'Share'}</button>
+          <button className="chip-btn" onClick={() => setSideOpen((v) => !v)} aria-label="Toggle the side column">{sideOpen ? 'Hide panel' : 'Panel'}</button>
+          <Link className="chip-btn leave" to="/">Leave</Link>
+        </div>
       </div>
 
       <div className="table-main">
@@ -236,7 +241,7 @@ export function TablePage() {
             <div className="sheet-backdrop" role="presentation">
               <div className="sheet" role="dialog" aria-label="Game over">
                 <button className="btn secondary small close" onClick={() => setShowEnd(false)} aria-label="Look at the final table">✕</button>
-                <EndPanel result={result} seats={table.seats} myPlayerId={myPlayerId} gameId={gameId} onPlayAgain={() => void playAgain()} playAgainBusy={playAgainBusy} />
+                <EndPanel result={result} seats={table.seats} myPlayerId={myPlayerId} gameId={gameId} gameName={table.table.gameName} onPlayAgain={() => void playAgain()} playAgainBusy={playAgainBusy} />
               </div>
             </div>
           )}

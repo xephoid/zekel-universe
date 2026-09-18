@@ -242,12 +242,19 @@ export const sweetlandsGlue: GlueModule = {
         { label: 'Hand', value: asNum(p['hand_count']) },
         ...Object.entries(units).map(([u, where]) => ({ label: words(u), value: asStr(where, 'off-board') })),
       ];
-      const label = p['faction'] ? asStr(p['faction_name'], words(ck)) : `${pid} (no faction yet)`;
+      // Before the factions are assigned the engine's default faction means
+      // nothing; the seat is the name then.
+      const assigned = phase !== 'setup_factions' && !!p['faction'];
+      const label = assigned ? asStr(p['faction_name'], words(ck)) : `Seat ${players.indexOf(p) + 1}`;
+      // Your own card sits in the bench beside the hand: the counts only,
+      // since the map shows your units and the hand shows itself.
+      const benchStats = stats.filter((s) => ['Points', 'Influence', 'Sugar cubes', 'Intel tokens'].includes(s.label));
       const tableau: Zone = {
         kind: 'tableau', id: `sl:p:${pid}`,
         data: {
-          label: `${label}${pid === me ? ' (you)' : ''}`, owner: ck, active: pid === activePid, stats,
-          artUrl: p['faction'] ? PORTRAIT[ck] : undefined,
+          label: `${label}${pid === me ? ' (you)' : ''}`, owner: assigned ? ck : undefined, active: pid === activePid,
+          stats: pid === me ? benchStats : stats,
+          artUrl: assigned ? PORTRAIT[ck] : undefined,
         },
       };
       pointsSpaces[asNum(p['points'])]?.pieces.push({ label: `${ck} (${pid})`, colorKey: ck });

@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import type { GameOverResult, LegalMove, MoveMenu, MoveMenuEntry, RulesBriefing, SeatSummary, TableEventWire } from '@universe/shared';
 import type { MoveForm } from '../glue';
 import { PACES, type Pace } from '../playback/PlaybackQueue';
+import { Avatar } from '../ui';
 
 export function PaceControl({ pace, setPace }: { pace: Pace; setPace: (p: Pace) => void }) {
   return (
@@ -215,8 +216,8 @@ export function Sheet({ title, onClose, children }: { title: string; onClose: ()
   );
 }
 
-export function EndPanel({ result, seats, myPlayerId, gameId, onPlayAgain, playAgainBusy }: {
-  result: GameOverResult; seats: SeatSummary[]; myPlayerId: string | null; gameId: string; onPlayAgain: () => void; playAgainBusy: boolean;
+export function EndPanel({ result, seats, myPlayerId, gameId, gameName, onPlayAgain, playAgainBusy }: {
+  result: GameOverResult; seats: SeatSummary[]; myPlayerId: string | null; gameId: string; gameName?: string; onPlayAgain: () => void; playAgainBusy: boolean;
 }) {
   const [copied, setCopied] = useState(false);
   const nameFor = (pid: string) => {
@@ -225,20 +226,31 @@ export function EndPanel({ result, seats, myPlayerId, gameId, onPlayAgain, playA
     return seat?.displayName ?? pid;
   };
   const iWon = myPlayerId !== null && result.winners.includes(myPlayerId);
-  const headline = result.winners.length === 0 ? 'A tie' : iWon ? 'You win' : `${result.winners.map(nameFor).join(' and ')} ${result.winners.length > 1 ? 'win' : 'wins'}`;
+  const headline = result.winners.length === 0 ? 'A tie.' : iWon ? 'You win.' : `${result.winners.map(nameFor).join(' and ')} ${result.winners.length > 1 ? 'win' : 'wins'}.`;
+  const rows = Object.entries(result.scores)
+    .map(([pid, score]) => ({ pid, score: Number(score), name: nameFor(pid), winner: result.winners.includes(pid) }))
+    .sort((a, b) => Number(b.winner) - Number(a.winner) || b.score - a.score);
   return (
     <div className="end-panel">
-      <h2 style={{ fontSize: 32 }}>{headline}</h2>
-      <p>{result.summary}</p>
-      <div className="scores">
-        {Object.entries(result.scores).map(([pid, score]) => (
-          <span key={pid}>{nameFor(pid)}{pid === myPlayerId ? ' (you)' : ''}: <strong>{score}</strong></span>
+      <div>
+        <div className="kicker">{gameName}</div>
+        <h2>{headline}</h2>
+        {result.summary && <div className="sub">{result.summary}</div>}
+      </div>
+      <div className="results">
+        {rows.map((r, i) => (
+          <div key={r.pid} className={`result${i === 0 ? ' first' : ''}`}>
+            <span className="place">{i + 1}</span>
+            <Avatar name={r.name} size={30} />
+            <div className="grow"><div className="name">{r.name}{r.pid === myPlayerId ? ' (you)' : ''}</div><div className="sub">{r.winner ? 'winner' : r.pid === myPlayerId ? 'your seat' : ''}</div></div>
+            <span className="pts" style={{ color: r.winner ? 'var(--accent)' : undefined }}>{r.score}</span>
+          </div>
         ))}
       </div>
       <div className="actions">
-        <button className="btn" onClick={onPlayAgain} disabled={playAgainBusy}>{playAgainBusy ? 'Setting up…' : 'Play again'}</button>
+        <button className="btn" onClick={onPlayAgain} disabled={playAgainBusy}>{playAgainBusy ? 'Setting up…' : 'Play again, same table'}</button>
         <button className="btn secondary" onClick={() => { void navigator.clipboard?.writeText(window.location.href); setCopied(true); }}>{copied ? 'Link copied' : 'Share the result'}</button>
-        <Link className="btn secondary" to={`/games/${gameId}`}>Back to the game page</Link>
+        <Link className="btn quiet" to={`/games/${gameId}`}>Game page</Link>
       </div>
     </div>
   );

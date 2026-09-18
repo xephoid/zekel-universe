@@ -12,6 +12,7 @@ import { api, ApiRequestError } from '../api';
 import { glueFor, type GlueInput } from '../glue';
 import { JsonInspector, ZoneRenderer } from '../glue/ZoneRenderer';
 import { Nav } from './Nav';
+import { Wordmark } from '../ui';
 
 const POLL_MS = 3000;
 
@@ -74,15 +75,19 @@ export function WatchPage() {
   return (
     <FlipRoot viewKey={data.seq} className="table-shell watch-shell" style={paletteVars(plan?.palette)} reducedMotion={reduced}>
       <div className="table-topbar">
+        <Link to="/" className="brand" aria-label="zekel home" style={{ textDecoration: 'none', display: 'inline-flex' }}><Wordmark size={24} /></Link>
+        <span className="divider" />
         <span className="title">{plan?.title ?? data.table.gameName}</span>
         {plan?.status && <span className="round-note" aria-hidden="true">{plan.status}</span>}
         <span className="spacer center">
           <span className="turn-pill" aria-live="polite"><span className="dot" />{status}</span>
         </span>
-        <span className="chip-btn watching" aria-label="You are watching, not playing">Watching</span>
-        <button className="chip-btn" onClick={() => { void navigator.clipboard?.writeText(watchLink); setCopied(true); }}>{copied ? 'Link copied' : 'Share'}</button>
-        <Link className="chip-btn" to={`/games/${data.table.gameId}`}>Play this game</Link>
-        <Link className="chip-btn leave" to="/">Leave</Link>
+        <div className="actions">
+          <span className="chip-btn watching" aria-label="You are watching, not playing">Watching</span>
+          <button className="chip-btn" onClick={() => { void navigator.clipboard?.writeText(watchLink); setCopied(true); }}>{copied ? 'Link copied' : 'Share'}</button>
+          <Link className="chip-btn" to={`/games/${data.table.gameId}`}>Play this game</Link>
+          <Link className="chip-btn leave" to="/">Leave</Link>
+        </div>
       </div>
       <div className="table-main">
         <div className="table-board">

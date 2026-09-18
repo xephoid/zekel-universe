@@ -153,9 +153,13 @@ function playerZones(pid: string, p: Record<string, unknown>, isSelf: boolean, i
   if (asNum(p['refine_pending']) > 0) stats.push({ label: 'Refines pending', value: asNum(p['refine_pending']) });
   stats.push({ label: 'Missteps', value: asNum(p['misstep_count']), max: missCap ?? undefined });
 
+  // A watcher has no seat: the players go by their engine names then.
+  const watching = input.playerId === null;
+  const who = watching ? words(pid) : isSelf ? 'You' : 'Opponent';
+  const whose = watching ? `${words(pid)}'s` : isSelf ? 'Your' : "Opponent's";
   const tableau: Zone = {
     kind: 'tableau', id: `${prefix}:tableau`,
-    data: { label: isSelf ? 'You' : 'Opponent', owner: isSelf ? 'you' : 'opponent', active, activeLabel: isSelf ? 'your turn' : 'their turn', stats },
+    data: { label: who, owner: isSelf ? 'you' : 'opponent', active, activeLabel: isSelf ? 'your turn' : 'their turn', stats },
   };
 
   const handCards: CardData[] = contents.hand.length > 0
@@ -178,7 +182,7 @@ function playerZones(pid: string, p: Record<string, unknown>, isSelf: boolean, i
   };
   const played: Zone = {
     kind: 'card-zone', id: `${prefix}:played`, arriveFrom: `${prefix}:hand`,
-    data: { label: `${isSelf ? 'Your' : "Opponent's"} played cards`, mode: 'row', cards: contents.played.map((cid, i) => cardData(cid, instance('played', i), defs)) },
+    data: { label: `${whose} played cards`, mode: 'row', cards: contents.played.map((cid, i) => cardData(cid, instance('played', i), defs)) },
   };
   const supply = isObj(p['supply']) ? p['supply'] : {};
   const supplyCards: CardData[] = Object.entries(supply).map(([cid, count]) => ({
@@ -187,7 +191,7 @@ function playerZones(pid: string, p: Record<string, unknown>, isSelf: boolean, i
   }));
   const supplyZone: Zone = {
     kind: 'card-zone', id: `${prefix}:supply`,
-    data: { label: `${isSelf ? 'Your' : "Opponent's"} supply`, mode: 'row', cards: supplyCards },
+    data: { label: `${whose} supply`, mode: 'row', cards: supplyCards },
   };
   return { tableau, hand, deck, discard, played, supply: supplyZone, ids };
 }
