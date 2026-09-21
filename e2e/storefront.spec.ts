@@ -11,6 +11,12 @@ test('a stranger with a game link is playing in under a minute; browsing, the de
   // The acceptance check first, timed from the shared link.
   const t0 = Date.now();
   await page.goto('/games/fractured-fist');
+  // The tab icon is the wordmark's meeple, served as SVG with a PNG fallback.
+  await expect(page.locator('link[rel="icon"][type="image/svg+xml"]')).toHaveAttribute('href', '/favicon.svg');
+  const icon = await page.request.get('/favicon.svg');
+  expect(icon.status()).toBe(200);
+  expect(await icon.text()).toContain('rotate(-90 50 50)');
+  expect((await page.request.get('/favicon-32.png')).status()).toBe(200);
   await expect(page.getByRole('heading', { name: 'Fractured Fist', level: 1 })).toBeVisible();
   await page.getByRole('link', { name: 'Play now' }).click();
   await expect(page.getByText('Choose the 7 techniques in play')).toBeVisible();
