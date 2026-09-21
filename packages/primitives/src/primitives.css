@@ -95,9 +95,11 @@
 .zk-zone-label { font-size: 12px; font-weight: 600; color: var(--fg-muted); }
 .zk-zone-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: flex-start; }
 .zk-zone-fan { display: flex; padding-left: 0; }
-.zk-zone-fan .zk-card { margin-left: -30px; transition: margin var(--motion-fast), transform var(--motion-fast); }
+.zk-zone-fan .zk-card { margin-left: -30px; transition: margin var(--motion-fast), translate var(--motion-fast); }
 .zk-zone-fan .zk-card:first-child { margin-left: 0; }
-.zk-zone-fan .zk-card:hover, .zk-zone-fan .zk-card:focus-within { transform: translateY(-8px) !important; z-index: 5; }
+/* the lift on hover is the separate translate property, so it never
+   overrides a flight's transform */
+.zk-zone-fan .zk-card:hover, .zk-zone-fan .zk-card:focus-within { translate: 0 -8px; z-index: 5; }
 .zk-zone-pile { position: relative; display: inline-block; width: var(--zekel-card-w, 76px); height: var(--zekel-card-h, 104px); }
 .zk-zone-pile .zk-card { position: absolute; top: 0; left: 0; }
 .zk-zone-depth {

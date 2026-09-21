@@ -107,12 +107,32 @@ export function FlipRoot({ viewKey, reducedMotion, children, className, style }:
       return;
     }
 
+    // Measure first, animate second: a from-transform set on a zone would
+    // otherwise displace the cards inside it before they are measured.
+    const measured: Array<{ el: HTMLElement; id: string; rect: Rect; prev: Rect | undefined }> = [];
     for (const el of elements) {
       const id = el.dataset.flipId!;
-      const rect = rectOf(el);
+      let prev = prevRects.current.get(id);
+      let rect: Rect;
+      if (el.dataset.flipFlying) {
+        if (!keyChanged) {
+          // Mid-flight and nothing changed: keep the position the flight is
+          // heading to. Measuring now would read the flight's transform as
+          // a position, and the next change would replay the flight.
+          next.set(id, prev ?? rectOf(el));
+          continue;
+        }
+        // New data during a flight: the part continues from where it
+        // visibly is, so the flight is cut and the true position measured.
+        prev = rectOf(el);
+        cancelFlight(el);
+      }
+      rect = rectOf(el);
       next.set(id, rect);
+      measured.push({ el, id, rect, prev });
+    }
+    for (const { el, rect, prev } of measured) {
       if (!keyChanged || firstMeasure) continue;
-      const prev = prevRects.current.get(id);
       if (prev) {
         // Moved: slide from where it was to where it is, lifting on the way.
         const dx = prev.left - rect.left;
@@ -137,10 +157,7 @@ export function FlipRoot({ viewKey, reducedMotion, children, className, style }:
         const to = center(rect);
         animateTransform(el, `translate(${from.x - to.x}px, ${from.y - to.y}px) scale(0.7)`, ms, ease, true);
       } else {
-        el.style.animation = 'none';
-        // Force a reflow so the animation restarts when a class is reused.
-        void el.offsetWidth;
-        el.style.animation = `zk-drop var(--motion-drop, 420ms) var(--motion-settle, cubic-bezier(0.2, 0.9, 0.3, 1.2))`;
+        drop(el);
       }
     }
     prevRects.current = next;
@@ -168,26 +185,61 @@ export function FlipRoot({ viewKey, reducedMotion, children, className, style }:
   );
 }
 
+/** Parts in flight carry this flag so a measurement mid-flight is not
+ *  mistaken for a position. Each flight keeps its own way to end. */
+const flights = new WeakMap<HTMLElement, () => void>();
+
+function cancelFlight(el: HTMLElement) {
+  flights.get(el)?.();
+}
+
 function animateTransform(el: HTMLElement, fromTransform: string, ms: number, ease: string, lift: boolean) {
+  cancelFlight(el);
   const base = el.dataset.baseTransform ?? '';
   el.style.transition = 'none';
   el.style.transform = `${fromTransform} ${base}`.trim();
   if (lift) el.classList.add('zk-lift');
   el.style.zIndex = '30';
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
+  el.dataset.flipFlying = '1';
+  let timer: ReturnType<typeof setTimeout> | null = null;
+  let frame = requestAnimationFrame(() => {
+    frame = requestAnimationFrame(() => {
       el.style.transition = `transform ${ms}ms ${ease}, box-shadow ${ms}ms ${ease}`;
       el.style.transform = base;
-      const done = () => {
-        el.style.transition = '';
-        el.style.zIndex = '';
-        el.classList.remove('zk-lift');
-        el.removeEventListener('transitionend', done);
-      };
       el.addEventListener('transitionend', done);
-      setTimeout(done, ms + 50);
+      timer = setTimeout(done, ms + 50);
     });
   });
+  function done() {
+    cancelAnimationFrame(frame);
+    if (timer !== null) clearTimeout(timer);
+    el.removeEventListener('transitionend', done);
+    el.style.transition = '';
+    el.style.transform = base;
+    el.style.zIndex = '';
+    el.classList.remove('zk-lift');
+    delete el.dataset.flipFlying;
+    flights.delete(el);
+  }
+  flights.set(el, done);
+}
+
+/** No origin to fly from: the part drops in from above and settles. */
+function drop(el: HTMLElement) {
+  cancelFlight(el);
+  el.style.animation = 'none';
+  // Force a reflow so the animation restarts when a class is reused.
+  void el.offsetWidth;
+  el.style.animation = `zk-drop var(--motion-drop, 420ms) var(--motion-settle, cubic-bezier(0.2, 0.9, 0.3, 1.2))`;
+  el.dataset.flipFlying = '1';
+  const timer = setTimeout(done, 470);
+  function done() {
+    clearTimeout(timer);
+    el.style.animation = '';
+    delete el.dataset.flipFlying;
+    flights.delete(el);
+  }
+  flights.set(el, done);
 }
 
 function fade(el: HTMLElement, ms: number, ease: string) {
