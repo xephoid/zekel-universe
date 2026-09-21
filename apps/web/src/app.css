@@ -401,7 +401,8 @@ label.option-card { position: relative; padding-right: 40px; }
 
 /* ---- a zone that takes a whole row of the board ---- */
 .zones .zone.span-full { flex: 1 1 100%; width: 100%; min-width: 0; }
-.zones .zone.span-full .zk-zone-row { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; --zekel-card-w: 92px; --zekel-card-h: 130px; }
+/* the same card size on the zone, so an empty row is as tall as a full one */
+.zones .zone.span-full { --zekel-card-w: 92px; --zekel-card-h: 130px; }
 
 /* ---- the action bar (docs/design/Fractured Fist Table.dc.html) ---- */
 .action-bar {

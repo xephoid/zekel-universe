@@ -28,6 +28,10 @@
 }
 
 .zk-lift { box-shadow: var(--shadow-lift) !important; }
+/* the layer the ghosts fly in: over the table, under the sheets */
+.zk-flights { position: fixed; inset: 0; z-index: 40; pointer-events: none; overflow: visible; }
+.zk-flights .zk-ghost { pointer-events: none; }
+.zk-flights .zk-ghost .zk-card-flipper { transition: none; }
 
 .zk-lit {
   cursor: pointer;
@@ -95,7 +99,7 @@
 .zk-zone-label { font-size: 12px; font-weight: 600; color: var(--fg-muted); }
 .zk-zone-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: flex-start; }
 .zk-zone-fan { display: flex; padding-left: 0; }
-.zk-zone-fan .zk-card { margin-left: -30px; transition: margin var(--motion-fast), translate var(--motion-fast); }
+.zk-zone-fan .zk-card { margin-left: -30px; transition: translate var(--motion-fast); }
 .zk-zone-fan .zk-card:first-child { margin-left: 0; }
 /* the lift on hover is the separate translate property, so it never
    overrides a flight's transform */

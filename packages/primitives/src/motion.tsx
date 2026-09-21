@@ -10,6 +10,13 @@
 //   - A moving thing lifts: its shadow grows while it travels.
 //   - Motion is short: a few hundred milliseconds.
 //   - Reduced motion turns movement into a fade and keeps the timing.
+//
+// A card's flight is a ghost: a copy of the card in a fixed layer over the
+// whole table, flown from where the card was to where it is, while the
+// card itself waits hidden in place. So a card crossing from the bench into
+// a scrolling board, or out of a row that clips, is never cut off and never
+// painted behind what it passes. Every other part (a zone, a pool, a pawn)
+// moves within its own box and slides in place.
 
 import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 
@@ -114,22 +121,29 @@ export function FlipRoot({ viewKey, reducedMotion, children, className, style }:
       const id = el.dataset.flipId!;
       let prev = prevRects.current.get(id);
       let rect: Rect;
-      if (el.dataset.flipFlying) {
+      const flight = flights.get(el);
+      if (flight) {
         if (!keyChanged) {
           // Mid-flight and nothing changed: keep the position the flight is
-          // heading to. Measuring now would read the flight's transform as
-          // a position, and the next change would replay the flight.
+          // heading to. A drop animates the part itself, so measuring it
+          // now would read the animation as a position.
           next.set(id, prev ?? rectOf(el));
           continue;
         }
-        // New data during a flight: the part continues from where it
-        // visibly is, so the flight is cut and the true position measured.
-        prev = rectOf(el);
-        cancelFlight(el);
+        // New data during a flight: the part continues from where its
+        // ghost visibly is, so the flight is cut and the part measured.
+        prev = flight.ghost ? rectOf(flight.ghost) : rectOf(el);
+        flight.done();
       }
       rect = rectOf(el);
       next.set(id, rect);
       measured.push({ el, id, rect, prev });
+    }
+    const flying = new Set<string>();
+    if (keyChanged && !firstMeasure) {
+      for (const { id, rect, prev } of measured) {
+        if (prev ? Math.abs(prev.left - rect.left) >= 1 || Math.abs(prev.top - rect.top) >= 1 : true) flying.add(id);
+      }
     }
     for (const { el, rect, prev } of measured) {
       if (!keyChanged || firstMeasure) continue;
@@ -142,7 +156,8 @@ export function FlipRoot({ viewKey, reducedMotion, children, className, style }:
           fade(el, ms, ease);
           continue;
         }
-        animateTransform(el, `translate(${dx}px, ${dy}px)`, ms, ease, true);
+        if (el.classList.contains('zk-card')) fly(root, el, rect, `translate(${dx}px, ${dy}px)`, ms, ease, flying);
+        else slide(el, `translate(${dx}px, ${dy}px)`, ms, ease);
         continue;
       }
       // New: fly from its origin, or drop in.
@@ -155,7 +170,9 @@ export function FlipRoot({ viewKey, reducedMotion, children, className, style }:
       if (originRect) {
         const from = center(originRect);
         const to = center(rect);
-        animateTransform(el, `translate(${from.x - to.x}px, ${from.y - to.y}px) scale(0.7)`, ms, ease, true);
+        const fromTransform = `translate(${from.x - to.x}px, ${from.y - to.y}px) scale(0.7)`;
+        if (el.classList.contains('zk-card')) fly(root, el, rect, fromTransform, ms, ease, flying);
+        else slide(el, fromTransform, ms, ease);
       } else {
         drop(el);
       }
@@ -185,22 +202,84 @@ export function FlipRoot({ viewKey, reducedMotion, children, className, style }:
   );
 }
 
-/** Parts in flight carry this flag so a measurement mid-flight is not
- *  mistaken for a position. Each flight keeps its own way to end. */
-const flights = new WeakMap<HTMLElement, () => void>();
-
-function cancelFlight(el: HTMLElement) {
-  flights.get(el)?.();
+interface Flight {
+  /** the copy in flight, when the flight is a ghost */
+  ghost: HTMLElement | null;
+  /** end the flight now: the part shows where it is */
+  done: () => void;
 }
 
-function animateTransform(el: HTMLElement, fromTransform: string, ms: number, ease: string, lift: boolean) {
-  cancelFlight(el);
+/** Parts in flight, each with its own way to end. */
+const flights = new WeakMap<HTMLElement, Flight>();
+
+/** The fixed layer the ghosts fly in, made once per root, above the table
+ *  and below the sheets. Inside the root so the palette variables apply. */
+function layerOf(root: HTMLElement): HTMLElement {
+  let layer = root.querySelector<HTMLElement>(':scope > .zk-flights');
+  if (!layer) {
+    layer = document.createElement('div');
+    layer.className = 'zk-flights';
+    root.appendChild(layer);
+  }
+  return layer;
+}
+
+/**
+ * Fly a ghost of `el` from `fromTransform` (relative to `rect`, where the
+ * part now is) to rest, while the part waits hidden in place. Parts inside
+ * the ghost that fly on their own are left out of the copy.
+ */
+function fly(root: HTMLElement, el: HTMLElement, rect: Rect, fromTransform: string, ms: number, ease: string, flying: Set<string>) {
+  flights.get(el)?.done();
+  const base = el.dataset.baseTransform ?? '';
+  const ghost = el.cloneNode(true) as HTMLElement;
+  // The copy is not a part: it must never be measured or lit.
+  for (const part of [ghost, ...Array.from(ghost.querySelectorAll<HTMLElement>('[data-flip-id]'))]) {
+    const id = part.dataset.flipId;
+    if (part !== ghost && id && flying.has(id)) part.style.visibility = 'hidden';
+    delete part.dataset.flipId;
+    delete part.dataset.flipFrom;
+    part.removeAttribute('id');
+    part.removeAttribute('tabindex');
+  }
+  ghost.classList.remove('zk-lit');
+  ghost.classList.add('zk-ghost', 'zk-lift');
+  Object.assign(ghost.style, {
+    position: 'absolute', left: `${rect.left}px`, top: `${rect.top}px`, width: `${rect.width}px`, height: `${rect.height}px`,
+    margin: '0', boxSizing: 'border-box', visibility: 'visible', animation: 'none', translate: 'none',
+    transition: 'none', transform: `${fromTransform} ${base}`.trim(),
+  });
+  layerOf(root).appendChild(ghost);
+  el.style.visibility = 'hidden';
+  let timer: ReturnType<typeof setTimeout> | null = null;
+  let frame = requestAnimationFrame(() => {
+    frame = requestAnimationFrame(() => {
+      ghost.style.transition = `transform ${ms}ms ${ease}, box-shadow ${ms}ms ${ease}`;
+      ghost.style.transform = base;
+      ghost.addEventListener('transitionend', done);
+      timer = setTimeout(done, ms + 50);
+    });
+  });
+  function done() {
+    cancelAnimationFrame(frame);
+    if (timer !== null) clearTimeout(timer);
+    ghost.removeEventListener('transitionend', done);
+    ghost.remove();
+    el.style.visibility = '';
+    flights.delete(el);
+  }
+  flights.set(el, { ghost, done });
+}
+
+/** A part that is not a card moves in place: its own transform slides
+ *  from where it was to rest, lifting on the way. */
+function slide(el: HTMLElement, fromTransform: string, ms: number, ease: string) {
+  flights.get(el)?.done();
   const base = el.dataset.baseTransform ?? '';
   el.style.transition = 'none';
   el.style.transform = `${fromTransform} ${base}`.trim();
-  if (lift) el.classList.add('zk-lift');
+  el.classList.add('zk-lift');
   el.style.zIndex = '30';
-  el.dataset.flipFlying = '1';
   let timer: ReturnType<typeof setTimeout> | null = null;
   let frame = requestAnimationFrame(() => {
     frame = requestAnimationFrame(() => {
@@ -218,28 +297,25 @@ function animateTransform(el: HTMLElement, fromTransform: string, ms: number, ea
     el.style.transform = base;
     el.style.zIndex = '';
     el.classList.remove('zk-lift');
-    delete el.dataset.flipFlying;
     flights.delete(el);
   }
-  flights.set(el, done);
+  flights.set(el, { ghost: null, done });
 }
 
-/** No origin to fly from: the part drops in from above and settles. */
+/** No origin to fly from: the part drops in from above and settles, in place. */
 function drop(el: HTMLElement) {
-  cancelFlight(el);
+  flights.get(el)?.done();
   el.style.animation = 'none';
   // Force a reflow so the animation restarts when a class is reused.
   void el.offsetWidth;
   el.style.animation = `zk-drop var(--motion-drop, 420ms) var(--motion-settle, cubic-bezier(0.2, 0.9, 0.3, 1.2))`;
-  el.dataset.flipFlying = '1';
   const timer = setTimeout(done, 470);
   function done() {
     clearTimeout(timer);
     el.style.animation = '';
-    delete el.dataset.flipFlying;
     flights.delete(el);
   }
-  flights.set(el, done);
+  flights.set(el, { ghost: null, done });
 }
 
 function fade(el: HTMLElement, ms: number, ease: string) {

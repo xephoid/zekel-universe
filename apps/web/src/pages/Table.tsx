@@ -267,17 +267,15 @@ export function TablePage() {
               ) : null}
               <div className="caption-text">
                 {current ? current.summary : (t.error ?? 'Setting the table…')}
-                {state.done && momentSeq !== null && current?.seq === momentSeq && !moment && (
-                  <div className="caption-controls">
-                    <button className="chip-btn" onClick={playback.replayLast}>Replay the strike</button>
-                  </div>
-                )}
-                {!state.done && (
-                  <div className="caption-controls">
-                    <PaceControl pace={playback.pace} setPace={playback.setPace} />
-                    <button className="chip-btn" onClick={playback.replayLast} disabled={!current}>Replay last</button>
-                  </div>
-                )}
+                {/* Always drawn, so the card's height never changes between a
+                    move playing and a move landed: a change would shift the
+                    whole board and read as a jitter on every move. */}
+                <div className="caption-controls">
+                  <PaceControl pace={playback.pace} setPace={playback.setPace} />
+                  <button className="chip-btn" onClick={playback.replayLast} disabled={!current || !!moment}>
+                    {current && current.seq === momentSeq ? 'Replay the strike' : 'Replay last'}
+                  </button>
+                </div>
               </div>
             </div>
           )}
