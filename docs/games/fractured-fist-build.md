@@ -2,6 +2,34 @@
 
 Status 2026-09-21. Written for whoever implements the Fractured Fist table.
 
+**Built 2026-09-21.** Items 1 to 4 and 6 to 8 below are in `main`; item 5
+is settled by the engine, not built (see the open question). What the build
+decided, in `docs/implementation-plan.md` under "Decided in the Fractured
+Fist pass": the draw stays automatic and the deck never lights up (the
+engine has no draw step; asked for in the plan's section 13); the gutter
+shows the queued numbers and the target's stamina without subtracting, and
+the "N through" line appears only in the strike moment, read from the
+stamina the engine took off; the moment is a glue hook (`momentFor`) that
+plays before its event lands, behind a gate in the playback queue, rather
+than a field of the plan; the step chips are Technique and Channel, the
+engine's two phases; the reload button says how many reloads were used,
+because the engine does not publish the cap. Two of the four shared-type
+changes went as proposed (`counts` on a card; `steps` and `prompt` on the
+plan), the moment became a hook, and the multi setup field gained groups, a
+preset, chips and a summary function so the setup page draws the loadout.
+
+The design is three artboards in `docs/design/`: **Fractured Fist Loadout**,
+**Fractured Fist Table** and **Fractured Fist Strike**. The first two run — open
+them in Play and press things. The third is a still sheet, because you cannot
+read a 580 ms beat while it plays. Edit the working files and republish with the
+`design` skill; never hand-edit an assembled output.
+
+Every rule, card, cost and turn step comes from
+[fractured-fist.md](fractured-fist.md), which takes the engine over the printed
+rulebook. Do not re-derive any of it here, and do not copy a number out of the
+artboards: they are drawings, and their sample state is a mid-game snapshot, not
+a fixture.
+
 ## What is wrong today
 
 [`apps/web/src/glue/fractured-fist.ts`](../../apps/web/src/glue/fractured-fist.ts)

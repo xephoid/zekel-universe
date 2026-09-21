@@ -366,6 +366,16 @@ milestone that wants it arrives.
   setup choices): today one `assign_setup_choices` move assigns every seat,
   so at a table with friends one player picks for all. Wanted before
   Sweetlands with friends; M4 records the limitation.
+- **A draw step in Fractured Fist.** The engine resolves every draw inside
+  the move that causes it (`play_card`, `end_turn`, `focus_reload`) and
+  lists no `resolve_report`, so the table cannot put the draw behind a Draw
+  button as the brief asks; the deck deals itself. A draw step of the same
+  shape as the other games' reported randomness would let the deck light
+  up and wait. Until then the Fractured Fist artboard is wrong on that one
+  point, and the build notes say so.
+- **The Focus reload cap in Fractured Fist's reference data.** The engine
+  allows three reloads a turn but publishes the number nowhere, so the
+  reload button says how many were used and not how many are left.
 
 ## 14. Decisions made and still open
 
@@ -567,6 +577,67 @@ Added on request (2026-09-21):
   the k (the brief had suggested the upright meeple; the k was asked for).
   A 32 px PNG covers browsers without SVG icons and a 180 px PNG on the
   page background is the home-screen icon; both are rendered from the SVG.
+
+Decided in the Fractured Fist pass (2026-09-21), after the three artboards
+`Fractured Fist Loadout`, `Fractured Fist Table` and `Fractured Fist Strike`
+and the build notes in `docs/games/fractured-fist-build.md`:
+
+- **The draw stays automatic.** The engine has no draw step for this game
+  (section 13), so the deck never lights up and nothing pretends to wait
+  for a press. The Focus reload button is itself the press for that draw.
+- **The gutter does not subtract.** Between rounds it shows what each
+  player has queued against the other and the target's stamina, as two
+  small pools read straight from the view. What gets through is the
+  engine's to say, and it says it at the strike: the moment reads the
+  stamina the engine took off, never `damage − defense` of its own.
+- **Two counts on one card.** `CardData` gains an optional `counts` list
+  (`label`, `value`, `own`), a Universe addition the engine ignores, so one
+  shelf carries "you 4 · them 2" on every stack. `count` is unchanged.
+- **The action bar is table chrome.** `TablePlan` gains `steps` (named
+  steps, one current) and `prompt` (a title, a line of what you can do now,
+  and buttons). Every button is bound to a move the engine listed, or to a
+  batch; none appears otherwise. The numbered menu stays, collapsed when
+  the bar has buttons. The other three glues are untouched this pass.
+- **A batch is a fifth submission trigger.** "Play all resources" is one
+  press that sends several listed plays one at a time; the table finds the
+  move for the next card only among the legal moves the engine returned
+  after the previous one landed, and stops the moment a card means nothing
+  or several things. The agency policy records it as `batch`, with the
+  same test as a tap at each send. The button says what the press spends
+  when a Focus reload is still legal.
+- **The strike is a moment that plays before its event lands.** A glue may
+  answer `momentFor(before, after)`; the playback queue gained a gate that
+  holds the next event until the table says so. The overlay plays four
+  beats over the board as it still is (both hits at once, in the motion
+  tokens: locked, travel, absorb, land), fades, and only then does the
+  event land, so the played rows sweep to the discards as the FLIP already
+  does. Pace is the queue's 0.5/1/2; Skip closes it; "Replay the strike" is
+  `replayLast`, which runs through the gate again. A game ending on the
+  strike lands on the existing end panel, which stays put. The build notes
+  had the moment as a plan field; a plan is computed from the view on
+  screen, and this one has to play before that view changes, so it is a
+  hook instead.
+- **Counters scoped to the step.** Actions during Technique, spirit and
+  channels during Channel, refines while a refine is pending, and only for
+  the player on turn; stamina and the misstep meter always. Two step chips,
+  Technique and Channel, because those are the engine's phases; the
+  artboard's Cleanup chip stood for the draw press that cannot exist.
+- **A full-row zone.** A zone may carry `span: 'full'` and take a whole
+  row of the board, which is how the two played rows and the shelf stack
+  between the hand and the side column. The self tableau moved into the
+  bench beside the hand, where the other games already put it.
+- **The loadout is a grouped pick on the setup page.** A `multi` setup
+  field may carry groups, a preset, a summary function and per-option
+  chips, badges and tags; the setup page then draws sections by school,
+  seven numbered slots in the summary column, "Use the default seven" from
+  the engine's `starter_loadout` (a button, never a preselection), and the
+  totals from the engine's per-card `effects`. An eighth pick says why
+  instead of swapping. It stays on the setup page rather than becoming its
+  own route.
+- **Out of this pass.** The side column's round panel with the turn order
+  (the turn pill and the tableau badge cover it), the Voice and Chat
+  buttons, the opponent's turn (the slideshow already exists), card art,
+  and the phone layout.
 
 Still open:
 
