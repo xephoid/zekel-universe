@@ -50,6 +50,20 @@ export function toBase(link: string, base: string): string {
   return `${b.origin}${url.pathname}${url.search}${url.hash}`;
 }
 
+/**
+ * The Fractured Fist loadout on the setup screen: thirty technique cards
+ * grouped by school, nothing preselected, seven to add. Picks the first
+ * seven cards, one press each, and checks the slots fill up.
+ */
+export async function pickSeven(page: Page): Promise<void> {
+  await expect(page.getByText(/Choose the 7 techniques in play/)).toBeVisible();
+  const cards = page.getByRole('button', { name: /^Add / });
+  await expect(cards.first()).toBeVisible();
+  expect(await page.getByRole('button', { name: /^Remove / }).count()).toBe(0);
+  for (let i = 0; i < 7; i++) await page.getByRole('button', { name: /^Add / }).first().click();
+  await expect(page.getByText('7/7')).toBeVisible();
+}
+
 /** Tap a lit card in the bench when there is one; else pick from the menu. */
 export async function makeMove(page: Page): Promise<'tap' | 'menu' | null> {
   const lit = page.locator('.table-bench .zk-card.zk-lit');

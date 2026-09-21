@@ -5,7 +5,7 @@
 // submitted by the page on its own.
 
 import { test, expect } from '@playwright/test';
-import { makeMove } from './helpers';
+import { makeMove, pickSeven } from './helpers';
 
 
 test('a guest plays Fractured Fist against the AI from Play now to the end screen', async ({ page }) => {
@@ -15,11 +15,7 @@ test('a guest plays Fractured Fist against the AI from Play now to the end scree
   await page.getByRole('link', { name: 'Play now' }).click();
 
   // The game's own choice: exactly seven techniques, nothing preselected.
-  await expect(page.getByText('Choose the 7 techniques in play')).toBeVisible();
-  const boxes = page.getByRole('group', { name: /Choose the 7 techniques/ }).getByRole('checkbox');
-  await expect(boxes.first()).toBeVisible();
-  for (const b of await boxes.all()) await expect(b).not.toBeChecked();
-  for (let i = 0; i < 7; i++) await boxes.nth(i).check();
+  await pickSeven(page);
   await expect(page.getByText(/7 of 7/)).toBeVisible();
   await page.getByRole('button', { name: 'Start the game' }).click();
 

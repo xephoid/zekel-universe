@@ -13,6 +13,7 @@ import type { GameCatalogEntry, GameReferenceResponse, SeatSpec, TableMode } fro
 import { api, ApiRequestError } from '../api';
 import { glueFor, type SetupAnswers, type SetupField, type SetupSeat } from '../glue';
 import { useSession } from '../session';
+import { GroupedPicker, PickSlots, isGrouped } from './GroupedPick';
 import { Nav } from './Nav';
 import { Avatar, Cover, colorFor } from '../ui';
 
@@ -89,6 +90,9 @@ export function SetupPage() {
     });
   }
   const setSeat = (i: number, s: Seat) => setSeats(seats.map((x, j) => (j === i ? s : x)));
+  /** a whole multi answer at once: the preset button, or clear */
+  const setPicks = (field: SetupField, values: string[]) => setAnswers((prev) => ({ ...prev, [field.key]: values }));
+  const grouped = shown.filter(isGrouped);
 
   async function start() {
     if (!game || !reference) return;
@@ -120,7 +124,9 @@ export function SetupPage() {
   const startLabel = busy ? 'Starting…' : aiOnly ? 'Start the game' : 'Open the lobby';
   const hint = !game || !reference ? 'Loading the game…'
     : !aiOnly && !session.signedIn ? 'Sign in to open a table with friends; guests can still join by link.'
-    : !fieldsAnswered ? "Answer the game's own choices first."
+    : !fieldsAnswered ? (grouped.length > 0 && grouped.some((f) => (Array.isArray(answers[f.key]) ? (answers[f.key] as string[]).length : 0) !== f.pick)
+      ? `Pick ${grouped.map((f) => f.pick - (Array.isArray(answers[f.key]) ? (answers[f.key] as string[]).length : 0)).reduce((a, b) => a + b, 0)} more.`
+      : "Answer the game's own choices first.")
     : !modeAnswered ? 'Choose live or by turns.'
     : aiOnly ? 'The AI seats are ready; the table starts at once.' : 'The lobby opens; friends take their seats by link or invitation.';
 
@@ -204,6 +210,9 @@ export function SetupPage() {
                   );
                 }
                 const picked = f.kind === 'multi' ? (Array.isArray(v) ? v : []) : (typeof v === 'string' ? [v] : []);
+                if (isGrouped(f)) {
+                  return <GroupedPicker key={f.key} field={f} picked={picked} onToggle={(value) => pick(f, value)} onSet={(values) => setPicks(f, values)} />;
+                }
                 return (
                   <div className="stack" key={f.key} style={{ gap: 8 }}>
                     <div className="row-head">
@@ -238,6 +247,10 @@ export function SetupPage() {
               <div className="muted small">{seats.length + 1} players · {aiOnly ? 'against the AI' : mode === 'turns' ? 'by turns' : mode === 'live' ? 'live' : 'with friends'}</div>
             </div>
           </div>
+          {grouped.map((f) => {
+            const v = answers[f.key];
+            return <PickSlots key={f.key} field={f} picked={Array.isArray(v) ? v : []} onRemove={(value) => pick(f, value)} />;
+          })}
           <div className="seats">
             <div><span className="dot" style={{ background: colorFor(me) }} /><span className="grow">{me}</span><span className="muted">{typeof answers['faction.p1'] === 'string' && answers['faction.p1'] ? (fields.find((f) => f.key === 'faction.p1') as { options?: Array<{ value: string; label: string }> } | undefined)?.options?.find((o) => o.value === answers['faction.p1'])?.label ?? 'host' : 'host'}</span></div>
             {seats.map((s, i) => (

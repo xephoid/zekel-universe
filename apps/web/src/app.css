@@ -470,3 +470,40 @@ label.option-card { position: relative; padding-right: 40px; }
 [data-theme='dark'] .strike-token { background: #4a201c; border-color: #ffb3a8; color: #ffb3a8; }
 [data-theme='dark'] .strike-shield { background: #1e2f45; border-color: #a9c8ee; color: #a9c8ee; }
 [data-theme='dark'] .strike-absorb { color: #a9c8ee; }
+
+/* ---- a multi pick as its own screen (docs/design/Fractured Fist Loadout.dc.html) ---- */
+.pick-tools { display: flex; gap: 8px; align-items: center; }
+.pick-warn { font-size: 12px; color: var(--danger); }
+.pick-group { display: flex; flex-direction: column; gap: 10px; }
+.pick-group-head { display: flex; align-items: center; gap: 9px; }
+.pick-group-head .dot { width: 11px; height: 11px; border-radius: 50%; border: 1.5px solid var(--fg); box-sizing: border-box; }
+.pick-group-head .name { font: 700 16px var(--font-display); }
+.pick-group-head .count { font: 500 11px var(--font-mono); color: var(--fg-muted); }
+.pick-group-head .muted { font-size: 12px; }
+.pick-grid { gap: 10px; }
+.pick-card { padding: 10px 11px; gap: 7px; border-top-width: 3px; border-top-style: solid; transition: transform var(--motion-fast), box-shadow var(--motion-fast); }
+.pick-card:hover { transform: translateY(-2px); }
+.pick-card.on { background: var(--you-bg); }
+.pick-card .head { display: flex; gap: 6px; align-items: flex-start; }
+.pick-card .head .name { flex: 1; min-width: 0; font: 700 14px/1.2 var(--font-display); }
+.pick-card .badge, .pick-slots .badge { width: 22px; height: 22px; flex: none; border-radius: 5px; background: #24507f; color: #fff; display: grid; place-items: center; font: 600 12px var(--font-mono); }
+[data-theme='dark'] .pick-card .badge, [data-theme='dark'] .pick-slots .badge { background: #9dc0e8; color: #12202f; }
+.pick-card .chips, .pick-totals .chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.fx-chip { padding: 2px 7px; border-radius: 999px; background: var(--chip); color: var(--fg); font: 600 10px var(--font-body); }
+.pick-card .tag { font: 500 10px var(--font-mono); color: var(--fg-muted); min-height: 14px; }
+.pick-card .tag.on { color: var(--you-fg); }
+.pick-slots { display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--line); padding-top: 12px; }
+.pick-slots .count { font: 600 14px var(--font-mono); color: var(--fg-muted); }
+.pick-slots .count.full { color: var(--brand-orange); }
+.pick-slots ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.pick-slots .slot { display: flex; align-items: center; gap: 8px; height: 38px; border-radius: 9px; background: var(--chip); border: 1px solid var(--line); padding: 0 10px; box-sizing: border-box; font-size: 13px; }
+.pick-slots .slot.empty { background: transparent; border-style: dashed; }
+.pick-slots .slot .n { width: 16px; flex: none; font: 500 10px var(--font-mono); color: var(--fg-muted); }
+.pick-slots .slot .dot { width: 9px; height: 9px; flex: none; border-radius: 50%; border: 1.5px solid var(--fg); box-sizing: border-box; }
+.pick-slots .slot .name { flex: 1; min-width: 0; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pick-slots .slot .fx { font: 500 10px var(--font-mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 40%; }
+.pick-slots .slot .badge { width: 20px; height: 20px; font-size: 10px; }
+.pick-slots .slot .remove { width: 22px; height: 22px; flex: none; border-radius: 5px; border: none; background: transparent; color: var(--fg-muted); font: 500 14px var(--font-mono); cursor: pointer; line-height: 1; }
+.pick-slots .slot .remove:hover { color: var(--danger); }
+.pick-totals { display: flex; flex-direction: column; gap: 8px; }
+.pick-totals .kicker { font: 500 11px var(--font-mono); color: var(--fg-muted); text-transform: uppercase; }

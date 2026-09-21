@@ -6,6 +6,7 @@
 // Needs the full stack (engine + server on BASE_URL).
 
 import { test, expect } from '@playwright/test';
+import { pickSeven } from './helpers';
 
 test('a stranger with a game link is playing in under a minute; browsing, the devlog and the designer profile work', async ({ page, browser }) => {
   // The acceptance check first, timed from the shared link.
@@ -19,9 +20,7 @@ test('a stranger with a game link is playing in under a minute; browsing, the de
   expect((await page.request.get('/favicon-32.png')).status()).toBe(200);
   await expect(page.getByRole('heading', { name: 'Fractured Fist', level: 1 })).toBeVisible();
   await page.getByRole('link', { name: 'Play now' }).click();
-  await expect(page.getByText('Choose the 7 techniques in play')).toBeVisible();
-  const boxes = page.getByRole('group', { name: /Choose the 7 techniques/ }).getByRole('checkbox');
-  for (let i = 0; i < 7; i++) await boxes.nth(i).check();
+  await pickSeven(page);
   await page.getByRole('button', { name: 'Start the game' }).click();
   await expect(page).toHaveURL(/\/table\//);
   await expect(page.locator('.turn-pill')).toHaveText(/^Your move/, { timeout: 30_000 });

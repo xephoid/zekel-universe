@@ -4,7 +4,7 @@
 // outbox is readable at /api/test/outbox (never in production).
 
 import { test, expect } from '@playwright/test';
-import { readSignInLink, toBase } from './helpers';
+import { pickSeven, readSignInLink, toBase } from './helpers';
 
 const EMAIL = 'zeke@example.com';
 
@@ -15,9 +15,7 @@ test('a guest signs in by email link and keeps their table', async ({ page, base
   await page.getByRole('link', { name: /Fractured Fist/ }).first().click();
   await expect(page.getByRole('heading', { name: 'Fractured Fist', level: 1 })).toBeVisible();
   await page.getByRole('link', { name: 'Play now' }).click();
-  await expect(page.getByText('Choose the 7 techniques in play')).toBeVisible();
-  const boxes = page.getByRole('group', { name: /Choose the 7 techniques/ }).getByRole('checkbox');
-  for (let i = 0; i < 7; i++) await boxes.nth(i).check();
+  await pickSeven(page);
   await page.getByRole('button', { name: 'Start the game' }).click();
   await expect(page).toHaveURL(/\/table\//);
   await expect(page.getByText(/^Your move/)).toBeVisible({ timeout: 30_000 });

@@ -7,7 +7,7 @@
 // a short TURN_NUDGE_SWEEP_MS.
 
 import { test, expect, type Page } from '@playwright/test';
-import { makeMove, readMails, signIn } from './helpers';
+import { makeMove, pickSeven, readMails, signIn } from './helpers';
 
 const HOST = 'm3-host@example.com';
 const FRIEND = 'm3-friend@example.com';
@@ -37,8 +37,7 @@ test('a by-turns table: self-start, one nudge email to the absent player, back t
   await expect(a.getByRole('heading', { name: 'Set up the table' })).toBeVisible();
   await a.getByRole('group', { name: 'Seat 2' }).getByRole('button', { name: 'Friend' }).click();
   await a.getByRole('radio', { name: /^By turns/ }).click();
-  const boxes = a.getByRole('group', { name: /Choose the 7 techniques/ }).getByRole('checkbox');
-  for (let i = 0; i < 7; i++) await boxes.nth(i).check();
+  await pickSeven(a);
   await a.getByRole('button', { name: 'Open the lobby' }).click();
   await expect(a).toHaveURL(/\/table\/[^/]+\/lobby/, { timeout: 20_000 });
   const tableId = new URL(a.url()).pathname.split('/')[2]!;
