@@ -86,6 +86,7 @@ export interface TablesTable {
   engine_session_id: string | null;
   encrypted_host_token: string | null;
   options: string; // JSON: the game's own setup options
+  setup_moves: string | null; // JSON: the host's setup choices as engine moves
   next_actor_position: number | null;
   result: string | null; // JSON GameOverResult once finished
   created_at: string;

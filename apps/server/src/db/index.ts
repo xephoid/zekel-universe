@@ -23,7 +23,7 @@ export interface DatabaseClient {
 }
 
 /** Bump when the DDL below changes in a way an existing database cannot absorb. */
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;
 
 export function parseDatabaseUrl(url: string): { dialect: DatabaseDialect; target: string } {
   const trimmed = url.trim();
@@ -125,6 +125,7 @@ const TABLES: string[] = [
     engine_session_id text,
     encrypted_host_token text,
     options text NOT NULL DEFAULT '{}',
+    setup_moves text,
     next_actor_position integer,
     result text,
     created_at text NOT NULL,
@@ -184,6 +185,7 @@ const TABLES: string[] = [
  *  for a fresh database. */
 const MIGRATIONS: Record<number, string[]> = {
   3: ['ALTER TABLE notifications ADD COLUMN emailed_at text'],
+  4: ['ALTER TABLE tables ADD COLUMN setup_moves text'],
 };
 
 async function migrate(db: Kysely<DB>): Promise<void> {

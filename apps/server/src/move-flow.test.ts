@@ -264,10 +264,18 @@ describe('move flow integration', () => {
     expect((await tableService.joinTable(guest, tableId)).seatPosition).toBe(1);
   });
 
-  it('a failed engine session start leaves the table in the lobby, not stuck', async () => {
+  it('a failed start leaves nothing behind for a table against the AI, and a lobby to try again for a table with friends', async () => {
     engine.stateFails = true;
     await expect(createVsAiTable()).rejects.toBeTruthy();
-    const rows = await db.selectFrom('tables').selectAll().execute();
-    expect(rows[0]!.status).toBe('lobby');
+    expect(await db.selectFrom('tables').selectAll().execute()).toHaveLength(0);
+    expect(await db.selectFrom('seats').selectAll().execute()).toHaveLength(0);
+
+    const { tableId } = await tableService.createTable(host, {
+      gameId: 'fractured-fist', mode: 'live', seatSpecs: [{ kind: 'human' }, { kind: 'human' }], hostPosition: 0,
+    });
+    await tableService.joinTable(friend, tableId);
+    await tableService.setReady(friend, tableId, true);
+    await expect(tableService.startTable(host, tableId)).rejects.toBeTruthy();
+    expect((await tableService.getTable(tableId))!.status).toBe('lobby');
   });
 });

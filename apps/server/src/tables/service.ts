@@ -33,6 +33,8 @@ export interface CreateTableArgs {
   seatSpecs: SeatSpec[];
   hostPosition: number;
   options?: Record<string, unknown>;
+  /** the host's own setup choices as engine moves, applied once the session exists */
+  setupMoves?: Array<Record<string, unknown>>;
 }
 
 export interface TableRecord {
@@ -49,6 +51,8 @@ export interface TableRecord {
   result: GameOverResult | null;
   createdAt: string;
   finishedAt: string | null;
+  /** JSON: the host's setup choices as moves, applied when the session starts */
+  setupMoves: string;
 }
 
 export interface SeatRecord {
@@ -78,6 +82,7 @@ function tableFromRow(r: TablesTable): TableRecord {
     result: parseJson<GameOverResult | null>(r.result, null),
     createdAt: r.created_at,
     finishedAt: r.finished_at,
+    setupMoves: r.setup_moves ?? '[]',
   };
 }
 
@@ -186,6 +191,7 @@ export class TableService {
       engine_session_id: null,
       encrypted_host_token: null,
       options: JSON.stringify(args.options ?? {}),
+      setup_moves: JSON.stringify(args.setupMoves ?? []),
       next_actor_position: null,
       result: null,
       created_at: now(),
@@ -209,7 +215,15 @@ export class TableService {
     }
 
     if (!friendTable) {
-      await this.startEngineSession(tableId);
+      try {
+        await this.startEngineSession(tableId);
+      } catch (err) {
+        // A table against the AI that could not start (a setup choice the
+        // engine refused, or the engine down) leaves nothing behind.
+        await this.db.deleteFrom('seats').where('table_id', '=', tableId).execute();
+        await this.db.deleteFrom('tables').where('id', '=', tableId).execute();
+        throw err;
+      }
       return { tableId, status: 'playing' };
     }
     return { tableId, status: 'lobby' };
@@ -257,6 +271,14 @@ export class TableService {
       // Multi-device join tokens live under session.join and only exist with
       // two or more human seats. Solo-vs-AI gets none; Universe acts unauthenticated there.
       const hostToken = session.join?.host_token ?? null;
+      // The host's setup choices from the setup screen, as moves by the host's
+      // seat, in order. The engine validates each; a refusal fails the start.
+      const hostSeat = tableSeats.find((s) => s.position === hostPosition);
+      const hostPlayerId = hostSeat?.enginePlayerId ?? `p${hostPosition + 1}`;
+      const setupMoves = parseJson<Array<Record<string, unknown>>>(table.setupMoves, []);
+      for (const move of setupMoves) {
+        await this.engine.applyMove(session.session_id, hostPlayerId, hostToken ?? undefined, { move });
+      }
       await this.db.updateTable('tables').set({
         engine_session_id: session.session_id,
         encrypted_host_token: hostToken ? encryptToken(hostToken, this.secretKey) : null,
@@ -361,6 +383,30 @@ export class TableService {
       result: JSON.stringify(result),
       next_actor_position: null,
     }).where('id', '=', tableId).execute();
+  }
+
+  /** True when this principal hosts the table and nobody else holds a seat. */
+  async canDelete(principal: Principal, tableId: string): Promise<boolean> {
+    const table = await this.getTable(tableId);
+    if (!table || !isHostOf(table, principal)) return false;
+    const seats = await this.getSeats(tableId);
+    return seats.every((s) => s.kind === 'ai' || !(s.userId || s.guestId) || seatOwnedBy(s, principal));
+  }
+
+  /**
+   * Delete a table the principal may delete (canDelete): its events, seats,
+   * invites and notifications go with it. The engine keeps its session; the
+   * table's row was the only way to reach it.
+   */
+  async deleteTable(principal: Principal, tableId: string): Promise<void> {
+    if (!(await this.canDelete(principal, tableId))) {
+      throw new TableError('cannot_delete', 'Only the host can delete a table, and only while nobody else holds a seat');
+    }
+    await this.db.deleteFrom('notifications').where('table_id', '=', tableId).execute();
+    await this.db.deleteFrom('invites').where('table_id', '=', tableId).execute();
+    await this.db.deleteFrom('table_events').where('table_id', '=', tableId).execute();
+    await this.db.deleteFrom('seats').where('table_id', '=', tableId).execute();
+    await this.db.deleteFrom('tables').where('id', '=', tableId).execute();
   }
 
   async setNextActor(tableId: string, position: number | null): Promise<void> {

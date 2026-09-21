@@ -412,6 +412,62 @@ describe('REST', () => {
     expect((await app.fastify.inject({ method: 'GET', url: '/api/tables/nope/watch' })).statusCode).toBe(404);
   });
 
+  it("setup moves: the host's setup choices are applied by the host's seat before the table opens; a refused one fails the start cleanly", async () => {
+    const cookie = await guest();
+    const created = await app.fastify.inject({
+      method: 'POST', url: '/api/tables', headers: { origin: ORIGIN, cookie },
+      payload: { gameId: 'fractured-fist', mode: 'live', seats: [{ kind: 'human' }, { kind: 'ai' }], hostPosition: 0, setupMoves: [{ type: 'pass' }] },
+    });
+    expect(created.statusCode).toBe(200);
+    const { tableId } = created.json<CreateTableResponse>();
+    // The pass went to the engine as p1 before the opening events; the AI then opened.
+    expect(engine.applied).toEqual([{ session: 'session-1', player: 'p1', move: { type: 'pass' } }]);
+    const events = await app.realtime.eventsAfter(tableId, 0);
+    expect(events[0]!.summary).toContain('An AI opens');
+    expect(events.length).toBeGreaterThan(1);
+
+    const refused = await app.fastify.inject({
+      method: 'POST', url: '/api/tables', headers: { origin: ORIGIN, cookie },
+      payload: { gameId: 'fractured-fist', mode: 'live', seats: [{ kind: 'human' }, { kind: 'ai' }], hostPosition: 0, setupMoves: [{ type: 'illegal' }] },
+    });
+    expect(refused.statusCode).toBe(422);
+    expect(refused.json<{ error: string }>().error).toBe('setup_rejected');
+    // Nothing is left behind: the guest still has one table.
+    const mine = (await app.fastify.inject({ method: 'GET', url: '/api/my-tables', headers: { cookie } })).json<MyTablesResponse>();
+    expect(mine.tables).toHaveLength(1);
+    expect(mine.tables[0]!.deletable).toBe(true);
+    // Shape checks on the list.
+    expect((await app.fastify.inject({ method: 'POST', url: '/api/tables', headers: { origin: ORIGIN, cookie }, payload: { gameId: 'fractured-fist', mode: 'live', seats: [{ kind: 'human' }, { kind: 'ai' }], hostPosition: 0, setupMoves: 'nope' } })).statusCode).toBe(200);
+    expect((await app.fastify.inject({ method: 'POST', url: '/api/tables', headers: { origin: ORIGIN, cookie }, payload: { gameId: 'fractured-fist', mode: 'live', seats: [{ kind: 'human' }, { kind: 'ai' }], hostPosition: 0, setupMoves: [1] } })).statusCode).toBe(400);
+  });
+
+  it('delete: the host removes a table nobody else sits at, with everything the table owned; anyone else is refused', async () => {
+    const host = await signIn('del-host@example.com');
+    const other = await signIn('del-other@example.com');
+    const ai = (await app.fastify.inject({
+      method: 'POST', url: '/api/tables', headers: { origin: ORIGIN, cookie: host },
+      payload: { gameId: 'fractured-fist', mode: 'live', seats: [{ kind: 'human' }, { kind: 'ai' }], hostPosition: 0 },
+    })).json<CreateTableResponse>();
+    expect((await app.fastify.inject({ method: 'DELETE', url: `/api/tables/${ai.tableId}`, headers: { origin: ORIGIN, cookie: other } })).statusCode).toBe(403);
+    expect((await app.fastify.inject({ method: 'DELETE', url: `/api/tables/${ai.tableId}`, headers: { origin: ORIGIN, cookie: host } })).statusCode).toBe(200);
+    expect((await app.fastify.inject({ method: 'GET', url: `/api/tables/${ai.tableId}`, headers: { cookie: host } })).statusCode).toBe(404);
+    expect(await db.selectFrom('table_events').select('id').where('table_id', '=', ai.tableId).execute()).toHaveLength(0);
+    expect(await db.selectFrom('seats').select('id').where('table_id', '=', ai.tableId).execute()).toHaveLength(0);
+    expect((await app.fastify.inject({ method: 'DELETE', url: `/api/tables/${ai.tableId}`, headers: { origin: ORIGIN, cookie: host } })).statusCode).toBe(404);
+
+    // A lobby with a friend seated is not the host's alone any more.
+    const lobby = (await app.fastify.inject({
+      method: 'POST', url: '/api/tables', headers: { origin: ORIGIN, cookie: host },
+      payload: { gameId: 'fractured-fist', mode: 'live', seats: [{ kind: 'human' }, { kind: 'human' }], hostPosition: 0 },
+    })).json<CreateTableResponse>();
+    let mine = (await app.fastify.inject({ method: 'GET', url: '/api/my-tables', headers: { cookie: host } })).json<MyTablesResponse>();
+    expect(mine.tables.find((t) => t.id === lobby.tableId)!.deletable).toBe(true);
+    await app.fastify.inject({ method: 'POST', url: `/api/tables/${lobby.tableId}/join`, headers: { origin: ORIGIN, cookie: other } });
+    mine = (await app.fastify.inject({ method: 'GET', url: '/api/my-tables', headers: { cookie: host } })).json<MyTablesResponse>();
+    expect(mine.tables.find((t) => t.id === lobby.tableId)!.deletable).toBe(false);
+    expect((await app.fastify.inject({ method: 'DELETE', url: `/api/tables/${lobby.tableId}`, headers: { origin: ORIGIN, cookie: host } })).statusCode).toBe(403);
+  });
+
   it('rate limits sign-in links per address', async () => {
     let last = 200;
     for (let i = 0; i < 6; i++) {

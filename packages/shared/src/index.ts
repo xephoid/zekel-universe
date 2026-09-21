@@ -185,6 +185,9 @@ export interface TableSummary {
   nextActorPosition: number | null;
   /** the requesting principal is up next */
   waitingOnMe: boolean;
+  /** the requesting principal may delete this table: they host it and no
+   *  other person holds a seat (a game against the AI, or a lobby nobody joined) */
+  deletable: boolean;
 }
 
 /** GET /api/tables/:id */
@@ -213,6 +216,15 @@ export interface CreateTableRequest {
   hostPosition: number;
   /** the game's own setup options, as the engine's options schema describes */
   options?: Record<string, unknown>;
+  /**
+   * The game's own setup choices the host made on the setup screen that the
+   * engine takes as moves once the session exists (a faction per seat, the
+   * foe, a character). Applied in order by the host's seat right after the
+   * session is created, before the table opens; the engine validates each
+   * one, and a refused move fails the creation. Only for choices that are
+   * the host's to make: a friend's own choices stay at the table.
+   */
+  setupMoves?: Array<Record<string, unknown>>;
 }
 
 export interface CreateTableResponse {

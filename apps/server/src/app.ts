@@ -14,6 +14,7 @@ import type {
   GamesResponse, InvitesResponse, JoinTableAck, JoinTableMessage, MeResponse, MoveAck, MoveMessage, MyTablesResponse,
   SeatSummary, TableEventsResponse, TableInvite, TableResponse, TableStatus, TableSummary, UndoAck, UndoMessage, GameUpdate, UpdatesResponse, DesignerResponse, WatchResponse } from '@universe/shared';
 import { SOCKET_EVENTS } from '@universe/shared';
+import { EngineError } from '@universe/engine-client';
 
 import type { DB } from './db/schema.js';
 import { parseJson } from './db/index.js';
@@ -771,6 +772,7 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
       hostIsMe: isHostOf(table, p),
       nextActorPosition: table.nextActorPosition,
       waitingOnMe: !!next && ownsSeat(next, p),
+      deletable: isHostOf(table, p) && seats.every((s) => s.kind === 'ai' || !(s.userId || s.guestId) || ownsSeat(s, p)),
     };
   }
 
@@ -783,13 +785,38 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     if (!body.gameId || !body.mode || !Array.isArray(body.seats) || body.hostPosition === undefined) {
       throw new HttpError(400, 'bad_request', 'gameId, mode, seats and hostPosition are required');
     }
-    return tableService.createTable(p, {
-      gameId: body.gameId,
-      mode: body.mode,
-      seatSpecs: body.seats,
-      hostPosition: body.hostPosition,
-      options: body.options && typeof body.options === 'object' ? body.options : {},
-    });
+    const setupMoves = Array.isArray(body.setupMoves) ? body.setupMoves : [];
+    if (setupMoves.length > 20 || setupMoves.some((m) => !m || typeof m !== 'object' || Array.isArray(m))) {
+      throw new HttpError(400, 'bad_request', 'setupMoves must be a short list of move objects');
+    }
+    try {
+      return await tableService.createTable(p, {
+        gameId: body.gameId,
+        mode: body.mode,
+        seatSpecs: body.seats,
+        hostPosition: body.hostPosition,
+        options: body.options && typeof body.options === 'object' ? body.options : {},
+        setupMoves,
+      });
+    } catch (err) {
+      // A setup choice the engine refused reads as a rule, not a fault.
+      if (err instanceof EngineError && err.isRuleRejection) throw new HttpError(422, 'setup_rejected', err.message);
+      throw err;
+    }
+  });
+
+  app.delete('/api/tables/:id', async (req) => {
+    const p = await requirePrincipal(req);
+    const { id } = req.params as { id: string };
+    const table = await tableService.getTable(id);
+    if (!table) throw new HttpError(404, 'no_table');
+    try {
+      await tableService.deleteTable(p, id);
+    } catch (err) {
+      if (err instanceof TableError && err.code === 'cannot_delete') throw new HttpError(403, err.code, err.message);
+      throw err;
+    }
+    return { ok: true };
   });
 
   app.post('/api/tables/:id/join', async (req) => {
