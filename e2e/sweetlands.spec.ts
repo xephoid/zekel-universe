@@ -20,41 +20,41 @@ async function menuRow(page: Page, pattern: RegExp) {
 test('Sweetlands: the player makes every setup choice, draws with the button, and plays a card through the chooser', async ({ page }) => {
   await page.goto('/games/sweetlands-imperium/setup');
   await expect(page.getByRole('heading', { name: 'Set up the table' })).toBeVisible();
-  await expect(page.getByRole('group', { name: 'Seat 2' })).toBeVisible();
-  await page.getByRole('button', { name: 'Start the game' }).click();
+  await expect(page.getByRole('group', { name: 'Seat 2', exact: true })).toBeVisible();
+
+  // 1. On the setup screen, against the AI: every faction and the foe are
+  //    the host's to choose, with nothing preselected and no start until then.
+  const start = page.getByRole('button', { name: 'Start the game' });
+  await expect(start).toBeDisabled();
+  await expect(page.getByRole('group', { name: 'Your faction' }).getByRole('radio', { checked: true })).toHaveCount(0);
+  await page.getByRole('group', { name: 'Your faction' }).getByRole('radio', { name: 'Grand Vizier Cheesecake' }).check();
+  await page.getByRole('group', { name: /Seat 2's faction/ }).getByRole('radio', { name: 'Princess Jellybean' }).check();
+  await expect(start).toBeDisabled();
+  await page.getByRole('group', { name: 'The castle foe' }).getByRole('radio', { name: 'Orc' }).check();
+  await expect(start).toBeEnabled();
+  await start.click();
   await expect(page).toHaveURL(/\/table\//, { timeout: 20_000 });
   await expect(page.locator('.turn-pill')).toHaveText(/^Your move/, { timeout: 30_000 });
 
-  // The board: 80 spaces, 4 starts and the castle, with the treat art in place.
+  // The board: 80 spaces, 4 starts and the castle, with the treat art in
+  // place, the factions seated and the foe in the castle.
   await expect(page.locator('.zk-map-node')).toHaveCount(85);
   await expect(page.locator('.zk-map-art')).toHaveCount(8);
-  await expect(page.locator('.round-note')).toHaveText('Setup · Factions');
-
-  // 1. Factions: a form with nothing preselected; the Send button waits.
-  await menuRow(page, /Assign each player a faction/);
-  const factions = page.getByRole('dialog', { name: 'Choose factions' });
-  await expect(factions).toBeVisible();
-  const send = factions.getByRole('button', { name: 'Seat the factions' });
-  await expect(send).toBeDisabled();
-  await expect(factions.getByRole('radio', { checked: true })).toHaveCount(0);
-  await factions.getByRole('group', { name: 'p1 (you)' }).getByRole('radio', { name: 'Grand Vizier Cheesecake' }).check();
-  await expect(send).toBeDisabled();
-  await factions.getByRole('group', { name: 'p2 (AI)' }).getByRole('radio', { name: 'Princess Jellybean' }).check();
-  await expect(send).toBeEnabled();
-  await send.click();
-  await expect(page.locator('.log li').first()).toContainText('Factions assigned', { timeout: 20_000 });
   await expect(page.locator('.zk-portrait')).toHaveCount(2);
-
-  // 2. The foe: the castle lights up; the chooser offers the engine's three moves.
-  await expect(page.locator('.round-note')).toHaveText('Setup · Foe');
-  const castle = page.locator('.zk-map-blob.zk-lit');
-  await expect(castle).toHaveAttribute('aria-label', 'Candy Castle');
-  await castle.click();
-  const chooser = page.getByRole('dialog', { name: 'Which move?' });
-  await expect(chooser.locator('.chooser button')).toHaveCount(3);
-  await chooser.getByRole('button', { name: /Choose the orc/ }).click();
-  await expect(page.locator('.log li').first()).toContainText('ORC', { timeout: 20_000 });
   await expect(page.locator('.zk-map-badges').filter({ hasText: 'Orc' })).toHaveCount(1);
+  await expect(page.locator('.zk-tableau').filter({ hasText: 'Grand Vizier Cheesecake (you)' })).toHaveCount(1);
+  await expect(page.locator('.zk-tableau').filter({ hasText: 'Princess Jellybean' })).toHaveCount(1);
+
+  // 2. Two seats cannot share a faction: the setup screen says so before the
+  //    engine would. (On a second setup page, so this table is untouched.)
+  const other = await page.context().newPage();
+  await other.goto('/games/sweetlands-imperium/setup');
+  await other.getByRole('group', { name: 'Your faction' }).getByRole('radio', { name: 'General Fudge' }).check();
+  await other.getByRole('group', { name: /Seat 2's faction/ }).getByRole('radio', { name: 'General Fudge' }).check();
+  await other.getByRole('group', { name: 'The castle foe' }).getByRole('radio', { name: 'Dragon' }).check();
+  await other.getByRole('button', { name: 'Start the game' }).click();
+  await expect(other.getByRole('alert')).toContainText('same faction');
+  await other.close();
 
   // 3. The secret objective: a menu row; the kept card shows in the bench.
   await expect(page.locator('.round-note')).toHaveText('Setup · Secrets');

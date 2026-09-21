@@ -36,33 +36,31 @@ async function tryRow(page: Page, row: ReturnType<Page['locator']>): Promise<boo
 test('Warble Way: the character is the player\'s to create, and dice and cards wait for the button', async ({ page }) => {
   await page.goto('/games/warble-way-galaxy/setup');
   await expect(page.getByRole('heading', { name: 'Set up the table' })).toBeVisible();
-  await page.getByRole('button', { name: 'Start the game' }).click();
+
+  // The character is created on the setup screen: every answer is the
+  // player's, nothing is preselected, and the start waits for them.
+  const start = page.getByRole('button', { name: 'Start the game' });
+  await expect(start).toBeDisabled();
+  await page.getByLabel("Your character's name").fill('Zara');
+  await page.getByRole('group', { name: 'Race' }).getByRole('radio', { name: 'Grull' }).check();
+  await page.getByLabel("Your ship's name").fill('Wandering Star');
+  await page.getByRole('group', { name: 'Ability scores' }).getByRole('radio', { name: 'Choose the scores' }).check();
+  await expect(start).toBeDisabled(); // scores still empty
+  await page.getByLabel(/Swashbuckling/).fill('3');
+  await page.getByLabel(/Hacking/).fill('2');
+  await page.getByLabel(/Sneaking/).fill('1');
+  for (const other of ['Armor', 'Demolitions', 'Research', 'Mechanics', 'Piloting', 'Gunslinging', 'Leadership', 'Diplomacy', 'Acting']) {
+    await page.getByLabel(new RegExp(other)).fill('0');
+  }
+  await page.getByRole('group', { name: /Disposition/ }).getByRole('radio', { name: 'Brash' }).check();
+  await expect(start).toBeEnabled();
+  await start.click();
   await expect(page).toHaveURL(/\/table\//, { timeout: 20_000 });
   await expect(page.locator('.turn-pill')).toHaveText(/^Your move/, { timeout: 30_000 });
-
-  // Two skeletons on the menu; the first opens the form with empty answers.
-  const rows = page.locator('.move-menu ol button');
-  await expect(rows.filter({ hasText: /Create your character/ })).toHaveCount(1);
-  await rows.filter({ hasText: /Create your character/ }).click();
-  const form = page.getByRole('dialog', { name: 'Create your character' });
-  await expect(form).toBeVisible();
-  const begin = form.getByRole('button', { name: 'Begin the season' });
-  await expect(begin).toBeDisabled();
-  await expect(form.getByRole('radio', { checked: true })).toHaveCount(0);
-  await expect(form.getByLabel('Character name')).toHaveValue('');
-  await form.getByLabel('Character name').fill('Zara');
-  await form.getByRole('group', { name: 'Race' }).getByRole('radio', { name: 'Grull' }).check();
-  await form.getByLabel('Ship name').fill('Wandering Star');
-  await form.getByRole('group', { name: /Disposition/ }).getByRole('radio', { name: 'Brash' }).check();
-  await expect(begin).toBeDisabled(); // scores still empty
-  await form.getByLabel(/Swashbuckling/).fill('3');
-  await form.getByLabel(/Hacking/).fill('2');
-  await form.getByLabel(/Sneaking/).fill('1');
-  await expect(begin).toBeEnabled();
-  await begin.click();
-  await expect(log(page)).not.toHaveText('The table is set.', { timeout: 30_000 });
   await expect(page.locator('.zk-tableau').filter({ hasText: 'Zara' }).first()).toBeVisible();
   await expect(page.locator('.zk-tableau').filter({ hasText: 'Wandering Star' }).first()).toBeVisible();
+  const rows = page.locator('.move-menu ol button');
+  await expect(rows.filter({ hasText: /Create your character/ })).toHaveCount(0);
 
   // Take a mission to launch into space, then draw and roll only by pressing.
   await expect(page.locator('.turn-pill')).toHaveText(/^Your move/, { timeout: 30_000 });

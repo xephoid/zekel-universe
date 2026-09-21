@@ -11,7 +11,10 @@ feed, and browsing by player count, play time and tag with search. A game
 page carries the designer's devlog and a link to the rules as the engine
 states them; each designer has a profile. Any table has a share link that
 lets anyone watch it: the engine's public view, whose turn it is, and the
-log, with no seat and no way to act.
+log, with no seat and no way to act. My tables lists every table of yours,
+and a table you host alone can be deleted there. The setup screen asks
+every one of the game's own choices the host may make, factions and foe
+and character included, before the table starts.
 
 A guest opens a game page, presses Play now, makes the game's own setup
 choices, and plays a complete game of Fractured Fist against the AI in the

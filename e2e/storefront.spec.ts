@@ -82,4 +82,17 @@ test('a stranger with a game link is playing in under a minute; browsing, the de
   // The designers' place in the navigation.
   await page.locator('.topnav').getByRole('link', { name: 'Designers' }).click();
   await expect(page.getByRole('heading', { name: 'Designers' })).toBeVisible();
+
+  // My tables: only this guest's tables, and the one against the AI can be deleted.
+  await page.locator('.topnav').getByRole('link', { name: /My tables/ }).click();
+  await expect(page.getByRole('heading', { name: 'My tables', level: 1 })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Featured' })).toHaveCount(0);
+  const row = page.locator(`.table-row[data-table-id="${tableId}"]`);
+  await expect(row).toBeVisible();
+  await row.getByRole('button', { name: /Delete/ }).click();
+  await expect(row.getByText('Delete this table?')).toBeVisible();
+  await row.getByRole('button', { name: 'Yes, delete' }).click();
+  await expect(row).toHaveCount(0);
+  expect((await page.request.get(`/api/tables/${tableId}`)).status()).toBe(404);
+  expect((await watcher.request.get(`/api/tables/${tableId}/watch`)).status()).toBe(404);
 });

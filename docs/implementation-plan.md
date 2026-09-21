@@ -536,6 +536,29 @@ the canvas:
   is a row of larger cards, not a rotated fan. The sign-in card offers email
   only, since v0 has no other provider.
 
+Added on request (2026-09-21):
+
+- **My tables has its own page** (`/tables`, where the bar's My tables
+  points): every table of yours, grouped by your move, in progress, in the
+  lobby and finished, and nothing else. A table you host alone (against
+  the AI, or a lobby nobody joined) can be deleted there, with a confirm
+  in the row; `DELETE /api/tables/:id` refuses any other case (403), and
+  takes the table's events, seats, invites and notifications with it. The
+  engine keeps its session.
+- **Every setup choice on the setup screen.** Some games take their setup
+  choices only as moves once the session exists (Sweetlands' factions and
+  foe, Warble Way's character), so the setup screen asked for nothing and
+  the table asked instead. Now a glue lists those choices as setup fields
+  (choice, multi, text or number), turns the answers into `setupMoves`,
+  and the server applies them by the host's seat right after the session
+  is created and before the table opens; a refused one fails the start
+  with the engine's reason (422) and leaves no table behind. Choices that
+  belong to a friend who is not at the setup screen (their faction) stay
+  at the table; a table against the AI has the host make them all. The
+  Cybernoir rules choice the engine takes as an option (when Overclock
+  grants the draws) is a setup field too. The table's own forms remain for
+  tables that reach a choice unanswered.
+
 Still open:
 
 - The engine's Postgres session store (section 13) before the first Heroku
