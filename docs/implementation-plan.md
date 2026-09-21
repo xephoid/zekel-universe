@@ -556,8 +556,11 @@ Added on request (2026-09-21):
   belong to a friend who is not at the setup screen (their faction) stay
   at the table; a table against the AI has the host make them all. The
   Cybernoir rules choice the engine takes as an option (when Overclock
-  grants the draws) is a setup field too. The table's own forms remain for
-  tables that reach a choice unanswered.
+  grants the draws) is a setup field too, and so is which role the host
+  plays, Detective or Hacker: it becomes the engine's `detective` option,
+  the Detective's player id by seat position, and the other seat takes the
+  other role. The table's own forms remain for tables that reach a choice
+  unanswered.
 
 Still open:
 
