@@ -18,7 +18,7 @@
 
 import type { CardData, TrackData } from '@universe/primitives';
 import type { GameReferenceResponse } from '@universe/shared';
-import type { GlueModule, GlueInput, LegalMove, SelectEvent, SetupField, TablePlan, Zone } from './types';
+import type { GlueModule, GlueInput, LegalMove, SelectEvent, SetupField, TablePlan, Zone, SetupSeat } from './types';
 import { asArr, asNum, asStr, isObj, shapeHas, words } from './types';
 import { trackIdentities, type IdentityState } from './identity';
 
@@ -312,7 +312,7 @@ export const fracturedFistGlue: GlueModule = {
     return legalMoves.find((m) => m.move['type'] === 'resolve_report') ?? null;
   },
 
-  setupFields(reference: GameReferenceResponse): SetupField[] {
+  setupFields(reference: GameReferenceResponse, _seats?: SetupSeat[]): SetupField[] {
     // The loadout is a printed-rules decision: the seven techniques in play.
     // The engine's options schema names the option; its reference data
     // lists every technique. The player picks; nothing is preselected.

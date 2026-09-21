@@ -147,10 +147,11 @@ describe('fractured-fist glue', () => {
   it('presents the loadout as a seven-pick with nothing preselected', () => {
     const fields = g.setupFields(FF_REFERENCE);
     expect(fields).toHaveLength(1);
-    expect(fields[0]!.kind).toBe('multi');
-    expect(fields[0]!.pick).toBe(7);
-    expect(fields[0]!.options.map((o) => o.value)).toEqual(['quicken', 'center', 'attack', 'block', 'grand-finale']);
-    expect(fields[0]!.options.find((o) => o.value === 'grand-finale')!.hint).toContain('Titan Entertainment');
+    const f = fields[0]!;
+    if (f.kind !== 'multi') throw new Error('the loadout is a multi pick');
+    expect(f.pick).toBe(7);
+    expect(f.options.map((o) => o.value)).toEqual(['quicken', 'center', 'attack', 'block', 'grand-finale']);
+    expect(f.options.find((o) => o.value === 'grand-finale')!.hint).toContain('Titan Entertainment');
   });
 });
 
@@ -195,6 +196,25 @@ describe('warble-way-galaxy glue', () => {
     const moves = [{ move_id: 'r', description: 'Roll 3d6 + SNE', move: { type: 'resolve_report' } }];
     expect(g.resolveReportMove(moves)?.move_id).toBe('r');
     expect(g.diceFor!({ engineMove: null, summary: 'Rolled 3, 5 + 1 for research.', view: null })).toEqual([3, 5, 1]);
+  });
+  it('setup screen: the character is created from the answers, as one create_character move', () => {
+    const ref: GameReferenceResponse = {
+      gameId: 'warble-way-galaxy', rules: '', moveSchema: {}, optionsSchema: {},
+      referenceData: {
+        stats: { brawn: ['SWA (Swashbuckling)'], smarts: ['HAK (Hacking)'] },
+        races: ['human', 'grull'],
+        archetypes: [{ id: 'void-runner', name: 'Void Runner', scores: { SNE: 3 }, difficulty: 'easy', stars: '★' }],
+      },
+    };
+    const seats = [{ position: 0, kind: 'human' as const, host: true }];
+    const fields = g.setupFields(ref, seats);
+    expect(fields.map((f) => f.key)).toEqual(['character_name', 'race', 'ship_name', 'method', 'score.SWA', 'score.HAK', 'archetype_name', 'disposition']);
+    expect(g.setupMoves!({ character_name: 'Zara', race: 'grull', ship_name: 'Wasp', method: 'recommended', 'score.SWA': '3', 'score.HAK': '2', disposition: 'brash' }, seats, ref))
+      .toEqual([{ type: 'create_character', character_name: 'Zara', race: 'grull', ship_name: 'Wasp', method: 'recommended', disposition: 'brash', scores: { SWA: 3, HAK: 2 } }]);
+    expect(g.setupMoves!({ character_name: 'Zara', race: 'human', ship_name: 'Wasp', method: 'archetype', archetype_name: 'Void Runner', disposition: 'none' }, seats, ref))
+      .toEqual([{ type: 'create_character', character_name: 'Zara', race: 'human', ship_name: 'Wasp', method: 'archetype', archetype_name: 'Void Runner' }]);
+    // Unanswered: no move, so the table asks instead.
+    expect(g.setupMoves!({ character_name: 'Zara' }, seats, ref)).toEqual([]);
   });
   it('character creation is a form the player fills in, with the races, abilities and archetypes from the reference data', () => {
     const ref: GameReferenceResponse = {
@@ -388,6 +408,25 @@ describe('sweetlands-imperium glue', () => {
     expect(tf.build({ treatRegion: '3', treatSlot: 'random' })).toMatchObject({ treatRegion: 3, treatSlot: 'random', cardId: 'i3' });
     // A complete move has no form.
     expect(formForMove(g, SL_MOVES[6]!, inp)).toBeNull();
+  });
+  it('setup screen: against the AI the host picks every faction and the foe, which become the setup moves; with a friend the factions stay at the table', () => {
+    const seats = [{ position: 0, kind: 'human' as const, host: true }, { position: 1, kind: 'ai' as const, host: false, aiDifficulty: 'easy' }];
+    const ref: GameReferenceResponse = { ...SL_REFERENCE, referenceData: { ...(SL_REFERENCE.referenceData as object), foes: [{ type: 'dragon', dice: 5 }, { type: 'orc', dice: 3 }] } };
+    const fields = g.setupFields(ref, seats);
+    expect(fields.map((f) => [f.key, f.kind])).toEqual([['faction.p1', 'choice'], ['faction.p2', 'choice'], ['foe', 'choice']]);
+    const f1 = fields[0]!;
+    if (f1.kind !== 'choice') throw new Error('choice');
+    expect(f1.options.map((o) => o.value)).toEqual(['milkshake', 'fudge', 'jellybean', 'cheesecake']); // no Nomads at two seats
+    expect(g.setupMoves!({ 'faction.p1': 'cheesecake', 'faction.p2': 'jellybean', foe: 'orc' }, seats, ref)).toEqual([
+      { type: 'assign_setup_choices', selections: { p1: 'cheesecake', p2: 'jellybean' } },
+      { type: 'choose_foe', foe: 'orc' },
+    ]);
+    // Half an answer sends nothing for that step.
+    expect(g.setupMoves!({ 'faction.p1': 'cheesecake', foe: 'orc' }, seats, ref)).toEqual([{ type: 'choose_foe', foe: 'orc' }]);
+    // A friend's seat: their faction is theirs to choose at the table.
+    const withFriend = [seats[0]!, { position: 1, kind: 'human' as const, host: false }];
+    expect(g.setupFields(ref, withFriend)).toEqual([]);
+    expect(g.setupFields(ref)).toEqual([]);
   });
   it('shows the Draw button for a pending report and reads no dice (sugar dice are not d6)', () => {
     const draw = { move_id: 'r', description: 'Draw 2 Intel card(s) (the server deals them when you press this).', move: { type: 'resolve_report' } };

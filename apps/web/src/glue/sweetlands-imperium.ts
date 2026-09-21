@@ -15,7 +15,7 @@
 
 import type { CardData, MapNode, TableauData } from '@universe/primitives';
 import type { GameReferenceResponse } from '@universe/shared';
-import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, SelectEvent, SetupField, TablePlan, Zone } from './types';
+import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, SelectEvent, SetupAnswers, SetupField, SetupSeat, TablePlan, Zone } from './types';
 import { asArr, asNum, asStr, isObj, shapeHas, words } from './types';
 import { answerList, answerText } from './forms';
 import { SPACES, REGION_FACTION, SPACE_COLORS, TREATS, BOARD } from './sweetlands-board';
@@ -416,10 +416,47 @@ export const sweetlandsGlue: GlueModule = {
     return legalMoves.find((m) => m.move['type'] === 'resolve_report') ?? null;
   },
 
-  setupFields(_reference: GameReferenceResponse): SetupField[] {
-    // Factions, the foe and the secret objectives are chosen at the table,
-    // where the engine offers them as legal moves.
-    return [];
+  /**
+   * Against the AI the host makes every setup choice here: a faction per
+   * seat (the AI seats' too, as the engine asks the first human to assign
+   * them all) and the castle foe. With a friend at the table the factions
+   * stay at the table, since each person chooses their own; the secret
+   * objectives are dealt in play and always stay there.
+   */
+  setupFields(reference: GameReferenceResponse, seats?: SetupSeat[]): SetupField[] {
+    if (!seats || seats.some((s) => s.kind === 'human' && !s.host)) return [];
+    const factions = referenceFactions(reference).filter((f) => seats.length === 5 ? true : f.id !== 'nomads');
+    if (factions.length === 0) return [];
+    const options = factions.map((f) => ({ value: f.id, label: f.name, hint: f.ability }));
+    const fields: SetupField[] = seats.map((s) => ({
+      kind: 'choice', key: `faction.p${s.position + 1}`,
+      label: s.host ? 'Your faction' : `Seat ${s.position + 1}'s faction (AI${s.aiDifficulty ? `, ${s.aiDifficulty}` : ''})`,
+      help: s.host ? 'No two seats share a faction.' : undefined,
+      options,
+    }));
+    const rd = reference.referenceData;
+    const foes = isObj(rd) ? asArr(rd['foes']).flatMap((f) => (isObj(f) && typeof f['type'] === 'string' ? [{ type: f['type'], dice: asNum(f['dice']) }] : [])) : [];
+    if (foes.length > 0) {
+      fields.push({
+        kind: 'choice', key: 'foe', label: 'The castle foe',
+        help: 'Guards the Candy Castle until a knight defeats it.',
+        options: foes.map((f) => ({ value: f.type, label: words(f.type), hint: f.dice ? `rolls ${f.dice} dice` : undefined })),
+      });
+    }
+    return fields;
+  },
+
+  setupMoves(answers: SetupAnswers, seats: SetupSeat[], _reference: GameReferenceResponse): Array<Record<string, unknown>> {
+    const selections: Record<string, string> = {};
+    for (const s of seats) {
+      const v = answers[`faction.p${s.position + 1}`];
+      if (typeof v === 'string' && v) selections[`p${s.position + 1}`] = v;
+    }
+    const moves: Array<Record<string, unknown>> = [];
+    if (Object.keys(selections).length === seats.length) moves.push({ type: 'assign_setup_choices', selections });
+    const foe = answers['foe'];
+    if (typeof foe === 'string' && foe) moves.push({ type: 'choose_foe', foe });
+    return moves;
   },
 
   diceFor() {

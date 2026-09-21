@@ -58,15 +58,23 @@ export interface TablePlan {
 }
 
 /** One of the game's own setup choices, presented as a field the player fills in. */
-export interface SetupField {
-  key: string;
-  label: string;
-  help?: string;
-  kind: 'choice' | 'multi';
-  options: Array<{ value: string; label: string; hint?: string }>;
-  /** for multi: exactly this many */
-  pick?: number;
+export type SetupField =
+  | { key: string; label: string; help?: string; kind: 'choice'; options: Array<{ value: string; label: string; hint?: string }> }
+  | { key: string; label: string; help?: string; kind: 'multi'; options: Array<{ value: string; label: string; hint?: string }>; /** exactly this many */ pick: number }
+  | { key: string; label: string; help?: string; kind: 'text'; placeholder?: string; maxLength?: number }
+  | { key: string; label: string; help?: string; kind: 'number'; min?: number; max?: number };
+
+/** A seat as the setup screen has it: who sits there, before the table exists. */
+export interface SetupSeat {
+  position: number;
+  kind: 'human' | 'ai';
+  /** the host's own seat */
+  host: boolean;
+  aiDifficulty?: string;
 }
+
+/** The answers on the setup screen, by field key; multi picks are lists. */
+export type SetupAnswers = Record<string, string | string[]>;
 
 /** One question a template move asks the player before it can be sent. */
 export type FormField =
@@ -113,8 +121,20 @@ export interface GlueModule {
   formFor?(move: LegalMove, input: GlueInput): MoveForm | null;
   /** Roll/Draw appears iff a legal move is a resolve_report */
   resolveReportMove(legalMoves: LegalMove[]): LegalMove | null;
-  /** The game's own setup choices, from the engine's options schema and reference data. */
-  setupFields(reference: GameReferenceResponse): SetupField[];
+  /**
+   * The game's own setup choices, from the engine's options schema and
+   * reference data, for the seats as set up. Choices that belong to a friend
+   * who is not here yet are not listed; they stay at the table.
+   */
+  setupFields(reference: GameReferenceResponse, seats?: SetupSeat[]): SetupField[];
+  /** The part of the answers that goes to the engine as session options. */
+  setupOptions?(answers: SetupAnswers, seats: SetupSeat[]): Record<string, unknown>;
+  /**
+   * The part of the answers the engine takes as moves once the session
+   * exists (a faction per seat, the foe, a character), by the host's seat,
+   * in order. The server applies them before the table opens.
+   */
+  setupMoves?(answers: SetupAnswers, seats: SetupSeat[], reference: GameReferenceResponse): Array<Record<string, unknown>>;
   /** A caption for a roll or draw event, when the glue can read the result. */
   diceFor?(event: { engineMove: Record<string, unknown> | null; summary: string; view: unknown }): number[] | null;
 }

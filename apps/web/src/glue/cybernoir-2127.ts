@@ -7,7 +7,7 @@
 
 import type { CardData, MapNode, TableauData } from '@universe/primitives';
 import type { GameReferenceResponse } from '@universe/shared';
-import type { GlueModule, GlueInput, LegalMove, SelectEvent, SetupField, TablePlan, Zone } from './types';
+import type { GlueModule, GlueInput, LegalMove, SelectEvent, SetupField, TablePlan, Zone, SetupAnswers, SetupSeat } from './types';
 import { asArr, asNum, asStr, isObj, shapeHas, words } from './types';
 
 const PALETTE: Record<string, string> = {
@@ -225,9 +225,26 @@ export const cybernoirGlue: GlueModule = {
     return legalMoves.find((m) => m.move['type'] === 'resolve_report') ?? null;
   },
 
-  setupFields(_reference: GameReferenceResponse): SetupField[] {
-    return [];
+  setupFields(reference: GameReferenceResponse, _seats?: SetupSeat[]): SetupField[] {
+    // The engine's options schema names one rules choice: when Overclock
+    // grants the Detective two Location draws.
+    const schema = reference.optionsSchema;
+    const props = isObj(schema) && isObj(schema['properties']) ? schema['properties'] : {};
+    const timing = isObj(props['overclock_draw_timing']) ? props['overclock_draw_timing'] : null;
+    const values = timing && Array.isArray(timing['enum']) ? timing['enum'].map((v) => String(v)) : [];
+    if (values.length === 0) return [];
+    return [{
+      kind: 'choice', key: 'overclock_draw_timing', label: 'Overclock: when the Detective draws the two Locations',
+      help: typeof timing?.['description'] === 'string' ? timing['description'] : undefined,
+      options: values.map((v) => ({ value: v, label: words(v) })),
+    }];
   },
+
+  setupOptions(answers: SetupAnswers): Record<string, unknown> {
+    const v = answers['overclock_draw_timing'];
+    return typeof v === 'string' && v ? { overclock_draw_timing: v } : {};
+  },
+
 };
 
 export default cybernoirGlue;

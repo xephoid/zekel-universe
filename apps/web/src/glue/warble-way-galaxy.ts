@@ -7,7 +7,7 @@
 
 import type { CardData, GridData, TableauData } from '@universe/primitives';
 import type { GameReferenceResponse } from '@universe/shared';
-import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, SelectEvent, SetupField, TablePlan, Zone } from './types';
+import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, SelectEvent, SetupAnswers, SetupField, SetupSeat, TablePlan, Zone } from './types';
 import { asArr, asNum, asStr, isObj, shapeHas, words } from './types';
 import { answerNumber, answerText } from './forms';
 
@@ -262,10 +262,47 @@ export const warbleWayGlue: GlueModule = {
     return legalMoves.find((m) => m.move['type'] === 'resolve_report') ?? null;
   },
 
-  setupFields(_reference: GameReferenceResponse): SetupField[] {
-    // Character creation is a checklist step the engine offers as legal
-    // moves once the session exists; the table presents it there (formFor).
-    return [];
+  /** Character creation on the setup screen: the same questions as the
+   *  table's form, answered before the season starts. */
+  setupFields(reference: GameReferenceResponse, _seats?: SetupSeat[]): SetupField[] {
+    const races = raceOptions(reference);
+    const abilities = abilityOptions(reference);
+    const archetypes = archetypeOptions(reference);
+    if (races.length === 0 || abilities.length === 0) return [];
+    const fields: SetupField[] = [
+      { kind: 'text', key: 'character_name', label: 'Your character\'s name', maxLength: 40 },
+      { kind: 'choice', key: 'race', label: 'Race', options: races.map((r) => ({ value: r, label: words(r) })) },
+      { kind: 'text', key: 'ship_name', label: 'Your ship\'s name', maxLength: 40 },
+      {
+        kind: 'choice', key: 'method', label: 'Ability scores',
+        help: 'Recommended: one score 3, one 2, one 1. Or an archetype card, a pre-built spread with a printed difficulty.',
+        options: [{ value: 'recommended', label: 'Choose the scores' }, ...(archetypes.length ? [{ value: 'archetype', label: 'An archetype card' }] : [])],
+      },
+    ];
+    for (const a of abilities) fields.push({ kind: 'number', key: `score.${a.code}`, label: `${a.name} (${a.code}, ${words(a.stat)})`, min: 0, max: 3 });
+    if (archetypes.length) fields.push({ kind: 'choice', key: 'archetype_name', label: 'Archetype card', options: archetypes.map((a) => ({ value: a.name, label: a.label })) });
+    fields.push({ kind: 'choice', key: 'disposition', label: 'Disposition (a roleplay hint, never a rule)', options: [
+      { value: 'none', label: 'No hint' }, { value: 'brash', label: 'Brash' }, { value: 'risk_averse', label: 'Risk-averse' },
+    ] });
+    return fields;
+  },
+
+  setupMoves(answers: SetupAnswers, _seats: SetupSeat[], reference: GameReferenceResponse): Array<Record<string, unknown>> {
+    const text = (k: string) => (typeof answers[k] === 'string' ? (answers[k] as string).trim() : '');
+    const name = text('character_name'); const race = text('race'); const ship = text('ship_name');
+    const method = text('method'); const disposition = text('disposition');
+    if (!name || !race || !ship || !method) return [];
+    const base: Record<string, unknown> = { type: 'create_character', character_name: name, race, ship_name: ship, method, ...(disposition && disposition !== 'none' ? { disposition } : {}) };
+    if (method === 'archetype') {
+      const card = text('archetype_name');
+      return card ? [{ ...base, archetype_name: card }] : [];
+    }
+    const scores: Record<string, number> = {};
+    for (const a of abilityOptions(reference)) {
+      const v = Number(answers[`score.${a.code}`]);
+      if (Number.isFinite(v) && v > 0) scores[a.code] = v;
+    }
+    return Object.keys(scores).length ? [{ ...base, scores }] : [];
   },
 
   /** Character creation: the engine lists two skeletons ("FILL IN the
