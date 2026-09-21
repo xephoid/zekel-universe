@@ -517,6 +517,28 @@ describe('the generic template form', () => {
   });
 });
 
+describe('cybernoir-2127 setup', () => {
+  const g = GLUES['cybernoir-2127']!;
+  const ref: GameReferenceResponse = {
+    gameId: 'cybernoir-2127', rules: '', moveSchema: {}, referenceData: {},
+    optionsSchema: { type: 'object', properties: {
+      detective: { type: 'string', description: 'player_id of the Detective' },
+      overclock_draw_timing: { enum: ['immediate', 'next_turn', 'optional'], description: 'When Overclock grants the draws.' },
+    } },
+  };
+  const seats = [{ position: 0, kind: 'human' as const, host: true }, { position: 1, kind: 'ai' as const, host: false }];
+  it("asks which role the host plays and turns it into the engine's detective option, beside the rules choice", () => {
+    const fields = g.setupFields(ref, seats);
+    expect(fields.map((f) => f.key)).toEqual(['role', 'overclock_draw_timing']);
+    expect(g.setupOptions!({ role: 'hacker', overclock_draw_timing: 'optional' }, seats)).toEqual({ detective: 'p2', overclock_draw_timing: 'optional' });
+    expect(g.setupOptions!({ role: 'detective', overclock_draw_timing: 'immediate' }, seats)).toEqual({ detective: 'p1', overclock_draw_timing: 'immediate' });
+    // Unanswered: the engine's own default stands rather than a guess.
+    expect(g.setupOptions!({}, seats)).toEqual({});
+    // Without the option in the schema, no role field.
+    expect(g.setupFields({ ...ref, optionsSchema: { type: 'object', properties: {} } }, seats)).toEqual([]);
+  });
+});
+
 describe('guards', () => {
   it('every glue refuses unknown view shapes and falls back to the JSON inspector', () => {
     const junk = { nonsense: true };

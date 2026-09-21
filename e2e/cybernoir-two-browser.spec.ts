@@ -27,6 +27,7 @@ test('two signed-in humans at one Cybernoir table, each seeing only their own pr
   // Seat 2 defaults to an AI; make it an open seat for a friend.
   await a.getByRole('group', { name: 'Seat 2' }).getByRole('button', { name: 'Friend' }).click();
   await a.getByRole('radio', { name: /^Live/ }).click();
+  await a.getByRole('group', { name: 'Your role' }).getByRole('radio', { name: 'Hacker' }).check();
   await a.getByRole('group', { name: /Overclock/ }).getByRole('radio', { name: 'Immediate' }).check();
   await a.getByRole('button', { name: 'Open the lobby' }).click();
   await expect(a).toHaveURL(/\/table\/[^/]+\/lobby/, { timeout: 20_000 });
@@ -46,7 +47,8 @@ test('two signed-in humans at one Cybernoir table, each seeing only their own pr
   await start.click();
   await expect(a).toHaveURL(/\/table\/[^/]+$/, { timeout: 20_000 });
   await expect(b).toHaveURL(/\/table\/[^/]+$/, { timeout: 20_000 });
-  await expect(a.getByText(/^Your move/)).toBeVisible({ timeout: 30_000 });
+  await expect(b.locator('.turn-pill')).toHaveText(/^Your move/, { timeout: 30_000 });
+  await expect(a.locator('.turn-pill')).toHaveText(/^Waiting on/, { timeout: 30_000 });
 
   // The M2 check: neither browser's feed carries the other's private view.
   // The detective holds location_hand; the hacker holds hand and hideout.
@@ -55,22 +57,24 @@ test('two signed-in humans at one Cybernoir table, each seeing only their own pr
   const bFeed = await visibleEvents(b);
   const aView = aFeed.events[aFeed.events.length - 1]!['view'] as Record<string, unknown>;
   const bView = bFeed.events[bFeed.events.length - 1]!['view'] as Record<string, unknown>;
-  expect(aView['role']).toBe('detective');
-  expect(bView['role']).toBe('hacker');
-  expect(Array.isArray(aView['location_hand'])).toBe(true);
-  expect(Array.isArray(bView['hand'])).toBe(true);
-  expect(aFeed.text).not.toContain('"hand":');
-  expect(aFeed.text).not.toContain('"hideout":');
-  expect(bFeed.text).not.toContain('"location_hand":');
-  for (const card of aView['location_hand'] as string[]) expect(bFeed.text).not.toContain(card);
-  for (const card of bView['hand'] as string[]) expect(aFeed.text).not.toContain(card);
-  // Only the seat to move holds legal moves.
-  expect((aFeed.events[aFeed.events.length - 1]!['legalMoves'] as unknown[]).length).toBeGreaterThan(0);
-  expect(bFeed.events[bFeed.events.length - 1]!['legalMoves']).toEqual([]);
+  // The host chose the Hacker at setup, so the friend is the Detective and
+  // goes first.
+  expect(aView['role']).toBe('hacker');
+  expect(bView['role']).toBe('detective');
+  expect(Array.isArray(aView['hand'])).toBe(true);
+  expect(Array.isArray(bView['location_hand'])).toBe(true);
+  expect(bFeed.text).not.toContain('"hand":');
+  expect(bFeed.text).not.toContain('"hideout":');
+  expect(aFeed.text).not.toContain('"location_hand":');
+  for (const card of bView['location_hand'] as string[]) expect(aFeed.text).not.toContain(card);
+  for (const card of aView['hand'] as string[]) expect(bFeed.text).not.toContain(card);
+  // Only the seat to move holds legal moves: the Detective's.
+  expect((bFeed.events[bFeed.events.length - 1]!['legalMoves'] as unknown[]).length).toBeGreaterThan(0);
+  expect(aFeed.events[aFeed.events.length - 1]!['legalMoves']).toEqual([]);
 
   // And on screen: each table shows its owner's role.
-  await expect(a.getByText(/Detective \(you\)/)).toBeVisible();
-  await expect(b.getByText(/Hacker \(you\)/)).toBeVisible();
+  await expect(a.getByText(/Hacker \(you\)/)).toBeVisible();
+  await expect(b.getByText(/Detective \(you\)/)).toBeVisible();
 
   // A stranger's browser gets nothing from the feed at all.
   const stranger = await signIn(browser, 'm2-outside@example.com', baseURL!);

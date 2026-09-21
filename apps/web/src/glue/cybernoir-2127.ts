@@ -225,24 +225,51 @@ export const cybernoirGlue: GlueModule = {
     return legalMoves.find((m) => m.move['type'] === 'resolve_report') ?? null;
   },
 
+  /**
+   * Two setup choices, both session options the engine takes: which role
+   * the host plays (the engine's `detective` option names the Detective's
+   * player id; the other seat is the Hacker), and the one rules variant
+   * (when Overclock grants the Detective two Location draws).
+   */
   setupFields(reference: GameReferenceResponse, _seats?: SetupSeat[]): SetupField[] {
-    // The engine's options schema names one rules choice: when Overclock
-    // grants the Detective two Location draws.
     const schema = reference.optionsSchema;
     const props = isObj(schema) && isObj(schema['properties']) ? schema['properties'] : {};
+    const fields: SetupField[] = [];
+    if (isObj(props['detective'])) {
+      fields.push({
+        kind: 'choice', key: 'role', label: 'Your role',
+        help: 'The Detective goes first and hunts the leads; the Hacker hides the truth. The other seat takes the other role.',
+        options: [
+          { value: 'detective', label: 'Detective', hint: 'Chase leads across the city and name the hideout.' },
+          { value: 'hacker', label: 'Hacker', hint: 'Keep your hideout hidden and clear your name.' },
+        ],
+      });
+    }
     const timing = isObj(props['overclock_draw_timing']) ? props['overclock_draw_timing'] : null;
     const values = timing && Array.isArray(timing['enum']) ? timing['enum'].map((v) => String(v)) : [];
-    if (values.length === 0) return [];
-    return [{
-      kind: 'choice', key: 'overclock_draw_timing', label: 'Overclock: when the Detective draws the two Locations',
-      help: typeof timing?.['description'] === 'string' ? timing['description'] : undefined,
-      options: values.map((v) => ({ value: v, label: words(v) })),
-    }];
+    if (values.length > 0) {
+      fields.push({
+        kind: 'choice', key: 'overclock_draw_timing', label: 'Overclock: when the Detective draws the two Locations',
+        help: typeof timing?.['description'] === 'string' ? timing['description'] : undefined,
+        options: values.map((v) => ({ value: v, label: words(v) })),
+      });
+    }
+    return fields;
   },
 
-  setupOptions(answers: SetupAnswers): Record<string, unknown> {
+  setupOptions(answers: SetupAnswers, seats: SetupSeat[]): Record<string, unknown> {
+    const out: Record<string, unknown> = {};
+    const role = answers['role'];
+    const host = seats.find((s) => s.host);
+    const other = seats.find((s) => !s.host);
+    if ((role === 'detective' || role === 'hacker') && host && other) {
+      // Universe names seats p1..pN by position; the Detective is the host's
+      // seat or the other one.
+      out['detective'] = `p${(role === 'detective' ? host : other).position + 1}`;
+    }
     const v = answers['overclock_draw_timing'];
-    return typeof v === 'string' && v ? { overclock_draw_timing: v } : {};
+    if (typeof v === 'string' && v) out['overclock_draw_timing'] = v;
+    return out;
   },
 
 };
