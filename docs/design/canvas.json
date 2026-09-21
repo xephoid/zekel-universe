@@ -4,12 +4,18 @@
     { "file": "Sweetlands Table.dc.html", "x": 3160, "y": 0, "w": 1440, "h": 900, "is_interactive": true },
     { "file": "Zekel Pages.dc.html", "x": 3160, "y": 1040, "w": 1440, "h": 900, "is_interactive": true },
     { "file": "Primitives.dc.html", "title": "The eight primitives", "x": 3160, "y": 2200, "w": 1440, "h": 3260 },
-    { "file": "Sweetlands Art.dc.html", "title": "Sweetlands · factions and treats", "x": 3160, "y": 5620, "w": 1440, "h": 1180 }
+    { "file": "Sweetlands Art.dc.html", "title": "Sweetlands · factions and treats", "x": 3160, "y": 5620, "w": 1440, "h": 1180 },
+    { "file": "Fractured Fist Loadout.dc.html", "title": "Fractured Fist · choose the seven", "x": 4720, "y": 0, "w": 1440, "h": 900, "is_interactive": true },
+    { "file": "Fractured Fist Table.dc.html", "title": "Fractured Fist · the duel table", "x": 4720, "y": 1040, "w": 1440, "h": 900, "is_interactive": true },
+    { "file": "Fractured Fist Strike.dc.html", "title": "Fractured Fist · the strike, beat by beat", "x": 4720, "y": 2080, "w": 1440, "h": 900 }
   ],
   "annotations": [
     { "id": "fix-recall-draw", "x": 3160, "y": -200, "w": 420, "text": "Changed after review: the turn now opens on the Recall step (a real choice, even when the answer is nobody), then a Draw button for turn-start Intel. Nothing resolves on its own. Drawn cards fly in from the deck instead of fading in." },
     { "id": "primitives-note", "x": 3160, "y": 2060, "w": 480, "text": "Added after review: the eight primitives as a component sheet, drawn in this draft's own vocabulary. Every game board is composed from these and nothing else. The field lists are the exact data the engine hands each part today. Implementation builds these eight first; the Sweetlands table above is a composition of them (see the last section of the sheet)." },
-    { "id": "art-note", "x": 3160, "y": 5500, "w": 480, "text": "Added: the faction portraits and treat icons from the last five rulebook pages, cropped from the source. These replace the colored initials on avatars and the kingdom picker, and the text labels on treat tiles and treat cards." }
+    { "id": "art-note", "x": 3160, "y": 5500, "w": 480, "text": "Added: the faction portraits and treat icons from the last five rulebook pages, cropped from the source. These replace the colored initials on avatars and the kingdom picker, and the text labels on treat tiles and treat cards." },
+    { "id": "ff-loadout-note", "x": 4720, "y": -140, "w": 480, "text": "Fractured Fist, first pass. The seven-of-thirty pick as its own screen: grouped by school, seven numbered slots, a running total of what the seven can buy you. The default seven is a button, never a preselection." },
+    { "id": "ff-table-note", "x": 4720, "y": 900, "w": 480, "text": "Fractured Fist table. One supply shelf carrying both counts instead of twenty stacks; the strike gutter between the played rows; counters only in the step that can change them; an action bar holding the moves that move the turn. What to build from it: docs/games/fractured-fist-build.md." },
+    { "id": "ff-strike-note", "x": 4720, "y": 1940, "w": 480, "text": "The strike, frozen beat by beat, because you cannot read a 580ms beat while it plays. It runs on the table artboard above. Pace, skip and replay belong to the player and should reuse the playback pace Universe already has." }
   ],
   "launch": { "view": "canvas" }
 }

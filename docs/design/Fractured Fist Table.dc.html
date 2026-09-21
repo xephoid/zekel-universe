@@ -1,0 +1,985 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fractured Fist table</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Slackey&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:var(--brand)}a:hover{color:var(--action)}
+@keyframes ff-fly{0%{transform:translateY(54px) scale(.82);opacity:0}55%{opacity:1}100%{transform:translateY(0) scale(1);opacity:1}}
+@keyframes ff-drawin{0%{transform:translate(250px,-30px) scale(.68);opacity:0}30%{opacity:1}100%{transform:translate(0,0) scale(1);opacity:1}}
+@keyframes ff-buy{0%{transform:translate(-120px,-70px) scale(.7);opacity:0}40%{opacity:1}100%{transform:translate(0,0) scale(1);opacity:1}}
+@keyframes ff-fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes ff-pulse{0%,100%{box-shadow:0 0 0 2px var(--action),0 0 0 7px rgba(224,118,43,.22)}50%{box-shadow:0 0 0 3px var(--action),0 0 0 12px rgba(224,118,43,.04)}}
+@keyframes ff-tick{0%{transform:scale(1)}40%{transform:scale(1.4)}100%{transform:scale(1)}}
+@keyframes ff-scrim{from{opacity:0}to{opacity:1}}
+@keyframes ff-panel{from{opacity:0;transform:scale(.965)}to{opacity:1;transform:scale(1)}}
+@keyframes ff-shield{0%{transform:scale(1)}35%{transform:scale(1.2) rotate(-3deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes ff-absorb{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(52px,-6px) scale(.55);opacity:0}}
+@keyframes ff-pipout{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(18px) rotate(9deg);opacity:0}}
+@keyframes ff-banner{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</helmet>
+<div style="{{ rootStyle }}" data-screen-label="Fractured Fist table">
+
+  <!-- ============ top bar ============ -->
+  <div style="height:48px;flex:none;display:flex;align-items:center;gap:18px;padding:0 20px;background:var(--surface);border-bottom:1px solid var(--line);color:var(--text)">
+    <div style="display:inline-flex;align-items:center;gap:1px;font:400 24px 'Slackey',sans-serif;letter-spacing:-.02em;color:var(--mark)">ze<span style="display:inline-block;width:20px;height:20px;position:relative;transform:rotate(-90deg);margin:0 1px"><span style="position:absolute;left:50%;top:0;width:34%;height:34%;transform:translateX(-50%);border-radius:50%;background:var(--markhead)"></span><span style="position:absolute;left:0;top:28%;width:100%;height:24%;border-radius:999px;background:var(--markhead)"></span><span style="position:absolute;left:50%;top:40%;width:48%;height:36%;transform:translateX(-50%);border-radius:3px 3px 1px 1px;background:var(--markhead)"></span><span style="position:absolute;left:14%;bottom:0;width:32%;height:38%;border-radius:3px;transform:rotate(14deg);transform-origin:top center;background:var(--markhead)"></span><span style="position:absolute;right:14%;bottom:0;width:32%;height:38%;border-radius:3px;transform:rotate(-14deg);transform-origin:top center;background:var(--markhead)"></span></span>el</div>
+    <div style="width:1px;height:20px;background:var(--line)"></div>
+    <img src="assets/punch-blast.svg" alt="" style="width:22px;height:22px;border-radius:5px;display:block">
+    <div style="font-weight:600;font-size:14px">Fractured Fist</div>
+    <div style="font:500 12px 'IBM Plex Mono',monospace;color:var(--muted)">Round {{ round }}</div>
+    <div style="flex:1;display:flex;justify-content:center">
+      <div style="display:flex;align-items:center;gap:8px;padding:5px 12px;border-radius:999px;background:{{ turnPill.bg }};color:{{ turnPill.fg }};font-size:13px;font-weight:600">
+        <span style="width:8px;height:8px;border-radius:50%;background:currentColor"></span>{{ turnPill.text }}
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center">
+      <button onClick="{{ undo }}" style="height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--text);font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;opacity:{{ undoOpacity }}" style-hover="background:var(--surface2)">Undo</button>
+      <button style="height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--text);font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:var(--surface2)">Voice</button>
+      <button onClick="{{ toggleTheme }}" style="height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--text);font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:var(--surface2)">{{ themeLabel }}</button>
+      <button style="height:32px;padding:0 12px;border-radius:8px;border:none;background:transparent;color:var(--muted);font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="color:var(--danger)">Leave</button>
+    </div>
+  </div>
+
+  <div style="flex:1;display:flex;min-height:0">
+
+    <!-- ============ play column ============ -->
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;padding:14px 16px;gap:12px">
+
+      <!-- the fight: their row, the strike gutter, your row -->
+      <div style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:10px">
+
+        <div style="display:flex;align-items:baseline;gap:10px">
+          <span style="font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">THEIR PLAYED CARDS · {{ theirPlayedCount }}</span>
+          <span style="font-size:11px;color:var(--muted)">{{ theirPlayedNote }}</span>
+        </div>
+        <div style="height:130px;display:flex;gap:8px;align-items:flex-start">
+          <sc-for list="{{ theirPlayed }}" as="k" hint-placeholder-count="3">
+            <div title="{{ k.title }}" style="width:92px;height:130px;flex:none;border-radius:8px;background:var(--cardface);border:1px solid var(--line);border-top:3px solid {{ k.accent }};box-shadow:var(--shadow);box-sizing:border-box;padding:8px;display:flex;flex-direction:column;gap:5px;animation:{{ k.anim }};transform:{{ k.sweepTf }};opacity:{{ k.sweepOp }};transition:transform .54s cubic-bezier(.3,.8,.4,1) {{ k.sweepDelay }},opacity .42s {{ k.sweepDelay }}">
+              <div style="display:flex;gap:4px;align-items:flex-start">
+                <div style="flex:1;min-width:0;font:700 11px/1.15 'Bricolage Grotesque',sans-serif;color:var(--text)">{{ k.name }}</div>
+                <div style="width:18px;height:18px;flex:none;border-radius:4px;background:{{ k.costBg }};color:{{ k.costFg }};display:grid;place-items:center;font:600 10px 'IBM Plex Mono',monospace">{{ k.cost }}</div>
+              </div>
+              <div style="font:600 8px 'IBM Plex Mono',monospace;letter-spacing:.08em;color:{{ k.typeColor }}">{{ k.type }}</div>
+              <div style="display:flex;flex-direction:column;gap:3px">
+                <sc-for list="{{ k.chips }}" as="c" hint-placeholder-count="1">
+                  <span style="align-self:flex-start;padding:2px 6px;border-radius:999px;background:{{ c.bg }};color:{{ c.fg }};font:600 9px 'IBM Plex Sans',sans-serif">{{ c.t }}</span>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+          <sc-if value="{{ theirRowEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="height:130px;display:flex;align-items:center;font-size:12px;color:var(--muted)">Nothing played this round yet.</div>
+          </sc-if>
+        </div>
+
+        <!-- strike gutter -->
+        <div style="flex:none;border-radius:12px;background:var(--surface2);border:1px solid var(--line);padding:10px 14px;display:flex;flex-direction:column;gap:8px">
+          <sc-for list="{{ strike }}" as="s" hint-placeholder-count="2">
+            <div style="display:flex;align-items:center;gap:10px;font-family:'IBM Plex Sans',sans-serif">
+              <span style="width:16px;height:16px;flex:none;color:{{ s.arrowColor }}" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 16 16"><path d="{{ s.arrowPath }}" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              </span>
+              <span style="width:112px;flex:none;font-size:12px;font-weight:600;color:var(--text)">{{ s.label }}</span>
+              <span style="padding:2px 9px;border-radius:999px;background:var(--dmgbg);color:var(--dmgfg);font:600 12px 'IBM Plex Mono',monospace">{{ s.dmg }} damage</span>
+              <span style="font-size:12px;color:var(--muted)">less</span>
+              <span style="padding:2px 9px;border-radius:999px;background:var(--defbg);color:var(--deffg);font:600 12px 'IBM Plex Mono',monospace">{{ s.def }} defense</span>
+              <span style="font-size:12px;color:var(--muted)">=</span>
+              <span style="padding:2px 10px;border-radius:999px;background:{{ s.netBg }};color:{{ s.netFg }};font:600 12px 'IBM Plex Mono',monospace">{{ s.net }}</span>
+              <span style="flex:1"></span>
+              <span style="font:500 12px 'IBM Plex Mono',monospace;color:var(--muted)">{{ s.stamLine }}</span>
+            </div>
+          </sc-for>
+          <div style="font-size:11px;color:var(--muted);border-top:1px solid var(--line);padding-top:7px">Both hits land together when the round ends. Nothing is spent until then.</div>
+        </div>
+
+        <div style="display:flex;align-items:baseline;gap:10px">
+          <span style="font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">YOUR PLAYED CARDS · {{ yourPlayedCount }}</span>
+          <span style="font-size:11px;color:var(--muted)">{{ yourPlayedNote }}</span>
+        </div>
+        <div style="height:130px;display:flex;gap:8px;align-items:flex-start">
+          <sc-for list="{{ yourPlayed }}" as="k" hint-placeholder-count="2">
+            <div title="{{ k.title }}" style="width:92px;height:130px;flex:none;border-radius:8px;background:var(--cardface);border:1px solid var(--line);border-top:3px solid {{ k.accent }};box-shadow:var(--shadow);box-sizing:border-box;padding:8px;display:flex;flex-direction:column;gap:5px;animation:{{ k.anim }};transform:{{ k.sweepTf }};opacity:{{ k.sweepOp }};transition:transform .54s cubic-bezier(.3,.8,.4,1) {{ k.sweepDelay }},opacity .42s {{ k.sweepDelay }}">
+              <div style="display:flex;gap:4px;align-items:flex-start">
+                <div style="flex:1;min-width:0;font:700 11px/1.15 'Bricolage Grotesque',sans-serif;color:var(--text)">{{ k.name }}</div>
+                <div style="width:18px;height:18px;flex:none;border-radius:4px;background:{{ k.costBg }};color:{{ k.costFg }};display:grid;place-items:center;font:600 10px 'IBM Plex Mono',monospace">{{ k.cost }}</div>
+              </div>
+              <div style="font:600 8px 'IBM Plex Mono',monospace;letter-spacing:.08em;color:{{ k.typeColor }}">{{ k.type }}</div>
+              <div style="display:flex;flex-direction:column;gap:3px">
+                <sc-for list="{{ k.chips }}" as="c" hint-placeholder-count="1">
+                  <span style="align-self:flex-start;padding:2px 6px;border-radius:999px;background:{{ c.bg }};color:{{ c.fg }};font:600 9px 'IBM Plex Sans',sans-serif">{{ c.t }}</span>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+          <sc-if value="{{ yourRowEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="height:130px;display:flex;align-items:center;font-size:12px;color:var(--muted)">Play a card and it lands here.</div>
+          </sc-if>
+        </div>
+      </div>
+
+      <!-- supply shelf -->
+      <div style="flex:none;border-radius:12px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);padding:10px 12px;display:flex;flex-direction:column;gap:7px;opacity:{{ supplyOpacity }}">
+        <div style="display:flex;align-items:baseline;gap:10px">
+          <span style="font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">SUPPLY</span>
+          <span style="font-size:11px;color:var(--muted)">{{ supplyHint }}</span>
+          <span style="flex:1"></span>
+          <span style="font-size:11px;color:var(--muted)">You and Rook each own a full set. The two counts run down separately.</span>
+        </div>
+        <div style="display:flex;gap:6px">
+          <sc-for list="{{ supply }}" as="s" hint-placeholder-count="10">
+            <button onClick="{{ s.buy }}" title="{{ s.title }}" aria-label="{{ s.aria }}" style="width:92px;flex:none;border-radius:8px;background:var(--cardface);border:1px solid var(--line);border-top:3px solid {{ s.accent }};box-shadow:{{ s.shadow }};box-sizing:border-box;padding:7px 7px 0;display:flex;flex-direction:column;gap:4px;text-align:left;cursor:{{ s.cursor }};opacity:{{ s.opacity }};outline:{{ s.outline }};outline-offset:2px;font-family:'IBM Plex Sans',sans-serif;transition:transform .14s,box-shadow .14s" style-hover="transform:translateY(-3px)">
+              <div style="display:flex;gap:4px;align-items:flex-start">
+                <div style="flex:1;min-width:0;font:700 11px/1.15 'Bricolage Grotesque',sans-serif;color:var(--text)">{{ s.name }}</div>
+                <div style="width:18px;height:18px;flex:none;border-radius:4px;background:{{ s.costBg }};color:{{ s.costFg }};display:grid;place-items:center;font:600 10px 'IBM Plex Mono',monospace">{{ s.cost }}</div>
+              </div>
+              <span style="align-self:flex-start;padding:2px 6px;border-radius:999px;background:{{ s.chipBg }};color:{{ s.chipFg }};font:600 9px 'IBM Plex Sans',sans-serif">{{ s.chip }}</span>
+              <div style="margin-top:auto;display:flex;gap:6px;border-top:1px solid var(--line);padding:4px 0 6px;font:500 9.5px 'IBM Plex Mono',monospace;color:var(--muted)">
+                <span style="color:var(--text)">you {{ s.youCount }}</span><span>·</span><span>them {{ s.themCount }}</span>
+              </div>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+
+      <!-- action bar: the turn, in words, with the buttons that move it -->
+      <div style="flex:none;height:58px;border-radius:12px;background:{{ barBg }};border:1px solid {{ barLine }};display:flex;align-items:center;gap:14px;padding:0 14px">
+        <div style="display:flex;gap:5px;align-items:center;flex:none">
+          <sc-for list="{{ steps }}" as="p" hint-placeholder-count="3">
+            <span style="padding:4px 10px;border-radius:999px;background:{{ p.bg }};color:{{ p.fg }};font:600 12px 'IBM Plex Sans',sans-serif">{{ p.name }}</span>
+          </sc-for>
+        </div>
+        <div style="width:1px;height:26px;background:var(--line);flex:none"></div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;color:var(--text)">{{ hintTitle }}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:1px">{{ hintSub }}</div>
+        </div>
+        <sc-if value="{{ reloadShown }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ doReload }}" title="{{ reloadTitle }}" style="height:34px;padding:0 13px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--text);font:500 13px 'IBM Plex Sans',sans-serif;cursor:{{ reloadCursor }};opacity:{{ reloadOpacity }}" style-hover="background:var(--surface2)">Focus reload · {{ reloadCount }}/3</button>
+        </sc-if>
+        <sc-if value="{{ drawShown }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ drawNow }}" style="height:34px;padding:0 16px;border-radius:8px;border:none;background:var(--action);color:#fff;font:600 13px 'IBM Plex Sans',sans-serif;cursor:pointer;box-shadow:0 2px 0 var(--actionh)" style-hover="background:var(--actionh)" style-active="transform:translateY(2px);box-shadow:none">{{ drawLabel }}</button>
+        </sc-if>
+        <sc-if value="{{ refineOn }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ skipRefine }}" style="height:34px;padding:0 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--text);font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:var(--surface2)">Skip the rest</button>
+        </sc-if>
+        <sc-if value="{{ cashShown }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ cashIn }}" title="{{ cashTitle }}" style="height:34px;padding:0 14px;border-radius:8px;border:1px solid var(--brand);background:var(--surface);color:var(--brand);font:600 13px 'IBM Plex Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:8px" style-hover="background:var(--hlbg)">
+            <span>{{ cashLabel }}</span>
+            <span style="font:500 11px 'IBM Plex Sans',sans-serif;color:var(--muted)">{{ cashNote }}</span>
+          </button>
+        </sc-if>
+        <sc-if value="{{ advanceShown }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ advance }}" style="height:34px;padding:0 14px;border-radius:8px;border:1px solid var(--brand);background:var(--surface);color:var(--brand);font:600 13px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:var(--hlbg)">Advance to Channel</button>
+        </sc-if>
+        <sc-if value="{{ endShown }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ endTurn }}" style="height:34px;padding:0 16px;border-radius:8px;border:none;background:var(--action);color:#fff;font:600 13px 'IBM Plex Sans',sans-serif;cursor:pointer;box-shadow:0 2px 0 var(--actionh)" style-hover="background:var(--actionh)" style-active="transform:translateY(2px);box-shadow:none">End turn</button>
+        </sc-if>
+        <sc-if value="{{ continueShown }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ continueRound }}" style="height:34px;padding:0 16px;border-radius:8px;border:none;background:var(--action);color:#fff;font:600 13px 'IBM Plex Sans',sans-serif;cursor:pointer;box-shadow:0 2px 0 var(--actionh)" style-hover="background:var(--actionh)">{{ continueLabel }}</button>
+        </sc-if>
+      </div>
+
+      <!-- bench: you, your hand, your piles -->
+      <div style="flex:none;height:168px;display:flex;gap:12px;align-items:stretch">
+
+        <div style="width:300px;flex:none;border-radius:12px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);padding:11px 13px;display:flex;flex-direction:column;gap:9px;outline:{{ youOutline }};outline-offset:-1px">
+          <div style="display:flex;align-items:center;gap:9px">
+            <div style="width:30px;height:30px;border-radius:50%;background:var(--action);border:2px solid var(--ink);display:grid;place-items:center;font:600 12px 'IBM Plex Mono',monospace;color:#1c1a17">Z</div>
+            <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">Zeke</div><div style="font-size:11px;color:var(--muted)">Player 1 · moves first each round</div></div>
+            <span style="font-size:11px;padding:1px 7px;border-radius:999px;background:var(--youbg);color:var(--youfg);font-weight:600">You</span>
+          </div>
+          <div>
+            <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:4px"><span style="font:500 10px 'IBM Plex Mono',monospace;color:var(--muted)">STAMINA</span><span style="font:600 14px 'IBM Plex Mono',monospace;color:var(--text)">{{ you.stam }}</span><span style="font-size:11px;color:var(--muted)">of 7</span></div>
+            <div style="display:flex;gap:4px">
+              <sc-for list="{{ you.pips }}" as="p" hint-placeholder-count="7">
+                <span style="flex:1;height:12px;border-radius:3px;background:{{ p.bg }};border:1px solid {{ p.line }};box-sizing:border-box"></span>
+              </sc-for>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:4px"><span style="font:500 10px 'IBM Plex Mono',monospace;color:var(--muted)">MISSTEPS</span><span style="font:600 12px 'IBM Plex Mono',monospace;color:var(--text)">{{ you.miss }}</span><span style="font-size:11px;color:var(--muted)">of 10 · dead cards in your deck</span></div>
+            <div style="display:flex;gap:3px">
+              <sc-for list="{{ you.missPips }}" as="p" hint-placeholder-count="10">
+                <span style="flex:1;height:8px;border-radius:2px;background:{{ p.bg }};border:1px solid {{ p.line }};box-sizing:border-box"></span>
+              </sc-for>
+            </div>
+          </div>
+          <div style="margin-top:auto;display:flex;gap:6px">
+            <sc-for list="{{ counters }}" as="c" hint-placeholder-count="2">
+              <div style="flex:1;border-radius:8px;background:{{ c.bg }};padding:5px 8px;font-family:'IBM Plex Mono',monospace">
+                <div style="font-size:15px;font-weight:600;color:{{ c.fg }};animation:{{ c.anim }}">{{ c.value }}</div>
+                <div style="font-size:9.5px;color:var(--muted)">{{ c.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- hand fan -->
+        <div style="flex:1;min-width:0;position:relative;display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px">
+          <div style="position:absolute;top:0;left:0;display:flex;gap:8px;align-items:baseline">
+            <span style="font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">YOUR HAND · {{ handCount }}</span>
+            <span style="font-size:11px;color:{{ handNoteColor }}">{{ handNote }}</span>
+          </div>
+          <sc-for list="{{ hand }}" as="k" hint-placeholder-count="5">
+            <button onClick="{{ k.onClick }}" title="{{ k.title }}" aria-label="{{ k.aria }}" style="width:104px;height:140px;margin:0 -8px;flex:none;border-radius:9px;background:var(--cardface);border:1px solid var(--line);border-top:3px solid {{ k.accent }};box-shadow:{{ k.shadow }};transform:rotate({{ k.rot }}deg) translateY({{ k.ty }}px);transform-origin:50% 130%;cursor:{{ k.cursor }};position:relative;box-sizing:border-box;padding:9px;display:flex;flex-direction:column;gap:5px;text-align:left;outline:{{ k.outline }};outline-offset:2px;opacity:{{ k.opacity }};transition:transform .16s,box-shadow .16s;font-family:'IBM Plex Sans',sans-serif;animation:{{ k.anim }}" style-hover="transform:translateY(-16px)">
+              <div style="display:flex;gap:5px;align-items:flex-start">
+                <div style="flex:1;min-width:0;font:700 12px/1.15 'Bricolage Grotesque',sans-serif;color:var(--text)">{{ k.name }}</div>
+                <div style="width:20px;height:20px;flex:none;border-radius:4px;background:{{ k.costBg }};color:{{ k.costFg }};display:grid;place-items:center;font:600 11px 'IBM Plex Mono',monospace">{{ k.cost }}</div>
+              </div>
+              <div style="font:600 8.5px 'IBM Plex Mono',monospace;letter-spacing:.08em;color:{{ k.typeColor }}">{{ k.type }}</div>
+              <div style="display:flex;flex-direction:column;gap:3px">
+                <sc-for list="{{ k.chips }}" as="c" hint-placeholder-count="1">
+                  <span style="align-self:flex-start;padding:2px 7px;border-radius:999px;background:{{ c.bg }};color:{{ c.fg }};font:600 9.5px 'IBM Plex Sans',sans-serif">{{ c.t }}</span>
+                </sc-for>
+              </div>
+              <div style="margin-top:auto;font:500 9px/1.25 'IBM Plex Mono',monospace;color:var(--muted)">{{ k.foot }}</div>
+            </button>
+          </sc-for>
+        </div>
+
+        <!-- deck and discard -->
+        <div style="width:176px;flex:none;border-radius:12px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);padding:11px 12px;display:flex;gap:12px">
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px">
+            <button onClick="{{ drawNow }}" aria-label="{{ deckAria }}" style="width:56px;height:80px;border-radius:7px;background:var(--cardback);border:1px solid var(--ink);box-shadow:2px 2px 0 var(--surface2),4px 4px 0 var(--line);display:grid;place-items:center;font:600 13px 'IBM Plex Mono',monospace;color:var(--text);cursor:{{ deckCursor }};outline:{{ deckOutline }};outline-offset:3px;animation:{{ deckAnim }}">{{ deckCount }}</button>
+            <span style="font:500 10px 'IBM Plex Mono',monospace;color:var(--muted)">Deck</span>
+            <span style="font-size:10px;color:var(--muted);text-align:center;line-height:1.25">{{ deckNote }}</span>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px">
+            <div style="width:56px;height:80px;border-radius:7px;background:var(--cardface);border:1px solid var(--line);border-top:3px solid {{ discardAccent }};box-shadow:2px 2px 0 var(--surface2);box-sizing:border-box;padding:6px;display:flex;flex-direction:column;gap:3px;animation:{{ discardAnim }}">
+              <div style="font:700 9px/1.1 'Bricolage Grotesque',sans-serif;color:var(--text)">{{ discardTop }}</div>
+              <div style="margin-top:auto;font:600 12px 'IBM Plex Mono',monospace;color:var(--text)">{{ discardCount }}</div>
+            </div>
+            <span style="font:500 10px 'IBM Plex Mono',monospace;color:var(--muted)">Discard</span>
+            <span style="font-size:10px;color:var(--muted);text-align:center;line-height:1.25">Face up · both players can read it</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ side column ============ -->
+    <div style="width:420px;flex:none;border-left:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;min-height:0">
+
+      <!-- the opponent -->
+      <div style="padding:14px 16px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px;outline:{{ themOutline }};outline-offset:-2px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:34px;height:34px;border-radius:50%;background:#7a8b99;border:2px solid var(--ink);display:grid;place-items:center;font:600 13px 'IBM Plex Mono',monospace;color:#0f150f">R</div>
+          <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">Rook</div><div style="font-size:11px;color:var(--muted)">AI · medium · Player 2</div></div>
+          <span style="font-size:11px;padding:1px 8px;border-radius:999px;background:{{ themTag.bg }};color:{{ themTag.fg }};font-weight:600">{{ themTag.text }}</span>
+        </div>
+        <div>
+          <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:4px"><span style="font:500 10px 'IBM Plex Mono',monospace;color:var(--muted)">STAMINA</span><span style="font:600 14px 'IBM Plex Mono',monospace;color:var(--text)">{{ them.stam }}</span><span style="font-size:11px;color:var(--muted)">of 7</span></div>
+          <div style="display:flex;gap:4px">
+            <sc-for list="{{ them.pips }}" as="p" hint-placeholder-count="7">
+              <span style="flex:1;height:12px;border-radius:3px;background:{{ p.bg }};border:1px solid {{ p.line }};box-sizing:border-box"></span>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <div style="flex:1;display:flex;gap:6px;align-items:center;border-radius:8px;background:var(--surface2);padding:6px 9px">
+            <div style="display:flex;gap:2px" aria-hidden="true">
+              <sc-for list="{{ them.handBacks }}" as="b" hint-placeholder-count="5">
+                <span style="width:9px;height:14px;border-radius:2px;background:var(--cardback);border:1px solid var(--line);box-sizing:border-box"></span>
+              </sc-for>
+            </div>
+            <span style="font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">hand {{ them.hand }}</span>
+          </div>
+          <div style="flex:1;border-radius:8px;background:var(--surface2);padding:6px 9px;font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">deck {{ them.deck }} · discard {{ them.discard }}</div>
+        </div>
+        <div>
+          <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:4px"><span style="font:500 10px 'IBM Plex Mono',monospace;color:var(--muted)">THEIR MISSTEPS</span><span style="font:600 12px 'IBM Plex Mono',monospace;color:var(--text)">{{ them.miss }}</span><span style="font-size:11px;color:var(--muted)">of 10</span></div>
+          <div style="display:flex;gap:3px">
+            <sc-for list="{{ them.missPips }}" as="p" hint-placeholder-count="10">
+              <span style="flex:1;height:8px;border-radius:2px;background:{{ p.bg }};border:1px solid {{ p.line }};box-sizing:border-box"></span>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+      <!-- the round -->
+      <div style="padding:13px 16px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:9px">
+        <div style="display:flex;align-items:baseline;gap:8px">
+          <span style="font:700 15px 'Bricolage Grotesque',sans-serif;color:var(--text)">Round {{ round }}</span>
+          <span style="font-size:12px;color:var(--muted)">{{ roundNote }}</span>
+        </div>
+        <div style="display:flex;gap:6px">
+          <sc-for list="{{ order }}" as="o" hint-placeholder-count="2">
+            <div style="flex:1;border-radius:8px;background:{{ o.bg }};border:1px solid {{ o.line }};padding:7px 10px;display:flex;align-items:center;gap:7px;box-sizing:border-box">
+              <span style="width:9px;height:9px;border-radius:50%;background:{{ o.dot }}"></span>
+              <span style="font-size:12px;font-weight:600;color:{{ o.fg }}">{{ o.name }}</span>
+              <span style="flex:1"></span>
+              <span style="font-size:11px;color:var(--muted)">{{ o.state }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <!-- the log -->
+      <div style="flex:1;min-height:0;display:flex;flex-direction:column">
+        <div style="padding:12px 16px 8px;display:flex;align-items:center;gap:10px">
+          <span style="font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">WHAT HAPPENED</span>
+          <span style="flex:1"></span>
+          <sc-if value="{{ replayShown }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ replayStrike }}" style="height:26px;padding:0 10px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--text);font:500 11px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:var(--surface2)">Replay the strike</button>
+          </sc-if>
+        </div>
+        <div style="flex:1;min-height:0;overflow:auto;padding:0 16px 12px;display:flex;flex-direction:column;gap:7px">
+          <sc-for list="{{ log }}" as="l" hint-placeholder-count="6">
+            <div style="display:flex;gap:9px;align-items:flex-start;animation:{{ l.anim }}">
+              <span style="width:26px;flex:none;font:500 10px 'IBM Plex Mono',monospace;color:var(--muted);padding-top:2px">{{ l.round }}</span>
+              <span style="width:3px;flex:none;align-self:stretch;border-radius:2px;background:{{ l.mark }}"></span>
+              <span style="flex:1;font-size:12px;line-height:1.4;color:{{ l.fg }}">{{ l.text }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="flex:none;border-top:1px solid var(--line);padding:10px 16px;display:flex;gap:8px">
+        <button style="flex:1;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--text);font:500 12px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:var(--surface2)">Rules</button>
+        <button style="flex:1;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--text);font:500 12px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:var(--surface2)">Chat</button>
+        <button aria-label="Collapse the side column" style="width:36px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--muted);font:500 12px 'IBM Plex Mono',monospace;cursor:pointer" style-hover="background:var(--surface2)">&gt;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- the strike: both hits at once, and it takes the screen while it happens -->
+  <sc-if value="{{ strikeOn }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;inset:0;z-index:50;background:var(--scrim);display:grid;place-items:center;animation:ff-scrim .22s ease-out;opacity:{{ strikeScrimOp }};pointer-events:{{ strikePe }};transition:opacity .42s ease-out">
+      <div style="width:920px;box-sizing:border-box;border-radius:16px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadowlg);padding:22px 26px 18px;display:flex;flex-direction:column;gap:14px;animation:ff-panel .28s cubic-bezier(.2,.9,.3,1.2)">
+
+        <div style="display:flex;align-items:baseline;gap:12px">
+          <span style="font:700 22px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:var(--text)">{{ strikeTitle }}</span>
+          <span style="font-size:13px;color:var(--muted)">{{ strikeCaption }}</span>
+        </div>
+
+        <sc-if value="{{ strikeFight }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <sc-for list="{{ strikeLanes }}" as="L" hint-placeholder-count="2">
+              <div style="border-radius:12px;background:var(--surface2);border:1px solid var(--line);padding:12px 16px 14px;display:flex;flex-direction:column;gap:6px">
+                <div style="display:flex;align-items:baseline;gap:10px">
+                  <span style="font:700 13px 'Bricolage Grotesque',sans-serif;color:var(--text)">{{ L.label }}</span>
+                  <span style="font-size:12px;color:var(--muted)">{{ L.note }}</span>
+                </div>
+                <div style="position:relative;height:66px">
+                  <div style="position:absolute;left:0;top:7px;width:64px;height:52px;border-radius:10px;background:var(--dmgbg);border:2px solid var(--dmgfg);display:grid;place-items:center;font:700 22px 'IBM Plex Mono',monospace;color:var(--dmgfg);z-index:2;transform:{{ L.tokenTf }};opacity:{{ L.tokenOp }};box-shadow:{{ L.tokenShadow }};transition:transform .58s cubic-bezier(.3,.8,.4,1),opacity .36s ease-out,box-shadow .5s">{{ L.dmg }}</div>
+                  <div style="position:absolute;left:338px;top:0;font:600 11px 'IBM Plex Sans',sans-serif;color:var(--deffg);opacity:{{ L.absorbOp }};animation:{{ L.absorbAnim }}">{{ L.absorbText }}</div>
+                  <div style="position:absolute;left:410px;top:7px;width:52px;height:52px;border-radius:10px 10px 22px 22px;background:var(--defbg);border:2px solid var(--deffg);display:grid;place-items:center;font:700 19px 'IBM Plex Mono',monospace;color:var(--deffg);animation:{{ L.shieldAnim }}">{{ L.shieldN }}</div>
+                  <div style="position:absolute;right:0;top:0;height:66px;display:flex;align-items:center;gap:12px">
+                    <div style="width:34px;height:34px;border-radius:50%;background:{{ L.hex }};border:2px solid var(--ink);display:grid;place-items:center;font:600 13px 'IBM Plex Mono',monospace;color:{{ L.ink }}">{{ L.initial }}</div>
+                    <span style="width:44px;font-size:13px;font-weight:600;color:var(--text)">{{ L.target }}</span>
+                    <div style="display:flex;gap:4px">
+                      <sc-for list="{{ L.pips }}" as="p" hint-placeholder-count="7">
+                        <span style="width:22px;height:26px;border-radius:4px;background:{{ p.bg }};border:1px solid {{ p.line }};box-sizing:border-box;animation:{{ p.anim }}"></span>
+                      </sc-for>
+                    </div>
+                    <span style="width:26px;font:700 20px 'IBM Plex Mono',monospace;color:var(--text);animation:{{ L.stamAnim }}">{{ L.stamNow }}</span>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:8px;padding-top:2px">
+            <span style="font-size:12px;color:var(--muted);margin-right:2px">Pace</span>
+            <div style="display:flex;gap:2px;background:var(--surface2);border-radius:999px;padding:3px">
+              <sc-for list="{{ paceChips }}" as="p" hint-placeholder-count="3">
+                <button onClick="{{ p.set }}" style="height:26px;padding:0 13px;border-radius:999px;border:none;background:{{ p.bg }};color:{{ p.fg }};font:600 12px 'IBM Plex Sans',sans-serif;cursor:pointer">{{ p.n }}</button>
+              </sc-for>
+            </div>
+            <span style="flex:1"></span>
+            <button onClick="{{ skipStrike }}" style="height:32px;padding:0 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--text);font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:var(--surface2)">Skip to the end</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ strikeOver }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:14px;padding:18px 4px 6px;animation:ff-banner .42s cubic-bezier(.2,.9,.3,1.2)">
+            <img src="assets/punch-blast.svg" alt="" style="width:56px;height:56px;border-radius:12px;display:block">
+            <div>
+              <div style="font:700 36px 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;color:var(--text)">{{ resultTitle }}</div>
+              <div style="font-size:14px;color:var(--muted);margin-top:5px">{{ resultLine }}</div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:4px">
+              <a href="Fractured%20Fist%20Loadout.dc.html" style="height:46px;padding:0 20px;border-radius:12px;background:var(--action);color:#fff;font:600 15px 'IBM Plex Sans',sans-serif;display:grid;place-items:center;text-decoration:none;box-shadow:0 3px 0 var(--actionh)" style-hover="background:var(--actionh)">Play again, new seven</a>
+              <button style="height:46px;padding:0 20px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--text);font:500 15px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:var(--surface2)">Back to Fractured Fist</button>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- refine interrupt -->
+  <sc-if value="{{ refineOn }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;left:50%;bottom:196px;transform:translateX(-50%);display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--danger);border-radius:12px;box-shadow:var(--shadowlg);padding:11px 16px;animation:ff-fade .2s ease-out;z-index:30">
+      <span style="font-size:13px;font-weight:600;color:var(--text)">Assess is asking: remove {{ refineCount }} more from your hand, for good.</span>
+      <span style="font-size:12px;color:var(--muted)">Pick a card below, or skip the rest.</span>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900},"theme":{"editor":"enum","options":["light","dark"],"default":"light","tsType":"string","section":"Table"}}'>
+const THEMES = {
+  light:{'--mark':'#1f4d3a','--markhead':'#e0762b','--bg':'#f7f1e6','--surface':'#ffffff','--surface2':'#efe7d8','--text':'#1c1a17','--muted':'#6b655b','--brand':'#1f4d3a','--action':'#e0762b','--actionh':'#c9662a','--hl':'#1f4d3a','--hlbg':'#e6efe9','--youbg':'#fbe3d2','--youfg':'#7a3a12','--danger':'#b3261e','--line':'rgba(28,26,23,.12)','--ink':'#1c1a17','--cardface':'#fffdf8','--cardback':'#efe7d8','--scrim':'rgba(28,26,23,.42)','--shadow':'0 1px 2px rgba(28,26,23,.06),0 4px 12px rgba(28,26,23,.06)','--shadowlg':'0 8px 30px rgba(28,26,23,.18)','--dmgbg':'#fae3e0','--dmgfg':'#8f2018','--defbg':'#e2ebf7','--deffg':'#24507f','--stam':'#1f4d3a','--missfill':'#8a8578'},
+  dark:{'--mark':'#f3ead9','--markhead':'#ff8a3d','--bg':'#1a221c','--surface':'#232e26','--surface2':'#2c3a30','--text':'#f3ead9','--muted':'#b1ac9f','--brand':'#9bb08a','--action':'#ff8a3d','--actionh':'#e2792f','--hl':'#9bb08a','--hlbg':'#2f4a3a','--youbg':'#5a2c10','--youfg':'#fbe3d2','--danger':'#ff7b6b','--line':'rgba(243,234,217,.14)','--ink':'#0f150f','--cardface':'#2f3b32','--cardback':'#3a4a3f','--scrim':'rgba(0,0,0,.55)','--shadow':'0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.3)','--shadowlg':'0 8px 30px rgba(0,0,0,.5)','--dmgbg':'#4a201c','--dmgfg':'#ffb3a8','--defbg':'#1e2f45','--deffg':'#a9c8ee','--stam':'#9bb08a','--missfill':'#6d685f'}
+};
+const CHIPS = {
+  light:{Damage:['#fae3e0','#8f2018'],Defense:['#e2ebf7','#24507f'],Tech:['#e6efe9','#1f4d3a'],Draw:['#eceef2','#333d4a'],Spirit:['#ece4f8','#553592'],Channel:['#fbe3d2','#7a3a12'],Refine:['#efe7d8','#544d40'],Missteps:['#e6e2d9','#403c35'],Heal:['#dde9e1','#1f4d3a'],Worth:['#f8ecd6','#7d5410']},
+  dark:{Damage:['#4a201c','#ffb3a8'],Defense:['#1e2f45','#a9c8ee'],Tech:['#2f4a3a','#bcd3b0'],Draw:['#2b3138','#cfd6de'],Spirit:['#332a48','#cbb5f0'],Channel:['#4a2c14','#ffc79a'],Refine:['#37332b','#ccc4b4'],Missteps:['#32302a','#c3bdb0'],Heal:['#2f4a3a','#bcd3b0'],Worth:['#3b3120','#e3b463']}
+};
+const TYPEC = {light:{RESOURCE:'#8a5a12',TECHNIQUE:'#24507f',MISSTEP:'#5b564d'},dark:{RESOURCE:'#e3b463',TECHNIQUE:'#9dc0e8',MISSTEP:'#a8a297'}};
+const ACCENT = {light:{RESOURCE:'#e6a23c',TECHNIQUE:'#3f7cc9',MISSTEP:'#8a8578'},dark:{RESOURCE:'#e3b463',TECHNIQUE:'#6f9fd8',MISSTEP:'#6d685f'}};
+
+// Cards, costs and effects are the engine's, via docs/games/fractured-fist.md.
+const CARDS = {
+  focus:{name:'Focus',type:'RESOURCE',cost:0,worth:1,fx:[],foot:'reload fuel'},
+  momentum:{name:'Momentum',type:'RESOURCE',cost:3,worth:2,fx:[],foot:''},
+  mastery:{name:'Mastery',type:'RESOURCE',cost:6,worth:3,fx:[],foot:''},
+  misstep:{name:'Misstep',type:'MISSTEP',cost:0,fx:[],foot:'cannot be played'},
+  attack:{name:'Attack',type:'TECHNIQUE',cost:4,fx:[['Damage',1]],foot:''},
+  block:{name:'Block',type:'TECHNIQUE',cost:3,fx:[['Defense',1]],foot:''},
+  react:{name:'React',type:'TECHNIQUE',cost:3,fx:[['Tech',2]],foot:''},
+  quicken:{name:'Quicken',type:'TECHNIQUE',cost:2,fx:[['Draw',2]],foot:''},
+  center:{name:'Center',type:'TECHNIQUE',cost:2,fx:[['Spirit',2]],foot:''},
+  distract:{name:'Distract',type:'TECHNIQUE',cost:3,fx:[['Missteps',2]],foot:'to their discard'},
+  assess:{name:'Assess',type:'TECHNIQUE',cost:2,fx:[['Refine',2]],foot:'removes for good'}
+};
+const SHELF = ['focus','momentum','mastery','attack','block','react','quicken','center','distract','assess'];
+
+// How long each beat of the strike holds, in ms at normal pace.
+const BEATS = {1:780, 2:620, 3:580, 4:640, 5:640, 6:840};
+const CAPTIONS = {
+  1:'Both hits are locked in. They land at the same time.',
+  2:'The hits travel.',
+  4:'What gets through comes off stamina.',
+  5:'Both played rows sweep into the discards.',
+  6:'Actions and channels back to 1, spirit to 0.'
+};
+
+let uid = 100;
+const nid = () => 'c' + (uid++);
+const mk = (id) => ({u:nid(), c:id});
+
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    this.state = {
+      theme:null, round:4, phase:'technique', turn:'you', fresh:{}, pending:0,
+      strike:null, lastStrike:null, sweeping:false, pace:1,
+      you:{stam:5, miss:4, act:1, ch:1, spirit:0, dmg:0, def:0, reloads:0, refine:0},
+      them:{stam:6, miss:2, dmg:3, def:1, hand:5, deck:9, discard:8},
+      hand:[mk('attack'), mk('focus'), mk('quicken'), mk('misstep'), mk('momentum')],
+      deck:['focus','misstep','focus','momentum','focus','attack'],
+      discard:['focus','block','misstep','focus','focus','attack','momentum','focus','misstep','focus','block'],
+      played:[], theirPlayed:[mk('attack'), mk('attack'), mk('block')],
+      supplyYou:{focus:18,momentum:19,mastery:20,attack:3,block:4,react:5,quicken:4,center:5,distract:5,assess:4},
+      supplyThem:{focus:17,momentum:18,mastery:20,attack:2,block:4,react:5,quicken:5,center:5,distract:4,assess:5},
+      log:[
+        {r:4, who:'them', text:'Rook plays Attack, Attack, Block. Three damage queued, one defense.'},
+        {r:4, who:'table', text:'Round 4 begins. Actions and channels reset to 1, spirit to 0.'},
+        {r:3, who:'table', text:'Strike: Rook takes 2, you take 1. You 5, Rook 6.'},
+        {r:3, who:'you', text:'You buy Attack for 4 spirit. It goes to your discard.'}
+      ]
+    };
+  }
+
+  theme(){ return this.state.theme || this.props.theme || 'light'; }
+  push(text, who){ this.setState((s)=>({log:[{r:s.round, who:who||'you', text:text}].concat(s.log).slice(0,40)})); }
+  flash(key){ this.setState((s)=>({fresh:Object.assign({}, s.fresh, {[key]:Date.now()})})); }
+
+  // Draw N, reshuffling the discard into the deck when it runs dry.
+  draw(n){
+    this.setState((s)=>{
+      let deck = s.deck.slice(), discard = s.discard.slice(), hand = s.hand.slice(), note = null;
+      for (let i=0;i<n;i++){
+        if (deck.length === 0){
+          if (discard.length === 0) break;
+          deck = discard.slice();
+          for (let j=deck.length-1;j>0;j--){ const k=Math.floor(Math.random()*(j+1)); const t=deck[j]; deck[j]=deck[k]; deck[k]=t; }
+          discard = [];
+          note = 'Your discard shuffles into a new deck.';
+        }
+        const c = deck.shift();
+        const card = mk(c); card.fresh = true;
+        hand.push(card);
+      }
+      return {deck:deck, discard:discard, hand:hand, reshuffleNote:note};
+    });
+    clearTimeout(this.freshT);
+    this.freshT = setTimeout(()=>this.setState((s)=>({hand:s.hand.map((c)=>c.fresh?{u:c.u,c:c.c}:c), reshuffleNote:null})), 900);
+  }
+
+  playable(card){
+    const s = this.state, d = CARDS[card.c];
+    if (s.turn !== 'you') return 'Rook is taking their turn.';
+    if (s.you.refine > 0) return null; // refine mode: everything is pickable
+    if (s.pending > 0) return 'Draw the cards you are owed first.';
+    if (d.type === 'MISSTEP') return 'Missteps cannot be played. Refine one to remove it for good.';
+    if (d.type === 'TECHNIQUE'){
+      if (s.phase !== 'technique') return 'Techniques play in the Technique step.';
+      if (s.you.act < 1) return 'No actions left this turn.';
+      return null;
+    }
+    if (s.phase !== 'channel') return 'Resources play in the Channel step. Advance when you are ready.';
+    return null;
+  }
+
+  pick(card){
+    const s = this.state;
+    if (s.turn !== 'you') return;
+    if (s.you.refine > 0){ this.refine(card); return; }
+    if (this.playable(card)) return;
+    const d = CARDS[card.c];
+    if (d.type === 'RESOURCE'){
+      this.setState((st)=>({
+        hand: st.hand.filter((c)=>c.u!==card.u),
+        played: st.played.concat([{u:card.u, c:card.c, fresh:true}]),
+        you: Object.assign({}, st.you, {spirit: st.you.spirit + d.worth})
+      }));
+      this.flash('spirit');
+      this.push('You play ' + d.name + ' for ' + d.worth + ' spirit.');
+      return;
+    }
+    // technique: one action, then the card's own effects
+    let text = 'You play ' + d.name + '.';
+    this.setState((st)=>{
+      const y = Object.assign({}, st.you); const t = Object.assign({}, st.them);
+      let discard = st.discard.slice();
+      y.act -= 1;
+      d.fx.forEach((f)=>{
+        const kind = f[0], n = f[1];
+        if (kind === 'Tech') y.act += n;
+        if (kind === 'Damage') y.dmg += n;
+        if (kind === 'Defense') y.def += n;
+        if (kind === 'Spirit') y.spirit += n;
+        if (kind === 'Channel') y.ch += n;
+        if (kind === 'Refine') y.refine += n;
+        if (kind === 'Heal') y.stam = Math.min(7, y.stam + n);
+        if (kind === 'Missteps'){ const room = Math.max(0, 10 - t.miss); const put = Math.min(room, n); t.miss += put; t.discard += put; }
+      });
+      return {hand: st.hand.filter((c)=>c.u!==card.u), played: st.played.concat([{u:card.u, c:card.c, fresh:true}]), you:y, them:t, discard:discard};
+    });
+    // A draw is randomness: it waits for the player to press Draw, never resolves itself.
+    const owed = d.fx.filter((f)=>f[0] === 'Draw').reduce((a, f)=>a + f[1], 0);
+    if (owed) this.setState((st)=>({pending: st.pending + owed}));
+    d.fx.forEach((f)=>{
+      if (f[0] === 'Damage') this.flash('dmg');
+      if (f[0] === 'Defense') this.flash('def');
+      if (f[0] === 'Spirit') this.flash('spirit');
+      if (f[0] === 'Tech') this.flash('act');
+    });
+    if (d.fx.length) text += ' ' + d.fx.map((f)=>'+' + f[1] + ' ' + f[0]).join(', ') + '.';
+    this.push(text);
+  }
+
+  refine(card){
+    const d = CARDS[card.c];
+    this.setState((st)=>{
+      const y = Object.assign({}, st.you);
+      y.refine = Math.max(0, y.refine - 1);
+      if (d.type === 'MISSTEP') y.miss = Math.max(0, y.miss - 1);
+      return {hand: st.hand.filter((c)=>c.u!==card.u), you:y};
+    });
+    this.push('You refine ' + d.name + '. It leaves the game.');
+  }
+  skipRefine(){ this.setState((s)=>({you:Object.assign({}, s.you, {refine:0})})); this.push('You skip the rest of the refine.'); }
+
+  // Every resource in hand, played in one press. Still the player's call: the
+  // table never cashes them in on its own, and it says what the press costs you.
+  playAllResources(){
+    const s = this.state;
+    if (s.turn !== 'you' || s.phase !== 'channel' || s.you.refine > 0 || s.pending > 0) return;
+    const res = s.hand.filter((c)=>CARDS[c.c].type === 'RESOURCE');
+    if (res.length < 2) return;
+    const gain = res.reduce((a, c)=>a + CARDS[c.c].worth, 0);
+    const tally = {};
+    res.forEach((c)=>{ tally[CARDS[c.c].name] = (tally[CARDS[c.c].name] || 0) + 1; });
+    const names = Object.keys(tally).map((n)=>tally[n] > 1 ? (n + ' x' + tally[n]) : n).join(', ');
+    this.setState((st)=>({
+      hand: st.hand.filter((c)=>CARDS[c.c].type !== 'RESOURCE'),
+      played: st.played.concat(res.map((c, i)=>({u:c.u, c:c.c, fresh:true, d:i * 0.07}))),
+      you: Object.assign({}, st.you, {spirit: st.you.spirit + gain})
+    }));
+    this.flash('spirit');
+    this.push('You play ' + names + '. ' + gain + ' spirit.');
+  }
+
+  buy(id){
+    const s = this.state, d = CARDS[id];
+    if (s.turn !== 'you' || s.phase !== 'channel' || s.you.refine > 0) return;
+    if (s.you.spirit < d.cost || s.you.ch < 1 || s.supplyYou[id] < 1) return;
+    this.setState((st)=>({
+      you: Object.assign({}, st.you, {spirit: st.you.spirit - d.cost, ch: st.you.ch - 1}),
+      supplyYou: Object.assign({}, st.supplyYou, {[id]: st.supplyYou[id] - 1}),
+      discard: st.discard.concat([id]), bought: id
+    }));
+    this.flash('discard');
+    this.push('You buy ' + d.name + ' for ' + d.cost + ' spirit. It lands in your discard.');
+  }
+
+  reload(){
+    const s = this.state;
+    if (s.turn !== 'you' || s.you.stam >= s.them.stam || s.you.reloads >= 3) return;
+    const n = s.hand.filter((c)=>c.c==='focus').length;
+    if (n === 0) return;
+    this.setState((st)=>({
+      hand: st.hand.filter((c)=>c.c!=='focus'),
+      discard: st.discard.concat(st.hand.filter((c)=>c.c==='focus').map((c)=>c.c)),
+      you: Object.assign({}, st.you, {reloads: st.you.reloads + 1})
+    }));
+    this.draw(n);
+    this.push('Focus reload: ' + n + ' Focus to the discard, ' + n + ' new cards drawn.');
+  }
+
+  advance(){
+    if (this.state.phase !== 'technique' || this.state.you.refine > 0) return;
+    this.setState({phase:'channel'});
+    this.push('You advance to the Channel step.', 'table');
+  }
+
+  endTurn(){
+    const s = this.state;
+    if (s.turn !== 'you' || s.you.refine > 0) return;
+    const n = s.hand.length;
+    this.setState((st)=>({
+      discard: st.discard.concat(st.hand.map((c)=>c.c)), hand: [], phase:'cleanup', pending:5
+    }));
+    this.push('You end your turn. ' + n + ' cards to the discard.', 'table');
+  }
+
+  // Every draw is a press. The deck never deals itself.
+  drawNow(){
+    const s = this.state;
+    if (s.pending < 1) return;
+    const n = s.pending;
+    this.draw(n);
+    this.setState({pending:0});
+    if (s.phase === 'cleanup'){ this.setState({turn:'them'}); this.push('You draw back up to five. Rook takes their turn.', 'table'); }
+    else this.push('You draw ' + n + '.');
+  }
+
+  // ---- the strike: the one beat of the round that gets more than a moment ----
+  // Six steps, both hits running at the same time, pace in the player's hands.
+  startStrike(){
+    const s = this.state;
+    if (s.turn !== 'them' || s.strike) return;
+    const toThem = Math.max(0, s.you.dmg - s.them.def);
+    const toYou = Math.max(0, s.them.dmg - s.you.def);
+    const themAfter = s.them.stam - toThem, youAfter = s.you.stam - toYou;
+    const k = {
+      beat:0, replay:false,
+      youDmg:s.you.dmg, youDef:s.you.def, themDmg:s.them.dmg, themDef:s.them.def,
+      toThem:toThem, toYou:toYou,
+      absThem: Math.min(s.them.def, s.you.dmg), absYou: Math.min(s.you.def, s.them.dmg),
+      themBefore:s.them.stam, youBefore:s.you.stam, themAfter:themAfter, youAfter:youAfter,
+      over: themAfter <= 0 || youAfter <= 0,
+      result: (themAfter <= 0 && youAfter <= 0) ? 'tie' : (themAfter <= 0 ? 'you' : (youAfter <= 0 ? 'them' : null))
+    };
+    this.setState({strike:k, lastStrike:k});
+    this.step(1);
+  }
+
+  step(n){
+    const k = this.state.strike;
+    if (!k) return;
+    if (k.replay && n >= 5){ this.setState({strike:null}); return; }
+    if (n >= 7){ this.setState({strike:null}); return; }
+    if (n === 4 && !k.replay) this.landDamage();
+    if (n === 5 && !k.replay){
+      if (k.over){ this.setState({strike: Object.assign({}, k, {beat:5})}); return; }
+      this.setState({sweeping:true});
+    }
+    if (n === 6 && !k.replay) this.endRound();
+    this.setState({strike: Object.assign({}, k, {beat:n})});
+    this.strikeT = setTimeout(()=>this.step(n+1), BEATS[n] * this.state.pace);
+  }
+
+  landDamage(){
+    const k = this.state.strike;
+    this.setState((st)=>({
+      you: Object.assign({}, st.you, {stam: k.youAfter}),
+      them: Object.assign({}, st.them, {stam: k.themAfter})
+    }));
+    this.push('Strike: Rook takes ' + k.toThem + ', you take ' + k.toYou + '.', 'table');
+  }
+
+  endRound(){
+    this.setState((st)=>({
+      round: st.round + 1, turn:'you', phase:'technique', sweeping:false,
+      you: Object.assign({}, st.you, {act:1, ch:1, spirit:0, dmg:0, def:0, reloads:0}),
+      them: Object.assign({}, st.them, {dmg:2, def:0}),
+      discard: st.discard.concat(st.played.map((c)=>c.c)), played: [], theirPlayed: [mk('attack'), mk('quicken')]
+    }));
+    this.push('Both played rows sweep into the discards. Actions and channels back to 1, spirit to 0.', 'table');
+  }
+
+  skipStrike(){
+    clearTimeout(this.strikeT);
+    const k = this.state.strike;
+    if (!k) return;
+    if (k.replay){ this.setState({strike:null}); return; }
+    if (k.beat < 4) this.landDamage();
+    if (k.over){ this.setState({strike: Object.assign({}, k, {beat:5})}); return; }
+    this.endRound();
+    this.setState({strike:null, sweeping:false});
+  }
+
+  replayStrike(){
+    const last = this.state.lastStrike;
+    if (!last || this.state.strike) return;
+    clearTimeout(this.strikeT);
+    this.setState({strike: Object.assign({}, last, {beat:0, replay:true})});
+    this.step(1);
+  }
+
+  setPace(p){ this.setState({pace:p}); }
+
+  undo(){ /* wired to the engine in the build; drawn here so the affordance is designed */ }
+
+  cardView(card, place){
+    const th = this.theme(), d = CARDS[card.c], chips = CHIPS[th];
+    const fx = d.fx.map((f)=>({t:'+' + f[1] + ' ' + f[0], bg:chips[f[0]][0], fg:chips[f[0]][1]}));
+    if (d.worth) fx.unshift({t:d.worth + ' spirit', bg:chips.Worth[0], fg:chips.Worth[1]});
+    return {
+      u:card.u, name:d.name, type:d.type, cost:d.cost === 0 ? '0' : String(d.cost),
+      costBg: th === 'light' ? '#24507f' : '#9dc0e8', costFg: th === 'light' ? '#ffffff' : '#12202f',
+      typeColor: TYPEC[th][d.type], accent: ACCENT[th][d.type], chips: fx, foot: d.foot,
+      title: d.name + ' · ' + d.type.toLowerCase() + ' · costs ' + d.cost + ' spirit to buy',
+      anim: card.fresh ? (place === 'hand' ? 'ff-drawin .42s cubic-bezier(.2,.8,.2,1) both' : ('ff-fly .34s cubic-bezier(.2,.8,.2,1) ' + (card.d || 0) + 's both')) : 'none'
+    };
+  }
+
+  componentWillUnmount(){ clearTimeout(this.freshT); clearTimeout(this.strikeT); }
+
+  renderVals(){
+    const s = this.state, th = this.theme(), T = THEMES[th], chips = CHIPS[th];
+    const rootStyle = Object.assign({}, T, {width:'1440px', height:'900px', display:'flex', flexDirection:'column', background:'var(--bg)', fontFamily:"'IBM Plex Sans',sans-serif", overflow:'hidden', borderRadius:'12px', boxSizing:'border-box', position:'relative', color:'var(--text)'});
+    const yours = s.turn === 'you', refineOn = s.you.refine > 0, pendingOn = s.pending > 0;
+    const pips = (cur, max, fill) => Array.from({length:max}, (_, i)=>({bg: i < cur ? fill : 'transparent', line: i < cur ? fill : 'var(--line)'}));
+
+    const toThem = Math.max(0, s.you.dmg - s.them.def);
+    const toYou = Math.max(0, s.them.dmg - s.you.def);
+    const netStyle = (n) => n > 0 ? {bg:'var(--dmgbg)', fg:'var(--dmgfg)'} : {bg:'var(--defbg)', fg:'var(--deffg)'};
+    const strike = [
+      {label:'You hit Rook', arrowPath:'M8 13.5 L8 2.5 M8 2.5 L3.5 7 M8 2.5 L12.5 7', arrowColor:'var(--dmgfg)', dmg:s.you.dmg, def:s.them.def, net: toThem > 0 ? toThem + ' through' : 'all blocked', netBg:netStyle(toThem).bg, netFg:netStyle(toThem).fg, stamLine:'Rook ' + s.them.stam + ' to ' + (s.them.stam - toThem)},
+      {label:'Rook hits you', arrowPath:'M8 2.5 L8 13.5 M8 13.5 L3.5 9 M8 13.5 L12.5 9', arrowColor:'var(--dmgfg)', dmg:s.them.dmg, def:s.you.def, net: toYou > 0 ? toYou + ' through' : 'all blocked', netBg:netStyle(toYou).bg, netFg:netStyle(toYou).fg, stamLine:'You ' + s.you.stam + ' to ' + (s.you.stam - toYou)}
+    ];
+
+    const hand = s.hand.map((c, i, arr)=>{
+      const v = this.cardView(c, 'hand'), why = this.playable(c), ok = !why;
+      const mid = (arr.length - 1) / 2;
+      return Object.assign({}, v, {
+        onClick: ()=>this.pick(c),
+        rot: (i - mid) * 4, ty: Math.abs(i - mid) * 4,
+        cursor: (ok || refineOn) ? 'pointer' : 'default',
+        opacity: (ok || refineOn) ? 1 : .5,
+        outline: refineOn ? '3px solid var(--danger)' : (ok ? '2px solid var(--action)' : 'none'),
+        shadow: (ok || refineOn) ? '0 6px 16px rgba(0,0,0,.16)' : 'var(--shadow)',
+        title: refineOn ? 'Remove ' + v.name + ' from the game' : (why || ('Play ' + v.name)),
+        aria: refineOn ? ('Refine ' + v.name) : ('Play ' + v.name)
+      });
+    });
+
+    const supply = SHELF.map((id)=>{
+      const d = CARDS[id], v = this.cardView({u:id, c:id}, 'shelf');
+      const affordable = s.phase === 'channel' && yours && !refineOn && s.you.spirit >= d.cost && s.you.ch > 0 && s.supplyYou[id] > 0;
+      const chip = d.worth ? (d.worth + ' spirit') : (d.fx.length ? '+' + d.fx[0][1] + ' ' + d.fx[0][0] : 'no effect');
+      const ck = d.worth ? 'Worth' : (d.fx.length ? d.fx[0][0] : 'Missteps');
+      let title = d.name + ' costs ' + d.cost + ' spirit.';
+      if (s.phase !== 'channel') title += ' Buying opens in the Channel step.';
+      else if (s.you.ch < 1) title += ' No channels left this turn.';
+      else if (s.you.spirit < d.cost) title += ' You have ' + s.you.spirit + ' spirit.';
+      return {
+        buy: ()=>this.buy(id), name:d.name, cost:v.cost, costBg:v.costBg, costFg:v.costFg, accent:v.accent,
+        chip: chip, chipBg: chips[ck][0], chipFg: chips[ck][1],
+        youCount: s.supplyYou[id], themCount: s.supplyThem[id],
+        cursor: affordable ? 'pointer' : 'default', opacity: affordable ? 1 : .62,
+        outline: affordable ? '2px solid var(--action)' : 'none',
+        shadow: affordable ? '0 6px 14px rgba(0,0,0,.14)' : 'var(--shadow)',
+        title: title, aria: 'Buy ' + d.name + ' for ' + d.cost + ' spirit'
+      };
+    });
+
+    const stepName = {technique:'Technique', channel:'Channel', cleanup:'Cleanup'};
+    const steps = ['technique','channel','cleanup'].map((p)=>({
+      name: stepName[p],
+      bg: s.phase === p ? 'var(--brand)' : 'var(--surface2)',
+      fg: s.phase === p ? '#ffffff' : 'var(--muted)'
+    }));
+
+    let hintTitle = 'Technique step', hintSub = 'Play techniques, one action each. Nothing moves on until you say so.';
+    if (refineOn){ hintTitle = 'Remove ' + s.you.refine + ' more card' + (s.you.refine === 1 ? '' : 's'); hintSub = 'Pick from your hand, or skip the rest. Refined cards leave the game.'; }
+    else if (pendingOn){ hintTitle = 'Draw ' + s.pending; hintSub = s.phase === 'cleanup' ? 'Your hand went to the discard. Draw back up to five and Rook takes their turn.' : 'The card you played owes you cards. Press the deck, or the button.'; }
+    else if (!yours){ hintTitle = 'Rook is taking their turn'; hintSub = 'When they finish, both hits land at once.'; }
+    else if (s.phase === 'channel'){ hintTitle = 'Channel step'; hintSub = 'Play resources for spirit, then buy from your supply. ' + s.you.spirit + ' spirit, ' + s.you.ch + ' channel left.'; }
+    else if (s.you.act < 1){ hintTitle = 'No actions left'; hintSub = 'Advance to Channel to spend spirit, or end your turn.'; }
+
+    // Only the counters this step can change. The rest are noise until their turn comes.
+    const counters = (s.phase === 'channel'
+      ? [{label:'spirit', value:s.you.spirit, key:'spirit'}, {label:'channels left', value:s.you.ch, key:'ch'}]
+      : [{label:'actions left', value:s.you.act, key:'act'}]
+    ).map((c)=>({label:c.label, value:c.value, bg:'var(--surface2)', fg:'var(--text)', anim: s.fresh[c.key] ? 'ff-tick .3s ease-out' : 'none'}));
+
+    const reloadLegal = yours && s.you.stam < s.them.stam;
+    const focusInHand = s.hand.filter((c)=>c.c === 'focus').length;
+    const canReload = reloadLegal && s.you.reloads < 3 && focusInHand > 0 && !refineOn;
+
+    // Cash in everything at once. Only offered when there is more than one card
+    // to click, and it names the Focus it will use up.
+    const resInHand = s.hand.filter((c)=>CARDS[c.c].type === 'RESOURCE');
+    const cashGain = resInHand.reduce((a, c)=>a + CARDS[c.c].worth, 0);
+    const focusInBatch = resInHand.filter((c)=>c.c === 'focus').length;
+    const cashCostsReload = reloadLegal && s.you.reloads < 3 && focusInBatch > 0;
+
+    const logView = s.log.map((l, i)=>({
+      round: 'R' + l.r,
+      text: l.text,
+      fg: l.who === 'table' ? 'var(--muted)' : 'var(--text)',
+      mark: l.who === 'you' ? 'var(--action)' : (l.who === 'them' ? '#7a8b99' : 'var(--line)'),
+      anim: i === 0 ? 'ff-fade .25s ease-out' : 'none'
+    }));
+
+    const discardTopId = s.discard.length ? s.discard[s.discard.length - 1] : null;
+
+    // ---- the strike overlay, beat by beat ----
+    const k = s.strike, b = k ? k.beat : 0;
+    const lane = (o) => {
+      const shown = b <= 2 ? o.dmg : o.net;
+      let tf = 'translateX(0)';
+      if (b === 2 || b === 3) tf = 'translateX(330px)';
+      if (b >= 4) tf = o.net > 0 ? 'translateX(560px) scale(.5)' : 'translateX(330px) scale(.7)';
+      return {
+        label:o.label,
+        note: o.dmg === 0 ? 'nothing queued this round' : (o.abs > 0 ? (o.blocker + ' blocks ' + o.abs + ' of ' + o.dmg) : 'no defense in the way'),
+        dmg:String(shown), tokenTf:tf, tokenOp: b >= 4 ? 0 : 1,
+        tokenShadow: b === 2 ? '0 16px 28px rgba(0,0,0,.30)' : '0 3px 8px rgba(0,0,0,.18)',
+        shieldN:String(o.def), shieldAnim: (b === 3 && o.abs > 0) ? 'ff-shield .46s ease-out' : 'none',
+        absorbText: o.abs > 0 ? (o.abs + ' absorbed') : '',
+        absorbOp: (b >= 3 && o.abs > 0) ? 1 : 0,
+        absorbAnim: (b === 3 && o.abs > 0) ? 'ff-absorb .52s ease-out forwards' : 'none',
+        target:o.target, initial:o.initial, hex:o.hex, ink:o.ink,
+        stamNow: String(b >= 4 ? Math.max(0, o.after) : o.before),
+        stamAnim: b >= 4 ? 'ff-tick .34s ease-out' : 'none',
+        pips: Array.from({length:7}, (_, i)=>{
+          if (i < o.after) return {bg:'var(--stam)', line:'var(--stam)', anim:'none'};
+          if (i < o.before) return {bg:'var(--stam)', line:'var(--stam)', anim: b >= 4 ? ('ff-pipout .46s cubic-bezier(.3,.8,.4,1) ' + ((i - Math.max(0, o.after)) * 0.06) + 's forwards') : 'none'};
+          return {bg:'transparent', line:'var(--line)', anim:'none'};
+        })
+      };
+    };
+    const lanes = k ? [
+      lane({label:'You hit Rook', dmg:k.youDmg, def:k.themDef, abs:k.absThem, net:k.toThem, before:k.themBefore, after:k.themAfter, target:'Rook', initial:'R', hex:'#7a8b99', ink:'#0f150f', blocker:'Rook'}),
+      lane({label:'Rook hits you', dmg:k.themDmg, def:k.youDef, abs:k.absYou, net:k.toYou, before:k.youBefore, after:k.youAfter, target:'You', initial:'Z', hex:'var(--action)', ink:'#1c1a17', blocker:'You'})
+    ] : [];
+    const absLine = k ? ((k.absThem > 0 ? 'Rook blocks ' + k.absThem + '. ' : 'Rook has no defense up. ') + (k.absYou > 0 ? 'You block ' + k.absYou + '.' : 'You have no defense up.')) : '';
+    const resultTitle = k && k.result === 'tie' ? 'A tie' : (k && k.result === 'you' ? 'Rook is down' : 'You are down');
+    const paceChips = [{n:'Slow', v:1.6}, {n:'Normal', v:1}, {n:'Fast', v:.6}].map((p)=>({
+      n:p.n, set: ()=>this.setPace(p.v),
+      bg: s.pace === p.v ? 'var(--brand)' : 'transparent',
+      fg: s.pace === p.v ? '#ffffff' : 'var(--muted)'
+    }));
+    const sweeping = s.sweeping;
+
+    return {
+      rootStyle: rootStyle, round: s.round,
+      toggleTheme: ()=>this.setState({theme: th === 'light' ? 'dark' : 'light'}),
+      themeLabel: th === 'light' ? 'Dark' : 'Light',
+      undo: ()=>this.undo(), undoOpacity: .45,
+      turnPill: yours ? {bg:'var(--youbg)', fg:'var(--youfg)', text:'Your turn'} : {bg:'var(--surface2)', fg:'var(--muted)', text:'Rook is thinking'},
+
+      theirPlayed: s.theirPlayed.map((c, i)=>Object.assign(this.cardView(c, 'row'), {
+        sweepTf: sweeping ? 'translate(640px,-214px) rotate(6deg) scale(.8)' : 'none',
+        sweepOp: sweeping ? 0 : 1, sweepDelay: (i * 0.05) + 's'
+      })),
+      theirPlayedCount: s.theirPlayed.length,
+      theirRowEmpty: s.theirPlayed.length === 0,
+      theirPlayedNote: 'stays on the table until the round ends',
+      yourPlayed: s.played.map((c, i)=>Object.assign(this.cardView(c, 'row'), {
+        sweepTf: sweeping ? 'translate(430px,248px) rotate(-6deg) scale(.8)' : 'none',
+        sweepOp: sweeping ? 0 : 1, sweepDelay: (i * 0.05) + 's'
+      })),
+      yourPlayedCount: s.played.length,
+      yourRowEmpty: s.played.length === 0,
+      yourPlayedNote: 'resources included',
+      strike: strike,
+
+      supply: supply,
+      supplyOpacity: s.phase === 'channel' ? 1 : .78,
+      supplyHint: s.phase === 'channel' ? 'Pick one to buy. It goes to your discard.' : 'Buying opens in the Channel step.',
+
+      steps: steps, hintTitle: hintTitle, hintSub: hintSub,
+      barBg: yours && !refineOn ? 'var(--youbg)' : 'var(--surface)',
+      barLine: refineOn ? 'var(--danger)' : 'var(--line)',
+      drawShown: pendingOn, drawLabel: 'Draw ' + s.pending, drawNow: ()=>this.drawNow(),
+      cashShown: yours && s.phase === 'channel' && !refineOn && !pendingOn && resInHand.length > 1,
+      cashLabel: 'Play all resources · +' + cashGain,
+      cashNote: cashCostsReload ? 'spends your ' + focusInBatch + ' Focus' : '',
+      cashTitle: 'Plays all ' + resInHand.length + ' resources into your played row at once, for ' + cashGain + ' spirit.' + (cashCostsReload ? ' Your ' + focusInBatch + ' Focus go with them, so no reload after this.' : ''),
+      cashIn: ()=>this.playAllResources(),
+      reloadShown: reloadLegal && !pendingOn, reloadCount: s.you.reloads,
+      reloadCursor: canReload ? 'pointer' : 'default', reloadOpacity: canReload ? 1 : .5,
+      reloadTitle: focusInHand === 0 ? 'No Focus in hand' : 'Discard every Focus in hand and draw that many. Allowed while your stamina is lower.',
+      doReload: ()=>this.reload(),
+      refineOn: refineOn, refineCount: s.you.refine, skipRefine: ()=>this.skipRefine(),
+      advanceShown: yours && s.phase === 'technique' && !refineOn && !pendingOn, advance: ()=>this.advance(),
+      endShown: yours && !refineOn && !pendingOn, endTurn: ()=>this.endTurn(),
+      continueShown: !yours && !k, continueLabel: 'Resolve the round', continueRound: ()=>this.startStrike(),
+
+      strikeOn: !!k,
+      strikeFight: !!k && !(k.over && b >= 5),
+      strikeOver: !!k && k.over && b >= 5,
+      strikeTitle: k && k.replay ? ('Round ' + s.round + ' · strike, again') : ('Round ' + s.round + ' · strike'),
+      strikeCaption: b === 3 ? absLine : (CAPTIONS[b] || ''),
+      strikeLanes: lanes,
+      strikeScrimOp: (b >= 5 && k && !k.over) ? 0 : 1,
+      strikePe: (b >= 5 && k && !k.over) ? 'none' : 'auto',
+      paceChips: paceChips, skipStrike: ()=>this.skipStrike(),
+      resultTitle: resultTitle,
+      resultLine: k ? ('Final stamina — you ' + Math.max(0, k.youAfter) + ', Rook ' + Math.max(0, k.themAfter) + '.') : '',
+      replayShown: !!s.lastStrike && !k, replayStrike: ()=>this.replayStrike(),
+
+      you: {stam:s.you.stam, miss:s.you.miss, pips:pips(s.you.stam, 7, 'var(--stam)'), missPips:pips(s.you.miss, 10, 'var(--missfill)')},
+      counters: counters,
+      youOutline: yours ? '2px solid var(--action)' : 'none',
+      hand: hand, handCount: s.hand.length,
+      handNote: s.reshuffleNote || (refineOn ? 'pick one to remove' : (yours ? '' : 'waiting')),
+      handNoteColor: s.reshuffleNote ? 'var(--action)' : 'var(--muted)',
+
+      deckCount: s.deck.length, deckAnim: 'none',
+      deckOutline: pendingOn ? '2px solid var(--action)' : 'none',
+      deckCursor: pendingOn ? 'pointer' : 'default',
+      deckAria: pendingOn ? ('Draw ' + s.pending + ' cards') : 'Your deck',
+      deckNote: pendingOn ? ('Press to draw ' + s.pending) : (s.deck.length < 5 ? 'Runs out mid-draw: the discard shuffles back in.' : 'Face down · you know what is in it'),
+      discardCount: s.discard.length,
+      discardTop: discardTopId ? CARDS[discardTopId].name : 'empty',
+      discardAccent: discardTopId ? ACCENT[th][CARDS[discardTopId].type] : 'var(--line)',
+      discardAnim: s.fresh.discard ? 'ff-buy .4s cubic-bezier(.2,.8,.2,1)' : 'none',
+
+      them: {
+        stam:s.them.stam, miss:s.them.miss, hand:s.them.hand, deck:s.them.deck, discard:s.them.discard,
+        pips:pips(s.them.stam, 7, 'var(--stam)'), missPips:pips(s.them.miss, 10, 'var(--missfill)'),
+        handBacks: Array.from({length:s.them.hand}, (_, i)=>({i:i}))
+      },
+      themOutline: yours ? 'none' : '2px solid var(--action)',
+      themTag: yours ? {bg:'var(--surface2)', fg:'var(--muted)', text:'waiting'} : {bg:'var(--youbg)', fg:'var(--youfg)', text:'their turn'},
+      roundNote: yours ? 'you move first, then Rook, then both hits land' : 'your turn is done',
+      order: [
+        {name:'Zeke', state: yours ? 'playing' : 'done', dot:'var(--action)', bg: yours ? 'var(--youbg)' : 'var(--surface2)', line: yours ? 'var(--action)' : 'var(--line)', fg:'var(--text)'},
+        {name:'Rook', state: yours ? 'up next' : 'playing', dot:'#7a8b99', bg: yours ? 'var(--surface2)' : 'var(--youbg)', line: yours ? 'var(--line)' : 'var(--action)', fg:'var(--text)'}
+      ],
+      log: logView
+    };
+  }
+}
+</script>
+</body>
+</html>

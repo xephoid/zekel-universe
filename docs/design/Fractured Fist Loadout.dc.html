@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fractured Fist loadout</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Slackey&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:var(--brand)}a:hover{color:var(--action)}
+@keyframes ff-fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes ff-slot{0%{transform:scale(.88);opacity:0}100%{transform:scale(1);opacity:1}}
+</style>
+</helmet>
+<div style="{{ rootStyle }}" data-screen-label="Fractured Fist loadout">
+
+  <div style="height:48px;flex:none;display:flex;align-items:center;gap:18px;padding:0 20px;background:var(--surface);border-bottom:1px solid var(--line);color:var(--text)">
+    <div style="display:inline-flex;align-items:center;gap:1px;font:400 24px 'Slackey',sans-serif;letter-spacing:-.02em;color:var(--mark)">ze<span style="display:inline-block;width:20px;height:20px;position:relative;transform:rotate(-90deg);margin:0 1px"><span style="position:absolute;left:50%;top:0;width:34%;height:34%;transform:translateX(-50%);border-radius:50%;background:var(--markhead)"></span><span style="position:absolute;left:0;top:28%;width:100%;height:24%;border-radius:999px;background:var(--markhead)"></span><span style="position:absolute;left:50%;top:40%;width:48%;height:36%;transform:translateX(-50%);border-radius:3px 3px 1px 1px;background:var(--markhead)"></span><span style="position:absolute;left:14%;bottom:0;width:32%;height:38%;border-radius:3px;transform:rotate(14deg);transform-origin:top center;background:var(--markhead)"></span><span style="position:absolute;right:14%;bottom:0;width:32%;height:38%;border-radius:3px;transform:rotate(-14deg);transform-origin:top center;background:var(--markhead)"></span></span>el</div>
+    <div style="width:1px;height:20px;background:var(--line)"></div>
+    <img src="assets/punch-blast.svg" alt="" style="width:22px;height:22px;border-radius:5px;display:block">
+    <div style="font-weight:600;font-size:14px">Fractured Fist</div>
+    <div style="flex:1"></div>
+    <button onClick="{{ toggleTheme }}" style="height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--text);font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:var(--surface2)">{{ themeLabel }}</button>
+  </div>
+
+  <div style="flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:32px;padding:22px 32px 0">
+
+    <!-- the thirty -->
+    <div style="min-width:0;min-height:0;overflow:auto;padding-bottom:28px;display:flex;flex-direction:column;gap:22px">
+      <div>
+        <a href="Fractured%20Fist%20Table.dc.html" style="font:500 13px 'IBM Plex Sans',sans-serif;color:var(--muted);text-decoration:none">&lsaquo; Table setup</a>
+        <div style="font:700 32px 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;margin-top:8px">Choose the seven techniques</div>
+        <div style="font-size:14px;color:var(--muted);margin-top:6px;max-width:620px;line-height:1.45">These seven fill both supplies, five copies each. You and Rook buy from the same list, so a technique you pick is one you will face. The other twenty-three stay out of this game.</div>
+      </div>
+
+      <div style="display:flex;gap:8px;align-items:center">
+        <button onClick="{{ useDefault }}" style="height:34px;padding:0 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--text);font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:var(--surface2)">Use the default seven</button>
+        <button onClick="{{ clearAll }}" style="height:34px;padding:0 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--muted);font:500 13px 'IBM Plex Sans',sans-serif;cursor:{{ clearCursor }};opacity:{{ clearOpacity }}" style-hover="background:var(--surface2)">Clear</button>
+        <span style="flex:1"></span>
+        <span style="font-size:12px;color:{{ warnColor }}">{{ warnText }}</span>
+      </div>
+
+      <sc-for list="{{ groups }}" as="g" hint-placeholder-count="5">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:9px">
+            <span style="width:11px;height:11px;border-radius:50%;background:{{ g.dot }};border:1.5px solid var(--ink);box-sizing:border-box"></span>
+            <span style="font:700 16px 'Bricolage Grotesque',sans-serif;color:var(--text)">{{ g.name }}</span>
+            <span style="font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">{{ g.count }}</span>
+            <span style="font-size:12px;color:var(--muted)">{{ g.note }}</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:10px">
+            <sc-for list="{{ g.cards }}" as="c" hint-placeholder-count="4">
+              <button onClick="{{ c.toggle }}" title="{{ c.title }}" aria-label="{{ c.aria }}" style="border-radius:10px;background:{{ c.bg }};border:1px solid var(--line);border-top:3px solid {{ c.accent }};box-shadow:{{ c.shadow }};box-sizing:border-box;padding:10px 11px;display:flex;flex-direction:column;gap:7px;text-align:left;cursor:pointer;outline:{{ c.outline }};outline-offset:-1px;font-family:'IBM Plex Sans',sans-serif;transition:transform .13s,box-shadow .13s" style-hover="transform:translateY(-2px)">
+                <div style="display:flex;gap:6px;align-items:flex-start">
+                  <div style="flex:1;min-width:0;font:700 14px/1.2 'Bricolage Grotesque',sans-serif;color:var(--text)">{{ c.name }}</div>
+                  <div style="width:22px;height:22px;flex:none;border-radius:5px;background:{{ costBg }};color:{{ costFg }};display:grid;place-items:center;font:600 12px 'IBM Plex Mono',monospace">{{ c.cost }}</div>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:4px">
+                  <sc-for list="{{ c.chips }}" as="f" hint-placeholder-count="2">
+                    <span style="padding:2px 7px;border-radius:999px;background:{{ f.bg }};color:{{ f.fg }};font:600 10px 'IBM Plex Sans',sans-serif">{{ f.t }}</span>
+                  </sc-for>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;min-height:16px">
+                  <span style="font:500 10px 'IBM Plex Mono',monospace;color:{{ c.tagColor }}">{{ c.tag }}</span>
+                </div>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <!-- your seven -->
+    <div style="min-height:0;display:flex;flex-direction:column;gap:14px;padding-bottom:22px">
+      <div style="flex:none;border-radius:12px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);padding:16px 18px;display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:baseline;gap:8px">
+          <span style="font:700 17px 'Bricolage Grotesque',sans-serif">Your seven</span>
+          <span style="flex:1"></span>
+          <span style="font:600 14px 'IBM Plex Mono',monospace;color:{{ countColor }}">{{ picked }}/7</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <sc-for list="{{ slots }}" as="s" hint-placeholder-count="7">
+            <div style="display:flex;align-items:center;gap:9px;height:38px;border-radius:9px;background:{{ s.bg }};border:1px {{ s.borderStyle }} {{ s.border }};box-sizing:border-box;padding:0 10px;animation:{{ s.anim }}">
+              <span style="width:16px;flex:none;font:500 10px 'IBM Plex Mono',monospace;color:var(--muted)">{{ s.n }}</span>
+              <sc-if value="{{ s.full }}" hint-placeholder-val="{{ true }}">
+                <span style="width:9px;height:9px;flex:none;border-radius:50%;background:{{ s.dot }};border:1.5px solid var(--ink);box-sizing:border-box"></span>
+                <span style="flex:1;min-width:0;font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.name }}</span>
+                <span style="font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">{{ s.effect }}</span>
+                <span style="width:20px;height:20px;flex:none;border-radius:4px;background:{{ costBg }};color:{{ costFg }};display:grid;place-items:center;font:600 10px 'IBM Plex Mono',monospace">{{ s.cost }}</span>
+                <button onClick="{{ s.remove }}" aria-label="{{ s.removeAria }}" style="width:22px;height:22px;flex:none;border-radius:5px;border:none;background:transparent;color:var(--muted);font:500 14px 'IBM Plex Mono',monospace;cursor:pointer;line-height:1" style-hover="color:var(--danger)">&times;</button>
+              </sc-if>
+              <sc-if value="{{ s.empty }}" hint-placeholder-val="{{ false }}">
+                <span style="flex:1;font-size:13px;color:var(--muted)">empty</span>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="flex:none;border-radius:12px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);padding:14px 18px;display:flex;flex-direction:column;gap:10px">
+        <div style="font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">WHAT THESE SEVEN CAN BUY YOU</div>
+        <sc-if value="{{ anyPicked }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-wrap:wrap;gap:5px">
+            <sc-for list="{{ totals }}" as="t" hint-placeholder-count="4">
+              <span style="padding:3px 9px;border-radius:999px;background:{{ t.bg }};color:{{ t.fg }};font:600 11px 'IBM Plex Sans',sans-serif">{{ t.t }}</span>
+            </sc-for>
+          </div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.45">{{ costLine }}</div>
+        </sc-if>
+        <sc-if value="{{ nonePicked }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:12px;color:var(--muted);line-height:1.45">Pick a technique and the totals show up here, so you can see what this game will be about before it starts.</div>
+        </sc-if>
+      </div>
+
+      <div style="flex:1"></div>
+
+      <div style="flex:none;display:flex;flex-direction:column;gap:8px">
+        <sc-if value="{{ ready }}" hint-placeholder-val="{{ false }}">
+          <a href="Fractured%20Fist%20Table.dc.html" style="height:52px;border-radius:12px;background:var(--action);color:#fff;font:600 16px 'IBM Plex Sans',sans-serif;display:grid;place-items:center;text-decoration:none;box-shadow:0 3px 0 var(--actionh)" style-hover="background:var(--actionh)">Start the fight</a>
+        </sc-if>
+        <sc-if value="{{ notReady }}" hint-placeholder-val="{{ true }}">
+          <button disabled="{{ true }}" style="height:52px;border-radius:12px;border:1px solid var(--line);background:var(--surface2);color:var(--muted);font:600 16px 'IBM Plex Sans',sans-serif;cursor:default">Pick {{ remaining }} more</button>
+        </sc-if>
+        <div style="font-size:12px;color:var(--muted);text-align:center">Stamina 7, hand of 5, ten cards to start. You move first.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900},"theme":{"editor":"enum","options":["light","dark"],"default":"light","tsType":"string","section":"Loadout"}}'>
+const THEMES = {
+  light:{'--mark':'#1f4d3a','--markhead':'#e0762b','--bg':'#f7f1e6','--surface':'#ffffff','--surface2':'#efe7d8','--text':'#1c1a17','--muted':'#6b655b','--brand':'#1f4d3a','--action':'#e0762b','--actionh':'#c9662a','--hlbg':'#e6efe9','--youbg':'#fbe3d2','--youfg':'#7a3a12','--danger':'#b3261e','--line':'rgba(28,26,23,.12)','--ink':'#1c1a17','--shadow':'0 1px 2px rgba(28,26,23,.06),0 4px 12px rgba(28,26,23,.06)'},
+  dark:{'--mark':'#f3ead9','--markhead':'#ff8a3d','--bg':'#1a221c','--surface':'#232e26','--surface2':'#2c3a30','--text':'#f3ead9','--muted':'#b1ac9f','--brand':'#9bb08a','--action':'#ff8a3d','--actionh':'#e2792f','--hlbg':'#2f4a3a','--youbg':'#5a2c10','--youfg':'#fbe3d2','--danger':'#ff7b6b','--line':'rgba(243,234,217,.14)','--ink':'#0f150f','--shadow':'0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.3)'}
+};
+const CHIPS = {
+  light:{Damage:['#fae3e0','#8f2018'],Defense:['#e2ebf7','#24507f'],Tech:['#e6efe9','#1f4d3a'],Draw:['#eceef2','#333d4a'],Spirit:['#ece4f8','#553592'],Channel:['#fbe3d2','#7a3a12'],Refine:['#efe7d8','#544d40'],Missteps:['#e6e2d9','#403c35'],Heal:['#dde9e1','#1f4d3a']},
+  dark:{Damage:['#4a201c','#ffb3a8'],Defense:['#1e2f45','#a9c8ee'],Tech:['#2f4a3a','#bcd3b0'],Draw:['#2b3138','#cfd6de'],Spirit:['#332a48','#cbb5f0'],Channel:['#4a2c14','#ffc79a'],Refine:['#37332b','#ccc4b4'],Missteps:['#32302a','#c3bdb0'],Heal:['#2f4a3a','#bcd3b0']}
+};
+
+// The thirty techniques, costs, effects and schools: docs/games/fractured-fist.md,
+// which takes the engine over the printed rulebook wherever they disagree.
+const FACTIONS = [
+  {key:'none', name:'No school', dot:'#8a8578', note:'open to anyone'},
+  {key:'masters', name:'The Masters Circle', dot:'#d63031', note:'patient defence'},
+  {key:'uncounted', name:'The Uncounted', dot:'#0984e3', note:'pressure and dead cards'},
+  {key:'titan', name:'Titan Entertainment', dot:'#c9a227', note:'big, loud damage'},
+  {key:'awakened', name:'The Awakened', dot:'#00b894', note:'spirit and recovery'}
+];
+const TECHS = [
+  {id:'attack', name:'Attack', cost:4, f:'none', fx:[['Damage',1]], def:true},
+  {id:'block', name:'Block', cost:3, f:'none', fx:[['Defense',1]], def:true},
+  {id:'react', name:'React', cost:3, f:'none', fx:[['Tech',2]], def:true},
+  {id:'quicken', name:'Quicken', cost:2, f:'none', fx:[['Draw',2]], def:true},
+  {id:'center', name:'Center', cost:2, f:'none', fx:[['Spirit',2]], def:true},
+  {id:'distract', name:'Distract', cost:3, f:'none', fx:[['Missteps',2]], def:true},
+  {id:'assess', name:'Assess', cost:2, f:'none', fx:[['Refine',2]], def:true},
+  {id:'read-opponent', name:'Read Opponent', cost:4, f:'none', fx:[['Draw',1],['Tech',2]]},
+  {id:'deflecting-block', name:'Deflecting Block', cost:3, f:'none', fx:[['Tech',1],['Defense',1]]},
+  {id:'smoke-bomb', name:'Smoke Bomb', cost:3, f:'none', fx:[['Tech',2],['Missteps',1]]},
+  {id:'combination-rush', name:'Combination Rush', cost:3, f:'none', fx:[['Tech',2],['Channel',1]]},
+  {id:'thoughtful-composure', name:'Thoughtful Composure', cost:4, f:'none', fx:[['Tech',2],['Refine',2]]},
+  {id:'mental-clarity', name:'Mental Clarity', cost:3, f:'none', fx:[['Draw',3]]},
+  {id:'flying-kick', name:'Flying Kick', cost:6, f:'none', fx:[['Damage',2]]},
+  {id:'defensive-kata', name:'Defensive Kata', cost:4, f:'masters', fx:[['Refine',2],['Defense',2]]},
+  {id:'perfect-form', name:'Perfect Form', cost:5, f:'masters', fx:[['Refine',1],['Draw',2],['Tech',1]]},
+  {id:'masters-riposte', name:'Masters Riposte', cost:5, f:'masters', fx:[['Defense',1],['Damage',1]]},
+  {id:'flowing-counter', name:'Flowing Counter', cost:5, f:'masters', fx:[['Tech',2],['Defense',3]]},
+  {id:'impose-pressure', name:'Impose Pressure', cost:4, f:'uncounted', fx:[['Draw',1],['Spirit',2],['Channel',1]]},
+  {id:'leg-sweep', name:'Leg Sweep', cost:5, f:'uncounted', fx:[['Missteps',2],['Damage',1]]},
+  {id:'overwhelming-assault', name:'Overwhelming Assault', cost:8, f:'uncounted', fx:[['Tech',2],['Damage',2]]},
+  {id:'ruthless-barrage', name:'Ruthless Barrage', cost:5, f:'uncounted', fx:[['Draw',1],['Tech',2],['Missteps',3]]},
+  {id:'showstopper', name:'Showstopper', cost:5, f:'titan', fx:[['Spirit',2],['Damage',1]]},
+  {id:'targeted-strike', name:'Targeted Strike', cost:5, f:'titan', fx:[['Refine',1],['Damage',1]]},
+  {id:'grand-finale', name:'Grand Finale', cost:10, f:'titan', fx:[['Damage',5]]},
+  {id:'devastating-blow', name:'Devastating Blow', cost:8, f:'titan', fx:[['Draw',1],['Damage',3]]},
+  {id:'energy-channeling', name:'Energy Channeling', cost:4, f:'awakened', fx:[['Spirit',2],['Channel',1]]},
+  {id:'enlightened-flow', name:'Enlightened Flow', cost:5, f:'awakened', fx:[['Tech',3],['Spirit',2]]},
+  {id:'inner-harmony', name:'Inner Harmony', cost:6, f:'awakened', fx:[['Heal',2],['Refine',2]]},
+  {id:'transcendent-strike', name:'Transcendent Strike', cost:8, f:'awakened', fx:[['Draw',1],['Heal',3],['Damage',2]]}
+];
+const DEFAULT_SEVEN = ['attack','block','assess','center','distract','quicken','react'];
+const byId = (id) => TECHS.filter((t)=>t.id === id)[0];
+const dotFor = (f) => FACTIONS.filter((g)=>g.key === f)[0].dot;
+
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    this.state = {theme:null, picked:['attack','block','quicken'], warn:null, justAdded:null};
+  }
+  theme(){ return this.state.theme || this.props.theme || 'light'; }
+
+  toggle(id){
+    const s = this.state;
+    if (s.picked.indexOf(id) >= 0){
+      this.setState({picked: s.picked.filter((x)=>x !== id), warn:null, justAdded:null});
+      return;
+    }
+    if (s.picked.length >= 7){
+      this.setState({warn:'Seven is the limit. Take one out first, then add ' + byId(id).name + '.'});
+      return;
+    }
+    this.setState({picked: s.picked.concat([id]), warn:null, justAdded:id});
+  }
+  useDefault(){ this.setState({picked: DEFAULT_SEVEN.slice(), warn:null, justAdded:null}); }
+  clearAll(){ if (this.state.picked.length) this.setState({picked:[], warn:null, justAdded:null}); }
+
+  renderVals(){
+    const s = this.state, th = this.theme(), T = THEMES[th], chips = CHIPS[th];
+    const rootStyle = Object.assign({}, T, {width:'1440px', height:'900px', display:'flex', flexDirection:'column', background:'var(--bg)', fontFamily:"'IBM Plex Sans',sans-serif", overflow:'hidden', borderRadius:'12px', boxSizing:'border-box', color:'var(--text)'});
+    const picked = s.picked;
+    const costBg = th === 'light' ? '#24507f' : '#9dc0e8';
+    const costFg = th === 'light' ? '#ffffff' : '#12202f';
+
+    const groups = FACTIONS.map((g)=>{
+      const list = TECHS.filter((t)=>t.f === g.key);
+      return {
+        name: g.name, dot: g.dot, note: g.note, count: list.length + ' techniques',
+        cards: list.map((t)=>{
+          const on = picked.indexOf(t.id) >= 0;
+          const full = !on && picked.length >= 7;
+          return {
+            toggle: ()=>this.toggle(t.id),
+            name: t.name, cost: String(t.cost), accent: g.dot,
+            chips: t.fx.map((f)=>({t:'+' + f[1] + ' ' + f[0], bg:chips[f[0]][0], fg:chips[f[0]][1]})),
+            bg: on ? 'var(--youbg)' : 'var(--surface)',
+            outline: on ? '2px solid var(--action)' : 'none',
+            shadow: on ? '0 4px 12px rgba(0,0,0,.12)' : 'var(--shadow)',
+            tag: on ? 'in your seven' : (t.def ? 'default seven' : ''),
+            tagColor: on ? 'var(--youfg)' : 'var(--muted)',
+            title: full ? 'Seven is the limit — take one out first' : (on ? 'Take ' + t.name + ' out of your seven' : 'Add ' + t.name + ' to your seven'),
+            aria: on ? ('Remove ' + t.name) : ('Add ' + t.name)
+          };
+        })
+      };
+    });
+
+    const slots = Array.from({length:7}, (_, i)=>{
+      const id = picked[i];
+      if (!id) return {n:String(i+1), full:false, empty:true, bg:'transparent', border:'var(--line)', borderStyle:'dashed', anim:'none', name:'', effect:'', cost:'', dot:'', remove:()=>{}, removeAria:''};
+      const t = byId(id);
+      return {
+        n:String(i+1), full:true, empty:false, bg:'var(--surface2)', border:'var(--line)', borderStyle:'solid',
+        anim: s.justAdded === id ? 'ff-slot .2s ease-out' : 'none',
+        name:t.name, effect: t.fx.map((f)=>'+' + f[1] + ' ' + f[0]).join(', '), cost:String(t.cost), dot:dotFor(t.f),
+        remove: ()=>this.toggle(id), removeAria:'Remove ' + t.name
+      };
+    });
+
+    const sum = {};
+    picked.forEach((id)=>byId(id).fx.forEach((f)=>{ sum[f[0]] = (sum[f[0]] || 0) + f[1]; }));
+    const ORDER = ['Damage','Defense','Tech','Draw','Spirit','Channel','Refine','Missteps','Heal'];
+    const totals = ORDER.filter((k)=>sum[k]).map((k)=>({t:k + ' ' + sum[k], bg:chips[k][0], fg:chips[k][1]}));
+    const costs = picked.map((id)=>byId(id).cost);
+    const cheap = picked.length ? Math.min.apply(null, costs) : 0;
+    const dear = picked.length ? Math.max.apply(null, costs) : 0;
+    const costLine = picked.length
+      ? 'Cheapest ' + cheap + ' spirit, dearest ' + dear + '. Your opening deck makes 1 to 3 spirit a turn, so the cheap ones are what you can reach early.'
+      : '';
+
+    return {
+      rootStyle: rootStyle,
+      toggleTheme: ()=>this.setState({theme: th === 'light' ? 'dark' : 'light'}),
+      themeLabel: th === 'light' ? 'Dark' : 'Light',
+      groups: groups, slots: slots, totals: totals, costLine: costLine,
+      costBg: costBg, costFg: costFg,
+      picked: picked.length, remaining: 7 - picked.length,
+      countColor: picked.length === 7 ? 'var(--action)' : 'var(--muted)',
+      ready: picked.length === 7, notReady: picked.length !== 7,
+      anyPicked: picked.length > 0, nonePicked: picked.length === 0,
+      useDefault: ()=>this.useDefault(), clearAll: ()=>this.clearAll(),
+      clearCursor: picked.length ? 'pointer' : 'default', clearOpacity: picked.length ? 1 : .45,
+      warnText: s.warn || '', warnColor: s.warn ? 'var(--danger)' : 'var(--muted)'
+    };
+  }
+}
+</script>
+</body>
+</html>
