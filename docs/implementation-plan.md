@@ -561,6 +561,12 @@ Added on request (2026-09-21):
   the Detective's player id by seat position, and the other seat takes the
   other role. The table's own forms remain for tables that reach a choice
   unanswered.
+- **The tab icon is the wordmark's meeple.** `apps/web/public/favicon.svg`
+  redraws the five shapes of `docs/brand/wordmark.html` as vector art in
+  the brand orange, lying on its back as it does in the logo so it reads as
+  the k (the brief had suggested the upright meeple; the k was asked for).
+  A 32 px PNG covers browsers without SVG icons and a 180 px PNG on the
+  page background is the home-screen icon; both are rendered from the SVG.
 
 Still open:
 
