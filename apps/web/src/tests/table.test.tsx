@@ -5,7 +5,7 @@
 // shown as a rule with its lesson.
 
 import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest';
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import type { MoveAck, TableEventWire } from '@universe/shared';
 import { useFakeSocket } from '../socket';
@@ -157,6 +157,70 @@ describe('the table page and player agency', () => {
     const alert = await screen.findByRole('alert');
     expect(alert.textContent).toContain('Something went wrong');
     expect(alert.textContent).not.toContain('Not allowed');
+  });
+
+  it('an action-bar button submits the listed move it stands for, as a tap', async () => {
+    renderTable();
+    await screen.findByRole('button', { name: 'Attack' });
+    const bar = within(screen.getByRole('region', { name: 'Your turn' }));
+    await act(async () => { fireEvent.click(bar.getByRole('button', { name: 'End turn' })); });
+    await waitFor(() => expect(socket.emitted.filter((e) => e.event === 'move')).toHaveLength(1));
+    expect(submissionLog).toEqual([{ trigger: 'tap', move: { type: 'end_turn' } }]);
+    // Advance is not listed, so it is not offered.
+    expect(bar.queryByRole('button', { name: 'Advance to Channel' })).toBeNull();
+  });
+
+  it('"play all resources" is one press that sends the listed plays one at a time, each after the last landed', async () => {
+    const channel = { ...VIEW, phase: 'channel', players: { ...VIEW.players, p1: { ...VIEW.players.p1, hand: ['focus', 'focus', 'attack'] } } };
+    const plays = [
+      { move_id: 'play-0-focus', description: 'Play Focus for 1 spirit', move: { type: 'play_card', card_id: 'focus', hand_index: 0 } },
+      { move_id: 'play-1-focus', description: 'Play Focus for 1 spirit', move: { type: 'play_card', card_id: 'focus', hand_index: 1 } },
+      { move_id: 'end-turn', description: 'End turn', move: { type: 'end_turn' } },
+    ];
+    vi.stubGlobal('fetch', vi.fn((input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.startsWith('/api/tables/t1/events')) return Promise.resolve(new Response(JSON.stringify({ events: [{ ...opening, view: channel, legalMoves: plays, moveMenu: null }] }), { status: 200, headers: { 'content-type': 'application/json' } }));
+      return fakeFetch(url);
+    }));
+    renderTable();
+    const all = await screen.findByRole('button', { name: /Play all resources · \+2/ });
+    await act(async () => { fireEvent.click(all); });
+    await waitFor(() => expect(socket.emitted.filter((e) => e.event === 'move')).toHaveLength(1));
+    expect(submissionLog).toEqual([{ trigger: 'batch', move: { type: 'play_card', card_id: 'focus', hand_index: 0 } }]);
+    // The second Focus is at index 0 now; it goes only once the engine lists it.
+    const after = { ...channel, players: { ...channel.players, p1: { ...channel.players.p1, hand: ['focus', 'attack'], played: ['focus'], spirit: 1 } } };
+    await act(async () => {
+      socket.receive('table_event', ev(2, 'You play Focus for 1 spirit.', { view: after, legalMoves: [{ ...plays[0]! }, plays[2]!], yourTurn: true, playerId: 'p1', engineMove: plays[0]!.move, nextActorPosition: 0 }));
+    });
+    await waitFor(() => expect(socket.emitted.filter((e) => e.event === 'move')).toHaveLength(2), { timeout: 4000 });
+    expect(submissionLog[1]).toEqual({ trigger: 'batch', move: { type: 'play_card', card_id: 'focus', hand_index: 0 } });
+    // The batch is spent: one more event sends nothing.
+    const last = { ...after, players: { ...after.players, p1: { ...after.players.p1, hand: ['attack'], played: ['focus', 'focus'], spirit: 2 } } };
+    await act(async () => {
+      socket.receive('table_event', ev(3, 'You play Focus for 1 spirit.', { view: last, legalMoves: [plays[2]!], yourTurn: true, playerId: 'p1', engineMove: plays[0]!.move, nextActorPosition: 0 }));
+    });
+    await waitFor(() => expect(screen.getAllByText('You play Focus for 1 spirit.').length).toBeGreaterThan(1), { timeout: 4000 });
+    await new Promise((r) => setTimeout(r, 50));
+    expect(socket.emitted.filter((e) => e.event === 'move')).toHaveLength(2);
+  });
+
+  it('the strike plays as a moment over the board as it was, and the event lands when it is done', async () => {
+    renderTable();
+    await screen.findByRole('button', { name: 'Attack' });
+    const struck = { ...VIEW, round: 2, players: { ...VIEW.players, p1: { ...VIEW.players.p1, stamina: 6 }, p2: { ...VIEW.players.p2, stamina: 7 } } };
+    await act(async () => {
+      socket.receive('table_event', ev(2, 'End of round 1. Strike: p1 dealt 0, p2 dealt 1.', { kind: 'ai_move', actorSeatPosition: null, view: struck, legalMoves: LEGAL, yourTurn: true, playerId: 'p1', nextActorPosition: 0, engineMove: { type: 'end_turn' } }));
+    });
+    const dialog = await screen.findByRole('dialog', { name: 'Round 1 · strike' }, { timeout: 4000 });
+    expect(dialog.textContent).toContain('AI (easy) hits You');
+    // The board underneath still shows the round before the strike.
+    expect(screen.queryAllByText('End of round 1. Strike: p1 dealt 0, p2 dealt 1.')).toHaveLength(0);
+    expect(submissionLog).toHaveLength(0);
+    await act(async () => { fireEvent.click(screen.getByRole('button', { name: 'Skip to the end' })); });
+    await screen.findAllByText('End of round 1. Strike: p1 dealt 0, p2 dealt 1.', {}, { timeout: 4000 });
+    expect(screen.queryByRole('dialog', { name: 'Round 1 · strike' })).toBeNull();
+    // The strike can be watched again.
+    expect(screen.getByRole('button', { name: 'Replay the strike' })).toBeTruthy();
   });
 
   it('undo goes through the undo message, never as a move', async () => {

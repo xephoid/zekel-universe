@@ -65,13 +65,14 @@ const FF_REFERENCE: GameReferenceResponse = {
     cards: [
       { id: 'focus', name: 'Focus', type: 'RESOURCE', cost: 0, value: 1, description: '1 Spirit.' },
       { id: 'misstep', name: 'Misstep', type: 'MISSTEP', cost: 0, description: 'Cannot be played.' },
-      { id: 'quicken', name: 'Quicken', type: 'TECHNIQUE', cost: 2, description: '+2 Draw.' },
-      { id: 'center', name: 'Center', type: 'TECHNIQUE', cost: 2, description: '+2 Spirit.' },
-      { id: 'attack', name: 'Attack', type: 'TECHNIQUE', cost: 4, description: '+1 Damage.' },
-      { id: 'block', name: 'Block', type: 'TECHNIQUE', cost: 3, description: '+1 Defense.' },
+      { id: 'quicken', name: 'Quicken', type: 'TECHNIQUE', cost: 2, description: '+2 Draw.', effects: { draw: 2 } },
+      { id: 'center', name: 'Center', type: 'TECHNIQUE', cost: 2, description: '+2 Spirit.', effects: { spirit: 2 } },
+      { id: 'attack', name: 'Attack', type: 'TECHNIQUE', cost: 4, description: '+1 Damage.', effects: { damage: 1 } },
+      { id: 'block', name: 'Block', type: 'TECHNIQUE', cost: 3, description: '+1 Defense.', effects: { defense: 1 } },
       { id: 'momentum', name: 'Momentum', type: 'RESOURCE', cost: 3, value: 2, description: '2 spirit.' },
-      { id: 'grand-finale', name: 'Grand Finale', type: 'TECHNIQUE', cost: 10, description: '+5 Damage.', faction: 'Titan Entertainment' },
+      { id: 'grand-finale', name: 'Grand Finale', type: 'TECHNIQUE', cost: 10, description: '+5 Damage.', faction: 'Titan Entertainment', effects: { damage: 5 } },
     ],
+    starter_loadout: ['attack', 'block', 'assess', 'center', 'distract', 'quicken', 'react'],
     max_missteps: 10,
   },
   moveSchema: {},
@@ -80,35 +81,71 @@ const FF_REFERENCE: GameReferenceResponse = {
 
 describe('fractured-fist glue', () => {
   const g = GLUES['fractured-fist']!;
-  it('plans the bench (hand, deck, discard), the side (tableaux) and the board (played rows, supplies)', () => {
+  const hand = (plan: { bench: Zone[] }) => cards(plan.bench.find((z) => z.id === 'p:p1:hand'));
+  it('plans the bench (you, hand, deck, discard), the side (the opponent) and the board (their row, the gutter, your row, one shelf)', () => {
     const plan = g.plan(input(FF_VIEW, FF_MOVES, { playerId: 'p1', reference: FF_REFERENCE }))!;
     expect(plan).not.toBeNull();
-    expect(ids(plan.bench)).toEqual(['p:p1:hand', 'p:p1:deck', 'p:p1:discard']);
-    expect(ids(plan.side)).toContain('p:p2:tableau');
-    expect(ids(plan.side)).toContain('p:p1:tableau');
-    expect(ids(plan.side)).toContain('p:p2:hand');
-    // Both supplies sit near the centre, each still its owner's.
-    expect(ids(plan.board)).toEqual(['ff:phase', 'p:p1:played', 'p:p1:supply', 'p:p2:played', 'p:p2:supply']);
-    expect(plan.status).toBe('Round 2 · Technique phase');
+    expect(ids(plan.bench)).toEqual(['p:p1:tableau', 'p:p1:hand', 'p:p1:deck', 'p:p1:discard']);
+    expect(ids(plan.side)).toEqual(['p:p2:tableau', 'p:p2:hand', 'p:p2:deck', 'p:p2:discard']);
+    expect(ids(plan.board)).toEqual(['p:p2:played', 'ff:strike:p1', 'ff:strike:p2', 'p:p1:played', 'ff:supply']);
+    expect(plan.board.filter((z) => z.span === 'full').map((z) => z.id)).toEqual(['p:p2:played', 'p:p1:played', 'ff:supply']);
+    expect(plan.status).toBe('Round 2 · Technique step');
+    expect(plan.steps).toEqual([{ id: 'technique', label: 'Technique', current: true }, { id: 'channel', label: 'Channel', current: false }]);
+  });
+  it('draws one shelf with both players\' counts, yours marked as your own', () => {
+    const plan = g.plan(input(FF_VIEW, FF_MOVES, { playerId: 'p1', reference: FF_REFERENCE }))!;
+    const shelf = cards(plan.board.find((z) => z.id === 'ff:supply'));
+    expect(shelf.map((c) => c.id)).toEqual(['p:p1:supply:attack', 'p:p1:supply:focus', 'p:p1:supply:momentum']);
+    expect(shelf[0]!.counts).toEqual([{ label: 'you', value: 4, own: true }, { label: 'them', value: 5, own: false }]);
+    // A card only the other player still has is on the shelf too, at zero for you.
+    expect(shelf[1]!.counts).toEqual([{ label: 'you', value: 20, own: true }, { label: 'them', value: 0, own: false }]);
+    // Buying lights only your own stacks; the opponent's are never selectable.
+    const lit = g.litParts(input(FF_VIEW, FF_MOVES, { playerId: 'p1', reference: FF_REFERENCE }));
+    expect(lit).toContain('p:p1:supply:attack');
+    expect(lit.some((id) => id.startsWith('p:p2:supply'))).toBe(false);
+  });
+  it('the gutter shows what each player queued against the other, without subtracting', () => {
+    const plan = g.plan(input(FF_VIEW, FF_MOVES, { playerId: 'p1', reference: FF_REFERENCE }))!;
+    const mine = plan.board.find((z) => z.id === 'ff:strike:p1')!;
+    expect(mine.kind).toBe('pool');
+    const data = mine.data as { label: string; items: Array<{ label: string; count: number }> };
+    expect(data.label).toBe('You hit Opponent · Opponent at 7 of 7');
+    expect(data.items).toEqual([{ label: 'damage', count: 1, colorKey: 'damage' }, { label: 'defense', count: 1, colorKey: 'defense' }]);
+    const theirs = plan.board.find((z) => z.id === 'ff:strike:p2')!.data as { label: string };
+    expect(theirs.label).toBe('Opponent hits you · You at 6 of 7');
   });
   it('names cards from the reference data and shows the misstep cap from it, never from a constant', () => {
     const plan = g.plan(input(FF_VIEW, FF_MOVES, { playerId: 'p1', reference: FF_REFERENCE }))!;
-    const hand = cards(plan.bench[0]);
-    expect(hand.map((c) => c.label)).toEqual(['Focus', 'Misstep', 'Quicken', 'Center', 'Focus']);
-    expect(hand[2]!.badges).toContain('cost 2');
-    const tableau = plan.side.find((z) => z.id === 'p:p1:tableau')!;
+    expect(hand(plan).map((c) => c.label)).toEqual(['Focus', 'Misstep', 'Quicken', 'Center', 'Focus']);
+    expect(hand(plan)[2]!.badges).toContain('cost 2');
+    expect(hand(plan)[2]!.subtitle).toBe('+2 Draw');
+    const tableau = plan.bench.find((z) => z.id === 'p:p1:tableau')!;
     const stats = (tableau.data as { stats: Array<{ label: string; value: unknown; max?: number }> }).stats;
     expect(stats.find((s) => s.label === 'Missteps')).toEqual({ label: 'Missteps', value: 3, max: 10 });
     expect(stats.find((s) => s.label === 'Stamina')).toEqual({ label: 'Stamina', value: 6, max: 7 });
     // Without reference data the cap is simply absent.
     const bare = g.plan(input(FF_VIEW, FF_MOVES, { playerId: 'p1' }))!;
-    const bareStats = (bare.side.find((z) => z.id === 'p:p1:tableau')!.data as { stats: Array<{ label: string; max?: number }> }).stats;
+    const bareStats = (bare.bench.find((z) => z.id === 'p:p1:tableau')!.data as { stats: Array<{ label: string; max?: number }> }).stats;
     expect(bareStats.find((s) => s.label === 'Missteps')!.max).toBeUndefined();
+  });
+  it('shows only the counters the current step can change; stamina and missteps always', () => {
+    const labels = (view: unknown, pid: string) => {
+      const plan = g.plan(input(view, [], { playerId: 'p1', reference: FF_REFERENCE }))!;
+      const z = [...plan.bench, ...plan.side].find((x) => x.id === `p:${pid}:tableau`)!;
+      return (z.data as { stats: Array<{ label: string }> }).stats.map((s) => s.label);
+    };
+    expect(labels(FF_VIEW, 'p1')).toEqual(['Stamina', 'Actions', 'Missteps']);
+    // The opponent is not on turn: their per-turn counters cannot change.
+    expect(labels(FF_VIEW, 'p2')).toEqual(['Stamina', 'Missteps']);
+    const channel = { ...FF_VIEW, phase: 'channel' };
+    expect(labels(channel, 'p1')).toEqual(['Stamina', 'Spirit', 'Channels', 'Missteps']);
+    const refining = { ...FF_VIEW, players: { ...FF_VIEW.players, p1: { ...FF_VIEW.players.p1, refine_pending: 2 } } };
+    expect(labels(refining, 'p1')).toEqual(['Stamina', 'Refines pending', 'Actions', 'Missteps']);
   });
   it('gives cards stable instance ids that carry across events', () => {
     const memory = new Map<string, unknown>();
     const first = g.plan(input(FF_VIEW, FF_MOVES, { playerId: 'p1', reference: FF_REFERENCE, seq: 1, memory }))!;
-    const quicken = cards(first.bench[0])[2]!.id!;
+    const quicken = hand(first)[2]!.id!;
     const after = {
       ...FF_VIEW,
       players: { ...FF_VIEW.players, p1: { ...FF_VIEW.players.p1, hand: ['focus', 'misstep', 'center', 'focus'], played: ['attack', 'quicken'] } },
@@ -119,14 +156,28 @@ describe('fractured-fist glue', () => {
     }))!;
     const played = second.board.find((z) => z.id === 'p:p1:played')!;
     expect(cards(played).map((c) => c.id)).toContain(quicken);
-    expect(cards(second.bench[0]).map((c) => c.id)).not.toContain(quicken);
+    expect(hand(second).map((c) => c.id)).not.toContain(quicken);
+  });
+  it('a bought card flies in from its stack on the shelf', () => {
+    const memory = new Map<string, unknown>();
+    g.plan(input(FF_VIEW, FF_MOVES, { playerId: 'p1', reference: FF_REFERENCE, seq: 1, memory }));
+    const after = {
+      ...FF_VIEW,
+      players: { ...FF_VIEW.players, p1: { ...FF_VIEW.players.p1, discard: ['misstep', 'focus', 'attack'], discard_size: 3, supply: { attack: 3, focus: 20, momentum: 19 } } },
+    };
+    const second = g.plan(input(after, [], { playerId: 'p1', reference: FF_REFERENCE, seq: 2, memory, engineMove: { type: 'buy_card', card_id: 'attack' }, actorPlayerId: 'p1' }))!;
+    const discard = second.bench.find((z) => z.id === 'p:p1:discard')!;
+    expect(discard.kind === 'card-zone' && discard.arriveFrom).toBe('ff:supply');
+    const state = memory.get('ff:identity:p1') as { state: { zones: Record<string, string[]>; arrivals: Record<string, string> } };
+    const bought = state.state.zones['discard']![2]!;
+    expect(state.state.arrivals[bought]).toBe('p:p1:supply:attack');
   });
   it('lights playable hand cards by instance and buyable supply piles', () => {
     const memory = new Map<string, unknown>();
     const inp = input(FF_VIEW, FF_MOVES, { playerId: 'p1', reference: FF_REFERENCE, memory });
     const plan = g.plan(inp)!;
     const lit = g.litParts(inp);
-    const quicken = cards(plan.bench[0])[2]!.id!;
+    const quicken = hand(plan)[2]!.id!;
     expect(lit).toContain(quicken);
     expect(lit).toContain('p:p1:supply:attack');
     expect(lit).not.toContain('advance-phase');
@@ -136,22 +187,88 @@ describe('fractured-fist glue', () => {
     const memory = new Map<string, unknown>();
     const inp = input(FF_VIEW, FF_MOVES, { playerId: 'p1', reference: FF_REFERENCE, memory });
     const plan = g.plan(inp)!;
-    const quicken = cards(plan.bench[0])[2]!.id!;
+    const quicken = hand(plan)[2]!.id!;
     expect(g.moveForSelect({ component: 'card', id: quicken, label: 'Quicken' }, inp)?.move_id).toBe('play-2-quicken');
     expect(g.moveForSelect({ component: 'card', id: 'p:p1:supply:attack', label: 'Attack' }, inp)?.move_id).toBe('buy-attack');
-    expect(g.moveForSelect({ component: 'card', id: cards(plan.bench[0])[0]!.id!, label: 'Focus' }, inp)).toBeNull();
+    expect(g.moveForSelect({ component: 'card', id: hand(plan)[0]!.id!, label: 'Focus' }, inp)).toBeNull();
   });
-  it('has no resolve_report (no dice in this game)', () => {
+  it('has no resolve_report (no dice, and the engine resolves every draw itself)', () => {
     expect(g.resolveReportMove(FF_MOVES)).toBeNull();
   });
-  it('presents the loadout as a seven-pick with nothing preselected', () => {
+  it('the action bar holds the moves that move the turn, each only while the engine lists it', () => {
+    const plan = g.plan(input(FF_VIEW, FF_MOVES, { playerId: 'p1', reference: FF_REFERENCE }))!;
+    expect(plan.prompt!.title).toBe('Technique step');
+    expect(plan.prompt!.actions.map((a) => a.id)).toEqual(['advance-phase']);
+    const withEnd = g.plan(input(FF_VIEW, [...FF_MOVES, { move_id: 'end-turn', description: 'End turn', move: { type: 'end_turn' } }, { move_id: 'focus-reload', description: 'Focus reload', move: { type: 'focus_reload' } }], { playerId: 'p1', reference: FF_REFERENCE }))!;
+    expect(withEnd.prompt!.actions.map((a) => a.id)).toEqual(['focus-reload', 'advance-phase', 'end-turn']);
+    const end = withEnd.prompt!.actions.find((a) => a.id === 'end-turn')!;
+    expect('move' in end && end.move.move).toEqual({ type: 'end_turn' });
+    expect(end.primary).toBe(true);
+    // Not your turn: words, no buttons.
+    const theirs = g.plan(input({ ...FF_VIEW, active_player_id: 'p2' }, [], { playerId: 'p1', reference: FF_REFERENCE }))!;
+    expect(theirs.prompt!.title).toBe('Opponent is taking their turn');
+    expect(theirs.prompt!.actions).toEqual([]);
+    // A refine window is an interrupt with one way out besides picking.
+    const refining = { ...FF_VIEW, players: { ...FF_VIEW.players, p1: { ...FF_VIEW.players.p1, refine_pending: 1 } } };
+    const r = g.plan(input(refining, [{ move_id: 'refine-0-focus', description: 'Refine Focus', move: { type: 'refine_card', hand_index: 0 } }, { move_id: 'skip-refine', description: 'Skip', move: { type: 'skip_refine' } }], { playerId: 'p1', reference: FF_REFERENCE }))!;
+    expect(r.prompt!.title).toBe('Remove 1 more card');
+    expect(r.prompt!.urgent).toBe(true);
+    expect(r.prompt!.actions.map((a) => a.id)).toEqual(['skip-refine']);
+  });
+  it('offers "play all resources" only when more than one resource play is listed, and says what it spends', () => {
+    const channel = { ...FF_VIEW, phase: 'channel', players: { ...FF_VIEW.players, p1: { ...FF_VIEW.players.p1, hand: ['focus', 'misstep', 'quicken', 'momentum', 'focus'] } } };
+    const plays = [
+      { move_id: 'play-0-focus', description: 'Play Focus for 1 spirit', move: { type: 'play_card', card_id: 'focus', hand_index: 0 } },
+      { move_id: 'play-3-momentum', description: 'Play Momentum for 2 spirit', move: { type: 'play_card', card_id: 'momentum', hand_index: 3 } },
+      { move_id: 'play-4-focus', description: 'Play Focus for 1 spirit', move: { type: 'play_card', card_id: 'focus', hand_index: 4 } },
+      { move_id: 'end-turn', description: 'End turn', move: { type: 'end_turn' } },
+    ];
+    const memory = new Map<string, unknown>();
+    const plan = g.plan(input(channel, plays, { playerId: 'p1', reference: FF_REFERENCE, memory }))!;
+    const all = plan.prompt!.actions.find((a) => a.id === 'play-all-resources')!;
+    expect(all.label).toBe('Play all resources · +4');
+    expect(all.note).toBeUndefined();
+    const batch = 'batch' in all ? all.batch : [];
+    expect(batch.map((b) => b.id)).toEqual([hand(plan)[0]!.id, hand(plan)[3]!.id, hand(plan)[4]!.id]);
+    // With a reload still legal, the button says the Focus go with it.
+    const withReload = g.plan(input(channel, [...plays, { move_id: 'focus-reload', description: 'Focus reload', move: { type: 'focus_reload' } }], { playerId: 'p1', reference: FF_REFERENCE, memory }))!;
+    expect(withReload.prompt!.actions.find((a) => a.id === 'play-all-resources')!.note).toBe('spends your 2 Focus');
+    // One resource play: no button, the card itself is the press.
+    const one = g.plan(input(channel, [plays[1]!, plays[3]!], { playerId: 'p1', reference: FF_REFERENCE, memory }))!;
+    expect(one.prompt!.actions.map((a) => a.id)).toEqual(['end-turn']);
+  });
+  it('reads the strike from the views before and after the round ended, never from arithmetic of its own', () => {
+    const before = { ...FF_VIEW, players: { ...FF_VIEW.players, p1: { ...FF_VIEW.players.p1, damage_queued: 2, defense_queued: 0 }, p2: { ...FF_VIEW.players.p2, damage_queued: 3, defense_queued: 1, stamina: 6 } } };
+    const after = { ...FF_VIEW, round: 3, players: { ...FF_VIEW.players, p1: { ...FF_VIEW.players.p1, stamina: 3, damage_queued: 0, played: [] }, p2: { ...FF_VIEW.players.p2, stamina: 5, damage_queued: 0, defense_queued: 0 } } };
+    const m = g.momentFor!({ before, after, summary: 'End of round 2. Strike: p1 dealt 1, p2 dealt 3.', engineMove: { type: 'end_turn' }, playerId: 'p1', reference: FF_REFERENCE })!;
+    expect(m.kind).toBe('strike');
+    expect(m.title).toBe('Round 2 · strike');
+    expect(m.over).toBe(false);
+    expect(m.lanes).toEqual([
+      { attacker: 'p1', target: 'p2', hit: 2, shield: 1, through: 1, before: 6, after: 5, max: 7 },
+      { attacker: 'p2', target: 'p1', hit: 3, shield: 0, through: 3, before: 6, after: 3, max: 7 },
+    ]);
+    // No round change, no moment; the game ending on the strike is a moment that is over.
+    expect(g.momentFor!({ before, after: before, summary: '', engineMove: null, playerId: 'p1', reference: FF_REFERENCE })).toBeNull();
+    const over = { ...after, phase: 'game_over', players: { ...after.players, p1: { ...after.players.p1, stamina: 0 } } };
+    expect(g.momentFor!({ before, after: over, summary: '', engineMove: null, playerId: 'p1', reference: FF_REFERENCE })!.over).toBe(true);
+  });
+  it('presents the loadout as a seven-pick grouped by school with nothing preselected and the default as a preset', () => {
     const fields = g.setupFields(FF_REFERENCE);
     expect(fields).toHaveLength(1);
     const f = fields[0]!;
     if (f.kind !== 'multi') throw new Error('the loadout is a multi pick');
     expect(f.pick).toBe(7);
     expect(f.options.map((o) => o.value)).toEqual(['quicken', 'center', 'attack', 'block', 'grand-finale']);
-    expect(f.options.find((o) => o.value === 'grand-finale')!.hint).toContain('Titan Entertainment');
+    expect(f.groups!.map((gr) => gr.key)).toEqual(['none', 'Titan Entertainment']);
+    const finale = f.options.find((o) => o.value === 'grand-finale')!;
+    expect(finale.group).toBe('Titan Entertainment');
+    expect(finale.badge).toBe('10');
+    expect(finale.chips).toEqual(['+5 Damage']);
+    expect(f.options.find((o) => o.value === 'attack')!.tag).toBe('default seven');
+    expect(f.preset).toEqual({ label: 'Use the default seven', values: ['attack', 'block', 'center', 'quicken'] });
+    expect(f.summarize!(['attack', 'grand-finale', 'quicken'])).toEqual({ chips: ['Damage 6', 'Draw 2'], note: 'Cheapest 2 spirit, dearest 10.' });
+    expect(f.summarize!([])).toEqual({ chips: [], note: undefined });
   });
 });
 
