@@ -1,14 +1,17 @@
 // Table setup, as the canvas draws it: the seats as rows (AI or a friend,
 // the AI's level), the player count stepper, Live or By turns as two
-// cards, the game's own choices as a grid, and a sticky summary with the
-// Start button. Universe never defaults one of the game's setup choices:
-// each is a field the player fills in, and nothing is preselected.
+// cards, the game's own choices, and a sticky summary with the Start
+// button. Universe never defaults one of the game's setup choices: each is
+// a field the player fills in, and nothing is preselected. What the engine
+// takes at creation goes as options; what it takes as moves once the
+// session exists (a faction per seat, the foe, a character) goes as setup
+// moves the server applies before the table opens.
 
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import type { GameCatalogEntry, GameReferenceResponse, SeatSpec, TableMode } from '@universe/shared';
 import { api, ApiRequestError } from '../api';
-import { glueFor, type SetupField } from '../glue';
+import { glueFor, type SetupAnswers, type SetupField, type SetupSeat } from '../glue';
 import { useSession } from '../session';
 import { Nav } from './Nav';
 import { Avatar, Cover, colorFor } from '../ui';
@@ -19,6 +22,16 @@ type Seat = { kind: 'ai'; level: Level } | { kind: 'friend' };
 
 const AI_NAMES = ['Fudge', 'Jellybean', 'Cheesecake', 'Milkshake', 'Quiche'];
 
+/** True when a field has its answer: a pick, exactly N picks, text, or a number in range. */
+function answered(f: SetupField, v: string | string[] | undefined): boolean {
+  if (f.kind === 'multi') return Array.isArray(v) && v.length === f.pick;
+  if (f.kind === 'choice') return typeof v === 'string' && v !== '';
+  if (f.kind === 'text') return typeof v === 'string' && v.trim() !== '';
+  if (typeof v !== 'string' || v.trim() === '') return false;
+  const n = Number(v);
+  return Number.isFinite(n) && (f.min === undefined || n >= f.min) && (f.max === undefined || n <= f.max);
+}
+
 export function SetupPage() {
   const { id = '' } = useParams();
   const [params] = useSearchParams();
@@ -28,7 +41,7 @@ export function SetupPage() {
   const [reference, setReference] = useState<GameReferenceResponse | null>(null);
   const [seats, setSeats] = useState<Seat[]>([]);
   const [mode, setMode] = useState<TableMode | ''>('');
-  const [values, setValues] = useState<Record<string, string[]>>({});
+  const [answers, setAnswers] = useState<SetupAnswers>({});
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
@@ -43,43 +56,59 @@ export function SetupPage() {
   }, [id, params]);
 
   const glue = glueFor(id);
-  const fields: SetupField[] = useMemo(() => (reference && glue ? glue.setupFields(reference) : []), [reference, glue]);
+  const setupSeats: SetupSeat[] = useMemo(() => [
+    { position: 0, kind: 'human', host: true },
+    ...seats.map((s, i): SetupSeat => (s.kind === 'friend' ? { position: i + 1, kind: 'human', host: false } : { position: i + 1, kind: 'ai', host: false, aiDifficulty: s.level })),
+  ], [seats]);
+  const fields: SetupField[] = useMemo(() => (reference && glue ? glue.setupFields(reference, setupSeats) : []), [reference, glue, setupSeats]);
   const friendSeats = seats.filter((s) => s.kind === 'friend').length;
   const aiOnly = friendSeats === 0;
   const canAddSeat = game ? seats.length + 1 < game.maxPlayers : false;
   const canRemoveSeat = game ? seats.length + 1 > game.minPlayers : false;
   const me = session.displayName || 'You';
 
-  const fieldsAnswered = fields.every((f) => {
-    const v = values[f.key] ?? [];
-    return f.kind === 'multi' ? v.length === (f.pick ?? 1) : v.length === 1;
-  });
+  // Warble Way's scores and archetype card depend on the method chosen; a
+  // field that is not in play is neither shown nor required.
+  const method = answers['method'];
+  const inPlay = (f: SetupField) =>
+    !(f.key.startsWith('score.') && method !== 'recommended') && !(f.key === 'archetype_name' && method !== 'archetype');
+  const shown = fields.filter(inPlay);
+  const fieldsAnswered = shown.every((f) => answered(f, answers[f.key]));
   const modeAnswered = aiOnly || mode !== '';
   const ready = !!game && !!reference && fieldsAnswered && modeAnswered && (aiOnly || session.signedIn);
 
-  function toggle(field: SetupField, value: string) {
-    setValues((prev) => {
-      const cur = prev[field.key] ?? [];
-      if (field.kind === 'choice') return { ...prev, [field.key]: [value] };
-      if (cur.includes(value)) return { ...prev, [field.key]: cur.filter((x) => x !== value) };
-      if (cur.length >= (field.pick ?? 1)) return prev;
-      return { ...prev, [field.key]: [...cur, value] };
+  function pick(field: SetupField, value: string) {
+    setAnswers((prev) => {
+      if (field.kind === 'multi') {
+        const cur = Array.isArray(prev[field.key]) ? (prev[field.key] as string[]) : [];
+        if (cur.includes(value)) return { ...prev, [field.key]: cur.filter((x) => x !== value) };
+        if (cur.length >= field.pick) return prev;
+        return { ...prev, [field.key]: [...cur, value] };
+      }
+      return { ...prev, [field.key]: value };
     });
   }
   const setSeat = (i: number, s: Seat) => setSeats(seats.map((x, j) => (j === i ? s : x)));
 
   async function start() {
-    if (!game) return;
+    if (!game || !reference) return;
     if (!aiOnly && !mode) { setErr('Choose live or by turns.'); return; }
     if (!fieldsAnswered) { setErr("Answer each of the game's own choices. They are real decisions, not defaults."); return; }
     if (!aiOnly && !session.signedIn) { setErr('Sign in to open a table with friends.'); return; }
+    // Two seats cannot share a faction: the engine refuses it, and so do we, earlier.
+    const factionPicks = shown.filter((f) => f.key.startsWith('faction.')).map((f) => answers[f.key]);
+    if (new Set(factionPicks).size !== factionPicks.length) { setErr('No two seats can play the same faction.'); return; }
     setBusy(true);
     setErr(null);
     try {
       const seatSpecs: SeatSpec[] = [{ kind: 'human' }, ...seats.map((s): SeatSpec => (s.kind === 'friend' ? { kind: 'human' } : { kind: 'ai', aiDifficulty: s.level }))];
-      const options: Record<string, unknown> = {};
-      for (const f of fields) options[f.key] = f.kind === 'multi' ? values[f.key] ?? [] : (values[f.key] ?? [])[0];
-      const res = await api.createTable({ gameId: game.engineGameId, mode: aiOnly ? 'live' : (mode as TableMode), seats: seatSpecs, hostPosition: 0, options });
+      const live = Object.fromEntries(shown.map((f) => [f.key, answers[f.key] ?? (f.kind === 'multi' ? [] : '')]));
+      // Without a glue rule, an answer is an option under its own key.
+      const options = glue?.setupOptions
+        ? glue.setupOptions(live, setupSeats)
+        : glue?.setupMoves ? {} : live;
+      const setupMoves = glue?.setupMoves ? glue.setupMoves(live, setupSeats, reference) : [];
+      const res = await api.createTable({ gameId: game.engineGameId, mode: aiOnly ? 'live' : (mode as TableMode), seats: seatSpecs, hostPosition: 0, options, setupMoves });
       nav(res.status === 'lobby' ? `/table/${res.tableId}/lobby` : `/table/${res.tableId}`);
     } catch (e) {
       setErr(e instanceof ApiRequestError ? e.message : String(e));
@@ -153,29 +182,51 @@ export function SetupPage() {
             </div>
           </section>
 
-          {fields.map((f) => {
-            const picked = values[f.key] ?? [];
-            return (
-              <section key={f.key}>
-                <div className="row-head">
-                  <h3>{f.label}{f.kind === 'multi' ? ` · ${picked.length} of ${f.pick}` : ''}</h3>
-                  {f.help && <span className="muted" style={{ fontSize: 13 }}>{f.help}</span>}
-                </div>
-                <div className={`option-grid ${f.options.length > 6 ? 'four' : 'three'}`} role="group" aria-label={f.label}>
-                  {f.options.map((o) => {
-                    const on = picked.includes(o.value);
-                    return (
-                      <label key={o.value} className={`option-card${on ? ' on' : ''}`}>
-                        <input type={f.kind === 'multi' ? 'checkbox' : 'radio'} name={f.key} aria-label={o.label} checked={on} onChange={() => toggle(f, o.value)} />
-                        <span className="name">{o.label}</span>
-                        {o.hint && <span className="sub">{o.hint}</span>}
-                      </label>
-                    );
-                  })}
-                </div>
-              </section>
-            );
-          })}
+          {shown.length > 0 && (
+            <section>
+              <div className="row-head">
+                <h3>The game's own choices</h3>
+                {!aiOnly && <span className="muted" style={{ fontSize: 13 }}>Your friends make their own choices at the table.</span>}
+              </div>
+              {shown.map((f) => {
+                const v = answers[f.key];
+                if (f.kind === 'text' || f.kind === 'number') {
+                  return (
+                    <div className="field" key={f.key} style={{ maxWidth: f.kind === 'number' ? 360 : 480 }}>
+                      <label htmlFor={`setup-${f.key}`}>{f.label}</label>
+                      <input
+                        id={`setup-${f.key}`} type={f.kind === 'number' ? 'number' : 'text'} min={f.kind === 'number' ? f.min : undefined} max={f.kind === 'number' ? f.max : undefined}
+                        maxLength={f.kind === 'text' ? f.maxLength : undefined} placeholder={f.kind === 'text' ? f.placeholder : undefined}
+                        value={typeof v === 'string' ? v : ''} onChange={(e) => pick(f, e.target.value)}
+                      />
+                      {f.help && <span className="note">{f.help}</span>}
+                    </div>
+                  );
+                }
+                const picked = f.kind === 'multi' ? (Array.isArray(v) ? v : []) : (typeof v === 'string' ? [v] : []);
+                return (
+                  <div className="stack" key={f.key} style={{ gap: 8 }}>
+                    <div className="row-head">
+                      <span className="label" style={{ fontSize: 14, fontWeight: 600 }}>{f.label}{f.kind === 'multi' ? ` · ${picked.length} of ${f.pick}` : ''}</span>
+                      {f.help && <span className="muted" style={{ fontSize: 13 }}>{f.help}</span>}
+                    </div>
+                    <div className={`option-grid ${f.options.length > 6 ? 'four' : f.options.length > 2 ? 'three' : ''}`} role="group" aria-label={f.label}>
+                      {f.options.map((o) => {
+                        const on = picked.includes(o.value);
+                        return (
+                          <label key={o.value} className={`option-card${on ? ' on' : ''}`}>
+                            <input type={f.kind === 'multi' ? 'checkbox' : 'radio'} name={f.key} aria-label={o.label} checked={on} onChange={() => pick(f, o.value)} />
+                            <span className="name">{o.label}</span>
+                            {o.hint && <span className="sub">{o.hint}</span>}
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </section>
+          )}
           {reference === null && game && <p className="muted">Loading the game's setup choices…</p>}
         </div>
 
@@ -188,7 +239,7 @@ export function SetupPage() {
             </div>
           </div>
           <div className="seats">
-            <div><span className="dot" style={{ background: colorFor(me) }} /><span className="grow">{me}</span><span className="muted">host</span></div>
+            <div><span className="dot" style={{ background: colorFor(me) }} /><span className="grow">{me}</span><span className="muted">{typeof answers['faction.p1'] === 'string' && answers['faction.p1'] ? (fields.find((f) => f.key === 'faction.p1') as { options?: Array<{ value: string; label: string }> } | undefined)?.options?.find((o) => o.value === answers['faction.p1'])?.label ?? 'host' : 'host'}</span></div>
             {seats.map((s, i) => (
               <div key={i}>
                 <span className="dot" style={{ background: s.kind === 'ai' ? colorFor(AI_NAMES[i % AI_NAMES.length]!) : 'var(--chip)' }} />

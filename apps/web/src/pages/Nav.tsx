@@ -36,7 +36,7 @@ export function Nav() {
       <Link to="/" className="brand" aria-label="zekel home"><Wordmark size={24} /></Link>
       <div className="links">
         <Link to="/" className={onHome && !params.get('q') ? 'current' : undefined}>Browse</Link>
-        <Link to="/#my-tables" className={undefined}>My tables{waiting > 0 && <span className="count" aria-label={`${waiting} waiting on you`}>{waiting}</span>}</Link>
+        <Link to="/tables" className={location.pathname === '/tables' ? 'current' : undefined}>My tables{waiting > 0 && <span className="count" aria-label={`${waiting} waiting on you`}>{waiting}</span>}</Link>
         <Link to="/designers" className={location.pathname.startsWith('/designers') ? 'current' : undefined}>Designers</Link>
       </div>
       <form onSubmit={submit} className="search-form" style={{ display: 'contents' }}>

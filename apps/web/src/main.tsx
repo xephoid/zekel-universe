@@ -9,6 +9,7 @@ import { SessionProvider } from './session';
 import { HomePage } from './pages/Home';
 import { GamePage } from './pages/Game';
 import { RulesPage } from './pages/Rules';
+import { MyTablesPage } from './pages/MyTables';
 import { DesignerPage, DesignersPage } from './pages/Designer';
 import { WatchPage } from './pages/Watch';
 import { SetupPage } from './pages/Setup';
@@ -24,6 +25,7 @@ const router = createBrowserRouter([
   { path: '/games/:id', element: <GamePage /> },
   { path: '/games/:id/setup', element: <SetupPage /> },
   { path: '/games/:id/rules', element: <RulesPage /> },
+  { path: '/tables', element: <MyTablesPage /> },
   { path: '/designers', element: <DesignersPage /> },
   { path: '/designers/:slug', element: <DesignerPage /> },
   { path: '/table/:id/watch', element: <WatchPage /> },

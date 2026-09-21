@@ -51,6 +51,7 @@ export const api = {
   table: (id: string) => req<TableResponse>(`/api/tables/${encodeURIComponent(id)}`),
   tableEvents: (id: string, after: number) =>
     req<TableEventsResponse>(`/api/tables/${encodeURIComponent(id)}/events?after=${after}`),
+  deleteTable: (id: string) => req<{ ok: true }>(`/api/tables/${encodeURIComponent(id)}`, { method: 'DELETE' }),
   createTable: (body: CreateTableRequest) => post<CreateTableResponse>('/api/tables', body),
   joinTable: (id: string) => post<{ seatPosition: number }>(`/api/tables/${encodeURIComponent(id)}/join`),
   setReady: (id: string, ready: boolean) => post<{ position: number; ready: boolean }>(`/api/tables/${encodeURIComponent(id)}/ready`, { ready }),
