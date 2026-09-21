@@ -35,6 +35,13 @@ export interface PlaybackState {
 
 type Listener = (s: PlaybackState) => void;
 
+/**
+ * A gate runs before an event is applied and may hold it: the table uses
+ * it to play a moment (a strike) over the board as it still is, then lets
+ * the event land. The queue waits; nothing skips ahead.
+ */
+export type Gate = (next: TableEventWire, current: TableEventWire | null) => Promise<void>;
+
 function initial(): PlaybackState {
   return { applied: [], view: null, previousView: null, current: null, previous: null, pending: 0, done: true, lastSeq: 0, tick: 0 };
 }
@@ -45,6 +52,9 @@ export class PlaybackQueue {
   private timer: ReturnType<typeof setTimeout> | null = null;
   private lastAppliedAt = 0;
   private pace: Pace = 1;
+  private gate: Gate | null = null;
+  /** true while a gate holds the next event */
+  private gating = false;
   private listeners = new Set<Listener>();
   /** Test hook: deterministic advance without timers. */
   public manual = false;
@@ -66,6 +76,10 @@ export class PlaybackQueue {
 
   getPace(): Pace {
     return this.pace;
+  }
+
+  setGate(gate: Gate | null) {
+    this.gate = gate;
   }
 
   /** Dwell for one event at the current pace. */
@@ -99,14 +113,29 @@ export class PlaybackQueue {
    *  moves is paced one dwell apart. */
   private schedule() {
     if (this.manual) return;
-    if (this.timer !== null) return;
+    if (this.timer !== null || this.gating) return;
     if (this.queue.length === 0) return;
     const since = Date.now() - this.lastAppliedAt;
     const ms = this.state.current === null ? 0 : Math.max(0, this.dwellMs() - since);
     this.timer = setTimeout(() => {
       this.timer = null;
-      this.advance();
+      void this.advanceThroughGate();
     }, ms);
+  }
+
+  /** The timed path: let the gate see the next event first, then apply it. */
+  private async advanceThroughGate() {
+    const next = this.queue[0];
+    if (!next || !this.gate) { this.advance(); return; }
+    this.gating = true;
+    try {
+      await this.gate(next, this.state.current);
+    } finally {
+      this.gating = false;
+    }
+    // Only apply if the queue still starts with what the gate saw.
+    if (this.queue[0] === next) this.advance();
+    else this.schedule();
   }
 
   /** Apply the next queued event. Returns the event applied, or null. */
@@ -160,7 +189,11 @@ export class PlaybackQueue {
       tick: this.state.tick + 1,
     };
     this.emit();
-    const again = () => {
+    const again = async () => {
+      if (this.gate) {
+        this.gating = true;
+        try { await this.gate(current, this.state.current); } finally { this.gating = false; }
+      }
       this.apply(current);
       this.schedule();
     };
@@ -168,7 +201,7 @@ export class PlaybackQueue {
       this.queue.unshift(current);
       this.state = { ...this.state, pending: this.queue.length, done: false };
     } else {
-      this.timer = setTimeout(() => { this.timer = null; again(); }, this.dwellMs());
+      this.timer = setTimeout(() => { this.timer = null; void again(); }, this.dwellMs());
     }
   }
 

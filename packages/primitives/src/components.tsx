@@ -76,6 +76,11 @@ export function Card({ id, data, lit, onSelect, arriveFrom, className, style }: 
               </div>
             )}
             {data.count !== undefined && data.count > 1 && <div className="zk-card-count">×{data.count}</div>}
+            {data.counts && data.counts.length > 0 && (
+              <div className="zk-card-counts">
+                {data.counts.map((c, i) => <span key={i} className={c.own ? 'own' : undefined}>{c.label} {c.value}</span>)}
+              </div>
+            )}
           </div>
         </div>
         <div className="zk-card-back">

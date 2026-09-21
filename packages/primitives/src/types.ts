@@ -18,6 +18,12 @@ export interface CardData {
   subtitle?: string;
   /** Universe addition: art for the face. */
   artUrl?: string;
+  /**
+   * Universe addition: several counts on one card, for a stack drawn once
+   * but owned separately (each player's own copies of a supply card).
+   * `own` marks the viewer's count so it can be drawn stronger.
+   */
+  counts?: { label: string; value: number; own?: boolean }[];
 }
 
 /** <zekel-card-zone>: a row, a fan, or a pile of cards. */

@@ -5,7 +5,7 @@
 import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import type { GameOverResult, LegalMove, MoveMenu, MoveMenuEntry, RulesBriefing, SeatSummary, TableEventWire } from '@universe/shared';
-import type { MoveForm } from '../glue';
+import type { MoveForm, PlanPrompt, PlanStep, PromptAction } from '../glue';
 import { PACES, type Pace } from '../playback/PlaybackQueue';
 import { Avatar } from '../ui';
 
@@ -18,6 +18,41 @@ export function PaceControl({ pace, setPace }: { pace: Pace; setPace: (p: Pace) 
         </button>
       ))}
     </span>
+  );
+}
+
+/**
+ * The action bar (docs/design/Fractured Fist Table.dc.html): the turn's
+ * steps as chips, what you can do now in words, and the buttons that move
+ * the turn. Each button is a legal move the engine listed, or a batch the
+ * player presses once; none appears unless the glue found its move.
+ */
+export function ActionBar({ steps, prompt, onAction, disabled }: {
+  steps?: PlanStep[]; prompt?: PlanPrompt; onAction: (a: PromptAction) => void; disabled: boolean;
+}) {
+  if (!steps?.length && !prompt) return null;
+  return (
+    <div className={`action-bar${prompt?.actions.length ? ' live' : ''}${prompt?.urgent ? ' urgent' : ''}`} role="region" aria-label="Your turn">
+      {steps && steps.length > 0 && (
+        <div className="steps" aria-label="Steps">
+          {steps.map((st) => <span key={st.id} className={`step${st.current ? ' current' : ''}`} aria-current={st.current ? 'step' : undefined}>{st.label}</span>)}
+        </div>
+      )}
+      {prompt && (
+        <>
+          <span className="divider" />
+          <div className="words">
+            <div className="title">{prompt.title}</div>
+            {prompt.sub && <div className="sub">{prompt.sub}</div>}
+          </div>
+          {prompt.actions.map((a) => (
+            <button key={a.id} className={`btn${a.primary ? '' : ' secondary'} small`} disabled={disabled} title={a.title} onClick={() => onAction(a)}>
+              {a.label}{a.note && <span className="note">{a.note}</span>}
+            </button>
+          ))}
+        </>
+      )}
+    </div>
   );
 }
 

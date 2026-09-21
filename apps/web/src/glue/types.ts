@@ -30,7 +30,7 @@ export interface GlueInput {
   memory: Map<string, unknown>;
 }
 
-export type Zone =
+type ZoneBody =
   | { kind: 'card-zone'; id: string; data: CardZoneData; arriveFrom?: string }
   | { kind: 'tableau'; id: string; data: TableauData; children?: Zone[] }
   | { kind: 'bag'; id: string; data: BagData }
@@ -38,6 +38,65 @@ export type Zone =
   | { kind: 'pool'; id: string; data: PoolData }
   | { kind: 'grid'; id: string; data: GridData }
   | { kind: 'map'; id: string; data: MapData };
+
+/** A zone, with one layout hint: `span: 'full'` takes a whole row of the
+ *  board instead of flowing beside its neighbours. */
+export type Zone = ZoneBody & { span?: 'full' };
+
+/** One step of the turn, for the action bar's chips. */
+export interface PlanStep { id: string; label: string; current?: boolean }
+
+/**
+ * A button in the action bar. Each is bound to a move the engine listed,
+ * or to a batch: a series of taps sent one at a time, each only once the
+ * engine lists the move it stands for (see glue/agency.ts).
+ */
+export type PromptAction =
+  | { id: string; label: string; note?: string; title?: string; primary?: boolean; move: LegalMove }
+  | { id: string; label: string; note?: string; title?: string; primary?: boolean; batch: SelectEvent[] };
+
+/** The action bar: what step it is, what you can do now, and the buttons
+ *  that move the turn. Text only; every number in it comes from the view. */
+export interface PlanPrompt {
+  title: string;
+  sub?: string;
+  actions: PromptAction[];
+  /** the prompt is an interrupt (a refine window): drawn in the warning color */
+  urgent?: boolean;
+}
+
+/** One hit of a strike: what was queued, what was in the way, what the
+ *  engine says got through, and the target's meter before and after. */
+export interface StrikeLane {
+  /** engine player ids; the table names them from the seats */
+  attacker: string;
+  target: string;
+  hit: number;
+  shield: number;
+  /** read from the engine's result, never computed here */
+  through: number;
+  before: number;
+  after: number;
+  max: number;
+}
+
+/**
+ * A scripted beat the table plays over the board before an event lands,
+ * when the glue reads a resolution in the difference between the view on
+ * screen and the one arriving. Nothing in it asks the player anything, so
+ * it closes itself; pace, skip and replay are the playback queue's.
+ */
+export type Moment = { kind: 'strike'; key: string; title: string; lanes: StrikeLane[]; over: boolean };
+
+/** What a glue gets to decide whether an arriving event deserves a moment. */
+export interface MomentInput {
+  before: unknown;
+  after: unknown;
+  summary: string;
+  engineMove: Record<string, unknown> | null;
+  playerId: string | null;
+  reference: GameReferenceResponse | null;
+}
 
 /** A glue maps a view onto zones; the table page lays them out in the bench. */
 export interface TablePlan {
@@ -55,12 +114,43 @@ export interface TablePlan {
   title: string;
   /** one line for the turn indicator, e.g. "Round 3 · Technique phase" */
   status?: string;
+  /** the turn's steps, one current, for the action bar */
+  steps?: PlanStep[];
+  /** the action bar's words and buttons */
+  prompt?: PlanPrompt;
+}
+
+/** One option of a multi pick; the extras draw it as a card in a grouped picker. */
+export interface MultiOption {
+  value: string;
+  label: string;
+  hint?: string;
+  group?: string;
+  /** a small number in the corner (a cost) */
+  badge?: string;
+  /** short effect lines */
+  chips?: string[];
+  /** a quiet tag under the chips ("in the default seven") */
+  tag?: string;
 }
 
 /** One of the game's own setup choices, presented as a field the player fills in. */
 export type SetupField =
   | { key: string; label: string; help?: string; kind: 'choice'; options: Array<{ value: string; label: string; hint?: string }> }
-  | { key: string; label: string; help?: string; kind: 'multi'; options: Array<{ value: string; label: string; hint?: string }>; /** exactly this many */ pick: number }
+  | {
+      key: string; label: string; help?: string; kind: 'multi';
+      options: MultiOption[];
+      /** exactly this many */
+      pick: number;
+      /** sections to draw the options in, in order; an option names its section by `group` */
+      groups?: Array<{ key: string; label: string; note?: string; color?: string }>;
+      /** a named set the player may take with one press; never preselected */
+      preset?: { label: string; values: string[] };
+      /** what the picks add up to, beside the numbered slots */
+      summarize?: (values: string[]) => { chips: string[]; note?: string };
+      /** what one pick is called, e.g. "technique" */
+      noun?: string;
+    }
   | { key: string; label: string; help?: string; kind: 'text'; placeholder?: string; maxLength?: number }
   | { key: string; label: string; help?: string; kind: 'number'; min?: number; max?: number };
 
@@ -121,6 +211,12 @@ export interface GlueModule {
   formFor?(move: LegalMove, input: GlueInput): MoveForm | null;
   /** Roll/Draw appears iff a legal move is a resolve_report */
   resolveReportMove(legalMoves: LegalMove[]): LegalMove | null;
+  /**
+   * A moment the arriving event deserves (a strike), read from the view on
+   * screen and the one arriving, or null. The table plays it before the
+   * event lands, so the board still shows the state the moment resolves.
+   */
+  momentFor?(input: MomentInput): Moment | null;
   /**
    * The game's own setup choices, from the engine's options schema and
    * reference data, for the seats as set up. Choices that belong to a friend

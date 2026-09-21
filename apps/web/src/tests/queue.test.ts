@@ -2,11 +2,12 @@
 // replay repeats the last move, resume picks up after lastSeq, and no pace
 // skips to the end.
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { BASE_MS, PACES, PlaybackQueue } from '../playback/PlaybackQueue';
 import { ev } from './fixtures';
 
 describe('playback queue', () => {
+  afterEach(() => { vi.useRealTimers(); });
   it('applies events strictly in seq order, one at a time', () => {
     const q = new PlaybackQueue();
     q.manual = true;
@@ -84,6 +85,33 @@ describe('playback queue', () => {
     q.advance();
     q.push(ev(1, 'a-again'));
     expect(q.snapshot.pending).toBe(0);
+  });
+
+  it('a gate holds the next event until it resolves, and nothing skips past it', async () => {
+    vi.useFakeTimers();
+    const q = new PlaybackQueue();
+    q.setPace(2);
+    q.seed(ev(1, 'a'));
+    let release: (() => void) | null = null;
+    const seen: Array<[number, number | null]> = [];
+    q.setGate((next, current) => new Promise<void>((resolve) => { seen.push([next.seq, current?.seq ?? null]); release = resolve; }));
+    q.push(ev(2, 'b'));
+    q.push(ev(3, 'c'));
+    await vi.advanceTimersByTimeAsync(BASE_MS);
+    // The gate saw b against a; b has not landed.
+    expect(seen).toEqual([[2, 1]]);
+    expect(q.snapshot.current?.summary).toBe('a');
+    release!();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(q.snapshot.current?.summary).toBe('b');
+    // Then c waits for its own dwell and its own gate.
+    await vi.advanceTimersByTimeAsync(BASE_MS);
+    expect(seen).toEqual([[2, 1], [3, 2]]);
+    expect(q.snapshot.current?.summary).toBe('b');
+    release!();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(q.snapshot.current?.summary).toBe('c');
+    expect(q.snapshot.done).toBe(true);
   });
 
   it('has no pace that skips to the end: every pace dwells on every event', () => {

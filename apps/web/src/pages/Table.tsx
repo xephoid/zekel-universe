@@ -12,10 +12,11 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import type { LegalMove } from '@universe/shared';
 import { Die, FlipRoot, paletteVars, useSystemReducedMotion, type SelectEvent } from '@universe/primitives';
 import { glueFor, submitMove, type GlueInput, formForMove, movesForSelect } from '../glue';
-import type { MoveForm, FormContext } from '../glue';
+import type { MoveForm, FormContext, Moment, PromptAction } from '../glue';
 import { JsonInspector, ZoneRenderer } from '../glue/ZoneRenderer';
 import { useTable } from '../table/useTable';
-import { Briefings, EndPanel, Log, MoveChooser, MoveFormSheet, MoveMenuList, NoticeToast, PaceControl, Sheet, lessonsOf, type Lesson, type Notice } from '../table/parts';
+import { ActionBar, Briefings, EndPanel, Log, MoveChooser, MoveFormSheet, MoveMenuList, NoticeToast, PaceControl, Sheet, lessonsOf, type Lesson, type Notice } from '../table/parts';
+import { StrikeOverlay } from '../table/StrikeMoment';
 import { api } from '../api';
 import { useSession } from '../session';
 import { Wordmark } from '../ui';
@@ -63,6 +64,13 @@ export function TablePage() {
   const [busy, setBusy] = useState(false);
   const [playAgainBusy, setPlayAgainBusy] = useState(false);
   const [showEnd, setShowEnd] = useState(true);
+  /** a moment playing over the board; `resolve` lets the held event land */
+  const [moment, setMoment] = useState<{ m: Moment; seq: number; resolve: () => void } | null>(null);
+  /** the last event that came with a moment, so it can be replayed */
+  const [momentSeq, setMomentSeq] = useState<number | null>(null);
+  /** a batch in flight: the taps still to send, one per event */
+  const [batch, setBatch] = useState<SelectEvent[] | null>(null);
+  const batchSentFor = useRef<number | null>(null);
   const lastTap = useRef<{ x: number; y: number } | null>(null);
   const memory = useRef(new Map<string, unknown>());
   const reduced = useSystemReducedMotion();
@@ -104,7 +112,24 @@ export function TablePage() {
     ? glue.diceFor({ engineMove: current.engineMove, summary: current.summary, view: current.view })
     : null;
 
-  const send = useCallback(async (trigger: 'tap' | 'resolve_report_button' | 'form', move: Record<string, unknown>, formContext?: FormContext) => {
+  // A moment plays before its event lands: the queue holds the event, the
+  // glue reads the strike from the view on screen and the one arriving, the
+  // overlay plays it, and only then does the board change underneath.
+  useEffect(() => {
+    if (!glue?.momentFor) { playback.setGate(null); return; }
+    playback.setGate(async (next, cur) => {
+      const m = glue.momentFor!({ before: cur?.view ?? null, after: next.view, summary: next.summary, engineMove: next.engineMove, playerId: next.playerId, reference: t.reference });
+      if (!m) return;
+      setMomentSeq(next.seq);
+      await new Promise<void>((resolve) => setMoment({ m, seq: next.seq, resolve }));
+    });
+    return () => playback.setGate(null);
+  }, [glue, playback, t.reference]);
+  const momentDone = useCallback(() => {
+    setMoment((cur) => { cur?.resolve(); return null; });
+  }, []);
+
+  const send = useCallback(async (trigger: 'tap' | 'resolve_report_button' | 'form' | 'batch', move: Record<string, unknown>, formContext?: FormContext) => {
     if (busy) return;
     setBusy(true);
     setChooser(null);
@@ -142,6 +167,28 @@ export function TablePage() {
   // A new event closes any chooser or form: their moves may no longer exist.
   useEffect(() => { setChooser(null); setForm(null); }, [current?.seq]);
 
+  // An action-bar button: one listed move, or a batch of taps.
+  const onAction = useCallback((a: PromptAction) => {
+    if ('move' in a) { pick(a.move); return; }
+    setBatch(a.batch);
+  }, [pick]);
+
+  // The batch sends one tap per event: after each event the glue finds the
+  // move the next tap means among the engine's new legal moves, and the
+  // batch stops the moment a tap means nothing or several things.
+  useEffect(() => {
+    if (!batch || !glue) return;
+    if (!yourTurn || busy) return;
+    if (batchSentFor.current === (current?.seq ?? null)) return;
+    const [sel, ...rest] = batch;
+    if (!sel) { setBatch(null); return; }
+    const options = movesForSelect(glue, sel, input);
+    if (options.length !== 1 || formForMove(glue, options[0]!, input)) { setBatch(null); return; }
+    batchSentFor.current = current?.seq ?? null;
+    setBatch(rest.length ? rest : null);
+    void send('batch', options[0]!.move);
+  }, [batch, glue, yourTurn, busy, current?.seq, input, send]);
+
   const undo = useCallback(async () => {
     const ack = await t.undo();
     if ('error' in ack && ack.error) setNotice({ kind: ack.error.startsWith('engine') || ack.error === 'internal' ? 'fault' : 'rule', reason: ack.message ?? ack.error });
@@ -167,6 +214,11 @@ export function TablePage() {
   }, [table, t.mySeat, nav]);
 
   const result = current?.gameOver ?? table?.table.status === 'finished' ? (current?.gameOver ?? null) : null;
+  const nameFor = useCallback((pid: string) => {
+    const m = /^p(\d+)$/.exec(pid);
+    const seat = m ? table?.seats.find((s) => s.position === Number(m[1]) - 1) : undefined;
+    return seat?.displayName ?? (seat?.kind === 'ai' ? 'AI' : pid);
+  }, [table]);
   const turnLabel = !table ? '' : table.table.status === 'finished' ? 'Game over'
     : !state.done ? 'Playing back…'
     : current?.yourTurn ? 'Your move'
@@ -206,6 +258,7 @@ export function TablePage() {
       </div>
 
       <div className="table-main">
+        <div className="table-play">
         <div className="table-board">
           {result === null && (
             <div className={`caption-card${state.done ? '' : ' pending'}`} aria-live="polite">
@@ -214,6 +267,11 @@ export function TablePage() {
               ) : null}
               <div className="caption-text">
                 {current ? current.summary : (t.error ?? 'Setting the table…')}
+                {state.done && momentSeq !== null && current?.seq === momentSeq && !moment && (
+                  <div className="caption-controls">
+                    <button className="chip-btn" onClick={playback.replayLast}>Replay the strike</button>
+                  </div>
+                )}
                 {!state.done && (
                   <div className="caption-controls">
                     <PaceControl pace={playback.pace} setPace={playback.setPace} />
@@ -236,8 +294,8 @@ export function TablePage() {
               {/draw|deal/i.test(resolveReport.description ?? '') ? 'Draw' : 'Roll'}
             </button>
           )}
-          {yourTurn && <MoveMenuList menu={current?.moveMenu ?? null} legalMoves={legalMoves} onPick={pick} disabled={busy} open={lit.length === 0} />}
-          {result && showEnd && table && (
+          {yourTurn && <MoveMenuList menu={current?.moveMenu ?? null} legalMoves={legalMoves} onPick={pick} disabled={busy} open={lit.length === 0 && !plan?.prompt?.actions.length} />}
+          {result && showEnd && table && !moment && (
             <div className="sheet-backdrop" role="presentation">
               <div className="sheet" role="dialog" aria-label="Game over">
                 <button className="btn secondary small close" onClick={() => setShowEnd(false)} aria-label="Look at the final table">✕</button>
@@ -245,6 +303,8 @@ export function TablePage() {
               </div>
             </div>
           )}
+        </div>
+        {plan && (plan.steps || plan.prompt) && <ActionBar steps={plan.steps} prompt={plan.prompt} onAction={onAction} disabled={busy || !yourTurn} />}
         </div>
         <div className={`table-side${sideOpen ? '' : ' collapsed'}`}>
           {sideOpen && (
@@ -263,6 +323,10 @@ export function TablePage() {
       </div>
 
       <NoticeToast notice={notice} onClose={() => setNotice(null)} />
+
+      {moment && table && (
+        <StrikeOverlay key={`${moment.seq}:${state.tick}`} moment={moment.m} nameFor={nameFor} youPid={myPlayerId} pace={playback.pace} setPace={playback.setPace} onDone={momentDone} reduced={reduced} />
+      )}
 
       {chooser && yourTurn && <MoveChooser moves={chooser} onPick={pick} onClose={() => setChooser(null)} disabled={busy} />}
       {form && yourTurn && (

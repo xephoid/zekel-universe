@@ -298,6 +298,9 @@ label.option-card { position: relative; padding-right: 40px; }
 .chip-btn.leave:hover { color: var(--danger); background: transparent; }
 .chip-btn.watching { background: var(--you-bg); color: var(--you-fg); border-color: transparent; cursor: default; }
 .table-main { display: flex; flex: 1; min-height: 0; }
+/* the play column: the scrolling board, then the action bar pinned under it */
+.table-play { flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+.table-play .action-bar { margin: 0 16px 10px; }
 .table-board { flex: 1; overflow: auto; padding: 14px 16px; display: flex; flex-direction: column; gap: 14px; position: relative; }
 .table-board .zones { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
 .zones .zone-grid { flex: 1 1 100%; width: 100%; min-width: 0; }
@@ -395,3 +398,75 @@ label.option-card { position: relative; padding-right: 40px; }
 }
 .gallery section { margin: 24px 0; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); display: block; }
 .gallery .row { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
+
+/* ---- a zone that takes a whole row of the board ---- */
+.zones .zone.span-full { flex: 1 1 100%; width: 100%; min-width: 0; }
+.zones .zone.span-full .zk-zone-row { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; --zekel-card-w: 92px; --zekel-card-h: 130px; }
+
+/* ---- the action bar (docs/design/Fractured Fist Table.dc.html) ---- */
+.action-bar {
+  flex: none; min-height: 58px; border-radius: 12px; background: var(--card); border: 1px solid var(--line);
+  display: flex; align-items: center; gap: 12px; padding: 8px 14px; box-shadow: var(--shadow-card); flex-wrap: wrap;
+}
+.action-bar.live { background: var(--you-bg); }
+.action-bar.urgent { border-color: var(--danger); background: var(--card); }
+.action-bar .steps { display: flex; gap: 5px; align-items: center; flex: none; }
+.action-bar .step { padding: 4px 10px; border-radius: 999px; background: var(--chip); color: var(--fg-muted); font: 600 12px var(--font-body); }
+.action-bar .step.current { background: var(--accent); color: #fff; }
+.action-bar .divider { width: 1px; height: 26px; background: var(--line); flex: none; }
+.action-bar .words { flex: 1; min-width: 160px; }
+.action-bar .words .title { font-size: 13px; font-weight: 600; }
+.action-bar .words .sub { font-size: 12px; color: var(--fg-muted); margin-top: 1px; }
+.action-bar .btn.small { height: 34px; padding: 0 14px; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; }
+.action-bar .btn .note { font: 500 11px var(--font-body); opacity: 0.8; }
+
+/* ---- the strike moment (docs/design/Fractured Fist Strike.dc.html) ---- */
+.strike-scrim {
+  position: fixed; inset: 0; z-index: 45; background: rgba(28,26,23,0.42); display: grid; place-items: center; padding: 20px;
+  animation: zk-fadein var(--motion-normal) ease-out; transition-property: opacity; opacity: 1;
+}
+.strike-scrim.closing { opacity: 0; pointer-events: none; }
+.strike-panel {
+  width: min(920px, 100%); border-radius: 16px; background: var(--bg-raised); border: 1px solid var(--line); box-shadow: var(--shadow-pop);
+  padding: 22px 26px 18px; display: flex; flex-direction: column; gap: 14px; animation: strike-panel var(--motion-normal) var(--motion-settle);
+}
+@keyframes strike-panel { from { opacity: 0; transform: scale(0.965); } to { opacity: 1; transform: scale(1); } }
+.strike-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.strike-title { font: 700 22px var(--font-display); letter-spacing: -0.02em; }
+.strike-lanes { display: flex; flex-direction: column; gap: 12px; }
+.strike-lane { border-radius: 12px; background: var(--chip); border: 1px solid var(--line); padding: 12px 16px 14px; display: flex; flex-direction: column; gap: 6px; }
+.strike-lane-head { display: flex; align-items: baseline; gap: 10px; }
+.strike-lane-title { font: 700 13px var(--font-display); }
+.strike-stage { position: relative; height: 66px; }
+.strike-token {
+  position: absolute; left: 0; top: 7px; width: 64px; height: 52px; border-radius: 10px; z-index: 2;
+  background: #fae3e0; border: 2px solid #8f2018; color: #8f2018; display: grid; place-items: center; font: 700 22px var(--font-mono);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.18); transition-property: transform, opacity, box-shadow; transition-timing-function: var(--motion-easing);
+}
+.strike-token.travel { transform: translateX(min(330px, 40vw)); box-shadow: var(--shadow-lift); }
+.strike-token.landed { transform: translateX(min(560px, 62vw)) scale(0.5); opacity: 0; }
+.strike-token.stopped { transform: translateX(min(330px, 40vw)) scale(0.7); opacity: 0; }
+.strike-token.reduced { transition-property: opacity; transform: none !important; }
+.strike-absorb { position: absolute; left: min(338px, 42vw); top: 0; font: 600 11px var(--font-body); color: #24507f; opacity: 0; }
+.strike-absorb.on { animation: strike-absorb ease-out forwards; }
+@keyframes strike-absorb { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(52px, -6px) scale(0.55); opacity: 0; } }
+.strike-shield {
+  position: absolute; left: min(410px, 48vw); top: 7px; width: 52px; height: 52px; border-radius: 10px 10px 22px 22px;
+  background: #e2ebf7; border: 2px solid #24507f; color: #24507f; display: grid; place-items: center; font: 700 19px var(--font-mono);
+}
+.strike-shield.flare { animation: strike-shield ease-out; }
+@keyframes strike-shield { 0% { transform: scale(1); } 35% { transform: scale(1.2) rotate(-3deg); } 100% { transform: scale(1) rotate(0); } }
+.strike-target { position: absolute; right: 0; top: 0; height: 66px; display: flex; align-items: center; gap: 12px; }
+.strike-target-name { min-width: 44px; max-width: 120px; font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.strike-pips { display: flex; gap: 4px; }
+.strike-pip { width: 22px; height: 26px; border-radius: 4px; border: 1px solid var(--line); box-sizing: border-box; transition-property: transform, opacity, background; transition-timing-function: var(--motion-easing); }
+.strike-pip.full { background: var(--accent); border-color: var(--accent); }
+.strike-pip.out { background: var(--accent); border-color: var(--accent); transform: translateY(18px) rotate(9deg); opacity: 0; }
+[data-motion='reduced'] .strike-pip.out { transform: none; }
+.strike-stam { width: 26px; font: 700 20px var(--font-mono); }
+.strike-stam.tick { animation: strike-tick 340ms ease-out; }
+@keyframes strike-tick { 0% { transform: scale(1); } 40% { transform: scale(1.4); } 100% { transform: scale(1); } }
+.strike-controls { display: flex; align-items: center; gap: 8px; padding-top: 2px; }
+[data-theme='dark'] .strike-token { background: #4a201c; border-color: #ffb3a8; color: #ffb3a8; }
+[data-theme='dark'] .strike-shield { background: #1e2f45; border-color: #a9c8ee; color: #a9c8ee; }
+[data-theme='dark'] .strike-absorb { color: #a9c8ee; }

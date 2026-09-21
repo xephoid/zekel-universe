@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { TableEventWire } from '@universe/shared';
-import { PlaybackQueue, type Pace, type PlaybackState } from './PlaybackQueue';
+import { PlaybackQueue, type Gate, type Pace, type PlaybackState } from './PlaybackQueue';
 
 export interface PlaybackApi {
   state: PlaybackState;
@@ -11,6 +11,8 @@ export interface PlaybackApi {
   replayLast: () => void;
   resumeFrom: (events: TableEventWire[]) => void;
   lastSeq: () => number;
+  /** hold each event before it lands (a moment plays first); null clears it */
+  setGate: (gate: Gate | null) => void;
 }
 
 const PACE_KEY = 'universe:pace';
@@ -55,5 +57,6 @@ export function usePlaybackQueue(): PlaybackApi {
     replayLast: () => queue.replayLast(),
     resumeFrom: (events: TableEventWire[]) => queue.resumeFrom(events),
     lastSeq: () => queue.snapshot.lastSeq,
+    setGate: (gate: Gate | null) => queue.setGate(gate),
   }), [state, pace, queue]);
 }

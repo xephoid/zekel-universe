@@ -8,13 +8,16 @@
 //   3. an undo the person pressed,
 //   4. a form the person filled in and sent, which completes one template
 //      move the engine listed: every field the form did not ask about is the
-//      template's, and every answer is the person's.
+//      template's, and every answer is the person's,
+//   5. a batch the person pressed once ("play all resources"), which sends
+//      its moves one at a time, each only once the engine lists it after the
+//      previous one landed, and stops the moment one is not listed.
 // Nothing else ever submits. The table test renders the page with a fake
 // socket and asserts no submission happens without a simulated tap.
 
 import type { LegalMove } from '@universe/shared';
 
-export type SubmissionTrigger = 'tap' | 'resolve_report_button' | 'undo' | 'form';
+export type SubmissionTrigger = 'tap' | 'resolve_report_button' | 'undo' | 'form' | 'batch';
 
 /** What a form submission completes: the listed template and the keys the
  *  person was asked about. */
@@ -49,8 +52,12 @@ export function isSubmissionAllowed(
       if (!form || !legalMoves.some((m) => movesEqual(m.move, form.template))) return false;
       return completesTemplate(move, form.template, form.editableKeys);
     case 'tap':
-      // A person tapped a lit part or a numbered menu row: the move must be
-      // one the engine listed.
+      // A person tapped a lit part, a numbered menu row or an action-bar
+      // button: the move must be one the engine listed.
+      return legalMoves.some((m) => movesEqual(m.move, move));
+    case 'batch':
+      // One press, several moves: each is sent only while the engine lists
+      // it, against the menu the engine returned after the previous one.
       return legalMoves.some((m) => movesEqual(m.move, move));
     case 'resolve_report_button':
       // The Roll/Draw button submits ONLY resolve_report, and the person
