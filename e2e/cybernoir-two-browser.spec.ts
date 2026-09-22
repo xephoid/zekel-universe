@@ -47,6 +47,21 @@ test('two signed-in humans at one Cybernoir table, each seeing only their own pr
   await start.click();
   await expect(a).toHaveURL(/\/table\/[^/]+$/, { timeout: 20_000 });
   await expect(b).toHaveURL(/\/table\/[^/]+$/, { timeout: 20_000 });
+
+  // Setup: the Hacker names the hideout before the Detective's first turn.
+  // The host took the Hacker seat above, so the prompt is theirs. An engine
+  // that picks the hideout itself starts in the play phase and shows no
+  // prompt, and this step does nothing.
+  const hideoutPrompt = a.locator('.action-bar .title', { hasText: 'Choose your hideout' });
+  const asked = await Promise.race([
+    hideoutPrompt.waitFor({ state: 'visible', timeout: 30_000 }).then(() => true),
+    b.locator('.turn-pill', { hasText: /^Your move/ }).waitFor({ state: 'visible', timeout: 30_000 }).then(() => false),
+  ]).catch(() => false);
+  if (asked) {
+    await a.locator('.zk-map-blob.zk-lit').first().click();
+    await a.getByRole('button', { name: 'Hide here' }).click();
+  }
+
   await expect(b.locator('.turn-pill')).toHaveText(/^Your move/, { timeout: 30_000 });
   await expect(a.locator('.turn-pill')).toHaveText(/^Waiting on/, { timeout: 30_000 });
 

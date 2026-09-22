@@ -161,3 +161,93 @@ describe('choosers and forms on the table page', () => {
     expect(moves()).toHaveLength(0);
   });
 });
+
+// Cybernoir's setup phase on the real page: the Hacker's hideout is the one
+// secret they choose, and the city map is how they say it.
+const CN_SETUP_VIEW = {
+  phase: 'setup', turn: 1, activePlayerId: 'hak', playerOrder: ['det', 'hak'], pending: null,
+  endgame_triggered: false, endgame_reason: null, board: [],
+  informants_facedown_count: 0, informants_revealed: [],
+  jail: { slot_1_booked: [], slot_2_processing: [], slot_3_release_pending_then_freed: [] },
+  truthful_clues: {}, truthful_values: {}, negative_clues: [],
+  safehouse_burned: false, hideout_card_removed: true,
+  evidence: { weapon: null, witnesses: [], motive_set_1: [], motive_set_2: [], motive_set_3: [], motive_set_4: [] },
+  contacts_discard: [],
+  detective: { location_deck_size: 19, location_hand_size: 0, location_discard: [], poi_deck_size: 25, mid_game_guess_spent: false, ap: 4, overclock_used: false },
+  hacker: { contacts_deck_size: 26, contacts_discard_size: 0, hand_size: 0, ap: 0, overclock_used: false },
+  overclock_draws_owed: 0, overclock_draw_timing: 'immediate',
+  role: 'hacker', hand: [], hideout: null,
+};
+const CN_LEGAL = [{ move_id: 'report_hideout', description: 'Choose your hideout location', move: { type: 'report_hideout', location_name: '' } }];
+const CN_REFERENCE = {
+  gameId: 'cybernoir-2127', rules: 'rules', moveSchema: {}, optionsSchema: {},
+  referenceData: {
+    locations: [
+      { name: 'The Back Alley', borough: 'downtown', population: 2, affiliation: 'gang_1' },
+      { name: 'Junktown', borough: 'boonies', population: 0, affiliation: 'chimera' },
+    ],
+    people: [
+      { name: 'Zero Kelvin', home_location: 'The Back Alley' },
+      { name: 'Frostbyte', home_location: 'The Back Alley' },
+    ],
+  },
+};
+const CN_TABLE = {
+  table: { id: 't2', gameId: 'cybernoir-2127', gameName: 'Cybernoir 2127', mode: 'live', status: 'playing', createdAt: '', finishedAt: null, hostIsMe: true, nextActorPosition: 0, waitingOnMe: true },
+  seats: [{ position: 0, kind: 'human', aiDifficulty: null, ready: true, mine: true, taken: true, displayName: 'Guest' }, { position: 1, kind: 'ai', aiDifficulty: 'easy', ready: true, mine: false, taken: true, displayName: 'AI (easy)' }],
+  mySeats: [0],
+};
+const cnOpening: TableEventWire = ev(1, 'The table is set.', {
+  kind: 'setup', actorSeatPosition: null, view: CN_SETUP_VIEW, legalMoves: CN_LEGAL,
+  moveMenu: { prompt: 'Your move', entries: [{ key: '1', label: 'Choose your hideout location', move_id: 'report_hideout' }] },
+  yourTurn: true, playerId: 'hak', nextActorPosition: 0,
+});
+
+describe("cybernoir's hideout, chosen on the map", () => {
+  let socket: FakeSocket;
+  beforeEach(() => {
+    socket = new FakeSocket();
+    useFakeSocket(socket as never);
+    vi.stubGlobal('fetch', vi.fn((input: RequestInfo | URL) => {
+      const url = String(input);
+      const json = (body: unknown) => Promise.resolve(new Response(JSON.stringify(body), { status: 200, headers: { 'content-type': 'application/json' } }));
+      if (url === '/api/me') return json({ user: null, guest: { id: 'g', displayName: 'Guest', upgradedToUserId: null } });
+      if (url === '/api/tables/t2') return json(CN_TABLE);
+      if (url.startsWith('/api/tables/t2/events')) return json({ events: [cnOpening] });
+      if (url === '/api/games/cybernoir-2127/reference') return json(CN_REFERENCE);
+      return Promise.resolve(new Response('{"error":"not_found"}', { status: 404 }));
+    }));
+    submissionLog.length = 0;
+    localStorage.clear();
+  });
+  afterEach(() => { cleanup(); vi.unstubAllGlobals(); useFakeSocket(null); });
+
+  const moves = () => socket.emitted.filter((e) => e.event === 'move');
+
+  it('lights every location, names the tapped one back, and sends nothing until the Hacker presses Hide here', async () => {
+    render(
+      <SessionProvider>
+        <MemoryRouter initialEntries={['/table/t2']}>
+          <Routes><Route path="/table/:id" element={<TablePage />} /></Routes>
+        </MemoryRouter>
+      </SessionProvider>,
+    );
+    await screen.findByText('Choose your hideout');
+    const alley = await screen.findByRole('button', { name: 'The Back Alley' });
+    expect(alley.className).toContain('zk-lit');
+    expect((await screen.findByRole('button', { name: 'Junktown' })).className).toContain('zk-lit');
+
+    await act(async () => { fireEvent.click(alley); });
+    const sheet = await screen.findByRole('dialog', { name: 'Hide in The Back Alley?' });
+    expect(sheet.textContent).toContain('Downtown · 2 residents · Gang 1');
+    expect(sheet.textContent).toContain('Zero Kelvin, Frostbyte live here and start in your hand.');
+    // The tap opened the sheet and nothing else: the secret is still unsent.
+    expect(moves()).toHaveLength(0);
+    expect(submissionLog).toHaveLength(0);
+
+    await act(async () => { fireEvent.click(within(sheet).getByRole('button', { name: 'Hide here' })); });
+    await waitFor(() => expect(moves()).toHaveLength(1));
+    expect((moves()[0]!.payload as { move: unknown }).move).toEqual({ type: 'report_hideout', location_name: 'The Back Alley' });
+    expect(submissionLog[0]!.trigger).toBe('form');
+  });
+});

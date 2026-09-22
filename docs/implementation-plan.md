@@ -648,4 +648,12 @@ Still open:
 - Cybernoir 2127's glue compiles against the primitive contract and passes
   fixture tests and the two-human privacy spec, but a full game has not been
   played through in the browser.
+- Cybernoir's Hacker cannot yet choose a hideout, because the engine picks it
+  at session creation: `createInitialState` auto-completes setup whenever both
+  seats are *tracked*, and Universe marks human seats `digital`, which the
+  engine reads as tracked. The engine should auto-complete only when the
+  Hacker seat is an AI. Universe's side of it is built and waiting: the setup
+  phase lights the whole city, a tap names that location back before it is
+  sent, and the Detective is told to wait. See "The hideout" in
+  `docs/games/cybernoir-2127-build.md`.
 - The phone pass (M6).

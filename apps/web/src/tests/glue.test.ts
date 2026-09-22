@@ -10,7 +10,7 @@ import type { GlueInput, Zone } from '../glue';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { formForMove, movesForSelect, templateForm } from '../glue';
+import { formForMove, isSubmissionAllowed, movesForSelect, templateForm } from '../glue';
 import { SPACES, JUNCTION_ROADS, TREATS, CASTLE_POS } from '../glue/sweetlands-board';
 
 function input(view: unknown, legalMoves: GlueInput['legalMoves'] = [], extra: Partial<GlueInput> = {}): GlueInput {
@@ -576,12 +576,29 @@ const CN_REFERENCE: GameReferenceResponse = {
   gameId: 'cybernoir-2127', rules: '', moveSchema: {}, optionsSchema: {},
   referenceData: {
     locations: [
-      { name: 'Dark City Central Station', borough: 'downtown', affiliation: 'none' },
-      { name: 'Xistential Club', borough: 'downtown', affiliation: 'gang_2' },
-      { name: 'Shipyard', borough: 'boonies', affiliation: 'corp_1' },
-      { name: 'The Junction', borough: 'boonies', affiliation: 'gang_1' },
+      { name: 'Dark City Central Station', borough: 'downtown', population: 3, affiliation: 'none' },
+      { name: 'Xistential Club', borough: 'downtown', population: 1, affiliation: 'gang_2' },
+      { name: 'Shipyard', borough: 'boonies', population: 0, affiliation: 'corp_1' },
+      { name: 'The Junction', borough: 'boonies', population: 2, affiliation: 'gang_1' },
+    ],
+    people: [
+      { name: 'Blackice', home_location: 'The Junction' },
+      { name: 'Anansi the Spider', home_location: 'The Junction' },
+      { name: 'Eddie the Doorman', home_location: 'Xistential Club' },
     ],
   },
+};
+
+// The setup phase, before the Hacker has hidden: no board, no hand, and one
+// legal move with a blank for the location name.
+const CN_SETUP_VIEW = {
+  ...CN_VIEW, phase: 'setup', turn: 1, activePlayerId: 'hak',
+  board: [], hand: [], hideout: null,
+  hacker: { ...CN_VIEW.hacker, hand_size: 0, ap: 0 },
+};
+const CN_HIDEOUT_MOVE = {
+  move_id: 'report_hideout', description: 'Choose your hideout location',
+  move: { type: 'report_hideout', location_name: '' },
 };
 
 describe('cybernoir-2127 glue', () => {
@@ -604,6 +621,68 @@ describe('cybernoir-2127 glue', () => {
     const inp = input(CN_VIEW, moves, { reference: CN_REFERENCE });
     expect(g.litParts(inp)).toEqual(['cn:loc:dark-city-central-station', 'cn:informant:first']);
     expect(g.moveForSelect({ component: 'map', id: 'cn:loc:dark-city-central-station', label: '' }, inp)?.move_id).toBe('pl');
+  });
+
+  it('lets the Hacker pick the hideout at setup: the whole city is lit and a tap names it back before it is sent', () => {
+    const memory = new Map<string, unknown>();
+    const inp = input(CN_SETUP_VIEW, [CN_HIDEOUT_MOVE], { reference: CN_REFERENCE, memory });
+    expect(g.plan(inp)!.prompt!.title).toBe('Choose your hideout');
+    expect(g.litParts(inp)).toEqual([
+      'cn:loc:dark-city-central-station', 'cn:loc:xistential-club', 'cn:loc:shipyard', 'cn:loc:the-junction',
+    ]);
+    // The tap sends nothing on its own: it opens the sheet for that location.
+    const tap = g.moveForSelect({ component: 'map', id: 'cn:loc:the-junction', label: '' }, inp);
+    expect(tap?.move_id).toBe('report_hideout');
+    const sheet = g.formFor!(tap!, inp)!;
+    expect(sheet.title).toBe('Hide in The Junction?');
+    expect(sheet.help).toContain('Boonies · 2 residents · Gang 1');
+    expect(sheet.help).toContain('Blackice, Anansi the Spider live here');
+    expect(sheet.fields).toEqual([]);
+    expect(sheet.build({})).toEqual({ type: 'report_hideout', location_name: 'The Junction' });
+    expect(sheet.editableKeys).toEqual(['location_name']);
+    // And the door lets the finished move through, as a form the person sent.
+    expect(isSubmissionAllowed('form', sheet.build({})!, [CN_HIDEOUT_MOVE], {
+      template: sheet.template.move, editableKeys: sheet.editableKeys,
+    })).toBe(true);
+  });
+
+  it('asks the whole city when the Hacker reaches the hideout through the move menu instead of the map', () => {
+    const inp = input(CN_SETUP_VIEW, [CN_HIDEOUT_MOVE], { reference: CN_REFERENCE });
+    const sheet = g.formFor!(CN_HIDEOUT_MOVE, inp)!;
+    expect(sheet.title).toBe('Choose your hideout');
+    expect(sheet.fields.map((f) => f.key)).toEqual(['location_name']);
+    const options = (sheet.fields[0] as { options: Array<{ value: string; hint?: string }> }).options;
+    expect(options.map((o) => o.value)).toHaveLength(4);
+    expect(options.find((o) => o.value === 'Shipyard')!.hint).toBe('Boonies · 0 residents · Corp 1');
+    // Nothing is preselected, and a location the engine never named is refused.
+    expect(sheet.build({})).toBeNull();
+    expect(sheet.build({ location_name: 'Nowhere' })).toBeNull();
+    expect(sheet.build({ location_name: 'Shipyard' })).toEqual({ type: 'report_hideout', location_name: 'Shipyard' });
+  });
+
+  it('reads a tap once, so a later press with no fresh tap asks the whole question again', () => {
+    const memory = new Map<string, unknown>();
+    const inp = input(CN_SETUP_VIEW, [CN_HIDEOUT_MOVE], { reference: CN_REFERENCE, memory });
+    g.moveForSelect({ component: 'map', id: 'cn:loc:shipyard', label: '' }, inp);
+    expect(g.formFor!(CN_HIDEOUT_MOVE, inp)!.title).toBe('Hide in Shipyard?');
+    expect(g.formFor!(CN_HIDEOUT_MOVE, inp)!.title).toBe('Choose your hideout');
+  });
+
+  it('tells the Detective to wait while the Hacker hides, and lights nothing', () => {
+    const waiting = { ...CN_SETUP_VIEW, role: 'detective', location_hand: [] };
+    const inp = input(waiting, [], { reference: CN_REFERENCE });
+    expect(g.plan(inp)!.prompt).toEqual({
+      title: 'The Hacker is choosing a hideout', sub: 'The city opens once they have hidden.', actions: [],
+    });
+    expect(g.litParts(inp)).toEqual([]);
+  });
+
+  it("leaves an AI Hacker's nameless hideout move alone — that one the engine picks secretly", () => {
+    const nameless = { move_id: 'report_hideout', description: 'AI Hacker chooses its hideout secretly', move: { type: 'report_hideout' } };
+    const inp = input(CN_SETUP_VIEW, [nameless], { reference: CN_REFERENCE });
+    expect(g.formFor!(nameless, inp)).toBeNull();
+    expect(g.litParts(inp)).toEqual([]);
+    expect(g.plan(inp)!.prompt!.title).toBe('The Hacker is choosing a hideout');
   });
 });
 

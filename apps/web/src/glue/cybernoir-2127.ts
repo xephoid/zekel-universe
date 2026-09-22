@@ -7,7 +7,7 @@
 
 import type { CardData, MapNode, TableauData } from '@universe/primitives';
 import type { GameReferenceResponse } from '@universe/shared';
-import type { GlueModule, GlueInput, LegalMove, SelectEvent, SetupField, TablePlan, Zone, SetupAnswers, SetupSeat } from './types';
+import type { GlueModule, GlueInput, LegalMove, MoveForm, PlanPrompt, SelectEvent, SetupField, TablePlan, Zone, SetupAnswers, SetupSeat } from './types';
 import { asArr, asNum, asStr, isObj, shapeHas, words } from './types';
 
 const PALETTE: Record<string, string> = {
@@ -26,7 +26,7 @@ const PALETTE: Record<string, string> = {
   not: '#8a8578',
 };
 
-interface Loc { name: string; borough: string; affiliation?: string }
+interface Loc { name: string; borough: string; population?: number; affiliation?: string }
 
 function locations(reference: GameReferenceResponse | null, view: Record<string, unknown>): Loc[] {
   const rd = reference?.referenceData;
@@ -34,7 +34,12 @@ function locations(reference: GameReferenceResponse | null, view: Record<string,
   if (isObj(rd) && Array.isArray(rd['locations'])) {
     for (const l of rd['locations']) {
       if (isObj(l) && typeof l['name'] === 'string') {
-        out.push({ name: l['name'], borough: asStr(l['borough'], 'city'), affiliation: asStr(l['affiliation']) || undefined });
+        out.push({
+          name: l['name'],
+          borough: asStr(l['borough'], 'city'),
+          population: typeof l['population'] === 'number' ? l['population'] : undefined,
+          affiliation: asStr(l['affiliation']) || undefined,
+        });
       } else if (typeof l === 'string') {
         out.push({ name: l, borough: 'city' });
       }
@@ -49,6 +54,37 @@ function locations(reference: GameReferenceResponse | null, view: Record<string,
   for (const h of asArr(view['location_hand'])) names.add(asStr(h));
   return [...names].filter(Boolean).map((name) => ({ name, borough: 'city' }));
 }
+
+/** The people the engine's reference data puts at a location, by printed name. */
+function residentsOf(reference: GameReferenceResponse | null, locName: string): string[] {
+  const rd = reference?.referenceData;
+  if (!isObj(rd) || !Array.isArray(rd['people'])) return [];
+  return rd['people'].filter(isObj)
+    .filter((p) => asStr(p['home_location']) === locName)
+    .map((p) => asStr(p['name']))
+    .filter(Boolean);
+}
+
+/** One line of a location's three printed facts, for a hint under its name. */
+function locLine(l: Loc): string {
+  return [
+    words(l.borough),
+    typeof l.population === 'number' ? `${l.population} resident${l.population === 1 ? '' : 's'}` : '',
+    l.affiliation && l.affiliation !== 'none' ? words(l.affiliation) : 'no affiliation',
+  ].filter(Boolean).join(' · ');
+}
+
+/**
+ * The setup move the Hacker completes with a location name, when the engine
+ * lists it. An AI Hacker's template carries no `location_name` at all (the
+ * engine picks that one secretly), so it never matches here.
+ */
+function hideoutTemplate(legalMoves: LegalMove[]): LegalMove | null {
+  return legalMoves.find((m) => m.move['type'] === 'report_hideout' && m.move['location_name'] === '') ?? null;
+}
+
+/** Where a tap on the map during setup is kept until the sheet names it back. */
+const TAPPED_HIDEOUT = 'cn:tapped-hideout';
 
 export function locId(name: string): string {
   return `cn:loc:${name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
@@ -188,11 +224,29 @@ export const cybernoirGlue: GlueModule = {
       side.push({ kind: 'card-zone', id: 'cn:contacts-deck', data: { label: 'Contacts deck', mode: 'pile', countOnly: asNum(hak['contacts_deck_size']) } });
     }
 
+    // Setup is the Hacker's one secret decision: they name the hideout and
+    // hide there all game. The map is how they say it; the Detective waits.
+    const choosing = asStr(view['phase']) === 'setup' ? hideoutTemplate(input.legalMoves) : null;
+    let prompt: PlanPrompt | undefined;
+    if (choosing) {
+      prompt = {
+        title: 'Choose your hideout',
+        sub: `Tap a location on the map — ${locs.length} to choose from. You hide there all game, the people who live there start in your hand, and the Detective wins by naming it.`,
+        actions: [],
+      };
+    } else if (asStr(view['phase']) === 'setup') {
+      prompt = { title: 'The Hacker is choosing a hideout', sub: 'The city opens once they have hidden.', actions: [] };
+    }
+
     const status = `Turn ${asNum(view['turn'], 1)} · ${words(asStr(view['phase']))}`;
-    return { board, bench, side, palette: PALETTE, title: 'Cybernoir 2127', status };
+    return { board, bench, side, palette: PALETTE, title: 'Cybernoir 2127', status, prompt };
   },
 
   litParts(input: GlueInput): string[] {
+    // Setup: every location in the city is a place the Hacker may hide.
+    if (hideoutTemplate(input.legalMoves)) {
+      return locations(input.reference, isObj(input.view) ? input.view : {}).map((l) => locId(l.name));
+    }
     const lit: string[] = [];
     const hand = shapeHas(input.view, 'role') ? asArr(input.view['location_hand'] ?? input.view['hand']) : [];
     for (const m of input.legalMoves) {
@@ -207,6 +261,15 @@ export const cybernoirGlue: GlueModule = {
   },
 
   moveForSelect(sel: SelectEvent, input: GlueInput): LegalMove | null {
+    const choosing = hideoutTemplate(input.legalMoves);
+    if (choosing) {
+      const l = locations(input.reference, isObj(input.view) ? input.view : {}).find((x) => locId(x.name) === sel.id);
+      if (!l) return null;
+      // The tap is the answer; the sheet names it back and the player presses
+      // Hide here. Nothing is sent until they do.
+      input.memory.set(TAPPED_HIDEOUT, l.name);
+      return choosing;
+    }
     const hand = shapeHas(input.view, 'role') ? asArr(input.view['location_hand'] ?? input.view['hand']) : [];
     return (
       input.legalMoves.find((m) => {
@@ -219,6 +282,52 @@ export const cybernoirGlue: GlueModule = {
         return false;
       }) ?? null
     );
+  },
+
+  /**
+   * The hideout. The engine lists it as a blank to fill in, so it goes
+   * through a sheet either way: a tap on the map gets that location named
+   * back before it is sent, and the numbered menu gets the whole city as a
+   * list. The tap is read once — a later press with no fresh tap asks the
+   * whole question again rather than leaning on an old one.
+   */
+  formFor(move: LegalMove, input: GlueInput): MoveForm | null {
+    if (move.move['type'] !== 'report_hideout' || move.move['location_name'] !== '') return null;
+    const locs = locations(input.reference, isObj(input.view) ? input.view : {});
+    if (locs.length === 0) return null;
+    const tapped = asStr(input.memory.get(TAPPED_HIDEOUT));
+    input.memory.delete(TAPPED_HIDEOUT);
+    const one = locs.find((l) => l.name === tapped);
+    if (one) {
+      const who = residentsOf(input.reference, one.name);
+      return {
+        title: `Hide in ${one.name}?`,
+        help: `${locLine(one)}. ${who.length > 0
+          ? `${who.join(', ')} live here and start in your hand.`
+          : 'Nobody lives here, so you start on three drawn Contacts.'}`,
+        fields: [],
+        template: move,
+        editableKeys: ['location_name'],
+        submitLabel: 'Hide here',
+        build: () => ({ ...move.move, location_name: one.name }),
+      };
+    }
+    return {
+      title: 'Choose your hideout',
+      help: 'You hide here all game and never move unless you burn the safehouse. The Detective wins by naming it.',
+      fields: [{
+        kind: 'choice', key: 'location_name', label: 'Location',
+        options: locs.map((l) => ({ value: l.name, label: l.name, hint: locLine(l) })),
+      }],
+      template: move,
+      editableKeys: ['location_name'],
+      submitLabel: 'Hide here',
+      build(answers) {
+        const v = answers['location_name'];
+        if (typeof v !== 'string' || !locs.some((l) => l.name === v)) return null;
+        return { ...move.move, location_name: v };
+      },
+    };
   },
 
   resolveReportMove(legalMoves: LegalMove[]): LegalMove | null {
