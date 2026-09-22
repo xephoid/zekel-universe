@@ -4,9 +4,9 @@
 
 import { describe, expect, it } from 'vitest';
 import type { GameReferenceResponse } from '@universe/shared';
-import type { CardZoneData, MapData, TrackData } from '@universe/primitives';
+import type { CardZoneData, MapData, TableauData, TrackData } from '@universe/primitives';
 import { GLUES } from '../glue';
-import type { GlueInput, Zone } from '../glue';
+import type { GlueInput, TablePlan, Zone } from '../glue';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -568,7 +568,7 @@ const CN_VIEW = {
   overclock_draws_owed: 0, overclock_draw_timing: null,
   role: 'hacker',
   hand: ['Blackice', 'The Weapon'],
-  hideout: 'The Junction',
+  hideout: { location_name: 'The Junction', borough: 'boonies', population: 2, affiliation: 'gang_1' },
   evidence_detail: {},
 };
 
@@ -675,6 +675,28 @@ describe('cybernoir-2127 glue', () => {
       title: 'The Hacker is choosing a hideout', sub: 'The city opens once they have hidden.', actions: [],
     });
     expect(g.litParts(inp)).toEqual([]);
+  });
+
+  it("names the Hacker's own safehouse on the map and in their panel, and marks nothing when the view will not name it", () => {
+    const named = g.plan(input(CN_VIEW, [], { reference: CN_REFERENCE }))!;
+    const namedMap = named.board.find((z) => z.kind === 'map')!.data as MapData;
+    expect(namedMap.nodes.find((n) => n.id === 'cn:loc:the-junction')!.pieces).toEqual([{ label: 'safehouse', colorKey: 'safehouse' }]);
+    const panel = (z: TablePlan) => (z.bench.find((b) => b.id === 'cn:hacker')!.data as TableauData).stats!;
+    expect(panel(named).find((st) => st.label === 'Safehouse')!.value).toBe('The Junction');
+
+    // A view that gives only the three printed facts marks no node: two
+    // locations share them, so a mark would be a guess.
+    const factsOnly = { ...CN_VIEW, hideout: { location_name: null, borough: 'boonies', population: 2, affiliation: 'gang_1' } };
+    const quiet = g.plan(input(factsOnly, [], { reference: CN_REFERENCE }))!;
+    const quietMap = quiet.board.find((z) => z.kind === 'map')!.data as MapData;
+    expect(quietMap.nodes.every((n) => (n.pieces ?? []).length === 0)).toBe(true);
+    expect(panel(quiet).find((st) => st.label === 'Safehouse')!.value).toBe('Boonies · Gang 1');
+
+    // The Detective's view carries no hideout at all: no mark, no stat.
+    const det = g.plan(input({ ...CN_VIEW, role: 'detective', hideout: null, location_hand: [] }, [], { reference: CN_REFERENCE }))!;
+    const detMap = det.board.find((z) => z.kind === 'map')!.data as MapData;
+    expect(detMap.nodes.every((n) => (n.pieces ?? []).length === 0)).toBe(true);
+    expect((det.side.find((z) => z.id === 'cn:hacker')!.data as TableauData).stats!.some((st) => st.label === 'Safehouse')).toBe(false);
   });
 
   it("leaves an AI Hacker's nameless hideout move alone — that one the engine picks secretly", () => {

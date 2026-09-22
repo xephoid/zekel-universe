@@ -648,12 +648,17 @@ Still open:
 - Cybernoir 2127's glue compiles against the primitive contract and passes
   fixture tests and the two-human privacy spec, but a full game has not been
   played through in the browser.
-- Cybernoir's Hacker cannot yet choose a hideout, because the engine picks it
-  at session creation: `createInitialState` auto-completes setup whenever both
-  seats are *tracked*, and Universe marks human seats `digital`, which the
-  engine reads as tracked. The engine should auto-complete only when the
-  Hacker seat is an AI. Universe's side of it is built and waiting: the setup
-  phase lights the whole city, a tap names that location back before it is
-  sent, and the Detective is told to wait. See "The hideout" in
-  `docs/games/cybernoir-2127-build.md`.
+- **Settled: Cybernoir's hideout is the Hacker's choice.** The engine used to
+  pick it at session creation, because `createInitialState` auto-completed
+  setup whenever both seats were *tracked* and Universe marks human seats
+  `digital`, which the engine reads as tracked. Who holds the cards and who
+  decides are different things. The engine now auto-completes only when the
+  AI plays the Hacker, and names the chosen location in the Hacker's own view
+  beside the three printed facts (the facts do not identify a place: Trailer
+  Towers and Little Ghana share all three). Universe opens the setup phase
+  with the whole city lit, names the tapped location back before anything is
+  sent, marks the safehouse on the map for its owner, and tells the Detective
+  to wait. This closes the "Settle this first" question in
+  `docs/games/cybernoir-2127-build.md`; the engine naming it was that note's
+  own recommendation, and Universe holds no second copy of the fact.
 - The phone pass (M6).
