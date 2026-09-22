@@ -259,3 +259,80 @@ describe("cybernoir's hideout, chosen on the map", () => {
     expect(submissionLog[0]!.trigger).toBe('form');
   });
 });
+
+// A verb on the action bar is a group of the engine's own moves. Pressing it
+// sends nothing: with several behind it, it asks which, in the engine's words.
+const CN_PLAY_VIEW = {
+  ...CN_SETUP_VIEW, phase: 'play', activePlayerId: 'det', role: 'detective',
+  board: ['The Back Alley'], location_hand: ['Junktown'], informants: [], hideout: null,
+  detective: { ...CN_SETUP_VIEW.detective, ap: 4, location_hand_size: 1 },
+};
+const CN_PLAY_MOVES = [
+  { move_id: 'a1', description: 'Arrest Zero Kelvin at The Back Alley', move: { type: 'arrest', target_person: 'Zero Kelvin' } },
+  { move_id: 'a2', description: 'Arrest Frostbyte at The Back Alley', move: { type: 'arrest', target_person: 'Frostbyte' } },
+  { move_id: 'end', description: 'End turn', move: { type: 'pass_turn' } },
+];
+
+describe("cybernoir's verb bar", () => {
+  let socket: FakeSocket;
+  beforeEach(() => {
+    socket = new FakeSocket();
+    useFakeSocket(socket as never);
+    vi.stubGlobal('fetch', vi.fn((input: RequestInfo | URL) => {
+      const url = String(input);
+      const json = (body: unknown) => Promise.resolve(new Response(JSON.stringify(body), { status: 200, headers: { 'content-type': 'application/json' } }));
+      if (url === '/api/me') return json({ user: null, guest: { id: 'g', displayName: 'Guest', upgradedToUserId: null } });
+      if (url === '/api/tables/t2') return json(CN_TABLE);
+      if (url.startsWith('/api/tables/t2/events')) return json({ events: [ev(1, 'Played The Back Alley.', {
+        kind: 'move', actorSeatPosition: 1, view: CN_PLAY_VIEW, legalMoves: CN_PLAY_MOVES,
+        moveMenu: { prompt: 'Your move', entries: CN_PLAY_MOVES.map((m, i) => ({ key: String(i + 1), label: m.description, move_id: m.move_id })) },
+        yourTurn: true, playerId: 'det', nextActorPosition: 0,
+      })] });
+      if (url === '/api/games/cybernoir-2127/reference') return json(CN_REFERENCE);
+      return Promise.resolve(new Response('{"error":"not_found"}', { status: 404 }));
+    }));
+    submissionLog.length = 0;
+    localStorage.clear();
+  });
+  afterEach(() => { cleanup(); vi.unstubAllGlobals(); useFakeSocket(null); });
+
+  const moves = () => socket.emitted.filter((e) => e.event === 'move');
+
+  it('asks which arrest, and sends only the one the player picks', async () => {
+    render(
+      <SessionProvider>
+        <MemoryRouter initialEntries={['/table/t2']}>
+          <Routes><Route path="/table/:id" element={<TablePage />} /></Routes>
+        </MemoryRouter>
+      </SessionProvider>,
+    );
+    // Scoped to the action bar: the numbered list still holds the same moves.
+    const bar = await screen.findByRole('region', { name: 'Your turn' });
+    const arrest = within(bar).getByRole('button', { name: /^Arrest/ });
+    expect(arrest.textContent).toContain('2 to choose from');
+    await act(async () => { fireEvent.click(arrest); });
+    const chooser = await screen.findByRole('dialog', { name: 'Which move?' });
+    expect(moves()).toHaveLength(0);
+    expect(submissionLog).toHaveLength(0);
+    await act(async () => { fireEvent.click(within(chooser).getByRole('button', { name: 'Arrest Frostbyte at The Back Alley' })); });
+    await waitFor(() => expect(moves()).toHaveLength(1));
+    expect((moves()[0]!.payload as { move: unknown }).move).toEqual({ type: 'arrest', target_person: 'Frostbyte' });
+    expect(submissionLog[0]!.trigger).toBe('tap');
+  });
+
+  it('a verb with one move behind it still waits for the press', async () => {
+    render(
+      <SessionProvider>
+        <MemoryRouter initialEntries={['/table/t2']}>
+          <Routes><Route path="/table/:id" element={<TablePage />} /></Routes>
+        </MemoryRouter>
+      </SessionProvider>,
+    );
+    const bar = await screen.findByRole('region', { name: 'Your turn' });
+    const end = within(bar).getByRole('button', { name: /^End turn/ });
+    expect(moves()).toHaveLength(0);
+    await act(async () => { fireEvent.click(end); });
+    await waitFor(() => expect(moves()).toHaveLength(1));
+    expect((moves()[0]!.payload as { move: unknown }).move).toEqual({ type: 'pass_turn' });
+  });
+});

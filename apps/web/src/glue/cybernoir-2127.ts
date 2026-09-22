@@ -7,7 +7,7 @@
 
 import type { CardData, MapNode, TableauData } from '@universe/primitives';
 import type { GameReferenceResponse } from '@universe/shared';
-import type { GlueModule, GlueInput, LegalMove, MoveForm, PlanPrompt, SelectEvent, SetupField, TablePlan, Zone, SetupAnswers, SetupSeat } from './types';
+import type { GlueModule, GlueInput, LegalMove, MoveForm, PlanPrompt, PromptAction, SelectEvent, SetupField, TablePlan, Zone, SetupAnswers, SetupSeat } from './types';
 import { asArr, asNum, asStr, isObj, shapeHas, words } from './types';
 
 const PALETTE: Record<string, string> = {
@@ -113,6 +113,61 @@ function locationCard(id: string, label: string, locs: Loc[], reference: GameRef
   };
 }
 
+export function personId(name: string): string {
+  return `cn:person:${name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
+}
+
+/**
+ * Who the Detective can reach: everyone living at a Location they have
+ * played. Twelve of their legal moves target a person, and people were drawn
+ * nowhere, so those moves had nothing to touch.
+ *
+ * A person already spoken for is drawn unlit, with where they are — a public
+ * fact, or one this seat is entitled to. Why that puts them out of reach is a
+ * rule, and the engine says it by not listing the move.
+ */
+function whoYouCanReach(
+  view: Record<string, unknown>,
+  reference: GameReferenceResponse | null,
+  people: Map<string, Person>,
+  n: Names,
+): Zone {
+  const played = asArr(view['board']).map((b) => asStr(b));
+  const here: string[] = [];
+  for (const loc of played) for (const who of residentsOf(reference, loc)) if (!here.includes(who)) here.push(who);
+
+  const where = new Map<string, string>();
+  const jail = isObj(view['jail']) ? view['jail'] : {};
+  for (const [key, label] of [['slot_1_booked', 'booked'], ['slot_2_processing', 'processing'], ['slot_3_release_pending_then_freed', 'release pending']] as const) {
+    for (const who of asArr(jail[key])) where.set(asStr(who), `in jail · ${label}`);
+  }
+  const evidence = isObj(view['evidence']) ? view['evidence'] : {};
+  for (const key of Object.keys(evidence)) {
+    if (key === 'weapon') continue;
+    for (const who of asArr(evidence[key])) where.set(asStr(who), 'played as Evidence');
+  }
+  for (const inf of asArr(view['informants'])) {
+    const o = isObj(inf) ? inf : {};
+    where.set(asStr(o['person']), o['revealed'] ? 'your informant, revealed' : 'your informant');
+  }
+
+  return {
+    kind: 'card-zone', id: 'cn:reach',
+    data: {
+      label: here.length > 0 ? `Who you can reach (${here.length})` : 'Who you can reach',
+      mode: 'row', size: 'small',
+      cards: here.map((who) => {
+        // Not the Contact's play cost: that is what the HACKER pays for them.
+        // What reaching them costs the Detective is in the engine's own words,
+        // on the moves the tap offers.
+        const { cost: _hackersPrice, ...card } = contactCard(personId(who), who, people, n);
+        const at = where.get(who);
+        return { ...card, colorKey: at ? 'none' : 'detective', ...(at ? { subtitle: at } : {}) };
+      }),
+    },
+  };
+}
+
 /** The people the engine's reference data puts at a location, by printed name. */
 function residentsOf(reference: GameReferenceResponse | null, locName: string): string[] {
   const rd = reference?.referenceData;
@@ -153,6 +208,60 @@ function names(reference: GameReferenceResponse | null): Names {
 /** How many people live at a location, in words. */
 function residentCount(population: number | undefined): string {
   return typeof population === 'number' ? `${population} resident${population === 1 ? '' : 's'}` : '';
+}
+
+/**
+ * The turn's verbs, in the order the printed turn sheet has them. A verb is
+ * drawn only when the engine lists a move behind it, and a verb that several
+ * moves stand behind asks which, in the engine's own words.
+ *
+ * The label is the verb; the engine's own sentence is the button's title and
+ * the chooser's row, so the two-hundred-character paragraph about burning the
+ * safehouse never becomes a button label. Where the engine states a cost it
+ * states it in that sentence — "Play Blackice (2 AP)" — and a verb with one
+ * move behind it carries that sentence as its note. A cost per verb would
+ * need the engine to publish one; it does not, and Universe will not invent
+ * one.
+ */
+const VERBS: Array<{ id: string; label: string; types: string[]; primary?: boolean }> = [
+  // The Detective's turn.
+  { id: 'play-location', label: 'Play a Location', types: ['play_location'], primary: true },
+  { id: 'upkeep', label: 'Pay upkeep', types: ['upkeep_choice'], primary: true },
+  { id: 'arrest', label: 'Arrest', types: ['arrest'] },
+  { id: 'recruit', label: 'Recruit an informant', types: ['recruit_informant'] },
+  { id: 'buy-clue', label: 'Buy a clue', types: ['buy_clue'] },
+  { id: 'draw-location', label: 'Draw a Location', types: ['draw_extra_location'] },
+  { id: 'guess', label: 'Guess the hideout', types: ['guess_location', 'final_guess'] },
+  // The Hacker's turn.
+  { id: 'evidence', label: 'Play Evidence', types: ['play_evidence'], primary: true },
+  { id: 'person', label: 'Play a person', types: ['play_person'] },
+  { id: 'win-back', label: 'Win back a Contact', types: ['win_back'] },
+  { id: 'draw-contact', label: 'Draw a Contact', types: ['draw_contact'] },
+  { id: 'jailbreak', label: 'Jailbreak', types: ['jailbreak'] },
+  { id: 'reveal', label: 'Reveal an informant', types: ['reveal_informant'] },
+  { id: 'overclock', label: 'Overclock', types: ['overclock'] },
+  { id: 'burn', label: 'Burn the safehouse', types: ['burn_safehouse'] },
+  // Both.
+  { id: 'end-turn', label: 'End turn', types: ['pass_turn'] },
+];
+
+/** The verbs the engine is offering this seat right now. */
+function verbActions(legalMoves: LegalMove[]): PromptAction[] {
+  const out: PromptAction[] = [];
+  for (const v of VERBS) {
+    const moves = legalMoves.filter((m) => v.types.includes(asStr(m.move['type'])));
+    if (moves.length === 0) continue;
+    const only = moves.length === 1 ? moves[0]! : null;
+    out.push({
+      id: `cn:verb:${v.id}`,
+      label: v.label,
+      note: only ? undefined : `${moves.length} to choose from`,
+      title: only ? only.description : undefined,
+      ...(v.primary ? { primary: true } : {}),
+      moves,
+    });
+  }
+  return out;
 }
 
 /** The three facts a clue can name, in the order the printed case board has. */
@@ -439,6 +548,7 @@ export const cybernoirGlue: GlueModule = {
           }),
         },
       });
+      side.push(whoYouCanReach(view, input.reference, people, name));
       side.push({ kind: 'card-zone', id: 'cn:location-deck', data: { label: 'Location deck', mode: 'pile', countOnly: asNum(det['location_deck_size']) } });
     } else {
       bench.push(hakTz);
@@ -465,6 +575,18 @@ export const cybernoirGlue: GlueModule = {
       };
     } else if (asStr(view['phase']) === 'setup') {
       prompt = { title: 'The Hacker is choosing a hideout', sub: 'The city opens once they have hidden.', actions: [] };
+    } else {
+      // The turn's verbs. The numbered list stays, one tap away, and is no
+      // longer the only way to act.
+      const actions = verbActions(input.legalMoves);
+      if (actions.length > 0) {
+        const ap = asNum((role === 'detective' ? det : hak)['ap']);
+        prompt = {
+          title: role === 'detective' ? "Detective's turn" : "Hacker's turn",
+          sub: `${ap} action point${ap === 1 ? '' : 's'} left. Unspent points are lost at the end of the turn.`,
+          actions,
+        };
+      }
     }
 
     const status = `Turn ${asNum(view['turn'], 1)} · ${words(asStr(view['phase']))}`;
@@ -485,6 +607,8 @@ export const cybernoirGlue: GlueModule = {
       if (typeof m.move['hand_index'] === 'number') lit.push(`cn:hand:${m.move['hand_index']}:${asStr(hand[m.move['hand_index']])}`);
       const inf = asStr(m.move['target_informant']);
       if ((t === 'reveal_informant' || t === 'informant_removal_choice') && inf) lit.push(`cn:informant:${inf}`);
+      const person = asStr(m.move['target_person']);
+      if (person) lit.push(personId(person));
     }
     return [...new Set(lit)];
   },
@@ -558,6 +682,16 @@ export const cybernoirGlue: GlueModule = {
         return { ...move.move, location_name: v };
       },
     };
+  },
+
+  movesForSelect(sel: SelectEvent, input: GlueInput): LegalMove[] {
+    const person = input.legalMoves.filter((m) => {
+      const target = asStr(m.move['target_person']);
+      return !!target && personId(target) === sel.id;
+    });
+    if (person.length > 0) return person;
+    const one = cybernoirGlue.moveForSelect(sel, input);
+    return one ? [one] : [];
   },
 
   resolveReportMove(legalMoves: LegalMove[]): LegalMove | null {

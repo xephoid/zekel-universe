@@ -170,6 +170,13 @@ export function TablePage() {
   // An action-bar button: one listed move, or a batch of taps.
   const onAction = useCallback((a: PromptAction) => {
     if ('move' in a) { pick(a.move); return; }
+    // A verb with several moves behind it asks which, in the engine's own
+    // words; with one, that one. An empty verb is never drawn.
+    if ('moves' in a) {
+      if (a.moves.length === 1) pick(a.moves[0]!);
+      else if (a.moves.length > 1) setChooser(a.moves);
+      return;
+    }
     setBatch(a.batch);
   }, [pick]);
 

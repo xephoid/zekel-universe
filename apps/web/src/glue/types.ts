@@ -53,7 +53,10 @@ export interface PlanStep { id: string; label: string; current?: boolean }
  */
 export type PromptAction =
   | { id: string; label: string; note?: string; title?: string; primary?: boolean; move: LegalMove }
-  | { id: string; label: string; note?: string; title?: string; primary?: boolean; batch: SelectEvent[] };
+  | { id: string; label: string; note?: string; title?: string; primary?: boolean; batch: SelectEvent[] }
+  /** A verb several listed moves stand behind: one opens directly, several ask
+   *  which, in the engine's own words. Nothing is chosen for the player. */
+  | { id: string; label: string; note?: string; title?: string; primary?: boolean; moves: LegalMove[] };
 
 /** The action bar: what step it is, what you can do now, and the buttons
  *  that move the turn. Text only; every number in it comes from the view. */

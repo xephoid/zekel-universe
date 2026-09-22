@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 import type { GameReferenceResponse } from '@universe/shared';
 import type { CardZoneData, MapData, PoolData, TableauData, TrackData } from '@universe/primitives';
 import { GLUES } from '../glue';
-import type { GlueInput, TablePlan, Zone } from '../glue';
+import type { GlueInput, LegalMove, TablePlan, Zone } from '../glue';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -747,6 +747,65 @@ describe('cybernoir-2127 glue', () => {
     const nots = plan.board.find((z) => z.id === 'cn:not-clues')!.data as PoolData;
     expect(nots.label).toBe('Ruled out — nothing yet');
     expect(nots.items).toEqual([]);
+  });
+
+  it('offers the turn as verbs, only where the engine lists a move behind one', () => {
+    const moves = [
+      { move_id: 'pl1', description: 'Play Shipyard (mandatory)', move: { type: 'play_location', location_name: 'Shipyard' } },
+      { move_id: 'pl2', description: 'Play The Junction (mandatory)', move: { type: 'play_location', location_name: 'The Junction' } },
+      { move_id: 'a1', description: 'Arrest Blackice at The Junction', move: { type: 'arrest', target_person: 'Blackice' } },
+      { move_id: 'burn', description: 'Burn the Safehouse (3 AP, once per game): relocate to a new secret hideout — discarded Locations return to the deck and ALL Clue tokens (truthful and Negative) are removed from the table', move: { type: 'burn_safehouse' } },
+      { move_id: 'end', description: 'End turn', move: { type: 'pass_turn' } },
+    ];
+    const det = { ...CN_VIEW, role: 'detective', hideout: null, location_hand: [], informants: [] };
+    const prompt = g.plan(input(det, moves, { reference: CN_REFERENCE }))!.prompt!;
+    expect(prompt.actions.map((a) => a.label)).toEqual(['Play a Location', 'Arrest', 'Burn the safehouse', 'End turn']);
+    // A verb several moves stand behind says how many and carries them all;
+    // one move behind it carries the engine's own sentence.
+    const play = prompt.actions[0] as { note?: string; title?: string; moves: LegalMove[] };
+    expect(play.note).toBe('2 to choose from');
+    expect(play.moves).toHaveLength(2);
+    const arrest = prompt.actions[1] as { note?: string; title?: string; moves: LegalMove[] };
+    expect(arrest.note).toBeUndefined();
+    expect(arrest.title).toBe('Arrest Blackice at The Junction');
+    // The burn paragraph is the button's title, never its label.
+    const burn = prompt.actions[2] as { label: string; title?: string };
+    expect(burn.label).toBe('Burn the safehouse');
+    expect(burn.title!.length).toBeGreaterThan(100);
+    // No verb the engine did not list.
+    expect(prompt.actions.some((a) => a.label === 'Recruit an informant')).toBe(false);
+    // Nothing is offered when the engine lists nothing.
+    expect(g.plan(input(det, [], { reference: CN_REFERENCE }))!.prompt).toBeUndefined();
+  });
+
+  it('draws who the Detective can reach, and what a tap on a person could mean', () => {
+    const det = {
+      ...CN_VIEW, role: 'detective', hideout: null, location_hand: [],
+      board: ['The Junction'],
+      informants: [{ person: 'Anansi the Spider', revealed: false }],
+      jail: { slot_1_booked: [], slot_2_processing: [], slot_3_release_pending_then_freed: [] },
+    };
+    const moves = [
+      { move_id: 'a', description: 'Arrest Blackice at The Junction', move: { type: 'arrest', target_person: 'Blackice' } },
+      { move_id: 'r', description: 'Recruit Blackice as informant', move: { type: 'recruit_informant', target_person: 'Blackice' } },
+    ];
+    const inp = input(det, moves, { reference: CN_REFERENCE });
+    const reach = g.plan(inp)!.side.find((z) => z.id === 'cn:reach')!;
+    // Everyone living at a played Location, with the ones already spoken for
+    // drawn unlit and saying where they are.
+    expect(cards(reach).map((c) => [c.label, c.subtitle, c.colorKey])).toEqual([
+      ['Blackice', 'Board Discard', 'detective'],
+      ['Anansi the Spider', 'your informant', 'none'],
+    ]);
+    // Not the Contact's play cost: that is the Hacker's price, not theirs.
+    expect(cards(reach).every((c) => c.cost === undefined)).toBe(true);
+    // Every arrest and recruit the engine lists has something on screen to tap.
+    expect(g.litParts(inp)).toContain('cn:person:blackice');
+    // Both prices on one person: the tap asks which, in the engine's words.
+    const options = movesForSelect(g, { component: 'card', id: 'cn:person:blackice', label: 'Blackice' }, inp);
+    expect(options.map((m) => m.description)).toEqual(['Arrest Blackice at The Junction', 'Recruit Blackice as informant']);
+    // A person nobody can reach lights nothing.
+    expect(g.litParts(inp)).not.toContain('cn:person:anansi-the-spider');
   });
 
   it('lights locations named by play_location moves and informants by ordinal', () => {

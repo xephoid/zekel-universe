@@ -112,10 +112,13 @@
    overrides a flight's transform */
 .zk-zone-fan .zk-card:hover, .zk-zone-fan .zk-card:focus-within { translate: 0 -8px; z-index: 5; }
 /* A zone that shows a shape rather than faces: name chips, not cards. */
-.zk-zone-small { --zekel-card-w: 84px; --zekel-card-h: 30px; }
+.zk-zone-small { --zekel-card-w: 104px; --zekel-card-h: 34px; }
 .zk-zone-small .zk-card { font-size: 10px; }
 .zk-zone-small .zk-card-face { padding: 4px 6px; justify-content: center; }
-.zk-zone-small .zk-card-label { font-weight: 600; font-size: 10px; line-height: 1.15; overflow: hidden; }
+.zk-zone-small .zk-card-label {
+  font-weight: 600; font-size: 10px; line-height: 1.2; overflow: hidden;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+}
 .zk-zone-small .zk-card-sub, .zk-zone-small .zk-card-badges { display: none; }
 .zk-zone-small .zk-zone-label { font-size: 11px; }
 
