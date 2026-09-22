@@ -171,14 +171,19 @@ export function TablePage() {
   const onAction = useCallback((a: PromptAction) => {
     if ('move' in a) { pick(a.move); return; }
     // A verb with several moves behind it asks which, in the engine's own
-    // words; with one, that one. An empty verb is never drawn.
+    // words — unless they are all answers to one question the glue knows how
+    // to ask, in which case it asks that once instead of listing sixteen
+    // sentences. With one move behind it, that one.
     if ('moves' in a) {
-      if (a.moves.length === 1) pick(a.moves[0]!);
-      else if (a.moves.length > 1) setChooser(a.moves);
+      if (a.moves.length === 1) { pick(a.moves[0]!); return; }
+      if (a.moves.length === 0) return;
+      const f = formForMove(glue, a.moves[0]!, input);
+      if (f) { setChooser(null); setForm(f); return; }
+      setChooser(a.moves);
       return;
     }
     setBatch(a.batch);
-  }, [pick]);
+  }, [glue, input, pick]);
 
   // The batch sends one tap per event: after each event the glue finds the
   // move the next tap means among the engine's new legal moves, and the

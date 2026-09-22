@@ -90,6 +90,8 @@ function contactCard(id: string, label: string, people: Map<string, Person>, n: 
   ];
   return {
     id, label, colorKey: 'hacker',
+    // A big hand folds by faction: the field a Motive set is built from.
+    ...(p.affiliation ? { groupKey: p.affiliation } : {}),
     ...(p.cost === undefined ? {} : { cost: p.cost }),
     ...(p.ability && p.ability !== 'witness' ? { subtitle: words(p.ability) } : {}),
     ...(badges.length > 0 ? { badges } : {}),
@@ -104,6 +106,8 @@ function locationCard(id: string, label: string, locs: Loc[], reference: GameRef
   const who = residentsOf(reference, l.name);
   return {
     id, label, colorKey: 'detective',
+    // A big hand of Locations folds by borough.
+    groupKey: l.borough,
     ...(who.length > 0 ? { subtitle: who.join(', ') } : {}),
     badges: [
       n.borough(l.borough),
@@ -111,6 +115,20 @@ function locationCard(id: string, label: string, locs: Loc[], reference: GameRef
       ...(l.affiliation && l.affiliation !== 'none' ? [n.affiliation(l.affiliation)] : []),
     ].filter(Boolean),
   };
+}
+
+/** The people a move names, however it names them. */
+function namedPeople(m: LegalMove): string[] {
+  const out: string[] = [];
+  for (const key of ['person_name', 'target_person']) {
+    const v = asStr(m.move[key]);
+    if (v) out.push(v);
+  }
+  for (const v of asArr(m.move['people'])) {
+    const name = asStr(v);
+    if (name) out.push(name);
+  }
+  return out;
 }
 
 export function personId(name: string): string {
@@ -244,6 +262,48 @@ const VERBS: Array<{ id: string; label: string; types: string[]; primary?: boole
   // Both.
   { id: 'end-turn', label: 'End turn', types: ['pass_turn'] },
 ];
+
+/**
+ * A moment that stops the turn and asks one question: the Detective deciding
+ * whether to block, and the Hacker choosing which clue that block buys. Both
+ * doors are drawn with what each costs, in the engine's own words, with
+ * nothing preselected and no clock. Declining is a button like any other and
+ * says nothing afterwards.
+ */
+function interruptPrompt(pending: string, legalMoves: LegalMove[]): PlanPrompt | null {
+  const decide = legalMoves.filter((m) => m.move['type'] === 'block_decide');
+  if (decide.length > 0) {
+    return {
+      title: 'Block this play?',
+      sub: 'Revealing an informant stops the card and buys you a clue; the informant stays face up from then on. Letting it through costs you nothing and tells them nothing.',
+      urgent: true,
+      actions: decide.map((m) => ({
+        id: `cn:block:${m.move['block'] === true ? 'yes' : 'no'}`,
+        label: m.move['block'] === true ? 'Block it' : 'Let it through',
+        title: m.description,
+        ...(m.move['block'] === true ? { primary: true } : {}),
+        move: m,
+      })),
+    };
+  }
+  const clue = legalMoves.filter((m) => m.move['type'] === 'clue_reveal');
+  if (clue.length > 0) {
+    return {
+      title: 'Which clue do you give?',
+      sub: 'The block bought them one true fact about where you are hiding. You choose which, and it stays on the table for the rest of the game.',
+      urgent: true,
+      actions: clue.map((m) => ({
+        id: `cn:clue:${asStr(m.move['category'])}`,
+        label: words(asStr(m.move['category'])),
+        title: m.description,
+        move: m,
+      })),
+    };
+  }
+  // A pending step this glue has no words for keeps the numbered list.
+  void pending;
+  return null;
+}
 
 /** The verbs the engine is offering this seat right now. */
 function verbActions(legalMoves: LegalMove[]): PromptAction[] {
@@ -526,7 +586,11 @@ export const cybernoirGlue: GlueModule = {
       if (Array.isArray(hand)) {
         bench.push({
           kind: 'card-zone', id: 'cn:hand', arriveFrom: 'cn:location-deck',
-          data: { label: 'Your location hand', mode: 'fan', cards: hand.map((h, i) => locationCard(`cn:hand:${i}:${asStr(h)}`, asStr(h), locs, input.reference, name)) },
+          data: {
+            label: 'Your location hand', mode: 'fan',
+            groupNames: Object.fromEntries(boroughs.map((b) => [b, name.borough(b)])),
+            cards: hand.map((h, i) => locationCard(`cn:hand:${i}:${asStr(h)}`, asStr(h), locs, input.reference, name)),
+          },
         });
       }
       const informants = asArr(view['informants']);
@@ -557,12 +621,20 @@ export const cybernoirGlue: GlueModule = {
       if (Array.isArray(hand)) {
         bench.push({
           kind: 'card-zone', id: 'cn:hand', arriveFrom: 'cn:contacts-deck',
-          data: { label: 'Your contacts', mode: 'fan', cards: hand.map((h, i) => contactCard(`cn:hand:${i}:${asStr(h)}`, asStr(h), people, name)) },
+          data: {
+            label: 'Your contacts', mode: 'fan',
+            groupNames: Object.fromEntries([...new Set([...people.values()].map((p) => p.affiliation).filter(Boolean))]
+              .map((a) => [a as string, name.affiliation(a as string)])),
+            cards: hand.map((h, i) => contactCard(`cn:hand:${i}:${asStr(h)}`, asStr(h), people, name)),
+          },
         });
       }
       side.push({ kind: 'card-zone', id: 'cn:contacts-deck', data: { label: 'Contacts deck', mode: 'pile', countOnly: asNum(hak['contacts_deck_size']) } });
     }
 
+    // A moment that stops the turn and asks one question comes before the
+    // turn's own verbs.
+    const interrupt = interruptPrompt(asStr(view['pending']), input.legalMoves);
     // Setup is the Hacker's one secret decision: they name the hideout and
     // hide there all game. The map is how they say it; the Detective waits.
     const choosing = asStr(view['phase']) === 'setup' ? hideoutTemplate(input.legalMoves) : null;
@@ -575,6 +647,8 @@ export const cybernoirGlue: GlueModule = {
       };
     } else if (asStr(view['phase']) === 'setup') {
       prompt = { title: 'The Hacker is choosing a hideout', sub: 'The city opens once they have hidden.', actions: [] };
+    } else if (interrupt) {
+      prompt = interrupt;
     } else {
       // The turn's verbs. The numbered list stays, one tap away, and is no
       // longer the only way to act.
@@ -600,6 +674,19 @@ export const cybernoirGlue: GlueModule = {
     }
     const lit: string[] = [];
     const hand = shapeHas(input.view, 'role') ? asArr(input.view['location_hand'] ?? input.view['hand']) : [];
+    // The Hacker's own cards are named, not indexed: every move that names a
+    // person lights the card in hand with that name. Without this the hand is
+    // dark even while the engine is offering every card in it.
+    const inHand = (who: string): string | null => {
+      const i = hand.findIndex((h) => asStr(h) === who);
+      return i < 0 ? null : `cn:hand:${i}:${who}`;
+    };
+    for (const m of input.legalMoves) {
+      for (const who of namedPeople(m)) {
+        const card = inHand(who);
+        if (card) lit.push(card);
+      }
+    }
     for (const m of input.legalMoves) {
       const t = asStr(m.move['type']);
       const loc = asStr(m.move['location_name'] ?? m.move['target_location'] ?? m.move['new_location_name']);
@@ -638,13 +725,61 @@ export const cybernoirGlue: GlueModule = {
   },
 
   /**
-   * The hideout. The engine lists it as a blank to fill in, so it goes
-   * through a sheet either way: a tap on the map gets that location named
-   * back before it is sent, and the numbered menu gets the whole city as a
-   * list. The tap is read once — a later press with no fresh tap asks the
-   * whole question again rather than leaning on an old one.
+   * Upkeep: each informant, kept or released, with nothing preselected. The
+   * engine lists every combination as its own move, so the form finds the one
+   * the answers make and sends that — and shows the engine's own sentence for
+   * it, which is where the cost is stated. Universe does not add up what
+   * holding them costs: that is a rule.
    */
   formFor(move: LegalMove, input: GlueInput): MoveForm | null {
+    if (move.move['type'] === 'upkeep_choice') {
+      const view = isObj(input.view) ? input.view : {};
+      const informants = asArr(view['informants']).map((inf) => asStr(isObj(inf) ? inf['person'] : inf)).filter(Boolean);
+      if (informants.length === 0) return null;
+      const listed = input.legalMoves.filter((m) => m.move['type'] === 'upkeep_choice');
+      const madeBy = (answers: Record<string, unknown>): { keep: string[]; release: string[] } | null => {
+        const keep: string[] = [];
+        const release: string[] = [];
+        for (const who of informants) {
+          const a = answers[`inf.${who}`];
+          if (a === 'keep') keep.push(who);
+          else if (a === 'release') release.push(who);
+          else return null;
+        }
+        return { keep, release };
+      };
+      const same = (a: string[], b: unknown): boolean => {
+        const other = asArr(b).map((x) => asStr(x));
+        return a.length === other.length && a.every((x) => other.includes(x));
+      };
+      return {
+        title: 'Pay upkeep',
+        help: 'Every informant you keep costs you, and a released one goes back into the deck. Say what happens to each.',
+        fields: informants.map((who) => ({
+          kind: 'choice' as const, key: `inf.${who}`, label: who,
+          options: [{ value: 'keep', label: 'Keep' }, { value: 'release', label: 'Release' }],
+        })),
+        template: move,
+        editableKeys: ['keep', 'release'],
+        submitLabel: 'Pay upkeep',
+        build(answers) {
+          const made = madeBy(answers);
+          if (!made) return null;
+          // Only ever a move the engine listed. With more informants than the
+          // engine enumerates, it lists one blank to fill in instead.
+          const exact = listed.find((m) => same(made.keep, m.move['keep']) && same(made.release, m.move['release']));
+          if (exact) return exact.move;
+          const blank = listed.find((m) => asArr(m.move['keep']).length === 0 && asArr(m.move['release']).length === 0);
+          return blank ? { ...blank.move, keep: made.keep, release: made.release } : null;
+        },
+      };
+    }
+
+    // The hideout. The engine lists it as a blank to fill in, so it goes
+    // through a sheet either way: a tap on the map gets that location named
+    // back before it is sent, and the numbered menu gets the whole city as a
+    // list. The tap is read once — a later press with no fresh tap asks the
+    // whole question again rather than leaning on an old one.
     if (move.move['type'] !== 'report_hideout' || move.move['location_name'] !== '') return null;
     const locs = locations(input.reference, isObj(input.view) ? input.view : {});
     if (locs.length === 0) return null;
@@ -685,11 +820,13 @@ export const cybernoirGlue: GlueModule = {
   },
 
   movesForSelect(sel: SelectEvent, input: GlueInput): LegalMove[] {
-    const person = input.legalMoves.filter((m) => {
-      const target = asStr(m.move['target_person']);
-      return !!target && personId(target) === sel.id;
-    });
+    const person = input.legalMoves.filter((m) => namedPeople(m).some((who) => personId(who) === sel.id));
     if (person.length > 0) return person;
+    const inHand = /^cn:hand:\d+:(.+)$/.exec(sel.id);
+    if (inHand) {
+      const named = input.legalMoves.filter((m) => namedPeople(m).includes(inHand[1]!));
+      if (named.length > 0) return named;
+    }
     const one = cybernoirGlue.moveForSelect(sel, input);
     return one ? [one] : [];
   },

@@ -643,7 +643,7 @@ describe('cybernoir-2127 glue', () => {
     const hand = cards(plan.bench.find((z) => z.id === 'cn:hand'));
     expect(hand[0]).toEqual({
       id: 'cn:hand:0:Blackice', label: 'Blackice', colorKey: 'hacker',
-      cost: 2, subtitle: 'Board Discard', badges: ['Iceden Collective'],
+      groupKey: 'gang_1', cost: 2, subtitle: 'Board Discard', badges: ['Iceden Collective'],
     });
     // The Weapon is in the Contacts deck but not among the people; it is drawn
     // as itself rather than given facts it does not have.
@@ -651,7 +651,7 @@ describe('cybernoir-2127 glue', () => {
     // A Witness says so, and its ability line would only repeat the badge.
     const witness = g.plan(input({ ...CN_VIEW, hand: ['Eddie the Doorman'] }, [], { reference: CN_REFERENCE }))!;
     expect(cards(witness.bench.find((z) => z.id === 'cn:hand'))[0])
-      .toEqual({ id: 'cn:hand:0:Eddie the Doorman', label: 'Eddie the Doorman', colorKey: 'hacker', cost: 0, badges: ['Witness'] });
+      .toEqual({ id: 'cn:hand:0:Eddie the Doorman', label: 'Eddie the Doorman', colorKey: 'hacker', groupKey: 'none', cost: 0, badges: ['Witness'] });
   });
 
   it('tells the Hacker how many informants are facing them, which is their central risk', () => {
@@ -670,7 +670,7 @@ describe('cybernoir-2127 glue', () => {
     // A Location shows who lives there: residents are what playing it reaches.
     expect(cards(plan.bench.find((z) => z.id === 'cn:hand'))[0]).toEqual({
       id: 'cn:hand:0:The Junction', label: 'The Junction', colorKey: 'detective',
-      subtitle: 'Blackice, Anansi the Spider',
+      groupKey: 'boonies', subtitle: 'Blackice, Anansi the Spider',
       badges: ['Boonies', '2 residents', 'Iceden Collective'],
     });
     // They pay to hold their informants and are the one person entitled to
@@ -806,6 +806,76 @@ describe('cybernoir-2127 glue', () => {
     expect(options.map((m) => m.description)).toEqual(['Arrest Blackice at The Junction', 'Recruit Blackice as informant']);
     // A person nobody can reach lights nothing.
     expect(g.litParts(inp)).not.toContain('cn:person:anansi-the-spider');
+  });
+
+  it('asks what happens to each informant at upkeep, with nothing preselected', () => {
+    const det = {
+      ...CN_VIEW, role: 'detective', hideout: null, location_hand: [],
+      informants: [{ person: 'Blackice', revealed: false }, { person: 'Anansi the Spider', revealed: true }],
+    };
+    // The engine lists every combination; the form finds the one the answers make.
+    const listed = [
+      { move_id: 'u0', description: 'Release all informants (Blackice, Anansi the Spider)', move: { type: 'upkeep_choice', keep: [], release: ['Blackice', 'Anansi the Spider'] } },
+      { move_id: 'u1', description: 'Keep Blackice (1 AP); release Anansi the Spider', move: { type: 'upkeep_choice', keep: ['Blackice'], release: ['Anansi the Spider'] } },
+      { move_id: 'u3', description: 'Keep all informants (2 AP)', move: { type: 'upkeep_choice', keep: ['Blackice', 'Anansi the Spider'], release: [] } },
+    ];
+    const inp = input(det, listed, { reference: CN_REFERENCE });
+    const form = g.formFor!(listed[1]!, inp)!;
+    expect(form.title).toBe('Pay upkeep');
+    expect(form.fields.map((f) => f.label)).toEqual(['Blackice', 'Anansi the Spider']);
+    // Nothing is preselected, and a half-answered form sends nothing.
+    expect(form.build({})).toBeNull();
+    expect(form.build({ 'inf.Blackice': 'keep' })).toBeNull();
+    // What it sends is a move the engine listed, not one assembled here.
+    expect(form.build({ 'inf.Blackice': 'keep', 'inf.Anansi the Spider': 'release' }))
+      .toEqual({ type: 'upkeep_choice', keep: ['Blackice'], release: ['Anansi the Spider'] });
+    expect(form.build({ 'inf.Blackice': 'keep', 'inf.Anansi the Spider': 'keep' }))
+      .toEqual({ type: 'upkeep_choice', keep: ['Blackice', 'Anansi the Spider'], release: [] });
+    // And the verb bar offers it as one press rather than sixteen sentences.
+    expect(g.plan(inp)!.prompt!.actions.map((a) => a.label)).toEqual(['Pay upkeep']);
+  });
+
+  it('stops the turn for a block, states both doors, and preselects neither', () => {
+    const pending = { ...CN_VIEW, role: 'detective', hideout: null, location_hand: [], pending: 'block_pending' };
+    const moves = [
+      { move_id: 'yes', description: 'Block Frostbyte by revealing informant', move: { type: 'block_decide', block: true } },
+      { move_id: 'no', description: 'Decline to block — let the play proceed', move: { type: 'block_decide', block: false } },
+    ];
+    const prompt = g.plan(input(pending, moves, { reference: CN_REFERENCE }))!.prompt!;
+    expect(prompt.title).toBe('Block this play?');
+    expect(prompt.urgent).toBe(true);
+    expect(prompt.actions.map((a) => [a.label, a.title])).toEqual([
+      ['Block it', 'Block Frostbyte by revealing informant'],
+      ['Let it through', 'Decline to block — let the play proceed'],
+    ]);
+    // The turn's own verbs wait: one question at a time.
+    expect(prompt.actions.some((a) => a.label === 'End turn')).toBe(false);
+  });
+
+  it('asks the Hacker which clue the block bought, category by category', () => {
+    const pending = { ...CN_VIEW, pending: 'clue_reveal_pending' };
+    const moves = [
+      { move_id: 'b', description: 'Reveal your hideout borough', move: { type: 'clue_reveal', category: 'borough', value: 'boonies' } },
+      { move_id: 'p', description: 'Reveal your hideout population', move: { type: 'clue_reveal', category: 'population', value: 2 } },
+    ];
+    const prompt = g.plan(input(pending, moves, { reference: CN_REFERENCE }))!.prompt!;
+    expect(prompt.title).toBe('Which clue do you give?');
+    expect(prompt.urgent).toBe(true);
+    expect(prompt.actions.map((a) => a.label)).toEqual(['Borough', 'Population']);
+  });
+
+  it('folds a big hand by what its cards stack with, and names the stacks', () => {
+    const big = { ...CN_VIEW, hand: Array.from({ length: 13 }, (_, i) => (i % 2 === 0 ? 'Blackice' : 'Anansi the Spider')) };
+    const zone = g.plan(input(big, [], { reference: CN_REFERENCE }))!.bench.find((z) => z.id === 'cn:hand')!;
+    const d = zone.data as CardZoneData;
+    expect(d.cards!.every((c) => !!c.groupKey)).toBe(true);
+    expect(d.groupNames!['gang_1']).toBe('Iceden Collective');
+    expect(d.groupNames!['gang_2']).toBe('Crimson Clan');
+    // The Detective's Locations stack by borough instead.
+    const det = { ...CN_VIEW, role: 'detective', hideout: null, location_hand: ['The Junction', 'Shipyard'] };
+    const locZone = g.plan(input(det, [], { reference: CN_REFERENCE }))!.bench.find((z) => z.id === 'cn:hand')!;
+    expect((locZone.data as CardZoneData).cards!.map((c) => c.groupKey)).toEqual(['boonies', 'boonies']);
+    expect((locZone.data as CardZoneData).groupNames!['boonies']).toBe('Boonies');
   });
 
   it('lights locations named by play_location moves and informants by ordinal', () => {

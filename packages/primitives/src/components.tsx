@@ -94,6 +94,21 @@ export function Card({ id, data, lit, onSelect, arriveFrom, className, style }: 
 
 // ---- Card zone -------------------------------------------------------------------
 
+/** A fan's cards by what they stack with, in first-seen order. Null when any
+ *  card does not say — a hand only folds if the whole hand can. */
+function groupsOf(cards: CardData[]): Array<[string, CardData[]]> | null {
+  // A plain list of pairs: this module exports a `Map` component of its own,
+  // which shadows the built-in one.
+  const out: Array<[string, CardData[]]> = [];
+  for (const c of cards) {
+    if (!c.groupKey) return null;
+    const found = out.find(([key]) => key === c.groupKey);
+    if (found) found[1].push(c);
+    else out.push([c.groupKey, [c]]);
+  }
+  return out;
+}
+
 /** The outlines after a zone's cards: the slots still to be filled. */
 function emptySlots(id: string, count: number | undefined): ReactNode {
   if (!count || count <= 0) return null;
@@ -102,10 +117,37 @@ function emptySlots(id: string, count: number | undefined): ReactNode {
   ));
 }
 
+/**
+ * How a fan of `n` cards sits, at the bench's card width.
+ *
+ * Up to seven nothing overlaps and every face is readable — the common case.
+ * From eight the fan tightens, sliding cards under each other but never
+ * leaving a strip narrower than a thumb. Past eleven, squeezing stops being
+ * the answer: the strip is still tappable but carries nothing you can plan
+ * with, so a hand whose cards say what they stack with folds into stacks
+ * instead. (docs/design/Cybernoir Big Hands.dc.html)
+ */
+const FAN_FULL_UP_TO = 7;
+const FAN_TIGHT_UP_TO = 11;
+/** No exposed strip is ever narrower than a thumb. */
+const THUMB_PX = 44;
+
+export function fanOverlap(n: number, cardWidth: number): number {
+  if (n <= FAN_FULL_UP_TO) return 0;
+  const floor = Math.max(0, cardWidth - THUMB_PX);
+  const wanted = 30 + (n - FAN_FULL_UP_TO) * 6;
+  return Math.min(floor, wanted);
+}
+
 export function CardZone({ id, data, lit, onSelect, arriveFrom, className, style }: PrimitiveProps<CardZoneData>) {
   const isLit = lit?.includes(id) ?? false;
   const lp = litProps(isLit, () => onSelect?.({ component: 'card-zone', id, label: data.label ?? id }));
+  const [openGroup, setOpenGroup] = useState<string | null>(null);
+  const [spread, setSpread] = useState(false);
   const cards = data.cards;
+  // Spread lays the whole hand out at once, and is there as soon as the fan
+  // starts overlapping — for the player who would rather see all of it.
+  const showSpread = data.mode === 'fan' && (cards?.length ?? 0) > FAN_FULL_UP_TO;
   let body: ReactNode;
   if (cards === undefined) {
     const n = data.countOnly ?? 0;
@@ -133,14 +175,52 @@ export function CardZone({ id, data, lit, onSelect, arriveFrom, className, style
       </div>
     );
   } else {
-    body = (
-      <div className={data.mode === 'fan' ? 'zk-zone-fan' : 'zk-zone-row'}>
-        {cards.map((c, i) => (
-          <Card key={c.id ?? `${id}:${i}`} id={c.id ?? `${id}:${i}`} data={c} lit={lit} onSelect={onSelect} arriveFrom={arriveFrom} />
-        ))}
-        {emptySlots(id, data.empty)}
-      </div>
+    const card = (c: CardData, i: number, s?: CSSProperties) => (
+      <Card key={c.id ?? `${id}:${i}`} id={c.id ?? `${id}:${i}`} data={c} lit={lit} onSelect={onSelect} arriveFrom={arriveFrom} style={s} />
     );
+    const groups = data.mode === 'fan' && !spread ? groupsOf(cards) : null;
+    if (groups && cards.length > FAN_TIGHT_UP_TO) {
+      // Past eleven the hand folds into stacks. A stack holding a card the
+      // engine is offering lights itself; opening it lights the card.
+      body = (
+        <div className="zk-zone-row">
+          {groups.map(([key, members]) => {
+            const open = openGroup === key;
+            const holds = members.some((c) => c.id && lit?.includes(c.id));
+            return (
+              <div key={key} className={cx('zk-stack', open && 'open')}>
+                <button
+                  type="button"
+                  className={cx('zk-stack-head', holds && 'zk-lit')}
+                  aria-expanded={open}
+                  onClick={() => setOpenGroup(open ? null : key)}
+                >
+                  <span className="zk-stack-name">{data.groupNames?.[key] ?? key}</span>
+                  <span className="zk-stack-count">{members.length}</span>
+                  <span className="zk-stack-who">{members.map((c) => c.label).join(', ')}</span>
+                </button>
+                {open && <div className="zk-zone-row zk-stack-open">{members.map((c, i) => card(c, i))}</div>}
+              </div>
+            );
+          })}
+        </div>
+      );
+    } else if (data.mode === 'fan' && !spread) {
+      const overlap = fanOverlap(cards.length, 96);
+      body = (
+        <div className="zk-zone-fan">
+          {cards.map((c, i) => card(c, i, i === 0 ? { marginLeft: 0 } : { marginLeft: -overlap }))}
+          {emptySlots(id, data.empty)}
+        </div>
+      );
+    } else {
+      body = (
+        <div className={data.mode === 'fan' ? 'zk-zone-row zk-zone-spread' : 'zk-zone-row'}>
+          {cards.map((c, i) => card(c, i))}
+          {emptySlots(id, data.empty)}
+        </div>
+      );
+    }
   }
   return (
     <div
@@ -152,7 +232,16 @@ export function CardZone({ id, data, lit, onSelect, arriveFrom, className, style
       onClick={lp.onClick}
       onKeyDown={lp.onKeyDown}
     >
-      {data.label && <div className="zk-zone-label">{data.label}</div>}
+      {(data.label || showSpread) && (
+        <div className="zk-zone-label">
+          {data.label}
+          {showSpread && (
+            <button type="button" className="zk-spread" aria-pressed={spread} onClick={(e) => { e.stopPropagation(); setSpread(!spread); }}>
+              {spread ? 'Fan' : 'Spread'}
+            </button>
+          )}
+        </div>
+      )}
       {body}
     </div>
   );

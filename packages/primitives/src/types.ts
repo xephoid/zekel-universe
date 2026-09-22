@@ -19,6 +19,13 @@ export interface CardData {
   /** Universe addition: what playing this card costs, drawn as a pip in the
    *  corner rather than as one badge among many. */
   cost?: string | number;
+  /**
+   * Universe addition: what this card stacks with when a hand grows past
+   * what a fan can hold — a faction, a suit, a borough. Squeezing a fan
+   * tighter stops working long before a thumb runs out of room, so past
+   * eleven cards the hand folds into stacks on this key instead.
+   */
+  groupKey?: string;
   /** Universe addition: art for the face. */
   artUrl?: string;
   /**
@@ -36,6 +43,11 @@ export interface CardZoneData {
   cards?: CardData[];
   /** Hidden pile: no cards, just how many. */
   countOnly?: number;
+  /**
+   * Universe addition: the key's printed name, for a stack's label when a
+   * fan folds. A key with no name here is put into words.
+   */
+  groupNames?: Record<string, string>;
   /**
    * Universe addition: `small` draws the cards as name chips rather than
    * faces, for a zone whose job is to show a shape (Cybernoir's case file)

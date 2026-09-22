@@ -130,6 +130,30 @@
 }
 .zk-zone-fan .zk-card-slot { margin-left: -30px; }
 .zk-zone-fan .zk-card-slot:first-child { margin-left: 0; }
+/* Past eleven cards a fan folds into stacks: each says what it holds, and
+   opening one fans that stack alone. A stack holding a card the engine is
+   offering lights itself, so folding never hides a move. */
+.zk-stack { display: inline-flex; flex-direction: column; gap: 4px; vertical-align: top; }
+.zk-stack-head {
+  width: 132px; min-height: var(--zekel-card-h, 104px); box-sizing: border-box;
+  padding: 8px; border-radius: var(--radius-md); border: 1px solid var(--border);
+  background: var(--bg-raised); color: inherit; font: inherit; text-align: left; cursor: pointer;
+  display: flex; flex-direction: column; gap: 4px;
+  box-shadow: 3px 3px 0 var(--bg), 4px 4px 0 1px var(--border);
+}
+.zk-stack-name { font-weight: 700; font-size: 11px; }
+.zk-stack-count { font-family: var(--font-mono); font-size: 16px; font-weight: 600; }
+.zk-stack-who { font-size: 9px; color: var(--fg-muted); overflow: hidden; }
+.zk-stack.open .zk-stack-head { border-color: var(--brand-orange); }
+.zk-stack-open { margin-top: 4px; }
+/* Spread: the whole hand at once, as a grid. */
+.zk-zone-spread { flex-wrap: wrap; max-width: 100%; }
+.zk-spread {
+  margin-left: 8px; padding: 1px 8px; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--bg-raised); color: inherit;
+  font: inherit; font-size: 11px; cursor: pointer;
+}
+.zk-spread[aria-pressed='true'] { border-color: var(--brand-orange); }
 .zk-zone-pile { position: relative; display: inline-block; width: var(--zekel-card-w, 76px); height: var(--zekel-card-h, 104px); }
 .zk-zone-pile .zk-card { position: absolute; top: 0; left: 0; }
 .zk-zone-depth {

@@ -647,24 +647,30 @@ Still open:
   them).
 - Cybernoir 2127's glue compiles against the primitive contract and passes
   fixture tests and the two-human privacy spec, but a full game has not been
-  played through in the browser. Six of the eight items of the table's design
-  pass have landed — printed names instead of ids, the clue rail both seats
-  share, the case file as the points track, cards carrying their own facts,
-  the turn as a row of verbs, and who the Detective can reach; upkeep and the
-  block, and hands that grow, remain. They are listed in
-  `docs/games/cybernoir-2127-build.md`. Four library changes came with them,
+  played through in the browser. All eight items of the table's design pass
+  have landed — printed names instead of ids, the clue rail both seats share,
+  the case file as the points track, cards carrying their own facts, the turn
+  as a row of verbs, who the Detective can reach, upkeep and the block as real
+  panels, and a hand that folds into stacks as it grows. What each one did not
+  manage is written up beside it in `docs/games/cybernoir-2127-build.md`; the
+  late-game moments are still unseen, because no full game has been played
+  end to end. Six library changes came with them,
   all general rather than game-shaped: a track space grows from a circle into
   a pill when it holds a word; a pool of one-offs leaves off a count of one; a
   card zone can draw empty slots after its cards, so a zone whose shape is
-  part of the game says what is missing; and a card zone can draw small, as
-  name chips rather than faces. `CardData` gained `cost`, drawn as a pip
-  rather than one badge among many.
+  part of the game says what is missing; a card zone can draw small, as name
+  chips rather than faces; and a fan that outgrows what a fan can hold folds
+  into stacks on a card's `groupKey`, with a Spread control that lays the
+  whole hand out. `CardData` gained `cost`, drawn as a pip rather than one
+  badge among many.
 - **An action-bar button may stand for several moves.** `PromptAction` gained
   a `moves` variant: a verb with one listed move behind it sends on the press,
   and a verb with several opens the chooser that already existed for taps,
   showing the engine's own sentence for each. It is how a turn becomes eight
   verbs instead of nineteen sentences without anything being chosen for the
-  player.
+  player. When every move behind a verb answers one question the glue knows
+  how to ask — upkeep's sixteen keep-and-release combinations — the verb asks
+  that once instead of listing them.
 - Two rules stayed in the engine rather than being copied here, both by adding
   a published fact: how many cards win the game (`reference_data.evidence`),
   and which location a Hacker hides in. Two more are open the same way —
