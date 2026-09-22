@@ -679,6 +679,13 @@ Still open:
   Detective could tap a region of the city to play a Location but not the card
   holding it — and a tap on a card means every move that names it. The strip
   stays as the way to reach a verb that is not a card.
+- **A small card zone still says what its cards say.** `size: 'small'` was
+  suppressing the subtitle and badges, so a chip was a bare name. It is about
+  the shape of a row, not about withholding a card's facts. Cybernoir's case
+  file now carries what is printed on each piece of Evidence — where that
+  person lives, their faction, their cost — because Evidence is face up for
+  good and for the Detective it is the case, not a score. The same fix made
+  "Who you can reach" show where an unreachable person is.
 - **A track's spaces can hold named cards.** Cybernoir's jail is "3 spaces in
   a line, each holding a stack of face-up POI cards; arrows between spaces",
   and it was drawn as anonymous dots with the names in tooltips.

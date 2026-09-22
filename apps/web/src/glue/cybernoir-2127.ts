@@ -69,7 +69,7 @@ function locations(reference: GameReferenceResponse | null, view: Record<string,
 }
 
 /** One of the game's people, as the engine's reference data prints them. */
-interface Person { name: string; affiliation?: string; cost?: number; ability?: string; isWitness: boolean }
+interface Person { name: string; affiliation?: string; home?: string; cost?: number; ability?: string; isWitness: boolean }
 
 function peopleByName(reference: GameReferenceResponse | null): Map<string, Person> {
   const rd = reference?.referenceData;
@@ -80,6 +80,7 @@ function peopleByName(reference: GameReferenceResponse | null): Map<string, Pers
     out.set(p['name'], {
       name: p['name'],
       affiliation: asStr(p['affiliation']) || undefined,
+      home: asStr(p['home_location']) || undefined,
       cost: typeof p['cost'] === 'number' ? p['cost'] : undefined,
       ability: asStr(p['ability']) || undefined,
       isWitness: p['is_witness'] === true,
@@ -332,12 +333,22 @@ function interruptPrompt(pending: string, legalMoves: LegalMove[]): PlanPrompt |
   return null;
 }
 
-/** The verbs the engine is offering this seat right now. */
+/**
+ * The verbs the engine is offering this seat right now.
+ *
+ * A move type no verb above claims still gets a button, labelled with the
+ * engine's own word for it. The turn's follow-up questions — which Location
+ * to discard, which informant to flip, what to take back — are move types of
+ * their own, and without this the bar was empty at exactly the moment the
+ * engine was waiting on an answer.
+ */
 function verbActions(legalMoves: LegalMove[]): PromptAction[] {
   const out: PromptAction[] = [];
+  const claimed = new Set<string>();
   for (const v of VERBS) {
     const moves = legalMoves.filter((m) => v.types.includes(asStr(m.move['type'])));
     if (moves.length === 0) continue;
+    for (const t of v.types) claimed.add(t);
     const only = moves.length === 1 ? moves[0]! : null;
     out.push({
       id: `cn:verb:${v.id}`,
@@ -345,6 +356,19 @@ function verbActions(legalMoves: LegalMove[]): PromptAction[] {
       note: only ? undefined : `${moves.length} to choose from`,
       title: only ? only.description : undefined,
       ...(v.primary ? { primary: true } : {}),
+      moves,
+    });
+  }
+  const leftover = [...new Set(legalMoves.map((m) => asStr(m.move['type'])).filter((t) => t && !claimed.has(t)))];
+  for (const t of leftover) {
+    const moves = legalMoves.filter((m) => asStr(m.move['type']) === t);
+    const only = moves.length === 1 ? moves[0]! : null;
+    out.push({
+      id: `cn:verb:${t}`,
+      label: words(t.replace(/_choice$/, '')),
+      note: only ? undefined : `${moves.length} to choose from`,
+      title: only ? only.description : undefined,
+      primary: true,
       moves,
     });
   }
@@ -389,8 +413,35 @@ function negativeClue(tokenId: string, n: Names): { category: string; value: str
  * a count here: how many cards win is a rule. An engine that does not publish
  * the shape gets the played cards and no outlines.
  */
-function evidenceCase(view: Record<string, unknown>, reference: GameReferenceResponse | null, role: string): Zone {
+function evidenceCase(
+  view: Record<string, unknown>,
+  reference: GameReferenceResponse | null,
+  role: string,
+  people: Map<string, Person>,
+  n: Names,
+): Zone {
   const evidence = isObj(view['evidence']) ? view['evidence'] : {};
+  /**
+   * Evidence is face up for good, and what is printed on it is the
+   * Detective's to read: where each person lives is what narrows the
+   * nineteen locations down, and their faction is what a Motive set is made
+   * of. The ability is not shown — a card played as Evidence never used one.
+   */
+  const card = (id: string, label: string, fallbackColor: string): CardData => {
+    const p = people.get(label);
+    if (!p) return { id, label, colorKey: fallbackColor };
+    const badges = [
+      ...(p.affiliation && p.affiliation !== 'none' ? [n.affiliation(p.affiliation)] : []),
+      ...(p.isWitness ? ['Witness'] : []),
+    ];
+    return {
+      id, label,
+      colorKey: p.affiliation || 'none',
+      ...(p.home ? { subtitle: `at ${p.home}` } : {}),
+      ...(p.cost === undefined ? {} : { cost: p.cost }),
+      ...(badges.length > 0 ? { badges } : {}),
+    };
+  };
   const rd = reference?.referenceData;
   const shape = isObj(rd) && isObj(rd['evidence']) ? rd['evidence'] : null;
   const size = (key: string): number | undefined => {
@@ -417,14 +468,14 @@ function evidenceCase(view: Record<string, unknown>, reference: GameReferenceRes
     size('weapon'));
 
   row('cn:case:witnesses', 'Witnesses',
-    asArr(evidence['witnesses']).map((w) => ({ id: `cn:ev:witness:${asStr(w)}`, label: asStr(w), colorKey: 'witness' })),
+    asArr(evidence['witnesses']).map((w) => card(`cn:ev:witness:${asStr(w)}`, asStr(w), 'witness')),
     size('witnesses'));
 
   // The motive rows the engine names, in order. `motive_set_4` is in the view
   // for old sessions and is drawn only if something is actually in it.
   const motiveKeys = Object.keys(evidence).filter((k) => k.startsWith('motive_set_')).sort();
   motiveKeys.forEach((key, i) => {
-    const cards = asArr(evidence[key]).map((m) => ({ id: `cn:ev:${key}:${asStr(m)}`, label: asStr(m), colorKey: 'motive' }));
+    const cards = asArr(evidence[key]).map((m) => card(`cn:ev:${key}:${asStr(m)}`, asStr(m), 'motive'));
     const expected = motiveSets === undefined || i < motiveSets;
     if (!expected && cards.length === 0) return;
     row(`cn:case:${key}`, `Motive ${ORDINALS[i] ? words(ORDINALS[i]) : String(i + 1)}`, cards, expected ? setSize : undefined);
@@ -571,7 +622,7 @@ export const cybernoirGlue: GlueModule = {
       },
     });
 
-    const caseFile = evidenceCase(view, input.reference, role);
+    const caseFile = evidenceCase(view, input.reference, role, people, name);
 
     // The clue rail: what the Detective knows. Three truthful slots, one per
     // category, each holding its revealed value or drawn empty, and the ruled

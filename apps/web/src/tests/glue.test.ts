@@ -720,6 +720,36 @@ describe('cybernoir-2127 glue', () => {
     expect((det.points!.data as TableauData).label).toBe("The Hacker's case");
   });
 
+  it("gives the Detective what is printed on the Hacker's Evidence, which is how the case is solved", () => {
+    const played = {
+      ...CN_VIEW, role: 'detective', hideout: null, location_hand: [], informants: [],
+      evidence: {
+        ...CN_VIEW.evidence,
+        witnesses: ['Eddie the Doorman'],
+        motive_set_1: ['Blackice', 'Anansi the Spider'],
+      },
+    };
+    const rows = (g.plan(input(played, [], { reference: CN_REFERENCE }))!.points as { children?: Zone[] }).children!;
+    const witnesses = cards(rows.find((r) => r.id === 'cn:case:witnesses'));
+    // Where they live is the fact that narrows nineteen locations down.
+    expect(witnesses[0]).toEqual({
+      id: 'cn:ev:witness:Eddie the Doorman', label: 'Eddie the Doorman',
+      colorKey: 'none', subtitle: 'at Xistential Club', cost: 0, badges: ['Witness'],
+    });
+    const motive = cards(rows.find((r) => r.id === 'cn:case:motive_set_1'));
+    expect(motive.map((c) => [c.label, c.subtitle, c.badges])).toEqual([
+      ['Blackice', 'at The Junction', ['Iceden Collective']],
+      ['Anansi the Spider', 'at The Junction', ['Crimson Clan']],
+    ]);
+    // The Weapon is not a person and is drawn as itself.
+    const weapon = cards(rows.find((r) => r.id === 'cn:case:weapon'));
+    expect(weapon).toEqual([]);
+    // The Hacker sees the same on their own case: it is their own card's
+    // printed face either way.
+    const mine = (g.plan(input({ ...played, role: 'hacker' }, [], { reference: CN_REFERENCE }))!.points as { children?: Zone[] }).children!;
+    expect(cards(mine.find((r) => r.id === 'cn:case:witnesses'))[0]!.subtitle).toBe('at Xistential Club');
+  });
+
   it('draws no slot outlines when the engine does not publish the shape of the win', () => {
     const rd = CN_REFERENCE.referenceData as Record<string, unknown>;
     const older = { ...CN_REFERENCE, referenceData: { ...rd, evidence: undefined } };
@@ -786,6 +816,16 @@ describe('cybernoir-2127 glue', () => {
     expect(prompt.actions.some((a) => a.label === 'Recruit an informant')).toBe(false);
     // Nothing is offered when the engine lists nothing.
     expect(g.plan(input(det, [], { reference: CN_REFERENCE }))!.prompt).toBeUndefined();
+    // But a move no verb claims still gets one, in the engine's own word for
+    // it: the bar was empty at exactly the moment the engine was waiting.
+    const followUp = [{
+      move_id: 'bd', description: 'Discard a Location from the board: Shipyard',
+      move: { type: 'board_discard_choice', target_location: 'Shipyard' },
+    }];
+    const asked = g.plan(input(det, followUp, { reference: CN_REFERENCE }))!.prompt!;
+    expect(asked.actions.map((a) => [a.label, a.title])).toEqual([
+      ['Board Discard', 'Discard a Location from the board: Shipyard'],
+    ]);
   });
 
   it('draws who the Detective can reach, and what a tap on a person could mean', () => {
