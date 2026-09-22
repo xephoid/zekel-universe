@@ -147,6 +147,8 @@ export interface MapNode {
   artUrl?: string;
   /** Universe addition: node ids this node connects to by a road. */
   roadsTo?: string[];
+  /** Universe addition: the area of the board this region belongs to. */
+  area?: string;
 }
 
 /** <zekel-map>: a positional board of named regions. */
@@ -155,6 +157,19 @@ export interface MapData {
   /** Board aspect ratio as height/width percent (default 62). */
   aspect?: number;
   nodes: MapNode[];
+  /**
+   * Universe addition: named parts of the board, drawn as labelled bands
+   * behind the regions that belong to them — Cybernoir's nineteen locations
+   * grouped in three boroughs. The nodes keep their own coordinates; a band
+   * says what part of the board they are standing in.
+   */
+  areas?: Array<{ key: string; label: string; note?: string; y: number; height: number; colorKey?: string }>;
+  /**
+   * Universe addition: `pill` draws a region wide enough to hold its name,
+   * for a board whose regions are places rather than spaces. `dot` is the
+   * default, for boards with many small spaces.
+   */
+  nodeShape?: 'dot' | 'pill';
 }
 
 /** One select event, common to every primitive. */

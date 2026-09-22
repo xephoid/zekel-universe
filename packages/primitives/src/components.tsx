@@ -491,19 +491,37 @@ export function Map({ id, data, lit, onSelect, className, style }: PrimitiveProp
     <div data-flip-id={id} className={className} style={style}>
       {data.label && <div className="zk-zone-label">{data.label}</div>}
       <div ref={ref} className="zk-map" style={{ paddingTop: `${aspect}%` }}>
+        {(data.areas ?? []).map((a) => (
+          <div
+            key={a.key}
+            className="zk-map-area"
+            style={{ top: `${a.y}%`, height: `${a.height}%`, ...(a.colorKey ? { borderColor: themeColor(a.colorKey) } : {}) }}
+          >
+            <span className="zk-map-area-name">{a.label}</span>
+            {a.note && <span className="zk-map-area-note">{a.note}</span>}
+          </div>
+        ))}
         {roads}
         {data.nodes.map((n) => {
           const isLit = lit?.includes(n.id) ?? false;
           const lp = litProps(isLit, () => onSelect?.({ component: 'map', id: n.id, label: n.label }));
+          const pill = data.nodeShape === 'pill';
           const px = 34 * (n.size ?? 1);
+          // A pill is a place, wide enough to hold its own name; a dot is a
+          // space on a board with many of them.
+          const blob = pill
+            ? { minWidth: px * 2.4, height: px * 0.82, background: themeColor(n.colorKey ?? n.label) }
+            : { width: px, height: px, background: themeColor(n.colorKey ?? n.label) };
           return (
-            <div key={n.id} className="zk-map-node" style={{ left: `${n.x}%`, top: `${n.y}%` }}>
+            <div key={n.id} className={cx('zk-map-node', pill && 'pill')} style={{ left: `${n.x}%`, top: `${n.y}%` }}>
               <div
-                className={cx('zk-map-blob', lp.className)}
-                style={{ width: px, height: px, background: themeColor(n.colorKey ?? n.label) }}
+                className={cx('zk-map-blob', pill && 'pill', lp.className)}
+                style={blob}
                 role={lp.role} tabIndex={lp.tabIndex} onClick={lp.onClick} onKeyDown={lp.onKeyDown}
                 aria-label={n.label}
+                title={pill ? n.label : undefined}
               >
+                {pill && <span className="zk-map-blob-name">{n.label}</span>}
                 {n.artUrl && <img className="zk-map-art" src={n.artUrl} alt="" />}
                 {(n.pieces ?? []).map((p) => (
                   <span key={p.label} className="zk-piece" data-flip-id={`${id}:piece:${p.label}`}
@@ -512,7 +530,7 @@ export function Map({ id, data, lit, onSelect, className, style }: PrimitiveProp
                   </span>
                 ))}
               </div>
-              <div className="zk-map-name">{n.label}</div>
+              {!pill && <div className="zk-map-name">{n.label}</div>}
               {n.badges && n.badges.length > 0 && (
                 <div className="zk-map-badges">{n.badges.map((b, i) => <span key={i} className="zk-card-badge" style={{ color: 'var(--fg)', background: 'var(--border)' }}>{b}</span>)}</div>
               )}

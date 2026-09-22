@@ -671,9 +671,19 @@ Still open:
   affiliation reads as colour on every person, location and stack instead of
   as a grey pill. Checked on three games. The table still differs from the
   artboards in two ways that are not styling, both written up in
-  `docs/games/cybernoir-2127-build.md`: the city is drawn with the `map`
-  primitive where the design has borough rows of location chips, and the verb
-  bar is a strip where the design is a column.
+  `docs/games/cybernoir-2127-build.md`: the city and the verb bar. The city is
+  now settled — see below. The verb bar is a strip where the design is a
+  column of rows with costs and notes, and is the last real difference.
+- **DECIDED: Cybernoir's city is a map.** It was never the wrong primitive.
+  The game reference maps it to Map and the Primitives component sheet says
+  "Cybernoir's 19 locations are a map"; the table artboard draws the same map
+  laid out in borough bands. What was missing was on the map itself, and two
+  additive fields close it: `areas`, named parts of a board drawn as labelled
+  bands behind the regions standing in them, and `nodeShape: 'pill'` for a
+  board whose regions are places rather than spaces. Both default off, so
+  Sweetlands' eighty-space board is unchanged. With bands each printed fact is
+  said once and where it fits: the borough is the band, the faction is the
+  region's colour, and how many live there is its one badge.
 - **An action-bar button may stand for several moves.** `PromptAction` gained
   a `moves` variant: a verb with one listed move behind it sends on the press,
   and a verb with several opens the chooser that already existed for taps,

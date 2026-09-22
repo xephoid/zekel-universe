@@ -621,19 +621,28 @@ describe('cybernoir-2127 glue', () => {
     const map = plan.board.find((z) => z.kind === 'map')!.data as MapData;
     expect(map.nodes).toHaveLength(4);
     expect(map.nodes.find((n) => n.id === 'cn:loc:dark-city-central-station')!.badges).toContain('played');
-    // Every location carries its three printed facts, in the game's own words:
-    // "Gang 1" is an alias the engine happens to list, not the faction's name.
-    expect(map.nodes.find((n) => n.id === 'cn:loc:the-junction')!.badges)
-      .toEqual(['safehouse', 'Boonies', '2 residents', 'Iceden Collective']);
+    // Each of the three facts a clue can name is said once, where it fits:
+    // the borough is the band a region stands in, the faction is its colour,
+    // and how many live there is its one badge.
+    const junction = map.nodes.find((n) => n.id === 'cn:loc:the-junction')!;
+    expect(junction.badges).toEqual(['safehouse', '2 residents']);
+    expect(junction.area).toBe('boonies');
+    expect(junction.colorKey).toBe('gang_1');
     expect(map.nodes.find((n) => n.id === 'cn:loc:dark-city-central-station')!.badges)
-      .toEqual(['played', 'Downtown', '3 residents']);
+      .toEqual(['played', '3 residents']);
+    // The bands carry the printed borough names: "Gang 1" is an alias the
+    // engine happens to list, not a faction's name, and no id reaches the eye.
+    expect(map.areas!.map((a) => [a.key, a.label, a.note])).toEqual([
+      ['downtown', 'Downtown', '2 locations'],
+      ['boonies', 'Boonies', '2 locations'],
+    ]);
+    expect(map.nodeShape).toBe('pill');
     expect(JSON.stringify(plan)).not.toContain('Gang ');
     // Without the reference data there is no name to print, so the id is put
     // into words rather than shown raw — and never guessed at.
     const bare = g.plan(input(CN_VIEW, [], { reference: { ...CN_REFERENCE, referenceData: { locations: (CN_REFERENCE.referenceData as { locations: unknown[] }).locations } } }))!;
     const bareMap = bare.board.find((z) => z.kind === 'map')!.data as MapData;
-    expect(bareMap.nodes.find((n) => n.id === 'cn:loc:the-junction')!.badges)
-      .toEqual(['safehouse', 'Boonies', '2 residents', 'Gang 1']);
+    expect(bareMap.areas!.map((a) => a.label)).toEqual(['Downtown', 'Boonies']);
     expect(map.nodes.find((n) => n.id === 'cn:loc:the-junction')!.pieces).toEqual([{ label: 'safehouse', colorKey: 'safehouse' }]);
     expect(ids(plan.bench)).toEqual(['cn:hacker', 'cn:hand']);
     expect(plan.board.find((z) => z.id === 'cn:evidence')).toBeUndefined();

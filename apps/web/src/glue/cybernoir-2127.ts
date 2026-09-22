@@ -476,12 +476,23 @@ export const cybernoirGlue: GlueModule = {
 
     const name = names(input.reference);
     const people = peopleByName(input.reference);
+    // The city is a map: nineteen named regions grouped in three borough
+    // areas, no edges and no routes (cybernoir-2127.md, and the component
+    // sheet, which says so in as many words). A region is a place rather
+    // than a space, so it is drawn as a pill wide enough to hold its name.
+    //
+    // Each of the three facts a clue can name is said once and in the place
+    // that fits it: the borough is the band the region stands in, the faction
+    // is the region's colour, and how many people live there is its one
+    // badge. They used to be three text badges each, which is what made the
+    // map unreadable.
     const locs = locations(input.reference, view);
     const boroughs = [...new Set(locs.map((l) => l.borough))];
+    const bandHeight = 100 / Math.max(1, boroughs.length);
     const nodes: MapNode[] = [];
     boroughs.forEach((b, bi) => {
       const inBand = locs.filter((l) => l.borough === b);
-      const yTop = (bi / boroughs.length) * 100;
+      const yTop = bi * bandHeight;
       inBand.forEach((l, i) => {
         const cols = Math.ceil(inBand.length / 2);
         const row = i % 2;
@@ -491,16 +502,14 @@ export const cybernoirGlue: GlueModule = {
         nodes.push({
           id: locId(l.name),
           label: l.name,
-          x: 8 + (cols <= 1 ? 42 : (col / (cols - 1)) * 84),
-          y: yTop + 14 + row * ((100 / boroughs.length) - 22),
+          area: b,
+          x: 16 + (cols <= 1 ? 34 : (col / (cols - 1)) * 68),
+          y: yTop + bandHeight * 0.36 + row * bandHeight * 0.34,
           colorKey: isPlayed ? 'played' : (l.affiliation || 'none'),
           badges: [
             ...(isPlayed ? ['played'] : []),
             ...(isHideout ? ['safehouse'] : []),
-            // The three printed facts a clue can name, in the game's own words.
-            name.borough(l.borough),
             residentCount(l.population),
-            ...(l.affiliation && l.affiliation !== 'none' ? [name.affiliation(l.affiliation)] : []),
           ].filter(Boolean),
           pieces: isHideout ? [{ label: 'safehouse', colorKey: 'safehouse' }] : [],
         });
@@ -510,7 +519,17 @@ export const cybernoirGlue: GlueModule = {
     const board: Zone[] = [
       {
         kind: 'map', id: 'cn:map',
-        data: { label: `The city · ${locs.length} locations · ${played.size} played`, aspect: 70, nodes },
+        data: {
+          label: `The city · ${locs.length} locations · ${played.size} played`,
+          aspect: 52, nodeShape: 'pill', nodes,
+          areas: boroughs.map((b, bi) => ({
+            key: b,
+            label: name.borough(b),
+            note: `${locs.filter((l) => l.borough === b).length} locations`,
+            y: bi * bandHeight,
+            height: bandHeight,
+          })),
+        },
       },
     ];
 

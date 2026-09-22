@@ -254,6 +254,29 @@
   box-shadow: inset 0 0 14px rgba(0,0,0,0.18);
 }
 .zk-map-name { font-size: 11px; font-weight: 700; margin-top: 3px; color: var(--fg); text-shadow: 0 1px 3px var(--bg); white-space: nowrap; }
+/* A region that is a place rather than a space: a pill wide enough to hold
+   its own name, the way the component sheet draws Cybernoir's locations. */
+.zk-map-node.pill { z-index: 1; }
+.zk-map-blob.pill {
+  border-radius: 999px; border-width: 1.5px; padding: 0 10px;
+  box-shadow: var(--shadow-sm); gap: 5px; flex-wrap: nowrap;
+}
+.zk-map-blob.pill { max-width: 168px; }
+.zk-map-blob-name {
+  font-size: 10.5px; font-weight: 600; color: #fff; white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.45);
+  overflow: hidden; text-overflow: ellipsis;
+}
+/* A named part of the board, behind the regions standing in it. */
+.zk-map-area {
+  position: absolute; left: 0; right: 0;
+  border-top: 1px dashed var(--border);
+  display: flex; align-items: flex-start; gap: 8px; padding: 4px 10px 0;
+  pointer-events: none;
+}
+.zk-map-area:first-of-type { border-top: none; }
+.zk-map-area-name { font: 600 11px var(--font-body); color: var(--fg-muted); }
+.zk-map-area-note { font: 500 10px var(--font-mono); color: var(--fg-muted); opacity: 0.8; }
 .zk-map-badges { display: flex; gap: 2px; justify-content: center; }
 .zk-map-road { position: absolute; height: 3px; background: var(--border); transform-origin: 0 50%; opacity: 0.8; border-radius: 2px; }
 
