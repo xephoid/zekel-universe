@@ -663,6 +663,17 @@ Still open:
   into stacks on a card's `groupKey`, with a Spread control that lays the
   whole hand out. `CardData` gained `cost`, drawn as a pip rather than one
   badge among many.
+- **Every zone is a panel, and games colour their own parts.** A zone is now a
+  white card on the paper with a header, the way the action bar already was
+  and the way every table artboard draws it — one rule on `.zone` in the app's
+  stylesheet, not in the library, since it is page chrome rather than a
+  primitive's business. Cybernoir supplies its six faction colours, so
+  affiliation reads as colour on every person, location and stack instead of
+  as a grey pill. Checked on three games. The table still differs from the
+  artboards in two ways that are not styling, both written up in
+  `docs/games/cybernoir-2127-build.md`: the city is drawn with the `map`
+  primitive where the design has borough rows of location chips, and the verb
+  bar is a strip where the design is a column.
 - **An action-bar button may stand for several moves.** `PromptAction` gained
   a `moves` variant: a verb with one listed move behind it sends on the press,
   and a verb with several opens the chooser that already existed for taps,

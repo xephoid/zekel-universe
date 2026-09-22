@@ -10,15 +10,28 @@ import type { GameReferenceResponse } from '@universe/shared';
 import type { GlueModule, GlueInput, LegalMove, MoveForm, PlanPrompt, PromptAction, SelectEvent, SetupField, TablePlan, Zone, SetupAnswers, SetupSeat } from './types';
 import { asArr, asNum, asStr, isObj, shapeHas, words } from './types';
 
+/**
+ * The game's own colours, from the design canvas (docs/design/Cybernoir
+ * Hacker Table.dc.html and Big Hands). Affiliation is the code that matters:
+ * it is the field a Motive set is built from and what a big hand folds on, so
+ * every person and every location wears their faction's colour rather than
+ * the seat that happens to hold them.
+ */
 const PALETTE: Record<string, string> = {
+  // The six factions, keyed by the engine's own ids.
+  none: '#575b61',
+  corp_1: '#1c2a5e',
+  corp_2: '#0b6155',
+  gang_1: '#1f6e8c',
+  gang_2: '#7a1220',
+  gang_3: '#5a3d8a',
+  // The two seats, for panels and owner accents.
   detective: '#b3222a',
   hacker: '#1f6e8c',
-  none: '#6b6f76',
+  // States and the case file's three kinds of Evidence.
   played: '#3b3f46',
   safehouse: '#c9a227',
-  downtown: '#4a4e57',
-  the_hive: '#7a4a12',
-  boonies: '#6e6558',
+  out_of_reach: '#8a8578',
   evidence: '#3E7C4F',
   witness: '#1f6e8c',
   motive: '#b3222a',
@@ -83,13 +96,13 @@ function peopleByName(reference: GameReferenceResponse | null): Map<string, Pers
  */
 function contactCard(id: string, label: string, people: Map<string, Person>, n: Names): CardData {
   const p = people.get(label);
-  if (!p) return { id, label, colorKey: 'hacker' };
+  if (!p) return { id, label, colorKey: 'none' };
   const badges = [
     ...(p.affiliation && p.affiliation !== 'none' ? [n.affiliation(p.affiliation)] : []),
     ...(p.isWitness ? ['Witness'] : []),
   ];
   return {
-    id, label, colorKey: 'hacker',
+    id, label, colorKey: p.affiliation || 'none',
     // A big hand folds by faction: the field a Motive set is built from.
     ...(p.affiliation ? { groupKey: p.affiliation } : {}),
     ...(p.cost === undefined ? {} : { cost: p.cost }),
@@ -102,10 +115,10 @@ function contactCard(id: string, label: string, people: Map<string, Person>, n: 
  *  residents are what playing it puts in the Detective's reach. */
 function locationCard(id: string, label: string, locs: Loc[], reference: GameReferenceResponse | null, n: Names): CardData {
   const l = locs.find((x) => x.name === label);
-  if (!l) return { id, label, colorKey: 'detective' };
+  if (!l) return { id, label, colorKey: 'none' };
   const who = residentsOf(reference, l.name);
   return {
-    id, label, colorKey: 'detective',
+    id, label, colorKey: l.affiliation || 'none',
     // A big hand of Locations folds by borough.
     groupKey: l.borough,
     ...(who.length > 0 ? { subtitle: who.join(', ') } : {}),
@@ -180,7 +193,7 @@ function whoYouCanReach(
         // on the moves the tap offers.
         const { cost: _hackersPrice, ...card } = contactCard(personId(who), who, people, n);
         const at = where.get(who);
-        return { ...card, colorKey: at ? 'none' : 'detective', ...(at ? { subtitle: at } : {}) };
+        return { ...card, ...(at ? { colorKey: 'out_of_reach', subtitle: at } : {}) };
       }),
     },
   };
@@ -480,7 +493,7 @@ export const cybernoirGlue: GlueModule = {
           label: l.name,
           x: 8 + (cols <= 1 ? 42 : (col / (cols - 1)) * 84),
           y: yTop + 14 + row * ((100 / boroughs.length) - 22),
-          colorKey: isPlayed ? 'played' : b,
+          colorKey: isPlayed ? 'played' : (l.affiliation || 'none'),
           badges: [
             ...(isPlayed ? ['played'] : []),
             ...(isHideout ? ['safehouse'] : []),
@@ -495,7 +508,10 @@ export const cybernoirGlue: GlueModule = {
     });
 
     const board: Zone[] = [
-      { kind: 'map', id: 'cn:map', data: { label: 'The city', aspect: 70, nodes } },
+      {
+        kind: 'map', id: 'cn:map',
+        data: { label: `The city · ${locs.length} locations · ${played.size} played`, aspect: 70, nodes },
+      },
     ];
 
     // Jail: three named slots with whoever sits in them.
@@ -606,7 +622,6 @@ export const cybernoirGlue: GlueModule = {
             const revealed = !!o['revealed'];
             return {
               ...contactCard(`cn:informant:${ORDINALS[i] ?? String(i)}`, asStr(o['person']), people, name),
-              colorKey: 'detective',
               subtitle: revealed ? 'revealed to the Hacker' : 'face down to the Hacker',
             };
           }),

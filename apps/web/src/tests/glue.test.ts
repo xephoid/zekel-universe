@@ -642,16 +642,16 @@ describe('cybernoir-2127 glue', () => {
     const plan = g.plan(input(CN_VIEW, [], { reference: CN_REFERENCE }))!;
     const hand = cards(plan.bench.find((z) => z.id === 'cn:hand'));
     expect(hand[0]).toEqual({
-      id: 'cn:hand:0:Blackice', label: 'Blackice', colorKey: 'hacker',
+      id: 'cn:hand:0:Blackice', label: 'Blackice', colorKey: 'gang_1',
       groupKey: 'gang_1', cost: 2, subtitle: 'Board Discard', badges: ['Iceden Collective'],
     });
     // The Weapon is in the Contacts deck but not among the people; it is drawn
     // as itself rather than given facts it does not have.
-    expect(hand[1]).toEqual({ id: 'cn:hand:1:The Weapon', label: 'The Weapon', colorKey: 'hacker' });
+    expect(hand[1]).toEqual({ id: 'cn:hand:1:The Weapon', label: 'The Weapon', colorKey: 'none' });
     // A Witness says so, and its ability line would only repeat the badge.
     const witness = g.plan(input({ ...CN_VIEW, hand: ['Eddie the Doorman'] }, [], { reference: CN_REFERENCE }))!;
     expect(cards(witness.bench.find((z) => z.id === 'cn:hand'))[0])
-      .toEqual({ id: 'cn:hand:0:Eddie the Doorman', label: 'Eddie the Doorman', colorKey: 'hacker', groupKey: 'none', cost: 0, badges: ['Witness'] });
+      .toEqual({ id: 'cn:hand:0:Eddie the Doorman', label: 'Eddie the Doorman', colorKey: 'none', groupKey: 'none', cost: 0, badges: ['Witness'] });
   });
 
   it('tells the Hacker how many informants are facing them, which is their central risk', () => {
@@ -669,16 +669,17 @@ describe('cybernoir-2127 glue', () => {
     const plan = g.plan(input(det, [], { reference: CN_REFERENCE }))!;
     // A Location shows who lives there: residents are what playing it reaches.
     expect(cards(plan.bench.find((z) => z.id === 'cn:hand'))[0]).toEqual({
-      id: 'cn:hand:0:The Junction', label: 'The Junction', colorKey: 'detective',
+      id: 'cn:hand:0:The Junction', label: 'The Junction', colorKey: 'gang_1',
       groupKey: 'boonies', subtitle: 'Blackice, Anansi the Spider',
       badges: ['Boonies', '2 residents', 'Iceden Collective'],
     });
     // They pay to hold their informants and are the one person entitled to
     // know who they are; the line says whether the Hacker has seen them.
     const informants = cards(plan.bench.find((z) => z.id === 'cn:informants'));
-    expect(informants.map((c) => [c.label, c.subtitle, c.cost])).toEqual([
-      ['Blackice', 'face down to the Hacker', 2],
-      ['Anansi the Spider', 'revealed to the Hacker', 1],
+    // Each wears their own faction, not the seat that holds them.
+    expect(informants.map((c) => [c.label, c.subtitle, c.cost, c.colorKey])).toEqual([
+      ['Blackice', 'face down to the Hacker', 2, 'gang_1'],
+      ['Anansi the Spider', 'revealed to the Hacker', 1, 'gang_2'],
     ]);
     expect(informants.every((c) => c.face !== 'down')).toBe(true);
   });
@@ -794,8 +795,8 @@ describe('cybernoir-2127 glue', () => {
     // Everyone living at a played Location, with the ones already spoken for
     // drawn unlit and saying where they are.
     expect(cards(reach).map((c) => [c.label, c.subtitle, c.colorKey])).toEqual([
-      ['Blackice', 'Board Discard', 'detective'],
-      ['Anansi the Spider', 'your informant', 'none'],
+      ['Blackice', 'Board Discard', 'gang_1'],
+      ['Anansi the Spider', 'your informant', 'out_of_reach'],
     ]);
     // Not the Contact's play cost: that is the Hacker's price, not theirs.
     expect(cards(reach).every((c) => c.cost === undefined)).toBe(true);

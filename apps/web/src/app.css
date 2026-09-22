@@ -399,6 +399,25 @@ label.option-card { position: relative; padding-right: 40px; }
 .gallery section { margin: 24px 0; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); display: block; }
 .gallery .row { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
 
+/* ---- every zone is a panel ----
+   The canvas draws each region of the table as a white card on the paper
+   with a header, the same way the action bar already is: one surface, one
+   hairline, one shadow (docs/design/Primitives.dc.html, and every game's
+   table artboard). A tableau brings its own chrome and keeps it. */
+.zone:not(.zone-tableau) {
+  background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+  padding: 10px 12px; box-shadow: var(--shadow-card);
+}
+.zone .zk-zone-label {
+  display: flex; align-items: baseline; gap: 8px;
+  font: 600 13px var(--font-body); color: var(--fg);
+  margin-bottom: 8px;
+}
+/* The map board carries the panel's own surface, so it does not draw a second. */
+.zone-map .zk-map { background: transparent; border: none; border-radius: 0; }
+/* A track's spaces hang their markers above, which needs the room back. */
+.zone-track .zk-track { padding-top: 16px; }
+
 /* ---- a zone that takes a whole row of the board ---- */
 .zones .zone.span-full { flex: 1 1 100%; width: 100%; min-width: 0; }
 /* the same card size on the zone, so an empty row is as tall as a full one */
