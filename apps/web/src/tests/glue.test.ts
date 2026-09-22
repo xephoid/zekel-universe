@@ -584,9 +584,9 @@ const CN_REFERENCE: GameReferenceResponse = {
       { name: 'The Junction', borough: 'boonies', population: 2, affiliation: 'gang_1' },
     ],
     people: [
-      { name: 'Blackice', home_location: 'The Junction' },
-      { name: 'Anansi the Spider', home_location: 'The Junction' },
-      { name: 'Eddie the Doorman', home_location: 'Xistential Club' },
+      { name: 'Blackice', home_location: 'The Junction', affiliation: 'gang_1', cost: 2, ability: 'board_discard', is_witness: false },
+      { name: 'Anansi the Spider', home_location: 'The Junction', affiliation: 'gang_2', cost: 1, ability: 'reveal_informant', is_witness: false },
+      { name: 'Eddie the Doorman', home_location: 'Xistential Club', affiliation: 'none', cost: 0, ability: 'witness', is_witness: true },
     ],
     affiliations: [
       { id: 'none', name: 'None' },
@@ -598,6 +598,7 @@ const CN_REFERENCE: GameReferenceResponse = {
       { id: 'downtown', name: 'Downtown' },
       { id: 'boonies', name: 'Boonies' },
     ],
+    evidence: { weapon: 1, witnesses: 3, motive_sets: 3, motive_set_size: 3, total: 13 },
   },
 };
 
@@ -635,9 +636,91 @@ describe('cybernoir-2127 glue', () => {
       .toEqual(['safehouse', 'Boonies', '2 residents', 'Gang 1']);
     expect(map.nodes.find((n) => n.id === 'cn:loc:the-junction')!.pieces).toEqual([{ label: 'safehouse', colorKey: 'safehouse' }]);
     expect(ids(plan.bench)).toEqual(['cn:hacker', 'cn:hand']);
-    // Evidence shows a count, never a denominator the engine does not publish.
-    expect((plan.board.find((z) => z.id === 'cn:evidence')!.data as CardZoneData).label).toBe('Evidence (1)');
+    expect(plan.board.find((z) => z.id === 'cn:evidence')).toBeUndefined();
   });
+  it('gives a Contact its cost, its field and what playing it does, without a tooltip', () => {
+    const plan = g.plan(input(CN_VIEW, [], { reference: CN_REFERENCE }))!;
+    const hand = cards(plan.bench.find((z) => z.id === 'cn:hand'));
+    expect(hand[0]).toEqual({
+      id: 'cn:hand:0:Blackice', label: 'Blackice', colorKey: 'hacker',
+      cost: 2, subtitle: 'Board Discard', badges: ['Iceden Collective'],
+    });
+    // The Weapon is in the Contacts deck but not among the people; it is drawn
+    // as itself rather than given facts it does not have.
+    expect(hand[1]).toEqual({ id: 'cn:hand:1:The Weapon', label: 'The Weapon', colorKey: 'hacker' });
+    // A Witness says so, and its ability line would only repeat the badge.
+    const witness = g.plan(input({ ...CN_VIEW, hand: ['Eddie the Doorman'] }, [], { reference: CN_REFERENCE }))!;
+    expect(cards(witness.bench.find((z) => z.id === 'cn:hand'))[0])
+      .toEqual({ id: 'cn:hand:0:Eddie the Doorman', label: 'Eddie the Doorman', colorKey: 'hacker', cost: 0, badges: ['Witness'] });
+  });
+
+  it('tells the Hacker how many informants are facing them, which is their central risk', () => {
+    const plan = g.plan(input(CN_VIEW, [], { reference: CN_REFERENCE }))!;
+    const stats = (plan.bench.find((z) => z.id === 'cn:hacker')!.data as TableauData).stats!;
+    expect(stats.find((st) => st.label === 'Informants facing you')!.value).toBe(1);
+  });
+
+  it("gives the Detective their own hand's facts, and their own informants' names", () => {
+    const det = {
+      ...CN_VIEW, role: 'detective', hideout: null,
+      location_hand: ['The Junction'],
+      informants: [{ person: 'Blackice', revealed: false }, { person: 'Anansi the Spider', revealed: true }],
+    };
+    const plan = g.plan(input(det, [], { reference: CN_REFERENCE }))!;
+    // A Location shows who lives there: residents are what playing it reaches.
+    expect(cards(plan.bench.find((z) => z.id === 'cn:hand'))[0]).toEqual({
+      id: 'cn:hand:0:The Junction', label: 'The Junction', colorKey: 'detective',
+      subtitle: 'Blackice, Anansi the Spider',
+      badges: ['Boonies', '2 residents', 'Iceden Collective'],
+    });
+    // They pay to hold their informants and are the one person entitled to
+    // know who they are; the line says whether the Hacker has seen them.
+    const informants = cards(plan.bench.find((z) => z.id === 'cn:informants'));
+    expect(informants.map((c) => [c.label, c.subtitle, c.cost])).toEqual([
+      ['Blackice', 'face down to the Hacker', 2],
+      ['Anansi the Spider', 'revealed to the Hacker', 1],
+    ]);
+    expect(informants.every((c) => c.face !== 'down')).toBe(true);
+  });
+
+  it('puts the case file in the points track, in the shape the printed sheet has it', () => {
+    const plan = g.plan(input(CN_VIEW, [], { reference: CN_REFERENCE }))!;
+    const caseFile = plan.points!;
+    expect(caseFile.kind).toBe('tableau');
+    expect((caseFile.data as TableauData).label).toBe('Your case');
+    // Five rows, and thirteen slots between them from turn one.
+    const rows = (caseFile as { children?: Zone[] }).children!;
+    const shape = rows.map((r) => {
+      const d = r.data as CardZoneData;
+      return [d.label, (d.cards ?? []).length, d.empty];
+    });
+    expect(shape).toEqual([
+      ['Weapon', 0, 1],
+      ['Witnesses', 1, 2],
+      ['Motive First', 0, 3],
+      ['Motive Second', 0, 3],
+      ['Motive Third', 0, 3],
+    ]);
+    const slots = shape.reduce((n, [, cards, empty]) => n + (cards as number) + (empty as number), 0);
+    expect(slots).toBe(13);
+    // The count is the engine's: played over the total it publishes.
+    expect((caseFile.data as TableauData).stats).toEqual([{ label: 'Evidence', value: 1, max: 13 }]);
+    // The Detective sees the same thirteen, as the threat they are.
+    const det = g.plan(input({ ...CN_VIEW, role: 'detective', hideout: null, location_hand: [] }, [], { reference: CN_REFERENCE }))!;
+    expect((det.points!.data as TableauData).label).toBe("The Hacker's case");
+  });
+
+  it('draws no slot outlines when the engine does not publish the shape of the win', () => {
+    const rd = CN_REFERENCE.referenceData as Record<string, unknown>;
+    const older = { ...CN_REFERENCE, referenceData: { ...rd, evidence: undefined } };
+    const rows = (g.plan(input(CN_VIEW, [], { reference: older }))!.points as { children?: Zone[] }).children!;
+    expect(rows.every((r) => (r.data as CardZoneData).empty === undefined)).toBe(true);
+    // Still the rows the view names, with what is actually on the table.
+    expect(rows.map((r) => (r.data as CardZoneData).label)).toEqual(['Weapon', 'Witnesses', 'Motive First', 'Motive Second', 'Motive Third', 'Motive Fourth']);
+    expect((g.plan(input(CN_VIEW, [], { reference: older }))!.points!.data as TableauData).stats)
+      .toEqual([{ label: 'Evidence', value: 1 }]);
+  });
+
   it('draws the clue rail both seats share: a slot per category, and the ruled out tokens', () => {
     const plan = g.plan(input(CN_VIEW, [], { reference: CN_REFERENCE }))!;
     const rail = plan.board.find((z) => z.id === 'cn:clues')!;

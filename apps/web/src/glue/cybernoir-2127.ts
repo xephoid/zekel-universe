@@ -55,6 +55,64 @@ function locations(reference: GameReferenceResponse | null, view: Record<string,
   return [...names].filter(Boolean).map((name) => ({ name, borough: 'city' }));
 }
 
+/** One of the game's people, as the engine's reference data prints them. */
+interface Person { name: string; affiliation?: string; cost?: number; ability?: string; isWitness: boolean }
+
+function peopleByName(reference: GameReferenceResponse | null): Map<string, Person> {
+  const rd = reference?.referenceData;
+  const out = new Map<string, Person>();
+  if (!isObj(rd) || !Array.isArray(rd['people'])) return out;
+  for (const p of rd['people']) {
+    if (!isObj(p) || typeof p['name'] !== 'string') continue;
+    out.set(p['name'], {
+      name: p['name'],
+      affiliation: asStr(p['affiliation']) || undefined,
+      cost: typeof p['cost'] === 'number' ? p['cost'] : undefined,
+      ability: asStr(p['ability']) || undefined,
+      isWitness: p['is_witness'] === true,
+    });
+  }
+  return out;
+}
+
+/**
+ * A Contact as a card that carries its own decision: what it costs against
+ * three action points, the field a Motive set is built from, and what playing
+ * it does. The ability is the engine's own id put into words — the engine
+ * publishes no sentence for it, and Universe does not write one.
+ */
+function contactCard(id: string, label: string, people: Map<string, Person>, n: Names): CardData {
+  const p = people.get(label);
+  if (!p) return { id, label, colorKey: 'hacker' };
+  const badges = [
+    ...(p.affiliation && p.affiliation !== 'none' ? [n.affiliation(p.affiliation)] : []),
+    ...(p.isWitness ? ['Witness'] : []),
+  ];
+  return {
+    id, label, colorKey: 'hacker',
+    ...(p.cost === undefined ? {} : { cost: p.cost }),
+    ...(p.ability && p.ability !== 'witness' ? { subtitle: words(p.ability) } : {}),
+    ...(badges.length > 0 ? { badges } : {}),
+  };
+}
+
+/** A Location as a card: its three printed facts, and who lives there —
+ *  residents are what playing it puts in the Detective's reach. */
+function locationCard(id: string, label: string, locs: Loc[], reference: GameReferenceResponse | null, n: Names): CardData {
+  const l = locs.find((x) => x.name === label);
+  if (!l) return { id, label, colorKey: 'detective' };
+  const who = residentsOf(reference, l.name);
+  return {
+    id, label, colorKey: 'detective',
+    ...(who.length > 0 ? { subtitle: who.join(', ') } : {}),
+    badges: [
+      n.borough(l.borough),
+      residentCount(l.population),
+      ...(l.affiliation && l.affiliation !== 'none' ? [n.affiliation(l.affiliation)] : []),
+    ].filter(Boolean),
+  };
+}
+
 /** The people the engine's reference data puts at a location, by printed name. */
 function residentsOf(reference: GameReferenceResponse | null, locName: string): string[] {
   const rd = reference?.referenceData;
@@ -125,6 +183,70 @@ function negativeClue(tokenId: string, n: Names): { category: string; value: str
   return { category: cat.label, value: clueValue(cat.key, tokenId.slice(cat.key.length + 1), n) };
 }
 
+/**
+ * The case file: the thirteen cards that win the game, in the shape the
+ * printed sheet has them — the Weapon, a row of Witnesses, and a row per
+ * Motive set. Empty slots are drawn as outlines so the shape of the win is
+ * visible from turn one.
+ *
+ * The row sizes come from the engine's `reference_data.evidence`, never from
+ * a count here: how many cards win is a rule. An engine that does not publish
+ * the shape gets the played cards and no outlines.
+ */
+function evidenceCase(view: Record<string, unknown>, reference: GameReferenceResponse | null, role: string): Zone {
+  const evidence = isObj(view['evidence']) ? view['evidence'] : {};
+  const rd = reference?.referenceData;
+  const shape = isObj(rd) && isObj(rd['evidence']) ? rd['evidence'] : null;
+  const size = (key: string): number | undefined => {
+    const v = shape?.[key];
+    return typeof v === 'number' ? v : undefined;
+  };
+  const motiveSets = size('motive_sets');
+  const setSize = size('motive_set_size');
+
+  const rows: Zone[] = [];
+  const row = (id: string, label: string, cards: CardData[], slots: number | undefined): void => {
+    rows.push({
+      kind: 'card-zone', id,
+      data: {
+        label, mode: 'row', size: 'small', cards,
+        empty: slots === undefined ? undefined : Math.max(0, slots - cards.length),
+      },
+      arriveFrom: role === 'hacker' ? 'cn:hand' : undefined,
+    });
+  };
+
+  row('cn:case:weapon', 'Weapon',
+    evidence['weapon'] ? [{ id: 'cn:ev:weapon', label: 'The Weapon', colorKey: 'weapon' }] : [],
+    size('weapon'));
+
+  row('cn:case:witnesses', 'Witnesses',
+    asArr(evidence['witnesses']).map((w) => ({ id: `cn:ev:witness:${asStr(w)}`, label: asStr(w), colorKey: 'witness' })),
+    size('witnesses'));
+
+  // The motive rows the engine names, in order. `motive_set_4` is in the view
+  // for old sessions and is drawn only if something is actually in it.
+  const motiveKeys = Object.keys(evidence).filter((k) => k.startsWith('motive_set_')).sort();
+  motiveKeys.forEach((key, i) => {
+    const cards = asArr(evidence[key]).map((m) => ({ id: `cn:ev:${key}:${asStr(m)}`, label: asStr(m), colorKey: 'motive' }));
+    const expected = motiveSets === undefined || i < motiveSets;
+    if (!expected && cards.length === 0) return;
+    row(`cn:case:${key}`, `Motive ${ORDINALS[i] ? words(ORDINALS[i]) : String(i + 1)}`, cards, expected ? setSize : undefined);
+  });
+
+  const played = rows.reduce((n, z) => n + ((z.data as { cards?: unknown[] }).cards?.length ?? 0), 0);
+  const total = size('total');
+  return {
+    kind: 'tableau', id: 'cn:case',
+    data: {
+      label: role === 'hacker' ? 'Your case' : "The Hacker's case",
+      owner: role === 'hacker' ? 'hacker' : 'evidence',
+      stats: [{ label: 'Evidence', value: played, ...(total === undefined ? {} : { max: total }) }],
+    },
+    children: rows,
+  };
+}
+
 /** One line of a location's three printed facts, for a hint under its name. */
 function locLine(l: Loc, n: Names): string {
   return [
@@ -171,6 +293,7 @@ export const cybernoirGlue: GlueModule = {
     const hideout = hideoutDesc ? asStr(hideoutDesc['location_name'], '') : asStr(hideoutRaw, '');
 
     const name = names(input.reference);
+    const people = peopleByName(input.reference);
     const locs = locations(input.reference, view);
     const boroughs = [...new Set(locs.map((l) => l.borough))];
     const nodes: MapNode[] = [];
@@ -223,14 +346,7 @@ export const cybernoirGlue: GlueModule = {
       },
     });
 
-    const evidence = isObj(view['evidence']) ? view['evidence'] : {};
-    const evCards: CardData[] = [];
-    if (evidence['weapon']) evCards.push({ id: 'cn:ev:weapon', label: asStr(evidence['weapon']), subtitle: 'Weapon', colorKey: 'weapon' });
-    asArr(evidence['witnesses']).forEach((w) => evCards.push({ id: `cn:ev:witness:${asStr(w)}`, label: asStr(w), subtitle: 'Witness', colorKey: 'witness' }));
-    for (const key of Object.keys(evidence).filter((k) => k.startsWith('motive'))) {
-      asArr(evidence[key]).forEach((m) => evCards.push({ id: `cn:ev:${key}:${asStr(m)}`, label: asStr(m), subtitle: words(key), colorKey: 'motive' }));
-    }
-    board.push({ kind: 'card-zone', id: 'cn:evidence', data: { label: `Evidence (${evCards.length})`, mode: 'row', cards: evCards } });
+    const caseFile = evidenceCase(view, input.reference, role);
 
     // The clue rail: what the Detective knows. Three truthful slots, one per
     // category, each holding its revealed value or drawn empty, and the ruled
@@ -281,6 +397,9 @@ export const cybernoirGlue: GlueModule = {
           || [name.borough(asStr(hideoutDesc!['borough'])), asStr(hideoutDesc!['affiliation']) && asStr(hideoutDesc!['affiliation']) !== 'none' ? name.affiliation(asStr(hideoutDesc!['affiliation'])) : ''].filter(Boolean).join(' · ')
           || 'hidden' }]
         : []),
+      // Block risk is the Hacker's central risk, and their view carries the
+      // count (never the names). It said nothing about it before.
+      { label: 'Informants facing you', value: asNum(view['informants_facedown_count']) },
       { label: 'Contacts deck', value: asNum(hak['contacts_deck_size']) },
       { label: 'Hand', value: asNum(hak['hand_size']) },
       { label: 'Safehouse burned', value: view['safehouse_burned'] ? 'yes' : 'no' },
@@ -298,7 +417,7 @@ export const cybernoirGlue: GlueModule = {
       if (Array.isArray(hand)) {
         bench.push({
           kind: 'card-zone', id: 'cn:hand', arriveFrom: 'cn:location-deck',
-          data: { label: 'Your location hand', mode: 'fan', cards: hand.map((n, i) => ({ id: `cn:hand:${i}:${asStr(n)}`, label: asStr(n), colorKey: 'detective' })) },
+          data: { label: 'Your location hand', mode: 'fan', cards: hand.map((h, i) => locationCard(`cn:hand:${i}:${asStr(h)}`, asStr(h), locs, input.reference, name)) },
         });
       }
       const informants = asArr(view['informants']);
@@ -306,10 +425,17 @@ export const cybernoirGlue: GlueModule = {
         kind: 'card-zone', id: 'cn:informants',
         data: {
           label: 'Informants', mode: 'row',
+          // Face up for their owner, who pays to hold them and is the one
+          // person entitled to know. The line underneath says whether the
+          // Hacker has seen it — the card is not public either way.
           cards: informants.map((inf, i) => {
             const o = isObj(inf) ? inf : {};
             const revealed = !!o['revealed'];
-            return { id: `cn:informant:${ORDINALS[i] ?? String(i)}`, label: revealed ? asStr(o['person']) : `Informant ${i + 1}`, face: revealed ? 'up' as const : 'down' as const, colorKey: 'detective' };
+            return {
+              ...contactCard(`cn:informant:${ORDINALS[i] ?? String(i)}`, asStr(o['person']), people, name),
+              colorKey: 'detective',
+              subtitle: revealed ? 'revealed to the Hacker' : 'face down to the Hacker',
+            };
           }),
         },
       });
@@ -321,7 +447,7 @@ export const cybernoirGlue: GlueModule = {
       if (Array.isArray(hand)) {
         bench.push({
           kind: 'card-zone', id: 'cn:hand', arriveFrom: 'cn:contacts-deck',
-          data: { label: 'Your contacts', mode: 'fan', cards: hand.map((n, i) => ({ id: `cn:hand:${i}:${asStr(n)}`, label: asStr(n), colorKey: 'hacker' })) },
+          data: { label: 'Your contacts', mode: 'fan', cards: hand.map((h, i) => contactCard(`cn:hand:${i}:${asStr(h)}`, asStr(h), people, name)) },
         });
       }
       side.push({ kind: 'card-zone', id: 'cn:contacts-deck', data: { label: 'Contacts deck', mode: 'pile', countOnly: asNum(hak['contacts_deck_size']) } });
@@ -342,7 +468,7 @@ export const cybernoirGlue: GlueModule = {
     }
 
     const status = `Turn ${asNum(view['turn'], 1)} · ${words(asStr(view['phase']))}`;
-    return { board, bench, side, palette: PALETTE, title: 'Cybernoir 2127', status, prompt };
+    return { board, bench, side, points: caseFile, palette: PALETTE, title: 'Cybernoir 2127', status, prompt };
   },
 
   litParts(input: GlueInput): string[] {

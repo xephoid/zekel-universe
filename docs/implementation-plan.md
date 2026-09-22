@@ -647,15 +647,22 @@ Still open:
   them).
 - Cybernoir 2127's glue compiles against the primitive contract and passes
   fixture tests and the two-human privacy spec, but a full game has not been
-  played through in the browser. The first two items of the table's design
-  pass have landed (printed names instead of ids; the clue rail both seats
-  share); six remain, listed in `docs/games/cybernoir-2127-build.md`. Two
-  library changes came with them, both general: a track space grows from a
-  circle into a pill when it holds a word, so a track can carry values as well
-  as positions, and a pool of one-offs leaves off a count of one. Left open on
-  purpose: whether the table may count how many Locations a clue still leaves
-  standing. That is arithmetic over public facts, but it is also a rule, so it
-  waits for the clue-giving form.
+  played through in the browser. Four of the eight items of the table's design
+  pass have landed — printed names instead of ids, the clue rail both seats
+  share, the case file as the points track, and cards carrying their own facts;
+  four remain, listed in `docs/games/cybernoir-2127-build.md`. Four library
+  changes came with them, all general rather than game-shaped: a track space
+  grows from a circle into a pill when it holds a word; a pool of one-offs
+  leaves off a count of one; a card zone can draw empty slots after its cards,
+  so a zone whose shape is part of the game says what is missing; and a card
+  zone can draw small, as name chips rather than faces. `CardData` gained
+  `cost`, drawn as a pip rather than one badge among many.
+- Two rules stayed in the engine rather than being copied here, both by adding
+  a published fact: how many cards win the game (`reference_data.evidence`),
+  and which location a Hacker hides in. Two more are open the same way —
+  whether the table may count how many Locations a clue leaves standing (the
+  engine's scoreboard already computes it), and a printed one-liner per Contact
+  ability, which the engine publishes only as an id today.
 - **Settled: Cybernoir's hideout is the Hacker's choice.** The engine used to
   pick it at session creation, because `createInitialState` auto-completed
   setup whenever both seats were *tracked* and Universe marks human seats

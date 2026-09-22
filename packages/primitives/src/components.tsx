@@ -66,6 +66,7 @@ export function Card({ id, data, lit, onSelect, arriveFrom, className, style }: 
         <div className="zk-card-face" style={faceStyle}>
           {data.artUrl && <img className="zk-card-art" src={data.artUrl} alt="" />}
           <div>
+            {data.cost !== undefined && <span className="zk-card-cost">{data.cost}</span>}
             <div className="zk-card-label">{data.label}</div>
             {data.subtitle && <div className="zk-card-sub">{data.subtitle}</div>}
           </div>
@@ -93,6 +94,14 @@ export function Card({ id, data, lit, onSelect, arriveFrom, className, style }: 
 
 // ---- Card zone -------------------------------------------------------------------
 
+/** The outlines after a zone's cards: the slots still to be filled. */
+function emptySlots(id: string, count: number | undefined): ReactNode {
+  if (!count || count <= 0) return null;
+  return Array.from({ length: count }, (_, i) => (
+    <span key={`${id}:empty:${i}`} className="zk-card-slot" aria-hidden="true" />
+  ));
+}
+
 export function CardZone({ id, data, lit, onSelect, arriveFrom, className, style }: PrimitiveProps<CardZoneData>) {
   const isLit = lit?.includes(id) ?? false;
   const lp = litProps(isLit, () => onSelect?.({ component: 'card-zone', id, label: data.label ?? id }));
@@ -107,7 +116,9 @@ export function CardZone({ id, data, lit, onSelect, arriveFrom, className, style
       </div>
     ) : <div className="zk-zone-empty">empty</div>;
   } else if (cards.length === 0) {
-    body = <div className="zk-zone-empty">empty</div>;
+    body = data.empty
+      ? <div className={data.mode === 'fan' ? 'zk-zone-fan' : 'zk-zone-row'}>{emptySlots(id, data.empty)}</div>
+      : <div className="zk-zone-empty">empty</div>;
   } else if (data.mode === 'pile') {
     // Bottom to top; the top card is the visible one and flies as itself.
     const under = cards.slice(Math.max(0, cards.length - 3), cards.length - 1);
@@ -127,13 +138,14 @@ export function CardZone({ id, data, lit, onSelect, arriveFrom, className, style
         {cards.map((c, i) => (
           <Card key={c.id ?? `${id}:${i}`} id={c.id ?? `${id}:${i}`} data={c} lit={lit} onSelect={onSelect} arriveFrom={arriveFrom} />
         ))}
+        {emptySlots(id, data.empty)}
       </div>
     );
   }
   return (
     <div
       data-flip-id={id}
-      className={cx('zk-zone', lp.className, className)}
+      className={cx('zk-zone', data.size === 'small' && 'zk-zone-small', lp.className, className)}
       style={style}
       role={lp.role}
       tabIndex={lp.tabIndex}

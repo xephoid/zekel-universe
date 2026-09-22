@@ -16,6 +16,9 @@ export interface CardData {
   badges?: string[];
   /** Universe addition: a second line under the label. */
   subtitle?: string;
+  /** Universe addition: what playing this card costs, drawn as a pip in the
+   *  corner rather than as one badge among many. */
+  cost?: string | number;
   /** Universe addition: art for the face. */
   artUrl?: string;
   /**
@@ -33,6 +36,19 @@ export interface CardZoneData {
   cards?: CardData[];
   /** Hidden pile: no cards, just how many. */
   countOnly?: number;
+  /**
+   * Universe addition: `small` draws the cards as name chips rather than
+   * faces, for a zone whose job is to show a shape (Cybernoir's case file)
+   * rather than let you read a card.
+   */
+  size?: 'small';
+  /**
+   * Universe addition: how many empty slots to draw after the cards. A zone
+   * whose shape is part of the game — Cybernoir's thirteen evidence slots,
+   * visible from turn one — says what is still missing, instead of the zone
+   * growing out of nothing.
+   */
+  empty?: number;
 }
 
 /** <zekel-tableau>: a player board with stat rows and nested zones. */
