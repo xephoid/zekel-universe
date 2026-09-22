@@ -330,11 +330,30 @@ export function Track({ id, data, lit, onSelect, className, style }: PrimitivePr
   return (
     <div data-flip-id={id} className={className} style={style}>
       {data.label && <div className="zk-zone-label">{data.label}</div>}
-      <div className="zk-track">
-        {data.spaces.map((s) => {
+      <div className={cx('zk-track', data.pieceShape === 'named' && 'named')}>
+        {data.spaces.map((s, si) => {
           const spaceId = `${id}:${s.index}`;
           const isLit = lit?.includes(spaceId) ?? false;
           const lp = litProps(isLit, () => onSelect?.({ component: 'track', id: spaceId, label: s.label ?? String(s.index) }));
+          const named = data.pieceShape === 'named';
+          if (named) {
+            // A space that holds a stack of face-up cards: who is standing on
+            // it is the point, so they are named rather than drawn as dots.
+            return (
+              <div key={String(s.index)} className="zk-track-slot-wrap">
+                {data.arrows && si > 0 && <span className="zk-track-arrow" aria-hidden="true">→</span>}
+                <div className={cx('zk-track-slot', (s.pieces?.length ?? 0) > 0 && 'filled')}>
+                  <div className="zk-track-slot-name">{s.index}</div>
+                  {(s.pieces ?? []).length > 0
+                    ? (s.pieces ?? []).map((p) => (
+                      <span key={p.label} className="zk-track-card" data-flip-id={`${id}:piece:${p.label}`}
+                        style={{ borderLeftColor: themeColor(p.colorKey ?? p.label) }}>{p.label}</span>
+                    ))
+                    : <span className="zk-track-slot-empty">{s.label ?? 'empty'}</span>}
+                </div>
+              </div>
+            );
+          }
           return (
             <div key={String(s.index)} className={cx('zk-track-space', s.filled && 'filled')}>
               {markersAt(s.index).map((m) => (

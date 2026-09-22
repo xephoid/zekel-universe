@@ -672,8 +672,18 @@ Still open:
   as a grey pill. Checked on three games. The table still differs from the
   artboards in two ways that are not styling, both written up in
   `docs/games/cybernoir-2127-build.md`: the city and the verb bar. The city is
-  now settled — see below. The verb bar is a strip where the design is a
-  column of rows with costs and notes, and is the last real difference.
+  now settled — see below. **DECIDED: the verb bar stays a strip.** The design
+  has it as a column of rows feeding a detail panel; the cards themselves are
+  the interface instead, and the effort went there. A card in hand now lights
+  wherever it can be played — it was named rather than indexed, so the
+  Detective could tap a region of the city to play a Location but not the card
+  holding it — and a tap on a card means every move that names it. The strip
+  stays as the way to reach a verb that is not a card.
+- **A track's spaces can hold named cards.** Cybernoir's jail is "3 spaces in
+  a line, each holding a stack of face-up POI cards; arrows between spaces",
+  and it was drawn as anonymous dots with the names in tooltips.
+  `pieceShape: 'named'` draws what stands on a space as named chips in a
+  labelled slot, and `arrows` draws the line between them. Both default off.
 - **DECIDED: Cybernoir's city is a map.** It was never the wrong primitive.
   The game reference maps it to Map and the Primitives component sheet says
   "Cybernoir's 19 locations are a map"; the table artboard draws the same map

@@ -105,6 +105,16 @@ export interface TrackData {
   spaces: TrackSpace[];
   /** Markers pointing at a space from above (time/reputation style). */
   markers?: { label: string; colorKey?: string; at: number | string }[];
+  /**
+   * Universe addition: `named` draws what stands on a space as a stack of
+   * named chips rather than anonymous pawns — Cybernoir's jail, whose three
+   * slots each hold a stack of face-up cards, and where who is in them is
+   * the whole point. `pawn` is the default.
+   */
+  pieceShape?: 'pawn' | 'named';
+  /** Universe addition: draw an arrow between spaces, for a track whose
+   *  pieces are carried along it rather than moved by the player. */
+  arrows?: boolean;
 }
 
 /** <zekel-pool>: a supply of counted things. */

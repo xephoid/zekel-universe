@@ -818,6 +818,53 @@ describe('cybernoir-2127 glue', () => {
     expect(g.litParts(inp)).not.toContain('cn:person:anansi-the-spider');
   });
 
+  it('lights a card in hand wherever it can be played, for either seat', () => {
+    // The Detective's Locations: the card in hand lights, not only the region.
+    const det = { ...CN_VIEW, role: 'detective', hideout: null, location_hand: ['Shipyard', 'The Junction'], informants: [] };
+    const play = { move_id: 'pl', description: 'Play Shipyard', move: { type: 'play_location', location_name: 'Shipyard' } };
+    const detIn = input(det, [play], { reference: CN_REFERENCE });
+    const lit = g.litParts(detIn);
+    expect(lit).toContain('cn:hand:0:Shipyard');
+    expect(lit).toContain('cn:loc:shipyard');
+    expect(lit).not.toContain('cn:hand:1:The Junction');
+    // And tapping the card in hand means that move.
+    expect(movesForSelect(g, { component: 'card', id: 'cn:hand:0:Shipyard', label: 'Shipyard' }, detIn).map((m) => m.move_id))
+      .toEqual(['pl']);
+
+    // The Hacker's Contacts, the same way.
+    const hakIn = input(CN_VIEW, [
+      { move_id: 'pp', description: 'Play Blackice (2 AP)', move: { type: 'play_person', person_name: 'Blackice' } },
+    ], { reference: CN_REFERENCE });
+    expect(g.litParts(hakIn)).toContain('cn:hand:0:Blackice');
+    expect(movesForSelect(g, { component: 'card', id: 'cn:hand:0:Blackice', label: 'Blackice' }, hakIn).map((m) => m.move_id))
+      .toEqual(['pp']);
+  });
+
+  it('names who is in each jail slot, rather than drawing them as dots', () => {
+    const held = {
+      ...CN_VIEW,
+      jail: {
+        slot_1_booked: ['Blackice'],
+        slot_2_processing: [],
+        slot_3_release_pending_then_freed: ['Anansi the Spider', 'Eddie the Doorman'],
+      },
+    };
+    const jail = g.plan(input(held, [], { reference: CN_REFERENCE }))!.board.find((z) => z.id === 'cn:jail')!;
+    const d = jail.data as TrackData;
+    expect(d.label).toBe('Jail · 3 held');
+    expect(d.pieceShape).toBe('named');
+    expect(d.arrows).toBe(true);
+    expect(d.spaces.map((sp) => [sp.index, sp.filled, (sp.pieces ?? []).map((p) => [p.label, p.colorKey])])).toEqual([
+      ['Booked', true, [['Blackice', 'gang_1']]],
+      ['Processing', false, []],
+      ['Release pending', true, [['Anansi the Spider', 'gang_2'], ['Eddie the Doorman', 'none']]],
+    ]);
+    // An empty jail says so rather than showing three bare slots.
+    const none = { ...CN_VIEW, jail: { slot_1_booked: [], slot_2_processing: [], slot_3_release_pending_then_freed: [] } };
+    const empty = g.plan(input(none, [], { reference: CN_REFERENCE }))!.board.find((z) => z.id === 'cn:jail')!;
+    expect((empty.data as TrackData).label).toBe('Jail · nobody held');
+  });
+
   it('asks what happens to each informant at upkeep, with nothing preselected', () => {
     const det = {
       ...CN_VIEW, role: 'detective', hideout: null, location_hand: [],

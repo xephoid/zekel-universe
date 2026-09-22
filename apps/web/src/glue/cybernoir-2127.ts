@@ -130,6 +130,20 @@ function locationCard(id: string, label: string, locs: Loc[], reference: GameRef
   };
 }
 
+/** The locations a move names, however it names them. */
+function namedLocations(m: LegalMove): string[] {
+  const out: string[] = [];
+  for (const key of ['location_name', 'target_location', 'new_location_name']) {
+    const v = asStr(m.move[key]);
+    if (v) out.push(v);
+  }
+  for (const v of asArr(m.move['discard_locations'])) {
+    const name = asStr(v);
+    if (name) out.push(name);
+  }
+  return out;
+}
+
 /** The people a move names, however it names them. */
 function namedPeople(m: LegalMove): string[] {
   const out: string[] = [];
@@ -538,14 +552,21 @@ export const cybernoirGlue: GlueModule = {
     const slots: Array<[string, string]> = [
       ['slot_1_booked', 'Booked'], ['slot_2_processing', 'Processing'], ['slot_3_release_pending_then_freed', 'Release pending'],
     ];
+    // Three slots in a line with arrows between them, each holding a stack of
+    // face-up cards. Who is in them is the whole point, so they are named.
+    const jailed = slots.reduce((n, [key]) => n + asArr(jail[key]).length, 0);
     board.push({
       kind: 'track', id: 'cn:jail',
       data: {
-        label: 'Jail',
+        label: jailed > 0 ? `Jail · ${jailed} held` : 'Jail · nobody held',
+        pieceShape: 'named', arrows: true,
         spaces: slots.map(([key, label]) => ({
           index: label,
           filled: asArr(jail[key]).length > 0,
-          pieces: asArr(jail[key]).map((who) => ({ label: asStr(who), colorKey: 'detective' })),
+          pieces: asArr(jail[key]).map((who) => ({
+            label: asStr(who),
+            colorKey: people.get(asStr(who))?.affiliation || 'none',
+          })),
         })),
       },
     });
@@ -708,23 +729,21 @@ export const cybernoirGlue: GlueModule = {
     }
     const lit: string[] = [];
     const hand = shapeHas(input.view, 'role') ? asArr(input.view['location_hand'] ?? input.view['hand']) : [];
-    // The Hacker's own cards are named, not indexed: every move that names a
-    // person lights the card in hand with that name. Without this the hand is
-    // dark even while the engine is offering every card in it.
-    const inHand = (who: string): string | null => {
-      const i = hand.findIndex((h) => asStr(h) === who);
-      return i < 0 ? null : `cn:hand:${i}:${who}`;
+    // A card in hand is named, not indexed — by a person for the Hacker, by a
+    // location for the Detective. Every move that names one lights the card
+    // holding it, so a playable card can be tapped where it is rather than
+    // only wherever else it happens to appear.
+    const inHand = (what: string): string | null => {
+      const i = hand.findIndex((h) => asStr(h) === what);
+      return i < 0 ? null : `cn:hand:${i}:${what}`;
     };
     for (const m of input.legalMoves) {
-      for (const who of namedPeople(m)) {
-        const card = inHand(who);
+      const t = asStr(m.move['type']);
+      for (const what of [...namedPeople(m), ...namedLocations(m)]) {
+        const card = inHand(what);
         if (card) lit.push(card);
       }
-    }
-    for (const m of input.legalMoves) {
-      const t = asStr(m.move['type']);
-      const loc = asStr(m.move['location_name'] ?? m.move['target_location'] ?? m.move['new_location_name']);
-      if (loc) lit.push(locId(loc));
+      for (const loc of namedLocations(m)) lit.push(locId(loc));
       if (typeof m.move['hand_index'] === 'number') lit.push(`cn:hand:${m.move['hand_index']}:${asStr(hand[m.move['hand_index']])}`);
       const inf = asStr(m.move['target_informant']);
       if ((t === 'reveal_informant' || t === 'informant_removal_choice') && inf) lit.push(`cn:informant:${inf}`);
@@ -858,7 +877,8 @@ export const cybernoirGlue: GlueModule = {
     if (person.length > 0) return person;
     const inHand = /^cn:hand:\d+:(.+)$/.exec(sel.id);
     if (inHand) {
-      const named = input.legalMoves.filter((m) => namedPeople(m).includes(inHand[1]!));
+      const named = input.legalMoves.filter((m) =>
+        namedPeople(m).includes(inHand[1]!) || namedLocations(m).includes(inHand[1]!));
       if (named.length > 0) return named;
     }
     const one = cybernoirGlue.moveForSelect(sel, input);
