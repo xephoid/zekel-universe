@@ -157,9 +157,12 @@
 
 /* track */
 .zk-track { display: flex; flex-wrap: wrap; gap: 2px 8px; align-items: flex-end; padding-top: 20px; }
-.zk-track-space { position: relative; width: 40px; text-align: center; }
+/* A space is a circle when its content is short — a number, a letter — and
+   grows into a pill when it holds a word, so a track can carry values as well
+   as positions (Cybernoir's clue rail reads "Downtown", not "D…"). */
+.zk-track-space { position: relative; min-width: 40px; text-align: center; }
 .zk-track-cell {
-  width: 34px; height: 34px; margin: 0 auto; border-radius: 50%;
+  min-width: 34px; height: 34px; padding: 0 10px; margin: 0 auto; border-radius: 17px;
   border: 2px solid var(--border); background: var(--bg-raised);
   display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600;
 }

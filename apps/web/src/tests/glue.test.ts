@@ -4,7 +4,7 @@
 
 import { describe, expect, it } from 'vitest';
 import type { GameReferenceResponse } from '@universe/shared';
-import type { CardZoneData, MapData, TableauData, TrackData } from '@universe/primitives';
+import type { CardZoneData, MapData, PoolData, TableauData, TrackData } from '@universe/primitives';
 import { GLUES } from '../glue';
 import type { GlueInput, TablePlan, Zone } from '../glue';
 import { readFileSync } from 'node:fs';
@@ -559,8 +559,10 @@ const CN_VIEW = {
   board: ['Dark City Central Station', 'Xistential Club'],
   informants_facedown_count: 1, informants_revealed: [{ person: 'Anansi the Spider' }],
   jail: { slot_1_booked: ['Blackice'], slot_2_processing: [], slot_3_release_pending_then_freed: [] },
-  truthful_clues: { weapon: 'not revolver' }, truthful_values: {},
-  negative_clues: ['not Ada'], safehouse_burned: false, hideout_card_removed: false,
+  truthful_clues: { borough: true, population: false, affiliation: false },
+  truthful_values: { borough: 'downtown' },
+  negative_clues: ['population_0', 'affiliation_gang_1'],
+  safehouse_burned: false, hideout_card_removed: false,
   evidence: { weapon: null, witnesses: ['Eddie the Doorman'], motive_set_1: [], motive_set_2: [], motive_set_3: [], motive_set_4: [] },
   contacts_discard: ['The Weapon'],
   detective: { location_deck_size: 12, location_hand_size: 3, location_discard: ['Shipyard'], poi_deck_size: 30, mid_game_guess_spent: false, ap: 3, overclock_used: false },
@@ -586,6 +588,16 @@ const CN_REFERENCE: GameReferenceResponse = {
       { name: 'Anansi the Spider', home_location: 'The Junction' },
       { name: 'Eddie the Doorman', home_location: 'Xistential Club' },
     ],
+    affiliations: [
+      { id: 'none', name: 'None' },
+      { id: 'corp_1', name: 'OmniSuperUltra Corp' },
+      { id: 'gang_1', name: 'Iceden Collective' },
+      { id: 'gang_2', name: 'Crimson Clan' },
+    ],
+    boroughs: [
+      { id: 'downtown', name: 'Downtown' },
+      { id: 'boonies', name: 'Boonies' },
+    ],
   },
 };
 
@@ -608,11 +620,52 @@ describe('cybernoir-2127 glue', () => {
     const map = plan.board.find((z) => z.kind === 'map')!.data as MapData;
     expect(map.nodes).toHaveLength(4);
     expect(map.nodes.find((n) => n.id === 'cn:loc:dark-city-central-station')!.badges).toContain('played');
+    // Every location carries its three printed facts, in the game's own words:
+    // "Gang 1" is an alias the engine happens to list, not the faction's name.
+    expect(map.nodes.find((n) => n.id === 'cn:loc:the-junction')!.badges)
+      .toEqual(['safehouse', 'Boonies', '2 residents', 'Iceden Collective']);
+    expect(map.nodes.find((n) => n.id === 'cn:loc:dark-city-central-station')!.badges)
+      .toEqual(['played', 'Downtown', '3 residents']);
+    expect(JSON.stringify(plan)).not.toContain('Gang ');
+    // Without the reference data there is no name to print, so the id is put
+    // into words rather than shown raw — and never guessed at.
+    const bare = g.plan(input(CN_VIEW, [], { reference: { ...CN_REFERENCE, referenceData: { locations: (CN_REFERENCE.referenceData as { locations: unknown[] }).locations } } }))!;
+    const bareMap = bare.board.find((z) => z.kind === 'map')!.data as MapData;
+    expect(bareMap.nodes.find((n) => n.id === 'cn:loc:the-junction')!.badges)
+      .toEqual(['safehouse', 'Boonies', '2 residents', 'Gang 1']);
     expect(map.nodes.find((n) => n.id === 'cn:loc:the-junction')!.pieces).toEqual([{ label: 'safehouse', colorKey: 'safehouse' }]);
     expect(ids(plan.bench)).toEqual(['cn:hacker', 'cn:hand']);
     // Evidence shows a count, never a denominator the engine does not publish.
     expect((plan.board.find((z) => z.id === 'cn:evidence')!.data as CardZoneData).label).toBe('Evidence (1)');
   });
+  it('draws the clue rail both seats share: a slot per category, and the ruled out tokens', () => {
+    const plan = g.plan(input(CN_VIEW, [], { reference: CN_REFERENCE }))!;
+    const rail = plan.board.find((z) => z.id === 'cn:clues')!;
+    expect(rail.span).toBe('full');
+    expect((rail.data as TrackData).spaces).toEqual([
+      { index: 'Borough', label: 'Downtown', filled: true },
+      { index: 'Population', label: undefined, filled: false },
+      { index: 'Affiliation', label: undefined, filled: false },
+    ]);
+    // A ruled-out token is a category and a printed value, not "NOT ×4".
+    const nots = plan.board.find((z) => z.id === 'cn:not-clues')!;
+    expect((nots.data as PoolData).label).toBe('Ruled out (2)');
+    expect((nots.data as PoolData).items.map((i) => i.label))
+      .toEqual(['Population 0', 'Affiliation Iceden Collective']);
+    // Both seats see the same rail: it is public.
+    const det = g.plan(input({ ...CN_VIEW, role: 'detective', hideout: null, location_hand: [] }, [], { reference: CN_REFERENCE }))!;
+    expect(det.board.find((z) => z.id === 'cn:clues')!.data).toEqual(rail.data);
+  });
+
+  it('draws an empty rail before any clue is given, and says so', () => {
+    const fresh = { ...CN_VIEW, truthful_clues: {}, truthful_values: {}, negative_clues: [] };
+    const plan = g.plan(input(fresh, [], { reference: CN_REFERENCE }))!;
+    expect((plan.board.find((z) => z.id === 'cn:clues')!.data as TrackData).spaces.every((sp) => !sp.filled)).toBe(true);
+    const nots = plan.board.find((z) => z.id === 'cn:not-clues')!.data as PoolData;
+    expect(nots.label).toBe('Ruled out — nothing yet');
+    expect(nots.items).toEqual([]);
+  });
+
   it('lights locations named by play_location moves and informants by ordinal', () => {
     const moves = [
       { move_id: 'pl', description: 'Play Dark City Central Station', move: { type: 'play_location', location_name: 'Dark City Central Station' } },
@@ -635,7 +688,7 @@ describe('cybernoir-2127 glue', () => {
     expect(tap?.move_id).toBe('report_hideout');
     const sheet = g.formFor!(tap!, inp)!;
     expect(sheet.title).toBe('Hide in The Junction?');
-    expect(sheet.help).toContain('Boonies · 2 residents · Gang 1');
+    expect(sheet.help).toContain('Boonies · 2 residents · Iceden Collective');
     expect(sheet.help).toContain('Blackice, Anansi the Spider live here');
     expect(sheet.fields).toEqual([]);
     expect(sheet.build({})).toEqual({ type: 'report_hideout', location_name: 'The Junction' });
@@ -653,7 +706,7 @@ describe('cybernoir-2127 glue', () => {
     expect(sheet.fields.map((f) => f.key)).toEqual(['location_name']);
     const options = (sheet.fields[0] as { options: Array<{ value: string; hint?: string }> }).options;
     expect(options.map((o) => o.value)).toHaveLength(4);
-    expect(options.find((o) => o.value === 'Shipyard')!.hint).toBe('Boonies · 0 residents · Corp 1');
+    expect(options.find((o) => o.value === 'Shipyard')!.hint).toBe('Boonies · 0 residents · OmniSuperUltra Corp');
     // Nothing is preselected, and a location the engine never named is refused.
     expect(sheet.build({})).toBeNull();
     expect(sheet.build({ location_name: 'Nowhere' })).toBeNull();
@@ -690,7 +743,7 @@ describe('cybernoir-2127 glue', () => {
     const quiet = g.plan(input(factsOnly, [], { reference: CN_REFERENCE }))!;
     const quietMap = quiet.board.find((z) => z.kind === 'map')!.data as MapData;
     expect(quietMap.nodes.every((n) => (n.pieces ?? []).length === 0)).toBe(true);
-    expect(panel(quiet).find((st) => st.label === 'Safehouse')!.value).toBe('Boonies · Gang 1');
+    expect(panel(quiet).find((st) => st.label === 'Safehouse')!.value).toBe('Boonies · Iceden Collective');
 
     // The Detective's view carries no hideout at all: no mark, no stat.
     const det = g.plan(input({ ...CN_VIEW, role: 'detective', hideout: null, location_hand: [] }, [], { reference: CN_REFERENCE }))!;

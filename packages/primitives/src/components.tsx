@@ -270,6 +270,11 @@ export function Track({ id, data, lit, onSelect, className, style }: PrimitivePr
 
 const MAX_TOKENS_DRAWN = 12;
 
+// A pool of one-offs — named things that are each on the table once, like
+// Cybernoir's ruled-out clue tokens — reads as names, so a count of one is
+// left off. Same rule the card already uses for its own count.
+
+
 export function Pool({ id, data, lit, onSelect, className, style }: PrimitiveProps<PoolData>) {
   return (
     <div data-flip-id={id} className={cx('zk-pool', className)} style={style}>
@@ -290,7 +295,7 @@ export function Pool({ id, data, lit, onSelect, className, style }: PrimitivePro
                     style={{ background: themeColor(it.colorKey ?? it.label) }} />
                 ))}
               </span>
-              {it.label} <b>×{it.count}</b>
+              {it.label}{it.count > 1 && <> <b>×{it.count}</b></>}
             </span>
           );
         })}

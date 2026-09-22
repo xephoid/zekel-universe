@@ -647,7 +647,15 @@ Still open:
   them).
 - Cybernoir 2127's glue compiles against the primitive contract and passes
   fixture tests and the two-human privacy spec, but a full game has not been
-  played through in the browser.
+  played through in the browser. The first two items of the table's design
+  pass have landed (printed names instead of ids; the clue rail both seats
+  share); six remain, listed in `docs/games/cybernoir-2127-build.md`. Two
+  library changes came with them, both general: a track space grows from a
+  circle into a pill when it holds a word, so a track can carry values as well
+  as positions, and a pool of one-offs leaves off a count of one. Left open on
+  purpose: whether the table may count how many Locations a clue still leaves
+  standing. That is arithmetic over public facts, but it is also a rule, so it
+  waits for the clue-giving form.
 - **Settled: Cybernoir's hideout is the Hacker's choice.** The engine used to
   pick it at session creation, because `createInitialState` auto-completed
   setup whenever both seats were *tracked* and Universe marks human seats

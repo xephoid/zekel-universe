@@ -65,12 +65,72 @@ function residentsOf(reference: GameReferenceResponse | null, locName: string): 
     .filter(Boolean);
 }
 
+/**
+ * The printed names behind the engine's ids. `gang_1` is Iceden Collective,
+ * not "Gang 1" — that is one of its aliases, and title-casing the id only
+ * looked right by accident. Every name on the table comes from the game's own
+ * reference data; an id the data does not carry is shown in words rather than
+ * raw, and never guessed at.
+ */
+interface Names { affiliation(id: string): string; borough(id: string): string }
+
+function names(reference: GameReferenceResponse | null): Names {
+  const rd = reference?.referenceData;
+  const table = (key: string): Map<string, string> => {
+    const out = new Map<string, string>();
+    const rows = isObj(rd) && Array.isArray(rd[key]) ? rd[key] : [];
+    for (const r of rows) {
+      if (isObj(r) && typeof r['id'] === 'string' && typeof r['name'] === 'string') out.set(r['id'], r['name']);
+    }
+    return out;
+  };
+  const affiliations = table('affiliations');
+  const boroughs = table('boroughs');
+  return {
+    affiliation: (id) => affiliations.get(id) ?? words(id),
+    borough: (id) => boroughs.get(id) ?? words(id),
+  };
+}
+
+/** How many people live at a location, in words. */
+function residentCount(population: number | undefined): string {
+  return typeof population === 'number' ? `${population} resident${population === 1 ? '' : 's'}` : '';
+}
+
+/** The three facts a clue can name, in the order the printed case board has. */
+const CLUE_CATEGORIES: Array<{ key: string; label: string }> = [
+  { key: 'borough', label: 'Borough' },
+  { key: 'population', label: 'Population' },
+  { key: 'affiliation', label: 'Affiliation' },
+];
+
+/**
+ * A clue token's value in the game's own words. The engine publishes a
+ * truthful value as the bare fact and a ruled-out one as a token id like
+ * `affiliation_gang_1`, so the id is split on its category and the rest read
+ * through the same printed names the map uses.
+ */
+function clueValue(category: string, value: unknown, n: Names): string {
+  if (category === 'borough') return n.borough(asStr(value));
+  if (category === 'affiliation') return n.affiliation(asStr(value));
+  // Population is the bare number: the slot it sits in already says what it
+  // counts, and a NOT token reads "Population 0".
+  return typeof value === 'number' ? String(value) : asStr(value);
+}
+
+/** A negative token id (`population_0`) as its category and printed value. */
+function negativeClue(tokenId: string, n: Names): { category: string; value: string } | null {
+  const cat = CLUE_CATEGORIES.find((c) => tokenId.startsWith(`${c.key}_`));
+  if (!cat) return null;
+  return { category: cat.label, value: clueValue(cat.key, tokenId.slice(cat.key.length + 1), n) };
+}
+
 /** One line of a location's three printed facts, for a hint under its name. */
-function locLine(l: Loc): string {
+function locLine(l: Loc, n: Names): string {
   return [
-    words(l.borough),
-    typeof l.population === 'number' ? `${l.population} resident${l.population === 1 ? '' : 's'}` : '',
-    l.affiliation && l.affiliation !== 'none' ? words(l.affiliation) : 'no affiliation',
+    n.borough(l.borough),
+    residentCount(l.population),
+    l.affiliation && l.affiliation !== 'none' ? n.affiliation(l.affiliation) : 'no affiliation',
   ].filter(Boolean).join(' · ');
 }
 
@@ -110,6 +170,7 @@ export const cybernoirGlue: GlueModule = {
     const hideoutDesc = isObj(hideoutRaw) ? hideoutRaw : null;
     const hideout = hideoutDesc ? asStr(hideoutDesc['location_name'], '') : asStr(hideoutRaw, '');
 
+    const name = names(input.reference);
     const locs = locations(input.reference, view);
     const boroughs = [...new Set(locs.map((l) => l.borough))];
     const nodes: MapNode[] = [];
@@ -128,7 +189,14 @@ export const cybernoirGlue: GlueModule = {
           x: 8 + (cols <= 1 ? 42 : (col / (cols - 1)) * 84),
           y: yTop + 14 + row * ((100 / boroughs.length) - 22),
           colorKey: isPlayed ? 'played' : b,
-          badges: [...(isPlayed ? ['played'] : []), ...(isHideout ? ['safehouse'] : []), ...(l.affiliation && l.affiliation !== 'none' ? [words(l.affiliation)] : [])],
+          badges: [
+            ...(isPlayed ? ['played'] : []),
+            ...(isHideout ? ['safehouse'] : []),
+            // The three printed facts a clue can name, in the game's own words.
+            name.borough(l.borough),
+            residentCount(l.population),
+            ...(l.affiliation && l.affiliation !== 'none' ? [name.affiliation(l.affiliation)] : []),
+          ].filter(Boolean),
           pieces: isHideout ? [{ label: 'safehouse', colorKey: 'safehouse' }] : [],
         });
       });
@@ -164,8 +232,35 @@ export const cybernoirGlue: GlueModule = {
     }
     board.push({ kind: 'card-zone', id: 'cn:evidence', data: { label: `Evidence (${evCards.length})`, mode: 'row', cards: evCards } });
 
-    const neg = asArr(view['negative_clues']);
-    board.push({ kind: 'pool', id: 'cn:not-clues', data: { label: 'NOT tokens', items: [{ label: 'NOT', count: neg.length, colorKey: 'not' }] } });
+    // The clue rail: what the Detective knows. Three truthful slots, one per
+    // category, each holding its revealed value or drawn empty, and the ruled
+    // out tokens beside them. Public, and the same for both seats — the
+    // deduction the whole game turns on, which the table used to say nothing
+    // about beyond "NOT ×4".
+    const revealed = isObj(view['truthful_clues']) ? view['truthful_clues'] : {};
+    const values = isObj(view['truthful_values']) ? view['truthful_values'] : {};
+    board.push({
+      kind: 'track', id: 'cn:clues', span: 'full',
+      data: {
+        label: 'What the Detective knows',
+        spaces: CLUE_CATEGORIES.map((c) => ({
+          index: c.label,
+          label: revealed[c.key] ? clueValue(c.key, values[c.key], name) : undefined,
+          filled: !!revealed[c.key],
+        })),
+      },
+    });
+
+    const ruledOut = asArr(view['negative_clues'])
+      .map((t) => negativeClue(asStr(t), name))
+      .filter((x): x is { category: string; value: string } => x !== null);
+    board.push({
+      kind: 'pool', id: 'cn:not-clues', span: 'full',
+      data: {
+        label: ruledOut.length > 0 ? `Ruled out (${ruledOut.length})` : 'Ruled out — nothing yet',
+        items: ruledOut.map((r) => ({ label: `${r.category} ${r.value}`, count: 1, colorKey: 'not' })),
+      },
+    });
 
     const det = isObj(view['detective']) ? view['detective'] : {};
     const hak = isObj(view['hacker']) ? view['hacker'] : {};
@@ -183,7 +278,7 @@ export const cybernoirGlue: GlueModule = {
       // Named when the engine names it; otherwise the facts the Hacker does have.
       ...(role === 'hacker' && (hideout || hideoutDesc)
         ? [{ label: 'Safehouse', value: hideout
-          || [asStr(hideoutDesc!['borough']), asStr(hideoutDesc!['affiliation'])].filter((x) => x && x !== 'none').map(words).join(' · ')
+          || [name.borough(asStr(hideoutDesc!['borough'])), asStr(hideoutDesc!['affiliation']) && asStr(hideoutDesc!['affiliation']) !== 'none' ? name.affiliation(asStr(hideoutDesc!['affiliation'])) : ''].filter(Boolean).join(' · ')
           || 'hidden' }]
         : []),
       { label: 'Contacts deck', value: asNum(hak['contacts_deck_size']) },
@@ -303,6 +398,7 @@ export const cybernoirGlue: GlueModule = {
     if (move.move['type'] !== 'report_hideout' || move.move['location_name'] !== '') return null;
     const locs = locations(input.reference, isObj(input.view) ? input.view : {});
     if (locs.length === 0) return null;
+    const name = names(input.reference);
     const tapped = asStr(input.memory.get(TAPPED_HIDEOUT));
     input.memory.delete(TAPPED_HIDEOUT);
     const one = locs.find((l) => l.name === tapped);
@@ -310,7 +406,7 @@ export const cybernoirGlue: GlueModule = {
       const who = residentsOf(input.reference, one.name);
       return {
         title: `Hide in ${one.name}?`,
-        help: `${locLine(one)}. ${who.length > 0
+        help: `${locLine(one, name)}. ${who.length > 0
           ? `${who.join(', ')} live here and start in your hand.`
           : 'Nobody lives here, so you start on three drawn Contacts.'}`,
         fields: [],
@@ -325,7 +421,7 @@ export const cybernoirGlue: GlueModule = {
       help: 'You hide here all game and never move unless you burn the safehouse. The Detective wins by naming it.',
       fields: [{
         kind: 'choice', key: 'location_name', label: 'Location',
-        options: locs.map((l) => ({ value: l.name, label: l.name, hint: locLine(l) })),
+        options: locs.map((l) => ({ value: l.name, label: l.name, hint: locLine(l, name) })),
       }],
       template: move,
       editableKeys: ['location_name'],

@@ -190,6 +190,14 @@ const CN_REFERENCE = {
       { name: 'Zero Kelvin', home_location: 'The Back Alley' },
       { name: 'Frostbyte', home_location: 'The Back Alley' },
     ],
+    affiliations: [
+      { id: 'gang_1', name: 'Iceden Collective' },
+      { id: 'gang_3', name: 'Chimera' },
+    ],
+    boroughs: [
+      { id: 'downtown', name: 'Downtown' },
+      { id: 'boonies', name: 'Boonies' },
+    ],
   },
 };
 const CN_TABLE = {
@@ -239,7 +247,7 @@ describe("cybernoir's hideout, chosen on the map", () => {
 
     await act(async () => { fireEvent.click(alley); });
     const sheet = await screen.findByRole('dialog', { name: 'Hide in The Back Alley?' });
-    expect(sheet.textContent).toContain('Downtown · 2 residents · Gang 1');
+    expect(sheet.textContent).toContain('Downtown · 2 residents · Iceden Collective');
     expect(sheet.textContent).toContain('Zero Kelvin, Frostbyte live here and start in your hand.');
     // The tap opened the sheet and nothing else: the secret is still unsent.
     expect(moves()).toHaveLength(0);
