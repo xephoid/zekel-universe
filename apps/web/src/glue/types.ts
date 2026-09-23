@@ -193,6 +193,13 @@ export interface MoveForm {
   editableKeys: string[];
   /** the move from the answers, or null while any answer is missing */
   build(answers: Record<string, unknown>): Record<string, unknown> | null;
+  /**
+   * What the answers so far add up to, shown above the send button and kept
+   * current as they change: the price of the move they make, in the engine's
+   * own words. Null while there is nothing to say yet. A glue must read this
+   * off the engine's own move, never work it out.
+   */
+  summarize?(answers: Record<string, unknown>): string | null;
   submitLabel?: string;
 }
 

@@ -522,10 +522,24 @@ press Overclock while a question was still on screen. A sheet is a modal now:
 it takes focus, keeps Tab inside, closes on Escape, and gives focus back to
 whatever opened it.
 
-Still to do from that game, in order: the engine publishing a cost and an
-effect line per move, so a button can say what it costs without Universe
-knowing; teaching made small and contextual; large combination lists turned
-into guided choices; and the map made better for deduction.
+**Costs and effects are beside the decision now.** Draw, Overclock and Burn
+hid their price in a tooltip, and a Contact said "Hand Discard", which is an
+id in title case. Both are rules, so the engine publishes them: an optional
+`cost` on every legal move, in printed words — "1 AP", "3 AP, once per game",
+"free; unspent AP is lost" — and a line per ability in the reference data.
+
+The price now sits on the verb button, leads the confirmation before the
+sentence, and — through a new `summarize` on a move form — shows what an
+upkeep answer costs while you are still answering, read off the engine's own
+move for that combination. A move the engine does not price shows no price;
+Universe invents none and parses none out of a sentence.
+
+This closes two of the four asks of the engine. The two left are the standing
+candidate count and the Detective's crossed-off locations.
+
+Still to do from that game, in order: teaching made small and contextual;
+large combination lists turned into guided choices; and the map made better
+for deduction.
 
 ## Out of scope
 

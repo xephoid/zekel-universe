@@ -26,7 +26,7 @@ export class MoveError extends Error {
     message: string,
     public readonly reason?: string,
     public readonly lesson?: string,
-    public readonly legalMoves?: Array<{ move_id?: string; description?: string; move: Record<string, unknown> }>,
+    public readonly legalMoves?: Array<{ move_id?: string; description?: string; move: Record<string, unknown>; cost?: string }>,
   ) {
     super(message);
     this.name = 'MoveError';

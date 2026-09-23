@@ -245,6 +245,13 @@ export interface LegalMove {
   move_id?: string;
   description?: string;
   move: Record<string, unknown>;
+  /**
+   * What taking this move spends, in the game's own printed words — "4 AP",
+   * "free, once per game". The engine supplies it; a game with no prices
+   * leaves it out. Universe prints it beside the decision and never parses a
+   * cost out of `description` or works one out for itself.
+   */
+  cost?: string;
 }
 
 export interface MoveMenuEntry {

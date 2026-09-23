@@ -599,6 +599,11 @@ const CN_REFERENCE: GameReferenceResponse = {
       { id: 'boonies', name: 'Boonies' },
     ],
     evidence: { weapon: 1, witnesses: 3, motive_sets: 3, motive_set_size: 3, total: 13 },
+    abilities: [
+      { id: 'board_discard', name: 'Board discard', text: 'Discard one Location the Detective has already played from the board.' },
+      { id: 'reveal_informant', name: 'Reveal an informant', text: "Turn one of the Detective's face-down informants face up." },
+      { id: 'witness', name: 'Witness', text: 'No ability of its own. Witnesses are played as Evidence, three at once.' },
+    ],
   },
 };
 
@@ -652,7 +657,9 @@ describe('cybernoir-2127 glue', () => {
     const hand = cards(plan.bench.find((z) => z.id === 'cn:hand'));
     expect(hand[0]).toEqual({
       id: 'cn:hand:0:Blackice', label: 'Blackice', colorKey: 'gang_1',
-      groupKey: 'gang_1', cost: 2, subtitle: 'Board Discard', badges: ['Iceden Collective'],
+      groupKey: 'gang_1', cost: 2,
+      subtitle: 'Discard one Location the Detective has already played from the board.',
+      badges: ['Iceden Collective'],
     });
     // The Weapon is in the Contacts deck but not among the people; it is drawn
     // as itself rather than given facts it does not have.
@@ -844,7 +851,7 @@ describe('cybernoir-2127 glue', () => {
     // Everyone living at a played Location, with the ones already spoken for
     // drawn unlit and saying where they are.
     expect(cards(reach).map((c) => [c.label, c.subtitle, c.colorKey])).toEqual([
-      ['Blackice', 'Board Discard', 'gang_1'],
+      ['Blackice', 'Discard one Location the Detective has already played from the board.', 'gang_1'],
       ['Anansi the Spider', 'your informant', 'out_of_reach'],
     ]);
     // Not the Contact's play cost: that is the Hacker's price, not theirs.
@@ -903,6 +910,46 @@ describe('cybernoir-2127 glue', () => {
     const none = { ...CN_VIEW, jail: { slot_1_booked: [], slot_2_processing: [], slot_3_release_pending_then_freed: [] } };
     const empty = g.plan(input(none, [], { reference: CN_REFERENCE }))!.board.find((z) => z.id === 'cn:jail')!;
     expect((empty.data as TrackData).label).toBe('Jail · nobody held');
+  });
+
+  it("puts the engine's price beside the decision, and never works one out", () => {
+    const det = { ...CN_VIEW, role: 'detective', hideout: null, location_hand: [], informants: [] };
+    const moves = [
+      { move_id: 'a1', description: 'Arrest Blackice at The Junction', cost: '1 AP', move: { type: 'arrest', target_person: 'Blackice' } },
+      { move_id: 'a2', description: 'Arrest Anansi the Spider at The Junction', cost: '1 AP', move: { type: 'arrest', target_person: 'Anansi the Spider' } },
+      { move_id: 'b', description: 'Burn the Safehouse: a very long sentence indeed', cost: '3 AP, once per game', move: { type: 'burn_safehouse' } },
+      { move_id: 'e', description: 'End turn', cost: 'free; unspent AP is lost', move: { type: 'pass_turn' } },
+    ];
+    const inp = input(det, moves, { reference: CN_REFERENCE });
+    const actions = g.plan(inp)!.prompt!.actions;
+    // Several moves behind one verb that share a price still show the price.
+    expect(actions.map((a) => [a.label, a.note])).toEqual([
+      ['Arrest', '1 AP'],
+      ['Burn the safehouse', '3 AP, once per game'],
+      ['End turn', 'free; unspent AP is lost'],
+    ]);
+    // And a confirmation leads with what it costs, then the engine's sentence.
+    expect(g.formFor!(moves[2]!, inp)!.help)
+      .toBe('3 AP, once per game — Burn the Safehouse: a very long sentence indeed');
+    // Without a price from the engine, nothing is invented.
+    const unpriced = [{ move_id: 'x', description: 'End turn', move: { type: 'pass_turn' } }];
+    expect(g.plan(input(det, unpriced, { reference: CN_REFERENCE }))!.prompt!.actions[0]!.note).toBeUndefined();
+  });
+
+  it('shows what an upkeep answer costs, in the engine’s own words', () => {
+    const det = {
+      ...CN_VIEW, role: 'detective', hideout: null, location_hand: [],
+      informants: [{ person: 'Blackice', revealed: false }, { person: 'Anansi the Spider', revealed: true }],
+    };
+    const listed = [
+      { move_id: 'u0', description: 'Release all informants (Blackice, Anansi the Spider)', cost: '1 AP for each informant you keep', move: { type: 'upkeep_choice', keep: [], release: ['Blackice', 'Anansi the Spider'] } },
+      { move_id: 'u1', description: 'Keep Blackice (1 AP); release Anansi the Spider', cost: '1 AP for each informant you keep', move: { type: 'upkeep_choice', keep: ['Blackice'], release: ['Anansi the Spider'] } },
+    ];
+    const form = g.formFor!(listed[1]!, input(det, listed, { reference: CN_REFERENCE }))!;
+    // Nothing to total yet while an answer is missing.
+    expect(form.summarize!({})).toBeNull();
+    expect(form.summarize!({ 'inf.Blackice': 'keep', 'inf.Anansi the Spider': 'release' }))
+      .toBe('Keep Blackice (1 AP); release Anansi the Spider · 1 AP for each informant you keep');
   });
 
   it('asks twice before spending what you only get to spend once', () => {

@@ -141,6 +141,7 @@ export function MoveFormSheet({ form, onSend, onClose, disabled }: {
             </fieldset>
           );
         })}
+        {form.summarize?.(answers) && <p className="form-total">{form.summarize(answers)}</p>}
         <button className="btn" type="submit" disabled={disabled || !built}>{form.submitLabel ?? 'Send'}</button>
       </form>
     </Sheet>

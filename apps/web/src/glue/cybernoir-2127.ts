@@ -71,6 +71,21 @@ function locations(reference: GameReferenceResponse | null, view: Record<string,
 /** One of the game's people, as the engine's reference data prints them. */
 interface Person { name: string; affiliation?: string; home?: string; cost?: number; ability?: string; isWitness: boolean }
 
+/** What each ability does, in the engine's own words. Before the engine
+ *  published these, a card said "Hand Discard", which is an id in title case
+ *  and does not tell you enough to choose. */
+function abilityLines(reference: GameReferenceResponse | null): Map<string, { name: string; text: string }> {
+  const rd = reference?.referenceData;
+  const out = new Map<string, { name: string; text: string }>();
+  if (!isObj(rd) || !Array.isArray(rd['abilities'])) return out;
+  for (const a of rd['abilities']) {
+    if (isObj(a) && typeof a['id'] === 'string') {
+      out.set(a['id'], { name: asStr(a['name'], a['id']), text: asStr(a['text']) });
+    }
+  }
+  return out;
+}
+
 function peopleByName(reference: GameReferenceResponse | null): Map<string, Person> {
   const rd = reference?.referenceData;
   const out = new Map<string, Person>();
@@ -95,9 +110,13 @@ function peopleByName(reference: GameReferenceResponse | null): Map<string, Pers
  * it does. The ability is the engine's own id put into words — the engine
  * publishes no sentence for it, and Universe does not write one.
  */
-function contactCard(id: string, label: string, people: Map<string, Person>, n: Names): CardData {
+function contactCard(
+  id: string, label: string, people: Map<string, Person>, n: Names,
+  abilities?: Map<string, { name: string; text: string }>,
+): CardData {
   const p = people.get(label);
   if (!p) return { id, label, colorKey: 'none' };
+  const ability = p.ability ? abilities?.get(p.ability) : undefined;
   const badges = [
     ...(p.affiliation && p.affiliation !== 'none' ? [n.affiliation(p.affiliation)] : []),
     ...(p.isWitness ? ['Witness'] : []),
@@ -107,7 +126,11 @@ function contactCard(id: string, label: string, people: Map<string, Person>, n: 
     // A big hand folds by faction: the field a Motive set is built from.
     ...(p.affiliation ? { groupKey: p.affiliation } : {}),
     ...(p.cost === undefined ? {} : { cost: p.cost }),
-    ...(p.ability && p.ability !== 'witness' ? { subtitle: words(p.ability) } : {}),
+    // What playing it does, in the engine's words; its id in words only when
+    // the engine has not published a line for it.
+    ...(p.ability && p.ability !== 'witness'
+      ? { subtitle: ability?.text || words(p.ability) }
+      : {}),
     ...(badges.length > 0 ? { badges } : {}),
   };
 }
@@ -177,6 +200,7 @@ function whoYouCanReach(
   reference: GameReferenceResponse | null,
   people: Map<string, Person>,
   n: Names,
+  abilities: Map<string, { name: string; text: string }>,
 ): Zone {
   const played = asArr(view['board']).map((b) => asStr(b));
   const here: string[] = [];
@@ -206,7 +230,7 @@ function whoYouCanReach(
         // Not the Contact's play cost: that is what the HACKER pays for them.
         // What reaching them costs the Detective is in the engine's own words,
         // on the moves the tap offers.
-        const { cost: _hackersPrice, ...card } = contactCard(personId(who), who, people, n);
+        const { cost: _hackersPrice, ...card } = contactCard(personId(who), who, people, n, abilities);
         const at = where.get(who);
         return { ...card, ...(at ? { colorKey: 'out_of_reach', subtitle: at } : {}) };
       }),
@@ -350,10 +374,14 @@ function verbActions(legalMoves: LegalMove[]): PromptAction[] {
     if (moves.length === 0) continue;
     for (const t of v.types) claimed.add(t);
     const only = moves.length === 1 ? moves[0]! : null;
+    // The price beside the button, in the engine's words. When several moves
+    // sit behind a verb and share a price, it is still the verb's price.
+    const prices = [...new Set(moves.map((m) => asStr(m.cost)).filter(Boolean))];
+    const price = prices.length === 1 ? prices[0]! : undefined;
     out.push({
       id: `cn:verb:${v.id}`,
       label: v.label,
-      note: only ? undefined : `${moves.length} to choose from`,
+      note: price ?? (only ? undefined : `${moves.length} to choose from`),
       title: only ? only.description : undefined,
       ...(v.primary ? { primary: true } : {}),
       moves,
@@ -558,6 +586,7 @@ export const cybernoirGlue: GlueModule = {
 
     const name = names(input.reference);
     const people = peopleByName(input.reference);
+    const abilities = abilityLines(input.reference);
     // The city is a map: nineteen named regions grouped in three borough
     // areas, no edges and no routes (cybernoir-2127.md, and the component
     // sheet, which says so in as many words). A region is a place rather
@@ -729,13 +758,13 @@ export const cybernoirGlue: GlueModule = {
             const o = isObj(inf) ? inf : {};
             const revealed = !!o['revealed'];
             return {
-              ...contactCard(`cn:informant:${ORDINALS[i] ?? String(i)}`, asStr(o['person']), people, name),
+              ...contactCard(`cn:informant:${ORDINALS[i] ?? String(i)}`, asStr(o['person']), people, name, abilities),
               subtitle: revealed ? 'revealed to the Hacker' : 'face down to the Hacker',
             };
           }),
         },
       });
-      side.push(whoYouCanReach(view, input.reference, people, name));
+      side.push(whoYouCanReach(view, input.reference, people, name, abilities));
       side.push({ kind: 'card-zone', id: 'cn:location-deck', data: { label: 'Location deck', mode: 'pile', countOnly: asNum(det['location_deck_size']) } });
     } else {
       bench.push(hakTz);
@@ -748,7 +777,7 @@ export const cybernoirGlue: GlueModule = {
             label: 'Your contacts', mode: 'fan',
             groupNames: Object.fromEntries([...new Set([...people.values()].map((p) => p.affiliation).filter(Boolean))]
               .map((a) => [a as string, name.affiliation(a as string)])),
-            cards: hand.map((h, i) => contactCard(`cn:hand:${i}:${asStr(h)}`, asStr(h), people, name)),
+            cards: hand.map((h, i) => contactCard(`cn:hand:${i}:${asStr(h)}`, asStr(h), people, name, abilities)),
           },
         });
       }
@@ -883,6 +912,14 @@ export const cybernoirGlue: GlueModule = {
         template: move,
         editableKeys: ['keep', 'release'],
         submitLabel: 'Pay upkeep',
+        // What this answer costs, from the engine's own move for it — never
+        // added up here. "1 AP for each informant you keep" is a rule.
+        summarize(answers) {
+          const made = madeBy(answers);
+          if (!made) return null;
+          const exact = listed.find((m) => same(made.keep, m.move['keep']) && same(made.release, m.move['release']));
+          return exact ? (exact.cost ? `${exact.description} · ${exact.cost}` : exact.description ?? null) : null;
+        },
         build(answers) {
           const made = madeBy(answers);
           if (!made) return null;
@@ -902,7 +939,7 @@ export const cybernoirGlue: GlueModule = {
     if (weighty) {
       return {
         title: weighty.title,
-        help: move.description,
+        help: [move.cost, move.description].filter(Boolean).join(' — '),
         fields: [],
         template: move,
         editableKeys: [],

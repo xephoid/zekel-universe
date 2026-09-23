@@ -399,6 +399,12 @@ label.option-card { position: relative; padding-right: 40px; }
 .gallery section { margin: 24px 0; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); display: block; }
 .gallery .row { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
 
+/* what the answers so far add up to, above a form's send button */
+.form-total {
+  margin: 4px 0 0; padding: 8px 10px; border-radius: 8px;
+  background: var(--chip); color: var(--fg); font-size: 13px; font-weight: 600;
+}
+
 /* ---- every zone is a panel ----
    The canvas draws each region of the table as a white card on the paper
    with a header, the same way the action bar already is: one surface, one
