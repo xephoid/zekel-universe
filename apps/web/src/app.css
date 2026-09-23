@@ -305,6 +305,17 @@ label.option-card { position: relative; padding-right: 40px; }
 .table-board .zones { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
 .zones .zone-grid { flex: 1 1 100%; width: 100%; min-width: 0; }
 .zones .zone-map { flex: 1 1 100%; width: 100%; min-width: 0; max-width: min(760px, calc(125vh - 380px)); margin: 0 auto; }
+/* A board with a filling zone is a column: the filling zone takes the height
+   the bands below it leave, so a tall board cannot push them off the screen.
+   The board still scrolls once the filling zone is down to its floor. */
+/* `min-height: auto` throughout: nothing here may shrink below what is in it,
+   or the band spills out of the board and is drawn over whatever follows. */
+.table-board .zones-fill { flex: 1 1 auto; flex-wrap: nowrap; flex-direction: column; align-items: stretch; }
+/* No `min-height: 0` here: the zone must not shrink past the board's floor,
+   or the board is drawn over the band under it instead of scrolling. */
+.zones-fill .zone-map { flex: 1 1 auto; max-width: none; margin: 0; }
+.zone-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; flex: none; }
+.zone-row > .zone { flex: 1 1 auto; min-width: 0; }
 .table-side {
   width: 420px; flex: none; overflow-y: auto; border-left: 1px solid var(--line);
   padding: 12px; display: flex; flex-direction: column; gap: 12px; background: var(--bg-raised);

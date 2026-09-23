@@ -39,9 +39,17 @@ type ZoneBody =
   | { kind: 'grid'; id: string; data: GridData }
   | { kind: 'map'; id: string; data: MapData };
 
-/** A zone, with one layout hint: `span: 'full'` takes a whole row of the
- *  board instead of flowing beside its neighbours. */
-export type Zone = ZoneBody & { span?: 'full' };
+/**
+ * A zone, with one layout hint.
+ * - `span: 'full'` takes a whole row of the board instead of flowing beside
+ *   its neighbours.
+ * - `span: 'row'` puts this zone in a band along the bottom of the board:
+ *   neighbouring `row` zones sit side by side in it, and the band keeps its
+ *   own height while a filling zone above takes the rest. This is how a board
+ *   holds a few short panels under a big one without the big one being pushed
+ *   off the screen.
+ */
+export type Zone = ZoneBody & { span?: 'full' | 'row' };
 
 /** One step of the turn, for the action bar's chips. */
 export interface PlanStep { id: string; label: string; current?: boolean }

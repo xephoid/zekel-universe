@@ -787,6 +787,28 @@ describe('cybernoir-2127 glue', () => {
     expect(plan.board.map((z) => z.id).slice(0, 3)).toEqual(['cn:map', 'cn:clues', 'cn:not-clues']);
   });
 
+  it('gives the city the height the table has left, and bands the short panels under it', () => {
+    const plan = g.plan(input(CN_VIEW, [], { reference: CN_REFERENCE }))!;
+    const map = plan.board.find((z) => z.id === 'cn:map')!.data as MapData;
+    // The city asks for the room that is there. Working its height out from
+    // its width is what pushed the bottom borough behind the action bar on a
+    // wide window, so there is no aspect to fall back on.
+    expect(map.fill).toEqual({ minHeight: 236 });
+    expect(map.aspect).toBeUndefined();
+
+    // A borough is one row, not two: every location in a band shares its y.
+    for (const area of map.areas!) {
+      const ys = new Set(map.nodes.filter((n) => n.area === area.key).map((n) => n.y));
+      expect(ys.size).toBe(1);
+    }
+    // Three bands, so three distinct rows down the board.
+    expect(new Set(map.nodes.map((n) => n.y)).size).toBe(map.areas!.length);
+
+    // The three short panels share one band instead of taking a row each.
+    const band = plan.board.filter((z) => z.span === 'row').map((z) => z.id);
+    expect(band).toEqual(['cn:clues', 'cn:not-clues', 'cn:jail']);
+  });
+
   it('shows what a location is when there is no move behind it', () => {
     const inp = input(CN_VIEW, [], { reference: CN_REFERENCE });
     const detail = g.detailFor!({ component: 'map', id: 'cn:loc:the-junction', label: 'The Junction' }, inp)!;
@@ -861,7 +883,7 @@ describe('cybernoir-2127 glue', () => {
   it('draws the clue rail both seats share: a slot per category, and the ruled out tokens', () => {
     const plan = g.plan(input(CN_VIEW, [], { reference: CN_REFERENCE }))!;
     const rail = plan.board.find((z) => z.id === 'cn:clues')!;
-    expect(rail.span).toBe('full');
+    expect(rail.span).toBe('row');
     expect((rail.data as TrackData).spaces).toEqual([
       { index: 'Borough', label: 'Downtown', filled: true },
       { index: 'Population', label: undefined, filled: false },

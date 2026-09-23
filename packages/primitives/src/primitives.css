@@ -274,6 +274,11 @@
 
 /* map */
 .zk-map { position: relative; width: 100%; border-radius: var(--radius-lg); background: var(--bg-raised); border: 2px solid var(--border); overflow: hidden; }
+/* A filling board is a column: label, the board taking what is left, legend.
+   It keeps `min-height: auto`, so the board's own floor holds and a table
+   with too little room scrolls instead of drawing the board over what is
+   under it. */
+.zk-map-filling { display: flex; flex-direction: column; }
 .zk-map-node { position: absolute; transform: translate(-50%, -50%); text-align: center; }
 .zk-map-blob {
   position: relative;

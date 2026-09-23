@@ -13,7 +13,7 @@ import type { LegalMove } from '@universe/shared';
 import { Die, FlipRoot, paletteVars, useSystemReducedMotion, type SelectEvent } from '@universe/primitives';
 import { glueFor, submitMove, type GlueInput, formForMove, movesForSelect } from '../glue';
 import type { MoveForm, FormContext, Moment, PromptAction } from '../glue';
-import { JsonInspector, ZoneRenderer } from '../glue/ZoneRenderer';
+import { BoardZones, JsonInspector, ZoneRenderer } from '../glue/ZoneRenderer';
 import { useTable } from '../table/useTable';
 import { ActionBar, LessonNote, EndPanel, Log, MoveChooser, MoveFormSheet, MoveMenuList, NoticeToast, PaceControl, Sheet, lessonsOf, type Lesson, type Notice } from '../table/parts';
 import { StrikeOverlay } from '../table/StrikeMoment';
@@ -323,7 +323,7 @@ export function TablePage() {
             <div className="dice-row">{dice.map((d, i) => <Die key={i} value={d} rollKey={current?.seq} />)}</div>
           )}
           {plan
-            ? <div className="zones">{plan.board.map((z) => <ZoneRenderer key={z.id} zone={z} lit={lit} onSelect={onSelect} />)}</div>
+            ? <BoardZones zones={plan.board} lit={lit} onSelect={onSelect} />
             : state.view
               ? <JsonInspector value={state.view} />
               : null}

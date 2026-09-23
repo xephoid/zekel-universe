@@ -686,18 +686,20 @@ export const cybernoirGlue: GlueModule = {
     boroughs.forEach((b, bi) => {
       const inBand = locs.filter((l) => l.borough === b);
       const yTop = bi * bandHeight;
+      // A borough is one row of places, the way the design draws it: the band
+      // says where you are and the row holds everything in it. Folding each
+      // band into two rows doubled the board's height for no gain, and the
+      // bottom borough ended up behind the action bar.
       inBand.forEach((l, i) => {
-        const cols = Math.ceil(inBand.length / 2);
-        const row = i % 2;
-        const col = Math.floor(i / 2);
+        const cols = inBand.length;
         const isPlayed = played.has(l.name);
         const isHideout = role === 'hacker' && hideout === l.name;
         nodes.push({
           id: locId(l.name),
           label: l.name,
           area: b,
-          x: 16 + (cols <= 1 ? 34 : (col / (cols - 1)) * 68),
-          y: yTop + bandHeight * 0.36 + row * bandHeight * 0.34,
+          x: cols <= 1 ? 50 : 8 + (i / (cols - 1)) * 84,
+          y: yTop + bandHeight * 0.62,
           // A played Location keeps its faction: the colour is what it IS,
           // and being played is what happened to it. It used to go grey, and
           // the Detective lost the one fact they are reasoning from.
@@ -730,7 +732,10 @@ export const cybernoirGlue: GlueModule = {
         kind: 'map', id: 'cn:map',
         data: {
           label: `The city · ${locs.length} locations · ${locs.length - crossedOff.size} still standing`,
-          aspect: 52, nodeShape: 'pill', nodes,
+          // The board takes the height the table has left rather than making
+          // its own out of its width. Below the floor the three bands would
+          // run into each other, so the board scrolls instead.
+          fill: { minHeight: 236 }, nodeShape: 'pill', nodes,
           // Every location can be looked at, whether or not a move is behind
           // it, and the colours say what they mean.
           inspectable: true,
@@ -756,7 +761,7 @@ export const cybernoirGlue: GlueModule = {
     const revealed = isObj(view['truthful_clues']) ? view['truthful_clues'] : {};
     const values = isObj(view['truthful_values']) ? view['truthful_values'] : {};
     board.push({
-      kind: 'track', id: 'cn:clues', span: 'full',
+      kind: 'track', id: 'cn:clues', span: 'row',
       data: {
         label: 'What the Detective knows',
         spaces: CLUE_CATEGORIES.map((c) => ({
@@ -771,7 +776,7 @@ export const cybernoirGlue: GlueModule = {
       .map((t) => negativeClue(asStr(t), name))
       .filter((x): x is { category: string; value: string } => x !== null);
     board.push({
-      kind: 'pool', id: 'cn:not-clues', span: 'full',
+      kind: 'pool', id: 'cn:not-clues', span: 'row',
       data: {
         label: ruledOut.length > 0 ? `Ruled out (${ruledOut.length})` : 'Ruled out — nothing yet',
         items: ruledOut.map((r) => ({ label: `${r.category} ${r.value}`, count: 1, colorKey: 'not' })),
@@ -788,7 +793,7 @@ export const cybernoirGlue: GlueModule = {
     // face-up cards. Who is in them is the whole point, so they are named.
     const jailed = slots.reduce((n, [key]) => n + asArr(jail[key]).length, 0);
     board.push({
-      kind: 'track', id: 'cn:jail',
+      kind: 'track', id: 'cn:jail', span: 'row',
       data: {
         label: jailed > 0 ? `Jail · ${jailed} held` : 'Jail · nobody held',
         pieceShape: 'named', arrows: true,

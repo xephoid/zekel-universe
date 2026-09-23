@@ -198,6 +198,17 @@ export interface MapData {
   /** Universe addition: what the colours mean, drawn under the board. A board
    *  that codes anything by colour owes the reader this. */
   legend?: Array<{ colorKey: string; label: string }>;
+  /**
+   * Universe addition: take the height the board has left instead of working
+   * it out from the width. `aspect` says a board's height is a fraction of how
+   * wide it happens to be, which is right for a drawn map and wrong for one
+   * whose regions are rows of pills: a wide window then makes a board taller
+   * than the screen, and the bottom rows fall off it. Filling asks the layout
+   * for the room that is actually there. `minHeight` is the floor in pixels
+   * below which the regions would collide, and under which the board scrolls
+   * rather than being crushed.
+   */
+  fill?: { minHeight: number };
 }
 
 /** One select event, common to every primitive. */

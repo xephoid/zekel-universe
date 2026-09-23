@@ -7,7 +7,7 @@
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from 'react';
 import { handledTransform, themeColor } from './theme.js';
 import type {
-  BagData, CardData, CardZoneData, GridData, MapData, PoolData, SelectEvent, TableauData, TrackData,
+  BagData, CardData, CardZoneData, GridData, MapData, MapNode, PoolData, SelectEvent, TableauData, TrackData,
 } from './types.js';
 
 export interface PrimitiveProps<T> {
@@ -514,10 +514,26 @@ export function Map({ id, data, lit, onSelect, className, style }: PrimitiveProp
       }
     }
   }
+  // A filling board takes the height the layout gives it, down to a floor; a
+  // board with an aspect makes its own height out of its width.
+  const fill = data.fill;
+  // How much room a pill has before it reaches the place beside it, in pixels.
+  // Null while the board has not been measured, or for a place standing alone
+  // in its row, which may take the width its name needs.
+  const pillRoom = (n: MapNode): number | null => {
+    if (size.w === 0) return null;
+    const gaps = data.nodes.filter((o) => o.id !== n.id && o.y === n.y).map((o) => Math.abs(o.x - n.x));
+    if (gaps.length === 0) return null;
+    return Math.max(64, (Math.min(...gaps) / 100) * size.w - 10);
+  };
   return (
-    <div data-flip-id={id} className={className} style={style}>
+    <div data-flip-id={id} className={cx(className, fill && 'zk-map-filling')} style={style}>
       {data.label && <div className="zk-zone-label">{data.label}</div>}
-      <div ref={ref} className="zk-map" style={{ paddingTop: `${aspect}%` }}>
+      <div
+        ref={ref}
+        className="zk-map"
+        style={fill ? { flex: '1 1 auto', minHeight: fill.minHeight } : { paddingTop: `${aspect}%` }}
+      >
         {(data.areas ?? []).map((a) => (
           <div
             key={a.key}
@@ -542,8 +558,19 @@ export function Map({ id, data, lit, onSelect, className, style }: PrimitiveProp
           const px = 34 * (n.size ?? 1);
           // A pill is a place, wide enough to hold its own name; a dot is a
           // space on a board with many of them.
+          //
+          // Wide enough for the name, but never wider than the room to its
+          // neighbour: a row of places has to stay a row of places whatever
+          // they are called, and the name truncates instead of running over
+          // the place beside it.
+          const room = pill ? pillRoom(n) : null;
           const blob = pill
-            ? { minWidth: px * 2.4, height: px * 0.82, background: themeColor(n.colorKey ?? n.label) }
+            ? {
+                minWidth: px * 2.4,
+                height: px * 0.82,
+                background: themeColor(n.colorKey ?? n.label),
+                ...(room !== null ? { maxWidth: room } : {}),
+              }
             : { width: px, height: px, background: themeColor(n.colorKey ?? n.label) };
           return (
             <div key={n.id} className={cx('zk-map-node', pill && 'pill', n.dim && 'dim')} style={{ left: `${n.x}%`, top: `${n.y}%` }}>
