@@ -399,6 +399,25 @@ label.option-card { position: relative; padding-right: 40px; }
 .gallery section { margin: 24px 0; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); display: block; }
 .gallery .row { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
 
+/* a part's own facts, when you tap something with no move behind it */
+.detail-lines { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; }
+.detail-lines > div { display: contents; }
+.detail-lines dt { font: 600 12px var(--font-mono); color: var(--fg-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.detail-lines dd { margin: 0; font-size: 14px; }
+.detail-lines dd.wide { grid-column: 1 / -1; color: var(--fg-muted); font-size: 13px; }
+
+/* one lesson, beside the thing it is about */
+.lesson-note {
+  flex: none; margin: 0 16px 8px; padding: 8px 12px; border-radius: 12px;
+  background: var(--card); border: 1px solid var(--line); box-shadow: var(--shadow-card);
+  display: flex; flex-direction: column; gap: 4px;
+}
+.lesson-head { display: flex; align-items: baseline; gap: 8px; }
+.lesson-title { font: 600 12px var(--font-body); }
+.lesson-count { font: 500 10px var(--font-mono); color: var(--fg-muted); }
+.lesson-gist { margin: 0; font-size: 12px; line-height: 1.45; color: var(--fg-muted); }
+.lesson-actions { display: flex; gap: 6px; }
+
 /* what the answers so far add up to, above a form's send button */
 .form-total {
   margin: 4px 0 0; padding: 8px 10px; border-radius: 8px;

@@ -768,6 +768,54 @@ describe('cybernoir-2127 glue', () => {
       .toEqual([{ label: 'Evidence', value: 1 }]);
   });
 
+  it('keeps a played location its own colour, says what it is, and can always be looked at', () => {
+    const plan = g.plan(input(CN_VIEW, [], { reference: CN_REFERENCE }))!;
+    const map = plan.board.find((z) => z.kind === 'map')!.data as MapData;
+    const played = map.nodes.find((n) => n.id === 'cn:loc:dark-city-central-station')!;
+    // Played is what happened to it, not what it is: the faction colour stays.
+    expect(played.colorKey).toBe('none');
+    expect(played.dim).toBe(true);
+    // A reader hears everything colour and position are carrying.
+    expect(map.nodes.find((n) => n.id === 'cn:loc:the-junction')!.describedAs)
+      .toBe('The Junction, Boonies, 2 residents, Iceden Collective, your safehouse');
+    expect(played.describedAs).toContain('played');
+    // And the colours say what they mean.
+    expect(map.legend!.map((k) => k.label)).toEqual(['No faction', 'Crimson Clan', 'OmniSuperUltra Corp', 'Iceden Collective']);
+    expect(map.inspectable).toBe(true);
+
+    // The clues sit right under the city, not below everything else.
+    expect(plan.board.map((z) => z.id).slice(0, 3)).toEqual(['cn:map', 'cn:clues', 'cn:not-clues']);
+  });
+
+  it('shows what a location is when there is no move behind it', () => {
+    const inp = input(CN_VIEW, [], { reference: CN_REFERENCE });
+    const detail = g.detailFor!({ component: 'map', id: 'cn:loc:the-junction', label: 'The Junction' }, inp)!;
+    expect(detail.title).toBe('The Junction');
+    expect(detail.lines).toEqual([
+      'Borough: Boonies',
+      'Lives here: Blackice, Anansi the Spider',
+      'Faction: Iceden Collective',
+      'This is your safehouse.',
+    ]);
+    // A played one says so, in a sentence rather than a badge.
+    expect(g.detailFor!({ component: 'map', id: 'cn:loc:dark-city-central-station', label: '' }, inp)!.lines)
+      .toContain('Played by the Detective — everyone can see it is not the hideout.');
+    // Something that is not a location has no detail to give.
+    expect(g.detailFor!({ component: 'card', id: 'cn:hand:0:Blackice', label: '' }, inp)).toBeNull();
+  });
+
+  it('puts the public discard piles on screen for both seats', () => {
+    const spent = { ...CN_VIEW, contacts_discard: ['Blackice', 'The Weapon'] };
+    const hacker = g.plan(input(spent, [], { reference: CN_REFERENCE }))!;
+    expect((hacker.side.find((z) => z.id === 'cn:contacts-discard')!.data as CardZoneData).label)
+      .toBe('Contacts discarded (2)');
+    const det = g.plan(input({ ...spent, role: 'detective', hideout: null, location_hand: [], informants: [] }, [], { reference: CN_REFERENCE }))!;
+    expect(det.side.find((z) => z.id === 'cn:contacts-discard')).toBeTruthy();
+    // And the Detective's own discarded Locations, which they cross off.
+    expect((det.side.find((z) => z.id === 'cn:location-discard')!.data as CardZoneData).label)
+      .toBe('Locations discarded (1)');
+  });
+
   it('draws the clue rail both seats share: a slot per category, and the ruled out tokens', () => {
     const plan = g.plan(input(CN_VIEW, [], { reference: CN_REFERENCE }))!;
     const rail = plan.board.find((z) => z.id === 'cn:clues')!;
@@ -950,6 +998,59 @@ describe('cybernoir-2127 glue', () => {
     expect(form.summarize!({})).toBeNull();
     expect(form.summarize!({ 'inf.Blackice': 'keep', 'inf.Anansi the Spider': 'release' }))
       .toBe('Keep Blackice (1 AP); release Anansi the Spider · 1 AP for each informant you keep');
+  });
+
+  it('asks who, then which clue, instead of listing every combination', () => {
+    const jail = ['Blackice', 'Anansi the Spider'].flatMap((who) =>
+      ['borough_downtown', 'population_0', 'affiliation_gang_1'].map((tok) => ({
+        move_id: `jb_${who}_${tok}`,
+        description: `Jailbreak: free ${who} (give Negative Clue: ${tok})`,
+        cost: 'free, and gives the Detective a NOT clue',
+        move: { type: 'jailbreak', freed_person: who, negative_clue_token: tok },
+      })));
+    const inp = input(CN_VIEW, jail, { reference: CN_REFERENCE });
+    const form = g.formFor!(jail[0]!, inp)!;
+    expect(form.title).toBe('Free someone from jail');
+
+    // Two questions, not six rows. The first offers each person once.
+    const opening = form.fieldsFor!({});
+    expect(opening.map((f) => f.label)).toEqual(['Who do you free?', 'Which clue do you give?']);
+    expect((opening[0] as { options: Array<{ label: string }> }).options.map((o) => o.label))
+      .toEqual(['Blackice', 'Anansi the Spider']);
+
+    // The clues are printed, never the raw token ids.
+    const clues = (opening[1] as { options: Array<{ label: string }> }).options.map((o) => o.label);
+    expect(clues).toEqual(['Borough — not Downtown', 'Population — not 0', 'Affiliation — not Iceden Collective']);
+    expect(JSON.stringify(clues)).not.toContain('_');
+
+    // Nothing is preselected, and a half-answered form sends nothing.
+    expect(form.build({})).toBeNull();
+    expect(form.build({ freed_person: 'Blackice' })).toBeNull();
+    // What the answers add up to is visible while answering.
+    expect(form.summarize!({ freed_person: 'Blackice' })).toBe('Who do you free?: Blackice');
+    // And what goes out is the one move the engine listed for those answers.
+    expect(form.build({ freed_person: 'Blackice', negative_clue_token: 'population_0' }))
+      .toEqual({ type: 'jailbreak', freed_person: 'Blackice', negative_clue_token: 'population_0' });
+  });
+
+  it('chooses a set as a set, and says how many are still to pick', () => {
+    const ev = [
+      { move_id: 'w1', description: 'Play complete Witness evidence: Eddie the Doorman + Blackice + Anansi the Spider', cost: 'free', move: { type: 'play_evidence', evidence_type: 'witness', people: ['Eddie the Doorman', 'Blackice', 'Anansi the Spider'] } },
+      { move_id: 'w2', description: 'Play complete Witness evidence: Eddie the Doorman + Blackice + Sleet', cost: 'free', move: { type: 'play_evidence', evidence_type: 'witness', people: ['Eddie the Doorman', 'Blackice', 'Sleet'] } },
+    ];
+    const form = g.formFor!(ev[0]!, input(CN_VIEW, ev, { reference: CN_REFERENCE }))!;
+    expect(form.title).toBe('Play Evidence');
+    const field = form.fields[0] as { kind: string; pick: number; options: Array<{ value: string }> };
+    expect(field.kind).toBe('multi');
+    expect(field.pick).toBe(3);
+    expect(field.options.map((o) => o.value)).toEqual(['Eddie the Doorman', 'Blackice', 'Anansi the Spider', 'Sleet']);
+    // Part way through it says what is left to do.
+    expect(form.summarize!({ people: ['Blackice'] })).toBe('Blackice — 2 more to choose');
+    expect(form.build({ people: ['Blackice'] })).toBeNull();
+    // A trio the engine did not list cannot be sent.
+    expect(form.build({ people: ['Blackice', 'Sleet', 'Anansi the Spider'] })).toBeNull();
+    // A trio it did list goes out as the engine wrote it, order and all.
+    expect(form.build({ people: ['Sleet', 'Blackice', 'Eddie the Doorman'] })).toEqual(ev[1]!.move);
   });
 
   it('asks twice before spending what you only get to spend once', () => {

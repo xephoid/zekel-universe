@@ -23,7 +23,15 @@ export interface PrimitiveProps<T> {
   style?: CSSProperties;
 }
 
-function litProps(isLit: boolean, fire: () => void) {
+interface LitProps {
+  className?: string;
+  role?: 'button';
+  tabIndex?: number;
+  onClick?: (e: { stopPropagation(): void }) => void;
+  onKeyDown?: (e: KeyboardEvent) => void;
+}
+
+function litProps(isLit: boolean, fire: () => void): LitProps {
   if (!isLit) return {};
   return {
     className: 'zk-lit',
@@ -523,7 +531,13 @@ export function Map({ id, data, lit, onSelect, className, style }: PrimitiveProp
         {roads}
         {data.nodes.map((n) => {
           const isLit = lit?.includes(n.id) ?? false;
-          const lp = litProps(isLit, () => onSelect?.({ component: 'map', id: n.id, label: n.label }));
+          const fire = () => onSelect?.({ component: 'map', id: n.id, label: n.label });
+          // Lit means "a move is behind this". Inspectable means "you may look
+          // at it": the same tap, and the table decides there is nothing to do
+          // but show you what it is.
+          const lp: LitProps = isLit || data.inspectable
+            ? { ...litProps(true, fire), className: isLit ? 'zk-lit' : 'zk-look' }
+            : {};
           const pill = data.nodeShape === 'pill';
           const px = 34 * (n.size ?? 1);
           // A pill is a place, wide enough to hold its own name; a dot is a
@@ -532,13 +546,13 @@ export function Map({ id, data, lit, onSelect, className, style }: PrimitiveProp
             ? { minWidth: px * 2.4, height: px * 0.82, background: themeColor(n.colorKey ?? n.label) }
             : { width: px, height: px, background: themeColor(n.colorKey ?? n.label) };
           return (
-            <div key={n.id} className={cx('zk-map-node', pill && 'pill')} style={{ left: `${n.x}%`, top: `${n.y}%` }}>
+            <div key={n.id} className={cx('zk-map-node', pill && 'pill', n.dim && 'dim')} style={{ left: `${n.x}%`, top: `${n.y}%` }}>
               <div
                 className={cx('zk-map-blob', pill && 'pill', lp.className)}
                 style={blob}
                 role={lp.role} tabIndex={lp.tabIndex} onClick={lp.onClick} onKeyDown={lp.onKeyDown}
-                aria-label={n.label}
-                title={pill ? n.label : undefined}
+                aria-label={n.describedAs ?? n.label}
+                title={pill ? (n.describedAs ?? n.label) : undefined}
               >
                 {pill && <span className="zk-map-blob-name">{n.label}</span>}
                 {n.artUrl && <img className="zk-map-art" src={n.artUrl} alt="" />}
@@ -557,6 +571,16 @@ export function Map({ id, data, lit, onSelect, className, style }: PrimitiveProp
           );
         })}
       </div>
+      {data.legend && data.legend.length > 0 && (
+        <div className="zk-map-legend" aria-label="What the colours mean">
+          {data.legend.map((k) => (
+            <span key={k.colorKey} className="zk-map-key">
+              <span className="zk-map-key-dot" style={{ background: themeColor(k.colorKey) }} />
+              {k.label}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

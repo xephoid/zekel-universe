@@ -15,13 +15,27 @@ import { glueFor, submitMove, type GlueInput, formForMove, movesForSelect } from
 import type { MoveForm, FormContext, Moment, PromptAction } from '../glue';
 import { JsonInspector, ZoneRenderer } from '../glue/ZoneRenderer';
 import { useTable } from '../table/useTable';
-import { ActionBar, Briefings, EndPanel, Log, MoveChooser, MoveFormSheet, MoveMenuList, NoticeToast, PaceControl, Sheet, lessonsOf, type Lesson, type Notice } from '../table/parts';
+import { ActionBar, LessonNote, EndPanel, Log, MoveChooser, MoveFormSheet, MoveMenuList, NoticeToast, PaceControl, Sheet, lessonsOf, type Lesson, type Notice } from '../table/parts';
 import { StrikeOverlay } from '../table/StrikeMoment';
 import { api } from '../api';
 import { useSession } from '../session';
 import { Wordmark } from '../ui';
 
 const LESSONS_KEY = 'universe:lessons';
+/** Lessons this person has said "Got it" to, per game, kept across reloads:
+ *  a rule you already know should not greet you again every time you open a
+ *  table. */
+const seenKey = (gameId: string) => `universe:lessons:seen:${gameId}`;
+function readSeen(gameId: string): Set<string> {
+  try {
+    const raw = localStorage.getItem(seenKey(gameId));
+    const ids: unknown = raw ? JSON.parse(raw) : [];
+    return new Set(Array.isArray(ids) ? ids.filter((x): x is string => typeof x === 'string') : []);
+  } catch { return new Set(); }
+}
+function rememberSeen(gameId: string, ids: Set<string>): void {
+  try { localStorage.setItem(seenKey(gameId), JSON.stringify([...ids])); } catch { /* private window */ }
+}
 
 function hueOf(s: string): number {
   let h = 0;
@@ -54,13 +68,14 @@ export function TablePage() {
 
   const [notice, setNotice] = useState<Notice | null>(null);
   const [lessons, setLessons] = useState<Lesson[]>([]);
-  const [seenLessons] = useState(() => new Set<string>());
+  const seenLessons = useRef<Set<string>>(new Set());
   const [lessonsOn, setLessonsOn] = useState(() => { try { return localStorage.getItem(LESSONS_KEY) !== 'off'; } catch { return true; } });
   const [sideOpen, setSideOpen] = useState(true);
   const [sheet, setSheet] = useState<'rules' | 'settings' | null>(null);
   const [chooser, setChooser] = useState<LegalMove[] | null>(null);
   const [shared, setShared] = useState(false);
   const [form, setForm] = useState<MoveForm | null>(null);
+  const [detail, setDetail] = useState<{ title: string; lines: string[] } | null>(null);
   const [busy, setBusy] = useState(false);
   const [playAgainBusy, setPlayAgainBusy] = useState(false);
   const [showEnd, setShowEnd] = useState(true);
@@ -82,14 +97,24 @@ export function TablePage() {
   const yourTurn = !!current?.yourTurn && state.done;
 
   // Rules lessons ride on events; the first time a rule matters it appears
-  // next to the board and never again.
+  // beside the action, and once dismissed it stays dismissed.
   useEffect(() => {
-    if (!current?.briefing || !lessonsOn) return;
-    const fresh = lessonsOf(current.briefing).filter((l) => !seenLessons.has(l.id));
+    if (gameId) seenLessons.current = readSeen(gameId);
+  }, [gameId]);
+  useEffect(() => {
+    if (!current?.briefing || !lessonsOn || !gameId) return;
+    const fresh = lessonsOf(current.briefing).filter((l) => !seenLessons.current.has(l.id));
     if (fresh.length === 0) return;
-    for (const l of fresh) seenLessons.add(l.id);
-    setLessons((prev) => [...prev, ...fresh]);
-  }, [current?.briefing, lessonsOn, seenLessons]);
+    setLessons((prev) => [...prev, ...fresh.filter((f) => !prev.some((p) => p.id === f.id))]);
+  }, [current?.briefing, lessonsOn, gameId]);
+
+  /** "Got it" is remembered: the rule does not come back on the next reload. */
+  const dismissLesson = useCallback((id: string) => {
+    setLessons((ls) => ls.filter((l) => l.id !== id));
+    if (!gameId) return;
+    seenLessons.current.add(id);
+    rememberSeen(gameId, seenLessons.current);
+  }, [gameId]);
 
   const input: GlueInput = useMemo(() => ({
     view: state.view,
@@ -160,12 +185,15 @@ export function TablePage() {
   const onSelect = useCallback((sel: SelectEvent) => {
     if (!glue) return;
     const options = movesForSelect(glue, sel, input);
-    if (options.length === 1) pick(options[0]!);
-    else if (options.length > 1) setChooser(options);
+    if (options.length === 1) { pick(options[0]!); return; }
+    if (options.length > 1) { setChooser(options); return; }
+    // No move behind it: looking is safe, so show what it is.
+    const detail = glue.detailFor?.(sel, input) ?? null;
+    if (detail) setDetail(detail);
   }, [glue, input, pick]);
 
   // A new event closes any chooser or form: their moves may no longer exist.
-  useEffect(() => { setChooser(null); setForm(null); }, [current?.seq]);
+  useEffect(() => { setChooser(null); setForm(null); setDetail(null); }, [current?.seq]);
 
   // An action-bar button: one listed move, or a batch of taps.
   const onAction = useCallback((a: PromptAction) => {
@@ -314,12 +342,12 @@ export function TablePage() {
             </div>
           )}
         </div>
+        <LessonNote lessons={lessons} onDismiss={dismissLesson} />
         {plan && (plan.steps || plan.prompt) && <ActionBar steps={plan.steps} prompt={plan.prompt} onAction={onAction} disabled={busy || !yourTurn} />}
         </div>
         <div className={`table-side${sideOpen ? '' : ' collapsed'}`}>
           {sideOpen && (
             <>
-              <Briefings lessons={lessons} onDismiss={(lid) => setLessons((ls) => ls.filter((l) => l.id !== lid))} />
               {plan?.side.map((z) => <ZoneRenderer key={z.id} zone={z} lit={lit} onSelect={onSelect} />)}
               {plan?.points && <ZoneRenderer zone={plan.points} lit={lit} onSelect={onSelect} />}
               <Log events={state.applied} currentSeq={current?.seq ?? null} />
@@ -346,6 +374,19 @@ export function TablePage() {
           onClose={() => setForm(null)}
           onSend={(move) => void send('form', move, { template: form.template.move, editableKeys: form.editableKeys })}
         />
+      )}
+
+      {detail && (
+        <Sheet title={detail.title} onClose={() => setDetail(null)}>
+          <dl className="detail-lines">
+            {detail.lines.map((line) => {
+              const at = line.indexOf(': ');
+              return at > 0
+                ? <div key={line}><dt>{line.slice(0, at)}</dt><dd>{line.slice(at + 2)}</dd></div>
+                : <div key={line}><dd className="wide">{line}</dd></div>;
+            })}
+          </dl>
+        </Sheet>
       )}
 
       {sheet === 'rules' && (

@@ -92,7 +92,7 @@ export function MoveFormSheet({ form, onSend, onClose, disabled }: {
     <Sheet title={form.title} onClose={onClose}>
       {form.help && <p className="muted form-help">{form.help}</p>}
       <form className="move-form" onSubmit={(e) => { e.preventDefault(); if (built) onSend(built); }}>
-        {form.fields.map((f) => {
+        {(form.fieldsFor?.(answers) ?? form.fields).map((f) => {
           if (f.kind === 'text') {
             return (
               <label key={f.key} className="field">
@@ -192,18 +192,39 @@ export function lessonsOf(b: RulesBriefing | null): Lesson[] {
   return b.sections.map((s) => ({ id: s.id, title: s.title, text: s.text }));
 }
 
-export function Briefings({ lessons, onDismiss }: { lessons: Lesson[]; onDismiss: (id: string) => void }) {
-  if (lessons.length === 0) return null;
+/**
+ * One lesson at a time, beside the thing it is about.
+ *
+ * Every section the engine sent used to open at once, stacked down the side
+ * column: a first Cybernoir turn put six long panels above the opponent, the
+ * evidence and the log — displacing exactly the game information that column
+ * exists to show. Now the queue shows its first card, short, with the rest of
+ * the words a press away, and the ones behind it counted.
+ */
+export function LessonNote({ lessons, onDismiss }: { lessons: Lesson[]; onDismiss: (id: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const lesson = lessons[0];
+  useEffect(() => { setOpen(false); }, [lesson?.id]);
+  if (!lesson) return null;
+  // The first sentence is the lesson; the rest is the detail behind "More".
+  const cut = lesson.text.search(/\.\s/);
+  const gist = cut > 0 ? lesson.text.slice(0, cut + 1) : lesson.text;
+  const rest = cut > 0 ? lesson.text.slice(cut + 2) : '';
   return (
-    <div className="side-section">
-      <h3>Rules that matter now</h3>
-      {lessons.map((l) => (
-        <div key={l.id} className="briefing-card" role="note">
-          <h4>{l.title}</h4>
-          <p>{l.text}</p>
-          <button className="btn secondary small" onClick={() => onDismiss(l.id)}>Got it</button>
-        </div>
-      ))}
+    <div className="lesson-note" role="note" aria-label={`Rule: ${lesson.title}`}>
+      <div className="lesson-head">
+        <span className="lesson-title">{lesson.title}</span>
+        {lessons.length > 1 && <span className="lesson-count">1 of {lessons.length}</span>}
+      </div>
+      <p className="lesson-gist">{open ? lesson.text : gist}</p>
+      <div className="lesson-actions">
+        {rest !== '' && (
+          <button className="btn secondary small" aria-expanded={open} onClick={() => setOpen(!open)}>
+            {open ? 'Less' : 'More'}
+          </button>
+        )}
+        <button className="btn secondary small" onClick={() => onDismiss(lesson.id)}>Got it</button>
+      </div>
     </div>
   );
 }

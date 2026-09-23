@@ -537,9 +537,43 @@ Universe invents none and parses none out of a sentence.
 This closes two of the four asks of the engine. The two left are the standing
 candidate count and the Detective's crossed-off locations.
 
-Still to do from that game, in order: teaching made small and contextual;
-large combination lists turned into guided choices; and the map made better
-for deduction.
+**Teaching is one card beside the action.** A first Hacker turn opened six
+long panels down the side column, displacing the opponent, the evidence and
+the log — the very things that column exists to show. Now the queue shows its
+first lesson, cut to its first sentence, with the rest behind "More" and the
+ones behind it counted. "Got it" is remembered per game in the browser, so a
+rule you know does not greet you again on the next reload; it never was
+before, which is why six arrived every time.
+
+**A question at a time, not every combination.** Jailbreak listed one move per
+person per clue token — thirty near-identical rows labelled `corp_1` and
+`the_hive`. It now asks who you free, then which clue that leaves, narrowing
+the engine's own moves as it goes and printing every value. Evidence and the
+clue-buying discard are chosen as sets: the eligible cards, pick the size the
+engine asked for, and what goes out is the combination it listed. Nothing is
+preselected and the summary line says what is still to choose.
+
+That needed one addition to the form contract: a form may say what its
+questions are *given the answers so far*, so a later question can depend on an
+earlier one.
+
+**The map for deduction.** A played Location used to go grey and lose its
+faction — the colour is what it *is*, and being played is what happened to it,
+so it keeps the colour and is drawn dimmed and dashed instead. The colours
+have a legend under the board, because a board that codes anything by colour
+owes the reader that, and every region names all of its facts to a screen
+reader rather than leaving them to colour and position. The clue rail now sits
+directly under the city instead of below everything else. The discard piles —
+both public, both already published by the engine — are on screen.
+
+And looking is safe: every location can be tapped whether or not a move is
+behind it, and one with none opens its own facts, full name and all. That is
+also the answer to truncated names on the map.
+
+**Not done from that item:** ruled-out locations and the Detective's private
+crossed-off ones. The engine computes both and publishes neither, and that
+fourth ask was not taken. Until it is, the table cannot draw them, and it
+draws nothing rather than guessing.
 
 ## Out of scope
 

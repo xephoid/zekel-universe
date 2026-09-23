@@ -241,9 +241,10 @@ describe("cybernoir's hideout, chosen on the map", () => {
       </SessionProvider>,
     );
     await screen.findByText('Choose your hideout');
-    const alley = await screen.findByRole('button', { name: 'The Back Alley' });
+    // A region is named by everything a reader needs, not just its label.
+    const alley = await screen.findByRole('button', { name: /^The Back Alley, Downtown, 2 residents, Iceden Collective/ });
     expect(alley.className).toContain('zk-lit');
-    expect((await screen.findByRole('button', { name: 'Junktown' })).className).toContain('zk-lit');
+    expect((await screen.findByRole('button', { name: /^Junktown, Boonies/ })).className).toContain('zk-lit');
 
     await act(async () => { fireEvent.click(alley); });
     const sheet = await screen.findByRole('dialog', { name: 'Hide in The Back Alley?' });

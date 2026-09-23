@@ -187,6 +187,13 @@ export interface MoveForm {
   title: string;
   help?: string;
   fields: FormField[];
+  /**
+   * The questions, given the answers so far, when a later one depends on an
+   * earlier one: "who do you free?" leaves a different set of clues to give.
+   * Used in place of `fields` when present; `fields` stays as what the form
+   * opens with.
+   */
+  fieldsFor?(answers: Record<string, unknown>): FormField[];
   /** the template this form completes */
   template: LegalMove;
   /** top-level move keys the answers may set or replace */
@@ -219,6 +226,13 @@ export interface GlueModule {
   /** The questions a template move asks before it can be sent, or null for a
    *  move that is complete as listed. */
   formFor?(move: LegalMove, input: GlueInput): MoveForm | null;
+  /**
+   * What to show when a tap means no move: the part's own facts. Looking at
+   * something is always safe, and should always be possible — a region of a
+   * board carries facts a player is reasoning from, and they should not have
+   * to be legal to read.
+   */
+  detailFor?(sel: SelectEvent, input: GlueInput): { title: string; lines: string[] } | null;
   /** Roll/Draw appears iff a legal move is a resolve_report */
   resolveReportMove(legalMoves: LegalMove[]): LegalMove | null;
   /**

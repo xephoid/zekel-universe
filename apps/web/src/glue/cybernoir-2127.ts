@@ -7,7 +7,7 @@
 
 import type { CardData, MapNode, TableauData } from '@universe/primitives';
 import type { GameReferenceResponse } from '@universe/shared';
-import type { GlueModule, GlueInput, LegalMove, MoveForm, PlanPrompt, PromptAction, SelectEvent, SetupField, TablePlan, Zone, SetupAnswers, SetupSeat } from './types';
+import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, PlanPrompt, PromptAction, SelectEvent, SetupField, TablePlan, Zone, SetupAnswers, SetupSeat } from './types';
 import { asArr, asNum, asStr, isObj, shapeHas, words } from './types';
 
 /**
@@ -557,6 +557,64 @@ const WEIGHTY: Array<{ type: string; title: string; confirm: string }> = [
   { type: 'overclock', title: 'Overclock?', confirm: 'Overclock' },
 ];
 
+/**
+ * A question at a time, instead of every combination at once.
+ *
+ * Jailbreak lists one move per person per clue token: thirty near-identical
+ * rows, labelled with raw ids. The moves differ in two independent fields, so
+ * the sheet asks about each in turn and narrows the listed moves as it goes.
+ * Nothing is chosen for the player: each step starts empty, and what is sent
+ * is the move the engine listed for those answers.
+ */
+function guidedForm(
+  template: LegalMove,
+  moves: LegalMove[],
+  title: string,
+  submitLabel: string,
+  steps: Array<{ key: string; label: string; name: (value: string) => string }>,
+): MoveForm {
+  const matching = (answers: Record<string, unknown>, upTo: number): LegalMove[] =>
+    moves.filter((m) => steps.slice(0, upTo).every((st) => {
+      const a = answers[st.key];
+      return a === undefined || a === '' || asStr(m.move[st.key]) === a;
+    }));
+  const optionsFor = (answers: Record<string, unknown>, i: number): string[] =>
+    [...new Set(matching(answers, i).map((m) => asStr(m.move[steps[i]!.key])).filter(Boolean))];
+  const fieldsAt = (answers: Record<string, unknown>): FormField[] =>
+    steps.map((st, i) => ({
+      kind: 'choice' as const,
+      key: st.key,
+      label: st.label,
+      options: optionsFor(answers, i).map((v) => ({ value: v, label: st.name(v) })),
+    }));
+  const chosen = (answers: Record<string, unknown>): LegalMove | null => {
+    const exact = matching(answers, steps.length).filter((m) =>
+      steps.every((st) => asStr(m.move[st.key]) === answers[st.key]));
+    return exact.length === 1 ? exact[0]! : null;
+  };
+  return {
+    title,
+    help: template.cost ? `${template.cost}.` : undefined,
+    fields: fieldsAt({}),
+    // Each step offers only what the answers before it leave standing.
+    fieldsFor: (answers) => fieldsAt(answers),
+    template,
+    editableKeys: steps.map((st) => st.key),
+    submitLabel,
+    summarize(answers) {
+      const picked = steps
+        .filter((st) => typeof answers[st.key] === 'string' && answers[st.key] !== '')
+        .map((st) => `${st.label}: ${st.name(asStr(answers[st.key]))}`);
+      if (picked.length === 0) return null;
+      const one = chosen(answers);
+      return picked.join(' · ') + (one?.cost ? ` · ${one.cost}` : '');
+    },
+    build(answers) {
+      return chosen(answers)?.move ?? null;
+    },
+  };
+}
+
 /** Where a tap on the map during setup is kept until the sheet names it back. */
 const TAPPED_HIDEOUT = 'cn:tapped-hideout';
 
@@ -616,7 +674,21 @@ export const cybernoirGlue: GlueModule = {
           area: b,
           x: 16 + (cols <= 1 ? 34 : (col / (cols - 1)) * 68),
           y: yTop + bandHeight * 0.36 + row * bandHeight * 0.34,
-          colorKey: isPlayed ? 'played' : (l.affiliation || 'none'),
+          // A played Location keeps its faction: the colour is what it IS,
+          // and being played is what happened to it. It used to go grey, and
+          // the Detective lost the one fact they are reasoning from.
+          colorKey: l.affiliation || 'none',
+          dim: isPlayed,
+          // Colour and position carry the faction and the borough, which a
+          // reader cannot hear. Say all of it.
+          describedAs: [
+            l.name,
+            name.borough(l.borough),
+            residentCount(l.population),
+            l.affiliation && l.affiliation !== 'none' ? name.affiliation(l.affiliation) : 'no faction',
+            isPlayed ? 'played' : '',
+            isHideout ? 'your safehouse' : '',
+          ].filter(Boolean).join(', '),
           badges: [
             ...(isPlayed ? ['played'] : []),
             ...(isHideout ? ['safehouse'] : []),
@@ -633,6 +705,11 @@ export const cybernoirGlue: GlueModule = {
         data: {
           label: `The city · ${locs.length} locations · ${played.size} played`,
           aspect: 52, nodeShape: 'pill', nodes,
+          // Every location can be looked at, whether or not a move is behind
+          // it, and the colours say what they mean.
+          inspectable: true,
+          legend: [...new Set(locs.map((l) => l.affiliation || 'none'))]
+            .map((a) => ({ colorKey: a, label: a === 'none' ? 'No faction' : name.affiliation(a) })),
           areas: boroughs.map((b, bi) => ({
             key: b,
             label: name.borough(b),
@@ -645,31 +722,6 @@ export const cybernoirGlue: GlueModule = {
     ];
 
     // Jail: three named slots with whoever sits in them.
-    const jail = isObj(view['jail']) ? view['jail'] : {};
-    const slots: Array<[string, string]> = [
-      ['slot_1_booked', 'Booked'], ['slot_2_processing', 'Processing'], ['slot_3_release_pending_then_freed', 'Release pending'],
-    ];
-    // Three slots in a line with arrows between them, each holding a stack of
-    // face-up cards. Who is in them is the whole point, so they are named.
-    const jailed = slots.reduce((n, [key]) => n + asArr(jail[key]).length, 0);
-    board.push({
-      kind: 'track', id: 'cn:jail',
-      data: {
-        label: jailed > 0 ? `Jail · ${jailed} held` : 'Jail · nobody held',
-        pieceShape: 'named', arrows: true,
-        spaces: slots.map(([key, label]) => ({
-          index: label,
-          filled: asArr(jail[key]).length > 0,
-          pieces: asArr(jail[key]).map((who) => ({
-            label: asStr(who),
-            colorKey: people.get(asStr(who))?.affiliation || 'none',
-          })),
-        })),
-      },
-    });
-
-    const caseFile = evidenceCase(view, input.reference, role, people, name);
-
     // The clue rail: what the Detective knows. Three truthful slots, one per
     // category, each holding its revealed value or drawn empty, and the ruled
     // out tokens beside them. Public, and the same for both seats — the
@@ -699,6 +751,33 @@ export const cybernoirGlue: GlueModule = {
         items: ruledOut.map((r) => ({ label: `${r.category} ${r.value}`, count: 1, colorKey: 'not' })),
       },
     });
+
+    const jail = isObj(view['jail']) ? view['jail'] : {};
+    const slots: Array<[string, string]> = [
+      ['slot_1_booked', 'Booked'], ['slot_2_processing', 'Processing'], ['slot_3_release_pending_then_freed', 'Release pending'],
+    ];
+
+
+    // Three slots in a line with arrows between them, each holding a stack of
+    // face-up cards. Who is in them is the whole point, so they are named.
+    const jailed = slots.reduce((n, [key]) => n + asArr(jail[key]).length, 0);
+    board.push({
+      kind: 'track', id: 'cn:jail',
+      data: {
+        label: jailed > 0 ? `Jail · ${jailed} held` : 'Jail · nobody held',
+        pieceShape: 'named', arrows: true,
+        spaces: slots.map(([key, label]) => ({
+          index: label,
+          filled: asArr(jail[key]).length > 0,
+          pieces: asArr(jail[key]).map((who) => ({
+            label: asStr(who),
+            colorKey: people.get(asStr(who))?.affiliation || 'none',
+          })),
+        })),
+      },
+    });
+
+    const caseFile = evidenceCase(view, input.reference, role, people, name);
 
     const det = isObj(view['detective']) ? view['detective'] : {};
     const hak = isObj(view['hacker']) ? view['hacker'] : {};
@@ -766,6 +845,18 @@ export const cybernoirGlue: GlueModule = {
       });
       side.push(whoYouCanReach(view, input.reference, people, name, abilities));
       side.push({ kind: 'card-zone', id: 'cn:location-deck', data: { label: 'Location deck', mode: 'pile', countOnly: asNum(det['location_deck_size']) } });
+      // Discards are face up by the rules and the engine publishes both. They
+      // are what a Detective crosses off, and they were nowhere on screen.
+      const locDiscard = asArr(det['location_discard']).map((d) => asStr(d)).filter(Boolean);
+      if (locDiscard.length > 0) {
+        side.push({
+          kind: 'card-zone', id: 'cn:location-discard',
+          data: {
+            label: `Locations discarded (${locDiscard.length})`, mode: 'row', size: 'small',
+            cards: locDiscard.map((l, i) => locationCard(`cn:discard:loc:${i}:${l}`, l, locs, input.reference, name)),
+          },
+        });
+      }
     } else {
       bench.push(hakTz);
       side.push(detTz);
@@ -813,6 +904,20 @@ export const cybernoirGlue: GlueModule = {
           actions,
         };
       }
+    }
+
+    // The Hacker's discard is face up and public, and neither seat could see
+    // it. What has been spent is half of what either of them is reasoning
+    // from.
+    const contactDiscard = asArr(view['contacts_discard']).map((d) => asStr(d)).filter(Boolean);
+    if (contactDiscard.length > 0) {
+      side.push({
+        kind: 'card-zone', id: 'cn:contacts-discard',
+        data: {
+          label: `Contacts discarded (${contactDiscard.length})`, mode: 'row', size: 'small',
+          cards: contactDiscard.map((c, i) => contactCard(`cn:discard:contact:${i}:${c}`, c, people, name, abilities)),
+        },
+      });
     }
 
     const status = `Turn ${asNum(view['turn'], 1)} · ${words(asStr(view['phase']))}`;
@@ -933,6 +1038,63 @@ export const cybernoirGlue: GlueModule = {
       };
     }
 
+    // Thirty near-identical rows, labelled with raw ids, is not a choice:
+    // ask who, then ask which clue that leaves.
+    if (move.move['type'] === 'jailbreak') {
+      const all = input.legalMoves.filter((m) => m.move['type'] === 'jailbreak');
+      if (all.length > 1) {
+        const n = names(input.reference);
+        return guidedForm(move, all, 'Free someone from jail', 'Free them', [
+          { key: 'freed_person', label: 'Who do you free?', name: (v) => v },
+          {
+            key: 'negative_clue_token',
+            label: 'Which clue do you give?',
+            name: (v) => {
+              const c = negativeClue(v, n);
+              return c ? `${c.category} — not ${c.value}` : words(v);
+            },
+          },
+        ]);
+      }
+    }
+
+    // A set is chosen as a set: the eligible cards, pick the size the engine
+    // is asking for, and what goes out is the combination it listed.
+    for (const [type, key, title, submit, label] of [
+      ['play_evidence', 'people', 'Play Evidence', 'Play them', 'The cards'],
+      ['buy_clue', 'discard_locations', 'Buy a clue', 'Buy it', 'Discard which three'],
+    ] as const) {
+      if (move.move['type'] !== type) continue;
+      const all = input.legalMoves.filter((m) => m.move['type'] === type && Array.isArray(m.move[key]));
+      const size = asArr(move.move[key]).length;
+      if (all.length <= 1 || size < 2) continue;
+      const pool = [...new Set(all.flatMap((m) => asArr(m.move[key]).map((x) => asStr(x))).filter(Boolean))];
+      const same = (a: string[], b: unknown) => {
+        const other = asArr(b).map((x) => asStr(x));
+        return a.length === other.length && a.every((x) => other.includes(x));
+      };
+      const matched = (answers: Record<string, unknown>) => {
+        const picked = Array.isArray(answers[key]) ? (answers[key] as string[]) : [];
+        return picked.length !== size ? null : all.find((m) => same(picked, m.move[key])) ?? null;
+      };
+      return {
+        title,
+        help: move.cost ? `${move.cost}.` : undefined,
+        fields: [{ kind: 'multi', key, label, pick: size, options: pool.map((v) => ({ value: v, label: v })) }],
+        template: move,
+        editableKeys: [key],
+        submitLabel: submit,
+        summarize(answers) {
+          const picked = Array.isArray(answers[key]) ? (answers[key] as string[]) : [];
+          if (picked.length === 0) return null;
+          const one = matched(answers);
+          if (!one) return `${picked.join(', ')} — ${size - picked.length} more to choose`;
+          return one.description ?? picked.join(', ');
+        },
+        build: (answers) => matched(answers)?.move ?? null,
+      };
+    }
+
     // A move you only get to make once waits for a second press, with the
     // engine's own sentence for what it costs.
     const weighty = WEIGHTY.find((w) => w.type === move.move['type']);
@@ -1003,6 +1165,32 @@ export const cybernoirGlue: GlueModule = {
     }
     const one = cybernoirGlue.moveForSelect(sel, input);
     return one ? [one] : [];
+  },
+
+  /** What a location is, for a tap with no move behind it. Everything here is
+   *  printed on the card, or on the table in front of both seats. */
+  detailFor(sel: SelectEvent, input: GlueInput): { title: string; lines: string[] } | null {
+    const view = isObj(input.view) ? input.view : {};
+    const locs = locations(input.reference, view);
+    const l = locs.find((x) => locId(x.name) === sel.id);
+    if (!l) return null;
+    const n = names(input.reference);
+    const who = residentsOf(input.reference, l.name);
+    const played = asArr(view['board']).map((b) => asStr(b)).includes(l.name);
+    const discarded = asArr(isObj(view['detective']) ? view['detective']['location_discard'] : []).map((d) => asStr(d)).includes(l.name);
+    const isHideout = asStr(view['role']) === 'hacker'
+      && asStr(isObj(view['hideout']) ? view['hideout']['location_name'] : view['hideout']) === l.name;
+    return {
+      title: l.name,
+      lines: [
+        `Borough: ${n.borough(l.borough)}`,
+        `Lives here: ${who.length > 0 ? who.join(', ') : 'nobody'}`,
+        `Faction: ${l.affiliation && l.affiliation !== 'none' ? n.affiliation(l.affiliation) : 'none'}`,
+        ...(played ? ['Played by the Detective — everyone can see it is not the hideout.'] : []),
+        ...(discarded ? ['In the Detective’s discard pile.'] : []),
+        ...(isHideout ? ['This is your safehouse.'] : []),
+      ],
+    };
   },
 
   resolveReportMove(legalMoves: LegalMove[]): LegalMove | null {

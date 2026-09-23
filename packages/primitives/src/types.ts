@@ -159,6 +159,15 @@ export interface MapNode {
   roadsTo?: string[];
   /** Universe addition: the area of the board this region belongs to. */
   area?: string;
+  /**
+   * Universe addition: this region is accounted for — played, ruled out,
+   * spent. Drawn quieter and dashed, but keeping its own colour, because the
+   * colour is what it *is* and the dimming is what happened to it.
+   */
+  dim?: boolean;
+  /** Universe addition: what a reader hears instead of just the label, when
+   *  the region's facts are carried by colour and position. */
+  describedAs?: string;
 }
 
 /** <zekel-map>: a positional board of named regions. */
@@ -180,6 +189,15 @@ export interface MapData {
    * default, for boards with many small spaces.
    */
   nodeShape?: 'dot' | 'pill';
+  /**
+   * Universe addition: every region can be looked at, not only the ones that
+   * are legal moves. Looking is always safe: a region with no move behind it
+   * reports the tap and nothing is sent.
+   */
+  inspectable?: boolean;
+  /** Universe addition: what the colours mean, drawn under the board. A board
+   *  that codes anything by colour owes the reader this. */
+  legend?: Array<{ colorKey: string; label: string }>;
 }
 
 /** One select event, common to every primitive. */
