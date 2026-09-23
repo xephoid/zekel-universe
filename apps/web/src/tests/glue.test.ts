@@ -905,6 +905,32 @@ describe('cybernoir-2127 glue', () => {
     expect((empty.data as TrackData).label).toBe('Jail · nobody held');
   });
 
+  it('asks twice before spending what you only get to spend once', () => {
+    const det = { ...CN_VIEW, role: 'detective', hideout: null, location_hand: [], informants: [] };
+    const guess = {
+      move_id: 'g', description: "Guess Shizuoka Megamall as Hacker's hideout (4 AP)",
+      move: { type: 'guess_location', location_name: 'Shizuoka Megamall' },
+    };
+    const inp = input(det, [guess], { reference: CN_REFERENCE });
+    // A tap on the map means the guess now, and it does not go out on the tap.
+    expect(movesForSelect(g, { component: 'map', id: 'cn:loc:shizuoka-megamall', label: '' }, inp).map((m) => m.move_id)).toEqual(['g']);
+    const sheet = g.formFor!(guess, inp)!;
+    expect(sheet.title).toBe('Guess the hideout?');
+    // What it costs comes from the engine's own sentence, not from here.
+    expect(sheet.help).toBe("Guess Shizuoka Megamall as Hacker's hideout (4 AP)");
+    expect(sheet.fields).toEqual([]);
+    expect(sheet.submitLabel).toBe('Guess it');
+    expect(sheet.build({})).toEqual(guess.move);
+    // And what it sends is the move the engine listed, unchanged.
+    expect(isSubmissionAllowed('form', sheet.build({})!, [guess], {
+      template: sheet.template.move, editableKeys: sheet.editableKeys,
+    })).toBe(true);
+
+    // Playing a Location is an ordinary turn action and still goes on the tap.
+    const play = { move_id: 'p', description: 'Play Shipyard', move: { type: 'play_location', location_name: 'Shipyard' } };
+    expect(g.formFor!(play, input(det, [play], { reference: CN_REFERENCE }))).toBeNull();
+  });
+
   it('asks what happens to each informant at upkeep, with nothing preselected', () => {
     const det = {
       ...CN_VIEW, role: 'detective', hideout: null, location_hand: [],

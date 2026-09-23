@@ -336,3 +336,57 @@ describe("cybernoir's verb bar", () => {
     expect((moves()[0]!.payload as { move: unknown }).move).toEqual({ type: 'pass_turn' });
   });
 });
+
+// A sheet is a modal dialog and behaves like one. Without this, Tab reached
+// the table's own buttons behind an open question, which on the Cybernoir
+// table means spending action points while a question is still on screen.
+describe('a sheet keeps the keyboard', () => {
+  let socket: FakeSocket;
+  beforeEach(() => {
+    socket = new FakeSocket();
+    useFakeSocket(socket as never);
+    vi.stubGlobal('fetch', vi.fn((input: RequestInfo | URL) => fakeFetch(String(input))));
+    submissionLog.length = 0;
+    localStorage.clear();
+  });
+  afterEach(() => { cleanup(); vi.unstubAllGlobals(); useFakeSocket(null); });
+
+  const moves = () => socket.emitted.filter((e) => e.event === 'move');
+
+  it('takes focus, keeps Tab inside, closes on Escape and gives focus back', async () => {
+    renderTable();
+    await screen.findByText(/^Your move/);
+    const opener = screen.getByText(/^Moves \(/).closest('details')!.querySelector('button')!;
+    opener.focus();
+    await act(async () => { fireEvent.click(screen.getByRole('button', { name: 'Discard 2 Intel to gain one purple Intel.' })); });
+    const sheet = await screen.findByRole('dialog', { name: 'Discard 2 Intel for Purple' });
+
+    // It is a modal, and focus is inside it.
+    expect(sheet.getAttribute('aria-modal')).toBe('true');
+    expect(sheet.contains(document.activeElement)).toBe(true);
+
+    // Tab off the last control comes back to the first, never out to the table.
+    const inside = [...sheet.querySelectorAll<HTMLElement>('button, input')];
+    inside[inside.length - 1]!.focus();
+    await act(async () => { fireEvent.keyDown(sheet, { key: 'Tab' }); });
+    expect(sheet.contains(document.activeElement)).toBe(true);
+
+    // Escape closes it, nothing was sent, and focus goes back to the opener.
+    await act(async () => { fireEvent.keyDown(sheet, { key: 'Escape' }); });
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Discard 2 Intel for Purple' })).toBeNull());
+    expect(moves()).toHaveLength(0);
+    expect(submissionLog).toHaveLength(0);
+    expect(document.activeElement).toBe(opener);
+  });
+
+  it('the chooser closes on Escape too, and sends nothing', async () => {
+    renderTable();
+    await screen.findByText(/^Your move/);
+    await act(async () => { fireEvent.click(await screen.findByRole('button', { name: 'Red' })); });
+    const chooser = await screen.findByRole('dialog', { name: 'Which move?' });
+    expect(chooser.contains(document.activeElement)).toBe(true);
+    await act(async () => { fireEvent.keyDown(chooser, { key: 'Escape' }); });
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Which move?' })).toBeNull());
+    expect(moves()).toHaveLength(0);
+  });
+});

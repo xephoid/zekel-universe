@@ -512,6 +512,23 @@ function hideoutTemplate(legalMoves: LegalMove[]): LegalMove | null {
   return legalMoves.find((m) => m.move['type'] === 'report_hideout' && m.move['location_name'] === '') ?? null;
 }
 
+/**
+ * Moves that are once per game, or that spend a whole turn's action points:
+ * they get a second press, naming what they cost in the engine's own words.
+ *
+ * The same tap on the map means different things as a turn goes on — play a
+ * Location early, guess the hideout later — and the second one spent four
+ * action points and the one mid-game guess without asking. A tap should never
+ * be the last word on something you only get to do once.
+ */
+const WEIGHTY: Array<{ type: string; title: string; confirm: string }> = [
+  { type: 'guess_location', title: 'Guess the hideout?', confirm: 'Guess it' },
+  { type: 'final_guess', title: 'Make your final guess?', confirm: 'Name it' },
+  { type: 'burn_safehouse', title: 'Burn the safehouse?', confirm: 'Burn it' },
+  { type: 'draw_extra_location', title: 'Draw an extra Location?', confirm: 'Draw it' },
+  { type: 'overclock', title: 'Overclock?', confirm: 'Overclock' },
+];
+
 /** Where a tap on the map during setup is kept until the sheet names it back. */
 const TAPPED_HIDEOUT = 'cn:tapped-hideout';
 
@@ -876,6 +893,21 @@ export const cybernoirGlue: GlueModule = {
           const blank = listed.find((m) => asArr(m.move['keep']).length === 0 && asArr(m.move['release']).length === 0);
           return blank ? { ...blank.move, keep: made.keep, release: made.release } : null;
         },
+      };
+    }
+
+    // A move you only get to make once waits for a second press, with the
+    // engine's own sentence for what it costs.
+    const weighty = WEIGHTY.find((w) => w.type === move.move['type']);
+    if (weighty) {
+      return {
+        title: weighty.title,
+        help: move.description,
+        fields: [],
+        template: move,
+        editableKeys: [],
+        submitLabel: weighty.confirm,
+        build: () => ({ ...move.move }),
       };
     }
 

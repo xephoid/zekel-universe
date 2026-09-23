@@ -495,6 +495,38 @@ a blank bar at exactly the moment an answer was owed. They now get a button
 labelled with the engine's own word for the move. This blocked three live
 checks before it was fixed, which is how it was found.
 
+## 12. What play testing found
+
+Added 2026-09-23, from a real game. Seven things; the first three are here,
+the rest follow.
+
+**Burning the safehouse relocated the Hacker without asking.** Press Burn and
+the hideout moved from Shizuoka Megamall to Trailer Towers with no chooser.
+The third instance of one conflation — after the setup hideout and the
+Detective's informants — where the engine keyed a secret pick on the seats
+being *tracked*, and digital mode makes a human seat tracked. Fixed in the
+engine; everything a human Hacker needed was already there and unreachable.
+Where the Hacker hides is theirs to choose, at setup and at a burn alike.
+
+**A tap on the map spent the one mid-game guess.** The same gesture means
+"play a Location" early in a turn and "guess the hideout" later, and the
+second went out on the tap: four action points and the once-per-game guess,
+gone. Moves that are once per game or cost a whole turn now take a second
+press, quoting the engine's own sentence for the cost — "Guess Shizuoka
+Megamall as Hacker's hideout (4 AP)". Which moves are weighty is a list in the
+glue: interface policy, not a rule, and no cost is written here.
+
+**A sheet did not keep the keyboard.** Escape did not close the chooser and
+Tab reached the table's own buttons behind it, so a keyboard player could
+press Overclock while a question was still on screen. A sheet is a modal now:
+it takes focus, keeps Tab inside, closes on Escape, and gives focus back to
+whatever opened it.
+
+Still to do from that game, in order: the engine publishing a cost and an
+effect line per move, so a button can say what it costs without Universe
+knowing; teaching made small and contextual; large combination lists turned
+into guided choices; and the map made better for deduction.
+
 ## Out of scope
 
 Card art, the phone pass (M6), voice, and the informant identities on the
