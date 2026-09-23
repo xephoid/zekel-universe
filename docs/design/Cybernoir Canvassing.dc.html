@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Canvassing a location</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;background:#F7F1E6;color:#16181c}
+a{color:#b3222a}a:hover{color:#8a1a21}
+</style>
+</helmet>
+<div style="width: 1120px; height: 420px; box-sizing: border-box; padding: 24px; background: #F7F1E6; display: flex; flex-direction: column; gap: 14px;">
+  <div>
+    <h1 style="margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.01em;">Playing a Location is how you reach people</h1>
+    <p style="margin: 4px 0 0; font-size: 12.5px; color: #5c5f66; line-height: 1.4;">Twelve of the Detective's nineteen legal moves are arrests and recruitments, and today none of them has anything on screen to touch — the people are not drawn. The card leaving the hand is what puts a name within reach, so that is where the move should start.</p>
+  </div>
+
+  <div style="display: flex; gap: 12px; flex-grow: 1;">
+    <sc-for list="{{steps}}" as="s" hint-placeholder-count="3">
+      <div style="flex: 1; min-width: 0; padding: 14px; background: #ffffff; border: 1px solid #DDD3C4; border-radius: 12px; display: flex; flex-direction: column; gap: 9px;">
+        <div style="display: flex; align-items: baseline; gap: 7px;">
+          <span style="width: 19px; height: 19px; flex-shrink: 0; border-radius: 999px; background: #b3222a; color: #ffffff; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center;">{{s.n}}</span>
+          <h2 style="margin: 0; font-size: 13.5px; font-weight: 600;">{{s.title}}</h2>
+        </div>
+        <div style="{{s.artStyle}}">
+          <sc-if value="{{s.isCard}}" hint-placeholder-val="{{true}}">
+            <div style="width: 104px; height: 126px; box-sizing: border-box; padding: 8px; border-radius: 10px; background: #fdf4dc; border: 2px solid #c9a227; display: flex; flex-direction: column; gap: 5px; align-items: flex-start; box-shadow: 0 10px 18px rgba(28,26,23,0.18);">
+              <div style="font-size: 11.5px; font-weight: 600; line-height: 1.15;">Little Ghana</div>
+              <div style="display: flex; gap: 3px;"><span style="width:5px;height:5px;border-radius:999px;background:#3d4046;"></span><span style="width:5px;height:5px;border-radius:999px;border:1px solid #c9c7bf;"></span><span style="width:5px;height:5px;border-radius:999px;border:1px solid #c9c7bf;"></span></div>
+              <span style="display: inline-flex; padding: 1px 5px; border-radius: 3px; background: #575b61; color: #ffffff; font-family: 'IBM Plex Mono', monospace; font-size: 8.5px;">CITIZEN</span>
+              <div style="font-size: 10px; color: #3d4046; line-height: 1.25;">Anansi the Spider</div>
+            </div>
+          </sc-if>
+          <sc-if value="{{s.isPeople}}" hint-placeholder-val="{{true}}">
+            <div style="display: flex; flex-direction: column; gap: 6px; width: 100%;">
+              <sc-for list="{{s.people}}" as="p" hint-placeholder-count="2">
+                <div style="{{p.rowStyle}}">
+                  <span style="font-size: 11.5px; font-weight: 600;">{{p.name}}</span>
+                  <span style="flex-grow: 1;"></span>
+                  <span style="{{p.arrestStyle}}">ARREST 1</span>
+                  <span style="{{p.recruitStyle}}">INFORMANT 3</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+        <p style="margin: 0; font-size: 11.5px; color: #5c5f66; line-height: 1.4;">{{s.text}}</p>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1120,"height":420}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const art = 'flex-grow:1;display:flex;align-items:center;justify-content:center;padding:10px;border-radius:10px;background:#F7F1E6;';
+    const row = (lit) => 'display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;'
+      + (lit ? 'background:#fdf4dc;border:1px solid #c9a227;' : 'background:#ffffff;border:1px solid #DDD3C4;');
+    const pill = (kind) => 'font-family:\'IBM Plex Mono\',monospace;font-size:9px;font-weight:600;padding:2px 6px;border-radius:999px;'
+      + (kind === 'arrest' ? 'background:#b3222a;color:#ffffff;' : 'color:#b3222a;border:1px solid #b3222a;');
+    return {
+      steps: [
+        { n: '1', title: 'The card lifts', isCard: true, isPeople: false, artStyle: art, people: [],
+          text: 'It leaves the fan and flies to the board. Its residents are printed on it, so you always knew who playing it would put in reach.' },
+        { n: '2', title: 'The name lights up', isCard: false, isPeople: true, artStyle: art,
+          people: [{ name: 'Anansi the Spider', lit: true }],
+          text: 'Anansi lands in “Who you can reach” with both prices on him. Nothing is chosen for you — the buttons simply exist now, where before there was a sentence in a list.' },
+        { n: '3', title: 'You spend, or you do not', isCard: false, isPeople: true, artStyle: art,
+          people: [{ name: 'Anansi the Spider', lit: true }, { name: 'Deckard Voss', lit: false }, { name: 'Sleet', lit: false }],
+          text: 'Arresting Anansi keeps him off the table for three turns. Recruiting him costs three of your four points and blocks only him.' },
+      ].map((s) => ({
+        n: s.n, title: s.title, text: s.text, artStyle: s.artStyle, isCard: s.isCard, isPeople: s.isPeople,
+        people: s.people.map((p) => ({ name: p.name, rowStyle: row(p.lit), arrestStyle: pill('arrest'), recruitStyle: pill('recruit') })),
+      })),
+    };
+  }
+}
+</script>
+</body>
+</html>

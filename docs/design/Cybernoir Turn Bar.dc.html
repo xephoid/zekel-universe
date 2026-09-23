@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Taking a turn</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;background:#F7F1E6;color:#16181c}
+a{color:#1f6e8c}a:hover{color:#16505f}
+button{font-family:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="width: 960px; height: 520px; box-sizing: border-box; padding: 24px; background: #F7F1E6; display: flex; flex-direction: column; gap: 14px;">
+  <div>
+    <h1 style="margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.01em;">Taking a turn</h1>
+    <p style="margin: 4px 0 0; font-size: 12.5px; color: #5c5f66; line-height: 1.4;">Eight verbs with their costs, not sixteen engine sentences. Pick a verb and the table asks the one question that verb needs. The numbered list stays, one tap away, because the brief keeps it as the fallback and as what a voice player hears.</p>
+  </div>
+
+  <div style="display: flex; gap: 16px; flex-grow: 1; min-height: 0;">
+    <div style="width: 330px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 13px; font-weight: 600;">Your turn</span>
+        <span style="display: inline-flex; gap: 3px;">
+          <sc-for list="{{pips}}" as="p" hint-placeholder-count="3"><span style="{{p.style}}"></span></sc-for>
+        </span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #5c5f66;">{{apLabel}}</span>
+        <span style="flex-grow: 1;"></span>
+        <button type="button" onClick="{{toggleList}}" style="min-height: 26px; padding: 3px 9px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #1f6e8c; background: #ffffff; border: 1px solid #DDD3C4; border-radius: 999px;">ALL 16</button>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px;">
+        <sc-for list="{{verbs}}" as="v" hint-placeholder-count="8">
+          <button type="button" onClick="{{v.pick}}" style="{{v.style}}">
+            <span style="display: flex; align-items: baseline; gap: 6px;">
+              <span style="font-size: 12px; font-weight: 600;">{{v.label}}</span>
+              <span style="flex-grow: 1;"></span>
+              <span style="{{v.costStyle}}">{{v.cost}}</span>
+            </span>
+            <span style="display: block; font-size: 10px; color: #5c5f66; text-align: left; line-height: 1.2;">{{v.note}}</span>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="flex-grow: 1; min-width: 0; padding: 16px; background: #ffffff; border: 1px solid #DDD3C4; border-radius: 14px; display: flex; flex-direction: column; gap: 10px;">
+      <sc-if value="{{showList}}" hint-placeholder-val="{{false}}">
+        <div>
+          <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px;">
+            <h2 style="margin: 0; font-size: 14px; font-weight: 600;">All 16 moves</h2>
+            <span style="font-size: 11.5px; color: #5c5f66;">the engine's own list, kept as the fallback</span>
+          </div>
+          <ol style="margin: 0; padding-left: 20px; font-size: 11.5px; line-height: 1.6; color: #16181c; max-height: 320px; overflow: hidden;">
+            <sc-for list="{{fallback}}" as="f" hint-placeholder-count="8"><li>{{f.label}}</li></sc-for>
+          </ol>
+        </div>
+      </sc-if>
+      <sc-if value="{{showDetail}}" hint-placeholder-val="{{true}}">
+        <div style="display: flex; flex-direction: column; gap: 10px; min-height: 0;">
+          <div style="display: flex; align-items: baseline; gap: 8px;">
+            <h2 style="margin: 0; font-size: 14px; font-weight: 600;">{{detail.title}}</h2>
+            <span style="flex-grow: 1;"></span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #5c5f66;">{{detail.cost}}</span>
+          </div>
+          <p style="margin: 0; font-size: 12px; color: #5c5f66; line-height: 1.45;">{{detail.body}}</p>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <sc-for list="{{detail.options}}" as="o" hint-placeholder-count="3">
+              <div style="{{o.style}}">
+                <div style="font-size: 12px; font-weight: 600;">{{o.label}}</div>
+                <div style="font-size: 10.5px; color: #5c5f66; line-height: 1.25;">{{o.note}}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top: auto; display: flex; align-items: center; gap: 10px; padding-top: 10px; border-top: 1px solid #ECE4D6;">
+            <span style="font-size: 11.5px; color: #5c5f66;">{{detail.foot}}</span>
+            <span style="flex-grow: 1;"></span>
+            <button type="button" style="{{detail.confirmStyle}}">{{detail.confirm}}</button>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+
+  <div style="padding: 11px 14px; background: #e4eef2; border: 1px solid #c6dde5; border-radius: 12px;">
+    <p style="margin: 0; font-size: 12px; line-height: 1.45;">Nothing here resolves a choice for the player. A verb only opens the question the rules ask; the draw still waits for the Draw button, and the AP a block eats is shown before the card is committed, not after.</p>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":960,"height":520}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { picked: 'evidence', list: false }; }
+  renderVals() {
+    const DETAIL = {
+      evidence: { title: 'Play Evidence', cost: 'free', body: 'Three affiliations, at most two gangs, and no trio you have played before. Motive I used Shizuoka, Crimson and Citizen, so those three together are spent.',
+        options: [
+          { label: 'Priya + Basilisk + Ma Kettle', note: 'Omni · Chimera · Citizen — legal', ok: true },
+          { label: 'Frostbyte + Little Garnet + Anansi', note: 'Iceden · Crimson · Citizen — legal, two gangs', ok: true },
+          { label: 'Kenji + Little Garnet + Ma Kettle', note: 'repeats Motive I’s three affiliations', ok: false },
+        ], foot: 'Three cards land together, or none of them do.', confirm: 'Play these three' },
+      person: { title: 'Play a person', cost: '0–2 AP', body: 'Their ability resolves, then the card goes to your discard. If a face-down informant matches, the Detective may block: the card comes back and the AP is gone.',
+        options: [
+          { label: 'Ma Kettle · 0 AP', note: 'Witness, no ability', ok: true },
+          { label: 'Kenji Watanabe · 1 AP', note: 'take a card back from your discard', ok: true },
+          { label: 'Priya Nakamura-Smith · 2 AP', note: 'turn an informant face up', ok: true },
+        ], foot: '3 face-down informants are out there.', confirm: 'Choose a card' },
+      winback: { title: 'Win back Blackice', cost: '2 AP', body: 'Blackice is face up in the informant row. Playing your matching Contact sends the informant back into the Detective’s deck. This play cannot be blocked.',
+        options: [{ label: 'Blackice', note: 'revealed on turn 6', ok: true }], foot: 'One fewer card the Detective can block with.', confirm: 'Win it back' },
+      draw: { title: 'Draw a Contact', cost: '1 AP', body: 'Nine cards in the deck, four in your discard. The draw happens when you press the button, not before.',
+        options: [], foot: 'Press to draw.', confirm: 'Draw' },
+      jailbreak: { title: 'Jailbreak', cost: 'free', body: 'Free one person from the holding track. In exchange you hand the Detective a NOT clue that must be new information.',
+        options: [{ label: 'Zero Kelvin', note: 'slot 1, booked', ok: true }, { label: 'Felix the Concierge', note: 'slot 3, out next turn anyway', ok: true }], foot: 'You choose which NOT token to give.', confirm: 'Free them' },
+      overclock: { title: 'Overclock', cost: 'free, once per turn', body: 'One more AP this turn. The Detective draws two Locations at once, which moves the endgame two cards closer.',
+        options: [], foot: 'Deck: 6 left. After this, 4.', confirm: 'Overclock' },
+      burn: { title: 'Burn the safehouse', cost: '3 AP, once per game', body: 'Every clue leaves the table, truthful and NOT. You pick a new hideout from the gathered pile, and you see which Locations the Detective is holding.',
+        options: [], foot: 'This is your whole turn unless you Overclock first.', confirm: 'Burn it' },
+      end: { title: 'End turn', cost: '', body: 'Unspent AP is lost. You have 3 left.', options: [], foot: '', confirm: 'End turn' },
+    };
+    const VERBS = [
+      { id: 'evidence', label: 'Play Evidence', cost: 'free', note: 'Motive II: one more', kind: 'primary' },
+      { id: 'person', label: 'Play a person', cost: '0–2 AP', note: '5 of 7 affordable', kind: 'normal' },
+      { id: 'winback', label: 'Win back', cost: '2 AP', note: 'Blackice, unblockable', kind: 'normal' },
+      { id: 'draw', label: 'Draw a Contact', cost: '1 AP', note: '9 in the deck', kind: 'normal' },
+      { id: 'jailbreak', label: 'Jailbreak', cost: 'free', note: 'costs you a NOT clue', kind: 'normal' },
+      { id: 'overclock', label: 'Overclock', cost: 'free', note: '+1 AP, 2 draws for them', kind: 'normal' },
+      { id: 'burn', label: 'Burn safehouse', cost: '3 AP', note: 'clears every clue', kind: 'danger' },
+      { id: 'end', label: 'End turn', cost: '', note: 'unspent AP is lost', kind: 'quiet' },
+    ];
+    const picked = this.state.picked;
+    const d = DETAIL[picked] ?? DETAIL.evidence;
+    return {
+      pips: [1, 2, 3].map(() => ({ style: 'width:8px;height:8px;border-radius:999px;background:#1f6e8c;' })),
+      apLabel: '3 AP left',
+      toggleList: () => this.setState({ list: !this.state.list }),
+      showList: !!this.state.list,
+      showDetail: !this.state.list,
+      verbs: VERBS.map((v) => ({
+        label: v.label, cost: v.cost, note: v.note,
+        pick: () => this.setState({ picked: v.id, list: false }),
+        style: 'width:100%;min-height:44px;text-align:left;padding:6px 9px;border-radius:10px;display:block;'
+          + (picked === v.id && !this.state.list ? 'background:#fdf4dc;border:2px solid #c9a227;'
+            : v.kind === 'danger' ? 'background:#ffffff;border:1px dashed #b3222a;'
+            : v.kind === 'quiet' ? 'background:#F7F1E6;border:1px solid #DDD3C4;'
+            : 'background:#ffffff;border:1px solid #DDD3C4;'),
+        costStyle: 'font-family:\'IBM Plex Mono\',monospace;font-size:10px;white-space:nowrap;color:' + (v.kind === 'danger' ? '#b3222a' : '#5c5f66') + ';',
+      })),
+      detail: {
+        title: d.title, cost: d.cost, body: d.body, foot: d.foot, confirm: d.confirm,
+        confirmStyle: 'min-height:38px;padding:8px 16px;border-radius:999px;border:none;background:#1f6e8c;color:#ffffff;font-size:12.5px;font-weight:600;',
+        options: d.options.map((o) => ({
+          label: o.label, note: o.note,
+          style: 'flex:1 1 200px;min-width:200px;padding:9px 11px;border-radius:10px;'
+            + (o.ok ? 'background:#ffffff;border:1px solid #DDD3C4;' : 'background:#F7F1E6;border:1px dashed #b3222a;opacity:0.75;'),
+        })),
+      },
+      fallback: [
+        'Draw a Contact (1 AP)', 'Play Kenji Watanabe (1 AP)', 'Play Little Garnet (2 AP)', 'Play Basilisk (2 AP)',
+        'Play Ma Kettle (0 AP)', 'Play Priya Nakamura-Smith (2 AP)', 'Play Frostbyte (2 AP)', 'Play Anansi the Spider (2 AP)',
+        'Play Motive set: Priya + Basilisk + Ma Kettle', 'Play Motive set: Frostbyte + Little Garnet + Anansi',
+        'Win back Blackice (2 AP)', 'Jailbreak: free Zero Kelvin', 'Jailbreak: free Felix the Concierge',
+        'Burn the Safehouse (3 AP)', 'Overclock', 'End turn',
+      ].map((label) => ({ label })),
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Every zone that grows</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;background:#F7F1E6;color:#16181c}
+a{color:#1f6e8c}a:hover{color:#16505f}
+</style>
+</helmet>
+<div style="width: 1120px; height: 620px; box-sizing: border-box; padding: 24px; background: #F7F1E6; display: flex; flex-direction: column; gap: 12px;">
+  <div>
+    <h1 style="margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.01em;">Every zone that grows</h1>
+    <p style="margin: 4px 0 0; font-size: 12.5px; color: #5c5f66; line-height: 1.4;">The hands are not the only thing that swells over fifteen turns. Each zone gets one rule, and the rule is always the same shape: stay readable, keep every legal move reachable, never hide a number the player is allowed to know.</p>
+  </div>
+
+  <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 7px;">
+    <sc-for list="{{zones}}" as="z" hint-placeholder-count="7">
+      <div style="display: flex; gap: 12px; align-items: center; padding: 9px 12px; background: #ffffff; border: 1px solid #DDD3C4; border-radius: 11px;">
+        <div style="width: 158px; flex-shrink: 0;">
+          <div style="font-size: 12.5px; font-weight: 600; line-height: 1.2;">{{z.name}}</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.04em; color: #5c5f66;">{{z.ceiling}}</div>
+        </div>
+        <div style="width: 168px; flex-shrink: 0; display: flex; align-items: center; gap: 3px;">
+          <sc-for list="{{z.sketch}}" as="s" hint-placeholder-count="5"><span style="{{s.style}}">{{s.label}}</span></sc-for>
+        </div>
+        <div style="flex-grow: 1; min-width: 0; font-size: 11.5px; line-height: 1.4; color: #16181c;">{{z.rule}}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="padding: 11px 13px; background: #e4eef2; border: 1px solid #c6dde5; border-radius: 12px;">
+    <p style="margin: 0; font-size: 11.5px; line-height: 1.45;">One rule underneath all of them: a count is never a substitute for the cards when the player is entitled to see them. A pile the Hacker may browse opens on a tap; a pile nobody may see shows its count and nothing else. The current table gets this backwards in one place — it draws the Detective's own face-down informants as card backs to the Detective.</p>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1120,"height":620}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const card = (fill, w) => ({ label: '', style: 'width:' + (w || 15) + 'px;height:22px;border-radius:3px;flex-shrink:0;background:' + fill + ';' });
+    const back = () => ({ label: '', style: 'width:15px;height:22px;border-radius:3px;flex-shrink:0;background:repeating-linear-gradient(45deg,#5B6B7A,#5B6B7A 3px,#6b7b8a 3px,#6b7b8a 6px);' });
+    const badge = (t) => ({ label: t, style: 'display:inline-flex;align-items:center;justify-content:center;height:22px;padding:0 7px;border-radius:999px;background:#16181c;color:#ffffff;font-family:\'IBM Plex Mono\',monospace;font-size:9.5px;font-weight:600;flex-shrink:0;' });
+    const ghost = (t) => ({ label: t, style: 'display:inline-flex;align-items:center;justify-content:center;height:22px;padding:0 7px;border-radius:999px;border:1px dashed #c9c7bf;color:#5c5f66;font-family:\'IBM Plex Mono\',monospace;font-size:9.5px;flex-shrink:0;' });
+    const notTok = () => ({ label: 'NOT', style: 'display:inline-flex;align-items:center;justify-content:center;height:20px;padding:0 6px;border-radius:999px;border:1px dashed #b3222a;color:#b3222a;font-family:\'IBM Plex Mono\',monospace;font-size:8.5px;flex-shrink:0;' });
+    return {
+      zones: [
+        { name: 'Contacts in hand', ceiling: 'NO LIMIT · 26 IN THE DECK',
+          sketch: [card('#1f6e8c'), card('#1f6e8c'), card('#1f6e8c'), card('#1f6e8c'), badge('+9')],
+          rule: 'Full cards to seven, a tightening fan to eleven, then affiliation stacks. Spread opens the whole hand as a grid at any size.' },
+        { name: 'Locations in hand', ceiling: 'UP TO 18',
+          sketch: [card('#b3222a'), card('#b3222a'), card('#b3222a'), badge('+4')],
+          rule: 'The same fan, grouped by borough instead — because a Location in hand is an elimination, and boroughs are how the case board reads.' },
+        { name: 'Informant row', ceiling: 'BOUNDED BY UPKEEP',
+          sketch: [card('#f0ead9'), card('#f0ead9'), back(), badge('4 AP')],
+          rule: 'Rarely past four: each costs 1 AP a turn against a 4 AP turn. The row carries the running upkeep total, and revealed ones sort to the end.' },
+        { name: 'Who you can reach', ceiling: 'UP TO ~20 NAMES',
+          sketch: [ghost('Central Station 3'), badge('+5')],
+          rule: 'Grows every turn the Detective plays a Location. Collapses into one group per Location with a count; the group the newest card opened stays expanded.' },
+        { name: 'NOT tokens', ceiling: 'UP TO 13',
+          sketch: [notTok(), notTok(), notTok(), badge('+5')],
+          rule: 'One wrapping row. Past six they collapse by category — “NOT: 3 populations, 2 factions” — and the full set opens on a tap. A Burn clears all of them at once.' },
+        { name: 'Holding slots', ceiling: 'SEVERAL PER SLOT',
+          sketch: [card('#f0ead9', 34), badge('3'), ghost('')],
+          rule: 'A slot holding more than one becomes a stack with a count and the top name; tapping fans it. Everyone still steps right together.' },
+        { name: 'Discard piles', ceiling: 'UP TO 26',
+          sketch: [card('#c9c7bf', 22), badge('12')],
+          rule: 'A pile with its count and its top card. Public piles open to browse on a tap; the Hacker browses their own, since Shizuoka lets them take a card back from it.' },
+      ].map((z) => z),
+    };
+  }
+}
+</script>
+</body>
+</html>

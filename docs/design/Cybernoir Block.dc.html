@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The block decision</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Special+Elite&display=swap">
+<style>
+body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;background:#F7F1E6;color:#16181c}
+a{color:#b3222a}a:hover{color:#8a1a21}
+</style>
+</helmet>
+<div style="width: 960px; height: 470px; box-sizing: border-box; padding: 24px; background: #F7F1E6; display: flex; flex-direction: column; gap: 14px;">
+  <div>
+    <h1 style="margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.01em;">Block, or say nothing</h1>
+    <p style="margin: 4px 0 0; font-size: 12.5px; color: #5c5f66; line-height: 1.4;">The Hacker plays a card that one of your face-down informants matches. You are asked privately. Declining is silent — they are never told a check happened — so this prompt is the only place the trade is visible.</p>
+  </div>
+
+  <div style="flex-grow: 1; padding: 16px; background: #ffffff; border: 1px solid #DDD3C4; border-radius: 14px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span style="width: 22px; height: 22px; border-radius: 999px; background: #1f6e8c; color: #e4eef2; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center;">H</span>
+      <h2 style="margin: 0; font-size: 15px; font-weight: 600;">The Hacker is playing Manticore — and Manticore is yours.</h2>
+      <span style="flex-grow: 1;"></span>
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #5c5f66;">ONLY YOU SEE THIS</span>
+    </div>
+
+    <div style="display: flex; gap: 12px; flex-grow: 1;">
+      <sc-for list="{{choices}}" as="c" hint-placeholder-count="2">
+        <div style="{{c.boxStyle}}">
+          <div style="display: flex; align-items: baseline; gap: 8px;">
+            <h3 style="margin: 0; font-size: 14px; font-weight: 600;">{{c.title}}</h3>
+            <span style="flex-grow: 1;"></span>
+            <span style="{{c.tagStyle}}">{{c.tag}}</span>
+          </div>
+          <sc-for list="{{c.lines}}" as="l" hint-placeholder-count="3">
+            <div style="display: flex; gap: 7px; align-items: flex-start;">
+              <span style="{{l.dot}}"></span>
+              <span style="font-size: 11.5px; line-height: 1.35;">{{l.text}}</span>
+            </div>
+          </sc-for>
+          <button type="button" style="{{c.btnStyle}}">{{c.btn}}</button>
+        </div>
+      </sc-for>
+    </div>
+
+    <p style="margin: 0; font-size: 11.5px; color: #5c5f66; line-height: 1.4;">Both doors are drawn the same size. The table states what each one costs and nothing more — no timer, no default, no "recommended". If the prompt is missed the play simply goes through, which is the same as declining.</p>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":960,"height":470}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const dot = (c) => 'flex-shrink:0;margin-top:5px;width:6px;height:6px;border-radius:999px;background:' + c + ';';
+    return {
+      choices: [
+        { title: 'Block it', tag: 'COSTS YOU A CLUE', kind: 'block', btn: 'Block with Manticore',
+          lines: [
+            { text: 'Manticore turns face up. The Hacker can buy that Contact back for 2 AP, and you cannot block that.', c: '#b3222a' },
+            { text: 'Their card returns to hand — but the 2 AP they spent is gone.', c: '#b3222a' },
+            { text: 'They choose a category and a truthful clue goes on the table. Two categories are still unspent.', c: '#b3222a' },
+            { text: 'A Motive or Witness set bounces whole: three cards, one block.', c: '#b3222a' },
+          ] },
+        { title: 'Say nothing', tag: 'COSTS YOU THE CARD', kind: 'pass', btn: 'Let it through',
+          lines: [
+            { text: 'The play resolves. Manticore discards a played Location from your board.', c: '#5c5f66' },
+            { text: 'The Hacker is not told a check happened. Manticore stays face down and stays useful.', c: '#5c5f66' },
+            { text: 'You keep paying 1 AP a turn to hold them.', c: '#5c5f66' },
+          ] },
+      ].map((c) => ({
+        title: c.title, tag: c.tag, btn: c.btn,
+        lines: c.lines.map((l) => ({ text: l.text, dot: dot(l.c) })),
+        boxStyle: 'flex:1;min-width:0;padding:14px;border-radius:12px;display:flex;flex-direction:column;gap:9px;'
+          + (c.kind === 'block' ? 'background:#fdf1f1;border:1px solid #b3222a;' : 'background:#F7F1E6;border:1px solid #DDD3C4;'),
+        tagStyle: 'font-family:\'IBM Plex Mono\',monospace;font-size:9px;letter-spacing:0.06em;padding:2px 6px;border-radius:999px;'
+          + (c.kind === 'block' ? 'color:#b3222a;border:1px solid #b3222a;' : 'color:#5c5f66;border:1px solid #c9c7bf;'),
+        btnStyle: 'margin-top:auto;min-height:44px;padding:11px 14px;border-radius:999px;font-size:13px;font-weight:600;'
+          + (c.kind === 'block' ? 'background:#b3222a;color:#ffffff;border:none;' : 'background:#ffffff;color:#16181c;border:1px solid #16181c;'),
+      })),
+    };
+  }
+}
+</script>
+</body>
+</html>

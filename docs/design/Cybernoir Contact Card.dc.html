@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Contact card anatomy</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;background:#F7F1E6;color:#16181c}
+a{color:#1f6e8c}a:hover{color:#16505f}
+</style>
+</helmet>
+<div style="width: 1120px; height: 340px; box-sizing: border-box; padding: 24px; background: #F7F1E6; display: flex; flex-direction: column; gap: 16px;">
+  <div>
+    <h1 style="margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.01em;">A Contact card carries its own decision</h1>
+    <p style="margin: 4px 0 0; font-size: 12.5px; color: #5c5f66;">Today a hand card is a blue rectangle with a name on it. Cost, affiliation, ability and block risk live only in the sentence inside the move list.</p>
+  </div>
+
+  <div style="display: flex; gap: 18px; align-items: flex-start;">
+
+    <div style="width: 396px; flex-shrink: 0;">
+      <h2 style="margin: 0 0 10px; font-size: 13px; font-weight: 600;">What goes on the face</h2>
+      <div style="display: flex; gap: 12px; align-items: flex-start;">
+        <div style="width: 150px; height: 208px; flex-shrink: 0; box-sizing: border-box; padding: 11px; border-radius: 12px; background: #ffffff; border: 1px solid #DDD3C4; box-shadow: 0 1px 2px rgba(28,26,23,0.06), 0 4px 12px rgba(28,26,23,0.06); display: flex; flex-direction: column; gap: 7px; align-items: flex-start;">
+          <div style="display: flex; align-items: flex-start; gap: 6px; width: 100%;">
+            <span style="flex-shrink: 0; width: 22px; height: 22px; border-radius: 999px; background: #1f6e8c; color: #ffffff; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center;">2</span>
+            <span style="font-size: 13px; font-weight: 600; line-height: 1.15;">Priya Nakamura-Smith</span>
+          </div>
+          <span style="display: inline-flex; padding: 2px 6px; border-radius: 3px; background: #1c2a5e; color: #ffffff; font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.04em;">OMNISUPERULTRA</span>
+          <div style="font-size: 11px; color: #3d4046; line-height: 1.3;">Turn one face-down informant face up.</div>
+          <div style="margin-top: auto; display: flex; align-items: center; gap: 5px;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.04em; padding: 2px 6px; border-radius: 999px; color: #b3222a; border: 1px dashed #b3222a;">BLOCK RISK</span>
+          </div>
+        </div>
+        <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px;">
+          <sc-for list="{{pins}}" as="p" hint-placeholder-count="4">
+            <div style="display: flex; gap: 8px; align-items: flex-start;">
+              <span style="flex-shrink: 0; width: 14px; height: 1px; margin-top: 8px; background: #b3222a;"></span>
+              <span style="font-size: 11px; line-height: 1.35;"><strong style="font-weight: 600;">{{p.title}}</strong> {{p.text}}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex-grow: 1; min-width: 0;">
+      <h2 style="margin: 0 0 10px; font-size: 13px; font-weight: 600;">Four states the Hacker reads at a glance</h2>
+      <div style="display: flex; gap: 10px;">
+        <sc-for list="{{states}}" as="s" hint-placeholder-count="4">
+          <div style="flex: 1; min-width: 0;">
+            <div style="{{s.cardStyle}}">
+              <span style="{{s.costStyle}}">{{s.cost}}</span>
+              <span style="font-size: 11.5px; font-weight: 600; line-height: 1.15;">{{s.name}}</span>
+              <span style="{{s.affStyle}}">{{s.aff}}</span>
+              <span style="margin-top: auto; {{s.tagStyle}}">{{s.tag}}</span>
+            </div>
+            <div style="margin-top: 7px; font-size: 11px; color: #5c5f66; line-height: 1.35;"><strong style="font-weight: 600; color: #16181c;">{{s.title}}</strong><br>{{s.note}}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1120,"height":340}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const card = (extra) => 'width:100%;height:150px;box-sizing:border-box;padding:9px;border-radius:10px;display:flex;flex-direction:column;gap:5px;align-items:flex-start;' + extra;
+    const cost = (bg) => 'width:19px;height:19px;border-radius:999px;background:' + bg + ';color:#ffffff;font-family:\'IBM Plex Mono\',monospace;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;';
+    const aff = (bg) => 'display:inline-flex;padding:1px 5px;border-radius:3px;background:' + bg + ';color:#ffffff;font-family:\'IBM Plex Mono\',monospace;font-size:8.5px;letter-spacing:0.04em;';
+    const tag = (c, border) => 'font-family:\'IBM Plex Mono\',monospace;font-size:8.5px;letter-spacing:0.04em;padding:1px 5px;border-radius:999px;color:' + c + ';border:1px dashed ' + border + ';';
+    return {
+      pins: [
+        { title: 'Cost.', text: 'What it spends, against 3 AP.' },
+        { title: 'Affiliation.', text: 'The field a Motive set is built from.' },
+        { title: 'Ability.', text: 'What playing it does, in one line.' },
+        { title: 'Block risk.', text: 'A face-down informant could match this card and bounce it.' },
+      ],
+      states: [
+        { name: 'Ma Kettle', cost: '0', aff: 'CITIZEN', title: 'Playable', note: 'Affordable now. Tap it to play, or tap to add it to a set.',
+          cardStyle: card('background:#ffffff;border:1px solid #DDD3C4;box-shadow:0 1px 2px rgba(28,26,23,0.06);'), costStyle: cost('#6b6f76'), affStyle: aff('#575b61'), tag: 'WITNESS', tagStyle: tag('#5c5f66', '#c9c7bf') },
+        { name: 'Basilisk', cost: '2', aff: 'CHIMERA', title: 'Picked for a set', note: 'Lifted and ringed. Two picked; the third completes Motive II.',
+          cardStyle: card('background:#fdf4dc;border:2px solid #c9a227;box-shadow:0 8px 18px rgba(28,26,23,0.14);'), costStyle: cost('#5a3d8a'), affStyle: aff('#5a3d8a'), tag: 'PICKED 2 OF 3', tagStyle: tag('#6b4a1e', '#c9a227') },
+        { name: 'Kenji Watanabe', cost: '1', aff: 'SHIZUOKA', title: 'Not for this set', note: 'Dimmed with the reason: its trio would repeat Motive I. Still playable for its ability.',
+          cardStyle: card('background:#F7F1E6;border:1px solid #DDD3C4;opacity:0.62;'), costStyle: cost('#0e7c6b'), affStyle: aff('#0b6155'), tag: 'REPEATS MOTIVE I', tagStyle: tag('#5c5f66', '#c9c7bf') },
+        { name: 'Frostbyte', cost: '2', aff: 'ICEDEN', title: 'Bounced back', note: 'A block returned it. The card flies home, the AP stays spent, and the card says so.',
+          cardStyle: card('background:#fdf1f1;border:1px dashed #b3222a;'), costStyle: cost('#1f6e8c'), affStyle: aff('#1f6e8c'), tag: 'BLOCKED T6', tagStyle: tag('#b3222a', '#b3222a') },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

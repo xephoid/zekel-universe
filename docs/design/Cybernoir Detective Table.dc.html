@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Detective table</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Special+Elite&display=swap">
+<style>
+body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;background:#F7F1E6;color:#16181c}
+a{color:#b3222a}a:hover{color:#8a1a21}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; box-sizing: border-box; display: flex; flex-direction: column; background: #F7F1E6; overflow: hidden;">
+
+  <div style="height: 52px; flex-shrink: 0; display: flex; align-items: center; gap: 14px; padding: 0 16px; background: #ffffff; border-bottom: 1px solid #DDD3C4;">
+    <span style="font-size: 17px; font-weight: 700; letter-spacing: -0.02em;">ze<span style="color: #E0762B;">k</span>el</span>
+    <span style="width: 1px; height: 20px; background: #DDD3C4;"></span>
+    <span style="font-size: 15px; font-weight: 600;">Cybernoir 2127</span>
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #5c5f66;">TURN 7</span>
+    <div style="display: flex; align-items: center; gap: 8px; margin-left: 10px; padding: 4px 10px; background: #f0ead9; border: 1px solid #e0d6bd; border-radius: 999px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #6b4a1e;">CASE CLOCK</span>
+      <span style="display: flex; gap: 2px;">
+        <sc-for list="{{clock}}" as="tick" hint-placeholder-count="18"><span style="{{tick.style}}"></span></sc-for>
+      </span>
+      <span style="font-size: 11px; font-weight: 600; color: #6b4a1e;">6 draws to your final guess</span>
+    </div>
+    <span style="flex-grow: 1;"></span>
+    <span style="display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px; background: #FBE3D2; color: #7A3A12; border-radius: 999px; font-size: 13px; font-weight: 600;">
+      Your move
+      <span style="display: inline-flex; gap: 3px;">
+        <sc-for list="{{apTop}}" as="pip" hint-placeholder-count="4"><span style="{{pip.style}}"></span></sc-for>
+      </span>
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px;">4 AP</span>
+    </span>
+    <span style="flex-grow: 1;"></span>
+    <div style="display: flex; gap: 6px;">
+      <sc-for list="{{topChips}}" as="chip" hint-placeholder-count="5">
+        <button type="button" style="min-height: 28px; padding: 5px 10px; font-size: 12px; color: #16181c; background: #ffffff; border: 1px solid #DDD3C4; border-radius: 999px;">{{chip.label}}</button>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="flex-grow: 1; display: flex; min-height: 0;">
+
+    <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; padding: 12px 14px;">
+
+      <div style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: #ffffff; border: 1px solid #DDD3C4; border-radius: 12px;">
+        <span style="width: 22px; height: 22px; border-radius: 999px; background: #1f6e8c; color: #e4eef2; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center;">H</span>
+        <span style="font-size: 13px;"><strong style="font-weight: 600;">Hacker</strong> played Motive I — that is 7 of the 13 cards they need.</span>
+        <span style="flex-grow: 1;"></span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #5c5f66;">PACE</span>
+        <sc-for list="{{paces}}" as="p" hint-placeholder-count="4">
+          <button type="button" style="{{p.style}}">{{p.label}}</button>
+        </sc-for>
+      </div>
+
+      <div style="flex-grow: 1; min-height: 0; display: flex; flex-direction: column; gap: 10px; padding: 12px; background: #ffffff; border: 1px solid #DDD3C4; border-radius: 14px;">
+        <div style="display: flex; align-items: baseline; gap: 10px;">
+          <h2 style="margin: 0; font-size: 15px; font-weight: 600;">Case board</h2>
+          <span style="font-size: 12px; color: #5c5f66;">19 locations · cross one off yourself, or let a clue do it</span>
+          <span style="flex-grow: 1;"></span>
+          <span style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; background: #fdf4dc; border: 1px solid #c9a227; border-radius: 999px;">
+            <span style="width: 8px; height: 8px; border-radius: 2px; background: #c9a227;"></span>
+            <span style="font-size: 12px; font-weight: 600; color: #6b4a1e;">2 left standing</span>
+          </span>
+        </div>
+
+        <sc-for list="{{boroughs}}" as="b" hint-placeholder-count="3">
+          <div style="display: flex; gap: 10px; align-items: flex-start;">
+            <div style="width: 108px; flex-shrink: 0; padding-top: 4px;">
+              <div style="font-size: 12px; font-weight: 600;">{{b.name}}</div>
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #5c5f66;">{{b.tagline}}</div>
+              <div style="{{b.tagStyle}}">{{b.tag}}</div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; flex-grow: 1;">
+              <sc-for list="{{b.locs}}" as="loc" hint-placeholder-count="6">
+                <div style="{{loc.boxStyle}}">
+                  <div style="display: flex; align-items: flex-start; gap: 4px;">
+                    <span style="{{loc.nameStyle}}">{{loc.short}}</span>
+                    <sc-if value="{{loc.isCrossed}}" hint-placeholder-val="{{true}}">
+                      <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" style="flex-shrink: 0; margin-top: 1px;"><path d="M3 3l10 10M13 3L3 13" fill="none" stroke="#b3222a" stroke-width="2" stroke-linecap="round"></path></svg>
+                    </sc-if>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 5px; margin-top: auto;">
+                    <span style="display: inline-flex; gap: 2px;">
+                      <sc-for list="{{loc.pops}}" as="d" hint-placeholder-count="3"><span style="{{d.style}}"></span></sc-for>
+                    </span>
+                    <span style="flex-grow: 1;"></span>
+                    <span style="{{loc.markStyle}}">{{loc.mark}}</span>
+                  </div>
+                  <span style="{{loc.affStyle}}">{{loc.aff}}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="display: flex; gap: 10px; height: 204px; flex-shrink: 0;">
+        <div style="flex-grow: 1; padding: 12px; background: #ffffff; border: 1px solid #DDD3C4; border-radius: 14px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; align-items: baseline; gap: 8px;">
+            <h2 style="margin: 0; font-size: 14px; font-weight: 600;">What you have bought</h2>
+            <span style="font-size: 11.5px; color: #5c5f66;">one truthful token per category, and every NOT you have earned</span>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <sc-for list="{{clues}}" as="c" hint-placeholder-count="3">
+              <div style="{{c.boxStyle}}">
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.08em; color: #5c5f66;">{{c.category}}</div>
+                <div style="{{c.valueStyle}}">{{c.value}}</div>
+                <div style="font-size: 10.5px; color: #5c5f66;">{{c.note}}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.08em; color: #5c5f66;">RULED OUT</span>
+            <sc-for list="{{nots}}" as="n" hint-placeholder-count="4">
+              <span style="display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border: 1px dashed #b3222a; border-radius: 999px; font-size: 11px; color: #16181c; background: #fdf1f1;">
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 600; color: #b3222a;">NOT</span>{{n.label}}
+              </span>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="width: 396px; flex-shrink: 0; padding: 12px; background: #ffffff; border: 1px solid #DDD3C4; border-radius: 14px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; align-items: baseline; gap: 8px;">
+            <h2 style="margin: 0; font-size: 14px; font-weight: 600;">Holding</h2>
+            <span style="font-size: 11.5px; color: #5c5f66;">everyone steps right when your turn ends</span>
+          </div>
+          <div style="display: flex; align-items: stretch; gap: 6px;">
+            <sc-for list="{{jail}}" as="j" hint-placeholder-count="3">
+              <div style="{{j.boxStyle}}">
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.06em; color: #5c5f66;">{{j.slot}}</div>
+                <div style="{{j.nameStyle}}">{{j.name}}</div>
+                <div style="font-size: 9.5px; color: #5c5f66;">{{j.note}}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top: auto; display: flex; align-items: center; gap: 8px; padding: 7px 9px; background: #f0ead9; border: 1px solid #e0d6bd; border-radius: 10px;">
+            <span style="font-size: 11.5px; color: #16181c;">Felix walks free at the end of this turn. Anansi the Spider can take him off the board sooner.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="width: 420px; flex-shrink: 0; border-left: 1px solid #DDD3C4; background: #FBF7EF; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+
+      <div style="flex-shrink: 0; padding: 12px; background: #ffffff; border: 1px solid #DDD3C4; border-radius: 14px;">
+        <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px;">
+          <h2 style="margin: 0; font-size: 14px; font-weight: 600; font-family: 'Special Elite', serif;">Who you can reach</h2>
+          <span style="flex-grow: 1;"></span>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #5c5f66;">4 AP TO SPEND</span>
+        </div>
+        <sc-for list="{{reach}}" as="r" hint-placeholder-count="4">
+          <div style="display: flex; align-items: center; gap: 7px; padding: 5px 0; border-top: 1px solid #ECE4D6;">
+            <span style="width: 128px; flex-shrink: 0; font-size: 11.5px; font-weight: 600; line-height: 1.15;">{{r.name}}</span>
+            <span style="{{r.affStyle}}">{{r.aff}}</span>
+            <span style="flex-grow: 1;"></span>
+            <button type="button" style="{{r.arrestStyle}}">{{r.arrest}}</button>
+            <button type="button" style="{{r.recruitStyle}}">{{r.recruit}}</button>
+          </div>
+        </sc-for>
+        <div style="margin-top: 8px; font-size: 11px; color: #5c5f66; line-height: 1.35;">Everyone living at a Location you have played. Playing a Location is what opens new names — Nature Reserve would add two.</div>
+      </div>
+
+      <div style="flex-shrink: 0; padding: 12px; background: #ffffff; border: 1px solid #DDD3C4; border-radius: 14px; border-left: 4px solid #1f6e8c;">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+          <span style="width: 10px; height: 10px; border-radius: 999px; background: #1f6e8c;"></span>
+          <h2 style="margin: 0; font-size: 14px; font-weight: 600;">The Hacker's case</h2>
+          <span style="flex-grow: 1;"></span>
+          <span style="font-size: 13px; font-weight: 600; color: #1f6e8c;">7 of 13</span>
+        </div>
+        <div style="display: flex; gap: 3px; margin-bottom: 8px;">
+          <sc-for list="{{threat}}" as="t" hint-placeholder-count="13"><span style="{{t.style}}"></span></sc-for>
+        </div>
+        <div style="font-size: 11.5px; color: #16181c; line-height: 1.4;">Weapon down. Witnesses down. Motive I down. Two Motive sets to go — six more cards and the case is theirs.</div>
+      </div>
+
+      <div style="flex-grow: 1; min-height: 0; padding: 12px; background: #ffffff; border: 1px solid #DDD3C4; border-radius: 14px; overflow: hidden;">
+        <h2 style="margin: 0 0 8px; font-size: 14px; font-weight: 600;">Log</h2>
+        <sc-for list="{{log}}" as="l" hint-placeholder-count="3">
+          <div style="display: flex; gap: 8px; padding: 3px 0; font-size: 12px;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #5c5f66; width: 34px; flex-shrink: 0;">{{l.turn}}</span>
+            <span style="color: #16181c;">{{l.text}}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div style="height: 244px; flex-shrink: 0; display: flex; gap: 12px; padding: 12px 14px; background: #ffffff; border-top: 1px solid #DDD3C4;">
+
+    <div style="width: 200px; flex-shrink: 0; padding: 10px; background: #f0ead9; border: 1px solid #e0d6bd; border-radius: 12px; display: flex; flex-direction: column; gap: 8px;">
+      <div style="font-family: 'Special Elite', serif; font-size: 13px; color: #7a1a1f;">DARK CITY PD</div>
+      <div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.08em; color: #6b4a1e;">ACTION POINTS</div>
+        <div style="display: flex; align-items: center; gap: 5px; margin-top: 4px;">
+          <sc-for list="{{apBench}}" as="pip" hint-placeholder-count="4"><span style="{{pip.style}}">{{pip.label}}</span></sc-for>
+          <span style="font-size: 12px; color: #6b4a1e;">4 left</span>
+        </div>
+      </div>
+      <sc-for list="{{markers}}" as="m" hint-placeholder-count="3">
+        <div style="display: flex; align-items: flex-start; gap: 6px; font-size: 11.5px; color: #16181c; line-height: 1.3;">
+          <span style="{{m.dotStyle}}"></span>{{m.label}}
+        </div>
+      </sc-for>
+      <div style="margin-top: auto; display: flex; gap: 8px; font-size: 11.5px; color: #6b4a1e;">
+        <span>Deck <strong style="font-weight: 600;">6</strong></span>
+        <span>Discard <strong style="font-weight: 600;">3</strong></span>
+      </div>
+    </div>
+
+    <div style="width: 356px; flex-shrink: 0; display: flex; flex-direction: column; gap: 6px;">
+      <div style="display: flex; align-items: baseline; gap: 8px;">
+        <span style="font-size: 13px; font-weight: 600;">Your Locations</span>
+        <span style="font-size: 11.5px; color: #5c5f66;">play one — it is free and it is required</span>
+      </div>
+      <div style="display: flex; gap: 7px;">
+        <sc-for list="{{hand}}" as="c" hint-placeholder-count="3">
+          <div style="{{c.cardStyle}}">
+            <div style="font-size: 11.5px; font-weight: 600; line-height: 1.15;">{{c.name}}</div>
+            <div style="display: flex; align-items: center; gap: 4px;">
+              <span style="display: inline-flex; gap: 2px;">
+                <sc-for list="{{c.pops}}" as="d" hint-placeholder-count="3"><span style="{{d.style}}"></span></sc-for>
+              </span>
+              <span style="font-size: 10px; color: #5c5f66;">{{c.borough}}</span>
+            </div>
+            <span style="{{c.affStyle}}">{{c.aff}}</span>
+            <div style="font-size: 10px; color: #3d4046; line-height: 1.25;">{{c.residents}}</div>
+            <span style="margin-top: auto; {{c.tagStyle}}">{{c.tag}}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px;">
+      <div style="display: flex; align-items: baseline; gap: 8px;">
+        <span style="font-size: 13px; font-weight: 600;">Your informants</span>
+        <span style="font-size: 11.5px; color: #b3222a; font-weight: 600;">upkeep 4 AP if you keep all four</span>
+      </div>
+      <div style="display: flex; gap: 7px;">
+        <sc-for list="{{informants}}" as="i" hint-placeholder-count="4">
+          <div style="{{i.cardStyle}}">
+            <div style="font-size: 11px; font-weight: 600; line-height: 1.15;">{{i.name}}</div>
+            <span style="{{i.affStyle}}">{{i.aff}}</span>
+            <div style="font-size: 9.5px; color: #3d4046; line-height: 1.2;">{{i.note}}</div>
+            <span style="margin-top: auto; {{i.tagStyle}}">{{i.tag}}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="width: 264px; flex-shrink: 0; display: flex; flex-direction: column; gap: 6px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 13px; font-weight: 600;">Your turn</span>
+        <span style="flex-grow: 1;"></span>
+        <a href="#moves" style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #b3222a;">ALL 19 MOVES</a>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px;">
+        <sc-for list="{{actions}}" as="a" hint-placeholder-count="8">
+          <button type="button" style="{{a.style}}">
+            <span style="display: flex; align-items: baseline; gap: 6px;">
+              <span style="font-size: 12px; font-weight: 600;">{{a.label}}</span>
+              <span style="flex-grow: 1;"></span>
+              <span style="{{a.costStyle}}">{{a.cost}}</span>
+            </span>
+            <span style="display: block; font-size: 10px; color: #5c5f66; text-align: left; line-height: 1.2;">{{a.note}}</span>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const AFF = {
+      none: { name: 'Citizen', color: '#575b61' },
+      corp_1: { name: 'Omni', color: '#1c2a5e' },
+      corp_2: { name: 'Shizuoka', color: '#0b6155' },
+      gang_1: { name: 'Iceden', color: '#1f6e8c' },
+      gang_2: { name: 'Crimson', color: '#7a1220' },
+      gang_3: { name: 'Chimera', color: '#5a3d8a' },
+    };
+    const chip = (aff) => 'display:inline-flex;align-items:center;align-self:flex-start;max-width:100%;overflow:hidden;padding:1px 5px;border-radius:3px;font-family:\'IBM Plex Mono\',monospace;font-size:8.5px;letter-spacing:0.04em;color:#ffffff;background:' + AFF[aff].color;
+    const box = (state) => {
+      const base = 'width:100%;height:62px;box-sizing:border-box;padding:6px;border-radius:8px;display:flex;flex-direction:column;gap:2px;';
+      if (state === 'standing') return base + 'background:#fdf4dc;border:2px solid #c9a227;';
+      if (state === 'played') return base + 'background:#f0ead9;border:1px solid #e0d6bd;';
+      if (state === 'crossed') return base + 'background:#F7F1E6;border:1px solid #DDD3C4;opacity:0.62;';
+      if (state === 'out') return base + 'background:#F7F1E6;border:1px dashed #DDD3C4;opacity:0.5;';
+      return base + 'background:#ffffff;border:1px solid #DDD3C4;';
+    };
+    const nameStyle = (state) => 'font-size:11px;font-weight:600;line-height:1.15;flex-grow:1;' + (state === 'out' || state === 'crossed' ? 'text-decoration:line-through;' : '');
+    const mark = { standing: 'STANDING', played: 'PLAYED', crossed: 'IN HAND', out: 'CLUE' };
+    const markStyle = (state) => {
+      const base = 'font-family:\'IBM Plex Mono\',monospace;font-size:8px;letter-spacing:0.06em;';
+      if (state === 'standing') return base + 'color:#6b4a1e;font-weight:600;';
+      if (state === 'played') return base + 'color:#b3222a;font-weight:600;';
+      if (state === 'crossed') return base + 'color:#b3222a;';
+      return base + 'color:#5c5f66;';
+    };
+    const pops = (n, dim) => [0, 1, 2].map((i) => ({
+      style: 'width:5px;height:5px;border-radius:999px;background:' + (i < n ? (dim ? '#9a958c' : '#3d4046') : 'transparent') + ';border:1px solid ' + (i < n ? 'transparent' : '#c9c7bf') + ';',
+    }));
+    const L = (short, pop, aff, state) => ({
+      short, pops: pops(pop, state === 'out' || state === 'crossed'), aff: AFF[aff].name, affStyle: chip(aff),
+      boxStyle: box(state), nameStyle: nameStyle(state), mark: mark[state], markStyle: markStyle(state),
+      isCrossed: state === 'crossed',
+    });
+    const small = (kind) => 'min-height:26px;padding:3px 8px;border-radius:999px;font-family:\'IBM Plex Mono\',monospace;font-size:10px;font-weight:600;'
+      + (kind === 'arrest' ? 'background:#b3222a;color:#ffffff;border:none;' : kind === 'recruit' ? 'background:#ffffff;color:#b3222a;border:1px solid #b3222a;' : 'background:#F7F1E6;color:#6f6a61;border:1px solid #DDD3C4;');
+    return {
+      clock: Array.from({ length: 18 }, (_, i) => ({
+        style: 'width:4px;height:10px;border-radius:1px;background:' + (i < 6 ? '#b3222a' : '#e0d6bd') + ';',
+      })),
+      apTop: [1, 2, 3, 4].map(() => ({ style: 'width:7px;height:7px;border-radius:999px;background:#7A3A12;' })),
+      topChips: [{ label: 'Undo' }, { label: 'Rules' }, { label: 'Settings' }, { label: 'Share' }, { label: 'Leave' }],
+      paces: [{ label: '1×' }, { label: '2×' }, { label: '4×' }, { label: 'Replay' }].map((p, i) => ({
+        label: p.label,
+        style: 'min-height:24px;padding:2px 8px;font-size:11px;border-radius:999px;border:1px solid #DDD3C4;background:' + (i === 0 ? '#f0ead9' : '#ffffff') + ';color:#16181c;',
+      })),
+      boroughs: [
+        { name: 'Downtown', tagline: 'neon & concrete', tag: 'NOT Downtown', tagStyle: 'margin-top:4px;display:inline-block;padding:1px 6px;border:1px dashed #b3222a;border-radius:999px;font-family:\'IBM Plex Mono\',monospace;font-size:8.5px;color:#b3222a;',
+          locs: [L('OmniSuperUltra Office', 3, 'corp_1', 'out'), L('Shizuoka Megamall', 3, 'corp_2', 'played'), L('Central Station', 3, 'none', 'played'), L('The Back Alley', 2, 'gang_1', 'crossed'), L('Xistential Club', 2, 'gang_2', 'played'), L('Sewers', 0, 'gang_3', 'played')] },
+        { name: 'The Hive', tagline: 'a billion beds', tag: 'the clue says here', tagStyle: 'margin-top:4px;display:inline-block;padding:1px 6px;border:1px solid #c9a227;background:#fdf4dc;border-radius:999px;font-family:\'IBM Plex Mono\',monospace;font-size:8.5px;color:#6b4a1e;',
+          locs: [L('Platinum Extraluxx', 3, 'corp_1', 'out'), L('Suburb Tower #2013', 2, 'corp_2', 'standing'), L('Nature Reserve #42', 2, 'gang_2', 'crossed'), L('Resident Block', 1, 'gang_3', 'standing'), L("Dirty Mel's", 1, 'gang_1', 'out'), L('Garbage Dump', 0, 'none', 'played')] },
+        { name: 'Boonies', tagline: 'off the grid', tag: 'NOT Boonies', tagStyle: 'margin-top:4px;display:inline-block;padding:1px 6px;border:1px dashed #b3222a;border-radius:999px;font-family:\'IBM Plex Mono\',monospace;font-size:8.5px;color:#b3222a;',
+          locs: [L('Shipyard', 1, 'corp_1', 'out'), L('Trailer Towers', 1, 'none', 'played'), L('Little Ghana', 1, 'none', 'crossed'), L('Warehouse', 0, 'corp_2', 'out'), L('The Junction', 0, 'gang_1', 'played'), L('Tower Furnace', 0, 'gang_2', 'out'), L('Junktown', 0, 'gang_3', 'out')] },
+      ],
+      clues: [
+        { category: 'BOROUGH', value: 'The Hive', note: 'bought with a block on turn 4',
+          boxStyle: 'flex:1;padding:8px 10px;border-radius:10px;background:#fdf4dc;border:1px solid #c9a227;',
+          valueStyle: 'font-size:15px;font-weight:600;margin:2px 0;color:#16181c;' },
+        { category: 'POPULATION', value: 'not yet', note: 'Suburb Tower is 2, Resident Block is 1',
+          boxStyle: 'flex:1;padding:8px 10px;border-radius:10px;background:#F7F1E6;border:1px dashed #c9c7bf;',
+          valueStyle: 'font-size:15px;font-weight:600;margin:2px 0;color:#6f6a61;' },
+        { category: 'AFFILIATION', value: 'not yet', note: 'the two left are Shizuoka and Chimera',
+          boxStyle: 'flex:1;padding:8px 10px;border-radius:10px;background:#F7F1E6;border:1px dashed #c9c7bf;',
+          valueStyle: 'font-size:15px;font-weight:600;margin:2px 0;color:#6f6a61;' },
+      ],
+      nots: [{ label: 'Population 0' }, { label: 'Population 3' }, { label: 'Iceden Collective' }, { label: 'Downtown' }],
+      jail: [
+        { slot: '1 BOOKED', name: 'Zero Kelvin', note: 'arrested this turn', boxStyle: 'flex:1;padding:8px;border-radius:10px;background:#f0ead9;border:1px solid #e0d6bd;', nameStyle: 'font-size:12px;font-weight:600;margin-top:4px;' },
+        { slot: '2 PROCESSING', name: 'empty', note: '', boxStyle: 'flex:1;padding:8px;border-radius:10px;background:#F7F1E6;border:1px dashed #c9c7bf;', nameStyle: 'font-size:12px;color:#6f6a61;margin-top:4px;' },
+        { slot: '3 RELEASE PENDING', name: 'Felix', note: 'back in the deck at turn end', boxStyle: 'flex:1;padding:8px;border-radius:10px;background:#f0ead9;border:1px solid #e0d6bd;', nameStyle: 'font-size:12px;font-weight:600;margin-top:4px;' },
+      ],
+      reach: [
+        { name: 'Deckard Voss', aff: 'corp_1' }, { name: 'Permafrost', aff: 'gang_1' },
+        { name: 'Hoarfrost', aff: 'gang_1' }, { name: 'Sleet', aff: 'corp_2' },
+        { name: 'Eddie the Doorman', aff: 'none' }, { name: 'Ma Kettle', aff: 'none' },
+        { name: 'Gus the Noodle Guy', aff: 'none', gone: 'played as Evidence' },
+      ].map((r) => ({
+        name: r.name, aff: AFF[r.aff].name, affStyle: chip(r.aff),
+        arrest: r.gone ? r.gone : 'ARREST 1', arrestStyle: small(r.gone ? 'gone' : 'arrest'),
+        recruit: r.gone ? '' : 'INFORMANT 3', recruitStyle: r.gone ? 'display:none;' : small('recruit'),
+      })),
+      threat: Array.from({ length: 13 }, (_, i) => ({
+        style: 'flex:1;height:10px;border-radius:2px;background:' + (i < 7 ? '#1f6e8c' : '#e4eef2') + ';',
+      })),
+      log: [
+        { turn: 'T7', text: 'Hacker played Motive I.' },
+        { turn: 'T6', text: 'You recruited Hoarfrost. 3 face down.' },
+        { turn: 'T6', text: 'Blackice was blocked and turned face up.' },
+      ],
+      apBench: [1, 2, 3, 4].map(() => ({ label: '✕', style: 'width:20px;height:20px;border-radius:4px;background:#b3222a;color:#ffffff;font-size:11px;display:flex;align-items:center;justify-content:center;' })),
+      markers: [
+        { label: 'Mid-game guess spent — Dirty Mel’s, wrong', dotStyle: 'flex-shrink:0;margin-top:4px;width:8px;height:8px;border-radius:999px;background:#6f6a61;' },
+        { label: 'Final guess waits for the last draw', dotStyle: 'flex-shrink:0;margin-top:4px;width:8px;height:8px;border-radius:999px;background:#b3222a;' },
+        { label: 'Upkeep not paid yet', dotStyle: 'flex-shrink:0;margin-top:4px;width:8px;height:8px;border-radius:999px;background:#c9a227;' },
+      ],
+      hand: [
+        { name: 'Nature Reserve #42', pop: 2, aff: 'gang_2', borough: 'The Hive', residents: 'Dot the Birdwatcher · Little Garnet', tag: 'CROSSED OFF ALREADY', hot: false },
+        { name: 'Little Ghana', pop: 1, aff: 'none', borough: 'Boonies', residents: 'Anansi the Spider', tag: 'PUTS ANANSI IN REACH', hot: true },
+        { name: 'The Back Alley', pop: 2, aff: 'gang_1', borough: 'Downtown', residents: 'Zero Kelvin · Frostbyte', tag: 'PUTS FROSTBYTE IN REACH', hot: true },
+      ].map((c) => ({
+        name: c.name, borough: c.borough, residents: c.residents, aff: AFF[c.aff].name, affStyle: chip(c.aff),
+        pops: pops(c.pop, false), tag: c.tag,
+        cardStyle: 'width:110px;height:152px;box-sizing:border-box;padding:8px;border-radius:10px;display:flex;flex-direction:column;gap:5px;align-items:flex-start;'
+          + (c.hot ? 'background:#fdf4dc;border:2px solid #c9a227;box-shadow:0 1px 2px rgba(28,26,23,0.06);' : 'background:#ffffff;border:1px solid #DDD3C4;'),
+        tagStyle: 'font-family:\'IBM Plex Mono\',monospace;font-size:8px;letter-spacing:0.04em;padding:1px 5px;border-radius:999px;line-height:1.2;'
+          + (c.hot ? 'color:#6b4a1e;border:1px solid #c9a227;' : 'color:#6f6a61;border:1px dashed #c9c7bf;'),
+      })),
+      informants: [
+        { name: 'Blackice', aff: 'gang_1', note: 'Face up. The Hacker can win this Contact back.', tag: 'REVEALED', state: 'revealed' },
+        { name: 'Yumi Sato', aff: 'corp_2', note: 'Blocks their Yumi Sato, nobody else.', tag: 'KEEP 1 AP', state: 'down' },
+        { name: 'Manticore', aff: 'gang_3', note: 'Blocks their Manticore.', tag: 'KEEP 1 AP', state: 'down' },
+        { name: 'Hoarfrost', aff: 'gang_1', note: 'Blocks their Hoarfrost.', tag: 'KEEP 1 AP', state: 'down' },
+      ].map((i) => ({
+        name: i.name, note: i.note, aff: AFF[i.aff].name, affStyle: chip(i.aff), tag: i.tag,
+        cardStyle: 'width:112px;height:152px;box-sizing:border-box;padding:8px;border-radius:10px;display:flex;flex-direction:column;gap:5px;align-items:flex-start;'
+          + (i.state === 'revealed' ? 'background:#fdf1f1;border:1px dashed #b3222a;' : 'background:#f0ead9;border:1px solid #e0d6bd;'),
+        tagStyle: 'font-family:\'IBM Plex Mono\',monospace;font-size:8px;letter-spacing:0.04em;padding:1px 5px;border-radius:999px;'
+          + (i.state === 'revealed' ? 'color:#b3222a;border:1px dashed #b3222a;' : 'color:#6b4a1e;border:1px solid #c9a227;'),
+      })),
+      actions: [
+        { label: 'Play a Location', cost: 'free', note: 'required, 3 in hand', state: 'primary' },
+        { label: 'Pay upkeep', cost: '0–4 AP', note: 'keep or release each', state: 'primary' },
+        { label: 'Arrest', cost: '1 AP', note: '6 within reach', state: 'normal' },
+        { label: 'Recruit', cost: '3 AP', note: 'same six', state: 'normal' },
+        { label: 'Buy a clue', cost: '3 cards', note: 'they pick the category', state: 'normal' },
+        { label: 'Draw extra', cost: '4 AP', note: 'shortens your clock', state: 'normal' },
+        { label: 'Guess', cost: '4 AP', note: 'spent on turn 5', state: 'spent' },
+        { label: 'End turn', cost: '', note: 'unspent AP is lost', state: 'quiet' },
+      ].map((a) => ({
+        label: a.label, cost: a.cost, note: a.note,
+        style: 'width:100%;min-height:44px;text-align:left;padding:5px 8px;border-radius:10px;display:block;'
+          + (a.state === 'primary' ? 'background:#fdf4dc;border:2px solid #c9a227;'
+            : a.state === 'spent' ? 'background:#F7F1E6;border:1px dashed #DDD3C4;opacity:0.6;'
+            : a.state === 'quiet' ? 'background:#F7F1E6;border:1px solid #DDD3C4;'
+            : 'background:#ffffff;border:1px solid #DDD3C4;'),
+        costStyle: 'font-family:\'IBM Plex Mono\',monospace;font-size:10px;white-space:nowrap;color:#5c5f66;',
+      })),
+    };
+  }
+}
+</script>
+</body>
+</html>

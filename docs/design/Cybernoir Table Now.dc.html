@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The table as it stands</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;background:#F7F1E6;color:#16181c}
+a{color:#1f6e8c}a:hover{color:#16505f}
+</style>
+</helmet>
+<div style="width: 1520px; height: 880px; box-sizing: border-box; padding: 24px; background: #F7F1E6; display: flex; flex-direction: column; gap: 14px;">
+  <div>
+    <h1 style="margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.01em;">The Hacker's table as it stands</h1>
+    <p style="margin: 4px 0 0; font-size: 12.5px; color: #5c5f66; line-height: 1.4;">The running app at 1440 × 900, turn 7, Hacker to move. Captured from the real glue module and the seat view the server stored for this table.</p>
+  </div>
+
+  <div style="display: flex; gap: 18px; flex-grow: 1; min-height: 0;">
+    <div style="position: relative; width: 1120px; height: 700px; flex-shrink: 0; border: 1px solid #DDD3C4; border-radius: 10px; overflow: hidden; background: #ffffff;">
+      <img src="assets/cybernoir-table-now.jpg" alt="The Cybernoir table on the Hacker's seat: a map of nineteen locations with clipped names, an empty jail track, a stat list, and a row of overlapping cards." style="display: block; width: 1120px; height: 700px; object-fit: cover; object-position: top left;">
+      <sc-for list="{{pins}}" as="p" hint-placeholder-count="8">
+        <span style="{{p.style}}">{{p.n}}</span>
+      </sc-for>
+    </div>
+
+    <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 7px;">
+      <h2 style="margin: 0 0 2px; font-size: 13px; font-weight: 600;">What a Hacker cannot see here</h2>
+      <sc-for list="{{notes}}" as="n" hint-placeholder-count="8">
+        <div style="display: flex; gap: 9px; align-items: flex-start; padding: 8px 10px; background: #ffffff; border: 1px solid #DDD3C4; border-radius: 10px;">
+          <span style="flex-shrink: 0; width: 20px; height: 20px; border-radius: 999px; background: #b3222a; color: #ffffff; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center;">{{n.n}}</span>
+          <span style="font-size: 11.5px; line-height: 1.35;">{{n.text}}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1520,"height":880}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const PINS = [
+      { n: '1', x: 76, y: 240 }, { n: '2', x: 800, y: 262 }, { n: '3', x: 728, y: 150 },
+      { n: '4', x: 952, y: 176 }, { n: '5', x: 972, y: 440 }, { n: '6', x: 140, y: 588 },
+      { n: '7', x: 614, y: 606 }, { n: '8', x: 392, y: 522 },
+    ];
+    return {
+      pins: PINS.map((p) => ({
+        n: p.n,
+        style: 'position:absolute;left:' + p.x + 'px;top:' + p.y + 'px;width:22px;height:22px;border-radius:999px;background:#b3222a;color:#ffffff;'
+          + 'font-family:\'IBM Plex Mono\',monospace;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;'
+          + 'box-shadow:0 0 0 3px rgba(255,255,255,0.9);',
+      })),
+      notes: [
+        { n: '1', text: 'Location names run off the left edge of the map and collide with the row below.' },
+        { n: '2', text: 'Badges read “Gang 2” and “Corp 1” — the engine’s internal ids, not Crimson Clan and OmniSuperUltra. Population is not shown at all.' },
+        { n: '3', text: 'The holding track shows dots, not who is in them, and two of the three labels overlap.' },
+        { n: '4', text: 'The Detective panel lists an Overclock the Detective does not have, and buries the Location deck — the game’s clock — as one number among six.' },
+        { n: '5', text: 'Two truthful clues and four NOT tokens are on the table. Neither appears anywhere: the deduction the whole game turns on is invisible to both seats.' },
+        { n: '6', text: 'Your own hideout reads “The Hive · Corp 2”. The seat view sends a description instead of the card, so the map cannot mark it.' },
+        { n: '7', text: 'Seven contacts overlap into a blue smear. No cost, no affiliation, no ability, no sign of which three make a legal Motive set.' },
+        { n: '8', text: 'Evidence — 7 of the 13 cards that win the game — and the 16-item move list are both below the fold, inside a column you have to scroll.' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

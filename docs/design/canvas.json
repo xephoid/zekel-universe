@@ -7,7 +7,19 @@
     { "file": "Sweetlands Art.dc.html", "title": "Sweetlands · factions and treats", "x": 3160, "y": 5620, "w": 1440, "h": 1180 },
     { "file": "Fractured Fist Loadout.dc.html", "title": "Fractured Fist · choose the seven", "x": 4720, "y": 0, "w": 1440, "h": 900, "is_interactive": true },
     { "file": "Fractured Fist Table.dc.html", "title": "Fractured Fist · the duel table", "x": 4720, "y": 1040, "w": 1440, "h": 900, "is_interactive": true },
-    { "file": "Fractured Fist Strike.dc.html", "title": "Fractured Fist · the strike, beat by beat", "x": 4720, "y": 2080, "w": 1440, "h": 900 }
+    { "file": "Fractured Fist Strike.dc.html", "title": "Fractured Fist · the strike, beat by beat", "x": 4720, "y": 2080, "w": 1440, "h": 900 },
+    { "file": "Cybernoir Table Now.dc.html", "title": "Cybernoir 2127 · the table as it ships today", "x": 6280, "y": 0, "w": 1520, "h": 880 },
+    { "file": "Cybernoir Hacker Table.dc.html", "title": "Cybernoir 2127 · the Hacker table", "x": 6280, "y": 1000, "w": 1440, "h": 900 },
+    { "file": "Cybernoir Detective Table.dc.html", "title": "Cybernoir 2127 · the Detective table", "x": 6280, "y": 2020, "w": 1440, "h": 900 },
+    { "file": "Cybernoir Case File.dc.html", "title": "Cybernoir · your case, 13 slots", "x": 7880, "y": 0, "w": 520, "h": 740 },
+    { "file": "Cybernoir Contact Card.dc.html", "title": "Cybernoir · the Contact card", "x": 7880, "y": 860, "w": 1120, "h": 340 },
+    { "file": "Cybernoir Turn Bar.dc.html", "title": "Cybernoir · taking a turn", "x": 7880, "y": 1320, "w": 960, "h": 520, "is_interactive": true },
+    { "file": "Cybernoir Clue Moment.dc.html", "title": "Cybernoir · the clue you have to give", "x": 7880, "y": 1960, "w": 960, "h": 440 },
+    { "file": "Cybernoir Canvassing.dc.html", "title": "Cybernoir · canvassing a Location", "x": 7880, "y": 2520, "w": 1120, "h": 420 },
+    { "file": "Cybernoir Block.dc.html", "title": "Cybernoir · block, or say nothing", "x": 7880, "y": 3060, "w": 960, "h": 470 },
+    { "file": "Cybernoir Upkeep.dc.html", "title": "Cybernoir · paying upkeep", "x": 7880, "y": 3650, "w": 960, "h": 440 },
+    { "file": "Cybernoir Big Hands.dc.html", "title": "Cybernoir · when the hand gets big", "x": 7880, "y": 4210, "w": 1440, "h": 800 },
+    { "file": "Cybernoir Crowding.dc.html", "title": "Cybernoir · every zone that grows", "x": 7880, "y": 5130, "w": 1120, "h": 620 }
   ],
   "annotations": [
     { "id": "fix-recall-draw", "x": 3160, "y": -200, "w": 420, "text": "Changed after review: the turn now opens on the Recall step (a real choice, even when the answer is nobody), then a Draw button for turn-start Intel. Nothing resolves on its own. Drawn cards fly in from the deck instead of fading in." },
@@ -15,7 +27,10 @@
     { "id": "art-note", "x": 3160, "y": 5500, "w": 480, "text": "Added: the faction portraits and treat icons from the last five rulebook pages, cropped from the source. These replace the colored initials on avatars and the kingdom picker, and the text labels on treat tiles and treat cards." },
     { "id": "ff-loadout-note", "x": 4720, "y": -140, "w": 480, "text": "Fractured Fist, first pass. The seven-of-thirty pick as its own screen: grouped by school, seven numbered slots, a running total of what the seven can buy you. The default seven is a button, never a preselection." },
     { "id": "ff-table-note", "x": 4720, "y": 900, "w": 480, "text": "Fractured Fist table. One supply shelf carrying both counts instead of twenty stacks; the strike gutter between the played rows; counters only in the step that can change them; an action bar holding the moves that move the turn. What to build from it: docs/games/fractured-fist-build.md." },
-    { "id": "ff-strike-note", "x": 4720, "y": 1940, "w": 480, "text": "The strike, frozen beat by beat, because you cannot read a 580ms beat while it plays. It runs on the table artboard above. Pace, skip and replay belong to the player and should reuse the playback pace Universe already has." }
+    { "id": "ff-strike-note", "x": 4720, "y": 1940, "w": 480, "text": "The strike, frozen beat by beat, because you cannot read a 580ms beat while it plays. It runs on the table artboard above. Pace, skip and replay belong to the player and should reuse the playback pace Universe already has." },
+    { "id": "cn-now-note", "x": 6280, "y": -200, "w": 480, "text": "Cybernoir 2127, first pass, both seats. This first board is the running app at 1440x900 with the gaps pinned on it: Evidence and the move list below the fold, no clue tokens anywhere, faction ids on the map, and twelve of the Detective's nineteen moves with nothing to touch. What to build from it: docs/games/cybernoir-2127-build.md." },
+    { "id": "cn-hacker-note", "x": 6280, "y": 900, "w": 480, "text": "The Hacker seat. The 13-slot case file moves to the top of the side column where the points track belongs; the clue rail and the informant count come onto the board; hand cards carry cost, affiliation, ability and block risk; eight verbs with costs replace sixteen engine sentences, with the numbered list one tap away." },
+    { "id": "cn-detective-note", "x": 6280, "y": 1920, "w": 480, "text": "The Detective seat. The map becomes the case board, with private crossings-off drawn differently from clue eliminations. 'Who you can reach' gives the twelve arrest and recruit moves something to touch. Upkeep and the block get real panels. Open: the Hacker's own hideout arrives as a description, not a card." }
   ],
   "launch": { "view": "canvas" }
 }
