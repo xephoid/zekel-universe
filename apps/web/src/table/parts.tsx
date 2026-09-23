@@ -248,6 +248,32 @@ export function NoticeToast({ notice, onClose }: { notice: Notice | null; onClos
   );
 }
 
+/**
+ * The engine's narration for the move on screen, held to a few lines.
+ *
+ * A summary is as long as the move was busy: a jail that advanced four
+ * prisoners names each of them, and one of these ran to nine lines and 217
+ * pixels. The card grew with it and pushed the board down by more than a
+ * hundred pixels from one move to the next, which is the same jitter the card
+ * already draws its controls to avoid, only larger.
+ *
+ * Nothing is lost by cutting it short. The Log beside the table carries every
+ * event in full, and when this one is cut the card says so and opens it.
+ */
+export function CaptionWords({ text, onClamped }: { text: string; onClamped: (clamped: boolean) => void }) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const measure = () => onClamped(el.scrollHeight - el.clientHeight > 1);
+    measure();
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null;
+    ro?.observe(el);
+    return () => ro?.disconnect();
+  }, [text, onClamped]);
+  return <div className="caption-words" ref={ref}>{text}</div>;
+}
+
 export function Log({ events, currentSeq }: { events: TableEventWire[]; currentSeq: number | null }) {
   return (
     <div className="side-section">

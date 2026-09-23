@@ -15,7 +15,7 @@ import { glueFor, submitMove, type GlueInput, formForMove, movesForSelect } from
 import type { MoveForm, FormContext, Moment, PromptAction } from '../glue';
 import { BoardZones, JsonInspector, ZoneRenderer } from '../glue/ZoneRenderer';
 import { useTable } from '../table/useTable';
-import { ActionBar, LessonNote, EndPanel, Log, MoveChooser, MoveFormSheet, MoveMenuList, NoticeToast, PaceControl, Sheet, lessonsOf, type Lesson, type Notice } from '../table/parts';
+import { ActionBar, CaptionWords, LessonNote, EndPanel, Log, MoveChooser, MoveFormSheet, MoveMenuList, NoticeToast, PaceControl, Sheet, lessonsOf, type Lesson, type Notice } from '../table/parts';
 import { StrikeOverlay } from '../table/StrikeMoment';
 import { api } from '../api';
 import { useSession } from '../session';
@@ -76,6 +76,10 @@ export function TablePage() {
   const [shared, setShared] = useState(false);
   const [form, setForm] = useState<MoveForm | null>(null);
   const [detail, setDetail] = useState<{ title: string; lines: string[] } | null>(null);
+  // The narration on the card is cut to a few lines; this holds the whole of
+  // it while the player reads it.
+  const [captionClamped, setCaptionClamped] = useState(false);
+  const [captionFull, setCaptionFull] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [playAgainBusy, setPlayAgainBusy] = useState(false);
   const [showEnd, setShowEnd] = useState(true);
@@ -254,6 +258,9 @@ export function TablePage() {
   }, [table, t.mySeat, nav]);
 
   const result = current?.gameOver ?? table?.table.status === 'finished' ? (current?.gameOver ?? null) : null;
+  // What the card says, in one place: the card cuts it to a few lines and the
+  // sheet behind "Read it all" prints the same string whole.
+  const captionText = current ? current.summary : (t.error ?? 'Setting the table…');
   const nameFor = useCallback((pid: string) => {
     const m = /^p(\d+)$/.exec(pid);
     const seat = m ? table?.seats.find((s) => s.position === Number(m[1]) - 1) : undefined;
@@ -306,7 +313,7 @@ export function TablePage() {
                 <ActorChip seat={table.seats.find((s) => s.position === current.actorSeatPosition)} you={yourTurn} />
               ) : null}
               <div className="caption-text">
-                {current ? current.summary : (t.error ?? 'Setting the table…')}
+                <CaptionWords text={captionText} onClamped={setCaptionClamped} />
                 {/* Always drawn, so the card's height never changes between a
                     move playing and a move landed: a change would shift the
                     whole board and read as a jitter on every move. */}
@@ -315,6 +322,9 @@ export function TablePage() {
                   <button className="chip-btn" onClick={playback.replayLast} disabled={!current || !!moment}>
                     {current && current.seq === momentSeq ? 'Replay the strike' : 'Replay last'}
                   </button>
+                  {captionClamped && (
+                    <button className="chip-btn" onClick={() => setCaptionFull(captionText)}>Read it all</button>
+                  )}
                 </div>
               </div>
             </div>
@@ -376,6 +386,11 @@ export function TablePage() {
         />
       )}
 
+      {captionFull && (
+        <Sheet title="What happened" onClose={() => setCaptionFull(null)}>
+          <p className="caption-full">{captionFull}</p>
+        </Sheet>
+      )}
       {detail && (
         <Sheet title={detail.title} onClose={() => setDetail(null)}>
           <dl className="detail-lines">
