@@ -570,10 +570,33 @@ And looking is safe: every location can be tapped whether or not a move is
 behind it, and one with none opens its own facts, full name and all. That is
 also the answer to truncated names on the map.
 
-**Not done from that item:** ruled-out locations and the Detective's private
-crossed-off ones. The engine computes both and publishes neither, and that
-fourth ask was not taken. Until it is, the table cannot draw them, and it
-draws nothing rather than guessing.
+**Done after all: the crossing-off.** Asked whether the played Locations could
+be used to cross places off. They can — and that is exactly why a client
+should not. A played card is only out because the safehouse card left the deck
+at setup; a truthful clue excludes everything that does not match it; a NOT
+token excludes everything that does; and the Detective's own hand and discards
+are out for them alone. Four rules, and the engine already stated all four to
+reason for its AI.
+
+So the engine states them once and publishes the answer with its reason.
+`ruledOutReason` gives why a Location cannot be the hideout, `candidateLocations`
+filters on it — the same set the AI has always used, now behind the same
+predicate so the two cannot drift — and the views carry `locations_ruled_out`
+publicly and `your_locations_ruled_out` to the Detective alone.
+
+The map draws them dimmed with "ruled out", the city's header counts what is
+still standing, and the reason is on the location's own sheet. Universe crosses
+nothing off itself.
+
+The first thing it showed on a live table: **15 of 19 standing on turn one**,
+before anything is played — the Detective's opening hand of four is already
+out, because they have held those cards. Playing one does not change the
+count; what changes is the reason, from private to public.
+
+One thing that came out of checking it: once a guess is on offer, every
+location has a move behind it, so a plain look is no longer reachable. The
+facts now ride inside the confirmation instead — the price, the engine's
+sentence, and the place's own borough, residents and faction.
 
 ## Out of scope
 

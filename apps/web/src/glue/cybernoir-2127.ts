@@ -238,6 +238,29 @@ function whoYouCanReach(
   };
 }
 
+/**
+ * Which Locations the engine says cannot be the hideout, and why. The seat's
+ * own list when it has one: the Detective's includes the cards only they have
+ * held, and the Hacker's view does not carry that list at all.
+ *
+ * Universe crosses nothing off itself. Whether a played card is out depends on
+ * whether the safehouse card left the deck, which is a rule, and the engine
+ * answers it.
+ */
+function ruledOutReasons(view: Record<string, unknown>): Map<string, string> {
+  const out = new Map<string, string>();
+  const lists = [view['locations_ruled_out'], view['your_locations_ruled_out']];
+  for (const list of lists) {
+    for (const r of asArr(list)) {
+      if (!isObj(r)) continue;
+      const where = asStr(r['location_name']);
+      const why = asStr(r['reason']);
+      if (where && why && !out.has(where)) out.set(where, why);
+    }
+  }
+  return out;
+}
+
 /** The people the engine's reference data puts at a location, by printed name. */
 function residentsOf(reference: GameReferenceResponse | null, locName: string): string[] {
   const rd = reference?.referenceData;
@@ -656,6 +679,7 @@ export const cybernoirGlue: GlueModule = {
     // badge. They used to be three text badges each, which is what made the
     // map unreadable.
     const locs = locations(input.reference, view);
+    const crossedOff = ruledOutReasons(view);
     const boroughs = [...new Set(locs.map((l) => l.borough))];
     const bandHeight = 100 / Math.max(1, boroughs.length);
     const nodes: MapNode[] = [];
@@ -678,7 +702,7 @@ export const cybernoirGlue: GlueModule = {
           // and being played is what happened to it. It used to go grey, and
           // the Detective lost the one fact they are reasoning from.
           colorKey: l.affiliation || 'none',
-          dim: isPlayed,
+          dim: isPlayed || crossedOff.has(l.name),
           // Colour and position carry the faction and the borough, which a
           // reader cannot hear. Say all of it.
           describedAs: [
@@ -687,10 +711,12 @@ export const cybernoirGlue: GlueModule = {
             residentCount(l.population),
             l.affiliation && l.affiliation !== 'none' ? name.affiliation(l.affiliation) : 'no faction',
             isPlayed ? 'played' : '',
+            crossedOff.has(l.name) ? `ruled out: ${crossedOff.get(l.name)}` : '',
             isHideout ? 'your safehouse' : '',
           ].filter(Boolean).join(', '),
           badges: [
             ...(isPlayed ? ['played'] : []),
+            ...(!isPlayed && crossedOff.has(l.name) ? ['ruled out'] : []),
             ...(isHideout ? ['safehouse'] : []),
             residentCount(l.population),
           ].filter(Boolean),
@@ -703,7 +729,7 @@ export const cybernoirGlue: GlueModule = {
       {
         kind: 'map', id: 'cn:map',
         data: {
-          label: `The city · ${locs.length} locations · ${played.size} played`,
+          label: `The city · ${locs.length} locations · ${locs.length - crossedOff.size} still standing`,
           aspect: 52, nodeShape: 'pill', nodes,
           // Every location can be looked at, whether or not a move is behind
           // it, and the colours say what they mean.
@@ -1099,9 +1125,19 @@ export const cybernoirGlue: GlueModule = {
     // engine's own sentence for what it costs.
     const weighty = WEIGHTY.find((w) => w.type === move.move['type']);
     if (weighty) {
+      // When the move names a place, decide with that place's facts in front
+      // of you: once a guess is on offer every location has a move behind it,
+      // so this is the only way left to look at one.
+      const about = namedLocations(move)[0];
+      const facts = about
+        ? cybernoirGlue.detailFor?.({ component: 'map', id: locId(about), label: about }, input)?.lines ?? []
+        : [];
       return {
         title: weighty.title,
-        help: [move.cost, move.description].filter(Boolean).join(' — '),
+        help: [
+          [move.cost, move.description].filter(Boolean).join(' — '),
+          ...(facts.length > 0 ? [`${about}: ${facts.join(' · ')}`] : []),
+        ].join(' — '),
         fields: [],
         template: move,
         editableKeys: [],
@@ -1178,6 +1214,7 @@ export const cybernoirGlue: GlueModule = {
     const who = residentsOf(input.reference, l.name);
     const played = asArr(view['board']).map((b) => asStr(b)).includes(l.name);
     const discarded = asArr(isObj(view['detective']) ? view['detective']['location_discard'] : []).map((d) => asStr(d)).includes(l.name);
+    const why = ruledOutReasons(view).get(l.name);
     const isHideout = asStr(view['role']) === 'hacker'
       && asStr(isObj(view['hideout']) ? view['hideout']['location_name'] : view['hideout']) === l.name;
     return {
@@ -1186,8 +1223,10 @@ export const cybernoirGlue: GlueModule = {
         `Borough: ${n.borough(l.borough)}`,
         `Lives here: ${who.length > 0 ? who.join(', ') : 'nobody'}`,
         `Faction: ${l.affiliation && l.affiliation !== 'none' ? n.affiliation(l.affiliation) : 'none'}`,
-        ...(played ? ['Played by the Detective — everyone can see it is not the hideout.'] : []),
+        ...(played ? ['Played by the Detective.'] : []),
         ...(discarded ? ['In the Detective’s discard pile.'] : []),
+        // Why it is out, in the engine's words. Universe rules nothing out.
+        ...(why ? [`Ruled out — ${why}.`] : []),
         ...(isHideout ? ['This is your safehouse.'] : []),
       ],
     };

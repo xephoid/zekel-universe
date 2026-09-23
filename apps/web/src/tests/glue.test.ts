@@ -799,9 +799,51 @@ describe('cybernoir-2127 glue', () => {
     ]);
     // A played one says so, in a sentence rather than a badge.
     expect(g.detailFor!({ component: 'map', id: 'cn:loc:dark-city-central-station', label: '' }, inp)!.lines)
-      .toContain('Played by the Detective — everyone can see it is not the hideout.');
+      .toContain('Played by the Detective.');
     // Something that is not a location has no detail to give.
     expect(g.detailFor!({ component: 'card', id: 'cn:hand:0:Blackice', label: '' }, inp)).toBeNull();
+  });
+
+  it("crosses a location off with the engine's reason, and never with one of its own", () => {
+    const told = {
+      ...CN_VIEW,
+      locations_ruled_out: [
+        { location_name: 'Dark City Central Station', reason: 'the Detective played this card, so it is not the safehouse' },
+        { location_name: 'Shipyard', reason: 'a NOT token rules out Corp 1' },
+      ],
+    };
+    const plan = g.plan(input(told, [], { reference: CN_REFERENCE }))!;
+    const map = plan.board.find((z) => z.kind === 'map')!.data as MapData;
+    const shipyard = map.nodes.find((n) => n.id === 'cn:loc:shipyard')!;
+    expect(shipyard.dim).toBe(true);
+    expect(shipyard.badges).toContain('ruled out');
+    expect(shipyard.describedAs).toContain('ruled out: a NOT token rules out Corp 1');
+    // How many still stand is the engine's arithmetic, not ours.
+    expect(map.label).toBe('The city · 4 locations · 2 still standing');
+    // And the reason is on the location's own sheet.
+    expect(g.detailFor!({ component: 'map', id: 'cn:loc:shipyard', label: '' }, input(told, [], { reference: CN_REFERENCE }))!.lines)
+      .toContain('Ruled out — a NOT token rules out Corp 1.');
+
+    // Told nothing, it crosses nothing off — a played card is only out
+    // because the safehouse card left the deck, which is the engine's to say.
+    const silent = g.plan(input(CN_VIEW, [], { reference: CN_REFERENCE }))!;
+    const quietMap = silent.board.find((z) => z.kind === 'map')!.data as MapData;
+    expect(quietMap.nodes.every((n) => !(n.badges ?? []).includes('ruled out'))).toBe(true);
+    expect(quietMap.label).toBe('The city · 4 locations · 4 still standing');
+  });
+
+  it('takes the Detective’s own crossing-off, which only their view carries', () => {
+    const det = {
+      ...CN_VIEW, role: 'detective', hideout: null, location_hand: [], informants: [],
+      locations_ruled_out: [],
+      your_locations_ruled_out: [{ location_name: 'Shipyard', reason: 'you have held or discarded this card' }],
+    };
+    const map = g.plan(input(det, [], { reference: CN_REFERENCE }))!.board.find((z) => z.kind === 'map')!.data as MapData;
+    const shipyard = map.nodes.find((n) => n.id === 'cn:loc:shipyard')!;
+    expect(shipyard.badges).toContain('ruled out');
+    expect(shipyard.describedAs).toContain('you have held or discarded this card');
+    // A played one says "played" and not both: one label, the more specific.
+    expect(map.nodes.find((n) => n.id === 'cn:loc:xistential-club')!.badges).not.toContain('ruled out');
   });
 
   it('puts the public discard piles on screen for both seats', () => {
@@ -1056,16 +1098,21 @@ describe('cybernoir-2127 glue', () => {
   it('asks twice before spending what you only get to spend once', () => {
     const det = { ...CN_VIEW, role: 'detective', hideout: null, location_hand: [], informants: [] };
     const guess = {
-      move_id: 'g', description: "Guess Shizuoka Megamall as Hacker's hideout (4 AP)",
-      move: { type: 'guess_location', location_name: 'Shizuoka Megamall' },
+      move_id: 'g', description: "Guess Shipyard as Hacker's hideout (4 AP)",
+      cost: '4 AP, once per game',
+      move: { type: 'guess_location', location_name: 'Shipyard' },
     };
     const inp = input(det, [guess], { reference: CN_REFERENCE });
     // A tap on the map means the guess now, and it does not go out on the tap.
-    expect(movesForSelect(g, { component: 'map', id: 'cn:loc:shizuoka-megamall', label: '' }, inp).map((m) => m.move_id)).toEqual(['g']);
+    expect(movesForSelect(g, { component: 'map', id: 'cn:loc:shipyard', label: '' }, inp).map((m) => m.move_id)).toEqual(['g']);
     const sheet = g.formFor!(guess, inp)!;
     expect(sheet.title).toBe('Guess the hideout?');
-    // What it costs comes from the engine's own sentence, not from here.
-    expect(sheet.help).toBe("Guess Shizuoka Megamall as Hacker's hideout (4 AP)");
+    // What it costs comes from the engine's own sentence, not from here — and
+    // the place's own facts come with it, because once a guess is on offer
+    // every location has a move behind it and this is the only look left.
+    expect(sheet.help).toContain("Guess Shipyard as Hacker's hideout (4 AP)");
+    expect(sheet.help).toContain('4 AP, once per game');
+    expect(sheet.help).toContain('Shipyard: Borough: Boonies');
     expect(sheet.fields).toEqual([]);
     expect(sheet.submitLabel).toBe('Guess it');
     expect(sheet.build({})).toEqual(guess.move);
