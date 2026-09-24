@@ -830,10 +830,10 @@ fields first and falls back to what the current engine sends.
   skipping actions and turning face-down cards face up); the retreat menu now
   reads the retreat check instead of a copy of it.
 
-**Still open:**
-
-- **A reserved hero is never placed.** The engine has the placement pending
-  but nothing arms it after a claimant with no base builds one, so the hero
-  stays reserved for good. When placement happens is a rules question.
-- **Shut reasons carry raw seat ids and coords**; the screens show them as
-  names for display only. The engine could phrase them with names.
+- **A reserved hero** is placed as soon as its owner has a base: building a
+  base asks where it goes, and the Build action resumes after (rules
+  decision 2026-09-24; nothing is paid back for the rounds it waited).
+- **Sentences a person reads name seats and tiles.** The engine's shut
+  reasons and the move descriptions a screen prints use faction names and
+  tile labels. Universe keeps its display swap (`ctx.say`) only as a
+  fallback for older engine sentences.
