@@ -131,6 +131,17 @@ describe('socket privacy', () => {
     expect(engine.applied.length).toBe(appliedBefore);
   });
 
+  it('a runaway stream of questions is cut off before it reaches the engine', async () => {
+    const tableId = await twoHumanTable(userA, userB);
+    const sockA = client('user-a');
+    await connected(sockA);
+    const acks = [];
+    for (let i = 0; i < 35; i++) acks.push(await query(sockA, tableId, 0, 'echo'));
+    expect(acks.filter((a) => 'ok' in a && a.ok)).toHaveLength(30);
+    expect(acks.at(-1)).toMatchObject({ error: 'rate_limited' });
+    expect(fake.queries).toHaveLength(30);
+  });
+
   it('two sockets, two seats, two views: no crossing', async () => {
     const tableId = await twoHumanTable(userA, userB);
     const sockA = client('user-a');

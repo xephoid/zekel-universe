@@ -807,28 +807,33 @@ for a unit, one per legal site for a new base, none at the base limit — so
 the engine never picks the spawn for the player. Universe reads the new
 fields first and falls back to what the current engine sends.
 
-**Open, and each needs the engine:**
+**Settled with the engine (2026-09-24), on the same engine branch:**
 
-- **Collector reach.** The payment stage shows the engine's proposed
-  placements to commit or drop; the player cannot move a collector to another
-  tile, because reach is chained (each placement extends the next, §6.1) and
-  the view publishes none of it. Computing the chain here would be a second
-  copy of the rule. The engine needs to publish reach, or accept a proposal
-  and answer with the next legal tiles.
-- **A claimed hero is placed by the engine** at the first base, with no move
-  to choose (a player-agency gap). Hero Claim is built without a Place It step.
-- **Treaty Response** has no structured proposer or treaty type
-  (`pending.context`); the screen shows Accept and Decline only.
-- **Second purchase** does not say whether it is a build or a research;
-  **Spy Assign** does not publish the source (Illusionist or Infiltrator);
-  **The End** has no structured kind of win; **Overlay Choice** does not name
-  the resource each hero would make the tile.
-- **Shut reasons carry raw seat ids and coords** ("rob is in this battle…");
-  the screens show them as faction names and tile labels for display only.
-- ~~A Counter with no possible target~~ and ~~the robot Infiltrator's look~~:
-  fixed on the engine branch (2026-09-24). The Counter resolves with no
-  target; the look is listed while the carrier hero is on the clock.
-- **One seat assigns every seat's faction** (`assign_setup_choices`); at a
-  table with friends that is the host choosing for them.
-- **A new base may be listed on a tile that already holds one of your
-  bases**; the engine's site rule does not exclude it. A rules question.
+- **Collector reach.** The payment stage asks the engine a read-only
+  question after every placement (`query_choice` "collector_reach", over the
+  table socket, only for the seat's own purchase): where each collector in
+  hand may go next, what the placements produce, whose consent they need,
+  and whether they cover the purchase. The person places each collector;
+  the engine's proposal is one press away, never pre-chosen; Commit opens
+  only when the engine says the payment covers the cost.
+- **Hero placement.** A claimed hero whose owner has two or more bases goes
+  through the reserved-hero placement; with one base there is no choice.
+- **Factions.** Each human picks their own at the table, in seat order; the
+  setup page still assigns a host-and-AI table in one move.
+- **New base sites** exclude any tile that already holds a base.
+- **Pendings name what their screens show**: the treaty offer, the second
+  purchase's kind, the spy's source (to its owner), the overlay's resources,
+  the kind of win.
+- **Engine bugs fixed**: a Counter with no target now resolves; a robot's
+  Detection is listed when its carrier acts; finishing one seat's stack card
+  no longer removes every seat's card of that kind (it had been silently
+  skipping actions and turning face-down cards face up); the retreat menu now
+  reads the retreat check instead of a copy of it.
+
+**Still open:**
+
+- **A reserved hero is never placed.** The engine has the placement pending
+  but nothing arms it after a claimant with no base builds one, so the hero
+  stays reserved for good. When placement happens is a rules question.
+- **Shut reasons carry raw seat ids and coords**; the screens show them as
+  names for display only. The engine could phrase them with names.

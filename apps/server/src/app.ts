@@ -55,6 +55,10 @@ export interface BuildAppOptions {
   testOutbox?: boolean;
 }
 
+/** A read-only engine question: at most this many per connection per window. */
+const QUERY_BURST = 30;
+const QUERY_WINDOW_MS = 10_000;
+
 export interface UniverseApp {
   fastify: FastifyInstance;
   io: SocketServer | null;
@@ -992,6 +996,16 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
       // name and a small argument object; the engine answers or refuses.
       socket.on(SOCKET_EVENTS.query, async (msg: Partial<QueryMessage>, ack?: (r: QueryAck) => void) => {
         const respond = ack ?? (() => {});
+        // Each question is an engine call: at most QUERY_BURST in any
+        // QUERY_WINDOW_MS on one connection. A person placing collectors asks
+        // once per placement; this only stops a runaway client.
+        const now = Date.now();
+        const recent = ((socket.data.queryTimes as number[] | undefined) ?? []).filter((t) => now - t < QUERY_WINDOW_MS);
+        if (recent.length >= QUERY_BURST) {
+          socket.data.queryTimes = recent;
+          return respond({ error: 'rate_limited', reason: 'Too many questions at once; try again in a moment.' });
+        }
+        socket.data.queryTimes = [...recent, now];
         try {
           const args = msg?.args ?? {};
           if (!msg?.tableId || typeof msg.seat !== 'number' || typeof msg.name !== 'string'
