@@ -729,3 +729,111 @@ Still open:
   `docs/games/cybernoir-2127-build.md`; the engine naming it was that note's
   own recommendation, and Universe holds no second copy of the fact.
 - The phone pass (M6).
+
+## 16. Neither Guts nor Gears (decided 2026-09-23)
+
+The design canvas is `docs/design/neither-guts-nor-gears/`; how its boards
+become one client is `docs/design/SCREEN-ROUTING.md`. Decisions made before
+building:
+
+- **DECIDED: a bespoke screen inside the table.** The NGnG glue keeps a
+  `plan()` for Watch and the move-menu fallback, and adds a React screen that
+  replaces the board and bench: a pure `route(view, seat)`, client-side
+  composer stages (Build → Payment → Place It), and an interrupt layer above
+  them (access request, treaty response, battle defense). The top bar, log,
+  playback, undo and the numbered move menu stay shared with every game.
+- **DECIDED: Ink and Oil over Pressed.** Wizard seats read as inked pages,
+  robot seats as machined parts, tokens follow their owner on every seat's
+  screen, and the map stays one map. Done as tokens scoped to the NGnG table.
+- **DECIDED: faction on the setup page; Leader draft and starting sites in
+  the table.** The draft and the reverse-order starts are shared-pool picks
+  in turn, so they are in-table pendings.
+- **DECIDED: follow the engine where the canvas disagrees**
+  (`DESIGN-ALIGNMENT.md` §3 in the engine): treaties break several at a time
+  with a Done, one gate over a Shared Tactics partner's whole hand, no claim
+  that a partner's commitment is visible, Detection as its own control beside
+  the activation, and "request 1 of 2" on an access request.
+- **DECIDED: what a screen may print.** State the client holds, printed card
+  and rules text, the engine's reason an option is shut, and short how-to
+  lines ("Click a hex to place it"). No design commentary, no strategy advice.
+- **How the view's gaps are closed.** Pendings that publish `options` are read
+  from them; pendings that publish only a `question` take their option set from
+  the seat's legal moves. Map pieces come from `players[].units`, `heroes` and
+  `committed_collectors` joined to `map.tiles` by coord, never from the
+  `"Name (owner)"` strings. `active_action` is still the string
+  `"kind by owner"`; one tested reader handles it until the engine publishes a
+  structured field.
+
+### Where NGnG stands (2026-09-23)
+
+Built, in the build order of `SCREEN-ROUTING.md` §12:
+
+1. **The shell.** The map (one map for every seat; pieces from the owners'
+   own lists; tokens slide between hexes and fly in from their owner's
+   supply), the action stack, the seats, the culture race, and the seat's
+   faction board as a strip and a full sheet, in Ink or Oil.
+2. **The router.** `route(view, seat, legalMoves)` is pure and tested
+   against views the engine produced (`scripts/ngg-fixtures.mjs` plays seeded
+   games and captures each decision; `scripts/ngg-fixtures-rare.mts` takes
+   the rare ones from the engine's hand-built states). A route without a
+   dedicated screen falls back to a chooser that lists the pending's options,
+   shut ones struck through with the engine's reason.
+3. **The purchase composer** (Build, Research, a second purchase, the
+   economic spend): choose, pay, place; one move on the last press; the draft
+   survives an interrupt. Access Request is the owner's interrupt, with the
+   declared purchase and its queue position; the buyer sees the same terms.
+4. **The battle**: Move Battle, Elara's spell, the secret commit and Shared
+   Tactics, the Counter, the Extra, the activation ladder with Detection
+   beside it, the Infiltrator, the defense (and the Spy Reveal) as an
+   interrupt, Retreat, Rally.
+5. **Everything else**: setup at the table, the Leader draft, starting
+   sites, planning, Core reallocation, the draw (the Draw button sits in the
+   decision that asks for it), the treaty offer as an interrupt, the
+   break window, Diplomacy and the offer composer, hero claims, a reserved
+   hero, the overlay, the spy, the end.
+
+`/dev/ngg` (dev server only) draws any captured view as the deciding seat or
+a watcher. `e2e/ngg.spec.ts` plays a live table through the screens alone.
+
+The wizard seat's type, IM Fell English, is bundled (regular only; nothing
+draws italic). Caveat, which the canvas uses only for margin notes, is not:
+the screens draw no margin notes.
+
+**Engine changes, on a branch not yet merged** (`claude/ngg-structured-view`
+in the engine): `resolving_action { card_kind, owner }` beside the
+`active_action` sentence; `battle.units[].ref`, the id battle moves name a
+unit by; and build moves that name where the piece goes — one per owned base
+for a unit, one per legal site for a new base, none at the base limit — so
+the engine never picks the spawn for the player. Universe reads the new
+fields first and falls back to what the current engine sends.
+
+**Settled with the engine (2026-09-24), on the same engine branch:**
+
+- **Collector reach.** The payment stage asks the engine a read-only
+  question after every placement (`query_choice` "collector_reach", over the
+  table socket, only for the seat's own purchase): where each collector in
+  hand may go next, what the placements produce, whose consent they need,
+  and whether they cover the purchase. The person places each collector;
+  the engine's proposal is one press away, never pre-chosen; Commit opens
+  only when the engine says the payment covers the cost.
+- **Hero placement.** A claimed hero whose owner has two or more bases goes
+  through the reserved-hero placement; with one base there is no choice.
+- **Factions.** Each human picks their own at the table, in seat order; the
+  setup page still assigns a host-and-AI table in one move.
+- **New base sites** exclude any tile that already holds a base.
+- **Pendings name what their screens show**: the treaty offer, the second
+  purchase's kind, the spy's source (to its owner), the overlay's resources,
+  the kind of win.
+- **Engine bugs fixed**: a Counter with no target now resolves; a robot's
+  Detection is listed when its carrier acts; finishing one seat's stack card
+  no longer removes every seat's card of that kind (it had been silently
+  skipping actions and turning face-down cards face up); the retreat menu now
+  reads the retreat check instead of a copy of it.
+
+- **A reserved hero** is placed as soon as its owner has a base: building a
+  base asks where it goes, and the Build action resumes after (rules
+  decision 2026-09-24; nothing is paid back for the rounds it waited).
+- **Sentences a person reads name seats and tiles.** The engine's shut
+  reasons and the move descriptions a screen prints use faction names and
+  tile labels. Universe keeps its display swap (`ctx.say`) only as a
+  fallback for older engine sentences.

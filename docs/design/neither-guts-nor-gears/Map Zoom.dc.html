@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Reading the board at three sizes</title>
+<script src="./support.js"></script>
+<script src="./icons.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:var(--brand)}a:hover{color:var(--action)}
+</style>
+</helmet>
+
+<div style="{{ rootStyle }}" data-screen-label="Map zoom levels">
+
+  <div style="display:flex;align-items:flex-end;gap:24px">
+    <div style="display:flex;flex-direction:column;gap:6px;flex-grow:1">
+      <div style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:var(--muted)">NEITHER GUTS NOR GEARS · THE MAP</div>
+      <div style="font:700 34px 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;line-height:1;color:var(--text)">Reading the board at three sizes</div>
+      <div style="font-size:13px;line-height:1.55;color:var(--text);max-width:820px">A hex can hold a whole army and an ally’s besides, so one drawing cannot serve every question. Three fixed steps, no free zooming: each one drops what the step below was carrying and adds what it could not fit. Drag anywhere to pan at any step.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:7px;flex-shrink:0">
+      <span style="font:600 9.5px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:var(--muted)">THE CONTROL, BOTTOM RIGHT OF THE BOARD</span>
+      <div style="display:flex;background:var(--surface);border:1.5px solid var(--ink);border-radius:11px;overflow:hidden;box-shadow:var(--shadow)">
+        <sc-for list="{{ stops }}" as="s" hint-placeholder-count="3">
+          <span style="{{ s.style }}">
+            <span style="{{ s.iconStyle }}"></span>
+            <span style="font:600 11.5px 'IBM Plex Sans',sans-serif">{{ s.label }}</span>
+          </span>
+        </sc-for>
+      </div>
+      <span style="font-size:11px;line-height:1.4;color:var(--muted);max-width:330px">Or the scroll wheel, or pinch. Double-tap a hex to jump straight to step 3 on it; double-tap the background to come back to step 1.</span>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;flex-grow:1;min-height:0">
+
+    <sc-for list="{{ levels }}" as="L" hint-placeholder-count="3">
+      <div style="display:flex;flex-direction:column;gap:12px;min-width:0">
+
+        <div style="display:flex;align-items:baseline;gap:9px">
+          <span style="{{ L.numStyle }}">{{ L.num }}</span>
+          <span style="font:700 19px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:var(--text)">{{ L.name }}</span>
+          <span style="font:500 11px 'IBM Plex Mono',monospace;color:var(--muted);margin-left:auto">{{ L.scale }}</span>
+        </div>
+
+        <div style="{{ L.boxStyle }}">
+          <div style="{{ L.innerStyle }}">
+            <sc-for list="{{ L.tiles }}" as="t" hint-placeholder-count="34">
+              <div style="{{ t.style }}"><span style="{{ t.codeStyle }}">{{ t.code }}</span><span style="{{ t.glyphStyle }}"><svg width="{{ t.gsize }}" height="{{ t.gsize }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ t.gp.g1 }}"></path><path d="{{ t.gp.g2 }}"></path><path d="{{ t.gp.g3 }}"></path></svg></span></div>
+            </sc-for>
+            <sc-for list="{{ L.marks }}" as="m" hint-placeholder-count="12">
+              <div style="{{ m.wrapStyle }}">
+                <sc-for list="{{ m.items }}" as="i" hint-placeholder-count="6">
+                  <span style="{{ i.style }}"><span style="{{ i.glyphStyle }}"><svg width="{{ i.gsize }}" height="{{ i.gsize }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ i.d1 }}"></path><path d="{{ i.d2 }}"></path><path d="{{ i.d3 }}"></path></svg></span><span style="{{ i.textStyle }}">{{ i.text }}</span></span>
+                </sc-for>
+              </div>
+            </sc-for>
+            <sc-for list="{{ L.units }}" as="u" hint-placeholder-count="6">
+              <div style="{{ u.wrapStyle }}">
+                <sc-for list="{{ u.items }}" as="i" hint-placeholder-count="6">
+                  <span style="{{ i.tokenStyle }}">
+                    <span style="{{ i.dotStyle }}"><span style="{{ i.glyphStyle }}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ i.d1 }}"></path><path d="{{ i.d2 }}"></path><path d="{{ i.d3 }}"></path></svg></span><span style="{{ i.letterStyle }}">{{ i.letter }}</span></span>
+                    <span style="{{ i.statStyle }}">{{ i.stats }}</span>
+                  </span>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+          <div style="{{ L.viewportStyle }}"><span style="{{ L.viewportTagStyle }}">{{ L.viewportTag }}</span></div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div style="font-size:12px;line-height:1.5;color:var(--text)">{{ L.blurb }}</div>
+          <div style="display:flex;flex-direction:column;gap:4px;padding:10px 12px;border-radius:10px;background:var(--surface)">
+            <sc-for list="{{ L.shows }}" as="s" hint-placeholder-count="4">
+              <div style="display:flex;align-items:flex-start;gap:8px">
+                <span style="{{ s.markStyle }}">{{ s.mark }}</span>
+                <span style="font-size:11.5px;line-height:1.4;color:var(--text);flex-grow:1">{{ s.text }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:18px;flex-shrink:0">
+
+    <div style="padding:16px 18px;border-radius:14px;background:var(--surface);border:1.5px solid var(--brand);display:flex;flex-direction:column;gap:10px">
+      <div style="font:700 17px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:var(--text)">Zoom is a view. It is never a rule.</div>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+        <sc-for list="{{ laws }}" as="l" hint-placeholder-count="4">
+          <div style="display:flex;align-items:flex-start;gap:9px">
+            <span style="{{ l.tagStyle }}">{{ l.tag }}</span>
+            <span style="font-size:11.5px;line-height:1.4;color:var(--text);flex-grow:1">{{ l.text }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="padding:16px 18px;border-radius:14px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:10px">
+      <div style="font:700 17px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:var(--text)">Panning, and getting lost</div>
+      <div style="display:flex;gap:14px">
+        <div style="display:flex;flex-direction:column;gap:6px;flex-grow:1">
+          <sc-for list="{{ pan }}" as="p" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:9px">
+              <span style="{{ p.keyStyle }}">{{ p.key }}</span>
+              <span style="font-size:11.5px;line-height:1.35;color:var(--text);flex-grow:1">{{ p.text }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="flex-shrink:0;display:flex;flex-direction:column;gap:5px;align-items:center">
+          <div style="{{ locatorStyle }}">
+            <sc-for list="{{ locatorTiles }}" as="t" hint-placeholder-count="34">
+              <div style="{{ t.style }}"></div>
+            </sc-for>
+            <div style="{{ locatorBoxStyle }}"></div>
+          </div>
+          <span style="font:600 9px 'IBM Plex Mono',monospace;letter-spacing:.05em;color:var(--muted)">LOCATOR · STEPS 2 AND 3</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1040},"theme":{"editor":"enum","options":["light","dark"],"default":"light","tsType":"&#39;light&#39;|&#39;dark&#39;","section":"Sheet"}}'>
+const THEMES={
+ light:{'--bg':'#f7f1e6','--surface':'#ffffff','--surface2':'#efe7d8','--text':'#1c1a17','--muted':'#6b655b','--brand':'#1f4d3a','--action':'#e0762b','--hlbg':'#e6efe9','--danger':'#b3261e','--line':'rgba(28,26,23,.14)','--ink':'#1c1a17','--boardbg':'#ffffff','--shadow':'0 1px 2px rgba(28,26,23,.06),0 4px 12px rgba(28,26,23,.06)'},
+ dark:{'--bg':'#1a221c','--surface':'#232e26','--surface2':'#2c3a30','--text':'#f3ead9','--muted':'#b1ac9f','--brand':'#9bb08a','--action':'#ff8a3d','--hlbg':'#2f4a3a','--danger':'#ff7b6b','--line':'rgba(243,234,217,.16)','--ink':'#0f150f','--boardbg':'#2a352d','--shadow':'0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.3)'}
+};
+const CLIP='polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)';
+const TER={Wa:'#4d86ab',Wo:'#57804a',Or:'#8d8577',Oi:'#3a342c',Et:'#7b55bd'};
+const FACS={cov:'#f0ece2',led:'#6b4fa0',fou:'#d8a020',unb:'#3f7d52'};
+function inkOn(f){return (f==='cov'||f==='fou')?'#1c1a17':'#ffffff';}
+const MAP=[[-2,2,'Wa'],[-2,4,'Or'],[-2,6,'Wa'],[-2,8,'Wa'],[-2,10,'Wo'],[-2,12,'Wa'],
+ [-1,1,'Wo'],[-1,3,'Wa'],[-1,5,'Wo'],[-1,7,'Et'],[-1,9,'Wo'],[-1,11,'Wo'],[-1,13,'Wo'],
+ [0,0,'Wa'],[0,2,'Or'],[0,4,'Or'],[0,6,'Oi'],[0,8,'Oi'],[0,10,'Or'],[0,12,'Or'],[0,14,'Wa'],
+ [1,1,'Wo'],[1,3,'Wa'],[1,5,'Wa'],[1,7,'Et'],[1,9,'Or'],[1,11,'Or'],[1,13,'Wo'],
+ [2,2,'Wa'],[2,4,'Wa'],[2,6,'Wo'],[2,8,'Wo'],[2,10,'Or'],[2,12,'Wa']];
+const W0=104,H0=90,CW0=78,RH0=45;
+function tileLabel(c,r){return String.fromCharCode(65+c+4)+(c%2===0?(r/2+1):((r+1)/2));}
+
+// The registry, and the two lookups this board needs. A token asks for the unit by NAME:
+// letters are faction-coded, so the same W is a Wall on a robot token and nothing on a
+// wizard one.
+const RG=(typeof NGG!=='undefined')?NGG:{icon:function(){return {has:false,d1:'',d2:'',d3:''};}};
+const WIZ={cov:1,sch:1,cir:1};
+const TOKEN_ANY={H:'Base',L:'Leader'};
+const TOKEN_WIZ={E:'Evoker',C:'Cleric',N:'Enchantress',I:'Illusionist',D:'Dragon',U:'Subject',F:'Surf'};
+const TOKEN_ROB={S:'Spinner Platform',P:'Spitter Platform',W:'Wall Platform',G:'Large Combat',
+                 M:'Immobile Combat',R:'Core',I:'Infiltrator'};
+function tokenIcon(fac,mark){
+ const name=TOKEN_ANY[mark]||(WIZ[fac]?TOKEN_WIZ[mark]:TOKEN_ROB[mark]);
+ return name?RG.icon(name):{has:false,d1:'',d2:'',d3:''};
+}
+function glyphOf(code){const i=RG.icon(code);return {g1:i.d1,g2:i.d2,g3:i.d3};}
+// A blank slot, so every item in a mixed list carries the same keys.
+const NOMARK={has:false,d1:'',d2:'',d3:''};
+function markOn(ic){return ic.has?{display:'grid',placeItems:'center'}:{display:'none'};}
+function textOn(ic){return ic.has?{display:'none'}:{};}
+
+// One table, drawn three ways. Bases and heroes survive every step down; ordinary units
+// collapse into a count at step 2 and vanish entirely at step 1.
+const BASES=[[-2,12,'cov'],[2,12,'fou'],[2,2,'led'],[-2,2,'unb']];
+const HEROES=[[0,6,'cov','L'],[2,12,'fou','S'],[2,2,'led','Q'],[-2,2,'unb','A']];
+const SPENT=[[-1,13,'cov'],[-2,10,'cov'],[-2,6,'cov'],[0,10,'cov'],[1,11,'fou'],[1,3,'led'],[-1,3,'unb']];
+// tile -> which factions hold it and how many ordinary units each has
+const STACKS=[[0,6,[['cov',3],['fou',2]]],[-1,5,[['cov',1]]],[-2,8,[['fou',1]]],
+ [-2,12,[['cov',1]]],[0,2,[['unb',1]]]];
+// every unit on the contested hex, for step 3
+const HEXUNITS=[[0,6,[['cov','L','70/3/6'],['cov','E','50/2/1'],['cov','C','2/0/1'],
+  ['cov','N','75/0/1'],['fou','L','60/2/4'],['fou','W','1/0/5']]],
+ [-1,5,[['cov','E','50/2/1']]]];
+
+class Component extends DCLogic{
+ renderVals(){
+  const T=THEMES[this.props.theme||'light'];
+  const BOXW=430,BOXH=392;
+
+  function geo(S){return {W:W0*S,H:H0*S,CW:CW0*S,RH:RH0*S};}
+  function at(c,r,S){const g=geo(S);return {x:(c+2)*g.CW,y:r*g.RH};}
+  function centreOf(c,r,S){const g=geo(S),p=at(c,r,S);return {x:p.x+g.W/2,y:p.y+g.H/2};}
+
+  function tilesAt(S,labels,ox,oy){
+   const g=geo(S);
+   return MAP.map(function(t){
+    const p=at(t[0],t[1],S);
+    return {code:labels?tileLabel(t[0],t[1]):'',gp:glyphOf(t[2]),gsize:Math.round(13*S),
+     // Step 1 drops the label and the glyph together. At 0.54 the glyph is four strokes in
+     // 26 px of hex and it would be noise, and step 1's whole job is to answer 'who is
+     // where', which colour already does.
+     glyphStyle:labels?{position:'absolute',left:'50%',bottom:(7*S)+'px',transform:'translateX(-50%)',
+       opacity:'.5',color:'#ffffff',pointerEvents:'none',display:'grid',placeItems:'center'}:{display:'none'},
+     style:{position:'absolute',left:(p.x+ox)+'px',top:(p.y+oy)+'px',width:g.W+'px',height:g.H+'px',
+       clipPath:CLIP,background:TER[t[2]]},
+     codeStyle:labels?{position:'absolute',left:'50%',top:(6*S)+'px',transform:'translateX(-50%)',
+       font:"600 "+(10*S)+"px 'IBM Plex Mono',monospace",color:'rgba(255,255,255,.8)',
+       letterSpacing:'.06em',pointerEvents:'none'}:{display:'none'}};});
+  }
+  function wrap(c,r,S,ox,oy,pad){
+   const g=geo(S),p=at(c,r,S);
+   return {position:'absolute',left:(p.x+ox)+'px',top:(p.y+oy)+'px',width:g.W+'px',height:g.H+'px',
+    display:'flex',alignItems:'center',justifyContent:'center',gap:(3*S)+'px',flexWrap:'wrap',
+    padding:pad,boxSizing:'border-box',pointerEvents:'none'};
+  }
+
+  // ---------- step 1: territory ----------
+  const S1=0.54, ox1=(BOXW-416*S1)/2, oy1=(BOXH-720*S1)/2;
+  const m1={};
+  function blank(it){it.d1=it.d1||'';it.d2=it.d2||'';it.d3=it.d3||'';it.gsize=it.gsize||0;
+   it.glyphStyle=it.glyphStyle||{display:'none'};it.textStyle=it.textStyle||{};return it;}
+  function push1(c,r,item){const k=c+','+r; if(!m1[k])m1[k]={c:c,r:r,items:[]}; m1[k].items.push(blank(item));}
+  BASES.forEach(function(b){push1(b[0],b[1],{text:'',
+   style:{width:'13px',height:'13px',borderRadius:'3px',background:FACS[b[2]],border:'1.5px solid #1c1a17',
+     boxShadow:'0 1px 3px rgba(0,0,0,.4)'}});});
+  HEROES.forEach(function(h){push1(h[0],h[1],{text:'',
+   style:{width:'13px',height:'13px',borderRadius:'50%',background:FACS[h[2]],
+     border:'1.5px solid #1c1a17',boxShadow:'0 0 0 2px rgba(255,255,255,.85)'}});});
+  STACKS.forEach(function(s){
+   var n=0; s[2].forEach(function(f){n+=f[1];});
+   push1(s[0],s[1],{text:'×'+n,
+    style:{font:"700 8.5px 'IBM Plex Mono',monospace",color:'#ffffff',background:'rgba(28,26,23,.72)',
+      borderRadius:'999px',padding:'1px 5px'}});});
+  SPENT.forEach(function(s){push1(s[0],s[1],{text:'',
+   style:{width:'8px',height:'8px',borderRadius:'50%',background:'transparent',
+     border:'1.5px dashed rgba(255,255,255,.95)'}});});
+  const marks1=Object.keys(m1).map(function(k){
+   return {items:m1[k].items,wrapStyle:wrap(m1[k].c,m1[k].r,S1,ox1,oy1,'0')};});
+
+  // ---------- step 2: board ----------
+  const S2=1.0, c2=centreOf(0,6,S2), ox2=BOXW/2-c2.x, oy2=BOXH/2-c2.y;
+  const m2={};
+  function push2(c,r,item){const k=c+','+r; if(!m2[k])m2[k]={c:c,r:r,items:[]}; m2[k].items.push(blank(item));}
+  BASES.forEach(function(b){const ic=RG.icon('Base');
+   push2(b[0],b[1],{text:'',d1:ic.d1,d2:ic.d2,d3:ic.d3,gsize:13,glyphStyle:markOn(ic),
+   style:{width:'20px',height:'20px',borderRadius:'5px',background:FACS[b[2]],border:'1.5px solid #1c1a17',
+     display:'grid',placeItems:'center',color:inkOn(b[2]),
+     boxShadow:'0 2px 4px rgba(0,0,0,.35)'}});});
+  HEROES.forEach(function(h){push2(h[0],h[1],{text:h[3],
+   style:{width:'22px',height:'22px',borderRadius:'50%',background:FACS[h[2]],border:'1.5px solid #1c1a17',
+     boxShadow:'0 0 0 2.5px rgba(255,255,255,.9)',display:'grid',placeItems:'center',
+     font:"700 9px 'IBM Plex Mono',monospace",color:inkOn(h[2])}});});
+  STACKS.forEach(function(s){s[2].forEach(function(f){
+   push2(s[0],s[1],{text:'×'+f[1],
+    style:{display:'inline-flex',alignItems:'center',height:'20px',padding:'0 6px',borderRadius:'999px',
+      background:FACS[f[0]],border:'1.5px solid #1c1a17',
+      font:"700 9.5px 'IBM Plex Mono',monospace",color:inkOn(f[0]),boxShadow:'0 2px 4px rgba(0,0,0,.35)'}});});});
+  SPENT.forEach(function(s){push2(s[0],s[1],{text:'',
+   style:{width:'13px',height:'13px',borderRadius:'50%',background:FACS[s[2]],
+     border:'1.5px dashed #1c1a17',opacity:'.9'}});});
+  const marks2=Object.keys(m2).map(function(k){
+   return {items:m2[k].items,wrapStyle:wrap(m2[k].c,m2[k].r,S2,ox2,oy2,'16px 12px 6px')};});
+
+  // ---------- step 3: hex ----------
+  const S3=2.0, c3=centreOf(0,6,S3), ox3=BOXW/2-c3.x, oy3=BOXH/2-c3.y;
+  const units3=HEXUNITS.map(function(u){
+   return {wrapStyle:wrap(u[0],u[1],S3,ox3,oy3,'30px 20px 14px'),
+    items:u[2].map(function(x){
+     const ic=tokenIcon(x[0],x[1]);
+     return {letter:x[1],stats:x[2],d1:ic.d1,d2:ic.d2,d3:ic.d3,
+      glyphStyle:markOn(ic),letterStyle:textOn(ic),
+      tokenStyle:{display:'flex',flexDirection:'column',alignItems:'center',gap:'2px'},
+      dotStyle:{width:'32px',height:'32px',borderRadius:'50%',background:FACS[x[0]],
+        border:'2px solid #1c1a17',display:'grid',placeItems:'center',
+        font:"700 13px 'IBM Plex Mono',monospace",color:inkOn(x[0]),
+        boxShadow:'0 3px 7px rgba(0,0,0,.4)'},
+      statStyle:{font:"600 8.5px 'IBM Plex Mono',monospace",color:'#ffffff',
+        background:'rgba(28,26,23,.78)',borderRadius:'999px',padding:'1px 5px',whiteSpace:'nowrap'}};})};});
+
+  // ---------- the three panels ----------
+  function box(){return {position:'relative',width:BOXW+'px',height:BOXH+'px',borderRadius:'12px',
+    background:'var(--boardbg)',border:'1px solid var(--line)',overflow:'hidden'};}
+  function inner(){return {position:'absolute',left:0,top:0,right:0,bottom:0};}
+  function vp(x,y,w,h,tag){
+   if(!tag) return {display:'none'};
+   return {position:'absolute',left:x+'px',top:y+'px',width:w+'px',height:h+'px',
+    border:'2px dashed var(--action)',borderRadius:'4px',pointerEvents:'none',
+    background:'rgba(224,118,43,.07)'};
+  }
+  // what step 2 frames, drawn on step 1
+  const c6on1=centreOf(0,6,S1);
+  const vp1w=BOXW*S1, vp1h=BOXH*S1;
+  // what step 3 frames, drawn on step 2
+  const vp2w=BOXW/2, vp2h=BOXH/2;
+
+  function show(mark,text,on){
+   return {mark:mark,text:text,
+    markStyle:{width:'16px',height:'16px',borderRadius:'50%',flexShrink:0,marginTop:'1px',display:'grid',
+      placeItems:'center',font:"700 9px 'IBM Plex Mono',monospace",color:'#ffffff',
+      background:on?'var(--brand)':'var(--danger)'}};
+  }
+
+  const levels=[
+   {num:'1',name:'Whole map',scale:'0.55×',
+    numStyle:{width:'24px',height:'24px',borderRadius:'7px',display:'grid',placeItems:'center',
+      font:"700 12px 'IBM Plex Mono',monospace",background:'var(--ink)',color:'var(--bg)'},
+    boxStyle:box(),innerStyle:inner(),
+    tiles:tilesAt(S1,false,ox1,oy1),marks:marks1,units:[],
+    viewportStyle:vp(c6on1.x+ox1-vp1w/2,c6on1.y+oy1-vp1h/2,vp1w,vp1h,true),
+    viewportTag:'STEP 2',
+    viewportTagStyle:{position:'absolute',left:'0',top:'-9px',font:"700 8px 'IBM Plex Mono',monospace",
+      letterSpacing:'.06em',background:'var(--action)',color:'#ffffff',borderRadius:'3px',padding:'1px 5px'},
+    blurb:'Where everyone is, and nothing else — no labels, no terrain glyphs, no unit marks. Every map fits here at any player count, including the fifty-two tile one. This is the step you plan a round on and the step the culture race makes sense at.',
+    shows:[show('✓','Bases as squares, heroes as ringed circles — both always survive the zoom out',true),
+     show('✓','A count per tile, so a stack of six reads as six without drawing six',true),
+     show('✓','One pip per collector — one to a tile, so spent ground reads at a glance',true),
+     show('✕','No individual units, no stat lines, no tile labels',false)]},
+
+   {num:'2',name:'Board',scale:'1× · default',
+    numStyle:{width:'24px',height:'24px',borderRadius:'7px',display:'grid',placeItems:'center',
+      font:"700 12px 'IBM Plex Mono',monospace",background:'var(--brand)',color:'#ffffff'},
+    boxStyle:box(),innerStyle:inner(),
+    tiles:tilesAt(S2,true,ox2,oy2),marks:marks2,units:[],
+    viewportStyle:vp(BOXW/2-vp2w/2,BOXH/2-vp2h/2,vp2w,vp2h,true),
+    viewportTag:'STEP 3',
+    viewportTagStyle:{position:'absolute',left:'0',top:'-9px',font:"700 8px 'IBM Plex Mono',monospace",
+      letterSpacing:'.06em',background:'var(--action)',color:'#ffffff',borderRadius:'3px',padding:'1px 5px'},
+    blurb:'The working step, and where you land by default. Tile labels come back, and the terrain glyph comes back with them. Heroes keep their own token because they are the ones worth a name; everything else collapses into one chip a faction with a count on it.',
+    shows:[show('✓','Tile labels, read against the letters and numbers in the margins',true),
+     show('✓','One chip per faction per tile, carrying the count',true),
+     show('✓','Heroes drawn separately, ringed, with their initial',true),
+     show('✕','Not which units those counts are — that is step 3',false)]},
+
+   {num:'3',name:'Hex',scale:'2×',
+    numStyle:{width:'24px',height:'24px',borderRadius:'7px',display:'grid',placeItems:'center',
+      font:"700 12px 'IBM Plex Mono',monospace",background:'var(--action)',color:'#ffffff'},
+    boxStyle:box(),innerStyle:inner(),
+    tiles:tilesAt(S3,true,ox3,oy3),marks:[],units:units3,
+    viewportStyle:vp(0,0,0,0,false),viewportTag:'',viewportTagStyle:{display:'none'},
+    blurb:'Every unit on the hex, drawn once each as its own mark rather than a letter, with the initiative, damage and defence you need to pick a target. Six units and two sides on one tile is a normal battle, and this is the only step that can show it honestly.',
+    shows:[show('✓','One token per unit, never a count',true),
+     show('✓','Init / damage / defence under each, already carrying its bonuses',true),
+     show('✓','Four or five tiles in view, so you can still see what is next door',true),
+     show('✕','Not the whole map — the locator shows where you are',false)]}
+  ];
+
+  // ---------- the control ----------
+  function stop(label,on){
+   return {label:label,
+    style:{display:'inline-flex',alignItems:'center',gap:'7px',padding:'9px 14px',
+      background:on?'var(--ink)':'transparent',color:on?'var(--bg)':'var(--text)'},
+    iconStyle:{width:'13px',height:'11px',clipPath:CLIP,flexShrink:0,
+      background:on?'var(--bg)':'var(--muted)',
+      transform:label==='Whole map'?'scale(.7)':(label==='Hex'?'scale(1.25)':'none')}};
+  }
+  const stops=[stop('Whole map',false),stop('Board',true),stop('Hex',false)];
+
+  function law(tag,text){
+   return {tag:tag,text:text,
+    tagStyle:{font:"600 9px 'IBM Plex Mono',monospace",letterSpacing:'.05em',padding:'3px 7px',borderRadius:'5px',
+      flexShrink:0,background:'var(--surface2)',color:'var(--muted)'}};
+  }
+  const laws=[
+   law('LEGAL','The same moves are legal at every step. Zooming out never hides an option, it only stops drawing the pieces.'),
+   law('LIST','The numbered list in the bench is identical at all three. A voice player is at no step at all.'),
+   law('LIT','A lit tile stays lit at every step, so a legal destination is never something you have to zoom in to find.'),
+   law('SLIDESHOW','When a move happens off screen, the view travels to it before it animates. Nothing important ever happens where you are not looking.')];
+
+  function key(k,text){
+   return {key:k,text:text,
+    keyStyle:{minWidth:'26px',height:'22px',padding:'0 7px',borderRadius:'6px',flexShrink:0,display:'grid',
+      placeItems:'center',font:"600 10px 'IBM Plex Mono',monospace",background:'var(--surface2)',
+      color:'var(--text)',border:'1px solid var(--line)'}};
+  }
+  const pan=[key('drag','Pan, at any step. The board never scrolls under the bench.'),
+   key('dbl','Double-tap a hex to drop to step 3 on it; the background to rise to step 1.'),
+   key('+ −','Step through the three. There is nothing between them.'),
+   key('0','Back to step 1, whole map, centred.')];
+
+  const SL=0.30, lw=416*SL, lh=720*SL;
+  const locatorTiles=MAP.map(function(t){
+   const g=geo(SL),p=at(t[0],t[1],SL);
+   return {style:{position:'absolute',left:p.x+'px',top:p.y+'px',width:g.W+'px',height:g.H+'px',
+     clipPath:CLIP,background:TER[t[2]],opacity:'.75'}};});
+  const lc=centreOf(0,6,SL);
+  const locatorStyle={position:'relative',width:lw+'px',height:lh+'px',borderRadius:'8px',
+    background:'var(--boardbg)',border:'1px solid var(--line)',overflow:'hidden'};
+  const locatorBoxStyle={position:'absolute',left:(lc.x-BOXW*SL/4)+'px',top:(lc.y-BOXH*SL/4)+'px',
+    width:(BOXW*SL/2)+'px',height:(BOXH*SL/2)+'px',border:'2px solid var(--action)',borderRadius:'3px',
+    background:'rgba(224,118,43,.14)'};
+
+  return {rootStyle:{...T,width:'1440px',height:'1040px',boxSizing:'border-box',padding:'34px 36px 32px',
+    display:'flex',flexDirection:'column',gap:'18px',background:'var(--bg)',
+    fontFamily:"'IBM Plex Sans',sans-serif",borderRadius:'12px',overflow:'hidden'},
+   stops:stops,levels:levels,laws:laws,pan:pan,
+   locatorTiles:locatorTiles,locatorStyle:locatorStyle,locatorBoxStyle:locatorBoxStyle};
+ }
+}
+</script>
+</body>
+</html>

@@ -7,7 +7,7 @@ import { describe, it, expect, afterEach, beforeEach } from 'vitest';
 import { io as ioClient, type Socket as ClientSocket } from 'socket.io-client';
 import type { AddressInfo } from 'node:net';
 import type { Kysely } from 'kysely';
-import type { JoinTableAck, MoveAck, TableEventWire } from '@universe/shared';
+import type { JoinTableAck, MoveAck, QueryAck, TableEventWire } from '@universe/shared';
 import type { DB } from './db/schema.js';
 import { createDatabase, type DatabaseClient } from './db/index.js';
 import { newId, newToken, hashToken, now, type Principal } from './identity.js';
@@ -34,6 +34,7 @@ describe('socket privacy', () => {
   let database: DatabaseClient;
   let db: Kysely<DB>;
   let universe: UniverseApp;
+  let fake: FakeEngine;
   let port: number;
   let sockets: ClientSocket[] = [];
   const tokens: Record<string, string> = {};
@@ -60,7 +61,7 @@ describe('socket privacy', () => {
     }
     const io = createSocketServer({ allowedOrigins: [ORIGIN] });
     universe = buildApp({
-      db, engine: new FakeEngine(), mailer: new ConsoleMailer(), secretKey: SECRET,
+      db, engine: (fake = new FakeEngine()), mailer: new ConsoleMailer(), secretKey: SECRET,
       appOrigin: ORIGIN, allowedOrigins: [ORIGIN], secureCookies: false, io, logger: false,
     });
     await universe.fastify.ready();
@@ -101,6 +102,45 @@ describe('socket privacy', () => {
     await universe.tableService.startTable(host, tableId);
     return tableId;
   }
+
+  const query = (s: ClientSocket, tableId: string, seat: number, name: string, args: unknown = {}) =>
+    new Promise<QueryAck>((r) => s.emit('query', { tableId, seat, name, args }, r));
+
+  it('a read-only question: the seat owner is answered, nobody else is, and nothing is applied', async () => {
+    const tableId = await twoHumanTable(userA, userB);
+    const sockA = client('user-a');
+    const sockB = client('user-b');
+    const sockC = client('user-c');
+    await Promise.all([connected(sockA), connected(sockB), connected(sockC)]);
+    const engine = fake;
+    const appliedBefore = engine.applied.length;
+
+    // The seat's owner asks and gets the engine's answer for that seat.
+    const ok = await query(sockA, tableId, 0, 'echo', { prior: [] });
+    expect(ok).toEqual({ ok: true, answer: { playerId: 'p1', args: { prior: [] } } });
+    // Another seated player cannot ask as seat 0; an unseated one cannot ask at all.
+    expect(await query(sockB, tableId, 0, 'echo')).toMatchObject({ error: 'not_your_seat' });
+    expect(await query(sockC, tableId, 1, 'echo')).toMatchObject({ error: 'not_your_seat' });
+    // A question the engine refuses reads as a rule, not a fault.
+    expect(await query(sockA, tableId, 0, 'nope')).toMatchObject({ error: 'move_rejected' });
+    // Malformed and oversized requests never reach the engine.
+    expect(await query(sockA, tableId, 0, '')).toMatchObject({ error: 'bad_request' });
+    expect(await query(sockA, tableId, 0, 'echo', ['not', 'an', 'object'])).toMatchObject({ error: 'bad_request' });
+    expect(await query(sockA, tableId, 0, 'echo', { big: 'x'.repeat(5000) })).toMatchObject({ error: 'bad_request' });
+    expect(engine.queries).toHaveLength(1);
+    expect(engine.applied.length).toBe(appliedBefore);
+  });
+
+  it('a runaway stream of questions is cut off before it reaches the engine', async () => {
+    const tableId = await twoHumanTable(userA, userB);
+    const sockA = client('user-a');
+    await connected(sockA);
+    const acks = [];
+    for (let i = 0; i < 35; i++) acks.push(await query(sockA, tableId, 0, 'echo'));
+    expect(acks.filter((a) => 'ok' in a && a.ok)).toHaveLength(30);
+    expect(acks.at(-1)).toMatchObject({ error: 'rate_limited' });
+    expect(fake.queries).toHaveLength(30);
+  });
 
   it('two sockets, two seats, two views: no crossing', async () => {
     const tableId = await twoHumanTable(userA, userB);

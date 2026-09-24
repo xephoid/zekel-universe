@@ -1,0 +1,130 @@
+// The engine's reference data for NGnG: the printed catalogue (costs, stat
+// lines, effects, treaty text, hero cards). A screen may print any of it,
+// because it is what is printed on the components. Nothing here is a rule the
+// client evaluates; it is the text and numbers on the cards.
+
+import type { GameReferenceResponse } from '@universe/shared';
+import { asArr, asNum, asStr, isObj } from '../types';
+
+export type Cost = Partial<Record<Resource, number>>;
+export type Resource = 'water' | 'wood' | 'ore' | 'oil' | 'ether';
+export const RESOURCES: Resource[] = ['water', 'wood', 'ore', 'oil', 'ether'];
+
+export interface RefUnit {
+  id: string; name: string; species: string; cost: Cost;
+  init: number | null; dmg: number | null; def: number | null;
+  maxPerPlayer: number; collector: boolean; collectorResource: string | null;
+  needsCore: boolean; requiresBuilding: string | null; immobile: boolean; notes: string;
+}
+export interface RefBuilding { id: string; name: string; species: string; cost: Cost; isBase: boolean; repeatableMax: number | null; effect: string }
+export interface RefResearch { id: string; name: string; species: string; prerequisite: string; cost: Cost; effect: string }
+export interface RefHero { num: number; id: string; name: string; category: string; species: string | null; recommendedLeader: boolean; effect: string }
+export interface RefCard { id: string; label: string; copies: number; effect: string }
+export interface RefTreaty { id: string; name: string; cultureIncome: number; effect: string; breakingCondition: string }
+export interface RefFaction { id: string; name: string; species: 'wizard' | 'robot'; color: string }
+
+export interface NggRef {
+  factions: RefFaction[];
+  units: RefUnit[];
+  buildings: RefBuilding[];
+  research: RefResearch[];
+  heroes: RefHero[];
+  cards: RefCard[];
+  treaties: RefTreaty[];
+  milestones: number[];
+  cultureTarget: number;
+  economicSpend: Cost;
+  techTarget: Record<string, number>;
+  militaryKillsNeeded: Record<string, number>;
+}
+
+function cost(x: unknown): Cost {
+  if (!isObj(x)) return {};
+  const out: Cost = {};
+  for (const r of RESOURCES) if (typeof x[r] === 'number') out[r] = x[r] as number;
+  return out;
+}
+
+function numOrNull(x: unknown): number | null {
+  return typeof x === 'number' ? x : null;
+}
+
+const cache = new WeakMap<object, NggRef>();
+
+export function readRef(reference: GameReferenceResponse | null): NggRef | null {
+  if (!reference) return null;
+  const hit = cache.get(reference);
+  if (hit) return hit;
+  const rd = reference.referenceData;
+  if (!isObj(rd)) return null;
+  const units = [...asArr(rd['wizard_units']), ...asArr(rd['robot_units'])].filter(isObj).map((u): RefUnit => ({
+    id: asStr(u['id']), name: asStr(u['name']), species: asStr(u['species']), cost: cost(u['cost']),
+    init: numOrNull(u['init']), dmg: numOrNull(u['dmg']), def: numOrNull(u['def']),
+    maxPerPlayer: asNum(u['maxPerPlayer']), collector: u['collector'] === true,
+    collectorResource: typeof u['collectorResource'] === 'string' ? u['collectorResource'] : null,
+    needsCore: u['needsCore'] === true,
+    requiresBuilding: typeof u['requiresBuilding'] === 'string' ? u['requiresBuilding'] : null,
+    immobile: u['immobile'] === true, notes: asStr(u['notes']),
+  }));
+  const buildings = [...asArr(rd['wizard_buildings']), ...asArr(rd['robot_buildings'])].filter(isObj).map((b): RefBuilding => ({
+    id: asStr(b['id']), name: asStr(b['name']), species: asStr(b['species']), cost: cost(b['cost']),
+    isBase: b['isBase'] === true, repeatableMax: numOrNull(b['repeatableMax']), effect: asStr(b['effect']),
+  }));
+  const research = [...asArr(rd['wizard_research']), ...asArr(rd['robot_research'])].filter(isObj).map((r): RefResearch => ({
+    id: asStr(r['id']), name: asStr(r['name']), species: asStr(r['species']), prerequisite: asStr(r['prerequisite']),
+    cost: cost(r['cost']), effect: asStr(r['effect']),
+  }));
+  const victory = isObj(rd['victory']) ? rd['victory'] : {};
+  const out: NggRef = {
+    factions: asArr(rd['factions']).filter(isObj).map((f) => ({
+      id: asStr(f['id']), name: asStr(f['name']), species: f['species'] === 'robot' ? 'robot' : 'wizard', color: asStr(f['color']),
+    })),
+    units, buildings, research,
+    heroes: asArr(rd['heroes']).filter(isObj).map((h) => ({
+      num: asNum(h['num']), id: asStr(h['id']), name: asStr(h['name']), category: asStr(h['category']),
+      species: typeof h['species'] === 'string' ? h['species'] : null,
+      recommendedLeader: h['recommendedLeader'] === true, effect: asStr(h['effect']),
+    })),
+    cards: asArr(rd['battle_deck']).filter(isObj).map((c) => ({ id: asStr(c['id']), label: asStr(c['label']), copies: asNum(c['copies']), effect: asStr(c['effect']) })),
+    treaties: asArr(rd['treaties']).filter(isObj).map((t) => ({
+      id: asStr(t['id']), name: asStr(t['name']), cultureIncome: asNum(t['cultureIncome']), effect: asStr(t['effect']), breakingCondition: asStr(t['breakingCondition']),
+    })),
+    milestones: asArr(victory['milestones']).map((m) => asNum(m)),
+    cultureTarget: asNum(victory['culture_target'], 100),
+    economicSpend: cost(victory['economic_spend']),
+    techTarget: isObj(victory['tech_target']) ? Object.fromEntries(Object.entries(victory['tech_target']).map(([k, v]) => [k, asNum(v)])) : {},
+    militaryKillsNeeded: isObj(victory['military_kills_needed']) ? Object.fromEntries(Object.entries(victory['military_kills_needed']).map(([k, v]) => [k, asNum(v)])) : {},
+  };
+  cache.set(reference, out);
+  return out;
+}
+
+/** Anything a build move can name: a unit or a building, by its printed name. */
+export function itemByName(ref: NggRef | null, name: string): { kind: 'unit'; unit: RefUnit } | { kind: 'building'; building: RefBuilding } | null {
+  if (!ref) return null;
+  const u = ref.units.find((x) => x.name === name);
+  if (u) return { kind: 'unit', unit: u };
+  const b = ref.buildings.find((x) => x.name === name);
+  return b ? { kind: 'building', building: b } : null;
+}
+
+export function heroByName(ref: NggRef | null, name: string): RefHero | null {
+  return ref?.heroes.find((h) => h.name === name) ?? null;
+}
+
+export function heroById(ref: NggRef | null, id: string): RefHero | null {
+  return ref?.heroes.find((h) => h.id === id) ?? null;
+}
+
+export function researchByName(ref: NggRef | null, name: string): RefResearch | null {
+  return ref?.research.find((r) => r.name === name) ?? null;
+}
+
+export function treatyByName(ref: NggRef | null, name: string): RefTreaty | null {
+  return ref?.treaties.find((t) => t.name === name || t.id === name) ?? null;
+}
+
+/** A card by the label a move or a hand names it by ("Counter", "Bonus (+1 DEF …)"). */
+export function cardByLabel(ref: NggRef | null, label: string): RefCard | null {
+  return ref?.cards.find((c) => c.label === label) ?? null;
+}

@@ -11,7 +11,7 @@ import type { Server as SocketServer, Socket } from 'socket.io';
 import type { Kysely } from 'kysely';
 import type {
   CreateTableRequest, CreateTableResponse, FriendsResponse, GameCatalogEntry, GameReferenceResponse, GameResponse,
-  GamesResponse, InvitesResponse, JoinTableAck, JoinTableMessage, MeResponse, MoveAck, MoveMessage, MyTablesResponse,
+  GamesResponse, InvitesResponse, JoinTableAck, JoinTableMessage, MeResponse, MoveAck, MoveMessage, MyTablesResponse, QueryAck, QueryMessage,
   SeatSummary, TableEventsResponse, TableInvite, TableResponse, TableStatus, TableSummary, UndoAck, UndoMessage, GameUpdate, UpdatesResponse, DesignerResponse, WatchResponse } from '@universe/shared';
 import { SOCKET_EVENTS } from '@universe/shared';
 import { EngineError } from '@universe/engine-client';
@@ -54,6 +54,10 @@ export interface BuildAppOptions {
    *  Must never be set in production (index.ts enforces). */
   testOutbox?: boolean;
 }
+
+/** A read-only engine question: at most this many per connection per window. */
+const QUERY_BURST = 30;
+const QUERY_WINDOW_MS = 10_000;
 
 export interface UniverseApp {
   fastify: FastifyInstance;
@@ -982,6 +986,38 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
           if (err instanceof MoveError) {
             respond({ error: err.code, reason: err.reason ?? err.message, lesson: err.lesson, legalMoves: err.legalMoves });
           } else {
+            app.log.error(err);
+            respond({ error: 'internal', reason: 'Something went wrong on the server.' });
+          }
+        }
+      });
+
+      // A read-only question about a decision being composed. Bounded: a short
+      // name and a small argument object; the engine answers or refuses.
+      socket.on(SOCKET_EVENTS.query, async (msg: Partial<QueryMessage>, ack?: (r: QueryAck) => void) => {
+        const respond = ack ?? (() => {});
+        // Each question is an engine call: at most QUERY_BURST in any
+        // QUERY_WINDOW_MS on one connection. A person placing collectors asks
+        // once per placement; this only stops a runaway client.
+        const now = Date.now();
+        const recent = ((socket.data.queryTimes as number[] | undefined) ?? []).filter((t) => now - t < QUERY_WINDOW_MS);
+        if (recent.length >= QUERY_BURST) {
+          socket.data.queryTimes = recent;
+          return respond({ error: 'rate_limited', reason: 'Too many questions at once; try again in a moment.' });
+        }
+        socket.data.queryTimes = [...recent, now];
+        try {
+          const args = msg?.args ?? {};
+          if (!msg?.tableId || typeof msg.seat !== 'number' || typeof msg.name !== 'string'
+            || msg.name.length === 0 || msg.name.length > 64 || typeof args !== 'object' || Array.isArray(args)
+            || JSON.stringify(args).length > 4096) {
+            return respond({ error: 'bad_request' });
+          }
+          const answer = await realtime.handleQuery(principal, msg.tableId, msg.seat, msg.name, args as Record<string, unknown>);
+          respond({ ok: true, answer });
+        } catch (err) {
+          if (err instanceof MoveError) respond({ error: err.code, reason: err.reason ?? err.message });
+          else {
             app.log.error(err);
             respond({ error: 'internal', reason: 'Something went wrong on the server.' });
           }

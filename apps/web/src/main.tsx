@@ -35,6 +35,12 @@ const router = createBrowserRouter([
   { path: '/signin', element: <SignInPage /> },
   { path: '/signin/complete', element: <SignInCompletePage /> },
   { path: '/gallery', element: <GalleryPage /> },
+  // Development only: captured NGnG views, drawn without a game. Loaded
+  // lazily inside the dev-only branch, so a production build drops the page
+  // and every captured view with it.
+  ...(import.meta.env.DEV
+    ? [{ path: '/dev/ngg', lazy: () => import('./pages/DevNgg').then((m) => ({ Component: m.DevNggPage })) }]
+    : []),
   { path: '*', element: <NotFoundPage /> },
 ]);
 

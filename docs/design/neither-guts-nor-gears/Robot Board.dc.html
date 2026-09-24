@@ -1,0 +1,676 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Robot faction board</title>
+<script src="./support.js"></script>
+<script src="./icons.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:var(--brand)}a:hover{color:var(--action)}
+</style>
+</helmet>
+
+<div style="{{ rootStyle }}" data-screen-label="Robot faction board">
+
+  <!-- the ground is machined: a rule grid and two registration ticks, no texture -->
+  <div style="position:absolute;left:0;top:0;right:0;bottom:0;pointer-events:none;border-radius:0;overflow:hidden">
+    <div style="position:absolute;left:0;top:0;right:0;bottom:0;background:repeating-linear-gradient(0deg, rgba(27,31,30,.05) 0 1px, transparent 1px 22px),repeating-linear-gradient(90deg, rgba(27,31,30,.05) 0 1px, transparent 1px 22px)"></div>
+    <div style="position:absolute;left:14px;top:14px;font:400 15px 'IBM Plex Mono',monospace;color:rgba(27,31,30,.3)">✛</div>
+    <div style="position:absolute;right:14px;top:14px;font:400 15px 'IBM Plex Mono',monospace;color:rgba(27,31,30,.3)">✛</div>
+    <div style="position:absolute;left:14px;bottom:14px;font:400 15px 'IBM Plex Mono',monospace;color:rgba(27,31,30,.3)">✛</div>
+    <div style="position:absolute;right:14px;bottom:14px;font:400 15px 'IBM Plex Mono',monospace;color:rgba(27,31,30,.3)">✛</div>
+  </div>
+
+  <!-- ============ HEADER ============ -->
+  <div style="display:flex;align-items:flex-start;gap:20px;border-bottom:1px solid var(--line);padding-bottom:22px">
+    <div style="width:68px;height:68px;border-radius:0px;background:{{ fac }};border:2px solid var(--ink);display:grid;place-items:center;flex-shrink:0;box-shadow:var(--shadow)">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="8" width="14" height="11" rx="2.5"></rect><path d="M12 8V4.5"></path><circle cx="12" cy="3.2" r="1.3"></circle><path d="M9.2 12.5h.01M14.8 12.5h.01"></path><path d="M9.5 16h5"></path></svg>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:5px;flex-grow:1">
+      <div style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:var(--muted)">NEITHER GUTS NOR GEARS &middot; FACTION BOARD</div>
+      <div style="font:700 34px 'IBM Plex Mono',monospace;letter-spacing:.06em;line-height:1;color:var(--text)">The Unbolted</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;font:500 12px 'IBM Plex Mono',monospace;color:var(--muted)">
+        <span style="background:var(--tagbg);color:var(--tagfg);border-radius:999px;padding:2px 9px">Robot</span>
+        <span style="background:var(--tagbg);color:var(--tagfg);border-radius:999px;padding:2px 9px">Green</span>
+        <span>Robots who took themselves apart from their owners.</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <div style="width:132px;padding:12px 14px;border-radius:0px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:2px">
+        <div style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:var(--muted)">CULTURE</div>
+        <div style="font:700 30px 'IBM Plex Mono',monospace;line-height:1;color:var(--text)">22</div>
+        <div style="font-size:11px;color:var(--muted)">+8 a round</div>
+      </div>
+      <div style="width:132px;padding:12px 14px;border-radius:0px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:2px">
+        <div style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:var(--muted)">TECHNOLOGY</div>
+        <div style="font:700 30px 'IBM Plex Mono',monospace;line-height:1;color:var(--text)">10<span style="font-size:16px;color:var(--muted)">/18</span></div>
+        <div style="font-size:11px;color:var(--muted)">unique types</div>
+      </div>
+      <div style="width:132px;padding:12px 14px;border-radius:0px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:2px">
+        <div style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:var(--muted)">CORES</div>
+        <div style="font:700 30px 'IBM Plex Mono',monospace;line-height:1;color:var(--text)">10<span style="font-size:16px;color:var(--muted)">/15</span></div>
+        <div style="font-size:11px;color:var(--muted)">7 fitted &middot; 3 spare</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="position:relative;display:flex;align-items:center;gap:10px;margin-top:-8px">
+    <div style="height:3px;flex-grow:1;background:var(--ink)"></div>
+    <span style="font:600 9px 'IBM Plex Mono',monospace;letter-spacing:.18em;color:var(--muted)">SHEET 1 OF 1 · TOL ±0</span>
+    <div style="height:1px;width:64px;background:var(--line)"></div>
+  </div>
+
+
+  <!-- ============ RESOURCE LEGEND ============ -->
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:var(--muted);margin-right:2px">COSTS ARE PAID BY PLACING COLLECTORS</span>
+    <sc-for list="{{ legend }}" as="l" hint-placeholder-count="5">
+      <span style="display:inline-flex;align-items:center;gap:7px;padding:4px 10px 4px 4px;border-radius:999px;background:var(--surface);border:1px solid var(--line)">
+        <span style="{{ l.swatch }}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ l.g1 }}"></path><path d="{{ l.g2 }}"></path><path d="{{ l.g3 }}"></path></svg></span>
+        <span style="font-size:12px;color:var(--text)">{{ l.name }}</span>
+        <span style="font-size:11px;color:var(--muted)">{{ l.where }}</span>
+      </span>
+    </sc-for>
+  </div>
+
+  <!-- ============ TRACKS ROW ============ -->
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px">
+
+    <!-- Core bay -->
+    <div style="padding:18px 20px 20px;border-radius:0px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+        <div style="font:700 19px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:var(--text)">Core bay</div>
+        <span style="font:600 10px 'IBM Plex Mono',monospace;background:var(--hlbg);color:var(--brand);border-radius:999px;padding:2px 8px">ROBOTS ONLY</span>
+        <span style="font-size:11.5px;color:var(--muted)">where the wizard board carries its mana track</span>
+      </div>
+      <div style="font-size:12.5px;line-height:1.5;color:var(--muted)">Every platform needs a Core to work &mdash; only the Infiltrator does not. A spare Core earns +1 culture a round while it sits here, and at upkeep you may move any Core to any platform, however far away it is.</div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+        <sc-for list="{{ coreZones }}" as="z" hint-placeholder-count="3">
+          <div style="{{ z.boxStyle }}">
+            <div style="display:flex;justify-content:space-between;align-items:baseline">
+              <span style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.05em;color:var(--muted)">{{ z.label }}</span>
+              <span style="font:700 14px 'IBM Plex Mono',monospace;color:var(--text)">{{ z.count }}</span>
+            </div>
+            <div style="display:flex;gap:5px;flex-wrap:wrap">
+              <sc-for list="{{ z.pips }}" as="p" hint-placeholder-count="5">
+                <span style="{{ p.style }}"></span>
+              </sc-for>
+            </div>
+            <div style="font-size:10.5px;line-height:1.35;color:var(--muted)">{{ z.note }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:0px;background:var(--surface2)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2" stroke-linecap="round" style="flex-shrink:0" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5v5.5M12 16.3h.01"></path></svg>
+        <span style="font-size:12px;line-height:1.45;color:var(--text)">A destroyed Core goes back to <strong>unpurchased</strong>, not to spare. It has to be bought again before it can be fitted.</span>
+      </div>
+    </div>
+
+    <!-- Technology track -->
+    <div style="padding:18px 20px 20px;border-radius:0px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:baseline;gap:10px">
+        <div style="font:700 19px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:var(--text)">Technology point track</div>
+        <span style="font:600 10px 'IBM Plex Mono',monospace;background:var(--tagbg);color:var(--tagfg);border-radius:999px;padding:2px 8px">18 TO WIN</span>
+      </div>
+      <div style="font-size:12.5px;line-height:1.5;color:var(--muted)">One permanent point for each unique unit, building and research you have ever acquired. The robot list is short on research and long on units, so the road runs through the workshop.</div>
+
+      <div style="display:flex;flex-direction:column;gap:11px">
+        <sc-for list="{{ techGroups }}" as="g" hint-placeholder-count="3">
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline">
+              <span style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.05em;color:var(--muted)">{{ g.label }}</span>
+              <span style="font:600 12px 'IBM Plex Mono',monospace;color:var(--text)">{{ g.score }}</span>
+            </div>
+            <div style="display:flex;gap:4px">
+              <sc-for list="{{ g.pips }}" as="p" hint-placeholder-count="12">
+                <span style="{{ p.style }}"></span>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:0px;background:var(--surface2)">
+        <span style="width:22px;height:22px;border-radius:50%;border:1.5px dashed var(--ink);display:grid;place-items:center;flex-shrink:0">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.6 5.6 6.1.8-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6L3.3 9.4l6.1-.8z"></path></svg>
+        </span>
+        <span style="font-size:12px;line-height:1.45;color:var(--text)">One borrowed point is available: <strong>Motherboard</strong> lends it while alive, owned and on the map. Greymore is a wizard hero, so robots get one, not two.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ BUILDINGS + SUPPLY ============ -->
+  <div style="display:grid;grid-template-columns:minmax(0,1.62fr) minmax(0,1fr);gap:18px">
+
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <!-- Buildings -->
+      <div style="padding:18px 20px 20px;border-radius:0px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+          <div style="font:700 19px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:var(--text)">Buildings</div>
+          <span style="font-size:12.5px;color:var(--muted)">One of each, kept here and never lost.</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <sc-for list="{{ buildings }}" as="b" hint-placeholder-count="4">
+            <div style="{{ b.slotStyle }}">
+              <span style="{{ b.markStyle }}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ b.d1 }}"></path><path d="{{ b.d2 }}"></path><path d="{{ b.d3 }}"></path><path d="{{ b.d4 }}"></path></svg></span>
+              <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0">
+                <div style="display:flex;align-items:baseline;gap:7px">
+                  <div style="font:700 13px 'IBM Plex Mono',monospace;letter-spacing:.06em;line-height:1.15;color:var(--text)">{{ b.name }}</div>
+                  <div style="{{ b.stateStyle }}">{{ b.state }}</div>
+                </div>
+                <div style="font-size:10.5px;line-height:1.35;color:var(--muted)">{{ b.unlocks }}</div>
+              </div>
+              <div style="display:flex;gap:3px;flex-shrink:0">
+                <sc-for list="{{ b.cost }}" as="c" hint-placeholder-count="3">
+                  <span style="{{ c.style }}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ c.d1 }}"></path><path d="{{ c.d2 }}"></path><path d="{{ c.d3 }}"></path></svg><span style="{{ c.textStyle }}">{{ c.text }}</span></span>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="padding:11px 14px;border-radius:0px;background:var(--surface2);display:flex;flex-direction:column;gap:5px">
+          <div style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:var(--muted)">NOT IN THESE SLOTS</div>
+          <div style="font-size:12px;line-height:1.45;color:var(--text)"><strong>Home</strong> is a base and stands on the map &mdash; it sits in the Bases supply at right, three at most including the free one you start with.</div>
+        </div>
+      </div>
+
+      <!-- Research -->
+      <div style="padding:18px 20px 20px;border-radius:0px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+          <div style="font:700 19px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:var(--text)">Research</div>
+          <span style="font-size:12.5px;color:var(--muted)">Robots have exactly one. A Research action can buy a battle strategy card instead, once the Defense Research Station stands.</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+          <div style="display:flex;flex-direction:column;gap:7px;padding:13px 14px;min-height:96px;border-radius:0px;border:1.5px dashed var(--line)">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+              <div style="font:700 15px 'IBM Plex Mono',monospace;letter-spacing:.06em;line-height:1.15;color:var(--text)">Metal Platforms</div>
+              <span style="width:22px;height:22px;border-radius:50%;border:1.5px dashed var(--line);flex-shrink:0"></span>
+            </div>
+            <div style="display:flex;gap:4px">
+              <sc-for list="{{ metalCost }}" as="c" hint-placeholder-count="2">
+                <span style="{{ c.style }}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ c.d1 }}"></path><path d="{{ c.d2 }}"></path><path d="{{ c.d3 }}"></path></svg><span style="{{ c.textStyle }}">{{ c.text }}</span></span>
+              </sc-for>
+            </div>
+            <div style="font-size:11.5px;line-height:1.4;color:var(--muted);margin-top:auto">Every platform you own gains +1 defense. Heroes are not platforms and get nothing.</div>
+            <div style="font:600 9.5px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:var(--muted);text-transform:uppercase">at Home</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:7px;padding:13px 14px;min-height:96px;border-radius:0px;background:var(--surface2)">
+            <div style="font:700 15px 'IBM Plex Mono',monospace;letter-spacing:.06em;line-height:1.15;color:var(--text)">Battle strategy card</div>
+            <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">
+              <sc-for list="{{ cardCost }}" as="c" hint-placeholder-count="3">
+                <span style="{{ c.style }}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ c.d1 }}"></path><path d="{{ c.d2 }}"></path><path d="{{ c.d3 }}"></path></svg><span style="{{ c.textStyle }}">{{ c.text }}</span></span>
+              </sc-for>
+              <span style="{{ eitherStyle }}">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ etD1 }}"></path><path d="{{ etD2 }}"></path></svg>
+                <span style="margin:0 3px;font:600 9px 'IBM Plex Mono',monospace">or</span>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ oiD1 }}"></path><path d="{{ oiD2 }}"></path><path d="{{ oiD3 }}"></path></svg>
+              </span>
+            </div>
+            <div style="font-size:11.5px;line-height:1.4;color:var(--muted);margin-top:auto">Drawn blind from the shared deck of twenty. Needs the Defense Research Station.</div>
+            <div style="font:600 9.5px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:var(--danger);text-transform:uppercase">locked</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Supply column -->
+    <div style="display:flex;flex-direction:column;gap:18px">
+
+      <div style="padding:18px 20px 20px;border-radius:0px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:15px">
+        <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+          <div style="font:700 19px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:var(--text)">Collectors</div>
+          <span style="font-size:11.5px;color:var(--muted)">fixed by type, eleven in all</span>
+        </div>
+        <div style="font-size:12px;line-height:1.45;color:var(--muted)">Each platform collects only its printed resource and only with a Core fitted. The mix is the reason the economic win needs friends: it is exactly three water, three wood, three ore, one oil and one ether.</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <sc-for list="{{ collectors }}" as="c" hint-placeholder-count="5">
+            <div style="display:flex;align-items:center;gap:9px">
+              <span style="{{ c.swatch }}">{{ c.code }}</span>
+              <span style="font-size:12.5px;color:var(--text);width:58px">{{ c.name }}</span>
+              <span style="display:flex;gap:5px;flex-grow:1">
+                <sc-for list="{{ c.pips }}" as="p" hint-placeholder-count="3">
+                  <span style="{{ p.style }}"></span>
+                </sc-for>
+              </span>
+              <span style="font:500 10px 'IBM Plex Mono',monospace;color:var(--muted)">{{ c.text }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;font:500 10.5px 'IBM Plex Mono',monospace;color:var(--muted)">
+          <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:13px;height:13px;border-radius:50%;background:#3f7d52;border:1.5px solid var(--ink);display:inline-block"></span>cored</span>
+          <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:13px;height:13px;border-radius:50%;background:transparent;border:1.5px solid var(--ink);opacity:.45;display:inline-block"></span>built, no Core</span>
+          <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:13px;height:13px;border-radius:50%;background:transparent;border:1px dashed var(--line);display:inline-block"></span>not built</span>
+        </div>
+      </div>
+
+      <div style="padding:18px 20px 20px;border-radius:0px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:15px">
+        <div style="font:700 19px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:var(--text)">Bases, treaties, actions</div>
+
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline">
+            <span style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.05em;color:var(--muted)">BASES &middot; HOMES</span>
+            <span style="font-size:11.5px;color:var(--muted)">1 on the map &middot; max 3</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <sc-for list="{{ bases }}" as="b" hint-placeholder-count="3">
+              <span style="{{ b.style }}"></span>
+            </sc-for>
+            <span style="display:flex;gap:4px;margin-left:4px">
+              <sc-for list="{{ baseCost }}" as="c" hint-placeholder-count="2">
+                <span style="{{ c.style }}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ c.d1 }}"></path><path d="{{ c.d2 }}"></path><path d="{{ c.d3 }}"></path></svg><span style="{{ c.textStyle }}">{{ c.text }}</span></span>
+              </sc-for>
+            </span>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <span style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.05em;color:var(--muted)">TREATY TOKENS</span>
+          <sc-for list="{{ treaties }}" as="t" hint-placeholder-count="5">
+            <div style="{{ t.rowStyle }}">
+              <span style="{{ t.dotStyle }}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ t.d1 }}"></path><path d="{{ t.d2 }}"></path><path d="{{ t.d3 }}"></path></svg></span>
+              <span style="font-size:12.5px;color:var(--text);flex-grow:1">{{ t.name }}</span>
+              <span style="font:600 10.5px 'IBM Plex Mono',monospace;color:var(--muted)">{{ t.culture }}</span>
+              <span style="{{ t.stateStyle }}">{{ t.state }}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <span style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.05em;color:var(--muted)">ACTION CARDS</span>
+          <div style="display:flex;gap:10px">
+            <sc-for list="{{ actions }}" as="a" hint-placeholder-count="4">
+              <div style="{{ a.cardStyle }}">
+                <span style="{{ a.markStyle }}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ a.d1 }}"></path><path d="{{ a.d2 }}"></path><path d="{{ a.d3 }}"></path><path d="{{ a.d4 }}"></path></svg></span>
+                <div style="font:700 13px 'IBM Plex Mono',monospace;line-height:1.1;color:var(--text)">{{ a.name }}</div>
+                <div style="{{ a.stateStyle }}">{{ a.state }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="font-size:11.5px;line-height:1.4;color:var(--muted)">Marshal Corvin Ashlock is yours, so a second Move / Battle card sits here. It leaves at the upkeep after he dies.</div>
+        </div>
+
+      </div>
+
+      <!-- Battle strategy cards -->
+      <div style="padding:18px 20px 20px;border-radius:0px;background:var(--surface);border:1.5px dashed var(--line);display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="{{ bcMark }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ bcD1 }}"></path><path d="{{ bcD2 }}"></path><path d="{{ bcD3 }}"></path><path d="{{ bcD4 }}"></path></svg></span>
+          <div style="font:700 19px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:var(--text);flex-grow:1">Battle strategy cards</div>
+          <span style="font:600 10.5px 'IBM Plex Mono',monospace;letter-spacing:.05em;color:var(--danger)">NONE HELD</span>
+        </div>
+        <div style="display:flex;gap:9px;align-items:center">
+          <sc-for list="{{ battleCards }}" as="b" hint-placeholder-count="2">
+            <span style="{{ b.style }}"></span>
+          </sc-for>
+          <span style="font-size:11.5px;line-height:1.4;color:var(--text);flex-grow:1">Two empty slots, and they stay empty. A robot reaches the deck through the <strong>Defense Research Station</strong>, not an Embassy, and yours is not built.</span>
+        </div>
+        <div style="font-size:11.5px;line-height:1.4;color:var(--muted);padding-top:9px;border-top:1px solid var(--line)">A card that arrives here sits <strong>face up</strong>, because this board is yours and you have to be able to read what you are holding. Opened by any other seat, the same panel shows backs and a count and never resolves a face.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ UNITS ============ -->
+  <div style="padding:18px 20px 20px;border-radius:0px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+      <div style="font:700 19px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:var(--text)">Units</div>
+      <span style="font-size:12.5px;color:var(--muted)">Twelve types, and every one of them is a technology point. Costs below exclude the Core, which is bought with the platform or fitted from the bay.</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px">
+      <sc-for list="{{ units }}" as="u" hint-placeholder-count="12">
+        <div style="{{ u.tileStyle }}">
+          <div style="display:flex;align-items:flex-start;gap:9px">
+            <span style="{{ u.markStyle }}">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ u.d1 }}"></path><path d="{{ u.d2 }}"></path><path d="{{ u.d3 }}"></path><path d="{{ u.d4 }}"></path><path d="{{ u.dd }}" stroke-dasharray="3 2.4"></path></svg>
+            </span>
+            <div style="display:flex;flex-direction:column;gap:2px;flex-grow:1;min-width:0">
+              <div style="font:700 14px 'IBM Plex Mono',monospace;letter-spacing:.06em;line-height:1.1;color:var(--text)">{{ u.name }}</div>
+              <div style="font-size:10.5px;color:var(--muted)">{{ u.kind }}</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:3px">
+            <sc-for list="{{ u.stats }}" as="s" hint-placeholder-count="3">
+              <span style="{{ s.style }}"><span style="display:block;font-size:8px;letter-spacing:.06em;opacity:.7">{{ s.label }}</span>{{ s.value }}</span>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:3px;flex-wrap:wrap">
+            <sc-for list="{{ u.cost }}" as="c" hint-placeholder-count="3">
+              <span style="{{ c.style }}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ c.d1 }}"></path><path d="{{ c.d2 }}"></path><path d="{{ c.d3 }}"></path></svg><span style="{{ c.textStyle }}">{{ c.text }}</span></span>
+            </sc-for>
+          </div>
+          <div style="font-size:10.5px;line-height:1.35;color:var(--muted);margin-top:auto">{{ u.note }}</div>
+          <div style="display:flex;align-items:center;gap:5px">
+            <sc-for list="{{ u.supply }}" as="s" hint-placeholder-count="5">
+              <span style="{{ s.style }}"></span>
+            </sc-for>
+            <span style="font:500 9.5px 'IBM Plex Mono',monospace;color:var(--muted);margin-left:auto">{{ u.supplyText }}</span>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- ============ HEROES ============ -->
+  <div style="padding:18px 20px 20px;border-radius:0px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+      <div style="font:700 19px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:var(--text)">Heroes</div>
+      <span style="font-size:12.5px;color:var(--muted)">The pool of twenty is shared by everyone at the table. A hero killed here never comes back for anybody.</span>
+    </div>
+
+    <div style="{{ spyStrip }}">
+      <span style="{{ spyStripMark }}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ spyD1 }}"></path><path d="{{ spyD2 }}"></path><path d="{{ spyD3 }}"></path><path d="{{ spyD4 }}" stroke-dasharray="3 2.4"></path></svg></span>
+      <div style="display:flex;flex-direction:column;gap:2px;flex-grow:1;min-width:0">
+        <span style="font:700 13.5px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:var(--text)">Your Infiltrator rides with Marshal Corvin Ashlock</span>
+        <span style="font-size:11.5px;line-height:1.4;color:var(--text)">Reveal it when he is attacked and the attack does nothing, and he steps to an adjacent tile. Revealing spends the Infiltrator.</span>
+      </div>
+      <div style="width:1px;align-self:stretch;background:var(--line);flex-shrink:0"></div>
+      <div style="display:flex;flex-direction:column;gap:2px;width:196px;flex-shrink:0">
+        <span style="font:600 9px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:var(--muted)">ONE CARD, FACE DOWN IN THE OPEN</span>
+        <span style="font-size:10.5px;line-height:1.35;color:var(--muted)">Buying the Infiltrator was public, and so is the card: every seat sees one lying face down by your name. Only you read the name on it, and Detection is what turns it over.</span>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px">
+      <sc-for list="{{ heroes }}" as="h" hint-placeholder-count="6">
+        <div style="{{ h.tileStyle }}">
+          <span style="{{ h.avatarStyle }}">{{ h.initials }}</span>
+          <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0">
+            <div style="font:700 12px 'IBM Plex Mono',monospace;line-height:1.15;color:var(--text)">{{ h.name }}</div>
+            <div style="font:500 9px 'IBM Plex Mono',monospace;color:var(--muted)">{{ h.type }}</div>
+            <div style="{{ h.badgeStyle }}">{{ h.badge }}</div>
+          </div>
+          <span style="{{ h.spyStyle }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ spyD1 }}"></path><path d="{{ spyD2 }}"></path><path d="{{ spyD3 }}"></path><path d="{{ spyD4 }}" stroke-dasharray="3 2.4"></path></svg></span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1240,"height":1700},"theme":{"editor":"enum","options":["light","dark"],"default":"light","tsType":"&#39;light&#39;|&#39;dark&#39;","section":"Board"}}'>
+const THEMES={
+ light:{'--bg':'#d3d6d2','--surface':'#e6e8e4','--surface2':'#d8dbd7','--text':'#1b1f1e','--muted':'rgba(27,31,30,.6)','--brand':'#2f6f5e','--action':'#c8791f','--hl':'#2f6f5e','--hlbg':'#cfd9d2','--tagbg':'#cbcfca','--tagfg':'rgba(27,31,30,.72)','--danger':'#a8321f','--line':'rgba(27,31,30,.24)','--ink':'#1b1f1e','--shadow':'0 2px 0 rgba(27,31,30,.18)'},
+ dark:{'--bg':'#1d201f','--surface':'#272b2a','--surface2':'#2f3433','--text':'#dfe1dd','--muted':'rgba(223,225,221,.62)','--brand':'#6fae99','--action':'#e0902f','--hl':'#6fae99','--hlbg':'#2b3a35','--tagbg':'#313634','--tagfg':'rgba(223,225,221,.74)','--danger':'#e0705a','--line':'rgba(223,225,221,.2)','--ink':'#0e100f','--shadow':'0 2px 0 rgba(0,0,0,.5)'}
+};
+const RES={wa:{c:'#2f6b91',code:'Wa',name:'Water',where:'rings the map'},
+           wo:{c:'#3f6730',code:'Wo',name:'Wood',where:'rings the map'},
+           or:{c:'#6f6858',code:'Or',name:'Ore',where:'8 tiles, centre'},
+           oi:{c:'#2f2a24',code:'Oi',name:'Oil',where:'2 tiles, centre'},
+           et:{c:'#6f43b5',code:'Et',name:'Ether',where:'2 tiles, centre'}};
+const FAC='#3f7d52';
+
+function chip(k,n){
+  const r=RES[k];
+  const ic=(typeof NGG!=='undefined')?NGG.icon(k):{d1:'',d2:'',d3:''};
+  return {text:n>1?('\u00d7'+n):'',d1:ic.d1,d2:ic.d2,d3:ic.d3,
+    textStyle:{marginLeft:n>1?'3px':'0',font:"600 10px 'IBM Plex Mono',monospace"},
+    style:{display:'inline-flex',alignItems:'center',font:"600 10px 'IBM Plex Mono',monospace",
+      color:'#ffffff',background:r.c,borderRadius:'0px',padding:'2px 6px',letterSpacing:'.02em'}};
+}
+function costs(list){return list.map(function(p){return chip(p[0],p[1]);});}
+function statBox(label,value,on){
+  return {label:label,value:value,
+    style:{flexGrow:1,textAlign:'center',font:"600 12px 'IBM Plex Mono',monospace",
+      color:on?'var(--text)':'var(--muted)',background:'var(--surface2)',borderRadius:'0px',
+      padding:'3px 0 4px',lineHeight:'1.15'}};
+}
+function dot(state,size){
+  const s={width:size+'px',height:size+'px',borderRadius:'50%',flexShrink:0,display:'inline-block'};
+  if(state==='on'){s.background=FAC;s.border='1.5px solid var(--ink)';}
+  else if(state==='dim'){s.background='transparent';s.border='1.5px solid var(--ink)';s.opacity='.45';}
+  else {s.background='transparent';s.border='1px dashed var(--line)';}
+  return {style:s};
+}
+
+class Component extends DCLogic{
+ renderVals(){
+  const T=THEMES[this.props.theme||'light'];
+
+  // ---- units ----
+  const ICO=(typeof NGG!=='undefined')?NGG:{icon:function(n){return {name:n,d1:'',d2:'',d3:'',d4:'',dd:''};}};
+
+
+  // ---- core bay ----
+  function zone(label,count,n,state,note,strong){
+    const pips=[];
+    for(let i=0;i<n;i++) pips.push(dot(state,16));
+    return {label:label,count:count,note:note,pips:pips,
+      boxStyle:{display:'flex',flexDirection:'column',gap:'8px',padding:'12px 13px',borderRadius:'0px',
+        background:strong?'var(--hlbg)':'var(--surface2)',
+        border:strong?'1.5px solid var(--brand)':'1px solid var(--line)'}};
+  }
+  const coreZones=[
+    zone('FITTED',7,7,'on','Inside a platform. Destroyed with it.',false),
+    zone('SPARE',3,3,'on','+1 culture each, every round. Cannot be attacked here.',true),
+    zone('UNPURCHASED',5,5,'empty','1 Wa each. Buy with a platform or on its own.',false)
+  ];
+
+  // ---- technology track ----
+  function techGroup(label,got,total){
+    const pips=[];
+    for(let i=0;i<total;i++){
+      const on=i<got;
+      pips.push({style:{flexGrow:1,height:'20px',borderRadius:'0px',
+        background:on?FAC:'transparent',
+        border:on?'1.5px solid var(--ink)':'1px dashed var(--line)'}});
+    }
+    return {label:label,score:got+' / '+total,pips:pips};
+  }
+  const techGroups=[techGroup('UNIT TYPES',7,12),techGroup('BUILDING TYPES',3,5),techGroup('RESEARCH',0,1)];
+
+  // ---- buildings ----
+  // A building is a row now, not a card. The two Research Stations share a mark frame and
+  // differ by what they open, the way the collectors do.
+  function slot(name,cost,unlocks,built){
+    const ic=ICO.icon(name);
+    return {name:name,cost:costs(cost),unlocks:unlocks,
+      d1:ic.d1,d2:ic.d2,d3:ic.d3,d4:ic.d4,
+      slotStyle:{display:'flex',alignItems:'center',gap:'10px',padding:'9px 11px',
+        borderRadius:'0px',background:built?'var(--surface)':'transparent',
+        border:built?'1px solid var(--line)':'1.5px dashed var(--line)',
+        boxShadow:built?'var(--shadow)':'none'},
+      markStyle:{width:'30px',height:'30px',borderRadius:'0px',flexShrink:0,display:'grid',
+        placeItems:'center',background:built?FAC:'transparent',
+        color:built?'#ffffff':'var(--text)',
+        border:built?'1.5px solid var(--ink)':'1.5px dashed var(--line)',
+        opacity:built?'1':'.6'},
+      state:built?'BUILT':'EMPTY',
+      stateStyle:{font:"600 8.5px 'IBM Plex Mono',monospace",letterSpacing:'.06em',
+        color:built?'var(--brand)':'var(--muted)'}};
+  }
+  const buildings=[
+    slot('Combat Frame Production',[['wo',2],['or',1]],'Spinner · Spitter · Large Combat Platform',true),
+    slot('Diplomatic Research Station',[['wo',2],['wa',1]],'Infiltrator · treaties',true),
+    slot('Defense Research Station',[['wo',2],['or',1]],'Wall Platform · battle strategy cards',false),
+    slot('Third Space',[['wo',3],['wa',1],['or',1]],'+5 culture every round',false)
+  ];
+
+  // ---- collectors ----
+  const COL=[['wa','Water',3,[ 'on','on','dim']],['wo','Wood',3,['on','on','empty']],
+             ['or','Ore',3,['on','dim','empty']],['oi','Oil',1,['on']],['et','Ether',1,['empty']]];
+  const collectors=COL.map(function(row){
+    const r=RES[row[0]];
+    const states=row[3];
+    const pips=[];
+    for(let i=0;i<row[2];i++) pips.push(dot(states[i]||'empty',15));
+    const built=states.filter(function(s){return s!=='empty';}).length;
+    return {code:r.code,name:row[1],pips:pips,text:built+' / '+row[2],
+      swatch:{width:'24px',height:'24px',borderRadius:'0px',display:'inline-grid',placeItems:'center',
+        font:"600 9.5px 'IBM Plex Mono',monospace",color:'#ffffff',background:r.c,border:'1.5px solid var(--ink)',flexShrink:0}};
+  });
+
+  // ---- bases ----
+  function sq(state){
+    const s={width:'22px',height:'22px',borderRadius:'0px',flexShrink:0,display:'inline-block'};
+    if(state==='out'){s.background='transparent';s.border='1.5px solid var(--ink)';s.opacity='.45';}
+    else if(state==='have'){s.background=FAC;s.border='1.5px solid var(--ink)';}
+    else {s.background='transparent';s.border='1px dashed var(--line)';}
+    return {style:s};
+  }
+  const bases=['out','have','have'].map(sq);
+
+  // ---- treaties ----
+  function treaty(name,culture,partner){
+    const active=!!partner;
+    const ic=ICO.icon(name);
+    return {name:name,culture:culture,d1:ic.d1,d2:ic.d2,d3:ic.d3,
+      rowStyle:{display:'flex',alignItems:'center',gap:'9px',padding:'6px 10px',borderRadius:'0px',
+        background:active?'var(--hlbg)':'var(--surface2)'},
+      dotStyle:{width:'22px',height:'22px',borderRadius:'0px',flexShrink:0,display:'grid',
+        placeItems:'center',color:active?'#ffffff':'var(--text)',
+        background:active?FAC:'transparent',
+        border:active?'1.5px solid var(--ink)':'1.5px dashed var(--line)'},
+      state:active?partner:'free',
+      stateStyle:{font:"600 9.5px 'IBM Plex Mono',monospace",letterSpacing:'.04em',
+        color:active?'var(--brand)':'var(--muted)'}};
+  }
+  const treaties=[treaty('Open Borders','+5',null),treaty('Shared Resources','+5','THE LEDGER'),
+    treaty('Peace','+5',null),treaty('Culture Treaty','+10',null),treaty('Shared Tactics','+5',null)];
+
+  // ---- action cards ----
+  function act(name,state,hero){
+    const played=state==='on the stack';
+    const ic=ICO.icon(name);
+    return {name:name,state:state,d1:ic.d1,d2:ic.d2,d3:ic.d3,d4:ic.d4,
+      markStyle:{width:'25px',height:'25px',borderRadius:'0px',display:'grid',placeItems:'center',
+        background:'var(--surface2)',color:'var(--text)',marginBottom:'2px'},
+      cardStyle:{flexGrow:1,minHeight:'72px',display:'flex',flexDirection:'column',
+        justifyContent:'space-between',padding:'9px',borderRadius:'0px',
+        background:played?'var(--surface2)':'var(--surface)',
+        border:hero?'1.5px solid var(--brand)':'1px solid var(--line)',
+        boxShadow:played?'none':'var(--shadow)',opacity:played?'.6':'1'},
+      stateStyle:{font:"600 9px 'IBM Plex Mono',monospace",letterSpacing:'.05em',
+        color:played?'var(--muted)':(hero?'var(--brand)':'var(--brand)'),textTransform:'uppercase'}};
+  }
+  const actions=[act('Build','in hand',false),act('Move / Battle','on the stack',false),
+    act('Research','in hand',false),act('Move / Battle','marshal',true)];
+
+  const markStyle={width:'30px',height:'30px',borderRadius:'0px',flexShrink:0,display:'grid',
+    placeItems:'center',background:'var(--surface2)',color:'var(--text)'};
+
+  function unit(name,kind,init,dmg,def,cost,note,have,cap){
+    const sup=[];
+    for(let i=0;i<cap;i++){
+      sup.push({style:{width:'8px',height:'8px',borderRadius:'50%',
+        background:i<have?FAC:'transparent',
+        border:i<have?'1.2px solid var(--ink)':'1px dashed var(--line)'}});
+    }
+    const ic=ICO.icon(name);
+    return {name:name,kind:kind,cost:costs(cost),note:note,
+      d1:ic.d1,d2:ic.d2,d3:ic.d3,d4:ic.d4,dd:ic.dd,markStyle:markStyle,
+      stats:[statBox('INIT',init,init!=='—'),statBox('DMG',dmg,dmg!=='—'),statBox('DEF',def,def!=='—')],
+      supply:sup,supplyText:have+' of '+cap,
+      tileStyle:{display:'flex',flexDirection:'column',gap:'7px',padding:'11px 12px',minHeight:'196px',
+        borderRadius:'0px',background:'var(--surface)',border:'1px solid var(--line)',boxShadow:'var(--shadow)'}};
+  }
+  const D='—';
+  const units=[
+    unit('Core','power',D,D,D,[['wa',1]],'Fits one platform. Spare Cores pay culture.',10,15),
+    unit('Water collector','collector',D,D,D,[['wa',1]],'Water only. Needs a Core.',3,3),
+    unit('Wood collector','collector',D,D,D,[['wa',1]],'Wood only. Needs a Core.',2,3),
+    unit('Ore collector','collector',D,D,D,[['wo',1]],'Ore only. Needs a Core.',2,3),
+    unit('Oil collector','collector',D,D,D,[['or',1]],'Oil only. One in the whole supply.',1,1),
+    unit('Ether collector','collector',D,D,D,[['oi',1]],'Ether only. One in the whole supply.',0,1),
+    unit('Spinner Platform','combat','5','2','1',[['wo',2]],'Needs Combat Frame Production. Defense is 1, not 2.',3,5),
+    unit('Spitter Platform','combat','95','1','1',[['wo',1],['or',1]],'Needs Combat Frame Production. Acts almost first.',2,5),
+    unit('Large Combat','combat','60','2 AoE','3',[['wo',2],['or',1],['oi',1]],'Needs Combat Frame Production. Hits every enemy.',0,5),
+    unit('Immobile Combat','fortress','98','3','3',[['wo',2],['or',2]],'Lives at a base. Never moves, rallies or retreats.',0,5),
+    unit('Wall Platform','shield','1','0','4',[['wo',3]],'Needs Defense Research Station. Must be shot first.',0,5),
+    unit('Infiltrator','spy',D,D,D,[['wa',1],['wo',1],['oi',1]],'Needs Diplomatic Research Station. No Core at all.',1,5)
+  ];
+
+  // ---- heroes ----
+  function hero(name,type,note,badge){
+    const lead=badge==='LEADER';
+    const empty=badge==='UNCLAIMED';
+    // What a hero DOES belongs on the pool screen, where you are choosing one. Here the
+    // slot only has to say who is in it and when it was earned — plus, for its owner only,
+    // whether it is the one carrying the spy.
+    const spy=!!SPY_CARRIER && name===SPY_CARRIER;
+    return {name:empty?'Empty slot':name,type:empty?note:type,badge:badge,
+      spyStyle:spy?{width:'22px',height:'22px',borderRadius:'0px',flexShrink:0,display:'grid',
+        placeItems:'center',background:'var(--surface2)',color:'var(--text)',
+        border:'1px solid var(--line)'}:{width:'0px',height:'0px',overflow:'hidden'},
+      initials:empty?'':name.split(' ').map(function(w){return w[0];}).slice(0,2).join(''),
+      tileStyle:{display:'flex',alignItems:'center',gap:'9px',padding:'9px 10px',
+        borderRadius:'0px',background:empty?'transparent':'var(--surface)',
+        border:empty?'1.5px dashed var(--line)':(spy?'1.5px solid var(--action)':(lead?'1.5px solid var(--ink)':'1px solid var(--line)')),
+        boxShadow:empty?'none':'var(--shadow)'},
+      avatarStyle:{width:'28px',height:'28px',borderRadius:'50%',flexShrink:0,display:'grid',placeItems:'center',
+        font:"700 10px 'IBM Plex Mono',monospace",color:'#ffffff',
+        background:empty?'transparent':FAC,
+        border:empty?'1px dashed var(--line)':'1.5px solid var(--ink)'},
+      badgeStyle:{font:"600 8.5px 'IBM Plex Mono',monospace",letterSpacing:'.06em',marginTop:'1px',
+        color:lead?'var(--brand)':'var(--muted)'}};
+  }
+  // The one hero carrying the assignment. The engine sends this only to its own seat.
+  const SPY_CARRIER='Marshal Corvin Ashlock';
+  const heroes=[
+    hero('Evo Angel','military · 80 / 4 / 6','Robots only. The hardest hitter in the pool, and your Leader.','LEADER'),
+    hero('Marshal Corvin Ashlock','military · 70 / 3 / 4','A second Move / Battle card while he lives.','CLAIMED AT 5'),
+    hero('Motherboard','technology · 30 / 1 / 3','+1 technology point, borrowed. Lost the moment she dies.','CLAIMED AT 15'),
+    hero('','','next claim at 30','UNCLAIMED'),
+    hero('','','then 50','UNCLAIMED'),
+    hero('','','then 75','UNCLAIMED')
+  ];
+
+  const legend=Object.keys(RES).map(function(k){
+    const r=RES[k];
+    const g=(typeof NGG!=='undefined')?NGG.icon(r.name):{d1:'',d2:'',d3:''};
+    return {code:r.code,name:r.name,where:r.where,g1:g.d1,g2:g.d2,g3:g.d3,
+      swatch:{width:'26px',height:'26px',borderRadius:'0px',display:'inline-grid',placeItems:'center',
+        color:'#ffffff',background:r.c,border:'1.5px solid var(--ink)'}};
+  });
+
+  // Costs that used to be letters typed into the markup, and the hand that had no home.
+  const metalCost=costs([['wo',2],['oi',2]]);
+  const baseCost=costs([['wo',3],['or',1]]);
+  const cardCost=costs([['wa',1],['wo',1],['or',1]]);
+  const etIc=ICO.icon('Ether'), oiIc=ICO.icon('Oil');
+  const eitherStyle={display:'inline-flex',alignItems:'center',color:'var(--text)',
+    background:'transparent',border:'1px dashed var(--line)',borderRadius:'0px',padding:'2px 6px'};
+  // The spy: public that you bought one, private which hero has it.
+  const spyIc=ICO.icon('Infiltrator');
+  const spyStrip={display:'flex',alignItems:'center',gap:'13px',padding:'11px 14px',
+    borderRadius:'0px',background:'var(--surface2)',border:'1.5px solid var(--action)'};
+  const spyStripMark={width:'30px',height:'30px',borderRadius:'0px',flexShrink:0,display:'grid',
+    placeItems:'center',background:'var(--surface)',color:'var(--action)',
+    border:'1px solid var(--line)'};
+
+  const bc=ICO.icon('Battle card');
+  const bcMark={width:'26px',height:'26px',borderRadius:'0px',flexShrink:0,display:'grid',
+    placeItems:'center',background:'var(--surface2)',color:'var(--text)'};
+  // Empty slots, drawn so the place they go is visible before any card exists. A held card
+  // would render face up here — this is the owner's own board — and would render as a back
+  // in the same panel on anybody else's screen.
+  function emptySlot(){
+   return {style:{width:'30px',height:'42px',borderRadius:'0px',flexShrink:0,
+     background:'transparent',border:'1.5px dashed var(--line)'}};
+  }
+  const battleCards=[emptySlot(),emptySlot()];
+
+  return {
+   rootStyle:{...T,position:'relative',width:'1240px',minHeight:'1700px',boxSizing:'border-box',padding:'40px 44px 48px',
+     display:'flex',flexDirection:'column',gap:'20px',background:'var(--bg)',
+     fontFamily:"'IBM Plex Sans',sans-serif",borderRadius:'0px'},
+   fac:FAC,legend:legend,coreZones:coreZones,techGroups:techGroups,buildings:buildings,
+   collectors:collectors,bases:bases,treaties:treaties,actions:actions,units:units,heroes:heroes,
+   metalCost:metalCost,cardCost:cardCost,baseCost:baseCost,eitherStyle:eitherStyle,
+   spyD1:spyIc.d1,spyD2:spyIc.d2,spyD3:spyIc.d3,spyD4:spyIc.dd,
+   spyStrip:spyStrip,spyStripMark:spyStripMark,
+   etD1:etIc.d1,etD2:etIc.d2,oiD1:oiIc.d1,oiD2:oiIc.d2,oiD3:oiIc.d3,
+   bcMark:bcMark,bcD1:bc.d1,bcD2:bc.d2,bcD3:bc.d3,bcD4:bc.d4,battleCards:battleCards
+  };
+ }
+}
+</script>
+</body>
+</html>

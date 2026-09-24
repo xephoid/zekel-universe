@@ -7,6 +7,7 @@ import type {
   BagData, CardZoneData, GridData, MapData, Palette, PoolData, SelectEvent, TableauData, TrackData,
 } from '@universe/primitives';
 import type { GameReferenceResponse, LegalMove } from '@universe/shared';
+import type { ComponentType } from 'react';
 
 export type { LegalMove, SelectEvent, Palette };
 
@@ -218,9 +219,47 @@ export interface MoveForm {
   submitLabel?: string;
 }
 
+/**
+ * What a game's own screen gets from the table. The screen draws the board
+ * and the decision in place of the bench layout; the top bar, the caption,
+ * the log, playback, undo and the numbered move menu stay the table's.
+ * Both callbacks go through submitMove(), so the agency rules hold: a tap
+ * sends a move the engine listed, and a form completes a listed template.
+ */
+export interface GameScreenProps {
+  input: GlueInput;
+  /** false on the watch page and while another seat owes the move */
+  yourTurn: boolean;
+  /** a move is in flight */
+  busy: boolean;
+  /** false on the watch page: nothing can be pressed at all */
+  interactive: boolean;
+  /** send one listed move, because the person tapped it */
+  onMove(move: LegalMove): void;
+  /** send a listed template with the answers the person gave */
+  onForm(template: LegalMove, move: Record<string, unknown>, editableKeys: string[]): void;
+  /**
+   * Press Draw (or Roll): present only while the engine lists a
+   * resolve_report for this seat. The screen draws the button where the
+   * draw belongs; the table draws none of its own when a screen is present.
+   */
+  onDraw?: () => void;
+  /**
+   * Ask the engine a read-only question about the decision being composed
+   * (Game.queryChoice): the answer, or null when it refused or could not be
+   * asked. Absent where there is no live table (the watch page, a preview).
+   */
+  ask?: (name: string, args: Record<string, unknown>) => Promise<{ answer: unknown } | { refused: string }>;
+  /** a seat's display name, from its engine player id */
+  nameFor(playerId: string): string;
+}
+
 export interface GlueModule {
   gameId: string;
   title: string;
+  /** A game whose table is more than the bench layout can hold draws its own
+   *  screen. When present the table renders it instead of the plan's zones. */
+  Screen?: ComponentType<GameScreenProps>;
   /** Build a plan, or null when the view does not match this game's shape;
    *  the table then renders the generic JSON inspector. */
   plan(input: GlueInput): TablePlan | null;

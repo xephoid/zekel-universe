@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Action icons</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:var(--brand)}a:hover{color:var(--action)}
+</style>
+</helmet>
+
+<div style="{{ rootStyle }}" data-screen-label="Action icons">
+
+  <div style="{{ s.header }}">
+    <div style="display:flex;flex-direction:column;gap:5px">
+      <span style="font:700 26px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:var(--text)">Actions &mdash; sixteen things a player does</span>
+      <span style="font-size:13px;line-height:1.45;color:var(--muted);max-width:740px">Only the first four are cards. The rest are the choices those cards open, and they earn marks because every one of them already has a screen on the Player choices page and a line in the log. Grouped by where they happen, because that is how a player meets them.</span>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <span style="{{ s.pill }}">4 CARDS</span>
+      <span style="{{ s.pill }}">12 CHOICES</span>
+    </div>
+  </div>
+
+  <div style="{{ s.cols }}">
+
+    <!-- ============ the cards ============ -->
+    <div style="{{ s.col }}">
+      <div style="{{ s.colHead }}">
+        <span style="{{ s.colName }}">On the stack</span>
+        <span style="{{ s.colNote }}">Three cards in hand, four with a hero</span>
+      </div>
+
+      <div style="{{ s.row }}">
+        <span style="{{ s.tileCard }}">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.6" y="16" width="16.8" height="4.6" rx="1.4"></rect><rect x="7.6" y="10.6" width="8.8" height="5.4" rx="1.3"></rect><path d="M12 3.6V8"></path><path d="M9.8 5.8 12 8l2.2-2.2"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Build</span>
+          <span style="{{ s.note }}">A block coming down onto a plinth. One unit, building or base.</span>
+        </div>
+      </div>
+
+      <div style="{{ s.row }}">
+        <span style="{{ s.tileCard }}">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.8 12h9.4"></path><path d="m8.6 8.4 3.6 3.6-3.6 3.6"></path><path d="m15.4 7.6 5 8.8M20.4 7.6l-5 8.8"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Move / Battle</span>
+          <span style="{{ s.note }}">An arrow meeting a clash. One card, two outcomes, and the arrow comes first.</span>
+        </div>
+      </div>
+
+      <div style="{{ s.row }}">
+        <span style="{{ s.tileCard }}">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="18.6" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="5.6" r="2"></circle><circle cx="19" cy="16.4" r="2"></circle><path d="m6.5 17.2 4-3.8M13.5 10.6l3.9-3.6M13.6 13.2l3.8 2.3"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Research</span>
+          <span style="{{ s.note }}">A branching tree, not a lightbulb. Unlock a technology, or buy a strategy card.</span>
+        </div>
+      </div>
+
+      <div style="{{ s.row }}">
+        <span style="{{ s.tileCard }}">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5.6 6 6 6-6 6"></path><path d="m12.6 6 6 6-6 6"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Pass</span>
+          <span style="{{ s.note }}">Not a card at all. It is drawn like one so it sits beside them in the hand.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ inside move / battle ============ -->
+    <div style="{{ s.col }}">
+      <div style="{{ s.colHead }}">
+        <span style="{{ s.colName }}">Inside a Move / Battle</span>
+        <span style="{{ s.colNote }}">Three shapes of the same card</span>
+      </div>
+
+      <div style="{{ s.row }}">
+        <span style="{{ s.tile }}">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="4.2" cy="12" r="1.9"></circle><path d="M6.8 12h10.4"></path><path d="m13.8 8.4 3.8 3.6-3.8 3.6"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Move</span>
+          <span style="{{ s.note }}">One tile to one neighbour. The dot is where you left, and it stays visible.</span>
+        </div>
+      </div>
+
+      <div style="{{ s.row }}">
+        <span style="{{ s.tile }}">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="2.4"></circle><path d="M12 3.4v5M12 20.6v-5M3.4 12h5M20.6 12h-5"></path><path d="M9.8 6.2 12 4l2.2 2.2M9.8 17.8 12 20l2.2-2.2M6.2 9.8 4 12l2.2 2.2M17.8 9.8 20 12l-2.2 2.2"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Rally</span>
+          <span style="{{ s.note }}">Every neighbour at once, pointing inward. The only mark with no single origin.</span>
+        </div>
+      </div>
+
+      <div style="{{ s.row }}">
+        <span style="{{ s.tile }}">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.6 12H4.8"></path><path d="m8.6 7.8-3.8 4.2 3.8 4.2"></path><path d="M20.4 4.6v14.8"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Retreat</span>
+          <span style="{{ s.note }}">Leaving a wall behind, all of you, one way. The bar is the hex you cannot go back to.</span>
+        </div>
+      </div>
+
+      <div style="{{ s.row }}">
+        <span style="{{ s.tile }}">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5.4 5.4 13.2 13.2"></path><path d="m18.6 5.4-13.2 13.2"></path><path d="M5.4 5.4v3.4M5.4 5.4h3.4M18.6 5.4v3.4M18.6 5.4h-3.4"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Attack</span>
+          <span style="{{ s.note }}">Crossed, with hilts. Entering an occupied tile is what makes this happen, never a button.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ inside a battle ============ -->
+    <div style="{{ s.col }}">
+      <div style="{{ s.colHead }}">
+        <span style="{{ s.colName }}">Inside a battle</span>
+        <span style="{{ s.colNote }}">Two of these stop the table</span>
+      </div>
+
+      <div style="{{ s.row }}">
+        <span style="{{ s.tile }}">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.6"></circle><path d="m10 8.2 6.2 3.8-6.2 3.8Z"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Activate</span>
+          <span style="{{ s.note }}">One unit takes its turn, in initiative order. The plainest mark, because it happens most.</span>
+        </div>
+      </div>
+
+      <div style="{{ s.row }}">
+        <span style="{{ s.tile }}">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.2" y="3.4" width="11.6" height="12.4" rx="2"></rect><path d="M3.4 20.6h17.2"></path><path d="M12 7v5.2M9.6 10l2.4 2.4 2.4-2.4"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Commit a card</span>
+          <span style="{{ s.note }}">Face down onto the line. Both sides commit before either sees, so the table waits here.</span>
+        </div>
+      </div>
+
+      <div style="{{ s.row }}">
+        <span style="{{ s.tile }}">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4.4 17.4 6.6v5.6c0 3.9-2.7 6.9-6.4 7.9-3.7-1-6.4-4-6.4-7.9V6.6Z"></path><path d="m21.4 4.2-3.2 3.2M21.6 11.4l-2.6-1.2"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Defend</span>
+          <span style="{{ s.note }}">A shield with the hit glancing off. Out of turn, and usually declined.</span>
+        </div>
+      </div>
+
+      <div style="{{ s.row }}">
+        <span style="{{ s.tile }}">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12.4c0-1.3 1-2.2 2.3-2.2h12.4c1.3 0 2.3.9 2.3 2.2 0 3.4-2.3 5.8-5.2 5.8-1.7 0-2.6-.9-3.3-2-.7 1.1-1.6 2-3.3 2-2.9 0-5.2-2.4-5.2-5.8Z"></path><path d="M12 7.2V3.4"></path><path d="m9.6 5.6 2.4-2.2 2.4 2.2"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Reveal the spy</span>
+          <span style="{{ s.note }}">The mask lifting. Spends the assignment, so it is the one battle choice you cannot take back.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ diplomacy ============ -->
+    <div style="{{ s.col }}">
+      <div style="{{ s.colHead }}">
+        <span style="{{ s.colName }}">Diplomacy</span>
+        <span style="{{ s.colNote }}">The intended winning path</span>
+      </div>
+
+      <div style="{{ s.row }}">
+        <span style="{{ s.tile }}">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.4" y="8" width="7.4" height="8" rx="2"></rect><rect x="14.2" y="8" width="7.4" height="8" rx="2"></rect><path d="M10.6 12h2.8"></path><path d="m11.8 10.2 1.8 1.8-1.8 1.8"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Offer a treaty</span>
+          <span style="{{ s.note }}">One token crossing to another. Only at the start or end of your own action.</span>
+        </div>
+      </div>
+
+      <div style="{{ s.row }}">
+        <span style="{{ s.tile }}">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.6"></circle><path d="m8 12.2 2.8 2.8 5.2-5.6"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Accept</span>
+          <span style="{{ s.note }}">Out of turn, and the only one of the four that creates income for two seats at once.</span>
+        </div>
+      </div>
+
+      <div style="{{ s.row }}">
+        <span style="{{ s.tile }}">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.6"></circle><path d="m9 9 6 6M15 9l-6 6"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Decline</span>
+          <span style="{{ s.note }}">Costs the offerer a window, not you. The response screen says when their next one is.</span>
+        </div>
+      </div>
+
+      <div style="{{ s.row }}">
+        <span style="{{ s.tile }}">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.6 8.4 7.8 6.6a3.7 3.7 0 0 0-5.2 5.2l1.8 1.8"></path><path d="m14.4 15.6 1.8 1.8a3.7 3.7 0 0 0 5.2-5.2l-1.8-1.8"></path><path d="m13.4 9.4-2.2 2.6h2.4l-2.2 2.6"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Break a treaty</span>
+          <span style="{{ s.note }}">A chain parted, with the fracture drawn between the halves. The log always names who broke it.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="{{ s.foot }}">
+    <div style="display:flex;flex-direction:column;gap:3px;flex-grow:1;min-width:0">
+      <span style="{{ s.footStrong }}">The four cards are drawn heavier than the twelve choices.</span>
+      <span style="{{ s.footText }}">A card is an object you hold, place and lose for the round; a choice is something you do once a card is already resolving. The heavier tile is the whole distinction, and it is why Pass is drawn as a card even though no card exists &mdash; it occupies the same place in the hand and costs you the same round.</span>
+    </div>
+    <div style="width:1px;align-self:stretch;background:var(--line);flex-shrink:0"></div>
+    <div style="display:flex;flex-direction:column;gap:5px;width:320px;flex-shrink:0">
+      <span style="{{ s.footStrong }}">Hero cards add no new mark</span>
+      <span style="{{ s.footText }}">Marshal Ashlock, Quartermaster Hollis and Archivist Dray each grant a fourth card, but it is a second copy of one of the three. A hero-granted card shows the same mark with the hero&rsquo;s star in its corner, so nothing new has to be learned.</span>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":700},"theme":{"editor":"enum","options":["light","dark"],"default":"light","tsType":"&#39;light&#39;|&#39;dark&#39;","section":"Sheet"}}'>
+const THEMES={
+ light:{'--bg':'#f7f1e6','--surface':'#ffffff','--surface2':'#efe7d8','--text':'#1c1a17','--muted':'#6b655b','--brand':'#1f4d3a','--action':'#e0762b','--hlbg':'#e6efe9','--danger':'#b3261e','--line':'rgba(28,26,23,.14)','--ink':'#1c1a17'},
+ dark:{'--bg':'#1a221c','--surface':'#232e26','--surface2':'#2c3a30','--text':'#f3ead9','--muted':'#b1ac9f','--brand':'#9bb08a','--action':'#ff8a3d','--hlbg':'#2f4a3a','--danger':'#ff7b6b','--line':'rgba(243,234,217,.16)','--ink':'#0f150f'}
+};
+
+class Component extends DCLogic{
+ renderVals(){
+  const T=THEMES[this.props.theme||'light'];
+
+  const tile={width:'44px',height:'44px',borderRadius:'10px',flexShrink:0,
+    background:'var(--surface2)',display:'grid',placeItems:'center',color:'var(--text)'};
+
+  const s={
+   header:{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:'24px',flexShrink:0},
+   pill:{font:"600 9.5px 'IBM Plex Mono',monospace",letterSpacing:'.06em',padding:'5px 10px',
+     borderRadius:'999px',background:'var(--surface)',border:'1px solid var(--line)',color:'var(--muted)'},
+   cols:{display:'grid',gridTemplateColumns:'repeat(4, 1fr)',gap:'16px',flexShrink:0},
+   col:{display:'flex',flexDirection:'column',gap:'10px',padding:'14px 15px 15px',
+     borderRadius:'13px',background:'var(--surface)',border:'1px solid var(--line)'},
+   colHead:{display:'flex',flexDirection:'column',gap:'2px',paddingBottom:'8px',
+     borderBottom:'1px solid var(--line)'},
+   colName:{font:"700 15px 'Bricolage Grotesque',sans-serif",letterSpacing:'-.01em',color:'var(--text)'},
+   colNote:{font:"600 9px 'IBM Plex Mono',monospace",letterSpacing:'.05em',color:'var(--muted)'},
+   row:{display:'flex',alignItems:'flex-start',gap:'11px'},
+   tile:tile,
+   // A card is an object you hold; a choice is something you do. The heavier tile is
+   // the only thing carrying that difference, so it has to be obvious at a glance.
+   tileCard:{...tile,background:'var(--surface2)',border:'1.5px solid var(--ink)',
+     borderRadius:'9px'},
+   meta:{display:'flex',flexDirection:'column',gap:'2px',flexGrow:1,minWidth:0},
+   name:{font:"700 13.5px 'Bricolage Grotesque',sans-serif",letterSpacing:'-.01em',color:'var(--text)'},
+   note:{fontSize:'10.5px',lineHeight:'1.4',color:'var(--muted)'},
+
+   foot:{display:'flex',alignItems:'flex-start',gap:'20px',padding:'14px 16px',borderRadius:'13px',
+     background:'var(--surface2)',border:'1px solid var(--line)',flexShrink:0},
+   footStrong:{font:"700 13px 'Bricolage Grotesque',sans-serif",letterSpacing:'-.01em',color:'var(--text)'},
+   footText:{fontSize:'11.5px',lineHeight:'1.45',color:'var(--muted)'}
+  };
+
+  return {
+   rootStyle:{...T,width:'1440px',height:'700px',boxSizing:'border-box',display:'flex',
+     flexDirection:'column',gap:'18px',padding:'32px 40px',background:'var(--bg)',
+     fontFamily:"'IBM Plex Sans',sans-serif",borderRadius:'12px',overflow:'hidden'},
+   s:s
+  };
+ }
+}
+</script>
+</body>
+</html>

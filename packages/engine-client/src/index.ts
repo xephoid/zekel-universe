@@ -223,6 +223,14 @@ export const createSessionSchema = z.object({
   guidance: z.string().optional(),
 }).passthrough();
 
+export const queryChoiceResultSchema = z.object({
+  session_id: z.string().optional(),
+  player_id: z.string().optional(),
+  name: z.string().optional(),
+  answer: z.unknown(),
+}).passthrough();
+export type QueryChoiceResult = z.infer<typeof queryChoiceResultSchema>;
+
 export const legalMovesResultSchema = z.object({
   session_id: z.string().optional(),
   player_id: z.string().optional(),
@@ -577,6 +585,17 @@ export class EngineClient {
       player_id: playerId,
       ...(token !== undefined ? { auth_token: token } : {}),
     }, legalMovesResultSchema);
+  }
+
+  /** A read-only question about a decision the seat is composing (query_choice). */
+  queryChoice(sessionId: string, playerId: string, token: string | undefined, name: string, args: Record<string, unknown>): Promise<QueryChoiceResult> {
+    return this.call('query_choice', {
+      session_id: sessionId,
+      player_id: playerId,
+      name,
+      args,
+      ...(token !== undefined ? { auth_token: token } : {}),
+    }, queryChoiceResultSchema);
   }
 
   /** Apply by full move object OR by move_id from a fresh get_legal_moves. */

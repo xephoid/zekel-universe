@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Resource icons</title>
+<script src="./support.js"></script>
+<script src="./icons.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:var(--brand)}a:hover{color:var(--action)}
+</style>
+</helmet>
+
+<div style="{{ rootStyle }}" data-screen-label="Resource icons">
+
+  <div style="{{ s.header }}">
+    <div style="display:flex;flex-direction:column;gap:5px">
+      <span style="font:700 26px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:var(--text)">Resources &mdash; five marks, already half drawn</span>
+      <span style="font-size:13px;line-height:1.45;color:var(--muted);max-width:740px">These were sitting inside the robot collectors all along. The rule that makes them a set is the one the spells already follow: the glyph <strong>alone</strong> is the resource, and the same glyph <strong>inside the bracket frame</strong> is the collector that takes it. Nothing new was invented here; the frame was simply lifted off.</span>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <span style="{{ s.pill }}">5 OF 5</span>
+      <span style="{{ s.pill }}">NO NEW SHAPES</span>
+    </div>
+  </div>
+
+  <div style="{{ s.grid }}">
+    <sc-for list="{{ res }}" as="r" hint-placeholder-count="5">
+      <div style="{{ r.cardStyle }}">
+
+        <div style="display:flex;align-items:center;gap:13px">
+          <span style="{{ r.hexStyle }}">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ r.d1 }}"></path><path d="{{ r.d2 }}"></path><path d="{{ r.d3 }}"></path></svg>
+          </span>
+          <div style="display:flex;flex-direction:column;gap:2px;flex-grow:1;min-width:0">
+            <span style="font:700 17px 'Bricolage Grotesque',sans-serif;letter-spacing:-.01em;color:var(--text)">{{ r.name }}</span>
+            <span style="{{ r.whereStyle }}">{{ r.where }}</span>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <span style="{{ s.label }}">ON A COST LINE</span>
+          <div style="display:flex;gap:6px;align-items:center">
+            <span style="{{ r.chipStyle }}">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ r.d1 }}"></path><path d="{{ r.d2 }}"></path><path d="{{ r.d3 }}"></path></svg>
+            </span>
+            <span style="{{ r.chipStyle }}">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ r.d1 }}"></path><path d="{{ r.d2 }}"></path><path d="{{ r.d3 }}"></path></svg>
+              <span style="{{ s.count }}">&times;2</span>
+            </span>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <span style="{{ s.label }}">THE COLLECTOR THAT TAKES IT</span>
+          <div style="display:flex;gap:9px;align-items:center">
+            <span style="{{ s.tile }}">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ r.c1 }}"></path><path d="{{ r.c2 }}"></path><path d="{{ r.c3 }}"></path><path d="{{ r.c4 }}"></path></svg>
+            </span>
+            <span style="{{ s.small }}">{{ r.collector }}</span>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:16px;margin-top:auto;padding-top:11px;border-top:1px solid var(--line)">
+          <div style="display:flex;flex-direction:column;gap:1px">
+            <span style="{{ s.num }}">{{ r.small }}</span>
+            <span style="{{ s.numLabel }}">3&ndash;4P TILES</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:1px">
+            <span style="{{ s.num }}">{{ r.big }}</span>
+            <span style="{{ s.numLabel }}">5&ndash;6P TILES</span>
+          </div>
+        </div>
+
+        <span style="{{ s.note }}">{{ r.note }}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="{{ s.foot }}">
+    <div style="display:flex;flex-direction:column;gap:3px;flex-grow:1;min-width:0">
+      <span style="{{ s.footStrong }}">Where this changes a screen: the cost line.</span>
+      <span style="{{ s.footText }}">A cost used to read <strong>Wo&times;2 Or&times;1</strong> &mdash; two abbreviations a player has to translate before they can compare anything. It now reads as two pictures and two numbers, in the same coloured pill, so scanning nine buildable things for the one you can afford is looking rather than reading. A cost of one drops the number entirely, because the glyph on its own already says one.</span>
+    </div>
+    <div style="width:1px;align-self:stretch;background:var(--line);flex-shrink:0"></div>
+    <div style="display:flex;flex-direction:column;gap:5px;width:330px;flex-shrink:0">
+      <span style="{{ s.footStrong }}">The one compromise</span>
+      <span style="{{ s.footText }}">Oil is a derrick, which is strictly an extraction shape standing in for the substance. Water and oil are the pair the eye confuses first, and two drops do not survive beside each other at 11 px in a cost pill. Colour cannot carry it either, since the pills are already colour-coded and a colour-blind player would be left with nothing.</span>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":700},"theme":{"editor":"enum","options":["light","dark"],"default":"light","tsType":"&#39;light&#39;|&#39;dark&#39;","section":"Sheet"}}'>
+const THEMES={
+ light:{'--bg':'#f7f1e6','--surface':'#ffffff','--surface2':'#efe7d8','--text':'#1c1a17','--muted':'#6b655b','--brand':'#1f4d3a','--action':'#e0762b','--hlbg':'#e6efe9','--danger':'#b3261e','--line':'rgba(28,26,23,.14)','--ink':'#1c1a17'},
+ dark:{'--bg':'#1a221c','--surface':'#232e26','--surface2':'#2c3a30','--text':'#f3ead9','--muted':'#b1ac9f','--brand':'#9bb08a','--action':'#ff8a3d','--hlbg':'#2f4a3a','--danger':'#ff7b6b','--line':'rgba(243,234,217,.16)','--ink':'#0f150f'}
+};
+// Two palettes, on purpose. The map tint is the tile you stand on; the chip tint is the
+// same resource on a cost line, darkened so white numerals hold at 10 px.
+const TER={Water:'#4d86ab',Wood:'#57804a',Ore:'#8d8577',Oil:'#3a342c',Ether:'#7b55bd'};
+const PILL={Water:'#2f6b91',Wood:'#3f6730',Ore:'#6f6858',Oil:'#2f2a24',Ether:'#6f43b5'};
+const CLIP='polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)';
+
+class Component extends DCLogic{
+ renderVals(){
+  const T=THEMES[this.props.theme||'light'];
+  const ICO=(typeof NGG!=='undefined')?NGG:{icon:function(n){return {name:n,has:false,d1:'',d2:'',d3:'',d4:'',dd:''};}};
+
+  function res(name,where,small,big,note){
+   const g=ICO.icon(name);                 // the resource: the glyph alone
+   const c=ICO.icon(name+' collector');    // the same glyph inside the bracket frame
+   return {name:name,where:where,small:small,big:big,note:note,
+    collector:name+' collector',
+    d1:g.d1,d2:g.d2,d3:g.d3,
+    c1:c.d1,c2:c.d2,c3:c.d3,c4:c.d4,
+    cardStyle:{display:'flex',flexDirection:'column',gap:'13px',padding:'15px 16px 16px',
+      borderRadius:'13px',background:'var(--surface)',border:'1px solid var(--line)'},
+    hexStyle:{width:'52px',height:'45px',flexShrink:0,clipPath:CLIP,background:TER[name],
+      display:'grid',placeItems:'center'},
+    whereStyle:{font:"600 8.5px 'IBM Plex Mono',monospace",letterSpacing:'.05em',color:'var(--muted)'},
+    chipStyle:{display:'inline-flex',alignItems:'center',background:PILL[name],color:'#ffffff',
+      borderRadius:'5px',padding:'3px 7px'}};
+  }
+  const res_ = [
+   res('Water','RINGS THE MAP',12,21,'The only resource on the rim, so the tiles nobody fights over are the ones that pay for Surfs and Cores.'),
+   res('Wood','RINGS THE MAP',10,19,'Two leaves, not a tree: a tree silhouette collapses to a blob at 11 px and this keeps its two arms.'),
+   res('Ore','8 TILES, CENTRE',8,8,'Eight tiles on every map, all of them in the middle. The count never changes with the player count.'),
+   res('Oil','2 TILES, CENTRE',2,2,'North Oil and South Oil, and nothing else. Two tiles decide every Large Combat Platform in the game.'),
+   res('Ether','2 TILES, CENTRE',2,2,'The West and East Cauldrons. Not a material, which is why it is the one mark that is not a thing you could pick up.')];
+
+  const s={
+   header:{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:'24px',flexShrink:0},
+   pill:{font:"600 9.5px 'IBM Plex Mono',monospace",letterSpacing:'.06em',padding:'5px 10px',
+     borderRadius:'999px',background:'var(--surface)',border:'1px solid var(--line)',color:'var(--muted)'},
+   grid:{display:'grid',gridTemplateColumns:'repeat(5, 1fr)',gap:'15px',flexShrink:0},
+   label:{font:"600 8px 'IBM Plex Mono',monospace",letterSpacing:'.06em',color:'var(--muted)'},
+   count:{marginLeft:'3px',font:"600 10px 'IBM Plex Mono',monospace"},
+   tile:{width:'38px',height:'38px',borderRadius:'9px',flexShrink:0,background:'var(--surface2)',
+     display:'grid',placeItems:'center',color:'var(--text)'},
+   small:{fontSize:'11px',lineHeight:'1.35',color:'var(--muted)'},
+   num:{font:"700 19px 'IBM Plex Mono',monospace",lineHeight:'1',color:'var(--text)'},
+   numLabel:{font:"600 8px 'IBM Plex Mono',monospace",letterSpacing:'.06em',color:'var(--muted)'},
+   note:{fontSize:'11px',lineHeight:'1.45',color:'var(--muted)'},
+   foot:{display:'flex',alignItems:'flex-start',gap:'20px',padding:'14px 16px',borderRadius:'13px',
+     background:'var(--surface2)',border:'1px solid var(--line)',flexShrink:0},
+   footStrong:{font:"700 13px 'Bricolage Grotesque',sans-serif",letterSpacing:'-.01em',color:'var(--text)'},
+   footText:{fontSize:'11.5px',lineHeight:'1.45',color:'var(--muted)'}
+  };
+
+  return {
+   rootStyle:{...T,width:'1440px',height:'700px',boxSizing:'border-box',display:'flex',
+     flexDirection:'column',gap:'18px',padding:'32px 40px',background:'var(--bg)',
+     fontFamily:"'IBM Plex Sans',sans-serif",borderRadius:'12px',overflow:'hidden'},
+   res:res_,s:s
+  };
+ }
+}
+</script>
+</body>
+</html>

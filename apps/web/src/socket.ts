@@ -4,7 +4,7 @@
 
 import { io, type Socket } from 'socket.io-client';
 import { SOCKET_EVENTS } from '@universe/shared';
-import type { JoinTableAck, MoveAck, TableEventWire, UndoAck } from '@universe/shared';
+import type { JoinTableAck, MoveAck, QueryAck, TableEventWire, UndoAck } from '@universe/shared';
 
 export interface TableSocketHandlers {
   onEvent: (e: TableEventWire) => void;
@@ -16,6 +16,8 @@ export interface TableSocketHandlers {
 
 export interface TableConnection {
   move(seat: number, move: Record<string, unknown>): Promise<MoveAck>;
+  /** a read-only question about a decision this seat is composing */
+  query(seat: number, name: string, args: Record<string, unknown>): Promise<QueryAck>;
   undo(): Promise<UndoAck>;
   close(): void;
 }
@@ -48,6 +50,12 @@ export function connectTable(tableId: string, h: TableSocketHandlers): TableConn
     move: (seat, move) => new Promise<MoveAck>((resolve) => {
       s.timeout(20_000).emit(SOCKET_EVENTS.move, { tableId, seat, move }, (err: Error | null, ack?: MoveAck) => {
         if (err || !ack) resolve({ error: 'engine_unavailable', reason: 'The table did not answer. Check your connection.' });
+        else resolve(ack);
+      });
+    }),
+    query: (seat, name, args) => new Promise<QueryAck>((resolve) => {
+      s.timeout(10_000).emit(SOCKET_EVENTS.query, { tableId, seat, name, args }, (err: Error | null, ack?: QueryAck) => {
+        if (err || !ack) resolve({ error: 'engine_unavailable', reason: 'The table did not answer.' });
         else resolve(ack);
       });
     }),
