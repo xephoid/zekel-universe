@@ -21,6 +21,12 @@ const game = new mod.NeitherGutsNorGearsGame();
 const outDir = resolve('apps/web/src/tests/fixtures/ngg');
 mkdirSync(outDir, { recursive: true });
 
+// The printed catalogue, in the shape the server's reference endpoint returns.
+writeFileSync(resolve('apps/web/src/tests/fixtures/ngg-reference.json'), JSON.stringify({
+  gameId: 'neither-guts-nor-gears', rules: game.getRulesText(), moveSchema: game.moveSchema,
+  optionsSchema: game.optionsSchema, referenceData: game.getReferenceData(),
+}, null, 1));
+
 const seen = new Map();
 const factionsWizardFirst = ['covenant', 'foundry', 'schism', 'ledger', 'brass-circle', 'unbolted'];
 

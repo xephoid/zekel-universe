@@ -19,6 +19,7 @@ import { ProfilePage } from './pages/Profile';
 import { SignInPage, SignInCompletePage } from './pages/SignIn';
 import { GalleryPage } from './pages/Gallery';
 import { NotFoundPage } from './pages/NotFound';
+import { DevNggPage } from './pages/DevNgg';
 
 const router = createBrowserRouter([
   { path: '/', element: <HomePage /> },
@@ -35,6 +36,8 @@ const router = createBrowserRouter([
   { path: '/signin', element: <SignInPage /> },
   { path: '/signin/complete', element: <SignInCompletePage /> },
   { path: '/gallery', element: <GalleryPage /> },
+  // Development only: captured NGnG views, drawn without a game.
+  ...(import.meta.env.DEV ? [{ path: '/dev/ngg', element: <DevNggPage /> }] : []),
   { path: '*', element: <NotFoundPage /> },
 ]);
 

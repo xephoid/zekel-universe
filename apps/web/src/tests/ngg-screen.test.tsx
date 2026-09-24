@@ -4,9 +4,10 @@
 
 import { describe, expect, it, vi } from 'vitest';
 import { render, cleanup } from '@testing-library/react';
-import type { LegalMove } from '@universe/shared';
+import type { GameReferenceResponse, LegalMove } from '@universe/shared';
 import type { GlueInput } from '../glue';
 import { NggScreen } from '../glue/ngg/NggScreen';
+import REFERENCE from './fixtures/ngg-reference.json';
 
 interface Fixture {
   key: string;
@@ -23,7 +24,7 @@ const FIXTURES = Object.entries(import.meta.glob<Fixture>('./fixtures/ngg/*.json
 
 function inputFor(view: unknown, playerId: string, legalMoves: LegalMove[]): GlueInput {
   return {
-    view, previous: null, legalMoves, playerId, reference: null, seq: 1,
+    view, previous: null, legalMoves, playerId, reference: REFERENCE as GameReferenceResponse, seq: 1,
     engineMove: null, actorPlayerId: null, memory: new Map(),
   };
 }
