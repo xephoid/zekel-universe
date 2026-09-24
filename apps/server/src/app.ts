@@ -1009,10 +1009,16 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     });
   }
 
-  // In production the server also serves the built frontend. In dev, Vite
-  // serves it, so this only runs when the build output is actually there.
+  // The server also serves the built frontend when it is there. In dev, Vite
+  // serves it and this does not run, because there is no build output.
+  //
+  // It used to ask for `NODE_ENV=production` as well, which made the e2e
+  // stack impossible to stand up: those specs sign in by reading the test
+  // outbox, and the outbox refuses to exist in production — rightly. So the
+  // one configuration that served the app was the one configuration that
+  // could not sign in, and the browser specs got a 404 for every page.
   const webDist = path.resolve(import.meta.dirname, '../../web/dist');
-  if (process.env.NODE_ENV === 'production' && existsSync(webDist)) {
+  if (existsSync(webDist)) {
     void app.register(fastifyStatic, { root: webDist });
     // Client-side routing: any GET that is not /api/* gets index.html back.
     app.setNotFoundHandler((req: FastifyRequest, reply: FastifyReply) => {

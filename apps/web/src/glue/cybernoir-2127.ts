@@ -819,7 +819,12 @@ export const cybernoirGlue: GlueModule = {
       { label: 'Location hand', value: asNum(det['location_hand_size']) },
       { label: 'Person deck', value: asNum(det['poi_deck_size']) },
       { label: 'Mid-game guess', value: det['mid_game_guess_spent'] ? 'spent' : 'available' },
-      { label: 'Overclock', value: det['overclock_used'] ? 'used' : 'available' },
+      // No Overclock row: Overclock is the Hacker's, and the Detective's panel
+      // used to carry one anyway. The engine publishes `overclock_used` on
+      // both seats, and the Detective's is structurally always false, so the
+      // row read "available" for an ability the Detective can never use — the
+      // opponent's own marker, misfiled. Each panel carries its own markers,
+      // the way the mid-game guess and the burned safehouse already do.
     ];
     const hakStats: NonNullable<TableauData['stats']> = [
       { label: 'Action points', value: asNum(hak['ap']) },

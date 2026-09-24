@@ -326,7 +326,14 @@
 .zk-map-area:first-of-type { border-top: none; }
 .zk-map-area-name { font: 600 11px var(--font-body); color: var(--fg-muted); }
 .zk-map-area-note { font: 500 10px var(--font-mono); color: var(--fg-muted); opacity: 0.8; }
-.zk-map-badges { display: flex; gap: 2px; justify-content: center; }
+/* A place's badges sit on one line under it, as wide as the words need.
+   They used to take the pill's width, and a place with a short name has a
+   short pill: the badges were squeezed until "ruled out" broke into "ruled"
+   and "out", two lines deep, reaching towards the row beneath. The pill is
+   held to the gap to its neighbour; the badges are smaller and centred, so
+   they may be a few pixels wider than it without crowding anything. */
+.zk-map-badges { display: flex; gap: 2px; justify-content: center; flex-wrap: nowrap; width: max-content; margin: 0 auto; }
+.zk-map-badges .zk-card-badge { white-space: nowrap; flex: none; }
 .zk-map-road { position: absolute; height: 3px; background: var(--border); transform-origin: 0 50%; opacity: 0.8; border-radius: 2px; }
 
 /* die */
