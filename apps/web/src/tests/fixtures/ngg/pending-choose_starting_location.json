@@ -283,7 +283,7 @@
   "resolving_action": null,
   "treaties": [],
   "battle": null,
-  "battle_deck_count": 38,
+  "battle_deck_count": 19,
   "battle_discard": [],
   "pending": {
    "kind": "choose_starting_location",
@@ -341,7 +341,7 @@
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_this_round": [],
+    "action_cards_played_count": 0,
     "battle_hand_count": 1,
     "spy_recruitments": 0,
     "units": [],
@@ -355,6 +355,18 @@
      }
     ],
     "bases": [],
+    "collectors": [
+     {
+      "collector": "surf-1",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-2",
+      "type": "Surf",
+      "placed_at": null
+     }
+    ],
     "committed_collectors": []
    },
    {
@@ -392,13 +404,13 @@
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_this_round": [],
+    "action_cards_played_count": 0,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Motherboard",
+      "hero": "Chronicler Ottoline Vey",
       "coord": "reserved",
       "is_leader": true,
       "dead": false,
@@ -406,6 +418,7 @@
      }
     ],
     "bases": [],
+    "collectors": [],
     "committed_collectors": []
    }
   ],
@@ -415,6 +428,7 @@
     "effect": "Move any number of your own eligible mobile units from adjacent locations into this battle."
    }
   ],
+  "your_action_cards_played": [],
   "your_spy_assignments": [],
   "your_knowledge": [],
   "your_reserved_heroes": [
@@ -721,7 +735,7 @@
   "resolving_action": null,
   "treaties": [],
   "battle": null,
-  "battle_deck_count": 38,
+  "battle_deck_count": 19,
   "battle_discard": [],
   "pending": {
    "kind": "choose_starting_location",
@@ -779,7 +793,7 @@
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_this_round": [],
+    "action_cards_played_count": 0,
     "battle_hand_count": 1,
     "spy_recruitments": 0,
     "units": [],
@@ -793,6 +807,18 @@
      }
     ],
     "bases": [],
+    "collectors": [
+     {
+      "collector": "surf-1",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-2",
+      "type": "Surf",
+      "placed_at": null
+     }
+    ],
     "committed_collectors": []
    },
    {
@@ -830,13 +856,13 @@
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_this_round": [],
+    "action_cards_played_count": 0,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Motherboard",
+      "hero": "Chronicler Ottoline Vey",
       "coord": "reserved",
       "is_leader": true,
       "dead": false,
@@ -844,14 +870,16 @@
      }
     ],
     "bases": [],
+    "collectors": [],
     "committed_collectors": []
    }
   ],
   "your_battle_hand": [],
+  "your_action_cards_played": [],
   "your_spy_assignments": [],
   "your_knowledge": [],
   "your_reserved_heroes": [
-   "Motherboard"
+   "Chronicler Ottoline Vey"
   ]
  },
  "watcherLegalMoves": []

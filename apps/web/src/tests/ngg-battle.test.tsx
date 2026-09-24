@@ -137,7 +137,7 @@ describe('NGnG battle screens', () => {
     press(r.container, /^Battle cardRally/);
     expect(r.onMove).not.toHaveBeenCalled();
     press(r.container, "Counter The Ledger's Rally");
-    expect(sentListed(r.onMove, r.legalMoves)).toEqual({ type: 'choose_counter_target', card: 'Rally' });
+    expect(sentListed(r.onMove, r.legalMoves)).toMatchObject({ type: 'choose_counter_target', card: 'Rally' });
   });
 
   it('Card Batch: the engine never asks for a Counter with nothing it may cancel', () => {
@@ -199,7 +199,7 @@ describe('NGnG battle screens', () => {
     const d = decider('pending-battle_defense-decoy');
     const dialog = d.container.querySelector('.ngg-interrupt') as HTMLElement;
     expect(dialog).not.toBeNull();
-    expect(dialog.textContent).toContain('No unrevealed spy rides that hero');
+    expect(dialog.textContent).toMatch(/No unrevealed (\w+ )?spy rides that hero/);
     expect(dialog.textContent).toContain('The Mana Shield window is not open on this attack');
     cleanup();
     const r = decider('pending-battle_defense-mana_shield');
@@ -240,22 +240,20 @@ describe('NGnG battle screens', () => {
 
   it('Rally: a subset the engine did not list whole is a listed template with only units changed', () => {
     const f = fx('pending-rally_selection-multi');
-    const legal: LegalMove[] = [
-      ...f.legalMoves,
-      { move_id: '', description: 'x', move: { type: 'select_rally_units', units: ['u-water-collector-p1'] } },
-      { move_id: '', description: 'y', move: { type: 'select_rally_units', units: ['u-wood-collector-p1'] } },
-      { move_id: '', description: 'z', move: { type: 'select_rally_units', units: ['u-ore-collector-p1-1'] } },
-      { move_id: '', description: 'all', move: { type: 'select_rally_units', units: ['u-water-collector-p1', 'u-wood-collector-p1', 'u-ore-collector-p1-1'] } },
-    ];
+    // Drop the listed pair, so bringing exactly those two is a form on a template.
+    const legal: LegalMove[] = f.legalMoves.filter((m) => {
+      const units = m.move['units'] as string[] | undefined;
+      return !(units && units.length === 2 && units.includes('rook') && units.includes('wren'));
+    });
     const r = mount(f.view, f.viewer, legal);
-    press(r.container, 'Water collector');
-    press(r.container, 'Wood collector');
+    press(r.container, 'Captain Rook Malvane');
+    press(r.container, 'Dowser Wren Calloway');
     press(r.container, 'Bring 2');
     expect(r.onMove).not.toHaveBeenCalled();
     expect(r.onForm).toHaveBeenCalledTimes(1);
     const [template, move, keys] = r.onForm.mock.calls[0]! as [LegalMove, Record<string, unknown>, string[]];
     expect(isSubmissionAllowed('form', move, legal, { template: template.move, editableKeys: keys })).toBe(true);
-    expect(move['units']).toEqual(['u-water-collector-p1', 'u-wood-collector-p1']);
+    expect([...(move['units'] as string[])].sort()).toEqual(['rook', 'wren']);
   });
 
   it('Move Battle: from, to, then the listed move; Skip is its own press', () => {
@@ -279,20 +277,24 @@ describe('NGnG battle screens', () => {
   });
 
   it('Move Battle: leaving a unit behind sends the listed template with only units changed', () => {
-    const f = fx('action-move_battle');
-    const legal = f.legalMoves.map((m) => (m.move['type'] === 'move_units'
-      ? { ...m, move: { ...m.move, units: ['motherboard', 'u-water-collector-p2'] } }
-      : m));
-    const r = mount(f.view, f.viewer, legal);
+    // Two of the seat's heroes share the origin; the listed move takes both.
+    const f = fx('action-move_battle-mid');
+    const view = structuredClone(f.view) as { players: Array<{ player_id: string; heroes: Array<{ hero: string; coord: string }> }> };
+    const me = view.players.find((p) => p.player_id === f.viewer)!;
+    me.heroes.find((h) => h.hero === 'Foreman Hadrik Stoll')!.coord = '2,6';
+    const legal = f.legalMoves
+      .filter((m) => m.move['type'] !== 'move_units' || m.move['from'] === '2,6')
+      .map((m) => (m.move['type'] === 'move_units' ? { ...m, move: { ...m.move, units: ['chronicler', 'foreman'] } } : m));
+    const r = mount(view, f.viewer, legal);
     fireEvent.click(r.container.querySelector('button.ngg-hex')!);
     fireEvent.click(r.container.querySelectorAll('button.ngg-hex')[0]!);
-    press(r.container, 'Water collector');
+    press(r.container, 'Foreman Hadrik Stoll');
     press(r.container, /^Move to /);
     expect(r.onMove).not.toHaveBeenCalled();
     const [template, move, keys] = r.onForm.mock.calls[0]! as [LegalMove, Record<string, unknown>, string[]];
     expect(keys).toEqual(['units']);
     expect(isSubmissionAllowed('form', move, legal, { template: template.move, editableKeys: keys })).toBe(true);
-    expect(move['units']).toEqual(['motherboard']);
+    expect(move['units']).toEqual(['chronicler']);
   });
 
   it("Elara's spell: a lit tile then Cast, or Do not cast", () => {

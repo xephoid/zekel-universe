@@ -60,7 +60,11 @@ export interface NggPlayer {
   coresReserve: number;
   coresSupply: number;
   actionCards: Record<string, number>;
-  actionCardsPlayed: string[];
+  /** the planned cards by kind ("build:base"); null where they are face down
+   *  to this viewer (another seat's, from an engine that hides them) */
+  actionCardsPlayed: string[] | null;
+  /** how many action cards the seat has played this round */
+  actionCardsPlayedCount: number;
   handCount: number;
   spyRecruitments: number;
   units: Array<{ id: string; type: string; coord: string; core: 'allocated' | 'CORELESS' | null }>;
@@ -143,6 +147,8 @@ export interface NggView {
   heroPoolCount: number;
   /** the seat's own private keys; empty for a watcher */
   hand: NggCard[];
+  /** the viewing seat's own planned cards; null from an older engine */
+  yourActionCardsPlayed: string[] | null;
   sharedHands: Record<string, NggCard[]>;
   spies: Array<{ source: string; hero: string; active: boolean }>;
   knowledge: unknown[];
@@ -209,7 +215,10 @@ function readPlayer(p: Record<string, unknown>): NggPlayer {
     actionCards: isObj(p['action_cards'])
       ? Object.fromEntries(Object.entries(p['action_cards']).map(([k, v]) => [k, asNum(v)]))
       : {},
-    actionCardsPlayed: asArr(p['action_cards_played_this_round']).map((c) => asStr(c)),
+    // An older engine published every seat's planned cards; a newer one
+    // publishes only how many, and the seat's own list apart (withViewer).
+    actionCardsPlayed: Array.isArray(p['action_cards_played_this_round']) ? asArr(p['action_cards_played_this_round']).map((c) => asStr(c)) : null,
+    actionCardsPlayedCount: Array.isArray(p['action_cards_played_this_round']) ? asArr(p['action_cards_played_this_round']).length : asNum(p['action_cards_played_count']),
     handCount: asNum(p['battle_hand_count']),
     spyRecruitments: asNum(p['spy_recruitments']),
     units: asArr(p['units']).filter(isObj).map((u) => ({
@@ -239,6 +248,14 @@ function readPlayer(p: Record<string, unknown>): NggPlayer {
       core: c['core'] === 'allocated' || c['core'] === 'CORELESS' ? c['core'] : null,
     })),
   };
+}
+
+/** The view as the viewing seat reads it: its own planned cards, which the
+ *  engine publishes apart from the public seat list, on its own seat. */
+export function withViewer(v: NggView, me: string | null): NggView {
+  if (!v.yourActionCardsPlayed || !me) return v;
+  const own = v.yourActionCardsPlayed;
+  return { ...v, players: v.players.map((p) => (p.id === me ? { ...p, actionCardsPlayed: own } : p)) };
 }
 
 /** A robot seat's Cores: fitted in a unit or collector, and spare in the reserve. */
@@ -385,6 +402,7 @@ export function readView(view: unknown): NggView | null {
     result: view['result'] ?? null,
     heroPoolCount: asNum(view['hero_pool_count']),
     hand: readCards(view['your_battle_hand']),
+    yourActionCardsPlayed: Array.isArray(view['your_action_cards_played']) ? asArr(view['your_action_cards_played']).map((c) => asStr(c)) : null,
     sharedHands: isObj(view['shared_tactics_hands'])
       ? Object.fromEntries(Object.entries(view['shared_tactics_hands']).map(([pid, cards]) => [pid, readCards(cards)]))
       : {},

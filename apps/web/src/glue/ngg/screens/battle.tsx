@@ -788,11 +788,14 @@ function ActivationScreen({ ctx }: { ctx: ScreenCtx }) {
   const [raw, setStash] = useStash<{ stamp: string; group?: string; target?: string }>(ctx, ACT_KEY);
   const st = raw && raw.stamp === stamp ? raw : { stamp };
 
-  // The initiative tie: each tied unit is one listed move.
+  // The initiative tie: each tied unit is one listed move (choose_initiative_order;
+  // an older engine listed the tied units' activations instead).
   if (tie) {
-    const refs = acts.map((m) => asStr(m.move['unit']));
+    const order = ctx.movesOf('choose_initiative_order');
+    const picks = order.length > 0 ? order : acts;
+    const refs = picks.map((m) => asStr(m.move['unit']));
     const sel = st.target && refs.includes(st.target) ? st.target : null;
-    const move = sel ? acts.find((m) => m.move['unit'] === sel) : undefined;
+    const move = sel ? picks.find((m) => m.move['unit'] === sel) : undefined;
     const mine = v.pending?.for === ctx.me;
     const panel = (
       <Panel kicker={battleKicker(ctx, true)} title={mine ? 'Tied initiative — pick who acts next' : 'Tied initiative'} tone={mine ? 'hl' : undefined}>

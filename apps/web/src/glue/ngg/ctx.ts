@@ -4,7 +4,7 @@
 
 import type { ReactNode } from 'react';
 import type { GameScreenProps, LegalMove } from '../types';
-import { labelOf, moveType, playerOf, type NggPlayer, type NggView } from './read';
+import { labelOf, moveType, playerOf, withViewer, type NggPlayer, type NggView } from './read';
 import { readRef, type NggRef } from './ref';
 import type { Route } from './route';
 
@@ -45,9 +45,10 @@ export interface ScreenCtx {
   say(text: string): string;
 }
 
-export function makeCtx(props: GameScreenProps, v: NggView, route: Route): ScreenCtx {
+export function makeCtx(props: GameScreenProps, view: NggView, route: Route): ScreenCtx {
   const { input } = props;
   const me = input.playerId;
+  const v = withViewer(view, me);
   const legal = props.yourTurn ? input.legalMoves : [];
   return {
     v,

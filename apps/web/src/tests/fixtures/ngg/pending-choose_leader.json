@@ -283,7 +283,7 @@
   "resolving_action": null,
   "treaties": [],
   "battle": null,
-  "battle_deck_count": 40,
+  "battle_deck_count": 20,
   "battle_discard": [],
   "pending": {
    "kind": "choose_leader",
@@ -341,12 +341,24 @@
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_this_round": [],
+    "action_cards_played_count": 0,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "units": [],
     "heroes": [],
     "bases": [],
+    "collectors": [
+     {
+      "collector": "surf-1",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-2",
+      "type": "Surf",
+      "placed_at": null
+     }
+    ],
     "committed_collectors": []
    },
    {
@@ -384,13 +396,13 @@
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_this_round": [],
+    "action_cards_played_count": 0,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Motherboard",
+      "hero": "Chronicler Ottoline Vey",
       "coord": "reserved",
       "is_leader": true,
       "dead": false,
@@ -398,10 +410,12 @@
      }
     ],
     "bases": [],
+    "collectors": [],
     "committed_collectors": []
    }
   ],
   "your_battle_hand": [],
+  "your_action_cards_played": [],
   "your_spy_assignments": [],
   "your_knowledge": [],
   "your_reserved_heroes": []
@@ -453,14 +467,6 @@
    "move": {
     "type": "choose_leader",
     "hero": "Kestrel Nine"
-   }
-  },
-  {
-   "move_id": "",
-   "description": "Choose Chronicler Ottoline Vey as Leader (recommended) — +5 culture per round during the income step. No income while reserved.",
-   "move": {
-    "type": "choose_leader",
-    "hero": "Chronicler Ottoline Vey"
    }
   },
   {
@@ -533,6 +539,14 @@
    "move": {
     "type": "choose_leader",
     "hero": "Dr. Elayn Smyth"
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Choose Motherboard as Leader (recommended) — +1 bonus tech point while alive, owned, and in play. Available to either species.",
+   "move": {
+    "type": "choose_leader",
+    "hero": "Motherboard"
    }
   },
   {
@@ -826,7 +840,7 @@
   "resolving_action": null,
   "treaties": [],
   "battle": null,
-  "battle_deck_count": 40,
+  "battle_deck_count": 20,
   "battle_discard": [],
   "pending": {
    "kind": "choose_leader",
@@ -884,12 +898,24 @@
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_this_round": [],
+    "action_cards_played_count": 0,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "units": [],
     "heroes": [],
     "bases": [],
+    "collectors": [
+     {
+      "collector": "surf-1",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-2",
+      "type": "Surf",
+      "placed_at": null
+     }
+    ],
     "committed_collectors": []
    },
    {
@@ -927,13 +953,13 @@
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_this_round": [],
+    "action_cards_played_count": 0,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Motherboard",
+      "hero": "Chronicler Ottoline Vey",
       "coord": "reserved",
       "is_leader": true,
       "dead": false,
@@ -941,14 +967,16 @@
      }
     ],
     "bases": [],
+    "collectors": [],
     "committed_collectors": []
    }
   ],
   "your_battle_hand": [],
+  "your_action_cards_played": [],
   "your_spy_assignments": [],
   "your_knowledge": [],
   "your_reserved_heroes": [
-   "Motherboard"
+   "Chronicler Ottoline Vey"
   ]
  },
  "watcherLegalMoves": []

@@ -60,7 +60,7 @@ test('NGnG: factions on the setup page, the draft and the start at the table, th
 
   // Into the round: sooner or later a planning decision is ours.
   await yourMove(page);
-  await expect(panel(page)).toContainText(/Place one card, or pass|Draw/i, { timeout: 60_000 });
+  await expect(panel(page)).toContainText(/Place one card, or pass|Draw|Reallocate Cores/i, { timeout: 60_000 });
   await expect(page.locator('.ngg-root')).toBeVisible();
 
   // Then play on through the screens alone — never the numbered menu — and

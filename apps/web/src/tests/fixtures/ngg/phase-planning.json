@@ -240,12 +240,9 @@
      "current_resource": "water",
      "start": 2,
      "base_owner": "p2",
-     "units": [
-      "Water collector (p2)",
-      "Wood collector (p2)"
-     ],
+     "units": [],
      "heroes": [
-      "Motherboard (p2)"
+      "Chronicler Ottoline Vey (p2)"
      ],
      "collectors": []
     },
@@ -290,7 +287,7 @@
   "resolving_action": null,
   "treaties": [],
   "battle": null,
-  "battle_deck_count": 38,
+  "battle_deck_count": 19,
   "battle_discard": [],
   "pending": null,
   "victory_status": {
@@ -302,7 +299,7 @@
    },
    "p2": {
     "culture": 0,
-    "tech": 5,
+    "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -347,7 +344,7 @@
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_this_round": [],
+    "action_cards_played_count": 0,
     "battle_hand_count": 1,
     "spy_recruitments": 0,
     "units": [],
@@ -362,6 +359,18 @@
     ],
     "bases": [
      "-2,10"
+    ],
+    "collectors": [
+     {
+      "collector": "surf-1",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-2",
+      "type": "Surf",
+      "placed_at": null
+     }
     ],
     "committed_collectors": []
    },
@@ -387,11 +396,10 @@
      "acquired_types": [
       "core",
       "water-collector",
-      "wood-collector",
       "home"
      ],
-     "bonus_points_live": 1,
-     "total": 5,
+     "bonus_points_live": 0,
+     "total": 3,
      "target": 18
     },
     "leader_kills": 0,
@@ -405,26 +413,13 @@
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_this_round": [],
+    "action_cards_played_count": 0,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
-    "units": [
-     {
-      "id": "u-water-collector-p2",
-      "type": "Water collector",
-      "coord": "2,4",
-      "core": "allocated"
-     },
-     {
-      "id": "u-wood-collector-p2",
-      "type": "Wood collector",
-      "coord": "2,4",
-      "core": "allocated"
-     }
-    ],
+    "units": [],
     "heroes": [
      {
-      "hero": "Motherboard",
+      "hero": "Chronicler Ottoline Vey",
       "coord": "2,4",
       "is_leader": true,
       "dead": false,
@@ -433,6 +428,20 @@
     ],
     "bases": [
      "2,4"
+    ],
+    "collectors": [
+     {
+      "collector": "water-collector-1",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-2",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     }
     ],
     "committed_collectors": []
    }
@@ -443,6 +452,7 @@
     "effect": "Move any number of your own eligible mobile units from adjacent locations into this battle."
    }
   ],
+  "your_action_cards_played": [],
   "your_spy_assignments": [],
   "your_knowledge": [],
   "your_reserved_heroes": []
@@ -450,7 +460,7 @@
  "legalMoves": [
   {
    "move_id": "",
-   "description": "Place a build card on the Action Stack.",
+   "description": "Place a build card face down on the Action Stack.",
    "move": {
     "type": "plan_action",
     "card": "build",
@@ -459,7 +469,7 @@
   },
   {
    "move_id": "",
-   "description": "Place a move_battle card on the Action Stack.",
+   "description": "Place a move_battle card face down on the Action Stack.",
    "move": {
     "type": "plan_action",
     "card": "move_battle",
@@ -468,7 +478,7 @@
   },
   {
    "move_id": "",
-   "description": "Place a research card on the Action Stack.",
+   "description": "Place a research card face down on the Action Stack.",
    "move": {
     "type": "plan_action",
     "card": "research",
@@ -723,12 +733,9 @@
      "current_resource": "water",
      "start": 2,
      "base_owner": "p2",
-     "units": [
-      "Water collector (p2)",
-      "Wood collector (p2)"
-     ],
+     "units": [],
      "heroes": [
-      "Motherboard (p2)"
+      "Chronicler Ottoline Vey (p2)"
      ],
      "collectors": []
     },
@@ -773,7 +780,7 @@
   "resolving_action": null,
   "treaties": [],
   "battle": null,
-  "battle_deck_count": 38,
+  "battle_deck_count": 19,
   "battle_discard": [],
   "pending": null,
   "victory_status": {
@@ -785,7 +792,7 @@
    },
    "p2": {
     "culture": 0,
-    "tech": 5,
+    "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -830,7 +837,7 @@
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_this_round": [],
+    "action_cards_played_count": 0,
     "battle_hand_count": 1,
     "spy_recruitments": 0,
     "units": [],
@@ -845,6 +852,18 @@
     ],
     "bases": [
      "-2,10"
+    ],
+    "collectors": [
+     {
+      "collector": "surf-1",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-2",
+      "type": "Surf",
+      "placed_at": null
+     }
     ],
     "committed_collectors": []
    },
@@ -870,11 +889,10 @@
      "acquired_types": [
       "core",
       "water-collector",
-      "wood-collector",
       "home"
      ],
-     "bonus_points_live": 1,
-     "total": 5,
+     "bonus_points_live": 0,
+     "total": 3,
      "target": 18
     },
     "leader_kills": 0,
@@ -888,26 +906,13 @@
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_this_round": [],
+    "action_cards_played_count": 0,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
-    "units": [
-     {
-      "id": "u-water-collector-p2",
-      "type": "Water collector",
-      "coord": "2,4",
-      "core": "allocated"
-     },
-     {
-      "id": "u-wood-collector-p2",
-      "type": "Wood collector",
-      "coord": "2,4",
-      "core": "allocated"
-     }
-    ],
+    "units": [],
     "heroes": [
      {
-      "hero": "Motherboard",
+      "hero": "Chronicler Ottoline Vey",
       "coord": "2,4",
       "is_leader": true,
       "dead": false,
@@ -917,10 +922,25 @@
     "bases": [
      "2,4"
     ],
+    "collectors": [
+     {
+      "collector": "water-collector-1",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-2",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     }
+    ],
     "committed_collectors": []
    }
   ],
   "your_battle_hand": [],
+  "your_action_cards_played": [],
   "your_spy_assignments": [],
   "your_knowledge": [],
   "your_reserved_heroes": []

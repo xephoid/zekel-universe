@@ -820,6 +820,19 @@ collectors need the engine's list of every owned collector (`collectors` in
 the seat view), which is not on the engine's main yet; until it is, the
 screen shows a dash, never a guessed number.
 
+**Checked against engine 6864d16 (2026-09-24):** the engine's rules-recheck
+fixes are on its main. What changed for the table: a seat's planned action
+cards are face down to other seats (the view gives a count, and the seat's
+own list apart, which the screen puts back on its own seat); every owned
+collector is published, so Surf and Core counts are live; a robot collector
+is an off-map piece that can hold a Core, and every robot seat is asked
+about its Cores at each upkeep (the upkeep screen names collectors by type);
+a tied initiative is its own move (`choose_initiative_order`); a Counter
+target names who played the card and its batch. The engine now also gives
+a reason for each blocked purchase in its grey list (`item`); the server
+does not pass that list to the table yet, so the Research and Build screens
+still leave a blocked purchase out rather than show it struck through.
+
 **Engine changes, on a branch not yet merged** (`claude/ngg-structured-view`
 in the engine): `resolving_action { card_kind, owner }` beside the
 `active_action` sentence; `battle.units[].ref`, the id battle moves name a

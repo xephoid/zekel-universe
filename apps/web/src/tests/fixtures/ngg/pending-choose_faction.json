@@ -393,7 +393,7 @@
   "resolving_action": null,
   "treaties": [],
   "battle": null,
-  "battle_deck_count": 40,
+  "battle_deck_count": 20,
   "battle_discard": [],
   "pending": {
    "kind": "choose_faction",
@@ -535,12 +535,24 @@
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_this_round": [],
+    "action_cards_played_count": 0,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "units": [],
     "heroes": [],
     "bases": [],
+    "collectors": [
+     {
+      "collector": "surf-1",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-2",
+      "type": "Surf",
+      "placed_at": null
+     }
+    ],
     "committed_collectors": []
    },
    {
@@ -578,12 +590,13 @@
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_this_round": [],
+    "action_cards_played_count": 0,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "units": [],
     "heroes": [],
     "bases": [],
+    "collectors": [],
     "committed_collectors": []
    },
    {
@@ -621,16 +634,18 @@
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_this_round": [],
+    "action_cards_played_count": 0,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "units": [],
     "heroes": [],
     "bases": [],
+    "collectors": [],
     "committed_collectors": []
    }
   ],
   "your_battle_hand": [],
+  "your_action_cards_played": [],
   "your_spy_assignments": [],
   "your_knowledge": [],
   "your_reserved_heroes": []
@@ -1069,7 +1084,7 @@
   "resolving_action": null,
   "treaties": [],
   "battle": null,
-  "battle_deck_count": 40,
+  "battle_deck_count": 20,
   "battle_discard": [],
   "pending": {
    "kind": "choose_faction",
@@ -1211,12 +1226,24 @@
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_this_round": [],
+    "action_cards_played_count": 0,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "units": [],
     "heroes": [],
     "bases": [],
+    "collectors": [
+     {
+      "collector": "surf-1",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-2",
+      "type": "Surf",
+      "placed_at": null
+     }
+    ],
     "committed_collectors": []
    },
    {
@@ -1254,12 +1281,13 @@
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_this_round": [],
+    "action_cards_played_count": 0,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "units": [],
     "heroes": [],
     "bases": [],
+    "collectors": [],
     "committed_collectors": []
    },
    {
@@ -1297,16 +1325,18 @@
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_this_round": [],
+    "action_cards_played_count": 0,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "units": [],
     "heroes": [],
     "bases": [],
+    "collectors": [],
     "committed_collectors": []
    }
   ],
   "your_battle_hand": [],
+  "your_action_cards_played": [],
   "your_spy_assignments": [],
   "your_knowledge": [],
   "your_reserved_heroes": []

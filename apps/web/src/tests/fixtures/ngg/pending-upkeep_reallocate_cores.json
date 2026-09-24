@@ -1,13 +1,13 @@
 {
- "key": "pending-battle_defense",
+ "key": "pending-upkeep_reallocate_cores",
  "players": 2,
- "viewer": "wiz",
+ "viewer": "p2",
  "view": {
   "game_id": "neither-guts-nor-gears",
-  "phase": "planning",
+  "phase": "upkeep",
   "round": 1,
-  "active_player_id": "wiz",
-  "first_player_id": "rob",
+  "active_player_id": "p2",
+  "first_player_id": "p1",
   "layout": "two",
   "map": {
    "tiles": [
@@ -50,10 +50,10 @@
      "printed_resource": "wood",
      "current_resource": "wood",
      "start": 1,
-     "base_owner": "wiz",
+     "base_owner": "p1",
      "units": [],
      "heroes": [
-      "Warden Hesper Quill (wiz)"
+      "Archmage Chaimidious (p1)"
      ],
      "collectors": []
     },
@@ -119,10 +119,7 @@
      "current_resource": "ore",
      "start": null,
      "base_owner": null,
-     "units": [
-      "Cleric (wiz)",
-      "Evoker (wiz)"
-     ],
+     "units": [],
      "heroes": [],
      "collectors": []
     },
@@ -242,10 +239,10 @@
      "printed_resource": "water",
      "current_resource": "water",
      "start": 2,
-     "base_owner": "rob",
+     "base_owner": "p2",
      "units": [],
      "heroes": [
-      "Kestrel Nine (rob)"
+      "Chronicler Ottoline Vey (p2)"
      ],
      "collectors": []
     },
@@ -289,102 +286,22 @@
   "active_action": null,
   "resolving_action": null,
   "treaties": [],
-  "battle": {
-   "coord": "0,2",
-   "origin": "0,0",
-   "phase": "activations",
-   "pass": 1,
-   "units": [
-    {
-     "unit": "Spitter Platform",
-     "ref": "u-spitter-rob-1",
-     "owner": "rob",
-     "side": "attackers",
-     "init": 95,
-     "dmg": 1,
-     "def": 1,
-     "activated": false
-    },
-    {
-     "unit": "Cleric",
-     "ref": "u-cleric-wiz-1",
-     "owner": "wiz",
-     "side": "defenders",
-     "init": 2,
-     "dmg": 0,
-     "def": 1,
-     "activated": false
-    },
-    {
-     "unit": "Evoker",
-     "ref": "u-evoker-wiz-1",
-     "owner": "wiz",
-     "side": "defenders",
-     "init": 50,
-     "dmg": 2,
-     "def": 1,
-     "activated": false
-    }
-   ],
-   "commitments": {
-    "rob": "pending",
-    "wiz": "pending"
-   }
-  },
-  "battle_deck_count": 20,
+  "battle": null,
+  "battle_deck_count": 19,
   "battle_discard": [],
   "pending": {
-   "kind": "battle_defense",
-   "for": "wiz",
-   "question": "wiz decides a defense",
-   "options": [
-    {
-     "option_id": "none",
-     "label": "Decline",
-     "move": {
-      "type": "resolve_battle_defense",
-      "defense": {
-       "kind": "none"
-      }
-     }
-    },
-    {
-     "option_id": "decoy",
-     "label": "Decoy",
-     "blocked_reason": "No unrevealed Illusionist spy rides that hero",
-     "rules_section": "battle-activation"
-    },
-    {
-     "option_id": "mana_shield",
-     "label": "Mana Shield",
-     "blocked_reason": "The Mana Shield window is not open on this attack",
-     "rules_section": "battle-activation"
-    },
-    {
-     "option_id": "cleric_save",
-     "label": "Cleric save",
-     "blocked_reason": "The Cleric window is not open on this attack",
-     "rules_section": "battle-activation"
-    }
-   ],
-   "context": {
-    "step": "decoy",
-    "attack_kind": "attack",
-    "attacker": "Spitter Platform",
-    "target": "Evoker",
-    "damage": 3,
-    "target_def": 1,
-    "your_mana": 5
-   }
+   "kind": "upkeep_reallocate_cores",
+   "for": "p2",
+   "question": "p2 may reallocate owned Cores among platforms"
   },
   "victory_status": {
-   "wiz": {
+   "p1": {
     "culture": 0,
     "tech": 2,
     "leader_kills": 0,
     "leader_alive": true
    },
-   "rob": {
+   "p2": {
     "culture": 0,
     "tech": 3,
     "leader_kills": 0,
@@ -394,7 +311,7 @@
   "result": null,
   "players": [
    {
-    "player_id": "wiz",
+    "player_id": "p1",
     "kind": "human",
     "faction": "The Covenant",
     "species": "wizard",
@@ -410,9 +327,7 @@
     "mana_max": 5,
     "buildings": [],
     "building_counts": {},
-    "research": [
-     "mana-shield"
-    ],
+    "research": [],
     "tech_progress": {
      "acquired_types": [
       "surf",
@@ -434,25 +349,12 @@
      "research": 1
     },
     "action_cards_played_count": 0,
-    "battle_hand_count": 0,
+    "battle_hand_count": 1,
     "spy_recruitments": 0,
-    "units": [
-     {
-      "id": "u-cleric-wiz-1",
-      "type": "Cleric",
-      "coord": "0,2",
-      "core": null
-     },
-     {
-      "id": "u-evoker-wiz-1",
-      "type": "Evoker",
-      "coord": "0,2",
-      "core": null
-     }
-    ],
+    "units": [],
     "heroes": [
      {
-      "hero": "Warden Hesper Quill",
+      "hero": "Archmage Chaimidious",
       "coord": "-2,10",
       "is_leader": true,
       "dead": false,
@@ -477,9 +379,9 @@
     "committed_collectors": []
    },
    {
-    "player_id": "rob",
-    "kind": "human",
-    "faction": "The Ledger",
+    "player_id": "p2",
+    "kind": "ai",
+    "faction": "The Foundry",
     "species": "robot",
     "culture": 0,
     "next_milestones": [
@@ -518,21 +420,14 @@
     "action_cards_played_count": 0,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
-    "units": [
-     {
-      "id": "u-spitter-rob-1",
-      "type": "Spitter Platform",
-      "coord": "0,0",
-      "core": "allocated"
-     }
-    ],
+    "units": [],
     "heroes": [
      {
-      "hero": "Kestrel Nine",
+      "hero": "Chronicler Ottoline Vey",
       "coord": "2,4",
       "is_leader": true,
       "dead": false,
-      "stats": "Init 70 DMG 3 DEF 6"
+      "stats": "Init 30 DMG 1 DEF 5"
      }
     ],
     "bases": [
@@ -564,22 +459,45 @@
  "legalMoves": [
   {
    "move_id": "",
-   "description": "Decline this defense (later defenses remain).",
+   "description": "Keep the Cores where they are (0 in reserve, 2 of 2 powered).",
    "move": {
-    "type": "resolve_battle_defense",
-    "defense": {
-     "kind": "none"
+    "type": "reallocate_cores",
+    "allocations": {
+     "water-collector-1": true,
+     "water-collector-2": true
+    }
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Take the Core out of Water collector (water-collector-1) into the reserve (+1 culture per round while there).",
+   "move": {
+    "type": "reallocate_cores",
+    "allocations": {
+     "water-collector-1": false,
+     "water-collector-2": true
+    }
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Take the Core out of Water collector (water-collector-2) into the reserve (+1 culture per round while there).",
+   "move": {
+    "type": "reallocate_cores",
+    "allocations": {
+     "water-collector-1": true,
+     "water-collector-2": false
     }
    }
   }
  ],
- "watcher": "rob",
+ "watcher": "p1",
  "watcherView": {
   "game_id": "neither-guts-nor-gears",
-  "phase": "planning",
+  "phase": "upkeep",
   "round": 1,
-  "active_player_id": "wiz",
-  "first_player_id": "rob",
+  "active_player_id": "p2",
+  "first_player_id": "p1",
   "layout": "two",
   "map": {
    "tiles": [
@@ -622,10 +540,10 @@
      "printed_resource": "wood",
      "current_resource": "wood",
      "start": 1,
-     "base_owner": "wiz",
+     "base_owner": "p1",
      "units": [],
      "heroes": [
-      "Warden Hesper Quill (wiz)"
+      "Archmage Chaimidious (p1)"
      ],
      "collectors": []
     },
@@ -691,10 +609,7 @@
      "current_resource": "ore",
      "start": null,
      "base_owner": null,
-     "units": [
-      "Cleric (wiz)",
-      "Evoker (wiz)"
-     ],
+     "units": [],
      "heroes": [],
      "collectors": []
     },
@@ -814,10 +729,10 @@
      "printed_resource": "water",
      "current_resource": "water",
      "start": 2,
-     "base_owner": "rob",
+     "base_owner": "p2",
      "units": [],
      "heroes": [
-      "Kestrel Nine (rob)"
+      "Chronicler Ottoline Vey (p2)"
      ],
      "collectors": []
     },
@@ -861,63 +776,22 @@
   "active_action": null,
   "resolving_action": null,
   "treaties": [],
-  "battle": {
-   "coord": "0,2",
-   "origin": "0,0",
-   "phase": "activations",
-   "pass": 1,
-   "units": [
-    {
-     "unit": "Spitter Platform",
-     "ref": "u-spitter-rob-1",
-     "owner": "rob",
-     "side": "attackers",
-     "init": 95,
-     "dmg": 1,
-     "def": 1,
-     "activated": false
-    },
-    {
-     "unit": "Cleric",
-     "ref": "u-cleric-wiz-1",
-     "owner": "wiz",
-     "side": "defenders",
-     "init": 2,
-     "dmg": 0,
-     "def": 1,
-     "activated": false
-    },
-    {
-     "unit": "Evoker",
-     "ref": "u-evoker-wiz-1",
-     "owner": "wiz",
-     "side": "defenders",
-     "init": 50,
-     "dmg": 2,
-     "def": 1,
-     "activated": false
-    }
-   ],
-   "commitments": {
-    "rob": "pending",
-    "wiz": "pending"
-   }
-  },
-  "battle_deck_count": 20,
+  "battle": null,
+  "battle_deck_count": 19,
   "battle_discard": [],
   "pending": {
-   "kind": "battle_defense",
-   "for": "wiz",
-   "question": "wiz decides a defense"
+   "kind": "upkeep_reallocate_cores",
+   "for": "p2",
+   "question": "p2 may reallocate owned Cores among platforms"
   },
   "victory_status": {
-   "wiz": {
+   "p1": {
     "culture": 0,
     "tech": 2,
     "leader_kills": 0,
     "leader_alive": true
    },
-   "rob": {
+   "p2": {
     "culture": 0,
     "tech": 3,
     "leader_kills": 0,
@@ -927,7 +801,7 @@
   "result": null,
   "players": [
    {
-    "player_id": "wiz",
+    "player_id": "p1",
     "kind": "human",
     "faction": "The Covenant",
     "species": "wizard",
@@ -943,9 +817,7 @@
     "mana_max": 5,
     "buildings": [],
     "building_counts": {},
-    "research": [
-     "mana-shield"
-    ],
+    "research": [],
     "tech_progress": {
      "acquired_types": [
       "surf",
@@ -967,25 +839,12 @@
      "research": 1
     },
     "action_cards_played_count": 0,
-    "battle_hand_count": 0,
+    "battle_hand_count": 1,
     "spy_recruitments": 0,
-    "units": [
-     {
-      "id": "u-cleric-wiz-1",
-      "type": "Cleric",
-      "coord": "0,2",
-      "core": null
-     },
-     {
-      "id": "u-evoker-wiz-1",
-      "type": "Evoker",
-      "coord": "0,2",
-      "core": null
-     }
-    ],
+    "units": [],
     "heroes": [
      {
-      "hero": "Warden Hesper Quill",
+      "hero": "Archmage Chaimidious",
       "coord": "-2,10",
       "is_leader": true,
       "dead": false,
@@ -1010,9 +869,9 @@
     "committed_collectors": []
    },
    {
-    "player_id": "rob",
-    "kind": "human",
-    "faction": "The Ledger",
+    "player_id": "p2",
+    "kind": "ai",
+    "faction": "The Foundry",
     "species": "robot",
     "culture": 0,
     "next_milestones": [
@@ -1051,21 +910,14 @@
     "action_cards_played_count": 0,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
-    "units": [
-     {
-      "id": "u-spitter-rob-1",
-      "type": "Spitter Platform",
-      "coord": "0,0",
-      "core": "allocated"
-     }
-    ],
+    "units": [],
     "heroes": [
      {
-      "hero": "Kestrel Nine",
+      "hero": "Chronicler Ottoline Vey",
       "coord": "2,4",
       "is_leader": true,
       "dead": false,
-      "stats": "Init 70 DMG 3 DEF 6"
+      "stats": "Init 30 DMG 1 DEF 5"
      }
     ],
     "bases": [
@@ -1088,7 +940,12 @@
     "committed_collectors": []
    }
   ],
-  "your_battle_hand": [],
+  "your_battle_hand": [
+   {
+    "card": "Rally",
+    "effect": "Move any number of your own eligible mobile units from adjacent locations into this battle."
+   }
+  ],
   "your_action_cards_played": [],
   "your_spy_assignments": [],
   "your_knowledge": [],

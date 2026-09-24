@@ -198,12 +198,13 @@ describe('NGnG round screens', () => {
     expectNoRawIds(r.column);
     const move = within(r.column).getByRole('button', { name: 'Move the Cores' }) as HTMLButtonElement;
     expect(move.disabled).toBe(true);
-    press(r.column, /Oil collector/);
+    // Robot collectors hold Cores too, named by type, never by id.
+    fireEvent.click(within(r.column).getAllByRole('button', { name: /Water collector/ })[0]!);
     expect(r.onForm).not.toHaveBeenCalled();
     fireEvent.click(move);
     const sent = expectFormAllowed(r.onForm, f.legalMoves);
     expect(sent.keys).toEqual(['allocations']);
-    expect(sent.move['allocations']).toMatchObject({ 'u-oil-collector-p1-1': false, 'u-water-collector-p1': true });
+    expect(sent.move['allocations']).toEqual({ 'water-collector-1': false, 'water-collector-2': true });
     cleanup();
   });
 
@@ -272,7 +273,7 @@ describe('NGnG round screens', () => {
     const r = draw(f.view, f.viewer, f.legalMoves);
     expectNothingSelected(r.column);
     expect(r.column.textContent).toContain('End of round, provided allied units do not share a space.');
-    press(r.column, /Open Borders with The Foundry/);
+    press(r.column, /Open Borders with The Unbolted/);
     expect(r.onMove).not.toHaveBeenCalled();
     press(r.column, 'Break Open Borders');
     expectSentListed(r.onMove, f.legalMoves, { type: 'break_treaty', treaty_type: 'Open Borders', partner: 'p2' });
@@ -282,7 +283,7 @@ describe('NGnG round screens', () => {
   it('Treaty Break: a watcher sees the public options with nothing live', () => {
     const f = fixture('pending-treaty_break_decision');
     const r = draw(f.watcherView, f.watcher, f.watcherLegalMoves, false);
-    expect(r.column.textContent).toContain('Open Borders with The Foundry');
+    expect(r.column.textContent).toContain('Open Borders with The Unbolted');
     expect(r.column.querySelectorAll('button:not(:disabled):not([data-view-only])')).toHaveLength(0);
     cleanup();
   });

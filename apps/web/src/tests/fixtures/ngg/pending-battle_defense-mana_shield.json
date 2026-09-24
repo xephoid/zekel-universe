@@ -243,10 +243,7 @@
      "current_resource": "water",
      "start": 2,
      "base_owner": "rob",
-     "units": [
-      "Water collector (rob)",
-      "Wood collector (rob)"
-     ],
+     "units": [],
      "heroes": [
       "Kestrel Nine (rob)"
      ],
@@ -334,7 +331,7 @@
     "wiz": "pending"
    }
   },
-  "battle_deck_count": 40,
+  "battle_deck_count": 20,
   "battle_discard": [],
   "pending": {
    "kind": "battle_defense",
@@ -458,7 +455,7 @@
    },
    "rob": {
     "culture": 0,
-    "tech": 4,
+    "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -505,7 +502,7 @@
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_this_round": [],
+    "action_cards_played_count": 0,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "units": [
@@ -534,6 +531,18 @@
     "bases": [
      "-2,10"
     ],
+    "collectors": [
+     {
+      "collector": "surf-1",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-2",
+      "type": "Surf",
+      "placed_at": null
+     }
+    ],
     "committed_collectors": []
    },
    {
@@ -558,11 +567,10 @@
      "acquired_types": [
       "core",
       "water-collector",
-      "wood-collector",
       "home"
      ],
      "bonus_points_live": 0,
-     "total": 4,
+     "total": 3,
      "target": 18
     },
     "leader_kills": 0,
@@ -576,22 +584,10 @@
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_this_round": [],
+    "action_cards_played_count": 0,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "units": [
-     {
-      "id": "u-water-collector-rob",
-      "type": "Water collector",
-      "coord": "2,4",
-      "core": "allocated"
-     },
-     {
-      "id": "u-wood-collector-rob",
-      "type": "Wood collector",
-      "coord": "2,4",
-      "core": "allocated"
-     },
      {
       "id": "u-spitter-rob-1",
       "type": "Spitter Platform",
@@ -611,10 +607,25 @@
     "bases": [
      "2,4"
     ],
+    "collectors": [
+     {
+      "collector": "water-collector-1",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-2",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     }
+    ],
     "committed_collectors": []
    }
   ],
   "your_battle_hand": [],
+  "your_action_cards_played": [],
   "your_spy_assignments": [],
   "your_knowledge": [],
   "your_reserved_heroes": []
@@ -928,10 +939,7 @@
      "current_resource": "water",
      "start": 2,
      "base_owner": "rob",
-     "units": [
-      "Water collector (rob)",
-      "Wood collector (rob)"
-     ],
+     "units": [],
      "heroes": [
       "Kestrel Nine (rob)"
      ],
@@ -1019,7 +1027,7 @@
     "wiz": "pending"
    }
   },
-  "battle_deck_count": 40,
+  "battle_deck_count": 20,
   "battle_discard": [],
   "pending": {
    "kind": "battle_defense",
@@ -1035,7 +1043,7 @@
    },
    "rob": {
     "culture": 0,
-    "tech": 4,
+    "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -1082,7 +1090,7 @@
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_this_round": [],
+    "action_cards_played_count": 0,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "units": [
@@ -1111,6 +1119,18 @@
     "bases": [
      "-2,10"
     ],
+    "collectors": [
+     {
+      "collector": "surf-1",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-2",
+      "type": "Surf",
+      "placed_at": null
+     }
+    ],
     "committed_collectors": []
    },
    {
@@ -1135,11 +1155,10 @@
      "acquired_types": [
       "core",
       "water-collector",
-      "wood-collector",
       "home"
      ],
      "bonus_points_live": 0,
-     "total": 4,
+     "total": 3,
      "target": 18
     },
     "leader_kills": 0,
@@ -1153,22 +1172,10 @@
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_this_round": [],
+    "action_cards_played_count": 0,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "units": [
-     {
-      "id": "u-water-collector-rob",
-      "type": "Water collector",
-      "coord": "2,4",
-      "core": "allocated"
-     },
-     {
-      "id": "u-wood-collector-rob",
-      "type": "Wood collector",
-      "coord": "2,4",
-      "core": "allocated"
-     },
      {
       "id": "u-spitter-rob-1",
       "type": "Spitter Platform",
@@ -1188,10 +1195,25 @@
     "bases": [
      "2,4"
     ],
+    "collectors": [
+     {
+      "collector": "water-collector-1",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-2",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     }
+    ],
     "committed_collectors": []
    }
   ],
   "your_battle_hand": [],
+  "your_action_cards_played": [],
   "your_spy_assignments": [],
   "your_knowledge": [],
   "your_reserved_heroes": []

@@ -1,12 +1,12 @@
 {
  "key": "action-move_battle-mid",
  "players": 2,
- "viewer": "p1",
+ "viewer": "p2",
  "view": {
   "game_id": "neither-guts-nor-gears",
   "phase": "action",
   "round": 2,
-  "active_player_id": "p1",
+  "active_player_id": "p2",
   "first_player_id": "p2",
   "layout": "two",
   "map": {
@@ -240,12 +240,10 @@
      "current_resource": "water",
      "start": 2,
      "base_owner": "p2",
-     "units": [
-      "Water collector (p2)",
-      "Wood collector (p2)",
-      "Ore collector (p2)"
+     "units": [],
+     "heroes": [
+      "Foreman Hadrik Stoll (p2)"
      ],
-     "heroes": [],
      "collectors": []
     },
     {
@@ -257,7 +255,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [
-      "Motherboard (p2)"
+      "Chronicler Ottoline Vey (p2)"
      ],
      "collectors": []
     },
@@ -285,47 +283,37 @@
     }
    ]
   },
-  "hero_pool_count": 18,
+  "hero_pool_count": 17,
   "action_stack": [
    {
     "position": 1,
     "owner": "p2",
-    "face": "down"
+    "card_kind": "build"
    },
    {
     "position": 2,
     "owner": "p1",
-    "card_kind": "build"
+    "face": "down"
    },
    {
     "position": 3,
     "owner": "p2",
-    "face": "down"
-   },
-   {
-    "position": 4,
-    "owner": "p1",
     "card_kind": "research"
    },
    {
-    "position": 5,
+    "position": 4,
     "owner": "p2",
-    "face": "down"
-   },
-   {
-    "position": 6,
-    "owner": "p1",
     "card_kind": "move_battle"
    }
   ],
-  "active_action": "move_battle by p1",
+  "active_action": "move_battle by p2",
   "resolving_action": {
    "card_kind": "move_battle",
-   "owner": "p1"
+   "owner": "p2"
   },
   "treaties": [],
   "battle": null,
-  "battle_deck_count": 38,
+  "battle_deck_count": 19,
   "battle_discard": [],
   "pending": null,
   "victory_status": {
@@ -336,8 +324,8 @@
     "leader_alive": true
    },
    "p2": {
-    "culture": 0,
-    "tech": 6,
+    "culture": 6,
+    "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -383,11 +371,7 @@
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_this_round": [
-     "build:base",
-     "research:base",
-     "move_battle:base"
-    ],
+    "action_cards_played_count": 1,
     "battle_hand_count": 1,
     "spy_recruitments": 0,
     "units": [],
@@ -403,6 +387,18 @@
     "bases": [
      "-2,10"
     ],
+    "collectors": [
+     {
+      "collector": "surf-1",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-2",
+      "type": "Surf",
+      "placed_at": null
+     }
+    ],
     "committed_collectors": []
    },
    {
@@ -410,9 +406,8 @@
     "kind": "ai",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 0,
+    "culture": 6,
     "next_milestones": [
-     5,
      15,
      30,
      50,
@@ -427,72 +422,68 @@
      "acquired_types": [
       "core",
       "water-collector",
-      "wood-collector",
-      "home",
-      "ore-collector"
+      "home"
      ],
-     "bonus_points_live": 1,
-     "total": 6,
+     "bonus_points_live": 0,
+     "total": 3,
      "target": 18
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
     "leader_alive": true,
     "subjects": 0,
-    "cores_reserve": 0,
+    "cores_reserve": 1,
     "cores_supply": 12,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_this_round": [
-     "research:base",
-     "build:base",
-     "move_battle:base"
-    ],
+    "action_cards_played_count": 3,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
-    "units": [
-     {
-      "id": "u-water-collector-p2",
-      "type": "Water collector",
-      "coord": "2,4",
-      "core": "allocated"
-     },
-     {
-      "id": "u-wood-collector-p2",
-      "type": "Wood collector",
-      "coord": "2,4",
-      "core": "allocated"
-     },
-     {
-      "id": "u-ore-collector-p2-1",
-      "type": "Ore collector",
-      "coord": "2,4",
-      "core": "allocated"
-     }
-    ],
+    "units": [],
     "heroes": [
      {
-      "hero": "Motherboard",
+      "hero": "Chronicler Ottoline Vey",
       "coord": "2,6",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Foreman Hadrik Stoll",
+      "coord": "2,4",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
      "2,4"
     ],
+    "collectors": [
+     {
+      "collector": "water-collector-1",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-2",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     }
+    ],
     "committed_collectors": []
    }
   ],
-  "your_battle_hand": [
-   {
-    "card": "Rally",
-    "effect": "Move any number of your own eligible mobile units from adjacent locations into this battle."
-   }
+  "your_battle_hand": [],
+  "your_action_cards_played": [
+   "build:base",
+   "research:base",
+   "move_battle:base"
   ],
   "your_spy_assignments": [],
   "your_knowledge": [],
@@ -501,49 +492,85 @@
  "legalMoves": [
   {
    "move_id": "",
-   "description": "Move Archmage Chaimidious from -2,8 to -2,6 (water).",
+   "description": "Move Chronicler Ottoline Vey from G4 to G3 (water).",
    "move": {
     "type": "move_units",
-    "from": "-2,8",
-    "to": "-2,6",
+    "from": "2,6",
+    "to": "2,4",
     "units": [
-     "chaimidious"
+     "chronicler"
     ]
    }
   },
   {
    "move_id": "",
-   "description": "Move Archmage Chaimidious from -2,8 to -2,10 (wood).",
+   "description": "Move Chronicler Ottoline Vey from G4 to G5 (wood).",
    "move": {
     "type": "move_units",
-    "from": "-2,8",
-    "to": "-2,10",
+    "from": "2,6",
+    "to": "2,8",
     "units": [
-     "chaimidious"
+     "chronicler"
     ]
    }
   },
   {
    "move_id": "",
-   "description": "Move Archmage Chaimidious from -2,8 to -1,7 (ether).",
+   "description": "Move Chronicler Ottoline Vey from G4 to F3 (water).",
    "move": {
     "type": "move_units",
-    "from": "-2,8",
-    "to": "-1,7",
+    "from": "2,6",
+    "to": "1,5",
     "units": [
-     "chaimidious"
+     "chronicler"
     ]
    }
   },
   {
    "move_id": "",
-   "description": "Move Archmage Chaimidious from -2,8 to -1,9 (wood).",
+   "description": "Move Chronicler Ottoline Vey from G4 to F4 (ether).",
    "move": {
     "type": "move_units",
-    "from": "-2,8",
-    "to": "-1,9",
+    "from": "2,6",
+    "to": "1,7",
     "units": [
-     "chaimidious"
+     "chronicler"
+    ]
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Move Foreman Hadrik Stoll from G3 to G4 (wood).",
+   "move": {
+    "type": "move_units",
+    "from": "2,4",
+    "to": "2,6",
+    "units": [
+     "foreman"
+    ]
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Move Foreman Hadrik Stoll from G3 to F2 (water).",
+   "move": {
+    "type": "move_units",
+    "from": "2,4",
+    "to": "1,3",
+    "units": [
+     "foreman"
+    ]
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Move Foreman Hadrik Stoll from G3 to F3 (water).",
+   "move": {
+    "type": "move_units",
+    "from": "2,4",
+    "to": "1,5",
+    "units": [
+     "foreman"
     ]
    }
   },
@@ -555,12 +582,12 @@
    }
   }
  ],
- "watcher": "p2",
+ "watcher": "p1",
  "watcherView": {
   "game_id": "neither-guts-nor-gears",
   "phase": "action",
   "round": 2,
-  "active_player_id": "p1",
+  "active_player_id": "p2",
   "first_player_id": "p2",
   "layout": "two",
   "map": {
@@ -794,12 +821,10 @@
      "current_resource": "water",
      "start": 2,
      "base_owner": "p2",
-     "units": [
-      "Water collector (p2)",
-      "Wood collector (p2)",
-      "Ore collector (p2)"
+     "units": [],
+     "heroes": [
+      "Foreman Hadrik Stoll (p2)"
      ],
-     "heroes": [],
      "collectors": []
     },
     {
@@ -811,7 +836,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [
-      "Motherboard (p2)"
+      "Chronicler Ottoline Vey (p2)"
      ],
      "collectors": []
     },
@@ -839,47 +864,37 @@
     }
    ]
   },
-  "hero_pool_count": 18,
+  "hero_pool_count": 17,
   "action_stack": [
    {
     "position": 1,
     "owner": "p2",
-    "card_kind": "research"
+    "face": "down"
    },
    {
     "position": 2,
     "owner": "p1",
-    "face": "down"
+    "card_kind": "move_battle"
    },
    {
     "position": 3,
     "owner": "p2",
-    "card_kind": "build"
-   },
-   {
-    "position": 4,
-    "owner": "p1",
     "face": "down"
    },
    {
-    "position": 5,
+    "position": 4,
     "owner": "p2",
-    "card_kind": "move_battle"
-   },
-   {
-    "position": 6,
-    "owner": "p1",
     "card_kind": "move_battle"
    }
   ],
-  "active_action": "move_battle by p1",
+  "active_action": "move_battle by p2",
   "resolving_action": {
    "card_kind": "move_battle",
-   "owner": "p1"
+   "owner": "p2"
   },
   "treaties": [],
   "battle": null,
-  "battle_deck_count": 38,
+  "battle_deck_count": 19,
   "battle_discard": [],
   "pending": null,
   "victory_status": {
@@ -890,8 +905,8 @@
     "leader_alive": true
    },
    "p2": {
-    "culture": 0,
-    "tech": 6,
+    "culture": 6,
+    "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -937,11 +952,7 @@
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_this_round": [
-     "build:base",
-     "research:base",
-     "move_battle:base"
-    ],
+    "action_cards_played_count": 1,
     "battle_hand_count": 1,
     "spy_recruitments": 0,
     "units": [],
@@ -957,6 +968,18 @@
     "bases": [
      "-2,10"
     ],
+    "collectors": [
+     {
+      "collector": "surf-1",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-2",
+      "type": "Surf",
+      "placed_at": null
+     }
+    ],
     "committed_collectors": []
    },
    {
@@ -964,9 +987,8 @@
     "kind": "ai",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 0,
+    "culture": 6,
     "next_milestones": [
-     5,
      15,
      30,
      50,
@@ -981,68 +1003,72 @@
      "acquired_types": [
       "core",
       "water-collector",
-      "wood-collector",
-      "home",
-      "ore-collector"
+      "home"
      ],
-     "bonus_points_live": 1,
-     "total": 6,
+     "bonus_points_live": 0,
+     "total": 3,
      "target": 18
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
     "leader_alive": true,
     "subjects": 0,
-    "cores_reserve": 0,
+    "cores_reserve": 1,
     "cores_supply": 12,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_this_round": [
-     "research:base",
-     "build:base",
-     "move_battle:base"
-    ],
+    "action_cards_played_count": 3,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
-    "units": [
-     {
-      "id": "u-water-collector-p2",
-      "type": "Water collector",
-      "coord": "2,4",
-      "core": "allocated"
-     },
-     {
-      "id": "u-wood-collector-p2",
-      "type": "Wood collector",
-      "coord": "2,4",
-      "core": "allocated"
-     },
-     {
-      "id": "u-ore-collector-p2-1",
-      "type": "Ore collector",
-      "coord": "2,4",
-      "core": "allocated"
-     }
-    ],
+    "units": [],
     "heroes": [
      {
-      "hero": "Motherboard",
+      "hero": "Chronicler Ottoline Vey",
       "coord": "2,6",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Foreman Hadrik Stoll",
+      "coord": "2,4",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
      "2,4"
     ],
+    "collectors": [
+     {
+      "collector": "water-collector-1",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-2",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     }
+    ],
     "committed_collectors": []
    }
   ],
-  "your_battle_hand": [],
+  "your_battle_hand": [
+   {
+    "card": "Rally",
+    "effect": "Move any number of your own eligible mobile units from adjacent locations into this battle."
+   }
+  ],
+  "your_action_cards_played": [
+   "move_battle:base"
+  ],
   "your_spy_assignments": [],
   "your_knowledge": [],
   "your_reserved_heroes": []

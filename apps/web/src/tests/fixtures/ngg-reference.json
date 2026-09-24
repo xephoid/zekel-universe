@@ -152,9 +152,6 @@
      },
      "at_base": {
       "type": "string"
-     },
-     "access": {
-      "type": "array"
      }
     }
    },
@@ -169,9 +166,6 @@
       "const": "economic_victory_spend"
      },
      "payment": {
-      "type": "array"
-     },
-     "access": {
       "type": "array"
      }
     }
@@ -257,9 +251,6 @@
       "type": "string"
      },
      "payment": {
-      "type": "array"
-     },
-     "access": {
       "type": "array"
      }
     }
@@ -347,6 +338,14 @@
      },
      "card": {
       "type": "string"
+     },
+     "played_by": {
+      "type": "string",
+      "description": "the player who played the card to counter (when two players played the same card)"
+     },
+     "batch": {
+      "type": "integer",
+      "minimum": 0
      }
     }
    },
@@ -384,6 +383,22 @@
      },
      "action": {
       "type": "object"
+     }
+    }
+   },
+   {
+    "type": "object",
+    "required": [
+     "type",
+     "unit"
+    ],
+    "properties": {
+     "type": {
+      "const": "choose_initiative_order"
+     },
+     "unit": {
+      "type": "string",
+      "description": "the tied allied unit (ref or printed name) that acts next"
      }
     }
    },
@@ -1300,7 +1315,8 @@
     "prerequisite": "Home",
     "cost": {
      "wood": 2,
-     "oil": 2
+     "ore": 1,
+     "oil": 1
     },
     "effect": "All robot platforms gain +1 DEF. Heroes are not affected. This does not give statless pieces a combat stat line."
    }

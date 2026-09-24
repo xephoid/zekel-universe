@@ -309,7 +309,7 @@ function Planning({ ctx }: { ctx: ScreenCtx }) {
         const held = mine.actionCards[key] ?? 0;
         return Array.from({ length: held }, (_, i) => {
           const which = i === 0 ? 'base' : 'hero_extra';
-          const played = mine.actionCardsPlayed.includes(`${kind}:${which}`);
+          const played = mine.actionCardsPlayed?.includes(`${kind}:${which}`) ?? false;
           const move = moves.find((m) => m.move['card'] === kind && m.move['which'] === which) ?? null;
           return { kind, which, played, move };
         });
@@ -354,7 +354,14 @@ function CoreReallocation({ ctx }: { ctx: ScreenCtx }) {
   const moves = ctx.movesOf('reallocate_cores');
   const template = moves[0] ?? null;
   const platformIds = template && isObj(template.move['allocations']) ? Object.keys(template.move['allocations']) : [];
-  const units = platformIds.map((id) => ({ id, unit: mine?.units.find((u) => u.id === id) ?? null }));
+  // A Core sits in a map platform or, from a newer engine, in a robot
+  // collector (an off-map piece until it is placed).
+  const units = platformIds.map((id) => {
+    const u = mine?.units.find((x) => x.id === id) ?? null;
+    const c = u ? null : mine?.ownedCollectors?.find((x) => x.id === id) ?? null;
+    const unit = u ?? (c ? { id, type: c.type, coord: c.placedAt, core: c.core } : null);
+    return { id, unit };
+  });
   const current: Record<string, boolean> = Object.fromEntries(units.map(({ id, unit }) => [id, unit?.core === 'allocated']));
   const keep = moves.find((m) => isObj(m.move['allocations']) && movesEqual(m.move['allocations'] as Record<string, unknown>, current)) ?? null;
   const [raw, setRaw] = useScratch<Record<string, boolean> | null>(ctx, 'ngg:core-reallocation', null);
@@ -380,7 +387,7 @@ function CoreReallocation({ ctx }: { ctx: ScreenCtx }) {
         <span><b>{reserve}</b><i>IN RESERVE</i></span>
         <span><b>{platformIds.length - allocated}</b><i>CORELESS</i></span>
       </div>
-      {decide && <HowTo>Tap a platform to take its Core out or put one in.</HowTo>}
+      {decide && <HowTo>Tap a platform or collector to take its Core out or put one in.</HowTo>}
       <div className="ngg-options">
         {units.map(({ id, unit }) => {
           const on = draft[id]!;
@@ -392,7 +399,7 @@ function CoreReallocation({ ctx }: { ctx: ScreenCtx }) {
               key={id}
               mark={<span data-flip-id={`ngg-core:${id}`}><Token kind="unit" faction={mine?.faction ?? null} name={unit?.type ?? 'Core'} size={24} state={on ? 'solid' : 'dashed'} /></span>}
               title={unit?.type ?? id}
-              sub={unit ? ctx.tile(unit.coord) : undefined}
+              sub={unit ? (unit.coord ? ctx.tile(unit.coord) : 'On the faction board') : undefined}
               aside={<span className={`ngr-core-tag${on !== was ? ' moved' : ''}`}><Icon name="Core" size={12} />{tag}</span>}
               selected={on !== was}
               disabled={!ctx.live || !canAdd}
@@ -411,7 +418,7 @@ function CoreReallocation({ ctx }: { ctx: ScreenCtx }) {
     </Panel>
   );
   const marks: MapMarks = {
-    tags: new Map(units.filter(({ id, unit }) => unit && draft[id] !== current[id]).map(({ id, unit }) => [unit!.coord, draft[id] ? 'CORE IN' : 'CORE OUT'])),
+    tags: new Map(units.filter(({ id, unit }) => unit?.coord && draft[id] !== current[id]).map(({ id, unit }) => [unit!.coord!, draft[id] ? 'CORE IN' : 'CORE OUT'])),
   };
   return <TableLayout ctx={ctx} marks={marks} panel={panel} />;
 }

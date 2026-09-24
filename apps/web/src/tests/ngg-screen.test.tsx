@@ -125,4 +125,17 @@ describe('NGnG screen', () => {
     expect(onMove).not.toHaveBeenCalled();
     cleanup();
   });
+  it("shows a seat its own planned cards and a rival's only as a face-down count", () => {
+    const f = FIXTURES.find((x) => x.name === 'phase-planning')!.f;
+    const view = f.view as { players: Array<Record<string, unknown>>; your_action_cards_played?: unknown };
+    expect(Array.isArray(view.your_action_cards_played)).toBe(true);
+    expect(view.players.every((p) => !('action_cards_played_this_round' in p))).toBe(true);
+    const r = render(<NggScreen input={inputFor(f.view, f.viewer, f.legalMoves)} yourTurn busy={false} interactive onMove={vi.fn()} onForm={vi.fn()} nameFor={(p) => p} />);
+    const rival = [...r.container.querySelectorAll<HTMLButtonElement>('button.ngg-seat')].find((b) => !b.classList.contains('you'))!;
+    fireEvent.click(rival);
+    const sheet = r.getByRole('dialog', { name: /faction board$/ });
+    expect(sheet.textContent).toContain('face down');
+    expect(sheet.textContent).not.toContain('on the stack');
+    cleanup();
+  });
 });

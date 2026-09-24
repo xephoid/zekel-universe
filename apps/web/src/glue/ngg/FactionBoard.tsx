@@ -81,11 +81,30 @@ function collectorType(p: NggPlayer, resource: string | null): string {
 }
 
 function ActionCards({ p }: { p: NggPlayer }) {
+  // Another seat's planned cards are face down: only how many is known.
+  if (p.actionCardsPlayed === null) {
+    return (
+      <div className="ngg-action-cards">
+        {ACTION_CARDS.map((c) => {
+          const held = p.actionCards[c.key] ?? 0;
+          return (
+            <span key={c.key} className="ngg-action-card">
+              <Icon name={c.icon} size={18} stroke={1.8} />
+              <b>{c.name}</b>
+              <i>{held} held</i>
+            </span>
+          );
+        })}
+        <span className="ngg-action-card facedown"><CardBack /><b>{p.actionCardsPlayedCount} played</b><i>face down</i></span>
+      </div>
+    );
+  }
+  const playedList = p.actionCardsPlayed;
   return (
     <div className="ngg-action-cards">
       {ACTION_CARDS.map((c) => {
         const held = p.actionCards[c.key] ?? 0;
-        const played = p.actionCardsPlayed.filter((x) => x.startsWith(`${c.played}:`)).length;
+        const played = playedList.filter((x) => x.startsWith(`${c.played}:`)).length;
         return (
           <span key={c.key} className={`ngg-action-card${played >= held && held > 0 ? ' used' : ''}`}>
             <Icon name={c.icon} size={18} stroke={1.8} />
