@@ -55,6 +55,15 @@ function ActionCards({ p }: { p: NggPlayer }) {
   );
 }
 
+/** A unit, building or technology id, by its printed name. */
+function nameOfType(ctx: ScreenCtx, id: string): string {
+  const ref = ctx.ref;
+  return ref?.units.find((u) => u.id === id)?.name
+    ?? ref?.buildings.find((b) => b.id === id)?.name
+    ?? ref?.research.find((r) => r.id === id)?.name
+    ?? id;
+}
+
 export function FactionStrip({ ctx, player, onOpen }: { ctx: ScreenCtx; player: NggPlayer; onOpen: () => void }) {
   const ink = inkOf(player.faction);
   return (
@@ -115,14 +124,17 @@ export function FactionBoard({ ctx, player }: { ctx: ScreenCtx; player: NggPlaye
 
       <Panel title="Technology" kicker={`${player.tech.total}${player.tech.target !== null ? ` of ${player.tech.target}` : ''} unique types`}>
         <Pips have={player.tech.total} max={player.tech.target ?? player.tech.total} cap={player.tech.target ?? player.tech.total} />
-        {player.tech.acquiredTypes.length > 0 && <p className="ngg-fb-note">{player.tech.acquiredTypes.join(' · ')}</p>}
+        {player.tech.acquiredTypes.length > 0 && (
+          <p className="ngg-fb-note">{player.tech.acquiredTypes.map((id) => nameOfType(ctx, id)).join(' · ')}</p>
+        )}
       </Panel>
 
       <div className="ngg-fb-grid">
         <Panel title="Buildings">
           <ul className="ngg-fb-list">
             {buildings.map((b) => {
-              const n = player.buildingCounts[b.id] ?? (player.buildings.includes(b.name) ? 1 : 0);
+              // A base is counted on the map, not among the buildings.
+              const n = b.isBase ? player.bases.length : player.buildingCounts[b.id] ?? (player.buildings.includes(b.name) ? 1 : 0);
               return (
                 <li key={b.id} className={n > 0 ? 'on' : 'off'}>
                   <span className="ngg-fb-list-mark"><Icon name={b.name} size={20} stroke={1.8} /></span>
