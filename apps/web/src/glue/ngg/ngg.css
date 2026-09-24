@@ -344,3 +344,12 @@ button.ngg-card { cursor: pointer; }
 .ngg-interrupt > .ngg-panel { box-shadow: 0 16px 40px rgba(28,26,23,.28); }
 
 .muted { color: var(--n-muted); }
+
+/* A shut primary button looks shut in every seat theme: the Ink and Oil
+   colours must not make a disabled button read as pressable. */
+.ngg-root .ngg-btn.primary:disabled, .ngg-board-sheet .ngg-btn.primary:disabled {
+  background: var(--n-surface2); color: var(--n-muted); box-shadow: none; cursor: not-allowed;
+}
+/* Under a game-drawn table the caption scrolls with the page instead of
+   sticking over the map and the action stack. */
+.table-board:has(> .ngg-root) > .caption-card { position: relative; }
