@@ -10,7 +10,7 @@
 // the items are the listed build moves, the spawn base or new-base site is
 // the listed moves' at_base, and the payment is the one the engine proposes.
 
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { LegalMove } from '../../types';
 import type { ComponentType } from 'react';
 import type { ScreenCtx } from '../ctx';
@@ -35,7 +35,12 @@ interface Draft {
   /** the placements the person chose, in order; absent when the engine's
    *  proposal is being committed as listed (no live engine to ask) */
   payment?: Payment;
+  /** a platform's Core, when the engine lists both ways: one from the reserve,
+   *  or a new one bought with it. Never chosen for the person. */
+  core?: CoreWay;
 }
+
+type CoreWay = 'reserve' | 'buy';
 
 const KEY = 'ngg:purchase';
 
@@ -64,6 +69,24 @@ interface Purchase {
   moves: LegalMove[];
   /** the engine's reason it cannot be bought now; such a purchase has no moves */
   shut: string | null;
+}
+
+/** How a listed platform purchase gets its Core. */
+function coreWayOf(m: LegalMove): CoreWay {
+  return m.move['core_pairing'] === true ? 'buy' : 'reserve';
+}
+
+/** The Core ways the engine lists for a purchase; two means the person chooses. */
+function coreWaysOf(p: Purchase): CoreWay[] {
+  if (p.kind !== 'unit') return [];
+  return [...new Set(p.moves.map(coreWayOf))];
+}
+
+function addCost(a: Cost | null, b: Cost | null): Cost | null {
+  if (!a || !b) return a ?? b;
+  const out: Cost = { ...a };
+  for (const [k, n] of Object.entries(b)) out[k as keyof Cost] = (out[k as keyof Cost] ?? 0) + (n ?? 0);
+  return out;
 }
 
 function paymentOf(m: LegalMove): Payment {
@@ -164,7 +187,8 @@ const KIND_WORDS: Record<Purchase['kind'], string> = {
 };
 
 function PurchaseRow({ ctx, p, selected, onPick }: { ctx: ScreenCtx; p: Purchase; selected: boolean; onPick: () => void }) {
-  const pairing = p.moves.some((m) => m.move['core_pairing'] === true);
+  const ways = coreWaysOf(p);
+  const pairing = ways.length === 1 && ways[0] === 'buy';
   const core = pairing ? coreCost(ctx) : null;
   return (
     <OptionRow
@@ -180,6 +204,7 @@ function PurchaseRow({ ctx, p, selected, onPick }: { ctx: ScreenCtx; p: Purchase
           <span className="ngg-eco-kind">{KIND_WORDS[p.kind]}</span>
           {p.cost && <CostChips cost={p.cost} />}
           {core && <span className="ngg-eco-core">+ Core <CostChips cost={core} /></span>}
+          {ways.length > 1 && <span className="ngg-eco-core">Core: yours or bought</span>}
         </span>
       }
     />
@@ -221,7 +246,15 @@ function Composer({ ctx, scope, buys, title, kicker, skip, skipLabel, children }
   const purchases = useMemo(() => purchasesOf(ctx, buys), [ctx, buys]);
   const open = purchases.filter((p) => !p.shut);
   // A pick the engine no longer lists (after a refusal, a new event) is gone.
-  const chosen = draft.pick ? open.find((p) => p.key === draft.pick) ?? null : null;
+  const picked = draft.pick ? open.find((p) => p.key === draft.pick) ?? null : null;
+  // A platform the engine lists both ways asks which Core before anything else.
+  const ways = picked ? coreWaysOf(picked) : [];
+  const coreAsk = ways.length > 1;
+  const way = coreAsk && draft.core && ways.includes(draft.core) ? draft.core : null;
+  const chosen: Purchase | null = !picked ? null
+    : !coreAsk ? picked
+    : way ? { ...picked, moves: picked.moves.filter((m) => coreWayOf(m) === way), cost: way === 'buy' ? addCost(picked.cost, coreCost(ctx)) : picked.cost }
+    : null;
   const stage = chosen ? draft.stage : 'choose';
   const first = chosen?.moves[0] ?? null;
   const payment = first ? paymentOf(first) : [];
@@ -237,7 +270,7 @@ function Composer({ ctx, scope, buys, title, kicker, skip, skipLabel, children }
   };
   const commitPayment = (chosenPayment?: Payment) => {
     if (!chosen || !first) return;
-    if (needsPlace) { setDraft({ pick: chosen.key, stage: 'place', payment: chosenPayment }); return; }
+    if (needsPlace) { setDraft({ pick: chosen.key, stage: 'place', payment: chosenPayment, core: draft.core }); return; }
     sendWith(first, chosenPayment);
   };
   const place = (coord: string) => {
@@ -254,14 +287,35 @@ function Composer({ ctx, scope, buys, title, kicker, skip, skipLabel, children }
             {children}
             {purchases.length > 0
               ? <div className="ngg-options">{purchases.map((p) => (
-                  <PurchaseRow key={p.key} ctx={ctx} p={p} selected={draft.pick === p.key}
-                    onPick={() => setDraft({ pick: p.key, stage: 'choose' })} />
+                  <Fragment key={p.key}>
+                    <PurchaseRow ctx={ctx} p={p} selected={draft.pick === p.key}
+                      onPick={() => setDraft({ pick: p.key, stage: 'choose' })} />
+                    {/* The Core question sits under the platform it is for. */}
+                    {picked && coreAsk && picked.key === p.key && (
+                      <div className="ngg-eco-coreway" role="group" aria-label={`Which Core goes in the ${picked.label}?`}>
+                        <HowTo>Which Core goes in the {picked.label}?</HowTo>
+                        <div className="ngg-options">
+                          <OptionRow selected={way === 'reserve'} disabled={!ctx.live}
+                            onPress={() => setDraft({ pick: picked.key, stage: 'choose', core: 'reserve' })}
+                            mark={<Icon name="Core" size={20} stroke={1.8} />}
+                            title="A Core from your reserve"
+                            sub={`${ctx.mine?.coresReserve ?? 0} in reserve · each one there earns +1 culture a round`} />
+                          <OptionRow selected={way === 'buy'} disabled={!ctx.live}
+                            onPress={() => setDraft({ pick: picked.key, stage: 'choose', core: 'buy' })}
+                            mark={<Icon name="Core" size={20} stroke={1.8} />}
+                            title="Buy a new Core with it"
+                            sub="One purchase: the platform and its Core together"
+                            aside={coreCost(ctx) ? <span className="ngg-eco-cost"><CostChips cost={coreCost(ctx)!} /></span> : undefined} />
+                        </div>
+                      </div>
+                    )}
+                  </Fragment>
                 ))}</div>
               : <HowTo>The engine lists nothing to buy this action.</HowTo>}
             {purchases.length > 0 && open.length === 0 && <HowTo>Nothing can be bought this action; each line says why.</HowTo>}
             <Actions>
               {skip && <Btn kind="secondary" disabled={!ctx.live} onClick={() => ctx.send(skip)}>{skipLabel}</Btn>}
-              <Btn disabled={!ctx.live || !draft.pick} onClick={() => draft.pick && setDraft({ pick: draft.pick, stage: 'pay' })}>
+              <Btn disabled={!ctx.live || !picked || (coreAsk && !way)} onClick={() => picked && setDraft({ pick: picked.key, stage: 'pay', core: draft.core })}>
                 {draft.pick ? `Choose ${purchases.find((p) => p.key === draft.pick)?.label ?? ''}` : 'Choose'}
               </Btn>
             </Actions>

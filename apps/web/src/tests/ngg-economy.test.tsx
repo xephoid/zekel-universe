@@ -285,4 +285,26 @@ describe('NGnG payment, placed by the person on tiles the engine names', () => {
     draw(f, { as: 'watcher', unavailable: f.unavailable });
     expect(document.querySelectorAll('.ngg-option.shut')).toHaveLength(0);
   });
+  it('a platform the engine lists both ways asks which Core, choosing nothing for the person', () => {
+    const f = ALL_NGG['action-build-robot-mid']!;
+    for (const way of ['buy', 'reserve'] as const) {
+      const { onMove, onForm } = draw(f);
+      fireEvent.click(screen.getAllByRole('button', { name: /^Water collector/ })[0]!);
+      const choose = screen.getByRole('button', { name: /^Choose/ }) as HTMLButtonElement;
+      const group = screen.getByRole('group', { name: /Which Core goes in the Water collector/ });
+      // Nothing is picked for the person, and nothing moves on until they pick.
+      expect(group.querySelectorAll('.ngg-option.selected')).toHaveLength(0);
+      expect(choose.disabled).toBe(true);
+      fireEvent.click(screen.getByRole('button', { name: way === 'buy' ? /Buy a new Core with it/ : /A Core from your reserve/ }));
+      expect(choose.disabled).toBe(false);
+      fireEvent.click(choose);
+      fireEvent.click(screen.getByRole('button', { name: /^Commit payment/ }));
+      expect(onForm).not.toHaveBeenCalled();
+      expect(onMove).toHaveBeenCalledTimes(1);
+      const sent = onMove.mock.calls[0]![0] as { move: Record<string, unknown> };
+      expect(sent.move['item']).toBe('Water collector');
+      expect(sent.move['core_pairing'] === true).toBe(way === 'buy');
+      cleanup();
+    }
+  });
 });

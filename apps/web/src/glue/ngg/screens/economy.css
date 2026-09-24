@@ -20,3 +20,7 @@
 .ngg-eco-take.held { border-style: solid; background: var(--n-hlbg); border-color: var(--n-brand); }
 .ngg-eco-take:disabled { opacity: .5; cursor: not-allowed; }
 .ngg-eco-remove { margin-left: auto; border: none; background: none; color: var(--n-muted); cursor: pointer; font-size: 12px; }
+
+/* The Core question, under the platform it is for. */
+.ngg-eco-coreway { margin: 2px 0 6px 18px; padding-left: 12px; border-left: 2px solid var(--n-line); }
+.ngg-eco-coreway .ngg-options { margin-top: 4px; }

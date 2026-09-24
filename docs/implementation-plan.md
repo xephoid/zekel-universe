@@ -841,6 +841,14 @@ victory struck through with the engine's own sentence. A struck line cannot
 be picked. Nothing is worked out in Universe: a line appears only when the
 engine names it.
 
+**Settled 2026-09-24: a platform's Core is the buyer's choice.** When the
+engine lists a platform both ways, with a Core from the reserve and with a
+new Core bought with it (`core_pairing`), the Build screen asks which, under
+the platform, with neither picked; the purchase cannot go on until the
+person answers. With only one way listed there is nothing to ask. (A
+platform always takes a Core when built, §7.7; only the Infiltrator needs
+none.)
+
 **Engine changes, on a branch not yet merged** (`claude/ngg-structured-view`
 in the engine): `resolving_action { card_kind, owner }` beside the
 `active_action` sentence; `battle.units[].ref`, the id battle moves name a
