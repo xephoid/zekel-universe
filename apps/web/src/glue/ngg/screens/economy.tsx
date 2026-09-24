@@ -236,7 +236,7 @@ function Composer({ ctx, scope, title, kicker, skip, skipLabel, children }: {
 
   if (stage === 'pay' && ctx.ask) {
     return (
-      <PayStage ctx={ctx} chosen={chosen} proposal={payment} needsPlace={needsPlace}
+      <PayStage ctx={ctx} chosen={chosen} purchase={first?.move ?? {}} proposal={payment} needsPlace={needsPlace}
         initial={draft.payment ?? []} onBack={back} onCommit={(pay) => commitPayment(pay)} />
     );
   }
@@ -310,6 +310,10 @@ interface Reach {
   next: Record<string, string[]>;
   produced: Record<string, number>;
   access_needed: Array<{ collectorId: string; coord: string; owner: string }>;
+  /** the engine's word on whether the placements pay for the purchase; absent from an engine that does not say */
+  covers?: boolean;
+  short?: Record<string, number>;
+  short_either?: string[] | null;
 }
 
 function readReach(x: unknown): Reach | null {
@@ -321,12 +325,17 @@ function readReach(x: unknown): Reach | null {
     next: o['next'] as Reach['next'],
     produced: (o['produced'] ?? {}) as Reach['produced'],
     access_needed: (Array.isArray(o['access_needed']) ? o['access_needed'] : []) as Reach['access_needed'],
+    ...(typeof o['covers'] === 'boolean' ? { covers: o['covers'] } : {}),
+    short: (o['short'] ?? {}) as Record<string, number>,
+    short_either: Array.isArray(o['short_either']) ? o['short_either'] as string[] : null,
   };
 }
 
-function PayStage({ ctx, chosen, proposal, needsPlace, initial, onBack, onCommit }: {
+function PayStage({ ctx, chosen, purchase, proposal, needsPlace, initial, onBack, onCommit }: {
   ctx: ScreenCtx;
   chosen: Purchase;
+  /** the listed move being paid for, so the engine can say whether the placements cover it */
+  purchase: Record<string, unknown>;
   /** the engine's own proposed payment, offered as one press, never pre-chosen */
   proposal: Payment;
   needsPlace: boolean;
@@ -345,7 +354,7 @@ function PayStage({ ctx, chosen, proposal, needsPlace, initial, onBack, onCommit
     if (!ask) return;
     let stop = false;
     setReach(null);
-    void ask('collector_reach', { prior: placed }).then((r) => {
+    void ask('collector_reach', { prior: placed, purchase }).then((r) => {
       if (stop) return;
       if ('answer' in r) { setReach(readReach(r.answer)); setRefused(null); } else { setRefused(r.refused); }
     });
@@ -395,6 +404,12 @@ function PayStage({ ctx, chosen, proposal, needsPlace, initial, onBack, onCommit
           <div className="ngg-eco-costline"><span>Produces</span>
             {reach && Object.keys(reach.produced).length > 0 ? <CostChips cost={reach.produced as Cost} /> : <span className="ngg-cost-free">nothing yet</span>}
           </div>
+          {reach && reach.covers === false && (
+            <div className="ngg-eco-costline"><span>Still needs</span>
+              {Object.keys(reach.short ?? {}).length > 0 && <CostChips cost={reach.short as Cost} />}
+              {reach.short_either && <span className="ngg-cost-free">and one {reach.short_either.join(' or ')}</span>}
+            </div>
+          )}
           {refused && <p className="ngg-option-reason">{ctx.say(refused)}</p>}
           <HowTo>{holdingId ? 'Click a lit hex to place it.' : 'Take a collector from your hand, then click a lit hex.'}</HowTo>
           {kinds.size > 0 && (
@@ -441,7 +456,7 @@ function PayStage({ ctx, chosen, proposal, needsPlace, initial, onBack, onCommit
             {proposal.length > 0 && placed.length === 0 && (
               <Btn kind="quiet" disabled={!ctx.live} onClick={() => { setPlaced(proposal); setHolding(null); }}>Use the engine’s proposal</Btn>
             )}
-            <Btn disabled={!ctx.live || (placed.length === 0 && proposal.length > 0)} onClick={() => onCommit(placed)}>
+            <Btn disabled={!ctx.live || !reach || reach.covers === false || (reach.covers === undefined && placed.length === 0 && proposal.length > 0)} onClick={() => onCommit(placed)}>
               {needsPlace ? 'Commit payment, then place it' : chosen.kind === 'economic' ? 'Commit all eleven' : 'Commit payment'}
             </Btn>
           </Actions>

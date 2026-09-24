@@ -158,10 +158,29 @@ describe('NGnG payment, placed by the person on tiles the engine names', () => {
           collectors: payment.map((p) => ({ id: p.collectorId, resource: null, placed_at: prior.find((x) => x.collectorId === p.collectorId)?.coord ?? null })),
           next: Object.fromEntries(payment.filter((p) => !prior.some((x) => x.collectorId === p.collectorId)).map((p) => [p.collectorId, payment.map((q) => q.coord).filter((c) => !taken.has(c))])),
           produced: {}, access_needed: [],
+          // Covered once every listed placement is down (the engine's word, stood in for here).
+          covers: prior.length === payment.length, short: prior.length === payment.length ? {} : { water: 1 }, short_either: null,
         },
       };
     });
     return { ask, asked };
+  }
+
+  async function waitForLitHex(): Promise<HTMLButtonElement> {
+    for (let i = 0; i < 50; i++) {
+      const hex = document.querySelector('button.ngg-hex') as HTMLButtonElement | null;
+      if (hex) return hex;
+      await new Promise((r) => setTimeout(r, 10));
+    }
+    throw new Error('no lit hex');
+  }
+  async function waitForEnabled(name: string) {
+    for (let i = 0; i < 50; i++) {
+      const b = screen.queryByRole('button', { name }) as HTMLButtonElement | null;
+      if (b && !b.disabled) return;
+      await new Promise((r) => setTimeout(r, 10));
+    }
+    throw new Error(`${name} never enabled`);
   }
 
   function drawLive(f: Fixture, ask: (n: string, a: Record<string, unknown>) => Promise<{ answer: unknown }>) {
@@ -193,13 +212,26 @@ describe('NGnG payment, placed by the person on tiles the engine names', () => {
     expect(tile).toBeTruthy();
     fireEvent.click(tile);
     await screen.findByRole('button', { name: /^Take back/ });
-    expect(asked.at(-1)).toEqual({ prior: [{ collectorId: payment[0]!.collectorId, coord: target }] });
+    expect(asked.at(-1)).toMatchObject({ prior: [{ collectorId: payment[0]!.collectorId, coord: target }], purchase: listed.move });
+    // Not yet covered: the engine says what is short, and Commit stays shut.
+    expect(screen.getByText('Still needs')).toBeTruthy();
+    expect((screen.getByRole('button', { name: 'Commit payment' }) as HTMLButtonElement).disabled).toBe(true);
+    // Place the rest, one lit tile at a time, until the engine says it covers.
+    for (let i = 1; i < payment.length; i++) {
+      const take = document.querySelector('button.ngg-eco-take:not([disabled])') as HTMLButtonElement | null;
+      if (take && take.getAttribute('aria-pressed') !== 'true') fireEvent.click(take);
+      const hex = await waitForLitHex();
+      fireEvent.click(hex);
+      await screen.findAllByRole('button', { name: /^Take back/ }).then((b) => expect(b.length).toBe(i + 1));
+    }
+    await waitForEnabled('Commit payment');
     press('Commit payment');
     expect(onMove).not.toHaveBeenCalled();
     expect(onForm).toHaveBeenCalledTimes(1);
     const [template, move, keys] = onForm.mock.calls[0]!;
     expect(template).toBe(listed);
-    expect(move['payment']).toEqual([{ collectorId: payment[0]!.collectorId, coord: target }]);
+    expect(move['payment'][0]).toEqual({ collectorId: payment[0]!.collectorId, coord: target });
+    expect(move['payment']).toHaveLength(payment.length);
     expect(isSubmissionAllowed('form', move, f.legalMoves, { template: listed.move, editableKeys: keys })).toBe(true);
   });
 
@@ -213,6 +245,7 @@ describe('NGnG payment, placed by the person on tiles the engine names', () => {
     press(`Choose ${item}`);
     fireEvent.click(await screen.findByRole('button', { name: 'Use the engine’s proposal' }));
     await screen.findAllByRole('button', { name: /^Take back/ });
+    await waitForEnabled('Commit payment');
     press('Commit payment');
     expect(onForm.mock.calls[0]![1]['payment']).toEqual(payment);
   });

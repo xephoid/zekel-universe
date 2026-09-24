@@ -101,8 +101,18 @@ async function pressWhatTheScreenOffers(page: Page, seen: Set<string>) {
   if (await draw.isVisible()) { await draw.click(); return; }
   // Walk a composer: pick an open option, then press the primary, until the
   // turn passes. A composer may take a few presses (choose, pay, place).
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 16; i++) {
     if (!(await page.locator('.turn-pill').textContent())?.startsWith('Your move')) return;
+    // A payment that cannot be finished by hand: take it all back and use the
+    // engine's own proposal (one press, the person's choice).
+    const commit = panel(page).getByRole('button', { name: /^Commit payment|^Commit all eleven/ });
+    const noTake = (await panel(page).locator('button.ngg-eco-take:enabled').count()) === 0;
+    if (await commit.isVisible() && await commit.isDisabled() && noTake) {
+      const back = panel(page).getByRole('button', { name: /^Take back/ }).first();
+      if (await back.isVisible()) { await back.click({ timeout: 5_000 }).catch(() => {}); await page.waitForTimeout(300); }
+      const proposal = panel(page).getByRole('button', { name: 'Use the engine’s proposal' });
+      if (await proposal.isVisible()) { await proposal.click({ timeout: 5_000 }).catch(() => {}); await page.waitForTimeout(500); }
+    }
     // Planning: put an action card on the stack rather than passing.
     const card = panel(page).locator('button.ngr-plan-card:enabled').first();
     if (await card.isVisible()) { await card.click({ timeout: 5_000 }).catch(() => {}); seen.add('placed a card'); continue; }
