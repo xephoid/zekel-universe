@@ -19,6 +19,7 @@ import { TableLayout } from '../Layout';
 import { TERRAIN } from '../factions';
 import { cardByLabel, heroById, researchByName, treatyByName } from '../ref';
 import { Actions, Btn, CardFace, FactionChip, HowTo, OptionRow, Panel, Rule } from '../ui';
+import { DiplomacyPanel } from './round';
 import './battle.css';
 
 type Screen = ComponentType<{ ctx: ScreenCtx }>;
@@ -340,7 +341,7 @@ function MoveBattleScreen({ ctx }: { ctx: ScreenCtx }) {
       )}
     </Panel>
   );
-  return <TableLayout ctx={ctx} marks={marks} panel={panel} />;
+  return <TableLayout ctx={ctx} marks={marks} panel={<>{panel}<DiplomacyPanel ctx={ctx} /></>} />;
 }
 
 // ---------------------------------------------------------------------------

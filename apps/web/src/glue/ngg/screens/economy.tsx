@@ -21,6 +21,7 @@ import { itemByName, researchByName, heroById, type Cost } from '../ref';
 import { TERRAIN } from '../factions';
 import { Actions, Btn, CostChips, HowTo, Icon, OptionRow, Panel, ResourceChip, Rule } from '../ui';
 import { moveType } from '../read';
+import { DiplomacyPanel } from './round';
 import './economy.css';
 
 // ---------------------------------------------------------------------------
@@ -200,7 +201,7 @@ function Composer({ ctx, scope, title, kicker, skip, skipLabel, children }: {
     return (
       <TableLayout
         ctx={ctx}
-        panel={
+        panel={<>
           <Panel title={title} kicker={kicker}>
             {children}
             {purchases.length > 0
@@ -208,7 +209,7 @@ function Composer({ ctx, scope, title, kicker, skip, skipLabel, children }: {
                   <PurchaseRow key={p.key} ctx={ctx} p={p} selected={draft.pick === p.key}
                     onPick={() => setDraft({ pick: p.key, stage: 'choose' })} />
                 ))}</div>
-              : <HowTo>Nothing here can be paid for from what you can reach.</HowTo>}
+              : <HowTo>The engine lists nothing to buy this action.</HowTo>}
             <Actions>
               {skip && <Btn kind="secondary" disabled={!ctx.live} onClick={() => ctx.send(skip)}>{skipLabel}</Btn>}
               <Btn disabled={!ctx.live || !draft.pick} onClick={() => draft.pick && setDraft({ pick: draft.pick, stage: 'pay' })}>
@@ -216,7 +217,10 @@ function Composer({ ctx, scope, title, kicker, skip, skipLabel, children }: {
               </Btn>
             </Actions>
           </Panel>
-        }
+          {/* A treaty may be offered while your own action resolves; the panel
+              draws only when the engine lists an offer. */}
+          <DiplomacyPanel ctx={ctx} />
+        </>}
       />
     );
   }
