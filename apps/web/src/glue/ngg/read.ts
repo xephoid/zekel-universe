@@ -4,8 +4,8 @@
 //   - map pieces come from each player's own structured lists (units, heroes,
 //     committed collectors), joined to the map by coord, never from the
 //     "Name (owner)" strings on a tile;
-//   - no prose is parsed, with one stated exception: `active_action`, which
-//     the engine still publishes as "kind by owner" (see activeActionOf).
+//   - no prose is parsed, with one stated exception: an older engine's
+//     `active_action` sentence (see activeActionOf).
 
 import { asArr, asBool, asNum, asStr, isObj } from '../types';
 
@@ -90,6 +90,8 @@ export interface NggPending {
 
 export interface NggBattleUnit {
   label: string;
+  /** the id battle moves name this unit by; null from an engine that does not publish it */
+  ref: string | null;
   owner: string;
   side: string;
   init: number;
@@ -146,10 +148,10 @@ export interface NggView {
 const CARD_KINDS: CardKind[] = ['build', 'research', 'move_battle'];
 
 /**
- * The resolving action card. The engine publishes it as the string
- * "build by p2"; this is the one place that string is read, and it takes a
- * structured `{ card_kind, owner }` first, so it retires itself the day the
- * engine sends one.
+ * The resolving action card. The engine publishes it structured as
+ * `resolving_action: { card_kind, owner }`; an engine from before that field
+ * sends only the sentence "build by p2", and this is the one place that
+ * sentence is read.
  */
 export function activeActionOf(raw: unknown): { cardKind: CardKind; owner: string } | null {
   if (isObj(raw)) {
@@ -275,6 +277,7 @@ function readBattle(b: unknown): NggBattle | null {
     pass: asNum(b['pass']),
     units: asArr(b['units']).filter(isObj).map((u) => ({
       label: asStr(u['unit']),
+      ref: strOrNull(u['ref']),
       owner: asStr(u['owner']),
       side: asStr(u['side']),
       init: asNum(u['init']),
@@ -352,7 +355,7 @@ export function readView(view: unknown): NggView | null {
       owner: asStr(a['owner']),
       cardKind: strOrNull(a['card_kind']),
     })),
-    activeAction: activeActionOf(view['active_action']),
+    activeAction: activeActionOf(view['resolving_action'] ?? view['active_action']),
     treaties: asArr(view['treaties']).filter(isObj).map((t) => {
       const partners = asArr(t['partners']).map((x) => asStr(x));
       return { name: asStr(t['treaty']), partners: [partners[0] ?? '', partners[1] ?? ''] as [string, string], cultureIncome: asNum(t['culture_income']) };

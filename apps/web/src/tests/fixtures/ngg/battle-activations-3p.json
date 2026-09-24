@@ -450,6 +450,10 @@
    }
   ],
   "active_action": "move_battle by p3",
+  "resolving_action": {
+   "card_kind": "move_battle",
+   "owner": "p3"
+  },
   "treaties": [],
   "battle": {
    "coord": "-2,6",
@@ -459,6 +463,7 @@
    "units": [
     {
      "unit": "Technomancer Greymore",
+     "ref": "greymore",
      "owner": "p3",
      "side": "attackers",
      "init": 30,
@@ -468,6 +473,7 @@
     },
     {
      "unit": "Archmage Chaimidious",
+     "ref": "chaimidious",
      "owner": "p1",
      "side": "defenders",
      "init": 70,
@@ -1225,6 +1231,10 @@
    }
   ],
   "active_action": "move_battle by p3",
+  "resolving_action": {
+   "card_kind": "move_battle",
+   "owner": "p3"
+  },
   "treaties": [],
   "battle": {
    "coord": "-2,6",
@@ -1234,6 +1244,7 @@
    "units": [
     {
      "unit": "Technomancer Greymore",
+     "ref": "greymore",
      "owner": "p3",
      "side": "attackers",
      "init": 30,
@@ -1243,6 +1254,7 @@
     },
     {
      "unit": "Archmage Chaimidious",
+     "ref": "chaimidious",
      "owner": "p1",
      "side": "defenders",
      "init": 70,

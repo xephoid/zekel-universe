@@ -472,6 +472,10 @@
    }
   ],
   "active_action": "move_battle by p1",
+  "resolving_action": {
+   "card_kind": "move_battle",
+   "owner": "p1"
+  },
   "treaties": [],
   "battle": {
    "coord": "2,4",
@@ -481,6 +485,7 @@
    "units": [
     {
      "unit": "Archmage Chaimidious",
+     "ref": "chaimidious",
      "owner": "p1",
      "side": "attackers",
      "init": 70,
@@ -490,6 +495,7 @@
     },
     {
      "unit": "Motherboard",
+     "ref": "motherboard",
      "owner": "p2",
      "side": "defenders",
      "init": 30,
@@ -1386,6 +1392,10 @@
    }
   ],
   "active_action": "move_battle by p1",
+  "resolving_action": {
+   "card_kind": "move_battle",
+   "owner": "p1"
+  },
   "treaties": [],
   "battle": {
    "coord": "2,4",
@@ -1395,6 +1405,7 @@
    "units": [
     {
      "unit": "Archmage Chaimidious",
+     "ref": "chaimidious",
      "owner": "p1",
      "side": "attackers",
      "init": 70,
@@ -1404,6 +1415,7 @@
     },
     {
      "unit": "Motherboard",
+     "ref": "motherboard",
      "owner": "p2",
      "side": "defenders",
      "init": 30,
