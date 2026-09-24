@@ -95,7 +95,10 @@ jobs:
       - name: Build and start the server
         working-directory: zekel-universe
         env:
-          NODE_ENV: production
+          # Not NODE_ENV=production: the specs sign in through the test
+          # outbox, and the server refuses to start with the outbox in
+          # production. The built app is served whenever the build output is
+          # there, which it is by this point.
           SECRET_KEY: ci-secret
           ENGINE_TOKEN: ci-contract-token
           ENGINE_URL: http://localhost:8787/mcp

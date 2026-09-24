@@ -676,6 +676,23 @@ describe('cybernoir-2127 glue', () => {
     expect(stats.find((st) => st.label === 'Informants facing you')!.value).toBe(1);
   });
 
+  it('gives each seat its own markers: no Overclock in the Detective panel', () => {
+    const plan = g.plan(input(CN_VIEW, [], { reference: CN_REFERENCE }))!;
+    const panel = (id: string) => {
+      const z = [...plan.board, ...plan.bench, ...plan.side].find((b) => b.id === id)!;
+      return (z.data as TableauData).stats!.map((st) => st.label);
+    };
+    // Overclock is the Hacker's, once per turn. The Detective's panel carried
+    // one too, and the engine publishes `overclock_used` on both seats with
+    // the Detective's always false — so it read "available" for an ability
+    // the Detective can never use.
+    expect(panel('cn:detective')).not.toContain('Overclock');
+    expect(panel('cn:hacker')).toContain('Overclock');
+    // The markers that do belong to each seat are still where they were.
+    expect(panel('cn:detective')).toContain('Mid-game guess');
+    expect(panel('cn:hacker')).toContain('Safehouse burned');
+  });
+
   it("gives the Detective their own hand's facts, and their own informants' names", () => {
     const det = {
       ...CN_VIEW, role: 'detective', hideout: null,
