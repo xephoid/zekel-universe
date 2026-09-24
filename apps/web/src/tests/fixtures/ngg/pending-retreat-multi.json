@@ -1,12 +1,12 @@
 {
- "key": "pending-elara_spell",
+ "key": "pending-retreat",
  "players": 4,
- "viewer": "p4",
+ "viewer": "p1",
  "view": {
   "game_id": "neither-guts-nor-gears",
   "phase": "action",
-  "round": 28,
-  "active_player_id": "p4",
+  "round": 4,
+  "active_player_id": "p1",
   "first_player_id": "p1",
   "layout": "threeFour",
   "map": {
@@ -19,11 +19,7 @@
      "start": 4,
      "base_owner": "p4",
      "units": [],
-     "heroes": [
-      "Archmage Elara (p4)",
-      "Kestrel Nine (p4)",
-      "Foreman Hadrik Stoll (p4)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -85,18 +81,9 @@
       "Water collector (p3)",
       "Wood collector (p3)",
       "Ore collector (p3)",
-      "Water collector (p3)",
-      "Oil collector (p3)",
-      "Wood collector (p3)",
-      "Ore collector (p3)",
-      "Wood collector (p3)"
+      "Oil collector (p3)"
      ],
-     "heroes": [
-      "Marshal Corvin Ashlock (p3)",
-      "Warden Hesper Quill (p3)",
-      "Captain Rook Malvane (p3)",
-      "Quartermaster Bertram Hollis (p3)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -305,9 +292,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Motherboard (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -351,10 +336,7 @@
      "start": 3,
      "base_owner": "p2",
      "units": [],
-     "heroes": [
-      "Chronicler Ottoline Vey (p2)",
-      "Envoy Sable Marrow (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -377,7 +359,8 @@
      "base_owner": null,
      "units": [],
      "heroes": [
-      "Archmage Chaimidious (p1)"
+      "Archmage Chaimidious (p1)",
+      "Motherboard (p2)"
      ],
      "collectors": []
     },
@@ -414,29 +397,19 @@
       "Water collector (p1)",
       "Wood collector (p1)",
       "Ore collector (p1)",
-      "Oil collector (p1)",
-      "Water collector (p1)",
-      "Ether collector (p1)",
-      "Wood collector (p1)",
-      "Ore collector (p1)",
-      "Wood collector (p1)",
-      "Spitter Platform (p1)",
-      "Spinner Platform (p1)"
+      "Oil collector (p1)"
      ],
-     "heroes": [
-      "Professor Anselm Kettering (p1)",
-      "Dr. Elayn Smyth (p1)"
-     ],
+     "heroes": [],
      "collectors": []
     }
    ]
   },
-  "hero_pool_count": 5,
+  "hero_pool_count": 16,
   "action_stack": [
    {
     "position": 1,
     "owner": "p1",
-    "face": "down"
+    "card_kind": "research"
    },
    {
     "position": 2,
@@ -451,12 +424,12 @@
    {
     "position": 4,
     "owner": "p4",
-    "card_kind": "build"
+    "face": "down"
    },
    {
     "position": 5,
     "owner": "p1",
-    "face": "down"
+    "card_kind": "build"
    },
    {
     "position": 6,
@@ -471,7 +444,7 @@
    {
     "position": 8,
     "owner": "p4",
-    "card_kind": "research"
+    "face": "down"
    },
    {
     "position": 9,
@@ -482,97 +455,81 @@
     "position": 10,
     "owner": "p2",
     "card_kind": "move_battle"
-   },
-   {
-    "position": 11,
-    "owner": "p3",
-    "card_kind": "move_battle"
-   },
-   {
-    "position": 12,
-    "owner": "p4",
-    "card_kind": "move_battle"
    }
   ],
-  "active_action": "move_battle by p4",
+  "active_action": "move_battle by p2",
   "resolving_action": {
    "card_kind": "move_battle",
-   "owner": "p4"
+   "owner": "p2"
   },
-  "treaties": [
-   {
-    "treaty": "Culture Treaty",
-    "partners": [
-     "p4",
-     "p3"
-    ],
-    "culture_income": 10
-   },
-   {
-    "treaty": "Open Borders",
-    "partners": [
-     "p2",
-     "p3"
-    ],
-    "culture_income": 5
-   },
-   {
-    "treaty": "Shared Resources",
-    "partners": [
-     "p3",
-     "p1"
-    ],
-    "culture_income": 5
-   },
-   {
-    "treaty": "Open Borders",
-    "partners": [
-     "p4",
-     "p1"
-    ],
-    "culture_income": 5
-   },
-   {
-    "treaty": "Shared Resources",
-    "partners": [
-     "p4",
-     "p2"
-    ],
-    "culture_income": 5
-   }
-  ],
-  "battle": null,
+  "treaties": [],
+  "battle": {
+   "coord": "2,6",
+   "origin": "2,4",
+   "phase": "activations",
+   "pass": 1,
+   "units": [
+    {
+     "unit": "Motherboard",
+     "ref": "motherboard",
+     "owner": "p2",
+     "side": "attackers",
+     "init": 30,
+     "dmg": 1,
+     "def": 5,
+     "activated": true
+    },
+    {
+     "unit": "Archmage Chaimidious",
+     "ref": "chaimidious",
+     "owner": "p1",
+     "side": "defenders",
+     "init": 70,
+     "dmg": 3,
+     "def": 6,
+     "activated": true
+    }
+   ],
+   "commitments": [
+    {
+     "card": "Counter",
+     "by": "p1",
+     "resolved": true,
+     "countered": false
+    }
+   ]
+  },
   "battle_deck_count": 39,
   "battle_discard": [
    "Counter"
   ],
   "pending": {
-   "kind": "elara_spell",
-   "for": "p4",
-   "question": "p4 may cast Elara's spell before movement"
+   "kind": "retreat",
+   "for": "p1",
+   "question": "p1 decides whether to retreat"
   },
   "victory_status": {
    "p1": {
-    "culture": 15,
-    "tech": 12,
+    "culture": 0,
+    "tech": 6,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p2": {
-    "culture": 15,
-    "tech": 3,
+    "culture": 3,
+    "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p3": {
-    "culture": 56,
-    "tech": 7,
+    "culture": 1,
+    "tech": 6,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p4": {
-    "culture": 30,
-    "tech": 3,
+    "culture": 3,
+    "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -584,25 +541,19 @@
     "kind": "human",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 15,
+    "culture": 0,
     "next_milestones": [
+     5,
+     15,
      30,
      50,
      75
     ],
     "mana_current": 0,
     "mana_max": 0,
-    "buildings": [
-     "Combat Frame Production",
-     "Diplomatic Research Station"
-    ],
-    "building_counts": {
-     "combat-frame-production": 1,
-     "diplomatic-research-station": 1
-    },
-    "research": [
-     "metal-platforms"
-    ],
+    "buildings": [],
+    "building_counts": {},
+    "research": [],
     "tech_progress": {
      "acquired_types": [
       "core",
@@ -610,16 +561,10 @@
       "wood-collector",
       "home",
       "ore-collector",
-      "oil-collector",
-      "ether-collector",
-      "combat-frame-production",
-      "spitter",
-      "spinner",
-      "diplomatic-research-station",
-      "metal-platforms"
+      "oil-collector"
      ],
      "bonus_points_live": 0,
-     "total": 12,
+     "total": 6,
      "target": 18
     },
     "leader_kills": 0,
@@ -627,7 +572,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 4,
+    "cores_supply": 11,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -664,48 +609,6 @@
       "type": "Oil collector",
       "coord": "2,12",
       "core": "allocated"
-     },
-     {
-      "id": "u-water-collector-p1-2",
-      "type": "Water collector",
-      "coord": "2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-ether-collector-p1-1",
-      "type": "Ether collector",
-      "coord": "2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-wood-collector-p1-2",
-      "type": "Wood collector",
-      "coord": "2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-ore-collector-p1-2",
-      "type": "Ore collector",
-      "coord": "2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-wood-collector-p1-3",
-      "type": "Wood collector",
-      "coord": "2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-spitter-p1-1",
-      "type": "Spitter Platform",
-      "coord": "2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-spinner-p1-1",
-      "type": "Spinner Platform",
-      "coord": "2,12",
-      "core": "allocated"
      }
     ],
     "heroes": [
@@ -715,20 +618,6 @@
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
-     },
-     {
-      "hero": "Professor Anselm Kettering",
-      "coord": "2,12",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 30 DMG 1 DEF 3"
-     },
-     {
-      "hero": "Dr. Elayn Smyth",
-      "coord": "2,12",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
@@ -741,8 +630,10 @@
     "kind": "ai",
     "faction": "The Schism",
     "species": "wizard",
-    "culture": 15,
+    "culture": 3,
     "next_milestones": [
+     5,
+     15,
      30,
      50,
      75
@@ -755,16 +646,17 @@
     "tech_progress": {
      "acquired_types": [
       "surf",
-      "castle"
+      "castle",
+      "subject"
      ],
      "bonus_points_live": 1,
-     "total": 3,
+     "total": 4,
      "target": 22
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
     "leader_alive": true,
-    "subjects": 0,
+    "subjects": 1,
     "cores_reserve": 0,
     "cores_supply": 15,
     "action_cards": {
@@ -773,8 +665,8 @@
      "research": 1
     },
     "action_cards_played_this_round": [
-     "build:base",
      "research:base",
+     "build:base",
      "move_battle:base"
     ],
     "battle_hand_count": 0,
@@ -783,24 +675,10 @@
     "heroes": [
      {
       "hero": "Motherboard",
-      "coord": "1,7",
+      "coord": "2,6",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
-     },
-     {
-      "hero": "Chronicler Ottoline Vey",
-      "coord": "2,2",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 30 DMG 1 DEF 3"
-     },
-     {
-      "hero": "Envoy Sable Marrow",
-      "coord": "2,2",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
@@ -813,18 +691,18 @@
     "kind": "ai",
     "faction": "The Ledger",
     "species": "robot",
-    "culture": 56,
+    "culture": 1,
     "next_milestones": [
+     5,
+     15,
+     30,
+     50,
      75
     ],
     "mana_current": 0,
     "mana_max": 0,
-    "buildings": [
-     "Diplomatic Research Station"
-    ],
-    "building_counts": {
-     "diplomatic-research-station": 1
-    },
+    "buildings": [],
+    "building_counts": {},
     "research": [],
     "tech_progress": {
      "acquired_types": [
@@ -833,11 +711,10 @@
       "wood-collector",
       "home",
       "ore-collector",
-      "oil-collector",
-      "diplomatic-research-station"
+      "oil-collector"
      ],
      "bonus_points_live": 0,
-     "total": 7,
+     "total": 6,
      "target": 18
     },
     "leader_kills": 0,
@@ -845,15 +722,15 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 1,
-    "cores_supply": 6,
+    "cores_supply": 10,
     "action_cards": {
-     "build": 2,
-     "moveBattle": 2,
+     "build": 1,
+     "moveBattle": 1,
      "research": 1
     },
     "action_cards_played_this_round": [
-     "build:base",
      "research:base",
+     "build:base",
      "move_battle:base"
     ],
     "battle_hand_count": 0,
@@ -878,32 +755,8 @@
       "core": "allocated"
      },
      {
-      "id": "u-water-collector-p3-2",
-      "type": "Water collector",
-      "coord": "-2,12",
-      "core": "allocated"
-     },
-     {
       "id": "u-oil-collector-p3-1",
       "type": "Oil collector",
-      "coord": "-2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-wood-collector-p3-2",
-      "type": "Wood collector",
-      "coord": "-2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-ore-collector-p3-2",
-      "type": "Ore collector",
-      "coord": "-2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-wood-collector-p3-3",
-      "type": "Wood collector",
       "coord": "-2,12",
       "core": "allocated"
      }
@@ -915,34 +768,6 @@
       "is_leader": true,
       "dead": false,
       "stats": "Init 80 DMG 4 DEF 6"
-     },
-     {
-      "hero": "Marshal Corvin Ashlock",
-      "coord": "-2,12",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 70 DMG 3 DEF 4"
-     },
-     {
-      "hero": "Warden Hesper Quill",
-      "coord": "-2,12",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 70 DMG 3 DEF 4"
-     },
-     {
-      "hero": "Captain Rook Malvane",
-      "coord": "-2,12",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 70 DMG 3 DEF 4"
-     },
-     {
-      "hero": "Quartermaster Bertram Hollis",
-      "coord": "-2,12",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
@@ -955,8 +780,11 @@
     "kind": "ai",
     "faction": "The Brass Circle",
     "species": "wizard",
-    "culture": 30,
+    "culture": 3,
     "next_milestones": [
+     5,
+     15,
+     30,
      50,
      75
     ],
@@ -968,16 +796,17 @@
     "tech_progress": {
      "acquired_types": [
       "surf",
-      "castle"
+      "castle",
+      "subject"
      ],
      "bonus_points_live": 1,
-     "total": 3,
+     "total": 4,
      "target": 22
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
     "leader_alive": true,
-    "subjects": 0,
+    "subjects": 1,
     "cores_reserve": 0,
     "cores_supply": 15,
     "action_cards": {
@@ -986,8 +815,8 @@
      "research": 1
     },
     "action_cards_played_this_round": [
-     "build:base",
      "research:base",
+     "build:base",
      "move_battle:base"
     ],
     "battle_hand_count": 0,
@@ -1000,27 +829,6 @@
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
-     },
-     {
-      "hero": "Archmage Elara",
-      "coord": "-2,2",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 70 DMG 3 DEF 4"
-     },
-     {
-      "hero": "Kestrel Nine",
-      "coord": "-2,2",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 70 DMG 3 DEF 4"
-     },
-     {
-      "hero": "Foreman Hadrik Stoll",
-      "coord": "-2,2",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
@@ -1037,44 +845,44 @@
  "legalMoves": [
   {
    "move_id": "",
-   "description": "Cast Elara's spell at -2,4 (ore) — 5 mana, 4 damage to all non-allied units there.",
+   "description": "Stay and keep fighting.",
    "move": {
-    "type": "cast_elara_spell",
-    "target_location": "-2,4"
+    "type": "choose_retreat",
+    "destination": null,
+    "stay": true
    }
   },
   {
    "move_id": "",
-   "description": "Cast Elara's spell at -1,1 (wood) — 5 mana, 4 damage to all non-allied units there.",
+   "description": "Retreat all your mobile units to 2,8.",
    "move": {
-    "type": "cast_elara_spell",
-    "target_location": "-1,1"
+    "type": "choose_retreat",
+    "destination": "2,8"
    }
   },
   {
    "move_id": "",
-   "description": "Cast Elara's spell at -1,3 (water) — 5 mana, 4 damage to all non-allied units there.",
+   "description": "Retreat all your mobile units to 1,5.",
    "move": {
-    "type": "cast_elara_spell",
-    "target_location": "-1,3"
+    "type": "choose_retreat",
+    "destination": "1,5"
    }
   },
   {
    "move_id": "",
-   "description": "Skip Elara's spell; move normally.",
+   "description": "Retreat all your mobile units to 1,7.",
    "move": {
-    "type": "cast_elara_spell",
-    "target_location": null,
-    "skip": true
+    "type": "choose_retreat",
+    "destination": "1,7"
    }
   }
  ],
- "watcher": "p1",
+ "watcher": "p2",
  "watcherView": {
   "game_id": "neither-guts-nor-gears",
   "phase": "action",
-  "round": 28,
-  "active_player_id": "p4",
+  "round": 4,
+  "active_player_id": "p1",
   "first_player_id": "p1",
   "layout": "threeFour",
   "map": {
@@ -1087,11 +895,7 @@
      "start": 4,
      "base_owner": "p4",
      "units": [],
-     "heroes": [
-      "Archmage Elara (p4)",
-      "Kestrel Nine (p4)",
-      "Foreman Hadrik Stoll (p4)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -1153,18 +957,9 @@
       "Water collector (p3)",
       "Wood collector (p3)",
       "Ore collector (p3)",
-      "Water collector (p3)",
-      "Oil collector (p3)",
-      "Wood collector (p3)",
-      "Ore collector (p3)",
-      "Wood collector (p3)"
+      "Oil collector (p3)"
      ],
-     "heroes": [
-      "Marshal Corvin Ashlock (p3)",
-      "Warden Hesper Quill (p3)",
-      "Captain Rook Malvane (p3)",
-      "Quartermaster Bertram Hollis (p3)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -1373,9 +1168,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Motherboard (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -1419,10 +1212,7 @@
      "start": 3,
      "base_owner": "p2",
      "units": [],
-     "heroes": [
-      "Chronicler Ottoline Vey (p2)",
-      "Envoy Sable Marrow (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -1445,7 +1235,8 @@
      "base_owner": null,
      "units": [],
      "heroes": [
-      "Archmage Chaimidious (p1)"
+      "Archmage Chaimidious (p1)",
+      "Motherboard (p2)"
      ],
      "collectors": []
     },
@@ -1482,34 +1273,24 @@
       "Water collector (p1)",
       "Wood collector (p1)",
       "Ore collector (p1)",
-      "Oil collector (p1)",
-      "Water collector (p1)",
-      "Ether collector (p1)",
-      "Wood collector (p1)",
-      "Ore collector (p1)",
-      "Wood collector (p1)",
-      "Spitter Platform (p1)",
-      "Spinner Platform (p1)"
+      "Oil collector (p1)"
      ],
-     "heroes": [
-      "Professor Anselm Kettering (p1)",
-      "Dr. Elayn Smyth (p1)"
-     ],
+     "heroes": [],
      "collectors": []
     }
    ]
   },
-  "hero_pool_count": 5,
+  "hero_pool_count": 16,
   "action_stack": [
    {
     "position": 1,
     "owner": "p1",
-    "card_kind": "research"
+    "face": "down"
    },
    {
     "position": 2,
     "owner": "p2",
-    "face": "down"
+    "card_kind": "research"
    },
    {
     "position": 3,
@@ -1524,12 +1305,12 @@
    {
     "position": 5,
     "owner": "p1",
-    "card_kind": "build"
+    "face": "down"
    },
    {
     "position": 6,
     "owner": "p2",
-    "face": "down"
+    "card_kind": "build"
    },
    {
     "position": 7,
@@ -1544,103 +1325,87 @@
    {
     "position": 9,
     "owner": "p1",
-    "card_kind": "move_battle"
+    "face": "down"
    },
    {
     "position": 10,
     "owner": "p2",
     "card_kind": "move_battle"
-   },
-   {
-    "position": 11,
-    "owner": "p3",
-    "card_kind": "move_battle"
-   },
-   {
-    "position": 12,
-    "owner": "p4",
-    "card_kind": "move_battle"
    }
   ],
-  "active_action": "move_battle by p4",
+  "active_action": "move_battle by p2",
   "resolving_action": {
    "card_kind": "move_battle",
-   "owner": "p4"
+   "owner": "p2"
   },
-  "treaties": [
-   {
-    "treaty": "Culture Treaty",
-    "partners": [
-     "p4",
-     "p3"
-    ],
-    "culture_income": 10
-   },
-   {
-    "treaty": "Open Borders",
-    "partners": [
-     "p2",
-     "p3"
-    ],
-    "culture_income": 5
-   },
-   {
-    "treaty": "Shared Resources",
-    "partners": [
-     "p3",
-     "p1"
-    ],
-    "culture_income": 5
-   },
-   {
-    "treaty": "Open Borders",
-    "partners": [
-     "p4",
-     "p1"
-    ],
-    "culture_income": 5
-   },
-   {
-    "treaty": "Shared Resources",
-    "partners": [
-     "p4",
-     "p2"
-    ],
-    "culture_income": 5
-   }
-  ],
-  "battle": null,
+  "treaties": [],
+  "battle": {
+   "coord": "2,6",
+   "origin": "2,4",
+   "phase": "activations",
+   "pass": 1,
+   "units": [
+    {
+     "unit": "Motherboard",
+     "ref": "motherboard",
+     "owner": "p2",
+     "side": "attackers",
+     "init": 30,
+     "dmg": 1,
+     "def": 5,
+     "activated": true
+    },
+    {
+     "unit": "Archmage Chaimidious",
+     "ref": "chaimidious",
+     "owner": "p1",
+     "side": "defenders",
+     "init": 70,
+     "dmg": 3,
+     "def": 6,
+     "activated": true
+    }
+   ],
+   "commitments": [
+    {
+     "card": "Counter",
+     "by": "p1",
+     "resolved": true,
+     "countered": false
+    }
+   ]
+  },
   "battle_deck_count": 39,
   "battle_discard": [
    "Counter"
   ],
   "pending": {
-   "kind": "elara_spell",
-   "for": "p4",
-   "question": "p4 may cast Elara's spell before movement"
+   "kind": "retreat",
+   "for": "p1",
+   "question": "p1 decides whether to retreat"
   },
   "victory_status": {
    "p1": {
-    "culture": 15,
-    "tech": 12,
+    "culture": 0,
+    "tech": 6,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p2": {
-    "culture": 15,
-    "tech": 3,
+    "culture": 3,
+    "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p3": {
-    "culture": 56,
-    "tech": 7,
+    "culture": 1,
+    "tech": 6,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p4": {
-    "culture": 30,
-    "tech": 3,
+    "culture": 3,
+    "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -1652,25 +1417,19 @@
     "kind": "human",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 15,
+    "culture": 0,
     "next_milestones": [
+     5,
+     15,
      30,
      50,
      75
     ],
     "mana_current": 0,
     "mana_max": 0,
-    "buildings": [
-     "Combat Frame Production",
-     "Diplomatic Research Station"
-    ],
-    "building_counts": {
-     "combat-frame-production": 1,
-     "diplomatic-research-station": 1
-    },
-    "research": [
-     "metal-platforms"
-    ],
+    "buildings": [],
+    "building_counts": {},
+    "research": [],
     "tech_progress": {
      "acquired_types": [
       "core",
@@ -1678,16 +1437,10 @@
       "wood-collector",
       "home",
       "ore-collector",
-      "oil-collector",
-      "ether-collector",
-      "combat-frame-production",
-      "spitter",
-      "spinner",
-      "diplomatic-research-station",
-      "metal-platforms"
+      "oil-collector"
      ],
      "bonus_points_live": 0,
-     "total": 12,
+     "total": 6,
      "target": 18
     },
     "leader_kills": 0,
@@ -1695,7 +1448,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 4,
+    "cores_supply": 11,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -1732,48 +1485,6 @@
       "type": "Oil collector",
       "coord": "2,12",
       "core": "allocated"
-     },
-     {
-      "id": "u-water-collector-p1-2",
-      "type": "Water collector",
-      "coord": "2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-ether-collector-p1-1",
-      "type": "Ether collector",
-      "coord": "2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-wood-collector-p1-2",
-      "type": "Wood collector",
-      "coord": "2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-ore-collector-p1-2",
-      "type": "Ore collector",
-      "coord": "2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-wood-collector-p1-3",
-      "type": "Wood collector",
-      "coord": "2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-spitter-p1-1",
-      "type": "Spitter Platform",
-      "coord": "2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-spinner-p1-1",
-      "type": "Spinner Platform",
-      "coord": "2,12",
-      "core": "allocated"
      }
     ],
     "heroes": [
@@ -1783,20 +1494,6 @@
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
-     },
-     {
-      "hero": "Professor Anselm Kettering",
-      "coord": "2,12",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 30 DMG 1 DEF 3"
-     },
-     {
-      "hero": "Dr. Elayn Smyth",
-      "coord": "2,12",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
@@ -1809,8 +1506,10 @@
     "kind": "ai",
     "faction": "The Schism",
     "species": "wizard",
-    "culture": 15,
+    "culture": 3,
     "next_milestones": [
+     5,
+     15,
      30,
      50,
      75
@@ -1823,16 +1522,17 @@
     "tech_progress": {
      "acquired_types": [
       "surf",
-      "castle"
+      "castle",
+      "subject"
      ],
      "bonus_points_live": 1,
-     "total": 3,
+     "total": 4,
      "target": 22
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
     "leader_alive": true,
-    "subjects": 0,
+    "subjects": 1,
     "cores_reserve": 0,
     "cores_supply": 15,
     "action_cards": {
@@ -1841,8 +1541,8 @@
      "research": 1
     },
     "action_cards_played_this_round": [
-     "build:base",
      "research:base",
+     "build:base",
      "move_battle:base"
     ],
     "battle_hand_count": 0,
@@ -1851,24 +1551,10 @@
     "heroes": [
      {
       "hero": "Motherboard",
-      "coord": "1,7",
+      "coord": "2,6",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
-     },
-     {
-      "hero": "Chronicler Ottoline Vey",
-      "coord": "2,2",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 30 DMG 1 DEF 3"
-     },
-     {
-      "hero": "Envoy Sable Marrow",
-      "coord": "2,2",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
@@ -1881,18 +1567,18 @@
     "kind": "ai",
     "faction": "The Ledger",
     "species": "robot",
-    "culture": 56,
+    "culture": 1,
     "next_milestones": [
+     5,
+     15,
+     30,
+     50,
      75
     ],
     "mana_current": 0,
     "mana_max": 0,
-    "buildings": [
-     "Diplomatic Research Station"
-    ],
-    "building_counts": {
-     "diplomatic-research-station": 1
-    },
+    "buildings": [],
+    "building_counts": {},
     "research": [],
     "tech_progress": {
      "acquired_types": [
@@ -1901,11 +1587,10 @@
       "wood-collector",
       "home",
       "ore-collector",
-      "oil-collector",
-      "diplomatic-research-station"
+      "oil-collector"
      ],
      "bonus_points_live": 0,
-     "total": 7,
+     "total": 6,
      "target": 18
     },
     "leader_kills": 0,
@@ -1913,15 +1598,15 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 1,
-    "cores_supply": 6,
+    "cores_supply": 10,
     "action_cards": {
-     "build": 2,
-     "moveBattle": 2,
+     "build": 1,
+     "moveBattle": 1,
      "research": 1
     },
     "action_cards_played_this_round": [
-     "build:base",
      "research:base",
+     "build:base",
      "move_battle:base"
     ],
     "battle_hand_count": 0,
@@ -1946,32 +1631,8 @@
       "core": "allocated"
      },
      {
-      "id": "u-water-collector-p3-2",
-      "type": "Water collector",
-      "coord": "-2,12",
-      "core": "allocated"
-     },
-     {
       "id": "u-oil-collector-p3-1",
       "type": "Oil collector",
-      "coord": "-2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-wood-collector-p3-2",
-      "type": "Wood collector",
-      "coord": "-2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-ore-collector-p3-2",
-      "type": "Ore collector",
-      "coord": "-2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-wood-collector-p3-3",
-      "type": "Wood collector",
       "coord": "-2,12",
       "core": "allocated"
      }
@@ -1983,34 +1644,6 @@
       "is_leader": true,
       "dead": false,
       "stats": "Init 80 DMG 4 DEF 6"
-     },
-     {
-      "hero": "Marshal Corvin Ashlock",
-      "coord": "-2,12",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 70 DMG 3 DEF 4"
-     },
-     {
-      "hero": "Warden Hesper Quill",
-      "coord": "-2,12",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 70 DMG 3 DEF 4"
-     },
-     {
-      "hero": "Captain Rook Malvane",
-      "coord": "-2,12",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 70 DMG 3 DEF 4"
-     },
-     {
-      "hero": "Quartermaster Bertram Hollis",
-      "coord": "-2,12",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
@@ -2023,8 +1656,11 @@
     "kind": "ai",
     "faction": "The Brass Circle",
     "species": "wizard",
-    "culture": 30,
+    "culture": 3,
     "next_milestones": [
+     5,
+     15,
+     30,
      50,
      75
     ],
@@ -2036,16 +1672,17 @@
     "tech_progress": {
      "acquired_types": [
       "surf",
-      "castle"
+      "castle",
+      "subject"
      ],
      "bonus_points_live": 1,
-     "total": 3,
+     "total": 4,
      "target": 22
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
     "leader_alive": true,
-    "subjects": 0,
+    "subjects": 1,
     "cores_reserve": 0,
     "cores_supply": 15,
     "action_cards": {
@@ -2054,8 +1691,8 @@
      "research": 1
     },
     "action_cards_played_this_round": [
-     "build:base",
      "research:base",
+     "build:base",
      "move_battle:base"
     ],
     "battle_hand_count": 0,
@@ -2068,27 +1705,6 @@
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
-     },
-     {
-      "hero": "Archmage Elara",
-      "coord": "-2,2",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 70 DMG 3 DEF 4"
-     },
-     {
-      "hero": "Kestrel Nine",
-      "coord": "-2,2",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 70 DMG 3 DEF 4"
-     },
-     {
-      "hero": "Foreman Hadrik Stoll",
-      "coord": "-2,2",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [

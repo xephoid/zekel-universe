@@ -5,7 +5,7 @@
  "view": {
   "game_id": "neither-guts-nor-gears",
   "phase": "claims",
-  "round": 17,
+  "round": 3,
   "active_player_id": "p1",
   "first_player_id": "p1",
   "layout": "two",
@@ -19,7 +19,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Archmage Chaimidious (p1)"
+     ],
      "collectors": []
     },
     {
@@ -30,10 +32,10 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Archmage Chaimidious (p1)"
-     ],
-     "collectors": []
+     "heroes": [],
+     "collectors": [
+      "surf-1 (p1)"
+     ]
     },
     {
      "coord": "-2,8",
@@ -55,7 +57,9 @@
      "base_owner": "p1",
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "surf-2 (p1)"
+     ]
     },
     {
      "coord": "-1,3",
@@ -66,9 +70,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "water-collector-p2-2 (p2)"
-     ]
+     "collectors": []
     },
     {
      "coord": "-1,5",
@@ -79,9 +81,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "wood-collector-p2-2 (p2)"
-     ]
+     "collectors": []
     },
     {
      "coord": "-1,7",
@@ -125,9 +125,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "ore-collector-p2-1 (p2)"
-     ]
+     "collectors": []
     },
     {
      "coord": "0,4",
@@ -252,11 +250,7 @@
       "Water collector (p2)",
       "Wood collector (p2)",
       "Ore collector (p2)",
-      "Oil collector (p2)",
-      "Water collector (p2)",
-      "Wood collector (p2)",
-      "Ore collector (p2)",
-      "Wood collector (p2)"
+      "Oil collector (p2)"
      ],
      "heroes": [],
      "collectors": []
@@ -268,17 +262,11 @@
      "current_resource": "wood",
      "start": null,
      "base_owner": null,
-     "units": [
-      "Spitter Platform (p2)",
-      "Spinner Platform (p2)"
-     ],
+     "units": [],
      "heroes": [
-      "Motherboard (p2)",
-      "Marshal Corvin Ashlock (p2)"
+      "Motherboard (p2)"
      ],
-     "collectors": [
-      "wood-collector-p2 (p2)"
-     ]
+     "collectors": []
     },
     {
      "coord": "2,8",
@@ -304,20 +292,11 @@
     }
    ]
   },
-  "hero_pool_count": 17,
+  "hero_pool_count": 18,
   "action_stack": [],
   "active_action": null,
   "resolving_action": null,
-  "treaties": [
-   {
-    "treaty": "Open Borders",
-    "partners": [
-     "p1",
-     "p2"
-    ],
-    "culture_income": 5
-   }
-  ],
+  "treaties": [],
   "battle": null,
   "battle_deck_count": 38,
   "battle_discard": [],
@@ -328,14 +307,14 @@
   },
   "victory_status": {
    "p1": {
-    "culture": 5,
-    "tech": 2,
+    "culture": 6,
+    "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p2": {
-    "culture": 14,
-    "tech": 11,
+    "culture": 1,
+    "tech": 7,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -347,7 +326,7 @@
     "kind": "human",
     "faction": "The Covenant",
     "species": "wizard",
-    "culture": 5,
+    "culture": 6,
     "next_milestones": [
      15,
      30,
@@ -362,16 +341,17 @@
     "tech_progress": {
      "acquired_types": [
       "surf",
-      "castle"
+      "castle",
+      "subject"
      ],
      "bonus_points_live": 0,
-     "total": 2,
+     "total": 3,
      "target": 22
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
     "leader_alive": true,
-    "subjects": 0,
+    "subjects": 3,
     "cores_reserve": 0,
     "cores_supply": 15,
     "action_cards": {
@@ -390,7 +370,7 @@
     "heroes": [
      {
       "hero": "Archmage Chaimidious",
-      "coord": "-2,6",
+      "coord": "-2,4",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
@@ -399,15 +379,27 @@
     "bases": [
      "-2,10"
     ],
-    "committed_collectors": []
+    "committed_collectors": [
+     {
+      "collector": "surf-1",
+      "coord": "-2,6",
+      "resource": "water"
+     },
+     {
+      "collector": "surf-2",
+      "coord": "-2,10",
+      "resource": "wood"
+     }
+    ]
    },
    {
     "player_id": "p2",
     "kind": "ai",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 14,
+    "culture": 1,
     "next_milestones": [
+     5,
      15,
      30,
      50,
@@ -415,14 +407,8 @@
     ],
     "mana_current": 0,
     "mana_max": 0,
-    "buildings": [
-     "Combat Frame Production",
-     "Diplomatic Research Station"
-    ],
-    "building_counts": {
-     "combat-frame-production": 1,
-     "diplomatic-research-station": 1
-    },
+    "buildings": [],
+    "building_counts": {},
     "research": [],
     "tech_progress": {
      "acquired_types": [
@@ -431,14 +417,10 @@
       "wood-collector",
       "home",
       "ore-collector",
-      "oil-collector",
-      "combat-frame-production",
-      "spitter",
-      "spinner",
-      "diplomatic-research-station"
+      "oil-collector"
      ],
      "bonus_points_live": 1,
-     "total": 11,
+     "total": 7,
      "target": 18
     },
     "leader_kills": 0,
@@ -446,10 +428,10 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 1,
-    "cores_supply": 4,
+    "cores_supply": 10,
     "action_cards": {
      "build": 1,
-     "moveBattle": 2,
+     "moveBattle": 1,
      "research": 1
     },
     "action_cards_played_this_round": [
@@ -483,42 +465,6 @@
       "type": "Oil collector",
       "coord": "2,4",
       "core": "allocated"
-     },
-     {
-      "id": "u-water-collector-p2-2",
-      "type": "Water collector",
-      "coord": "2,4",
-      "core": "allocated"
-     },
-     {
-      "id": "u-wood-collector-p2-2",
-      "type": "Wood collector",
-      "coord": "2,4",
-      "core": "allocated"
-     },
-     {
-      "id": "u-ore-collector-p2-2",
-      "type": "Ore collector",
-      "coord": "2,4",
-      "core": "allocated"
-     },
-     {
-      "id": "u-wood-collector-p2-3",
-      "type": "Wood collector",
-      "coord": "2,4",
-      "core": "allocated"
-     },
-     {
-      "id": "u-spitter-p2-1",
-      "type": "Spitter Platform",
-      "coord": "2,6",
-      "core": "allocated"
-     },
-     {
-      "id": "u-spinner-p2-1",
-      "type": "Spinner Platform",
-      "coord": "2,6",
-      "core": "allocated"
      }
     ],
     "heroes": [
@@ -528,13 +474,6 @@
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
-     },
-     {
-      "hero": "Marshal Corvin Ashlock",
-      "coord": "2,6",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 70 DMG 3 DEF 4"
      }
     ],
     "bases": [
@@ -545,26 +484,6 @@
       "collector": "water-collector-p2",
       "coord": "1,3",
       "resource": "water"
-     },
-     {
-      "collector": "wood-collector-p2",
-      "coord": "2,6",
-      "resource": "wood"
-     },
-     {
-      "collector": "ore-collector-p2-1",
-      "coord": "0,2",
-      "resource": "ore"
-     },
-     {
-      "collector": "water-collector-p2-2",
-      "coord": "-1,3",
-      "resource": "water"
-     },
-     {
-      "collector": "wood-collector-p2-2",
-      "coord": "-1,5",
-      "resource": "wood"
      }
     ]
    }
@@ -580,6 +499,14 @@
   "your_reserved_heroes": []
  },
  "legalMoves": [
+  {
+   "move_id": "",
+   "description": "Claim Marshal Corvin Ashlock — Gain one extra Move/Battle action card. Remove it at the upkeep after Marshal dies.",
+   "move": {
+    "type": "choose_milestone_hero",
+    "hero": "Marshal Corvin Ashlock"
+   }
+  },
   {
    "move_id": "",
    "description": "Claim Archmage Elara — At the start of a Move/Battle action, before movement, may spend 5 mana to deal 4 damage to all units in an adjacent space except your own units and those of Open Borders or Peace allies. Movement afterward is optional. This is not a battle.",
@@ -705,7 +632,7 @@
  "watcherView": {
   "game_id": "neither-guts-nor-gears",
   "phase": "claims",
-  "round": 17,
+  "round": 3,
   "active_player_id": "p1",
   "first_player_id": "p1",
   "layout": "two",
@@ -719,7 +646,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Archmage Chaimidious (p1)"
+     ],
      "collectors": []
     },
     {
@@ -730,10 +659,10 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Archmage Chaimidious (p1)"
-     ],
-     "collectors": []
+     "heroes": [],
+     "collectors": [
+      "surf-1 (p1)"
+     ]
     },
     {
      "coord": "-2,8",
@@ -755,7 +684,9 @@
      "base_owner": "p1",
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "surf-2 (p1)"
+     ]
     },
     {
      "coord": "-1,3",
@@ -766,9 +697,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "water-collector-p2-2 (p2)"
-     ]
+     "collectors": []
     },
     {
      "coord": "-1,5",
@@ -779,9 +708,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "wood-collector-p2-2 (p2)"
-     ]
+     "collectors": []
     },
     {
      "coord": "-1,7",
@@ -825,9 +752,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "ore-collector-p2-1 (p2)"
-     ]
+     "collectors": []
     },
     {
      "coord": "0,4",
@@ -952,11 +877,7 @@
       "Water collector (p2)",
       "Wood collector (p2)",
       "Ore collector (p2)",
-      "Oil collector (p2)",
-      "Water collector (p2)",
-      "Wood collector (p2)",
-      "Ore collector (p2)",
-      "Wood collector (p2)"
+      "Oil collector (p2)"
      ],
      "heroes": [],
      "collectors": []
@@ -968,17 +889,11 @@
      "current_resource": "wood",
      "start": null,
      "base_owner": null,
-     "units": [
-      "Spitter Platform (p2)",
-      "Spinner Platform (p2)"
-     ],
+     "units": [],
      "heroes": [
-      "Motherboard (p2)",
-      "Marshal Corvin Ashlock (p2)"
+      "Motherboard (p2)"
      ],
-     "collectors": [
-      "wood-collector-p2 (p2)"
-     ]
+     "collectors": []
     },
     {
      "coord": "2,8",
@@ -1004,20 +919,11 @@
     }
    ]
   },
-  "hero_pool_count": 17,
+  "hero_pool_count": 18,
   "action_stack": [],
   "active_action": null,
   "resolving_action": null,
-  "treaties": [
-   {
-    "treaty": "Open Borders",
-    "partners": [
-     "p1",
-     "p2"
-    ],
-    "culture_income": 5
-   }
-  ],
+  "treaties": [],
   "battle": null,
   "battle_deck_count": 38,
   "battle_discard": [],
@@ -1028,14 +934,14 @@
   },
   "victory_status": {
    "p1": {
-    "culture": 5,
-    "tech": 2,
+    "culture": 6,
+    "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p2": {
-    "culture": 14,
-    "tech": 11,
+    "culture": 1,
+    "tech": 7,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -1047,7 +953,7 @@
     "kind": "human",
     "faction": "The Covenant",
     "species": "wizard",
-    "culture": 5,
+    "culture": 6,
     "next_milestones": [
      15,
      30,
@@ -1062,16 +968,17 @@
     "tech_progress": {
      "acquired_types": [
       "surf",
-      "castle"
+      "castle",
+      "subject"
      ],
      "bonus_points_live": 0,
-     "total": 2,
+     "total": 3,
      "target": 22
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
     "leader_alive": true,
-    "subjects": 0,
+    "subjects": 3,
     "cores_reserve": 0,
     "cores_supply": 15,
     "action_cards": {
@@ -1090,7 +997,7 @@
     "heroes": [
      {
       "hero": "Archmage Chaimidious",
-      "coord": "-2,6",
+      "coord": "-2,4",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
@@ -1099,15 +1006,27 @@
     "bases": [
      "-2,10"
     ],
-    "committed_collectors": []
+    "committed_collectors": [
+     {
+      "collector": "surf-1",
+      "coord": "-2,6",
+      "resource": "water"
+     },
+     {
+      "collector": "surf-2",
+      "coord": "-2,10",
+      "resource": "wood"
+     }
+    ]
    },
    {
     "player_id": "p2",
     "kind": "ai",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 14,
+    "culture": 1,
     "next_milestones": [
+     5,
      15,
      30,
      50,
@@ -1115,14 +1034,8 @@
     ],
     "mana_current": 0,
     "mana_max": 0,
-    "buildings": [
-     "Combat Frame Production",
-     "Diplomatic Research Station"
-    ],
-    "building_counts": {
-     "combat-frame-production": 1,
-     "diplomatic-research-station": 1
-    },
+    "buildings": [],
+    "building_counts": {},
     "research": [],
     "tech_progress": {
      "acquired_types": [
@@ -1131,14 +1044,10 @@
       "wood-collector",
       "home",
       "ore-collector",
-      "oil-collector",
-      "combat-frame-production",
-      "spitter",
-      "spinner",
-      "diplomatic-research-station"
+      "oil-collector"
      ],
      "bonus_points_live": 1,
-     "total": 11,
+     "total": 7,
      "target": 18
     },
     "leader_kills": 0,
@@ -1146,10 +1055,10 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 1,
-    "cores_supply": 4,
+    "cores_supply": 10,
     "action_cards": {
      "build": 1,
-     "moveBattle": 2,
+     "moveBattle": 1,
      "research": 1
     },
     "action_cards_played_this_round": [
@@ -1183,42 +1092,6 @@
       "type": "Oil collector",
       "coord": "2,4",
       "core": "allocated"
-     },
-     {
-      "id": "u-water-collector-p2-2",
-      "type": "Water collector",
-      "coord": "2,4",
-      "core": "allocated"
-     },
-     {
-      "id": "u-wood-collector-p2-2",
-      "type": "Wood collector",
-      "coord": "2,4",
-      "core": "allocated"
-     },
-     {
-      "id": "u-ore-collector-p2-2",
-      "type": "Ore collector",
-      "coord": "2,4",
-      "core": "allocated"
-     },
-     {
-      "id": "u-wood-collector-p2-3",
-      "type": "Wood collector",
-      "coord": "2,4",
-      "core": "allocated"
-     },
-     {
-      "id": "u-spitter-p2-1",
-      "type": "Spitter Platform",
-      "coord": "2,6",
-      "core": "allocated"
-     },
-     {
-      "id": "u-spinner-p2-1",
-      "type": "Spinner Platform",
-      "coord": "2,6",
-      "core": "allocated"
      }
     ],
     "heroes": [
@@ -1228,13 +1101,6 @@
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
-     },
-     {
-      "hero": "Marshal Corvin Ashlock",
-      "coord": "2,6",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 70 DMG 3 DEF 4"
      }
     ],
     "bases": [
@@ -1245,26 +1111,6 @@
       "collector": "water-collector-p2",
       "coord": "1,3",
       "resource": "water"
-     },
-     {
-      "collector": "wood-collector-p2",
-      "coord": "2,6",
-      "resource": "wood"
-     },
-     {
-      "collector": "ore-collector-p2-1",
-      "coord": "0,2",
-      "resource": "ore"
-     },
-     {
-      "collector": "water-collector-p2-2",
-      "coord": "-1,3",
-      "resource": "water"
-     },
-     {
-      "collector": "wood-collector-p2-2",
-      "coord": "-1,5",
-      "resource": "wood"
      }
     ]
    }

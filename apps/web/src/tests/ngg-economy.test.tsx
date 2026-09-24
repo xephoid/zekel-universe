@@ -8,9 +8,10 @@ import type { GlueInput } from '../glue';
 import { isSubmissionAllowed } from '../glue/agency';
 import { NggScreen } from '../glue/ngg/NggScreen';
 import REFERENCE from './fixtures/ngg-reference.json';
-import BUILD from './fixtures/ngg/action-build-base.json';
+// A pinned view: these tests name the items it offers (fixtures/ngg-pinned/README.md).
+import BUILD from './fixtures/ngg-pinned/action-build-base.json';
 import ACCESS from './fixtures/ngg/pending-access_request-queue.json';
-import SMYTH from './fixtures/ngg/pending-smyth_reward-4p.json';
+import SMYTH from './fixtures/ngg/pending-smyth_reward-multi.json';
 
 interface Fixture { viewer: string; view: unknown; legalMoves: LegalMove[]; watcher: string; watcherView: unknown; watcherLegalMoves: LegalMove[] }
 

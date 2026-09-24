@@ -54,7 +54,11 @@
      "start": 1,
      "base_owner": "p1",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Chronicler Ottoline Vey (p1)",
+      "Foreman Hadrik Stoll (p1)",
+      "Quartermaster Bertram Hollis (p1)"
+     ],
      "collectors": []
     },
     {
@@ -248,9 +252,7 @@
       "Water collector (p2)",
       "Wood collector (p2)"
      ],
-     "heroes": [
-      "Motherboard (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -261,7 +263,10 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Motherboard (p2)",
+      "Marshal Corvin Ashlock (p2)"
+     ],
      "collectors": []
     },
     {
@@ -288,12 +293,12 @@
     }
    ]
   },
-  "hero_pool_count": 18,
+  "hero_pool_count": 14,
   "action_stack": [
    {
     "position": 1,
     "owner": "p1",
-    "card_kind": "build"
+    "face": "down"
    },
    {
     "position": 2,
@@ -316,20 +321,29 @@
    "card_kind": "build",
    "owner": "p2"
   },
-  "treaties": [],
+  "treaties": [
+   {
+    "treaty": "Open Borders",
+    "partners": [
+     "p2",
+     "p1"
+    ],
+    "culture_income": 5
+   }
+  ],
   "battle": null,
   "battle_deck_count": 38,
   "battle_discard": [],
   "pending": null,
   "victory_status": {
    "p1": {
-    "culture": 0,
-    "tech": 2,
+    "culture": 40,
+    "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p2": {
-    "culture": 2,
+    "culture": 7,
     "tech": 7,
     "leader_kills": 0,
     "leader_alive": true
@@ -342,36 +356,39 @@
     "kind": "human",
     "faction": "The Covenant",
     "species": "wizard",
-    "culture": 0,
+    "culture": 40,
     "next_milestones": [
-     5,
-     15,
-     30,
      50,
      75
     ],
     "mana_current": 5,
     "mana_max": 5,
-    "buildings": [],
-    "building_counts": {},
+    "buildings": [
+     "Embassy"
+    ],
+    "building_counts": {
+     "embassy": 1
+    },
     "research": [],
     "tech_progress": {
      "acquired_types": [
       "surf",
-      "castle"
+      "castle",
+      "subject",
+      "embassy"
      ],
      "bonus_points_live": 0,
-     "total": 2,
+     "total": 4,
      "target": 22
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
     "leader_alive": true,
-    "subjects": 0,
+    "subjects": 5,
     "cores_reserve": 0,
     "cores_supply": 15,
     "action_cards": {
-     "build": 1,
+     "build": 2,
      "moveBattle": 1,
      "research": 1
     },
@@ -390,6 +407,27 @@
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
+     },
+     {
+      "hero": "Chronicler Ottoline Vey",
+      "coord": "-2,10",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 30 DMG 1 DEF 3"
+     },
+     {
+      "hero": "Foreman Hadrik Stoll",
+      "coord": "-2,10",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 30 DMG 1 DEF 3"
+     },
+     {
+      "hero": "Quartermaster Bertram Hollis",
+      "coord": "-2,10",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
@@ -402,9 +440,8 @@
     "kind": "ai",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 2,
+    "culture": 7,
     "next_milestones": [
-     5,
      15,
      30,
      50,
@@ -436,7 +473,7 @@
     "cores_supply": 9,
     "action_cards": {
      "build": 1,
-     "moveBattle": 1,
+     "moveBattle": 2,
      "research": 1
     },
     "action_cards_played_this_round": [
@@ -487,10 +524,17 @@
     "heroes": [
      {
       "hero": "Motherboard",
-      "coord": "2,4",
+      "coord": "2,6",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Marshal Corvin Ashlock",
+      "coord": "2,6",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
      }
     ],
     "bases": [
@@ -514,7 +558,7 @@
     "payment": [
      {
       "collectorId": "water-collector-p2",
-      "coord": "1,3"
+      "coord": "-2,6"
      }
     ]
    }
@@ -528,19 +572,19 @@
     "payment": [
      {
       "collectorId": "water-collector-p2",
-      "coord": "1,3"
+      "coord": "-2,6"
      },
      {
       "collectorId": "wood-collector-p2",
-      "coord": "2,6"
+      "coord": "-2,10"
      },
      {
       "collectorId": "ore-collector-p2-1",
-      "coord": "0,2"
+      "coord": "-2,4"
      },
      {
       "collectorId": "water-collector-p2-2",
-      "coord": "-1,3"
+      "coord": "-2,8"
      }
     ],
     "core_pairing": true,
@@ -556,19 +600,19 @@
     "payment": [
      {
       "collectorId": "water-collector-p2",
-      "coord": "1,3"
+      "coord": "-2,6"
      },
      {
       "collectorId": "wood-collector-p2",
-      "coord": "2,6"
+      "coord": "-2,10"
      },
      {
       "collectorId": "ore-collector-p2-1",
-      "coord": "0,2"
+      "coord": "-2,4"
      },
      {
       "collectorId": "water-collector-p2-2",
-      "coord": "-1,3"
+      "coord": "-2,8"
      }
     ],
     "core_pairing": true,
@@ -584,11 +628,11 @@
     "payment": [
      {
       "collectorId": "water-collector-p2",
-      "coord": "1,3"
+      "coord": "-2,6"
      },
      {
       "collectorId": "wood-collector-p2",
-      "coord": "2,6"
+      "coord": "-2,10"
      }
     ],
     "core_pairing": true,
@@ -604,19 +648,19 @@
     "payment": [
      {
       "collectorId": "water-collector-p2",
-      "coord": "1,3"
+      "coord": "-2,6"
      },
      {
       "collectorId": "wood-collector-p2",
-      "coord": "2,6"
+      "coord": "-2,10"
      },
      {
       "collectorId": "ore-collector-p2-1",
-      "coord": "0,2"
+      "coord": "-2,4"
      },
      {
       "collectorId": "water-collector-p2-2",
-      "coord": "-1,3"
+      "coord": "-2,8"
      },
      {
       "collectorId": "wood-collector-p2-2",
@@ -634,19 +678,19 @@
     "payment": [
      {
       "collectorId": "water-collector-p2",
-      "coord": "1,3"
+      "coord": "-2,6"
      },
      {
       "collectorId": "wood-collector-p2",
-      "coord": "2,6"
+      "coord": "-2,10"
      },
      {
       "collectorId": "ore-collector-p2-1",
-      "coord": "0,2"
+      "coord": "-2,4"
      },
      {
       "collectorId": "water-collector-p2-2",
-      "coord": "-1,3"
+      "coord": "-2,8"
      },
      {
       "collectorId": "wood-collector-p2-2",
@@ -664,19 +708,19 @@
     "payment": [
      {
       "collectorId": "water-collector-p2",
-      "coord": "1,3"
+      "coord": "-2,6"
      },
      {
       "collectorId": "wood-collector-p2",
-      "coord": "2,6"
+      "coord": "-2,10"
      },
      {
       "collectorId": "ore-collector-p2-1",
-      "coord": "0,2"
+      "coord": "-2,4"
      },
      {
       "collectorId": "water-collector-p2-2",
-      "coord": "-1,3"
+      "coord": "-2,8"
      },
      {
       "collectorId": "wood-collector-p2-2",
@@ -746,7 +790,11 @@
      "start": 1,
      "base_owner": "p1",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Chronicler Ottoline Vey (p1)",
+      "Foreman Hadrik Stoll (p1)",
+      "Quartermaster Bertram Hollis (p1)"
+     ],
      "collectors": []
     },
     {
@@ -940,9 +988,7 @@
       "Water collector (p2)",
       "Wood collector (p2)"
      ],
-     "heroes": [
-      "Motherboard (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -953,7 +999,10 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Motherboard (p2)",
+      "Marshal Corvin Ashlock (p2)"
+     ],
      "collectors": []
     },
     {
@@ -980,7 +1029,7 @@
     }
    ]
   },
-  "hero_pool_count": 18,
+  "hero_pool_count": 14,
   "action_stack": [
    {
     "position": 1,
@@ -1008,20 +1057,29 @@
    "card_kind": "build",
    "owner": "p2"
   },
-  "treaties": [],
+  "treaties": [
+   {
+    "treaty": "Open Borders",
+    "partners": [
+     "p2",
+     "p1"
+    ],
+    "culture_income": 5
+   }
+  ],
   "battle": null,
   "battle_deck_count": 38,
   "battle_discard": [],
   "pending": null,
   "victory_status": {
    "p1": {
-    "culture": 0,
-    "tech": 2,
+    "culture": 40,
+    "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p2": {
-    "culture": 2,
+    "culture": 7,
     "tech": 7,
     "leader_kills": 0,
     "leader_alive": true
@@ -1034,36 +1092,39 @@
     "kind": "human",
     "faction": "The Covenant",
     "species": "wizard",
-    "culture": 0,
+    "culture": 40,
     "next_milestones": [
-     5,
-     15,
-     30,
      50,
      75
     ],
     "mana_current": 5,
     "mana_max": 5,
-    "buildings": [],
-    "building_counts": {},
+    "buildings": [
+     "Embassy"
+    ],
+    "building_counts": {
+     "embassy": 1
+    },
     "research": [],
     "tech_progress": {
      "acquired_types": [
       "surf",
-      "castle"
+      "castle",
+      "subject",
+      "embassy"
      ],
      "bonus_points_live": 0,
-     "total": 2,
+     "total": 4,
      "target": 22
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
     "leader_alive": true,
-    "subjects": 0,
+    "subjects": 5,
     "cores_reserve": 0,
     "cores_supply": 15,
     "action_cards": {
-     "build": 1,
+     "build": 2,
      "moveBattle": 1,
      "research": 1
     },
@@ -1082,6 +1143,27 @@
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
+     },
+     {
+      "hero": "Chronicler Ottoline Vey",
+      "coord": "-2,10",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 30 DMG 1 DEF 3"
+     },
+     {
+      "hero": "Foreman Hadrik Stoll",
+      "coord": "-2,10",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 30 DMG 1 DEF 3"
+     },
+     {
+      "hero": "Quartermaster Bertram Hollis",
+      "coord": "-2,10",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
@@ -1094,9 +1176,8 @@
     "kind": "ai",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 2,
+    "culture": 7,
     "next_milestones": [
-     5,
      15,
      30,
      50,
@@ -1128,7 +1209,7 @@
     "cores_supply": 9,
     "action_cards": {
      "build": 1,
-     "moveBattle": 1,
+     "moveBattle": 2,
      "research": 1
     },
     "action_cards_played_this_round": [
@@ -1179,10 +1260,17 @@
     "heroes": [
      {
       "hero": "Motherboard",
-      "coord": "2,4",
+      "coord": "2,6",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Marshal Corvin Ashlock",
+      "coord": "2,6",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
      }
     ],
     "bases": [

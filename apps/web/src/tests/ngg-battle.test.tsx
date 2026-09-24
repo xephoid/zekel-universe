@@ -27,16 +27,22 @@ const ALL = Object.fromEntries(
 );
 
 const BATTLE_FIXTURES = [
-  'action-move_battle', 'action-move_battle-4p', 'pending-elara_spell', 'pending-elara_spell-4p',
-  'pending-battle_commit-4p', 'pending-battle_commit-shared_tactics', 'pending-battle_commit-reserved',
-  'pending-counter_target-batches', 'pending-extra_selection-3p', 'pending-extra_selection-shut',
-  'battle-activations-4p', 'battle-activations-infiltrator',
+  'action-move_battle', 'action-move_battle-multi', 'pending-elara_spell', 'pending-elara_spell-multi',
+  'pending-battle_commit-multi', 'pending-battle_commit-shared_tactics', 'pending-battle_commit-reserved',
+  'pending-counter_target-batches', 'pending-extra_selection-multi', 'pending-extra_selection-shut',
+  'battle-activations-multi', 'battle-activations-infiltrator',
   'pending-battle_defense-decoy', 'pending-battle_defense-mana_shield', 'pending-battle_defense-cleric',
-  'pending-retreat-4p', 'pending-rally_selection-6p',
+  'pending-retreat-multi', 'pending-rally_selection-multi',
 ];
 
+// Views whose exact content these tests assert (fixtures/ngg-pinned/README.md).
+const PINNED = Object.fromEntries(
+  Object.entries(import.meta.glob<Fixture>('./fixtures/ngg-pinned/*.json', { eager: true, import: 'default' }))
+    .map(([path, f]) => [`pinned:${path.replace(/^.*\//, '').replace(/\.json$/, '')}`, f]),
+);
+
 function fx(name: string): Fixture {
-  const f = ALL[name];
+  const f = ALL[name] ?? PINNED[name];
   if (!f) throw new Error(`no fixture ${name}`);
   return f;
 }
@@ -94,7 +100,7 @@ describe('NGnG battle screens', () => {
   }
 
   it('Battle Commit: nothing goes until Commit, then the listed card', () => {
-    const r = decider('pending-battle_commit-4p');
+    const r = decider('pinned:pending-battle_commit-4p');
     expect(r.container.textContent).toContain('Commit one card, face down — or none');
     const commit = [...r.container.querySelectorAll('button')].find((b) => b.textContent === 'Commit')!;
     expect(commit.disabled).toBe(true);
@@ -157,7 +163,7 @@ describe('NGnG battle screens', () => {
     expect(move['type']).toBe('select_extra_cards');
     expect([...(move['cards'] as string[])].sort()).toEqual(['Bonus (+1 DMG to all your units)', 'Retreat']);
     cleanup();
-    const n = decider('pending-extra_selection-3p');
+    const n = decider('pending-extra_selection-multi');
     press(n.container, 'Add none');
     expect(sentListed(n.onMove, n.legalMoves)).toEqual({ type: 'select_extra_cards', cards: [] });
   });
@@ -212,7 +218,7 @@ describe('NGnG battle screens', () => {
   });
 
   it('Retreat: a lit tile, then Retreat to it; Stay in is its own press', () => {
-    const r = decider('pending-retreat-4p');
+    const r = decider('pending-retreat-multi');
     const tiles = r.container.querySelectorAll('button.ngg-hex');
     expect(tiles).toHaveLength(r.legalMoves.filter((m) => m.move['destination']).length);
     fireEvent.click(tiles[0]!);
@@ -221,19 +227,19 @@ describe('NGnG battle screens', () => {
     const move = sentListed(r.onMove, r.legalMoves);
     expect(move['type']).toBe('choose_retreat');
     cleanup();
-    const s = decider('pending-retreat-4p');
+    const s = decider('pending-retreat-multi');
     press(s.container, 'Stay in');
     expect(sentListed(s.onMove, s.legalMoves)).toEqual({ type: 'choose_retreat', destination: null, stay: true });
   });
 
   it('Rally: Bring nobody sends the listed empty move', () => {
-    const r = decider('pending-rally_selection-6p');
+    const r = decider('pending-rally_selection-multi');
     press(r.container, 'Bring nobody');
     expect(sentListed(r.onMove, r.legalMoves)).toEqual({ type: 'select_rally_units', units: [] });
   });
 
   it('Rally: a subset the engine did not list whole is a listed template with only units changed', () => {
-    const f = fx('pending-rally_selection-6p');
+    const f = fx('pending-rally_selection-multi');
     const legal: LegalMove[] = [
       ...f.legalMoves,
       { move_id: '', description: 'x', move: { type: 'select_rally_units', units: ['u-water-collector-p1'] } },
@@ -253,7 +259,7 @@ describe('NGnG battle screens', () => {
   });
 
   it('Move Battle: from, to, then the listed move; Skip is its own press', () => {
-    const r = decider('action-move_battle-4p');
+    const r = decider('action-move_battle-multi');
     expect(r.onMove).not.toHaveBeenCalled();
     // Stage one: the origin stacks are lit.
     let tiles = r.container.querySelectorAll('button.ngg-hex');
@@ -267,7 +273,7 @@ describe('NGnG battle screens', () => {
     const move = sentListed(r.onMove, r.legalMoves);
     expect(move['type']).toBe('move_units');
     cleanup();
-    const s = decider('action-move_battle-4p');
+    const s = decider('action-move_battle-multi');
     press(s.container, 'Skip this action');
     expect(sentListed(s.onMove, s.legalMoves)).toEqual({ type: 'skip_action' });
   });

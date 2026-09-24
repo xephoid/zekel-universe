@@ -76,8 +76,11 @@ test('NGnG: factions on the setup page, the draft and the start at the table, th
     await expect(page.getByRole('alert')).toHaveCount(0);
   }
   expect(errors).toEqual([]);
-  // Several different decisions were met and answered on their own screens.
+  // Several different decisions were met and answered on their own screens,
+  // and at least one purchase was paid by placing a collector on a tile the
+  // engine named in answer to the reach question.
   expect(seen.size).toBeGreaterThan(3);
+  expect(seen.has('placed a collector')).toBe(true);
 });
 
 /**
@@ -100,6 +103,16 @@ async function pressWhatTheScreenOffers(page: Page, seen: Set<string>) {
   // turn passes. A composer may take a few presses (choose, pay, place).
   for (let i = 0; i < 6; i++) {
     if (!(await page.locator('.turn-pill').textContent())?.startsWith('Your move')) return;
+    // Planning: put an action card on the stack rather than passing.
+    const card = panel(page).locator('button.ngr-plan-card:enabled').first();
+    if (await card.isVisible()) { await card.click({ timeout: 5_000 }).catch(() => {}); seen.add('placed a card'); continue; }
+    // Paying: take a collector from hand, then a lit hex the engine named.
+    const take = panel(page).locator('button.ngg-eco-take:enabled:not(.held)').first();
+    if (await take.isVisible()) await take.click({ timeout: 5_000 }).catch(() => {});
+    if (await page.locator('.ngg-eco-take.held').isVisible()) {
+      const hex = page.locator('button.ngg-hex').first();
+      if (await hex.isVisible()) { await hex.click({ timeout: 5_000 }).catch(() => {}); seen.add('placed a collector'); }
+    }
     const option = panel(page).locator('button.ngg-option:enabled:not(.selected)').first();
     if (await option.isVisible()) await option.click({ timeout: 5_000 }).catch(() => {});
     const lit = page.locator('button.ngg-hex').first();

@@ -1,13 +1,13 @@
 {
- "key": "action-build-base",
+ "key": "pending-access_request",
  "players": 4,
  "viewer": "p2",
  "view": {
   "game_id": "neither-guts-nor-gears",
   "phase": "action",
-  "round": 4,
+  "round": 3,
   "active_player_id": "p2",
-  "first_player_id": "p1",
+  "first_player_id": "p4",
   "layout": "threeFour",
   "map": {
    "tiles": [
@@ -83,8 +83,7 @@
       "Water collector (p3)",
       "Wood collector (p3)",
       "Ore collector (p3)",
-      "Oil collector (p3)",
-      "Water collector (p3)"
+      "Oil collector (p3)"
      ],
      "heroes": [],
      "collectors": []
@@ -274,7 +273,9 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "surf-1 (p2)"
+     ]
     },
     {
      "coord": "1,5",
@@ -285,7 +286,9 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "surf-2 (p2)"
+     ]
     },
     {
      "coord": "1,7",
@@ -412,47 +415,70 @@
   "action_stack": [
    {
     "position": 1,
-    "owner": "p1",
-    "face": "down"
-   },
-   {
-    "position": 2,
-    "owner": "p2",
-    "card_kind": "research"
-   },
-   {
-    "position": 3,
-    "owner": "p3",
-    "face": "down"
-   },
-   {
-    "position": 4,
     "owner": "p4",
     "face": "down"
    },
    {
-    "position": 5,
+    "position": 2,
     "owner": "p1",
     "face": "down"
    },
    {
-    "position": 6,
+    "position": 3,
     "owner": "p2",
+    "card_kind": "research"
+   },
+   {
+    "position": 4,
+    "owner": "p3",
+    "face": "down"
+   },
+   {
+    "position": 5,
+    "owner": "p4",
+    "face": "down"
+   },
+   {
+    "position": 6,
+    "owner": "p1",
     "card_kind": "build"
    }
   ],
-  "active_action": "build by p2",
+  "active_action": "build by p1",
   "resolving_action": {
    "card_kind": "build",
-   "owner": "p2"
+   "owner": "p1"
   },
   "treaties": [],
   "battle": null,
-  "battle_deck_count": 39,
-  "battle_discard": [
-   "Counter"
-  ],
-  "pending": null,
+  "battle_deck_count": 38,
+  "battle_discard": [],
+  "pending": {
+   "kind": "access_request",
+   "for": "p2",
+   "question": "p2 decides whether p1's water-collector-p1 may collect at 2,4",
+   "context": {
+    "buyer": "p1",
+    "action": "build",
+    "item": "Core",
+    "this_request": {
+     "collector": "water-collector-p1",
+     "tile": "G3"
+    },
+    "placements": [
+     {
+      "collector": "water-collector-p1",
+      "tile": "G3",
+      "resource": "water",
+      "location_owner": "p2"
+     }
+    ],
+    "queue": {
+     "index": 1,
+     "total": 1
+    }
+   }
+  },
   "victory_status": {
    "p1": {
     "culture": 0,
@@ -461,19 +487,19 @@
     "leader_alive": true
    },
    "p2": {
-    "culture": 3,
+    "culture": 2,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p3": {
-    "culture": 1,
+    "culture": 0,
     "tech": 6,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p4": {
-    "culture": 3,
+    "culture": 2,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
@@ -528,7 +554,7 @@
      "build:base",
      "move_battle:base"
     ],
-    "battle_hand_count": 0,
+    "battle_hand_count": 1,
     "spy_recruitments": 0,
     "units": [
      {
@@ -575,7 +601,7 @@
     "kind": "ai",
     "faction": "The Schism",
     "species": "wizard",
-    "culture": 3,
+    "culture": 2,
     "next_milestones": [
      5,
      15,
@@ -629,14 +655,25 @@
     "bases": [
      "2,2"
     ],
-    "committed_collectors": []
+    "committed_collectors": [
+     {
+      "collector": "surf-1",
+      "coord": "1,3",
+      "resource": "water"
+     },
+     {
+      "collector": "surf-2",
+      "coord": "1,5",
+      "resource": "water"
+     }
+    ]
    },
    {
     "player_id": "p3",
     "kind": "ai",
     "faction": "The Ledger",
     "species": "robot",
-    "culture": 1,
+    "culture": 0,
     "next_milestones": [
      5,
      15,
@@ -666,7 +703,7 @@
     "military_kills_needed": 2,
     "leader_alive": true,
     "subjects": 0,
-    "cores_reserve": 0,
+    "cores_reserve": 1,
     "cores_supply": 10,
     "action_cards": {
      "build": 1,
@@ -704,12 +741,6 @@
       "type": "Oil collector",
       "coord": "-2,12",
       "core": "allocated"
-     },
-     {
-      "id": "u-water-collector-p3-2",
-      "type": "Water collector",
-      "coord": "-2,12",
-      "core": "allocated"
      }
     ],
     "heroes": [
@@ -737,7 +768,7 @@
     "kind": "ai",
     "faction": "The Brass Circle",
     "species": "wizard",
-    "culture": 3,
+    "culture": 2,
     "next_milestones": [
      5,
      15,
@@ -802,253 +833,18 @@
  "legalMoves": [
   {
    "move_id": "",
-   "description": "Build Surf for 2 water (available collectors: surf-1, surf-2, surf-3, surf-4; edit payment placements as needed).",
+   "description": "Grant p1 collection access at 2,4 (their water-collector-p1 stays safely beside your units until upkeep).",
    "move": {
-    "type": "build",
-    "item": "Surf",
-    "payment": [
-     {
-      "collectorId": "surf-1",
-      "coord": "1,3"
-     },
-     {
-      "collectorId": "surf-2",
-      "coord": "1,5"
-     }
-    ]
+    "type": "respond_access_request",
+    "grant": true
    }
   },
   {
    "move_id": "",
-   "description": "Build Subject for 1 water + 1 wood (available collectors: surf-1, surf-2, surf-3, surf-4; edit payment placements as needed).",
+   "description": "Refuse p1 access at 2,4 — nothing commits.",
    "move": {
-    "type": "build",
-    "item": "Subject",
-    "payment": [
-     {
-      "collectorId": "surf-1",
-      "coord": "1,1"
-     },
-     {
-      "collectorId": "surf-2",
-      "coord": "0,0"
-     }
-    ]
-   }
-  },
-  {
-   "move_id": "",
-   "description": "Build Evoker for 2 wood + 1 ore at your base G2 (available collectors: surf-1, surf-2, surf-3, surf-4; edit payment placements as needed).",
-   "move": {
-    "type": "build",
-    "item": "Evoker",
-    "payment": [
-     {
-      "collectorId": "surf-1",
-      "coord": "1,1"
-     },
-     {
-      "collectorId": "surf-2",
-      "coord": "0,2"
-     },
-     {
-      "collectorId": "surf-3",
-      "coord": "-1,1"
-     }
-    ],
-    "at_base": "2,2"
-   }
-  },
-  {
-   "move_id": "",
-   "description": "Build Castle for 3 wood + 1 ore, a new base at G3.",
-   "move": {
-    "type": "build",
-    "item": "Castle",
-    "payment": [
-     {
-      "collectorId": "surf-1",
-      "coord": "1,1"
-     },
-     {
-      "collectorId": "surf-2",
-      "coord": "0,2"
-     },
-     {
-      "collectorId": "surf-3",
-      "coord": "-1,1"
-     },
-     {
-      "collectorId": "surf-4",
-      "coord": "2,6"
-     }
-    ],
-    "at_base": "2,4"
-   }
-  },
-  {
-   "move_id": "",
-   "description": "Build Library of Evocation for 1 water + 2 wood.",
-   "move": {
-    "type": "build",
-    "item": "Library of Evocation",
-    "payment": [
-     {
-      "collectorId": "surf-1",
-      "coord": "1,1"
-     },
-     {
-      "collectorId": "surf-2",
-      "coord": "0,0"
-     },
-     {
-      "collectorId": "surf-3",
-      "coord": "-1,1"
-     }
-    ]
-   }
-  },
-  {
-   "move_id": "",
-   "description": "Build Library of Illusion for 2 wood + 1 ore.",
-   "move": {
-    "type": "build",
-    "item": "Library of Illusion",
-    "payment": [
-     {
-      "collectorId": "surf-1",
-      "coord": "1,1"
-     },
-     {
-      "collectorId": "surf-2",
-      "coord": "0,2"
-     },
-     {
-      "collectorId": "surf-3",
-      "coord": "-1,1"
-     }
-    ]
-   }
-  },
-  {
-   "move_id": "",
-   "description": "Build Library of Enchantment for 2 wood + 1 ore.",
-   "move": {
-    "type": "build",
-    "item": "Library of Enchantment",
-    "payment": [
-     {
-      "collectorId": "surf-1",
-      "coord": "1,1"
-     },
-     {
-      "collectorId": "surf-2",
-      "coord": "0,2"
-     },
-     {
-      "collectorId": "surf-3",
-      "coord": "-1,1"
-     }
-    ]
-   }
-  },
-  {
-   "move_id": "",
-   "description": "Build Temple for 2 water + 2 wood.",
-   "move": {
-    "type": "build",
-    "item": "Temple",
-    "payment": [
-     {
-      "collectorId": "surf-1",
-      "coord": "1,1"
-     },
-     {
-      "collectorId": "surf-2",
-      "coord": "0,0"
-     },
-     {
-      "collectorId": "surf-3",
-      "coord": "-1,1"
-     },
-     {
-      "collectorId": "surf-4",
-      "coord": "-2,2"
-     }
-    ]
-   }
-  },
-  {
-   "move_id": "",
-   "description": "Build Embassy for 2 wood.",
-   "move": {
-    "type": "build",
-    "item": "Embassy",
-    "payment": [
-     {
-      "collectorId": "surf-1",
-      "coord": "1,1"
-     },
-     {
-      "collectorId": "surf-2",
-      "coord": "2,6"
-     }
-    ]
-   }
-  },
-  {
-   "move_id": "",
-   "description": "Build Amphitheatre for 1 water + 3 wood.",
-   "move": {
-    "type": "build",
-    "item": "Amphitheatre",
-    "payment": [
-     {
-      "collectorId": "surf-1",
-      "coord": "1,1"
-     },
-     {
-      "collectorId": "surf-2",
-      "coord": "0,0"
-     },
-     {
-      "collectorId": "surf-3",
-      "coord": "-1,1"
-     },
-     {
-      "collectorId": "surf-4",
-      "coord": "2,6"
-     }
-    ]
-   }
-  },
-  {
-   "move_id": "",
-   "description": "Build Mana Reserve for 1 water + 2 wood.",
-   "move": {
-    "type": "build",
-    "item": "Mana Reserve",
-    "payment": [
-     {
-      "collectorId": "surf-1",
-      "coord": "1,1"
-     },
-     {
-      "collectorId": "surf-2",
-      "coord": "0,0"
-     },
-     {
-      "collectorId": "surf-3",
-      "coord": "-1,1"
-     }
-    ]
-   }
-  },
-  {
-   "move_id": "",
-   "description": "Skip this Build action (the card is used for the round).",
-   "move": {
-    "type": "skip_action"
+    "type": "respond_access_request",
+    "grant": false
    }
   }
  ],
@@ -1056,9 +852,9 @@
  "watcherView": {
   "game_id": "neither-guts-nor-gears",
   "phase": "action",
-  "round": 4,
+  "round": 3,
   "active_player_id": "p2",
-  "first_player_id": "p1",
+  "first_player_id": "p4",
   "layout": "threeFour",
   "map": {
    "tiles": [
@@ -1134,8 +930,7 @@
       "Water collector (p3)",
       "Wood collector (p3)",
       "Ore collector (p3)",
-      "Oil collector (p3)",
-      "Water collector (p3)"
+      "Oil collector (p3)"
      ],
      "heroes": [],
      "collectors": []
@@ -1325,7 +1120,9 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "surf-1 (p2)"
+     ]
     },
     {
      "coord": "1,5",
@@ -1336,7 +1133,9 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "surf-2 (p2)"
+     ]
     },
     {
      "coord": "1,7",
@@ -1463,47 +1262,70 @@
   "action_stack": [
    {
     "position": 1,
-    "owner": "p1",
-    "card_kind": "research"
-   },
-   {
-    "position": 2,
-    "owner": "p2",
-    "face": "down"
-   },
-   {
-    "position": 3,
-    "owner": "p3",
-    "face": "down"
-   },
-   {
-    "position": 4,
     "owner": "p4",
     "face": "down"
    },
    {
-    "position": 5,
+    "position": 2,
     "owner": "p1",
-    "card_kind": "build"
+    "card_kind": "research"
+   },
+   {
+    "position": 3,
+    "owner": "p2",
+    "face": "down"
+   },
+   {
+    "position": 4,
+    "owner": "p3",
+    "face": "down"
+   },
+   {
+    "position": 5,
+    "owner": "p4",
+    "face": "down"
    },
    {
     "position": 6,
-    "owner": "p2",
+    "owner": "p1",
     "card_kind": "build"
    }
   ],
-  "active_action": "build by p2",
+  "active_action": "build by p1",
   "resolving_action": {
    "card_kind": "build",
-   "owner": "p2"
+   "owner": "p1"
   },
   "treaties": [],
   "battle": null,
-  "battle_deck_count": 39,
-  "battle_discard": [
-   "Counter"
-  ],
-  "pending": null,
+  "battle_deck_count": 38,
+  "battle_discard": [],
+  "pending": {
+   "kind": "access_request",
+   "for": "p2",
+   "question": "p2 decides whether p1's water-collector-p1 may collect at 2,4",
+   "context": {
+    "buyer": "p1",
+    "action": "build",
+    "item": "Core",
+    "this_request": {
+     "collector": "water-collector-p1",
+     "tile": "G3"
+    },
+    "placements": [
+     {
+      "collector": "water-collector-p1",
+      "tile": "G3",
+      "resource": "water",
+      "location_owner": "p2"
+     }
+    ],
+    "queue": {
+     "index": 1,
+     "total": 1
+    }
+   }
+  },
   "victory_status": {
    "p1": {
     "culture": 0,
@@ -1512,19 +1334,19 @@
     "leader_alive": true
    },
    "p2": {
-    "culture": 3,
+    "culture": 2,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p3": {
-    "culture": 1,
+    "culture": 0,
     "tech": 6,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p4": {
-    "culture": 3,
+    "culture": 2,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
@@ -1579,7 +1401,7 @@
      "build:base",
      "move_battle:base"
     ],
-    "battle_hand_count": 0,
+    "battle_hand_count": 1,
     "spy_recruitments": 0,
     "units": [
      {
@@ -1626,7 +1448,7 @@
     "kind": "ai",
     "faction": "The Schism",
     "species": "wizard",
-    "culture": 3,
+    "culture": 2,
     "next_milestones": [
      5,
      15,
@@ -1680,14 +1502,25 @@
     "bases": [
      "2,2"
     ],
-    "committed_collectors": []
+    "committed_collectors": [
+     {
+      "collector": "surf-1",
+      "coord": "1,3",
+      "resource": "water"
+     },
+     {
+      "collector": "surf-2",
+      "coord": "1,5",
+      "resource": "water"
+     }
+    ]
    },
    {
     "player_id": "p3",
     "kind": "ai",
     "faction": "The Ledger",
     "species": "robot",
-    "culture": 1,
+    "culture": 0,
     "next_milestones": [
      5,
      15,
@@ -1717,7 +1550,7 @@
     "military_kills_needed": 2,
     "leader_alive": true,
     "subjects": 0,
-    "cores_reserve": 0,
+    "cores_reserve": 1,
     "cores_supply": 10,
     "action_cards": {
      "build": 1,
@@ -1755,12 +1588,6 @@
       "type": "Oil collector",
       "coord": "-2,12",
       "core": "allocated"
-     },
-     {
-      "id": "u-water-collector-p3-2",
-      "type": "Water collector",
-      "coord": "-2,12",
-      "core": "allocated"
      }
     ],
     "heroes": [
@@ -1788,7 +1615,7 @@
     "kind": "ai",
     "faction": "The Brass Circle",
     "species": "wizard",
-    "culture": 3,
+    "culture": 2,
     "next_milestones": [
      5,
      15,
@@ -1845,7 +1672,12 @@
     "committed_collectors": []
    }
   ],
-  "your_battle_hand": [],
+  "your_battle_hand": [
+   {
+    "card": "Counter",
+    "effect": "Counter a battle strategy card that has not yet resolved."
+   }
+  ],
   "your_spy_assignments": [],
   "your_knowledge": [],
   "your_reserved_heroes": []

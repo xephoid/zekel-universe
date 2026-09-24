@@ -29,6 +29,14 @@ interface Fixture {
 }
 
 const ALL = import.meta.glob<Fixture>('./fixtures/ngg/*.json', { eager: true, import: 'default' });
+// Views whose exact content these tests assert (fixtures/ngg-pinned/README.md).
+const PINNED = import.meta.glob<Fixture>('./fixtures/ngg-pinned/*.json', { eager: true, import: 'default' });
+function pinned(name: string): Fixture {
+  const f = PINNED[`./fixtures/ngg-pinned/${name}.json`];
+  if (!f) throw new Error(`no pinned fixture ${name}`);
+  return structuredClone(f);
+}
+
 function fixture(name: string): Fixture {
   const f = ALL[`./fixtures/ngg/${name}.json`];
   if (!f) throw new Error(`no fixture ${name}`);
@@ -147,7 +155,7 @@ describe('NGnG round screens', () => {
   });
 
   it('Setup Start: a numbered site maps to its tile; taken sites name their owner', () => {
-    const f = fixture('pending-choose_starting_location-4p');
+    const f = fixture('pending-choose_starting_location-multi');
     const r = draw(f.view, f.viewer, f.legalMoves);
     expectNothingSelected(r.column);
     expectNoRawIds(r.column);
@@ -160,7 +168,7 @@ describe('NGnG round screens', () => {
   });
 
   it('Setup Start: the map lights only the listed sites and a lit site selects', () => {
-    const f = fixture('pending-choose_starting_location-4p');
+    const f = fixture('pending-choose_starting_location-multi');
     const r = draw(f.view, f.viewer, f.legalMoves);
     const lit = r.container.querySelectorAll('button.ngg-hex.lit');
     expect(lit).toHaveLength(1);
@@ -184,7 +192,7 @@ describe('NGnG round screens', () => {
   });
 
   it('Core Reallocation: toggles compose one allocations map on the listed template', () => {
-    const f = fixture('pending-upkeep_reallocate_cores-4p');
+    const f = fixture('pending-upkeep_reallocate_cores-multi');
     const r = draw(f.view, f.viewer, f.legalMoves);
     expectNothingSelected(r.column);
     expectNoRawIds(r.column);
@@ -200,7 +208,7 @@ describe('NGnG round screens', () => {
   });
 
   it('Core Reallocation: Leave them sends the listed keep-as-is move', () => {
-    const f = fixture('pending-upkeep_reallocate_cores-4p');
+    const f = fixture('pending-upkeep_reallocate_cores-multi');
     const r = draw(f.view, f.viewer, f.legalMoves);
     press(r.column, 'Leave them where they are');
     expectSentListed(r.onMove, f.legalMoves, f.legalMoves[0]!.move);
@@ -290,7 +298,7 @@ describe('NGnG round screens', () => {
   });
 
   it('Spy Assign: carriers with their tiles; tap then Assign sends the listed move', () => {
-    const f = fixture('pending-choose_spy-4p');
+    const f = pinned('pending-choose_spy-4p');
     const r = draw(f.view, f.viewer, f.legalMoves);
     expectNothingSelected(r.column);
     expectNoRawIds(r.column);
@@ -302,14 +310,14 @@ describe('NGnG round screens', () => {
   });
 
   it('Spy Assign: a watcher is not shown the carriers', () => {
-    const f = fixture('pending-choose_spy-4p');
+    const f = pinned('pending-choose_spy-4p');
     const r = draw(f.watcherView, f.watcher, f.watcherLegalMoves, false);
     expect(r.column.textContent).not.toContain('Which hero carries it');
     cleanup();
   });
 
   it('Reserved Hero: the listed bases light; tap one, then Place', () => {
-    const f = fixture('pending-choose_spy-4p');
+    const f = pinned('pending-choose_spy-4p');
     const view = f.view;
     view['pending'] = { kind: 'place_reserved_hero', for: f.viewer, question: 'places their reserved hero' };
     const legal = [lm({ type: 'place_reserved_hero', hero: 'Kestrel Nine', coord: '2,2' })];
@@ -326,7 +334,7 @@ describe('NGnG round screens', () => {
   });
 
   it('Overlay Choice: two listed heroes, nothing chosen until the person picks', () => {
-    const f = fixture('pending-choose_spy-4p');
+    const f = pinned('pending-choose_spy-4p');
     const view = f.view;
     view['pending'] = { kind: 'overlay_choice', for: f.viewer, question: 'picks the active Economy overlay' };
     const legal = [
@@ -344,7 +352,7 @@ describe('NGnG round screens', () => {
   });
 
   it('The End: the winner by faction, standings from victory_status, no raw ids', () => {
-    const f = fixture('phase-game_over');
+    const f = pinned('phase-game_over');
     const r = draw(f.view, f.viewer, f.legalMoves, false);
     expect(r.column.textContent).toContain('The Covenant wins');
     expect(r.column.textContent).toContain('culture 107');
@@ -364,9 +372,9 @@ describe('NGnG round screens', () => {
   });
 
   for (const name of [
-    'pending-choose_leader', 'pending-choose_starting_location', 'phase-planning', 'pending-upkeep_reallocate_cores-4p',
+    'pending-choose_leader', 'pending-choose_starting_location', 'phase-planning', 'pending-upkeep_reallocate_cores-multi',
     'pending-report_draw', 'pending-treaty_response', 'pending-treaty_break_decision', 'pending-choose_milestone_hero',
-    'pending-choose_spy-4p', 'phase-game_over',
+    'phase-game_over',
   ]) {
     it(`${name}: a watcher has no live control and nothing is sent`, () => {
       const f = fixture(name);
@@ -393,7 +401,7 @@ describe('DiplomacyPanel', () => {
   }
 
   it('draws nothing without a listed form_treaty', () => {
-    const f = fixture('pending-choose_spy-4p');
+    const f = pinned('pending-choose_spy-4p');
     const { ctx } = ctxFor(f, f.legalMoves);
     const r = render(<DiplomacyPanel ctx={ctx} />);
     expect(r.container.textContent).toBe('');
@@ -401,7 +409,7 @@ describe('DiplomacyPanel', () => {
   });
 
   it('offers only the listed partners and types, with printed text, and sends on a press', () => {
-    const f = fixture('pending-choose_spy-4p');
+    const f = pinned('pending-choose_spy-4p');
     const legal = [
       lm({ type: 'form_treaty', partner: 'p1', treaty_type: 'Culture Treaty' }),
       lm({ type: 'form_treaty', partner: 'p1', treaty_type: 'Shared Tactics' }),
@@ -427,7 +435,7 @@ describe('DiplomacyPanel', () => {
   });
 
   it('a seat whose turn it is not cannot open the offer', () => {
-    const f = fixture('pending-choose_spy-4p');
+    const f = pinned('pending-choose_spy-4p');
     const legal = [lm({ type: 'form_treaty', partner: 'p1', treaty_type: 'Peace' })];
     const { ctx } = ctxFor(f, legal, false);
     const r = render(<DiplomacyPanel ctx={ctx} />);

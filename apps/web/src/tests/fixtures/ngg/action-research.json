@@ -41,7 +41,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Archmage Chaimidious (p1)"
+     ],
      "collectors": []
     },
     {
@@ -52,9 +54,7 @@
      "start": 1,
      "base_owner": "p1",
      "units": [],
-     "heroes": [
-      "Archmage Chaimidious (p1)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -293,11 +293,16 @@
   "action_stack": [
    {
     "position": 1,
-    "owner": "p2",
-    "card_kind": "research"
+    "owner": "p1",
+    "card_kind": "build"
    },
    {
     "position": 2,
+    "owner": "p2",
+    "face": "down"
+   },
+   {
+    "position": 3,
     "owner": "p1",
     "card_kind": "research"
    }
@@ -377,7 +382,7 @@
     "heroes": [
      {
       "hero": "Archmage Chaimidious",
-      "coord": "-2,10",
+      "coord": "-2,8",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
@@ -541,7 +546,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Archmage Chaimidious (p1)"
+     ],
      "collectors": []
     },
     {
@@ -552,9 +559,7 @@
      "start": 1,
      "base_owner": "p1",
      "units": [],
-     "heroes": [
-      "Archmage Chaimidious (p1)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -793,11 +798,16 @@
   "action_stack": [
    {
     "position": 1,
+    "owner": "p1",
+    "face": "down"
+   },
+   {
+    "position": 2,
     "owner": "p2",
     "card_kind": "research"
    },
    {
-    "position": 2,
+    "position": 3,
     "owner": "p1",
     "card_kind": "research"
    }
@@ -877,7 +887,7 @@
     "heroes": [
      {
       "hero": "Archmage Chaimidious",
-      "coord": "-2,10",
+      "coord": "-2,8",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"

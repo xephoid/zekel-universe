@@ -1,12 +1,12 @@
 {
  "key": "pending-treaty_response",
  "players": 4,
- "viewer": "p3",
+ "viewer": "p4",
  "view": {
   "game_id": "neither-guts-nor-gears",
   "phase": "action",
-  "round": 25,
-  "active_player_id": "p3",
+  "round": 9,
+  "active_player_id": "p4",
   "first_player_id": "p2",
   "layout": "threeFour",
   "map": {
@@ -19,7 +19,10 @@
      "start": 4,
      "base_owner": "p4",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Archmage Elara (p4)",
+      "Captain Rook Malvane (p4)"
+     ],
      "collectors": []
     },
     {
@@ -46,7 +49,9 @@
      "heroes": [
       "Evo Angel (p3)"
      ],
-     "collectors": []
+     "collectors": [
+      "water-collector-p3 (p3)"
+     ]
     },
     {
      "coord": "-2,8",
@@ -81,15 +86,12 @@
       "Water collector (p3)",
       "Wood collector (p3)",
       "Ore collector (p3)",
-      "Water collector (p3)",
       "Oil collector (p3)",
+      "Water collector (p3)",
       "Wood collector (p3)",
-      "Ore collector (p3)",
-      "Wood collector (p3)"
+      "Ore collector (p3)"
      ],
-     "heroes": [
-      "Marshal Corvin Ashlock (p3)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -101,7 +103,9 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "surf-1 (p4)"
+     ]
     },
     {
      "coord": "-1,3",
@@ -123,7 +127,9 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "surf-2 (p4)"
+     ]
     },
     {
      "coord": "-1,7",
@@ -244,9 +250,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "ore-collector-p1-1 (p1)"
-     ]
+     "collectors": []
     },
     {
      "coord": "0,14",
@@ -257,9 +261,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "water-collector-p1-2 (p1)"
-     ]
+     "collectors": []
     },
     {
      "coord": "1,1",
@@ -291,10 +293,10 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Motherboard (p2)"
-     ],
-     "collectors": []
+     "heroes": [],
+     "collectors": [
+      "water-collector-p1 (p1)"
+     ]
     },
     {
      "coord": "1,7",
@@ -338,9 +340,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "wood-collector-p1 (p1)"
-     ]
+     "collectors": []
     },
     {
      "coord": "2,2",
@@ -350,7 +350,10 @@
      "start": 3,
      "base_owner": "p2",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Marshal Corvin Ashlock (p2)",
+      "Warden Hesper Quill (p2)"
+     ],
      "collectors": []
     },
     {
@@ -361,7 +364,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Motherboard (p2)"
+     ],
      "collectors": []
     },
     {
@@ -411,47 +416,32 @@
       "Wood collector (p1)",
       "Ore collector (p1)",
       "Oil collector (p1)",
-      "Water collector (p1)",
       "Ether collector (p1)",
-      "Wood collector (p1)",
-      "Ore collector (p1)",
-      "Wood collector (p1)",
-      "Spitter Platform (p1)"
+      "Water collector (p1)",
+      "Wood collector (p1)"
      ],
-     "heroes": [
-      "Professor Anselm Kettering (p1)"
-     ],
+     "heroes": [],
      "collectors": []
     }
    ]
   },
-  "hero_pool_count": 14,
+  "hero_pool_count": 12,
   "action_stack": [
    {
     "position": 1,
-    "owner": "p3",
-    "card_kind": "research"
+    "owner": "p2",
+    "face": "down"
    },
    {
     "position": 2,
-    "owner": "p1",
-    "card_kind": "research"
-   },
-   {
-    "position": 3,
-    "owner": "p2",
-    "card_kind": "research"
-   },
-   {
-    "position": 4,
-    "owner": "p4",
+    "owner": "p3",
     "card_kind": "research"
    }
   ],
-  "active_action": "research by p4",
+  "active_action": "research by p3",
   "resolving_action": {
    "card_kind": "research",
-   "owner": "p4"
+   "owner": "p3"
   },
   "treaties": [],
   "battle": null,
@@ -461,10 +451,10 @@
   ],
   "pending": {
    "kind": "treaty_response",
-   "for": "p3",
-   "question": "p3 answers p4's culture-treaty offer",
+   "for": "p4",
+   "question": "p4 answers p3's culture-treaty offer",
    "context": {
-    "proposer": "p4",
+    "proposer": "p3",
     "treaty": "Culture Treaty",
     "culture_income": 10,
     "effect": "Direct partners share an eligible partner's victory. Does not create military allies; partners may fight. Shared victory does not chain. Available only at four or more players. No automatic collection access.",
@@ -473,26 +463,26 @@
   },
   "victory_status": {
    "p1": {
-    "culture": 10,
-    "tech": 9,
-    "leader_kills": 0,
-    "leader_alive": true
-   },
-   "p2": {
-    "culture": 0,
-    "tech": 3,
-    "leader_kills": 0,
-    "leader_alive": true
-   },
-   "p3": {
-    "culture": 8,
+    "culture": 2,
     "tech": 7,
     "leader_kills": 0,
     "leader_alive": true
    },
+   "p2": {
+    "culture": 18,
+    "tech": 4,
+    "leader_kills": 0,
+    "leader_alive": true
+   },
+   "p3": {
+    "culture": 3,
+    "tech": 6,
+    "leader_kills": 0,
+    "leader_alive": true
+   },
    "p4": {
-    "culture": 0,
-    "tech": 3,
+    "culture": 18,
+    "tech": 5,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -504,8 +494,9 @@
     "kind": "human",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 10,
+    "culture": 2,
     "next_milestones": [
+     5,
      15,
      30,
      50,
@@ -513,12 +504,8 @@
     ],
     "mana_current": 0,
     "mana_max": 0,
-    "buildings": [
-     "Combat Frame Production"
-    ],
-    "building_counts": {
-     "combat-frame-production": 1
-    },
+    "buildings": [],
+    "building_counts": {},
     "research": [],
     "tech_progress": {
      "acquired_types": [
@@ -528,12 +515,10 @@
       "home",
       "ore-collector",
       "oil-collector",
-      "ether-collector",
-      "combat-frame-production",
-      "spitter"
+      "ether-collector"
      ],
      "bonus_points_live": 0,
-     "total": 9,
+     "total": 7,
      "target": 18
     },
     "leader_kills": 0,
@@ -541,7 +526,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 5,
+    "cores_supply": 8,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -580,38 +565,20 @@
       "core": "allocated"
      },
      {
-      "id": "u-water-collector-p1-2",
-      "type": "Water collector",
-      "coord": "2,12",
-      "core": "allocated"
-     },
-     {
       "id": "u-ether-collector-p1-1",
       "type": "Ether collector",
       "coord": "2,12",
       "core": "allocated"
      },
      {
+      "id": "u-water-collector-p1-2",
+      "type": "Water collector",
+      "coord": "2,12",
+      "core": "allocated"
+     },
+     {
       "id": "u-wood-collector-p1-2",
       "type": "Wood collector",
-      "coord": "2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-ore-collector-p1-2",
-      "type": "Ore collector",
-      "coord": "2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-wood-collector-p1-3",
-      "type": "Wood collector",
-      "coord": "2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-spitter-p1-1",
-      "type": "Spitter Platform",
       "coord": "2,12",
       "core": "allocated"
      }
@@ -623,13 +590,6 @@
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
-     },
-     {
-      "hero": "Professor Anselm Kettering",
-      "coord": "2,12",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
@@ -637,18 +597,8 @@
     ],
     "committed_collectors": [
      {
-      "collector": "wood-collector-p1",
-      "coord": "1,13",
-      "resource": "wood"
-     },
-     {
-      "collector": "ore-collector-p1-1",
-      "coord": "0,12",
-      "resource": "ore"
-     },
-     {
-      "collector": "water-collector-p1-2",
-      "coord": "0,14",
+      "collector": "water-collector-p1",
+      "coord": "1,5",
       "resource": "water"
      }
     ]
@@ -658,10 +608,8 @@
     "kind": "ai",
     "faction": "The Schism",
     "species": "wizard",
-    "culture": 0,
+    "culture": 18,
     "next_milestones": [
-     5,
-     15,
      30,
      50,
      75
@@ -674,21 +622,22 @@
     "tech_progress": {
      "acquired_types": [
       "surf",
-      "castle"
+      "castle",
+      "subject"
      ],
      "bonus_points_live": 1,
-     "total": 3,
+     "total": 4,
      "target": 22
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
     "leader_alive": true,
-    "subjects": 0,
+    "subjects": 5,
     "cores_reserve": 0,
     "cores_supply": 15,
     "action_cards": {
      "build": 1,
-     "moveBattle": 1,
+     "moveBattle": 2,
      "research": 1
     },
     "action_cards_played_this_round": [
@@ -702,10 +651,24 @@
     "heroes": [
      {
       "hero": "Motherboard",
-      "coord": "1,5",
+      "coord": "2,4",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Marshal Corvin Ashlock",
+      "coord": "2,2",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
+     },
+     {
+      "hero": "Warden Hesper Quill",
+      "coord": "2,2",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
      }
     ],
     "bases": [
@@ -718,8 +681,9 @@
     "kind": "ai",
     "faction": "The Ledger",
     "species": "robot",
-    "culture": 8,
+    "culture": 3,
     "next_milestones": [
+     5,
      15,
      30,
      50,
@@ -727,12 +691,8 @@
     ],
     "mana_current": 0,
     "mana_max": 0,
-    "buildings": [
-     "Diplomatic Research Station"
-    ],
-    "building_counts": {
-     "diplomatic-research-station": 1
-    },
+    "buildings": [],
+    "building_counts": {},
     "research": [],
     "tech_progress": {
      "acquired_types": [
@@ -741,11 +701,10 @@
       "wood-collector",
       "home",
       "ore-collector",
-      "oil-collector",
-      "diplomatic-research-station"
+      "oil-collector"
      ],
      "bonus_points_live": 0,
-     "total": 7,
+     "total": 6,
      "target": 18
     },
     "leader_kills": 0,
@@ -753,10 +712,10 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 1,
-    "cores_supply": 6,
+    "cores_supply": 7,
     "action_cards": {
      "build": 1,
-     "moveBattle": 2,
+     "moveBattle": 1,
      "research": 1
     },
     "action_cards_played_this_round": [
@@ -786,14 +745,14 @@
       "core": "allocated"
      },
      {
-      "id": "u-water-collector-p3-2",
-      "type": "Water collector",
+      "id": "u-oil-collector-p3-1",
+      "type": "Oil collector",
       "coord": "-2,12",
       "core": "allocated"
      },
      {
-      "id": "u-oil-collector-p3-1",
-      "type": "Oil collector",
+      "id": "u-water-collector-p3-2",
+      "type": "Water collector",
       "coord": "-2,12",
       "core": "allocated"
      },
@@ -808,12 +767,6 @@
       "type": "Ore collector",
       "coord": "-2,12",
       "core": "allocated"
-     },
-     {
-      "id": "u-wood-collector-p3-3",
-      "type": "Wood collector",
-      "coord": "-2,12",
-      "core": "allocated"
      }
     ],
     "heroes": [
@@ -823,51 +776,54 @@
       "is_leader": true,
       "dead": false,
       "stats": "Init 80 DMG 4 DEF 6"
-     },
-     {
-      "hero": "Marshal Corvin Ashlock",
-      "coord": "-2,12",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 70 DMG 3 DEF 4"
      }
     ],
     "bases": [
      "-2,12"
     ],
-    "committed_collectors": []
+    "committed_collectors": [
+     {
+      "collector": "water-collector-p3",
+      "coord": "-2,6",
+      "resource": "water"
+     }
+    ]
    },
    {
     "player_id": "p4",
     "kind": "ai",
     "faction": "The Brass Circle",
     "species": "wizard",
-    "culture": 0,
+    "culture": 18,
     "next_milestones": [
-     5,
-     15,
      30,
      50,
      75
     ],
     "mana_current": 5,
     "mana_max": 5,
-    "buildings": [],
-    "building_counts": {},
+    "buildings": [
+     "Embassy"
+    ],
+    "building_counts": {
+     "embassy": 1
+    },
     "research": [],
     "tech_progress": {
      "acquired_types": [
       "surf",
-      "castle"
+      "castle",
+      "subject",
+      "embassy"
      ],
      "bonus_points_live": 1,
-     "total": 3,
+     "total": 5,
      "target": 22
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
     "leader_alive": true,
-    "subjects": 0,
+    "subjects": 5,
     "cores_reserve": 0,
     "cores_supply": 15,
     "action_cards": {
@@ -890,12 +846,37 @@
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Archmage Elara",
+      "coord": "-2,2",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
+     },
+     {
+      "hero": "Captain Rook Malvane",
+      "coord": "-2,2",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
      }
     ],
     "bases": [
      "-2,2"
     ],
-    "committed_collectors": []
+    "committed_collectors": [
+     {
+      "collector": "surf-1",
+      "coord": "-1,1",
+      "resource": "wood"
+     },
+     {
+      "collector": "surf-2",
+      "coord": "-1,5",
+      "resource": "wood"
+     }
+    ]
    }
   ],
   "your_battle_hand": [],
@@ -906,7 +887,7 @@
  "legalMoves": [
   {
    "move_id": "",
-   "description": "Accept Culture Treaty from p4 — Direct partners share an eligible partner's victory. Does not create military allies; partners may fight. Shared victory does not chain. Available only at four or more players. No automatic collection access. (+10 culture each per round).",
+   "description": "Accept Culture Treaty from p3 — Direct partners share an eligible partner's victory. Does not create military allies; partners may fight. Shared victory does not chain. Available only at four or more players. No automatic collection access. (+10 culture each per round).",
    "move": {
     "type": "respond_treaty",
     "accept": true
@@ -914,7 +895,7 @@
   },
   {
    "move_id": "",
-   "description": "Decline Culture Treaty from p4.",
+   "description": "Decline Culture Treaty from p3.",
    "move": {
     "type": "respond_treaty",
     "accept": false
@@ -925,8 +906,8 @@
  "watcherView": {
   "game_id": "neither-guts-nor-gears",
   "phase": "action",
-  "round": 25,
-  "active_player_id": "p3",
+  "round": 9,
+  "active_player_id": "p4",
   "first_player_id": "p2",
   "layout": "threeFour",
   "map": {
@@ -939,7 +920,10 @@
      "start": 4,
      "base_owner": "p4",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Archmage Elara (p4)",
+      "Captain Rook Malvane (p4)"
+     ],
      "collectors": []
     },
     {
@@ -966,7 +950,9 @@
      "heroes": [
       "Evo Angel (p3)"
      ],
-     "collectors": []
+     "collectors": [
+      "water-collector-p3 (p3)"
+     ]
     },
     {
      "coord": "-2,8",
@@ -1001,15 +987,12 @@
       "Water collector (p3)",
       "Wood collector (p3)",
       "Ore collector (p3)",
-      "Water collector (p3)",
       "Oil collector (p3)",
+      "Water collector (p3)",
       "Wood collector (p3)",
-      "Ore collector (p3)",
-      "Wood collector (p3)"
+      "Ore collector (p3)"
      ],
-     "heroes": [
-      "Marshal Corvin Ashlock (p3)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -1021,7 +1004,9 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "surf-1 (p4)"
+     ]
     },
     {
      "coord": "-1,3",
@@ -1043,7 +1028,9 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "surf-2 (p4)"
+     ]
     },
     {
      "coord": "-1,7",
@@ -1164,9 +1151,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "ore-collector-p1-1 (p1)"
-     ]
+     "collectors": []
     },
     {
      "coord": "0,14",
@@ -1177,9 +1162,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "water-collector-p1-2 (p1)"
-     ]
+     "collectors": []
     },
     {
      "coord": "1,1",
@@ -1211,10 +1194,10 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Motherboard (p2)"
-     ],
-     "collectors": []
+     "heroes": [],
+     "collectors": [
+      "water-collector-p1 (p1)"
+     ]
     },
     {
      "coord": "1,7",
@@ -1258,9 +1241,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "wood-collector-p1 (p1)"
-     ]
+     "collectors": []
     },
     {
      "coord": "2,2",
@@ -1270,7 +1251,10 @@
      "start": 3,
      "base_owner": "p2",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Marshal Corvin Ashlock (p2)",
+      "Warden Hesper Quill (p2)"
+     ],
      "collectors": []
     },
     {
@@ -1281,7 +1265,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Motherboard (p2)"
+     ],
      "collectors": []
     },
     {
@@ -1331,47 +1317,32 @@
       "Wood collector (p1)",
       "Ore collector (p1)",
       "Oil collector (p1)",
-      "Water collector (p1)",
       "Ether collector (p1)",
-      "Wood collector (p1)",
-      "Ore collector (p1)",
-      "Wood collector (p1)",
-      "Spitter Platform (p1)"
+      "Water collector (p1)",
+      "Wood collector (p1)"
      ],
-     "heroes": [
-      "Professor Anselm Kettering (p1)"
-     ],
+     "heroes": [],
      "collectors": []
     }
    ]
   },
-  "hero_pool_count": 14,
+  "hero_pool_count": 12,
   "action_stack": [
    {
     "position": 1,
-    "owner": "p3",
-    "card_kind": "research"
+    "owner": "p2",
+    "face": "down"
    },
    {
     "position": 2,
-    "owner": "p1",
-    "card_kind": "research"
-   },
-   {
-    "position": 3,
-    "owner": "p2",
-    "card_kind": "research"
-   },
-   {
-    "position": 4,
-    "owner": "p4",
+    "owner": "p3",
     "card_kind": "research"
    }
   ],
-  "active_action": "research by p4",
+  "active_action": "research by p3",
   "resolving_action": {
    "card_kind": "research",
-   "owner": "p4"
+   "owner": "p3"
   },
   "treaties": [],
   "battle": null,
@@ -1381,10 +1352,10 @@
   ],
   "pending": {
    "kind": "treaty_response",
-   "for": "p3",
-   "question": "p3 answers p4's culture-treaty offer",
+   "for": "p4",
+   "question": "p4 answers p3's culture-treaty offer",
    "context": {
-    "proposer": "p4",
+    "proposer": "p3",
     "treaty": "Culture Treaty",
     "culture_income": 10,
     "effect": "Direct partners share an eligible partner's victory. Does not create military allies; partners may fight. Shared victory does not chain. Available only at four or more players. No automatic collection access.",
@@ -1393,26 +1364,26 @@
   },
   "victory_status": {
    "p1": {
-    "culture": 10,
-    "tech": 9,
-    "leader_kills": 0,
-    "leader_alive": true
-   },
-   "p2": {
-    "culture": 0,
-    "tech": 3,
-    "leader_kills": 0,
-    "leader_alive": true
-   },
-   "p3": {
-    "culture": 8,
+    "culture": 2,
     "tech": 7,
     "leader_kills": 0,
     "leader_alive": true
    },
+   "p2": {
+    "culture": 18,
+    "tech": 4,
+    "leader_kills": 0,
+    "leader_alive": true
+   },
+   "p3": {
+    "culture": 3,
+    "tech": 6,
+    "leader_kills": 0,
+    "leader_alive": true
+   },
    "p4": {
-    "culture": 0,
-    "tech": 3,
+    "culture": 18,
+    "tech": 5,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -1424,8 +1395,9 @@
     "kind": "human",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 10,
+    "culture": 2,
     "next_milestones": [
+     5,
      15,
      30,
      50,
@@ -1433,12 +1405,8 @@
     ],
     "mana_current": 0,
     "mana_max": 0,
-    "buildings": [
-     "Combat Frame Production"
-    ],
-    "building_counts": {
-     "combat-frame-production": 1
-    },
+    "buildings": [],
+    "building_counts": {},
     "research": [],
     "tech_progress": {
      "acquired_types": [
@@ -1448,12 +1416,10 @@
       "home",
       "ore-collector",
       "oil-collector",
-      "ether-collector",
-      "combat-frame-production",
-      "spitter"
+      "ether-collector"
      ],
      "bonus_points_live": 0,
-     "total": 9,
+     "total": 7,
      "target": 18
     },
     "leader_kills": 0,
@@ -1461,7 +1427,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 5,
+    "cores_supply": 8,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -1500,38 +1466,20 @@
       "core": "allocated"
      },
      {
-      "id": "u-water-collector-p1-2",
-      "type": "Water collector",
-      "coord": "2,12",
-      "core": "allocated"
-     },
-     {
       "id": "u-ether-collector-p1-1",
       "type": "Ether collector",
       "coord": "2,12",
       "core": "allocated"
      },
      {
+      "id": "u-water-collector-p1-2",
+      "type": "Water collector",
+      "coord": "2,12",
+      "core": "allocated"
+     },
+     {
       "id": "u-wood-collector-p1-2",
       "type": "Wood collector",
-      "coord": "2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-ore-collector-p1-2",
-      "type": "Ore collector",
-      "coord": "2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-wood-collector-p1-3",
-      "type": "Wood collector",
-      "coord": "2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-spitter-p1-1",
-      "type": "Spitter Platform",
       "coord": "2,12",
       "core": "allocated"
      }
@@ -1543,13 +1491,6 @@
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
-     },
-     {
-      "hero": "Professor Anselm Kettering",
-      "coord": "2,12",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
@@ -1557,18 +1498,8 @@
     ],
     "committed_collectors": [
      {
-      "collector": "wood-collector-p1",
-      "coord": "1,13",
-      "resource": "wood"
-     },
-     {
-      "collector": "ore-collector-p1-1",
-      "coord": "0,12",
-      "resource": "ore"
-     },
-     {
-      "collector": "water-collector-p1-2",
-      "coord": "0,14",
+      "collector": "water-collector-p1",
+      "coord": "1,5",
       "resource": "water"
      }
     ]
@@ -1578,10 +1509,8 @@
     "kind": "ai",
     "faction": "The Schism",
     "species": "wizard",
-    "culture": 0,
+    "culture": 18,
     "next_milestones": [
-     5,
-     15,
      30,
      50,
      75
@@ -1594,21 +1523,22 @@
     "tech_progress": {
      "acquired_types": [
       "surf",
-      "castle"
+      "castle",
+      "subject"
      ],
      "bonus_points_live": 1,
-     "total": 3,
+     "total": 4,
      "target": 22
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
     "leader_alive": true,
-    "subjects": 0,
+    "subjects": 5,
     "cores_reserve": 0,
     "cores_supply": 15,
     "action_cards": {
      "build": 1,
-     "moveBattle": 1,
+     "moveBattle": 2,
      "research": 1
     },
     "action_cards_played_this_round": [
@@ -1622,10 +1552,24 @@
     "heroes": [
      {
       "hero": "Motherboard",
-      "coord": "1,5",
+      "coord": "2,4",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Marshal Corvin Ashlock",
+      "coord": "2,2",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
+     },
+     {
+      "hero": "Warden Hesper Quill",
+      "coord": "2,2",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
      }
     ],
     "bases": [
@@ -1638,8 +1582,9 @@
     "kind": "ai",
     "faction": "The Ledger",
     "species": "robot",
-    "culture": 8,
+    "culture": 3,
     "next_milestones": [
+     5,
      15,
      30,
      50,
@@ -1647,12 +1592,8 @@
     ],
     "mana_current": 0,
     "mana_max": 0,
-    "buildings": [
-     "Diplomatic Research Station"
-    ],
-    "building_counts": {
-     "diplomatic-research-station": 1
-    },
+    "buildings": [],
+    "building_counts": {},
     "research": [],
     "tech_progress": {
      "acquired_types": [
@@ -1661,11 +1602,10 @@
       "wood-collector",
       "home",
       "ore-collector",
-      "oil-collector",
-      "diplomatic-research-station"
+      "oil-collector"
      ],
      "bonus_points_live": 0,
-     "total": 7,
+     "total": 6,
      "target": 18
     },
     "leader_kills": 0,
@@ -1673,10 +1613,10 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 1,
-    "cores_supply": 6,
+    "cores_supply": 7,
     "action_cards": {
      "build": 1,
-     "moveBattle": 2,
+     "moveBattle": 1,
      "research": 1
     },
     "action_cards_played_this_round": [
@@ -1706,14 +1646,14 @@
       "core": "allocated"
      },
      {
-      "id": "u-water-collector-p3-2",
-      "type": "Water collector",
+      "id": "u-oil-collector-p3-1",
+      "type": "Oil collector",
       "coord": "-2,12",
       "core": "allocated"
      },
      {
-      "id": "u-oil-collector-p3-1",
-      "type": "Oil collector",
+      "id": "u-water-collector-p3-2",
+      "type": "Water collector",
       "coord": "-2,12",
       "core": "allocated"
      },
@@ -1728,12 +1668,6 @@
       "type": "Ore collector",
       "coord": "-2,12",
       "core": "allocated"
-     },
-     {
-      "id": "u-wood-collector-p3-3",
-      "type": "Wood collector",
-      "coord": "-2,12",
-      "core": "allocated"
      }
     ],
     "heroes": [
@@ -1743,51 +1677,54 @@
       "is_leader": true,
       "dead": false,
       "stats": "Init 80 DMG 4 DEF 6"
-     },
-     {
-      "hero": "Marshal Corvin Ashlock",
-      "coord": "-2,12",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 70 DMG 3 DEF 4"
      }
     ],
     "bases": [
      "-2,12"
     ],
-    "committed_collectors": []
+    "committed_collectors": [
+     {
+      "collector": "water-collector-p3",
+      "coord": "-2,6",
+      "resource": "water"
+     }
+    ]
    },
    {
     "player_id": "p4",
     "kind": "ai",
     "faction": "The Brass Circle",
     "species": "wizard",
-    "culture": 0,
+    "culture": 18,
     "next_milestones": [
-     5,
-     15,
      30,
      50,
      75
     ],
     "mana_current": 5,
     "mana_max": 5,
-    "buildings": [],
-    "building_counts": {},
+    "buildings": [
+     "Embassy"
+    ],
+    "building_counts": {
+     "embassy": 1
+    },
     "research": [],
     "tech_progress": {
      "acquired_types": [
       "surf",
-      "castle"
+      "castle",
+      "subject",
+      "embassy"
      ],
      "bonus_points_live": 1,
-     "total": 3,
+     "total": 5,
      "target": 22
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
     "leader_alive": true,
-    "subjects": 0,
+    "subjects": 5,
     "cores_reserve": 0,
     "cores_supply": 15,
     "action_cards": {
@@ -1810,12 +1747,37 @@
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Archmage Elara",
+      "coord": "-2,2",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
+     },
+     {
+      "hero": "Captain Rook Malvane",
+      "coord": "-2,2",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
      }
     ],
     "bases": [
      "-2,2"
     ],
-    "committed_collectors": []
+    "committed_collectors": [
+     {
+      "collector": "surf-1",
+      "coord": "-1,1",
+      "resource": "wood"
+     },
+     {
+      "collector": "surf-2",
+      "coord": "-1,5",
+      "resource": "wood"
+     }
+    ]
    }
   ],
   "your_battle_hand": [],

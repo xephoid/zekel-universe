@@ -1,11 +1,11 @@
 {
- "key": "battle-activations",
+ "key": "action-move_battle",
  "players": 4,
  "viewer": "p1",
  "view": {
   "game_id": "neither-guts-nor-gears",
   "phase": "action",
-  "round": 13,
+  "round": 1,
   "active_player_id": "p1",
   "first_player_id": "p2",
   "layout": "threeFour",
@@ -19,7 +19,9 @@
      "start": 4,
      "base_owner": "p4",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Technomancer Greymore (p4)"
+     ],
      "collectors": []
     },
     {
@@ -30,9 +32,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Technomancer Greymore (p4)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -43,9 +43,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Evo Angel (p3)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -79,13 +77,11 @@
      "base_owner": "p3",
      "units": [
       "Water collector (p3)",
-      "Wood collector (p3)",
-      "Ore collector (p3)",
-      "Water collector (p3)",
-      "Oil collector (p3)",
       "Wood collector (p3)"
      ],
-     "heroes": [],
+     "heroes": [
+      "Evo Angel (p3)"
+     ],
      "collectors": []
     },
     {
@@ -338,7 +334,9 @@
      "start": 3,
      "base_owner": "p2",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Motherboard (p2)"
+     ],
      "collectors": []
     },
     {
@@ -349,10 +347,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Archmage Chaimidious (p1)",
-      "Motherboard (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -397,13 +392,11 @@
      "base_owner": "p1",
      "units": [
       "Water collector (p1)",
-      "Wood collector (p1)",
-      "Ore collector (p1)",
-      "Oil collector (p1)",
-      "Water collector (p1)",
-      "Ether collector (p1)"
+      "Wood collector (p1)"
      ],
-     "heroes": [],
+     "heroes": [
+      "Archmage Chaimidious (p1)"
+     ],
      "collectors": []
     }
    ]
@@ -453,17 +446,17 @@
    {
     "position": 9,
     "owner": "p2",
-    "card_kind": "move_battle"
+    "face": "down"
    },
    {
     "position": 10,
     "owner": "p3",
-    "card_kind": "move_battle"
+    "face": "down"
    },
    {
     "position": 11,
     "owner": "p4",
-    "card_kind": "move_battle"
+    "face": "down"
    },
    {
     "position": 12,
@@ -477,51 +470,14 @@
    "owner": "p1"
   },
   "treaties": [],
-  "battle": {
-   "coord": "2,4",
-   "origin": "2,6",
-   "phase": "activations",
-   "pass": 1,
-   "units": [
-    {
-     "unit": "Archmage Chaimidious",
-     "ref": "chaimidious",
-     "owner": "p1",
-     "side": "attackers",
-     "init": 70,
-     "dmg": 3,
-     "def": 6,
-     "activated": false
-    },
-    {
-     "unit": "Motherboard",
-     "ref": "motherboard",
-     "owner": "p2",
-     "side": "defenders",
-     "init": 30,
-     "dmg": 1,
-     "def": 5,
-     "activated": false
-    }
-   ],
-   "commitments": [
-    {
-     "card": "Counter",
-     "by": "p1",
-     "resolved": true,
-     "countered": false
-    }
-   ]
-  },
-  "battle_deck_count": 39,
-  "battle_discard": [
-   "Counter"
-  ],
+  "battle": null,
+  "battle_deck_count": 38,
+  "battle_discard": [],
   "pending": null,
   "victory_status": {
    "p1": {
-    "culture": 4,
-    "tech": 7,
+    "culture": 0,
+    "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
@@ -532,8 +488,8 @@
     "leader_alive": true
    },
    "p3": {
-    "culture": 4,
-    "tech": 6,
+    "culture": 0,
+    "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
@@ -551,7 +507,7 @@
     "kind": "human",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 4,
+    "culture": 0,
     "next_milestones": [
      5,
      15,
@@ -569,21 +525,18 @@
       "core",
       "water-collector",
       "wood-collector",
-      "home",
-      "ore-collector",
-      "oil-collector",
-      "ether-collector"
+      "home"
      ],
      "bonus_points_live": 0,
-     "total": 7,
+     "total": 4,
      "target": 18
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
     "leader_alive": true,
     "subjects": 0,
-    "cores_reserve": 1,
-    "cores_supply": 8,
+    "cores_reserve": 0,
+    "cores_supply": 13,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -594,7 +547,7 @@
      "build:base",
      "move_battle:base"
     ],
-    "battle_hand_count": 0,
+    "battle_hand_count": 1,
     "spy_recruitments": 0,
     "units": [
      {
@@ -608,36 +561,12 @@
       "type": "Wood collector",
       "coord": "2,12",
       "core": "allocated"
-     },
-     {
-      "id": "u-ore-collector-p1-1",
-      "type": "Ore collector",
-      "coord": "2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-oil-collector-p1-1",
-      "type": "Oil collector",
-      "coord": "2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-water-collector-p1-2",
-      "type": "Water collector",
-      "coord": "2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-ether-collector-p1-1",
-      "type": "Ether collector",
-      "coord": "2,12",
-      "core": "allocated"
      }
     ],
     "heroes": [
      {
       "hero": "Archmage Chaimidious",
-      "coord": "2,4",
+      "coord": "2,12",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
@@ -697,7 +626,7 @@
     "heroes": [
      {
       "hero": "Motherboard",
-      "coord": "2,4",
+      "coord": "2,2",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
@@ -713,7 +642,7 @@
     "kind": "ai",
     "faction": "The Ledger",
     "species": "robot",
-    "culture": 4,
+    "culture": 0,
     "next_milestones": [
      5,
      15,
@@ -731,12 +660,10 @@
       "core",
       "water-collector",
       "wood-collector",
-      "home",
-      "ore-collector",
-      "oil-collector"
+      "home"
      ],
      "bonus_points_live": 0,
-     "total": 6,
+     "total": 4,
      "target": 18
     },
     "leader_kills": 0,
@@ -744,7 +671,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 9,
+    "cores_supply": 13,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -769,36 +696,12 @@
       "type": "Wood collector",
       "coord": "-2,12",
       "core": "allocated"
-     },
-     {
-      "id": "u-ore-collector-p3-1",
-      "type": "Ore collector",
-      "coord": "-2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-water-collector-p3-2",
-      "type": "Water collector",
-      "coord": "-2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-oil-collector-p3-1",
-      "type": "Oil collector",
-      "coord": "-2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-wood-collector-p3-2",
-      "type": "Wood collector",
-      "coord": "-2,12",
-      "core": "allocated"
      }
     ],
     "heroes": [
      {
       "hero": "Evo Angel",
-      "coord": "-2,6",
+      "coord": "-2,12",
       "is_leader": true,
       "dead": false,
       "stats": "Init 80 DMG 4 DEF 6"
@@ -858,7 +761,7 @@
     "heroes": [
      {
       "hero": "Technomancer Greymore",
-      "coord": "-2,4",
+      "coord": "-2,2",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
@@ -870,7 +773,12 @@
     "committed_collectors": []
    }
   ],
-  "your_battle_hand": [],
+  "your_battle_hand": [
+   {
+    "card": "Counter",
+    "effect": "Counter a battle strategy card that has not yet resolved."
+   }
+  ],
   "your_spy_assignments": [],
   "your_knowledge": [],
   "your_reserved_heroes": []
@@ -878,25 +786,45 @@
  "legalMoves": [
   {
    "move_id": "",
-   "description": "Archmage Chaimidious attacks Motherboard (p2) — DMG 3 vs DEF 5.",
+   "description": "Move Archmage Chaimidious from 2,12 to 2,10 (ore).",
    "move": {
-    "type": "battle_activation",
-    "unit": "chaimidious",
-    "action": {
-     "kind": "attack",
-     "target": "motherboard"
-    }
+    "type": "move_units",
+    "from": "2,12",
+    "to": "2,10",
+    "units": [
+     "chaimidious"
+    ]
    }
   },
   {
    "move_id": "",
-   "description": "Archmage Chaimidious passes its activation (used for the pass).",
+   "description": "Move Archmage Chaimidious from 2,12 to 1,11 (ore).",
    "move": {
-    "type": "battle_activation",
-    "unit": "chaimidious",
-    "action": {
-     "kind": "pass"
-    }
+    "type": "move_units",
+    "from": "2,12",
+    "to": "1,11",
+    "units": [
+     "chaimidious"
+    ]
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Move Archmage Chaimidious from 2,12 to 1,13 (wood).",
+   "move": {
+    "type": "move_units",
+    "from": "2,12",
+    "to": "1,13",
+    "units": [
+     "chaimidious"
+    ]
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Skip this Move/Battle action.",
+   "move": {
+    "type": "skip_action"
    }
   }
  ],
@@ -904,7 +832,7 @@
  "watcherView": {
   "game_id": "neither-guts-nor-gears",
   "phase": "action",
-  "round": 13,
+  "round": 1,
   "active_player_id": "p1",
   "first_player_id": "p2",
   "layout": "threeFour",
@@ -918,7 +846,9 @@
      "start": 4,
      "base_owner": "p4",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Technomancer Greymore (p4)"
+     ],
      "collectors": []
     },
     {
@@ -929,9 +859,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Technomancer Greymore (p4)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -942,9 +870,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Evo Angel (p3)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -978,13 +904,11 @@
      "base_owner": "p3",
      "units": [
       "Water collector (p3)",
-      "Wood collector (p3)",
-      "Ore collector (p3)",
-      "Water collector (p3)",
-      "Oil collector (p3)",
       "Wood collector (p3)"
      ],
-     "heroes": [],
+     "heroes": [
+      "Evo Angel (p3)"
+     ],
      "collectors": []
     },
     {
@@ -1237,7 +1161,9 @@
      "start": 3,
      "base_owner": "p2",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Motherboard (p2)"
+     ],
      "collectors": []
     },
     {
@@ -1248,10 +1174,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Archmage Chaimidious (p1)",
-      "Motherboard (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -1296,13 +1219,11 @@
      "base_owner": "p1",
      "units": [
       "Water collector (p1)",
-      "Wood collector (p1)",
-      "Ore collector (p1)",
-      "Oil collector (p1)",
-      "Water collector (p1)",
-      "Ether collector (p1)"
+      "Wood collector (p1)"
      ],
-     "heroes": [],
+     "heroes": [
+      "Archmage Chaimidious (p1)"
+     ],
      "collectors": []
     }
    ]
@@ -1357,12 +1278,12 @@
    {
     "position": 10,
     "owner": "p3",
-    "card_kind": "move_battle"
+    "face": "down"
    },
    {
     "position": 11,
     "owner": "p4",
-    "card_kind": "move_battle"
+    "face": "down"
    },
    {
     "position": 12,
@@ -1376,51 +1297,14 @@
    "owner": "p1"
   },
   "treaties": [],
-  "battle": {
-   "coord": "2,4",
-   "origin": "2,6",
-   "phase": "activations",
-   "pass": 1,
-   "units": [
-    {
-     "unit": "Archmage Chaimidious",
-     "ref": "chaimidious",
-     "owner": "p1",
-     "side": "attackers",
-     "init": 70,
-     "dmg": 3,
-     "def": 6,
-     "activated": false
-    },
-    {
-     "unit": "Motherboard",
-     "ref": "motherboard",
-     "owner": "p2",
-     "side": "defenders",
-     "init": 30,
-     "dmg": 1,
-     "def": 5,
-     "activated": false
-    }
-   ],
-   "commitments": [
-    {
-     "card": "Counter",
-     "by": "p1",
-     "resolved": true,
-     "countered": false
-    }
-   ]
-  },
-  "battle_deck_count": 39,
-  "battle_discard": [
-   "Counter"
-  ],
+  "battle": null,
+  "battle_deck_count": 38,
+  "battle_discard": [],
   "pending": null,
   "victory_status": {
    "p1": {
-    "culture": 4,
-    "tech": 7,
+    "culture": 0,
+    "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
@@ -1431,8 +1315,8 @@
     "leader_alive": true
    },
    "p3": {
-    "culture": 4,
-    "tech": 6,
+    "culture": 0,
+    "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
@@ -1450,7 +1334,7 @@
     "kind": "human",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 4,
+    "culture": 0,
     "next_milestones": [
      5,
      15,
@@ -1468,21 +1352,18 @@
       "core",
       "water-collector",
       "wood-collector",
-      "home",
-      "ore-collector",
-      "oil-collector",
-      "ether-collector"
+      "home"
      ],
      "bonus_points_live": 0,
-     "total": 7,
+     "total": 4,
      "target": 18
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
     "leader_alive": true,
     "subjects": 0,
-    "cores_reserve": 1,
-    "cores_supply": 8,
+    "cores_reserve": 0,
+    "cores_supply": 13,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -1493,7 +1374,7 @@
      "build:base",
      "move_battle:base"
     ],
-    "battle_hand_count": 0,
+    "battle_hand_count": 1,
     "spy_recruitments": 0,
     "units": [
      {
@@ -1507,36 +1388,12 @@
       "type": "Wood collector",
       "coord": "2,12",
       "core": "allocated"
-     },
-     {
-      "id": "u-ore-collector-p1-1",
-      "type": "Ore collector",
-      "coord": "2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-oil-collector-p1-1",
-      "type": "Oil collector",
-      "coord": "2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-water-collector-p1-2",
-      "type": "Water collector",
-      "coord": "2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-ether-collector-p1-1",
-      "type": "Ether collector",
-      "coord": "2,12",
-      "core": "allocated"
      }
     ],
     "heroes": [
      {
       "hero": "Archmage Chaimidious",
-      "coord": "2,4",
+      "coord": "2,12",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
@@ -1596,7 +1453,7 @@
     "heroes": [
      {
       "hero": "Motherboard",
-      "coord": "2,4",
+      "coord": "2,2",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
@@ -1612,7 +1469,7 @@
     "kind": "ai",
     "faction": "The Ledger",
     "species": "robot",
-    "culture": 4,
+    "culture": 0,
     "next_milestones": [
      5,
      15,
@@ -1630,12 +1487,10 @@
       "core",
       "water-collector",
       "wood-collector",
-      "home",
-      "ore-collector",
-      "oil-collector"
+      "home"
      ],
      "bonus_points_live": 0,
-     "total": 6,
+     "total": 4,
      "target": 18
     },
     "leader_kills": 0,
@@ -1643,7 +1498,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 9,
+    "cores_supply": 13,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -1668,36 +1523,12 @@
       "type": "Wood collector",
       "coord": "-2,12",
       "core": "allocated"
-     },
-     {
-      "id": "u-ore-collector-p3-1",
-      "type": "Ore collector",
-      "coord": "-2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-water-collector-p3-2",
-      "type": "Water collector",
-      "coord": "-2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-oil-collector-p3-1",
-      "type": "Oil collector",
-      "coord": "-2,12",
-      "core": "allocated"
-     },
-     {
-      "id": "u-wood-collector-p3-2",
-      "type": "Wood collector",
-      "coord": "-2,12",
-      "core": "allocated"
      }
     ],
     "heroes": [
      {
       "hero": "Evo Angel",
-      "coord": "-2,6",
+      "coord": "-2,12",
       "is_leader": true,
       "dead": false,
       "stats": "Init 80 DMG 4 DEF 6"
@@ -1757,7 +1588,7 @@
     "heroes": [
      {
       "hero": "Technomancer Greymore",
-      "coord": "-2,4",
+      "coord": "-2,2",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"

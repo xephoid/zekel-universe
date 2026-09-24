@@ -50,7 +50,10 @@ function capture(s, key, who) {
     watcherView: game.getPlayerView(s, others[0]),
     watcherLegalMoves: game.getLegalMoves(s, others[0]),
   };
-  const named = key.split('-').length > 2 || key.startsWith('action-build-') ? key : `${key}${s.players.length === 2 ? '' : `-${s.players.length}p`}`;
+  // A stable name: the key for a two-seat game, "-multi" for a larger one
+  // (the record keeps the seat count), so tests can name what they read.
+  const special = key.split('-').length > 2 || key.startsWith('action-build-');
+  const named = special ? key : `${key}${s.players.length === 2 ? '' : '-multi'}`;
   writeFileSync(join(outDir, `${named}.json`), JSON.stringify(record, null, 1));
 }
 
