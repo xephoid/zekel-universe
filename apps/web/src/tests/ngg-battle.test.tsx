@@ -27,11 +27,12 @@ const ALL = Object.fromEntries(
 );
 
 const BATTLE_FIXTURES = [
-  'action-move_battle', 'action-move_battle-4p', 'pending-elara_spell', 'pending-elara_spell-3p',
+  'action-move_battle', 'action-move_battle-4p', 'pending-elara_spell', 'pending-elara_spell-4p',
   'pending-battle_commit-4p', 'pending-battle_commit-shared_tactics', 'pending-battle_commit-reserved',
-  'pending-counter_target-4p', 'pending-counter_target-batches', 'pending-extra_selection-3p', 'pending-extra_selection-shut',
-  'battle-activations-3p', 'pending-battle_defense-decoy', 'pending-battle_defense-mana_shield', 'pending-battle_defense-cleric',
-  'pending-retreat-3p', 'pending-rally_selection-6p',
+  'pending-counter_target-batches', 'pending-extra_selection-3p', 'pending-extra_selection-shut',
+  'battle-activations-4p', 'battle-activations-infiltrator',
+  'pending-battle_defense-decoy', 'pending-battle_defense-mana_shield', 'pending-battle_defense-cleric',
+  'pending-retreat-4p', 'pending-rally_selection-6p',
 ];
 
 function fx(name: string): Fixture {
@@ -133,11 +134,16 @@ describe('NGnG battle screens', () => {
     expect(sentListed(r.onMove, r.legalMoves)).toEqual({ type: 'choose_counter_target', card: 'Rally' });
   });
 
-  it('Card Batch: with no open target there is nothing to press', () => {
-    const r = decider('pending-counter_target-4p');
-    expect(r.container.textContent).toContain('A Counter cannot target itself');
-    const live = [...r.container.querySelectorAll('.ngg-column button')].filter((b) => !(b as HTMLButtonElement).disabled);
-    expect(live).toHaveLength(0);
+  it('Card Batch: the engine never asks for a Counter with nothing it may cancel', () => {
+    // A Counter with no open target resolves by itself in the engine; every
+    // captured Counter decision has at least one target to press.
+    const counters = Object.values(ALL).filter((f) => f.key === 'pending-counter_target');
+    expect(counters.length).toBeGreaterThan(0);
+    for (const f of counters) {
+      const options = (f.view as { pending: { options: Array<{ move?: unknown }> } }).pending.options;
+      expect(options.some((o) => o.move)).toBe(true);
+      expect(f.legalMoves.length).toBeGreaterThan(0);
+    }
   });
 
   it('Battle Extra: two picks send the listed pair; Add none sends the listed empty pick', () => {
@@ -157,17 +163,30 @@ describe('NGnG battle screens', () => {
   });
 
   it('Battle Activation: action, then target, then the listed move; Pass is its own press', () => {
-    const r = decider('battle-activations-3p');
-    expect(r.container.textContent).toContain('Archmage Chaimidious activates');
+    const r = decider('battle-activations-infiltrator');
+    expect(r.container.textContent).toContain('Kestrel Nine activates');
     press(r.container, /^Attack/);
-    press(r.container, 'Technomancer Greymore');
+    press(r.container, 'Evoker');
     expect(r.onMove).not.toHaveBeenCalled();
-    press(r.container, 'Attack Technomancer Greymore');
-    expect(sentListed(r.onMove, r.legalMoves)).toEqual({ type: 'battle_activation', unit: 'chaimidious', action: { kind: 'attack', target: 'greymore' } });
+    press(r.container, /^Attack .*Evoker/);
+    expect(sentListed(r.onMove, r.legalMoves)).toEqual({ type: 'battle_activation', unit: 'kestrel', action: { kind: 'attack', target: 'u-evoker-wiz-1' } });
     cleanup();
-    const p = decider('battle-activations-3p');
+    const p = decider('battle-activations-infiltrator');
     press(p.container, 'Pass the activation');
-    expect(sentListed(p.onMove, p.legalMoves)).toEqual({ type: 'battle_activation', unit: 'chaimidious', action: { kind: 'pass' } });
+    expect(sentListed(p.onMove, p.legalMoves)).toEqual({ type: 'battle_activation', unit: 'kestrel', action: { kind: 'pass' } });
+  });
+
+  it("Robot Infiltrator: the look is its own control, and sends the engine's listed move", () => {
+    const r = decider('battle-activations-infiltrator');
+    const look = r.legalMoves.find((m) => m.move['type'] === 'use_detection')!;
+    expect(look).toBeTruthy();
+    const buttons = [...r.container.querySelectorAll('button')].filter((b) => !b.disabled && /Detection|Look/i.test(b.textContent ?? ''));
+    expect(buttons.length).toBeGreaterThan(0);
+    fireEvent.click(buttons[buttons.length - 1]!);
+    // One press may pick the seat, a second confirms; either way only the listed look goes out.
+    const confirm = [...r.container.querySelectorAll('button')].filter((b) => !b.disabled && /^(Look|Inspect|Use Detection)/i.test(b.textContent ?? ''));
+    if (r.onMove.mock.calls.length === 0 && confirm.length) fireEvent.click(confirm[0]!);
+    expect(sentListed(r.onMove, r.legalMoves)).toEqual(look.move);
   });
 
   it('Battle Defense: drawn as an interrupt; shut defenses carry reasons; a shield is sent on confirm', () => {
@@ -193,16 +212,16 @@ describe('NGnG battle screens', () => {
   });
 
   it('Retreat: a lit tile, then Retreat to it; Stay in is its own press', () => {
-    const r = decider('pending-retreat-3p');
+    const r = decider('pending-retreat-4p');
     const tiles = r.container.querySelectorAll('button.ngg-hex');
-    expect(tiles).toHaveLength(3);
+    expect(tiles).toHaveLength(r.legalMoves.filter((m) => m.move['destination']).length);
     fireEvent.click(tiles[0]!);
     expect(r.onMove).not.toHaveBeenCalled();
     press(r.container, /^Retreat to /);
     const move = sentListed(r.onMove, r.legalMoves);
     expect(move['type']).toBe('choose_retreat');
     cleanup();
-    const s = decider('pending-retreat-3p');
+    const s = decider('pending-retreat-4p');
     press(s.container, 'Stay in');
     expect(sentListed(s.onMove, s.legalMoves)).toEqual({ type: 'choose_retreat', destination: null, stay: true });
   });

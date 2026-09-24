@@ -1,27 +1,16 @@
 {
- "key": "pending-retreat",
- "players": 3,
- "viewer": "p1",
+ "key": "battle-activations",
+ "players": 2,
+ "viewer": "rob",
  "view": {
   "game_id": "neither-guts-nor-gears",
-  "phase": "action",
-  "round": 11,
-  "active_player_id": "p1",
-  "first_player_id": "p1",
-  "layout": "threeFour",
+  "phase": "planning",
+  "round": 1,
+  "active_player_id": "rob",
+  "first_player_id": "rob",
+  "layout": "two",
   "map": {
    "tiles": [
-    {
-     "coord": "-2,2",
-     "label": "C2",
-     "printed_resource": "water",
-     "current_resource": "water",
-     "start": 4,
-     "base_owner": "p3",
-     "units": [],
-     "heroes": [],
-     "collectors": []
-    },
     {
      "coord": "-2,4",
      "label": "C3",
@@ -41,10 +30,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Technomancer Greymore (p3)",
-      "Archmage Chaimidious (p1)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -63,32 +49,12 @@
      "label": "C6",
      "printed_resource": "wood",
      "current_resource": "wood",
-     "start": null,
-     "base_owner": null,
-     "units": [],
-     "heroes": [],
-     "collectors": []
-    },
-    {
-     "coord": "-2,12",
-     "label": "C7",
-     "printed_resource": "water",
-     "current_resource": "water",
      "start": 1,
-     "base_owner": "p1",
+     "base_owner": "wiz",
      "units": [],
-     "heroes": [],
-     "collectors": []
-    },
-    {
-     "coord": "-1,1",
-     "label": "D1",
-     "printed_resource": "wood",
-     "current_resource": "wood",
-     "start": null,
-     "base_owner": null,
-     "units": [],
-     "heroes": [],
+     "heroes": [
+      "Warden Hesper Quill (wiz)"
+     ],
      "collectors": []
     },
     {
@@ -147,35 +113,15 @@
      "collectors": []
     },
     {
-     "coord": "-1,13",
-     "label": "D7",
-     "printed_resource": "wood",
-     "current_resource": "wood",
-     "start": null,
-     "base_owner": null,
-     "units": [],
-     "heroes": [],
-     "collectors": []
-    },
-    {
-     "coord": "0,0",
-     "label": "E1",
-     "printed_resource": "water",
-     "current_resource": "water",
-     "start": null,
-     "base_owner": null,
-     "units": [],
-     "heroes": [],
-     "collectors": []
-    },
-    {
      "coord": "0,2",
      "label": "E2",
      "printed_resource": "ore",
      "current_resource": "ore",
      "start": null,
      "base_owner": null,
-     "units": [],
+     "units": [
+      "Evoker (wiz)"
+     ],
      "heroes": [],
      "collectors": []
     },
@@ -228,28 +174,6 @@
      "label": "E7",
      "printed_resource": "ore",
      "current_resource": "ore",
-     "start": null,
-     "base_owner": null,
-     "units": [],
-     "heroes": [],
-     "collectors": []
-    },
-    {
-     "coord": "0,14",
-     "label": "E8",
-     "printed_resource": "water",
-     "current_resource": "water",
-     "start": null,
-     "base_owner": null,
-     "units": [],
-     "heroes": [],
-     "collectors": []
-    },
-    {
-     "coord": "1,1",
-     "label": "F1",
-     "printed_resource": "wood",
-     "current_resource": "wood",
      "start": null,
      "base_owner": null,
      "units": [],
@@ -312,46 +236,16 @@
      "collectors": []
     },
     {
-     "coord": "1,13",
-     "label": "F7",
-     "printed_resource": "wood",
-     "current_resource": "wood",
-     "start": null,
-     "base_owner": null,
-     "units": [],
-     "heroes": [],
-     "collectors": []
-    },
-    {
-     "coord": "2,2",
-     "label": "G2",
-     "printed_resource": "water",
-     "current_resource": "water",
-     "start": 3,
-     "base_owner": "p2",
-     "units": [
-      "Water collector (p2)",
-      "Wood collector (p2)",
-      "Ore collector (p2)",
-      "Oil collector (p2)",
-      "Water collector (p2)",
-      "Wood collector (p2)",
-      "Ore collector (p2)",
-      "Wood collector (p2)"
-     ],
-     "heroes": [
-      "Motherboard (p2)"
-     ],
-     "collectors": []
-    },
-    {
      "coord": "2,4",
      "label": "G3",
      "printed_resource": "water",
      "current_resource": "water",
-     "start": null,
-     "base_owner": null,
-     "units": [],
+     "start": 2,
+     "base_owner": "rob",
+     "units": [
+      "Water collector (rob)",
+      "Wood collector (rob)"
+     ],
      "heroes": [],
      "collectors": []
     },
@@ -387,135 +281,69 @@
      "units": [],
      "heroes": [],
      "collectors": []
-    },
-    {
-     "coord": "2,12",
-     "label": "G7",
-     "printed_resource": "water",
-     "current_resource": "water",
-     "start": 2,
-     "base_owner": null,
-     "units": [],
-     "heroes": [],
-     "collectors": []
     }
    ]
   },
-  "hero_pool_count": 17,
-  "action_stack": [
-   {
-    "position": 1,
-    "owner": "p1",
-    "card_kind": "build"
-   },
-   {
-    "position": 2,
-    "owner": "p2",
-    "face": "down"
-   },
-   {
-    "position": 3,
-    "owner": "p3",
-    "face": "down"
-   },
-   {
-    "position": 4,
-    "owner": "p1",
-    "card_kind": "research"
-   },
-   {
-    "position": 5,
-    "owner": "p2",
-    "face": "down"
-   },
-   {
-    "position": 6,
-    "owner": "p3",
-    "face": "down"
-   },
-   {
-    "position": 7,
-    "owner": "p1",
-    "card_kind": "move_battle"
-   },
-   {
-    "position": 8,
-    "owner": "p2",
-    "card_kind": "move_battle"
-   },
-   {
-    "position": 9,
-    "owner": "p3",
-    "card_kind": "move_battle"
-   }
-  ],
-  "active_action": "move_battle by p3",
-  "resolving_action": {
-   "card_kind": "move_battle",
-   "owner": "p3"
-  },
+  "hero_pool_count": 18,
+  "action_stack": [],
+  "active_action": null,
+  "resolving_action": null,
   "treaties": [],
   "battle": {
-   "coord": "-2,6",
-   "origin": "-2,4",
+   "coord": "0,2",
+   "origin": "0,0",
    "phase": "activations",
    "pass": 1,
    "units": [
     {
-     "unit": "Technomancer Greymore",
-     "ref": "greymore",
-     "owner": "p3",
+     "unit": "Spitter Platform",
+     "ref": "u-spitter-rob-1",
+     "owner": "rob",
      "side": "attackers",
-     "init": 30,
-     "dmg": 1,
-     "def": 5,
-     "activated": true
+     "init": 95,
+     "dmg": 3,
+     "def": 1,
+     "activated": false
     },
     {
-     "unit": "Archmage Chaimidious",
-     "ref": "chaimidious",
-     "owner": "p1",
-     "side": "defenders",
+     "unit": "Kestrel Nine",
+     "ref": "kestrel",
+     "owner": "rob",
+     "side": "attackers",
      "init": 70,
      "dmg": 3,
      "def": 6,
-     "activated": true
+     "activated": false
+    },
+    {
+     "unit": "Evoker",
+     "ref": "u-evoker-wiz-1",
+     "owner": "wiz",
+     "side": "defenders",
+     "init": 50,
+     "dmg": 2,
+     "def": 1,
+     "activated": false
     }
    ],
-   "commitments": [
-    {
-     "card": "Extra",
-     "by": "p1",
-     "resolved": true,
-     "countered": false
-    }
-   ]
+   "commitments": {
+    "rob": "pending",
+    "wiz": "pending"
+   }
   },
-  "battle_deck_count": 39,
-  "battle_discard": [
-   "Extra"
-  ],
-  "pending": {
-   "kind": "retreat",
-   "for": "p1",
-   "question": "p1 decides whether to retreat"
-  },
+  "battle_deck_count": 40,
+  "battle_discard": [],
+  "pending": null,
   "victory_status": {
-   "p1": {
+   "wiz": {
     "culture": 0,
     "tech": 2,
     "leader_kills": 0,
     "leader_alive": true
    },
-   "p2": {
-    "culture": 4,
-    "tech": 7,
-    "leader_kills": 0,
-    "leader_alive": true
-   },
-   "p3": {
+   "rob": {
     "culture": 0,
-    "tech": 3,
+    "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -523,9 +351,9 @@
   "result": null,
   "players": [
    {
-    "player_id": "p1",
+    "player_id": "wiz",
     "kind": "human",
-    "faction": "The Schism",
+    "faction": "The Covenant",
     "species": "wizard",
     "culture": 0,
     "next_milestones": [
@@ -560,34 +388,37 @@
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_this_round": [
-     "build:base",
-     "research:base",
-     "move_battle:base"
-    ],
+    "action_cards_played_this_round": [],
     "battle_hand_count": 0,
-    "spy_recruitments": 0,
-    "units": [],
+    "spy_recruitments": 1,
+    "units": [
+     {
+      "id": "u-evoker-wiz-1",
+      "type": "Evoker",
+      "coord": "0,2",
+      "core": null
+     }
+    ],
     "heroes": [
      {
-      "hero": "Archmage Chaimidious",
-      "coord": "-2,6",
+      "hero": "Warden Hesper Quill",
+      "coord": "-2,10",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
      }
     ],
     "bases": [
-     "-2,12"
+     "-2,10"
     ],
     "committed_collectors": []
    },
    {
-    "player_id": "p2",
-    "kind": "ai",
+    "player_id": "rob",
+    "kind": "human",
     "faction": "The Ledger",
     "species": "robot",
-    "culture": 4,
+    "culture": 0,
     "next_milestones": [
      5,
      15,
@@ -605,12 +436,10 @@
       "core",
       "water-collector",
       "wood-collector",
-      "home",
-      "ore-collector",
-      "oil-collector"
+      "home"
      ],
-     "bonus_points_live": 1,
-     "total": 7,
+     "bonus_points_live": 0,
+     "total": 4,
      "target": 18
     },
     "leader_kills": 0,
@@ -618,205 +447,104 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 7,
+    "cores_supply": 13,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_this_round": [
-     "research:base",
-     "build:base",
-     "move_battle:base"
-    ],
+    "action_cards_played_this_round": [],
     "battle_hand_count": 0,
-    "spy_recruitments": 0,
+    "spy_recruitments": 1,
     "units": [
      {
-      "id": "u-water-collector-p2",
+      "id": "u-water-collector-rob",
       "type": "Water collector",
-      "coord": "2,2",
+      "coord": "2,4",
       "core": "allocated"
      },
      {
-      "id": "u-wood-collector-p2",
+      "id": "u-wood-collector-rob",
       "type": "Wood collector",
-      "coord": "2,2",
+      "coord": "2,4",
       "core": "allocated"
      },
      {
-      "id": "u-ore-collector-p2-1",
-      "type": "Ore collector",
-      "coord": "2,2",
-      "core": "allocated"
-     },
-     {
-      "id": "u-oil-collector-p2-1",
-      "type": "Oil collector",
-      "coord": "2,2",
-      "core": "allocated"
-     },
-     {
-      "id": "u-water-collector-p2-2",
-      "type": "Water collector",
-      "coord": "2,2",
-      "core": "allocated"
-     },
-     {
-      "id": "u-wood-collector-p2-2",
-      "type": "Wood collector",
-      "coord": "2,2",
-      "core": "allocated"
-     },
-     {
-      "id": "u-ore-collector-p2-2",
-      "type": "Ore collector",
-      "coord": "2,2",
-      "core": "allocated"
-     },
-     {
-      "id": "u-wood-collector-p2-3",
-      "type": "Wood collector",
-      "coord": "2,2",
+      "id": "u-spitter-rob-1",
+      "type": "Spitter Platform",
+      "coord": "0,0",
       "core": "allocated"
      }
     ],
     "heroes": [
      {
-      "hero": "Motherboard",
-      "coord": "2,2",
+      "hero": "Kestrel Nine",
+      "coord": "0,0",
       "is_leader": true,
       "dead": false,
-      "stats": "Init 30 DMG 1 DEF 5"
+      "stats": "Init 70 DMG 3 DEF 6"
      }
     ],
     "bases": [
-     "2,2"
-    ],
-    "committed_collectors": []
-   },
-   {
-    "player_id": "p3",
-    "kind": "ai",
-    "faction": "The Brass Circle",
-    "species": "wizard",
-    "culture": 0,
-    "next_milestones": [
-     5,
-     15,
-     30,
-     50,
-     75
-    ],
-    "mana_current": 5,
-    "mana_max": 5,
-    "buildings": [],
-    "building_counts": {},
-    "research": [],
-    "tech_progress": {
-     "acquired_types": [
-      "surf",
-      "castle"
-     ],
-     "bonus_points_live": 1,
-     "total": 3,
-     "target": 22
-    },
-    "leader_kills": 0,
-    "military_kills_needed": 1,
-    "leader_alive": true,
-    "subjects": 0,
-    "cores_reserve": 0,
-    "cores_supply": 15,
-    "action_cards": {
-     "build": 1,
-     "moveBattle": 1,
-     "research": 1
-    },
-    "action_cards_played_this_round": [
-     "build:base",
-     "research:base",
-     "move_battle:base"
-    ],
-    "battle_hand_count": 0,
-    "spy_recruitments": 0,
-    "units": [],
-    "heroes": [
-     {
-      "hero": "Technomancer Greymore",
-      "coord": "-2,6",
-      "is_leader": true,
-      "dead": false,
-      "stats": "Init 30 DMG 1 DEF 5"
-     }
-    ],
-    "bases": [
-     "-2,2"
+     "2,4"
     ],
     "committed_collectors": []
    }
   ],
   "your_battle_hand": [],
-  "your_spy_assignments": [],
+  "your_spy_assignments": [
+   {
+    "source": "infiltrator",
+    "hero": "Kestrel Nine",
+    "active": true
+   }
+  ],
   "your_knowledge": [],
   "your_reserved_heroes": []
  },
  "legalMoves": [
   {
    "move_id": "",
-   "description": "Stay and keep fighting.",
+   "description": "Kestrel Nine attacks Evoker (wiz) — DMG 3 vs DEF 1.",
    "move": {
-    "type": "choose_retreat",
-    "destination": null,
-    "stay": true
+    "type": "battle_activation",
+    "unit": "kestrel",
+    "action": {
+     "kind": "attack",
+     "target": "u-evoker-wiz-1"
+    }
    }
   },
   {
    "move_id": "",
-   "description": "Retreat all your mobile units to -2,8.",
+   "description": "Kestrel Nine passes its activation (used for the pass).",
    "move": {
-    "type": "choose_retreat",
-    "destination": "-2,8"
+    "type": "battle_activation",
+    "unit": "kestrel",
+    "action": {
+     "kind": "pass"
+    }
    }
   },
   {
    "move_id": "",
-   "description": "Retreat all your mobile units to -1,5.",
+   "description": "Detection: your Infiltrator's hero privately inspects wiz's spy card — spends this activation and your spy assignment.",
    "move": {
-    "type": "choose_retreat",
-    "destination": "-1,5"
-   }
-  },
-  {
-   "move_id": "",
-   "description": "Retreat all your mobile units to -1,7.",
-   "move": {
-    "type": "choose_retreat",
-    "destination": "-1,7"
+    "type": "use_detection",
+    "target_player": "wiz"
    }
   }
  ],
- "watcher": "p2",
+ "watcher": "wiz",
  "watcherView": {
   "game_id": "neither-guts-nor-gears",
-  "phase": "action",
-  "round": 11,
-  "active_player_id": "p1",
-  "first_player_id": "p1",
-  "layout": "threeFour",
+  "phase": "planning",
+  "round": 1,
+  "active_player_id": "rob",
+  "first_player_id": "rob",
+  "layout": "two",
   "map": {
    "tiles": [
-    {
-     "coord": "-2,2",
-     "label": "C2",
-     "printed_resource": "water",
-     "current_resource": "water",
-     "start": 4,
-     "base_owner": "p3",
-     "units": [],
-     "heroes": [],
-     "collectors": []
-    },
     {
      "coord": "-2,4",
      "label": "C3",
@@ -836,10 +564,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Technomancer Greymore (p3)",
-      "Archmage Chaimidious (p1)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -858,32 +583,12 @@
      "label": "C6",
      "printed_resource": "wood",
      "current_resource": "wood",
-     "start": null,
-     "base_owner": null,
-     "units": [],
-     "heroes": [],
-     "collectors": []
-    },
-    {
-     "coord": "-2,12",
-     "label": "C7",
-     "printed_resource": "water",
-     "current_resource": "water",
      "start": 1,
-     "base_owner": "p1",
+     "base_owner": "wiz",
      "units": [],
-     "heroes": [],
-     "collectors": []
-    },
-    {
-     "coord": "-1,1",
-     "label": "D1",
-     "printed_resource": "wood",
-     "current_resource": "wood",
-     "start": null,
-     "base_owner": null,
-     "units": [],
-     "heroes": [],
+     "heroes": [
+      "Warden Hesper Quill (wiz)"
+     ],
      "collectors": []
     },
     {
@@ -942,35 +647,15 @@
      "collectors": []
     },
     {
-     "coord": "-1,13",
-     "label": "D7",
-     "printed_resource": "wood",
-     "current_resource": "wood",
-     "start": null,
-     "base_owner": null,
-     "units": [],
-     "heroes": [],
-     "collectors": []
-    },
-    {
-     "coord": "0,0",
-     "label": "E1",
-     "printed_resource": "water",
-     "current_resource": "water",
-     "start": null,
-     "base_owner": null,
-     "units": [],
-     "heroes": [],
-     "collectors": []
-    },
-    {
      "coord": "0,2",
      "label": "E2",
      "printed_resource": "ore",
      "current_resource": "ore",
      "start": null,
      "base_owner": null,
-     "units": [],
+     "units": [
+      "Evoker (wiz)"
+     ],
      "heroes": [],
      "collectors": []
     },
@@ -1023,28 +708,6 @@
      "label": "E7",
      "printed_resource": "ore",
      "current_resource": "ore",
-     "start": null,
-     "base_owner": null,
-     "units": [],
-     "heroes": [],
-     "collectors": []
-    },
-    {
-     "coord": "0,14",
-     "label": "E8",
-     "printed_resource": "water",
-     "current_resource": "water",
-     "start": null,
-     "base_owner": null,
-     "units": [],
-     "heroes": [],
-     "collectors": []
-    },
-    {
-     "coord": "1,1",
-     "label": "F1",
-     "printed_resource": "wood",
-     "current_resource": "wood",
      "start": null,
      "base_owner": null,
      "units": [],
@@ -1107,46 +770,16 @@
      "collectors": []
     },
     {
-     "coord": "1,13",
-     "label": "F7",
-     "printed_resource": "wood",
-     "current_resource": "wood",
-     "start": null,
-     "base_owner": null,
-     "units": [],
-     "heroes": [],
-     "collectors": []
-    },
-    {
-     "coord": "2,2",
-     "label": "G2",
-     "printed_resource": "water",
-     "current_resource": "water",
-     "start": 3,
-     "base_owner": "p2",
-     "units": [
-      "Water collector (p2)",
-      "Wood collector (p2)",
-      "Ore collector (p2)",
-      "Oil collector (p2)",
-      "Water collector (p2)",
-      "Wood collector (p2)",
-      "Ore collector (p2)",
-      "Wood collector (p2)"
-     ],
-     "heroes": [
-      "Motherboard (p2)"
-     ],
-     "collectors": []
-    },
-    {
      "coord": "2,4",
      "label": "G3",
      "printed_resource": "water",
      "current_resource": "water",
-     "start": null,
-     "base_owner": null,
-     "units": [],
+     "start": 2,
+     "base_owner": "rob",
+     "units": [
+      "Water collector (rob)",
+      "Wood collector (rob)"
+     ],
      "heroes": [],
      "collectors": []
     },
@@ -1182,135 +815,69 @@
      "units": [],
      "heroes": [],
      "collectors": []
-    },
-    {
-     "coord": "2,12",
-     "label": "G7",
-     "printed_resource": "water",
-     "current_resource": "water",
-     "start": 2,
-     "base_owner": null,
-     "units": [],
-     "heroes": [],
-     "collectors": []
     }
    ]
   },
-  "hero_pool_count": 17,
-  "action_stack": [
-   {
-    "position": 1,
-    "owner": "p1",
-    "face": "down"
-   },
-   {
-    "position": 2,
-    "owner": "p2",
-    "card_kind": "research"
-   },
-   {
-    "position": 3,
-    "owner": "p3",
-    "face": "down"
-   },
-   {
-    "position": 4,
-    "owner": "p1",
-    "face": "down"
-   },
-   {
-    "position": 5,
-    "owner": "p2",
-    "card_kind": "build"
-   },
-   {
-    "position": 6,
-    "owner": "p3",
-    "face": "down"
-   },
-   {
-    "position": 7,
-    "owner": "p1",
-    "card_kind": "move_battle"
-   },
-   {
-    "position": 8,
-    "owner": "p2",
-    "card_kind": "move_battle"
-   },
-   {
-    "position": 9,
-    "owner": "p3",
-    "card_kind": "move_battle"
-   }
-  ],
-  "active_action": "move_battle by p3",
-  "resolving_action": {
-   "card_kind": "move_battle",
-   "owner": "p3"
-  },
+  "hero_pool_count": 18,
+  "action_stack": [],
+  "active_action": null,
+  "resolving_action": null,
   "treaties": [],
   "battle": {
-   "coord": "-2,6",
-   "origin": "-2,4",
+   "coord": "0,2",
+   "origin": "0,0",
    "phase": "activations",
    "pass": 1,
    "units": [
     {
-     "unit": "Technomancer Greymore",
-     "ref": "greymore",
-     "owner": "p3",
+     "unit": "Spitter Platform",
+     "ref": "u-spitter-rob-1",
+     "owner": "rob",
      "side": "attackers",
-     "init": 30,
-     "dmg": 1,
-     "def": 5,
-     "activated": true
+     "init": 95,
+     "dmg": 3,
+     "def": 1,
+     "activated": false
     },
     {
-     "unit": "Archmage Chaimidious",
-     "ref": "chaimidious",
-     "owner": "p1",
-     "side": "defenders",
+     "unit": "Kestrel Nine",
+     "ref": "kestrel",
+     "owner": "rob",
+     "side": "attackers",
      "init": 70,
      "dmg": 3,
      "def": 6,
-     "activated": true
+     "activated": false
+    },
+    {
+     "unit": "Evoker",
+     "ref": "u-evoker-wiz-1",
+     "owner": "wiz",
+     "side": "defenders",
+     "init": 50,
+     "dmg": 2,
+     "def": 1,
+     "activated": false
     }
    ],
-   "commitments": [
-    {
-     "card": "Extra",
-     "by": "p1",
-     "resolved": true,
-     "countered": false
-    }
-   ]
+   "commitments": {
+    "rob": "pending",
+    "wiz": "pending"
+   }
   },
-  "battle_deck_count": 39,
-  "battle_discard": [
-   "Extra"
-  ],
-  "pending": {
-   "kind": "retreat",
-   "for": "p1",
-   "question": "p1 decides whether to retreat"
-  },
+  "battle_deck_count": 40,
+  "battle_discard": [],
+  "pending": null,
   "victory_status": {
-   "p1": {
+   "wiz": {
     "culture": 0,
     "tech": 2,
     "leader_kills": 0,
     "leader_alive": true
    },
-   "p2": {
-    "culture": 4,
-    "tech": 7,
-    "leader_kills": 0,
-    "leader_alive": true
-   },
-   "p3": {
+   "rob": {
     "culture": 0,
-    "tech": 3,
+    "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -1318,9 +885,9 @@
   "result": null,
   "players": [
    {
-    "player_id": "p1",
+    "player_id": "wiz",
     "kind": "human",
-    "faction": "The Schism",
+    "faction": "The Covenant",
     "species": "wizard",
     "culture": 0,
     "next_milestones": [
@@ -1355,34 +922,37 @@
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_this_round": [
-     "build:base",
-     "research:base",
-     "move_battle:base"
-    ],
+    "action_cards_played_this_round": [],
     "battle_hand_count": 0,
-    "spy_recruitments": 0,
-    "units": [],
+    "spy_recruitments": 1,
+    "units": [
+     {
+      "id": "u-evoker-wiz-1",
+      "type": "Evoker",
+      "coord": "0,2",
+      "core": null
+     }
+    ],
     "heroes": [
      {
-      "hero": "Archmage Chaimidious",
-      "coord": "-2,6",
+      "hero": "Warden Hesper Quill",
+      "coord": "-2,10",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
      }
     ],
     "bases": [
-     "-2,12"
+     "-2,10"
     ],
     "committed_collectors": []
    },
    {
-    "player_id": "p2",
-    "kind": "ai",
+    "player_id": "rob",
+    "kind": "human",
     "faction": "The Ledger",
     "species": "robot",
-    "culture": 4,
+    "culture": 0,
     "next_milestones": [
      5,
      15,
@@ -1400,12 +970,10 @@
       "core",
       "water-collector",
       "wood-collector",
-      "home",
-      "ore-collector",
-      "oil-collector"
+      "home"
      ],
-     "bonus_points_live": 1,
-     "total": 7,
+     "bonus_points_live": 0,
+     "total": 4,
      "target": 18
     },
     "leader_kills": 0,
@@ -1413,146 +981,58 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 7,
+    "cores_supply": 13,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_this_round": [
-     "research:base",
-     "build:base",
-     "move_battle:base"
-    ],
+    "action_cards_played_this_round": [],
     "battle_hand_count": 0,
-    "spy_recruitments": 0,
+    "spy_recruitments": 1,
     "units": [
      {
-      "id": "u-water-collector-p2",
+      "id": "u-water-collector-rob",
       "type": "Water collector",
-      "coord": "2,2",
+      "coord": "2,4",
       "core": "allocated"
      },
      {
-      "id": "u-wood-collector-p2",
+      "id": "u-wood-collector-rob",
       "type": "Wood collector",
-      "coord": "2,2",
+      "coord": "2,4",
       "core": "allocated"
      },
      {
-      "id": "u-ore-collector-p2-1",
-      "type": "Ore collector",
-      "coord": "2,2",
-      "core": "allocated"
-     },
-     {
-      "id": "u-oil-collector-p2-1",
-      "type": "Oil collector",
-      "coord": "2,2",
-      "core": "allocated"
-     },
-     {
-      "id": "u-water-collector-p2-2",
-      "type": "Water collector",
-      "coord": "2,2",
-      "core": "allocated"
-     },
-     {
-      "id": "u-wood-collector-p2-2",
-      "type": "Wood collector",
-      "coord": "2,2",
-      "core": "allocated"
-     },
-     {
-      "id": "u-ore-collector-p2-2",
-      "type": "Ore collector",
-      "coord": "2,2",
-      "core": "allocated"
-     },
-     {
-      "id": "u-wood-collector-p2-3",
-      "type": "Wood collector",
-      "coord": "2,2",
+      "id": "u-spitter-rob-1",
+      "type": "Spitter Platform",
+      "coord": "0,0",
       "core": "allocated"
      }
     ],
     "heroes": [
      {
-      "hero": "Motherboard",
-      "coord": "2,2",
+      "hero": "Kestrel Nine",
+      "coord": "0,0",
       "is_leader": true,
       "dead": false,
-      "stats": "Init 30 DMG 1 DEF 5"
+      "stats": "Init 70 DMG 3 DEF 6"
      }
     ],
     "bases": [
-     "2,2"
-    ],
-    "committed_collectors": []
-   },
-   {
-    "player_id": "p3",
-    "kind": "ai",
-    "faction": "The Brass Circle",
-    "species": "wizard",
-    "culture": 0,
-    "next_milestones": [
-     5,
-     15,
-     30,
-     50,
-     75
-    ],
-    "mana_current": 5,
-    "mana_max": 5,
-    "buildings": [],
-    "building_counts": {},
-    "research": [],
-    "tech_progress": {
-     "acquired_types": [
-      "surf",
-      "castle"
-     ],
-     "bonus_points_live": 1,
-     "total": 3,
-     "target": 22
-    },
-    "leader_kills": 0,
-    "military_kills_needed": 1,
-    "leader_alive": true,
-    "subjects": 0,
-    "cores_reserve": 0,
-    "cores_supply": 15,
-    "action_cards": {
-     "build": 1,
-     "moveBattle": 1,
-     "research": 1
-    },
-    "action_cards_played_this_round": [
-     "build:base",
-     "research:base",
-     "move_battle:base"
-    ],
-    "battle_hand_count": 0,
-    "spy_recruitments": 0,
-    "units": [],
-    "heroes": [
-     {
-      "hero": "Technomancer Greymore",
-      "coord": "-2,6",
-      "is_leader": true,
-      "dead": false,
-      "stats": "Init 30 DMG 1 DEF 5"
-     }
-    ],
-    "bases": [
-     "-2,2"
+     "2,4"
     ],
     "committed_collectors": []
    }
   ],
   "your_battle_hand": [],
-  "your_spy_assignments": [],
+  "your_spy_assignments": [
+   {
+    "source": "illusionist",
+    "hero": "Warden Hesper Quill",
+    "active": true
+   }
+  ],
   "your_knowledge": [],
   "your_reserved_heroes": []
  },

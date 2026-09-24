@@ -873,17 +873,21 @@ function ActivationScreen({ ctx }: { ctx: ScreenCtx }) {
       )}
       <Ladder ctx={ctx} acting={acting} />
       <Rule>Highest initiative first, both sides in one line. Each unit acts once.</Rule>
-      <Rule>If a whole pass kills nobody, the battle is a stalemate{b?.origin ? ` and every attacker still here goes back to ${ctx.tile(b.origin)}` : ''}.</Rule>
+      <Rule>If a whole pass kills nobody, the battle is a stalemate{b?.origin && v.tiles.some((t) => t.coord === b.origin) ? ` and every attacker still here goes back to ${ctx.tile(b.origin)}` : ''}.</Rule>
     </Panel>
   );
   // Detection is its own move, beside the activation, not one of its actions.
+  // A wizard's look is free; a robot's is its Infiltrator hero's activation
+  // and spends the spy assignment. The engine's own words say which.
+  const robotLook = ctx.mine?.species === 'robot';
   const detection = detections.length > 0 ? (
-    <Panel title="Detection" kicker="Does not spend the activation">
-      {researchByName(ctx.ref, 'Detection') && <Rule>{researchByName(ctx.ref, 'Detection')!.effect}</Rule>}
+    <Panel title="Detection" kicker={robotLook ? 'Spends this activation and your spy' : 'Does not spend the activation'}>
+      {!robotLook && researchByName(ctx.ref, 'Detection') && <Rule>{researchByName(ctx.ref, 'Detection')!.effect}</Rule>}
       <div className="ngg-options">
         {detections.map((m) => {
           const pid = asStr(m.move['target_player']);
-          return <OptionRow key={pid} title={`Detection — ${ctx.seat(pid)}`} mark={<FactionChip faction={factionOf(ctx, pid)} size={18} />} disabled={!live} onPress={() => ctx.send(m)} />;
+          return <OptionRow key={pid} title={`Detection — ${ctx.seat(pid)}`} sub={robotLook ? ctx.say(m.description ?? '') : undefined}
+            mark={<FactionChip faction={factionOf(ctx, pid)} size={18} />} disabled={!live} onPress={() => ctx.send(m)} />;
         })}
       </div>
     </Panel>

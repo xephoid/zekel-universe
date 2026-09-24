@@ -42,3 +42,29 @@ write('pending-treaty_break_decision-blocked', fx.sharedResourcesBlocked().s);
 write('pending-access_request-queue', fx.accessRequest().s);
 write('pending-counter_target-batches', fx.counterTarget().s);
 write('pending-extra_selection-shut', fx.extraSelection().s);
+
+// A robot's look: its Infiltrator-carrying hero is on the activation clock.
+{
+  const { startBattle } = await import(src + 'engine-battle.ts');
+  const s = fx.base2p();
+  const g = s.gameState;
+  const rob = g.players.find((p: { playerId: string }) => p.playerId === 'rob');
+  const wiz = g.players.find((p: { playerId: string }) => p.playerId === 'wiz');
+  rob.spyAssignments.push({ source: 'infiltrator', heroId: 'kestrel', active: true });
+  wiz.spyAssignments.push({ source: 'illusionist', heroId: 'warden', active: true });
+  const spitter = fx.placeUnit(g, 'rob', '0,0', 'spitter');
+  g.heroes.find((h: { id: string }) => h.id === 'kestrel').coord = '0,0';
+  fx.placeUnit(g, 'wiz', '0,2', 'evoker');
+  startBattle(g, rob, '0,0', '0,2', [{ kind: 'unit', id: spitter }, { kind: 'hero', id: 'kestrel' }], []);
+  g.battle.phase = 'activations';
+  g.battle.activationQueue = ['kestrel', ...g.battle.units.filter((u: { unitRef: string }) => u.unitRef !== 'kestrel').map((u: { unitRef: string }) => u.unitRef)];
+  g.battle.activationCursor = 0;
+  g.pending = null;
+  g.activePlayerId = 'rob';
+  writeFileSync(join(outDir, 'battle-activations-infiltrator.json'), JSON.stringify({
+    key: 'battle-activations', players: 2, viewer: 'rob',
+    view: game.getPlayerView(s, 'rob'), legalMoves: game.getLegalMoves(s, 'rob'),
+    watcher: 'wiz', watcherView: game.getPlayerView(s, 'wiz'), watcherLegalMoves: game.getLegalMoves(s, 'wiz'),
+  }, null, 1));
+  console.log('battle-activations-infiltrator');
+}
