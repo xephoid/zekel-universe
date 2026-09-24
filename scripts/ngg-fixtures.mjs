@@ -50,7 +50,8 @@ function capture(s, key, who) {
     watcherView: game.getPlayerView(s, others[0]),
     watcherLegalMoves: game.getLegalMoves(s, others[0]),
   };
-  writeFileSync(join(outDir, `${key}${s.players.length === 2 ? '' : `-${s.players.length}p`}.json`), JSON.stringify(record, null, 1));
+  const named = key.split('-').length > 2 || key.startsWith('action-build-') ? key : `${key}${s.players.length === 2 ? '' : `-${s.players.length}p`}`;
+  writeFileSync(join(outDir, `${named}.json`), JSON.stringify(record, null, 1));
 }
 
 for (let g = 0; g < games; g++) {
@@ -70,6 +71,23 @@ for (let g = 0; g < games; g++) {
     const tag = `${key}|${n === 2 ? 2 : 'n'}`;
     if (!seen.has(tag)) { seen.set(tag, true); capture(s, key, who); }
     const legal = game.getLegalMoves(s, who);
+    // Richer moments a screen needs to be seen with, the first time each holds.
+    const types = legal.map((m) => m.move.type);
+    const species = s.gameState.players.find((p) => p.playerId === who)?.species;
+    const special = [
+      ['action-build-wizard-mid', key === 'action-build' && species === 'wizard' && types.filter((t) => t === 'build').length >= 5],
+      ['action-build-robot-mid', key === 'action-build' && species === 'robot' && types.filter((t) => t === 'build').length >= 5],
+      ['action-build-base', key === 'action-build' && legal.some((m) => m.move.type === 'build' && 'at_base' in m.move)],
+      ['action-build-economic', legal.some((m) => m.move.type === 'economic_victory_spend')],
+      ['action-research-tech', key === 'action-research' && legal.some((m) => m.move.type === 'research' && m.move.kind === 'tech')],
+      ['action-research-card', key === 'action-research' && legal.some((m) => m.move.type === 'research' && m.move.kind === 'battle_card')],
+      ['pending-second_purchase-open', key === 'pending-second_purchase' && types.some((t) => t === 'build' || t === 'research')],
+      ['action-move_battle-mid', key === 'action-move_battle' && legal.filter((m) => m.move.type === 'move_units').length >= 4],
+      ['action-build-treaty', legal.some((m) => m.move.type === 'form_treaty')],
+    ];
+    for (const [name, hit] of special) {
+      if (hit && !seen.has(name)) { seen.set(name, true); capture(s, name, who); }
+    }
     if (legal.length === 0) break;
     const { move } = await game.getAIMove(s, who, 'medium');
     try {

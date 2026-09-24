@@ -1,7 +1,457 @@
-// NGnG screens: economy. See docs/design/SCREEN-ROUTING.md for the routes.
+// NGnG screens: the economy. One composer walks a purchase through three
+// stages — choose what to buy, see where the collectors go, place the piece —
+// and sends ONE move at the end (SCREEN-ROUTING §2b). Nothing reaches the
+// engine before the last press, and every stage can be backed out of with no
+// server call. The same composer serves Build, a second purchase, Research
+// and the economic spend. Access Request is the interrupt that can arrive on
+// another seat in the middle of it.
+//
+// Where the engine lists a choice, the screen offers exactly that list:
+// the items are the listed build moves, the spawn base or new-base site is
+// the listed moves' at_base, and the payment is the one the engine proposes.
 
+import { useMemo, useState, type ReactNode } from 'react';
+import type { LegalMove } from '../../types';
 import type { ComponentType } from 'react';
 import type { ScreenCtx } from '../ctx';
 import type { ScreenKey } from '../route';
+import type { MapProposal } from '../HexMap';
+import { TableLayout } from '../Layout';
+import { itemByName, researchByName, heroById, type Cost } from '../ref';
+import { TERRAIN } from '../factions';
+import { Actions, Btn, CostChips, HowTo, Icon, OptionRow, Panel, ResourceChip, Rule } from '../ui';
+import { moveType } from '../read';
+import './economy.css';
 
-export const ECONOMY_SCREENS: Partial<Record<ScreenKey, ComponentType<{ ctx: ScreenCtx }>>> = {};
+// ---------------------------------------------------------------------------
+// Composer state, kept in the table's memory so it survives an interrupt
+// (an access request, a treaty offer) and comes back where it was.
+
+interface Draft {
+  /** which listed purchase is chosen: an item name, a tech, or a fixed key */
+  pick: string | null;
+  stage: 'choose' | 'pay' | 'place';
+}
+
+const KEY = 'ngg:purchase';
+
+/** React state that writes through to the table's memory, so a screen that
+ *  unmounts (an interrupt took over) comes back with the draft it had. */
+function useDraft(ctx: ScreenCtx, scope: string): [Draft, (d: Draft) => void] {
+  const memKey = `${KEY}:${scope}`;
+  const [draft, setState] = useState<Draft>(() => (ctx.memory.get(memKey) as Draft | undefined) ?? { pick: null, stage: 'choose' });
+  const set = (d: Draft) => { ctx.memory.set(memKey, d); setState(d); };
+  return [draft, set];
+}
+
+// ---------------------------------------------------------------------------
+// Purchases, as the engine lists them.
+
+type Payment = Array<{ collectorId: string; coord: string }>;
+
+interface Purchase {
+  /** a stable key: the item, the tech, 'battle_card' or 'economic' */
+  key: string;
+  label: string;
+  kind: 'unit' | 'building' | 'base' | 'tech' | 'battle_card' | 'economic';
+  cost: Cost | null;
+  text: string | null;
+  /** every listed move for it; several when the engine lists one per place */
+  moves: LegalMove[];
+}
+
+function paymentOf(m: LegalMove): Payment {
+  const p = m.move['payment'];
+  return Array.isArray(p) ? (p as Payment) : [];
+}
+
+function atBaseOf(m: LegalMove): string | null {
+  const a = m.move['at_base'];
+  return typeof a === 'string' && a !== '' ? a : null;
+}
+
+function purchasesOf(ctx: ScreenCtx): Purchase[] {
+  const out = new Map<string, Purchase>();
+  for (const m of ctx.legal) {
+    const t = moveType(m.move);
+    if (t === 'build') {
+      const name = String(m.move['item'] ?? '');
+      const found = itemByName(ctx.ref, name);
+      const kind: Purchase['kind'] = found?.kind === 'building' ? (found.building.isBase ? 'base' : 'building') : 'unit';
+      const cost = found ? (found.kind === 'unit' ? found.unit.cost : found.building.cost) : null;
+      const text = found ? (found.kind === 'unit' ? found.unit.notes : found.building.effect) : null;
+      const p = out.get(name) ?? { key: name, label: name, kind, cost, text, moves: [] };
+      p.moves.push(m);
+      out.set(name, p);
+    } else if (t === 'research' && m.move['kind'] === 'tech') {
+      const name = String(m.move['tech'] ?? '');
+      const r = researchByName(ctx.ref, name);
+      out.set(name, { key: name, label: name, kind: 'tech', cost: r?.cost ?? null, text: r?.effect ?? null, moves: [m] });
+    } else if (t === 'research' && m.move['kind'] === 'battle_card') {
+      out.set('battle_card', { key: 'battle_card', label: 'Draw a battle card', kind: 'battle_card', cost: null, text: null, moves: [m] });
+    } else if (t === 'economic_victory_spend') {
+      out.set('economic', { key: 'economic', label: 'Economic victory: spend all five', kind: 'economic', cost: ctx.ref?.economicSpend ?? null, text: null, moves: [m] });
+    }
+  }
+  return [...out.values()];
+}
+
+/** The Core a platform bought with its own Core (core_pairing) also costs. */
+function coreCost(ctx: ScreenCtx): Cost | null {
+  return itemByName(ctx.ref, 'Core')?.kind === 'unit' ? (itemByName(ctx.ref, 'Core') as { unit: { cost: Cost } }).unit.cost : null;
+}
+
+/** What a collector is called and drawn as: a wizard's Surf takes any
+ *  resource; a robot's collector is typed, and it stands on its own resource. */
+function collectorIcon(ctx: ScreenCtx, ownerId: string | null, coord: string): string {
+  const species = ctx.v.players.find((p) => p.id === ownerId)?.species;
+  if (species === 'wizard') return 'Surf';
+  const res = ctx.v.tiles.find((t) => t.coord === coord)?.resource;
+  return res && TERRAIN[res] ? `${TERRAIN[res]!.name} collector` : 'Collector';
+}
+
+function proposalsOf(ctx: ScreenCtx, payment: Payment): MapProposal[] {
+  return payment.map((p) => ({
+    coord: p.coord, owner: ctx.me ?? '', kind: 'collector', key: `pay:${p.collectorId}`,
+    name: collectorIcon(ctx, ctx.me, p.coord),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// The composer.
+
+const KIND_WORDS: Record<Purchase['kind'], string> = {
+  unit: 'Unit', building: 'Building', base: 'Base', tech: 'Technology', battle_card: 'Battle card', economic: 'Victory',
+};
+
+function PurchaseRow({ ctx, p, selected, onPick }: { ctx: ScreenCtx; p: Purchase; selected: boolean; onPick: () => void }) {
+  const pairing = p.moves.some((m) => m.move['core_pairing'] === true);
+  const core = pairing ? coreCost(ctx) : null;
+  return (
+    <OptionRow
+      selected={selected}
+      disabled={!ctx.live}
+      onPress={onPick}
+      mark={<Icon name={p.kind === 'battle_card' ? 'Battle card' : p.kind === 'economic' ? 'Build' : p.label} size={20} stroke={1.8} />}
+      title={p.label}
+      sub={p.text || undefined}
+      aside={
+        <span className="ngg-eco-cost">
+          <span className="ngg-eco-kind">{KIND_WORDS[p.kind]}</span>
+          {p.cost && <CostChips cost={p.cost} />}
+          {core && <span className="ngg-eco-core">+ Core <CostChips cost={core} /></span>}
+        </span>
+      }
+    />
+  );
+}
+
+function PaymentList({ ctx, payment }: { ctx: ScreenCtx; payment: Payment }) {
+  return (
+    <ul className="ngg-eco-pay">
+      {payment.map((p) => {
+        const tile = ctx.v.tiles.find((t) => t.coord === p.coord);
+        const owner = tile?.baseOwner && tile.baseOwner !== ctx.me ? tile.baseOwner : null;
+        return (
+          <li key={p.collectorId}>
+            <span className="ngg-eco-pay-mark"><Icon name={collectorIcon(ctx, ctx.me, p.coord)} size={16} stroke={2} /></span>
+            <b>{ctx.tile(p.coord)}</b>
+            <ResourceChip resource={tile?.resource ?? null} />
+            {owner && <span className="ngg-eco-owner">{ctx.seat(owner)}’s base</span>}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+function Composer({ ctx, scope, title, kicker, skip, skipLabel, children }: {
+  ctx: ScreenCtx;
+  scope: string;
+  title: string;
+  kicker?: string;
+  /** the listed move that declines (skip_action) */
+  skip: LegalMove | null;
+  skipLabel: string;
+  children?: ReactNode;
+}) {
+  const [draft, setDraft] = useDraft(ctx, scope);
+  const purchases = useMemo(() => purchasesOf(ctx), [ctx]);
+  // A pick the engine no longer lists (after a refusal, a new event) is gone.
+  const chosen = draft.pick ? purchases.find((p) => p.key === draft.pick) ?? null : null;
+  const stage = chosen ? draft.stage : 'choose';
+  const first = chosen?.moves[0] ?? null;
+  const payment = first ? paymentOf(first) : [];
+  const places = chosen ? [...new Set(chosen.moves.map(atBaseOf).filter((x): x is string => x !== null))] : [];
+  const needsPlace = places.length > 0;
+
+  const back = () => setDraft({ pick: null, stage: 'choose' });
+  const commitPayment = () => {
+    if (!chosen || !first) return;
+    if (needsPlace) { setDraft({ pick: chosen.key, stage: 'place' }); return; }
+    ctx.send(first);
+  };
+  const place = (coord: string) => {
+    const m = chosen?.moves.find((x) => atBaseOf(x) === coord);
+    if (m) ctx.send(m);
+  };
+
+  if (stage === 'choose' || !chosen) {
+    return (
+      <TableLayout
+        ctx={ctx}
+        panel={
+          <Panel title={title} kicker={kicker}>
+            {children}
+            {purchases.length > 0
+              ? <div className="ngg-options">{purchases.map((p) => (
+                  <PurchaseRow key={p.key} ctx={ctx} p={p} selected={draft.pick === p.key}
+                    onPick={() => setDraft({ pick: p.key, stage: 'choose' })} />
+                ))}</div>
+              : <HowTo>Nothing here can be paid for from what you can reach.</HowTo>}
+            <Actions>
+              {skip && <Btn kind="secondary" disabled={!ctx.live} onClick={() => ctx.send(skip)}>{skipLabel}</Btn>}
+              <Btn disabled={!ctx.live || !draft.pick} onClick={() => draft.pick && setDraft({ pick: draft.pick, stage: 'pay' })}>
+                {draft.pick ? `Choose ${purchases.find((p) => p.key === draft.pick)?.label ?? ''}` : 'Choose'}
+              </Btn>
+            </Actions>
+          </Panel>
+        }
+      />
+    );
+  }
+
+  if (stage === 'pay') {
+    return (
+      <TableLayout
+        ctx={ctx}
+        marks={{
+          proposals: proposalsOf(ctx, payment),
+          tags: new Map(payment.map((p) => [p.coord, 'PAY'])),
+        }}
+        panel={
+          <Panel title={chosen.kind === 'economic' ? 'Spend all five' : `Pay for ${chosen.label}`} kicker={KIND_WORDS[chosen.kind]}>
+            {chosen.cost && <div className="ngg-eco-costline"><span>Cost</span><CostChips cost={chosen.cost} /></div>}
+            <HowTo>{payment.length === 0 ? 'Nothing to place: this one is free.' : `The engine proposes ${payment.length === 1 ? 'this placement' : `these ${payment.length} placements`}. Dashed means not on the board yet.`}</HowTo>
+            <PaymentList ctx={ctx} payment={payment} />
+            <Rule>Nothing is spent until you commit. Collectors stay on the map until upkeep.</Rule>
+            {chosen.kind === 'economic' && ctx.mine && (
+              <Rule>{ctx.mine.leaderAlive ? 'Your Leader is alive.' : 'Your Leader is dead: this spend cannot win.'}</Rule>
+            )}
+            <Actions>
+              <Btn kind="secondary" onClick={back}>Drop the purchase</Btn>
+              <Btn disabled={!ctx.live} onClick={commitPayment}>{needsPlace ? 'Commit payment, then place it' : chosen.kind === 'economic' ? 'Commit all eleven' : 'Commit payment'}</Btn>
+            </Actions>
+          </Panel>
+        }
+      />
+    );
+  }
+
+  // Place It: the piece is in hand; the lit hexes are the places the engine listed.
+  return (
+    <TableLayout
+      ctx={ctx}
+      marks={{
+        lit: new Set(places),
+        greyRest: true,
+        proposals: proposalsOf(ctx, payment),
+        tags: new Map(places.map((c) => [c, chosen.kind === 'base' ? 'NEW BASE' : 'BASE'])),
+        onTile: ctx.live ? place : undefined,
+      }}
+      panel={
+        <Panel title={`${chosen.label} is in hand`} kicker={chosen.kind === 'base' ? 'A new base' : 'Spawns at a base'}>
+          <HowTo>Click a lit hex to place it{places.length > 1 ? ` — ${places.length} are open` : ''}.</HowTo>
+          <div className="ngg-options">
+            {places.map((c) => (
+              <OptionRow key={c} disabled={!ctx.live} onPress={() => place(c)} title={ctx.tile(c)}
+                sub={chosen.kind === 'base' ? 'New base here' : 'Your base · place it here'}
+                aside={<ResourceChip resource={ctx.v.tiles.find((t) => t.coord === c)?.resource ?? null} />} />
+            ))}
+          </div>
+          <Rule>Nothing is spent until the hex is clicked.</Rule>
+          <Actions>
+            <Btn kind="secondary" onClick={() => setDraft({ pick: chosen.key, stage: 'pay' })}>Put it back</Btn>
+          </Actions>
+        </Panel>
+      }
+    />
+  );
+}
+
+function skipOf(ctx: ScreenCtx): LegalMove | null {
+  return ctx.movesOf('skip_action')[0] ?? null;
+}
+
+function BuildScreen({ ctx }: { ctx: ScreenCtx }) {
+  if (ctx.route.perspective !== 'decide') return <TableLayout ctx={ctx} />;
+  return (
+    <Composer ctx={ctx} scope={`build:${ctx.v.round}`} title="Buy one thing" kicker="Your Build card is resolving"
+      skip={skipOf(ctx)} skipLabel="Skip this action">
+      <Rule>One unit, building or base per Build action.</Rule>
+    </Composer>
+  );
+}
+
+function ResearchScreen({ ctx }: { ctx: ScreenCtx }) {
+  if (ctx.route.perspective !== 'decide') return <TableLayout ctx={ctx} />;
+  return (
+    <Composer ctx={ctx} scope={`research:${ctx.v.round}`} title="Unlock one technology, or draw a card" kicker="Your Research card is resolving"
+      skip={skipOf(ctx)} skipLabel="Skip this action">
+      <Rule>One purchase per Research action.</Rule>
+      <div className="ngg-eco-deck"><Icon name="Battle card" size={16} stroke={1.8} />{ctx.v.deckCount} battle cards in the deck · {ctx.v.hand.length} in your hand</div>
+    </Composer>
+  );
+}
+
+function SecondPurchaseScreen({ ctx }: { ctx: ScreenCtx }) {
+  if (ctx.route.perspective !== 'decide') return <TableLayout ctx={ctx} />;
+  const committed = ctx.mine?.collectors ?? [];
+  return (
+    <Composer ctx={ctx} scope={`second:${ctx.v.round}`} title="A second purchase" kicker="One action, two purchases"
+      skip={skipOf(ctx)} skipLabel="Stop at one">
+      <Rule>Separate collectors pay for each. The second falling through never undoes the first.</Rule>
+      {committed.length > 0 && (
+        <div className="ngg-eco-down">
+          <span className="ngg-kicker">Already down</span>
+          {committed.map((c) => <span key={c.id}>{ctx.tile(c.coord)} <ResourceChip resource={c.resource} /></span>)}
+        </div>
+      )}
+    </Composer>
+  );
+}
+
+function SmythScreen({ ctx }: { ctx: ScreenCtx }) {
+  const smyth = heroById(ctx.ref, 'smyth');
+  const techs = ctx.movesOf('research');
+  const panel = ctx.route.perspective !== 'decide' ? undefined : (
+    <Panel title="Take one unresearched technology" kicker={smyth?.name ?? "Smyth's reward"}>
+      {smyth && <Rule>{smyth.effect}</Rule>}
+      <div className="ngg-options">
+        {techs.map((m, i) => {
+          const name = String(m.move['tech'] ?? '');
+          const r = researchByName(ctx.ref, name);
+          return (
+            <OptionRow key={i} disabled={!ctx.live} onPress={() => ctx.send(m)}
+              mark={<Icon name={name} size={20} stroke={1.8} />}
+              title={`Take ${name}`} sub={r?.effect}
+              aside={<span className="ngg-eco-free">FREE HERE</span>} />
+          );
+        })}
+      </div>
+    </Panel>
+  );
+  return <TableLayout ctx={ctx} panel={panel} />;
+}
+
+// ---------------------------------------------------------------------------
+// Access Request: somebody wants your tile. An interrupt on the owner's seat;
+// the buyer sees the same terms and waits.
+
+interface AccessContext {
+  buyer: string;
+  action: string;
+  item: string;
+  thisRequest: { collector: string; tile: string };
+  placements: Array<{ collector: string; tile: string; resource: string | null; locationOwner: string | null }>;
+  queue: { index: number; total: number } | null;
+}
+
+function readAccess(ctx: ScreenCtx): AccessContext | null {
+  const c = ctx.v.pending?.context;
+  if (!c || typeof c['buyer'] !== 'string') return null;
+  const tr = (c['this_request'] ?? {}) as Record<string, unknown>;
+  const q = c['queue'] as Record<string, unknown> | null | undefined;
+  return {
+    buyer: c['buyer'] as string,
+    action: String(c['action'] ?? ''),
+    item: String(c['item'] ?? ''),
+    thisRequest: { collector: String(tr['collector'] ?? ''), tile: String(tr['tile'] ?? '') },
+    placements: (Array.isArray(c['placements']) ? c['placements'] : []).map((p: Record<string, unknown>) => ({
+      collector: String(p['collector'] ?? ''),
+      tile: String(p['tile'] ?? ''),
+      resource: typeof p['resource'] === 'string' ? p['resource'] : null,
+      locationOwner: typeof p['location_owner'] === 'string' ? p['location_owner'] : null,
+    })),
+    queue: q && typeof q['index'] === 'number' && typeof q['total'] === 'number' ? { index: q['index'] as number, total: q['total'] as number } : null,
+  };
+}
+
+function AccessRequestScreen({ ctx }: { ctx: ScreenCtx }) {
+  const a = readAccess(ctx);
+  const coordOf = (label: string) => ctx.v.tiles.find((t) => t.label === label)?.coord ?? null;
+  const asked = a ? coordOf(a.thisRequest.tile) : null;
+  const marks = a ? {
+    selected: asked,
+    greyRest: true,
+    lit: new Set<string>(),
+    origin: asked,
+    proposals: a.placements.map((p): MapProposal => ({
+      coord: coordOf(p.tile) ?? '', owner: a.buyer, kind: 'collector', key: `acc:${p.collector}`,
+      name: collectorIcon(ctx, a.buyer, coordOf(p.tile) ?? ''),
+    })).filter((p) => p.coord),
+  } : undefined;
+  const found = a ? itemByName(ctx.ref, a.item) : null;
+  const cost = found ? (found.kind === 'unit' ? found.unit.cost : found.building.cost) : null;
+  const grant = ctx.movesOf('respond_access_request').find((m) => m.move['grant'] === true) ?? null;
+  const refuse = ctx.movesOf('respond_access_request').find((m) => m.move['grant'] === false) ?? null;
+  const buyerLeader = a ? ctx.v.players.find((p) => p.id === a.buyer)?.leaderAlive : false;
+
+  const terms = a && (
+    <>
+      {a.queue && a.queue.total > 1 && <div className="ngg-kicker">Request {a.queue.index} of {a.queue.total}</div>}
+      <div className="ngg-eco-terms">
+        <span><i>WHICH COLLECTOR</i><b><Icon name={collectorIcon(ctx, a.buyer, asked ?? '')} size={15} stroke={2} />{collectorIcon(ctx, a.buyer, asked ?? '')}</b></span>
+        <span><i>WHICH TILE</i><b>{a.thisRequest.tile}</b></span>
+        <span><i>WHAT FOR</i><b>{a.item}</b>{cost && <CostChips cost={cost} />}</span>
+      </div>
+      <div className="ngg-kicker">Their placements</div>
+      <ul className="ngg-eco-pay">
+        {a.placements.map((p) => (
+          <li key={p.collector} className={p.tile === a.thisRequest.tile ? 'asked' : ''}>
+            <b>{p.tile}</b><ResourceChip resource={p.resource} />
+            {p.locationOwner && <span className="ngg-eco-owner">{p.locationOwner === ctx.me ? 'yours' : ctx.seat(p.locationOwner)}</span>}
+          </li>
+        ))}
+      </ul>
+      {a.item === 'Economic victory spend' && buyerLeader && (
+        <Rule>If this payment completes, {ctx.seat(a.buyer)} wins an economic victory.</Rule>
+      )}
+    </>
+  );
+
+  if (ctx.route.interrupt && a) {
+    return (
+      <TableLayout
+        ctx={ctx}
+        marks={marks}
+        interrupt={
+          <Panel tone="urgent" kicker="Not your turn — your answer" title={`${ctx.seat(a.buyer)} asks to stand one collector on ${a.thisRequest.tile}`}>
+            {terms}
+            {grant && <Rule>{grant.description}</Rule>}
+            {refuse && <Rule>{refuse.description}</Rule>}
+            <Actions>
+              {refuse && <Btn kind="secondary" disabled={!ctx.live} onClick={() => ctx.send(refuse)}>Refuse</Btn>}
+              {grant && <Btn disabled={!ctx.live} onClick={() => ctx.send(grant)}>Allow</Btn>}
+            </Actions>
+          </Panel>
+        }
+      />
+    );
+  }
+  // The buyer (and only the buyer) sees the terms while the owner decides.
+  const panel = a ? (
+    <Panel kicker={a.queue && a.queue.total > 1 ? `Request ${a.queue.index} of ${a.queue.total}` : 'Waiting for consent'} title={`${ctx.seat(ctx.v.pending?.for)} has to agree`}>
+      {terms}
+    </Panel>
+  ) : undefined;
+  return <TableLayout ctx={ctx} marks={marks} panel={panel} />;
+}
+
+export const ECONOMY_SCREENS: Partial<Record<ScreenKey, ComponentType<{ ctx: ScreenCtx }>>> = {
+  build: BuildScreen,
+  research: ResearchScreen,
+  'second-purchase': SecondPurchaseScreen,
+  'smyth-reward': SmythScreen,
+  'access-request': AccessRequestScreen,
+};
