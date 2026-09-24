@@ -462,7 +462,14 @@
   "pending": {
    "kind": "treaty_response",
    "for": "p3",
-   "question": "p3 answers p4's culture-treaty offer"
+   "question": "p3 answers p4's culture-treaty offer",
+   "context": {
+    "proposer": "p4",
+    "treaty": "Culture Treaty",
+    "culture_income": 10,
+    "effect": "Direct partners share an eligible partner's victory. Does not create military allies; partners may fight. Shared victory does not chain. Available only at four or more players. No automatic collection access.",
+    "break_condition": "Outside the culture phase, only when no action or battle is resolving."
+   }
   },
   "victory_status": {
    "p1": {
@@ -1375,7 +1382,14 @@
   "pending": {
    "kind": "treaty_response",
    "for": "p3",
-   "question": "p3 answers p4's culture-treaty offer"
+   "question": "p3 answers p4's culture-treaty offer",
+   "context": {
+    "proposer": "p4",
+    "treaty": "Culture Treaty",
+    "culture_income": 10,
+    "effect": "Direct partners share an eligible partner's victory. Does not create military allies; partners may fight. Shared victory does not chain. Available only at four or more players. No automatic collection access.",
+    "break_condition": "Outside the culture phase, only when no action or battle is resolving."
+   }
   },
   "victory_status": {
    "p1": {

@@ -68,3 +68,26 @@ write('pending-extra_selection-shut', fx.extraSelection().s);
   }, null, 1));
   console.log('battle-activations-infiltrator');
 }
+
+// Each human picks their own faction: the second human's turn, one taken.
+{
+  let s = game.createSession([
+    { player_id: 'p1', kind: 'human', table: 'digital' }, { player_id: 'p2', kind: 'human', table: 'digital' }, { player_id: 'p3', kind: 'ai' },
+  ], { seed: 5, setupFirstPlayerId: 'p1' });
+  s = game.applyMove(s, 'p1', { type: 'choose_faction', faction: 'covenant' }).newState;
+  write('pending-choose_faction', s);
+}
+
+// A claimed hero, owed a base because its owner holds two.
+{
+  const s = fx.base2p();
+  const g = s.gameState;
+  fx.placeUnit(g, 'wiz', '0,6', 'evoker');
+  g.bases.push({ id: 'base-wiz-2', ownerId: 'wiz', coord: '0,6' });
+  g.phase = 'claims';
+  g.claimsOwed = { wiz: 1 };
+  g.pending = { kind: 'choose_milestone_hero', forPlayerId: 'wiz', claimsOwed: 1 };
+  g.activePlayerId = 'wiz';
+  const next = game.applyMove(s, 'wiz', { type: 'choose_milestone_hero', hero: 'Chronicler Ottoline Vey' }).newState;
+  write('pending-place_reserved_hero', next);
+}

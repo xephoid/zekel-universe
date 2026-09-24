@@ -13,7 +13,7 @@ import { moveType, type NggView } from './read';
 
 export type ScreenKey =
   // setup
-  | 'setup-table' | 'setup-draft' | 'setup-start'
+  | 'setup-table' | 'setup-faction' | 'setup-draft' | 'setup-start'
   // round
   | 'planning' | 'core-reallocation' | 'upkeep' | 'culture' | 'end-of-round'
   // build
@@ -51,6 +51,7 @@ export interface Route {
 }
 
 const PENDING_SCREENS: Record<string, ScreenKey> = {
+  choose_faction: 'setup-faction',
   choose_leader: 'setup-draft',
   choose_starting_location: 'setup-start',
   report_draw: 'report-draw',
@@ -156,6 +157,7 @@ export function route(v: NggView, me: string | null, legalMoves: LegalMove[] = [
 /** What a waiting seat is told another seat is doing: the pending's kind in
  *  words, which is state the client holds, never a paraphrase of the rules. */
 export const WAITING_ON: Record<string, string> = {
+  choose_faction: 'choosing a faction',
   choose_leader: 'choosing a Leader',
   choose_starting_location: 'choosing a starting location',
   report_draw: 'drawing a battle card',

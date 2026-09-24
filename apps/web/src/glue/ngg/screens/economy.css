@@ -15,3 +15,8 @@
 .ngg-eco-terms span { display: flex; flex-direction: column; gap: 4px; padding: 8px 10px; border-radius: 9px; background: var(--n-surface2); }
 .ngg-eco-terms i { font: 600 9px var(--n-mono); letter-spacing: .06em; color: var(--n-muted); font-style: normal; }
 .ngg-eco-terms b { display: flex; align-items: center; gap: 5px; font-size: 13px; }
+.ngg-eco-hand { display: flex; flex-wrap: wrap; gap: 6px; }
+.ngg-eco-take { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; border: 1.5px dashed var(--n-ink); background: var(--n-surface); color: var(--n-text); font: 600 12px var(--n-face); cursor: pointer; }
+.ngg-eco-take.held { border-style: solid; background: var(--n-hlbg); border-color: var(--n-brand); }
+.ngg-eco-take:disabled { opacity: .5; cursor: not-allowed; }
+.ngg-eco-remove { margin-left: auto; border: none; background: none; color: var(--n-muted); cursor: pointer; font-size: 12px; }

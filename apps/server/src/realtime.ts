@@ -273,6 +273,36 @@ export class Realtime {
     return this.serialized(tableId, () => this.applyHumanMove(principal, tableId, seatPosition, move));
   }
 
+  /**
+   * A read-only question from a seat about the decision it is composing.
+   * The same ownership and status checks as a move; nothing is applied, no
+   * event is written, and it does not wait behind moves.
+   */
+  async handleQuery(
+    principal: Principal,
+    tableId: string,
+    seatPosition: number,
+    name: string,
+    args: Record<string, unknown>,
+  ): Promise<unknown> {
+    const table = await this.tableService.getTable(tableId);
+    if (!table) throw new MoveError('no_table', `No table ${tableId}`);
+    if (table.status !== 'playing') throw new MoveError('not_playing', 'This table is not in play');
+    const seats = await this.tableService.getSeats(tableId);
+    const seat = seats.find((s) => s.position === seatPosition);
+    if (!seat || !seatOwnedBy(seat, principal)) {
+      throw new MoveError('not_your_seat', 'You do not own that seat');
+    }
+    const token = await this.tableService.hostToken(tableId);
+    const playerId = seat.enginePlayerId ?? `p${seatPosition + 1}`;
+    try {
+      const result = await this.engine.queryChoice(table.engineSessionId!, playerId, token, name, args);
+      return result.answer;
+    } catch (err) {
+      throw classifyEngineFailure(err);
+    }
+  }
+
   private async applyHumanMove(
     principal: Principal,
     tableId: string,

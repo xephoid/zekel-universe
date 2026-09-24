@@ -15,6 +15,7 @@ import './ngg.css';
 /** Short titles for the generic chooser, one per screen. */
 const TITLES: Record<ScreenKey, string> = {
   'setup-table': 'Set up the table',
+  'setup-faction': 'Choose your faction',
   'setup-draft': 'Draft your Leader',
   'setup-start': 'Choose a starting site',
   planning: 'Place one card, or pass',

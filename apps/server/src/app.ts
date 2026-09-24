@@ -11,7 +11,7 @@ import type { Server as SocketServer, Socket } from 'socket.io';
 import type { Kysely } from 'kysely';
 import type {
   CreateTableRequest, CreateTableResponse, FriendsResponse, GameCatalogEntry, GameReferenceResponse, GameResponse,
-  GamesResponse, InvitesResponse, JoinTableAck, JoinTableMessage, MeResponse, MoveAck, MoveMessage, MyTablesResponse,
+  GamesResponse, InvitesResponse, JoinTableAck, JoinTableMessage, MeResponse, MoveAck, MoveMessage, MyTablesResponse, QueryAck, QueryMessage,
   SeatSummary, TableEventsResponse, TableInvite, TableResponse, TableStatus, TableSummary, UndoAck, UndoMessage, GameUpdate, UpdatesResponse, DesignerResponse, WatchResponse } from '@universe/shared';
 import { SOCKET_EVENTS } from '@universe/shared';
 import { EngineError } from '@universe/engine-client';
@@ -982,6 +982,28 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
           if (err instanceof MoveError) {
             respond({ error: err.code, reason: err.reason ?? err.message, lesson: err.lesson, legalMoves: err.legalMoves });
           } else {
+            app.log.error(err);
+            respond({ error: 'internal', reason: 'Something went wrong on the server.' });
+          }
+        }
+      });
+
+      // A read-only question about a decision being composed. Bounded: a short
+      // name and a small argument object; the engine answers or refuses.
+      socket.on(SOCKET_EVENTS.query, async (msg: Partial<QueryMessage>, ack?: (r: QueryAck) => void) => {
+        const respond = ack ?? (() => {});
+        try {
+          const args = msg?.args ?? {};
+          if (!msg?.tableId || typeof msg.seat !== 'number' || typeof msg.name !== 'string'
+            || msg.name.length === 0 || msg.name.length > 64 || typeof args !== 'object' || Array.isArray(args)
+            || JSON.stringify(args).length > 4096) {
+            return respond({ error: 'bad_request' });
+          }
+          const answer = await realtime.handleQuery(principal, msg.tableId, msg.seat, msg.name, args as Record<string, unknown>);
+          respond({ ok: true, answer });
+        } catch (err) {
+          if (err instanceof MoveError) respond({ error: err.code, reason: err.reason ?? err.message });
+          else {
             app.log.error(err);
             respond({ error: 'internal', reason: 'Something went wrong on the server.' });
           }

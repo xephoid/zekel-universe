@@ -375,11 +375,28 @@ export type UndoAck =
   | { ok?: false; error: string; message?: string };
 
 /** Socket event names, in one place so both sides agree. */
+/**
+ * A read-only question a seat asks the engine about a decision it is
+ * composing (Game.queryChoice). Nothing is applied; the answer is the
+ * engine's, shaped by the game.
+ */
+export interface QueryMessage {
+  tableId: string;
+  seat: number;
+  name: string;
+  args: Record<string, unknown>;
+}
+
+export type QueryAck =
+  | { ok: true; answer: unknown }
+  | { ok?: false; error: string; reason?: string };
+
 export const SOCKET_EVENTS = {
   /** client to server */
   joinTable: 'join_table',
   leaveTable: 'leave_table',
   move: 'move',
+  query: 'query',
   undo: 'undo',
   /** server to client */
   tableEvent: 'table_event',

@@ -5,7 +5,7 @@
  "view": {
   "game_id": "neither-guts-nor-gears",
   "phase": "action",
-  "round": 11,
+  "round": 13,
   "active_player_id": "p2",
   "first_player_id": "p1",
   "layout": "two",
@@ -19,9 +19,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Archmage Chaimidious (p1)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -32,7 +30,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Archmage Chaimidious (p1)"
+     ],
      "collectors": []
     },
     {
@@ -250,9 +250,7 @@
       "Ore collector (p2)",
       "Wood collector (p2)"
      ],
-     "heroes": [
-      "Motherboard (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -263,7 +261,10 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Motherboard (p2)",
+      "Marshal Corvin Ashlock (p2)"
+     ],
      "collectors": []
     },
     {
@@ -290,7 +291,7 @@
     }
    ]
   },
-  "hero_pool_count": 18,
+  "hero_pool_count": 17,
   "action_stack": [
    {
     "position": 1,
@@ -331,8 +332,8 @@
     "leader_alive": true
    },
    "p2": {
-    "culture": 4,
-    "tech": 7,
+    "culture": 6,
+    "tech": 8,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -388,7 +389,7 @@
     "heroes": [
      {
       "hero": "Archmage Chaimidious",
-      "coord": "-2,4",
+      "coord": "-2,6",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
@@ -404,9 +405,8 @@
     "kind": "ai",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 4,
+    "culture": 6,
     "next_milestones": [
-     5,
      15,
      30,
      50,
@@ -414,8 +414,12 @@
     ],
     "mana_current": 0,
     "mana_max": 0,
-    "buildings": [],
-    "building_counts": {},
+    "buildings": [
+     "Combat Frame Production"
+    ],
+    "building_counts": {
+     "combat-frame-production": 1
+    },
     "research": [],
     "tech_progress": {
      "acquired_types": [
@@ -424,21 +428,22 @@
       "wood-collector",
       "home",
       "ore-collector",
-      "oil-collector"
+      "oil-collector",
+      "combat-frame-production"
      ],
      "bonus_points_live": 1,
-     "total": 7,
+     "total": 8,
      "target": 18
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
     "leader_alive": true,
     "subjects": 0,
-    "cores_reserve": 0,
-    "cores_supply": 7,
+    "cores_reserve": 1,
+    "cores_supply": 6,
     "action_cards": {
      "build": 1,
-     "moveBattle": 1,
+     "moveBattle": 2,
      "research": 1
     },
     "action_cards_played_this_round": [
@@ -501,10 +506,17 @@
     "heroes": [
      {
       "hero": "Motherboard",
-      "coord": "2,4",
+      "coord": "2,6",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Marshal Corvin Ashlock",
+      "coord": "2,6",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
      }
     ],
     "bases": [
@@ -535,10 +547,44 @@
   },
   {
    "move_id": "",
-   "description": "Build Water collector for 1 water + a Core (core_pairing, +1 water) at your base G3 (available collectors: water-collector-p2, wood-collector-p2, ore-collector-p2-1, oil-collector-p2-1, water-collector-p2-2, wood-collector-p2-2, ore-collector-p2-2, wood-collector-p2-3; edit payment placements as needed).",
+   "description": "Build Water collector for 1 water at your base G3 (available collectors: water-collector-p2, wood-collector-p2, ore-collector-p2-1, oil-collector-p2-1, water-collector-p2-2, wood-collector-p2-2, ore-collector-p2-2, wood-collector-p2-3; edit payment placements as needed).",
    "move": {
     "type": "build",
     "item": "Water collector",
+    "payment": [
+     {
+      "collectorId": "water-collector-p2",
+      "coord": "1,3"
+     }
+    ],
+    "at_base": "2,4"
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Build Ore collector for 1 wood at your base G3 (available collectors: water-collector-p2, wood-collector-p2, ore-collector-p2-1, oil-collector-p2-1, water-collector-p2-2, wood-collector-p2-2, ore-collector-p2-2, wood-collector-p2-3; edit payment placements as needed).",
+   "move": {
+    "type": "build",
+    "item": "Ore collector",
+    "payment": [
+     {
+      "collectorId": "water-collector-p2",
+      "coord": "1,3"
+     },
+     {
+      "collectorId": "wood-collector-p2",
+      "coord": "2,6"
+     }
+    ],
+    "at_base": "2,4"
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Build Spinner Platform for 2 wood at your base G3 (available collectors: water-collector-p2, wood-collector-p2, ore-collector-p2-1, oil-collector-p2-1, water-collector-p2-2, wood-collector-p2-2, ore-collector-p2-2, wood-collector-p2-3; edit payment placements as needed).",
+   "move": {
+    "type": "build",
+    "item": "Spinner Platform",
     "payment": [
      {
       "collectorId": "water-collector-p2",
@@ -555,18 +601,21 @@
      {
       "collectorId": "water-collector-p2-2",
       "coord": "-1,3"
+     },
+     {
+      "collectorId": "wood-collector-p2-2",
+      "coord": "-1,5"
      }
     ],
-    "core_pairing": true,
     "at_base": "2,4"
    }
   },
   {
    "move_id": "",
-   "description": "Build Ore collector for 1 wood + a Core (core_pairing, +1 water) at your base G3 (available collectors: water-collector-p2, wood-collector-p2, ore-collector-p2-1, oil-collector-p2-1, water-collector-p2-2, wood-collector-p2-2, ore-collector-p2-2, wood-collector-p2-3; edit payment placements as needed).",
+   "description": "Build Spitter Platform for 1 wood + 1 ore at your base G3 (available collectors: water-collector-p2, wood-collector-p2, ore-collector-p2-1, oil-collector-p2-1, water-collector-p2-2, wood-collector-p2-2, ore-collector-p2-2, wood-collector-p2-3; edit payment placements as needed).",
    "move": {
     "type": "build",
-    "item": "Ore collector",
+    "item": "Spitter Platform",
     "payment": [
      {
       "collectorId": "water-collector-p2",
@@ -575,15 +624,18 @@
      {
       "collectorId": "wood-collector-p2",
       "coord": "2,6"
+     },
+     {
+      "collectorId": "ore-collector-p2-1",
+      "coord": "0,2"
      }
     ],
-    "core_pairing": true,
     "at_base": "2,4"
    }
   },
   {
    "move_id": "",
-   "description": "Build Immobile Combat Platform for 2 wood + 2 ore + a Core (core_pairing, +1 water) at your base G3 (available collectors: water-collector-p2, wood-collector-p2, ore-collector-p2-1, oil-collector-p2-1, water-collector-p2-2, wood-collector-p2-2, ore-collector-p2-2, wood-collector-p2-3; edit payment placements as needed).",
+   "description": "Build Immobile Combat Platform for 2 wood + 2 ore at your base G3 (available collectors: water-collector-p2, wood-collector-p2, ore-collector-p2-1, oil-collector-p2-1, water-collector-p2-2, wood-collector-p2-2, ore-collector-p2-2, wood-collector-p2-3; edit payment placements as needed).",
    "move": {
     "type": "build",
     "item": "Immobile Combat Platform",
@@ -613,13 +665,12 @@
       "coord": "-2,4"
      }
     ],
-    "core_pairing": true,
     "at_base": "2,4"
    }
   },
   {
    "move_id": "",
-   "description": "Build Home for 3 wood + 1 ore, a new base at G3.",
+   "description": "Build Home for 3 wood + 1 ore, a new base at G4.",
    "move": {
     "type": "build",
     "item": "Home",
@@ -653,37 +704,7 @@
       "coord": "2,8"
      }
     ],
-    "at_base": "2,4"
-   }
-  },
-  {
-   "move_id": "",
-   "description": "Build Combat Frame Production for 2 wood + 1 ore.",
-   "move": {
-    "type": "build",
-    "item": "Combat Frame Production",
-    "payment": [
-     {
-      "collectorId": "water-collector-p2",
-      "coord": "1,3"
-     },
-     {
-      "collectorId": "wood-collector-p2",
-      "coord": "2,6"
-     },
-     {
-      "collectorId": "ore-collector-p2-1",
-      "coord": "0,2"
-     },
-     {
-      "collectorId": "water-collector-p2-2",
-      "coord": "-1,3"
-     },
-     {
-      "collectorId": "wood-collector-p2-2",
-      "coord": "-1,5"
-     }
-    ]
+    "at_base": "2,6"
    }
   },
   {
@@ -796,7 +817,7 @@
  "watcherView": {
   "game_id": "neither-guts-nor-gears",
   "phase": "action",
-  "round": 11,
+  "round": 13,
   "active_player_id": "p2",
   "first_player_id": "p1",
   "layout": "two",
@@ -810,9 +831,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Archmage Chaimidious (p1)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -823,7 +842,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Archmage Chaimidious (p1)"
+     ],
      "collectors": []
     },
     {
@@ -1041,9 +1062,7 @@
       "Ore collector (p2)",
       "Wood collector (p2)"
      ],
-     "heroes": [
-      "Motherboard (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -1054,7 +1073,10 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Motherboard (p2)",
+      "Marshal Corvin Ashlock (p2)"
+     ],
      "collectors": []
     },
     {
@@ -1081,7 +1103,7 @@
     }
    ]
   },
-  "hero_pool_count": 18,
+  "hero_pool_count": 17,
   "action_stack": [
    {
     "position": 1,
@@ -1122,8 +1144,8 @@
     "leader_alive": true
    },
    "p2": {
-    "culture": 4,
-    "tech": 7,
+    "culture": 6,
+    "tech": 8,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -1179,7 +1201,7 @@
     "heroes": [
      {
       "hero": "Archmage Chaimidious",
-      "coord": "-2,4",
+      "coord": "-2,6",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
@@ -1195,9 +1217,8 @@
     "kind": "ai",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 4,
+    "culture": 6,
     "next_milestones": [
-     5,
      15,
      30,
      50,
@@ -1205,8 +1226,12 @@
     ],
     "mana_current": 0,
     "mana_max": 0,
-    "buildings": [],
-    "building_counts": {},
+    "buildings": [
+     "Combat Frame Production"
+    ],
+    "building_counts": {
+     "combat-frame-production": 1
+    },
     "research": [],
     "tech_progress": {
      "acquired_types": [
@@ -1215,21 +1240,22 @@
       "wood-collector",
       "home",
       "ore-collector",
-      "oil-collector"
+      "oil-collector",
+      "combat-frame-production"
      ],
      "bonus_points_live": 1,
-     "total": 7,
+     "total": 8,
      "target": 18
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
     "leader_alive": true,
     "subjects": 0,
-    "cores_reserve": 0,
-    "cores_supply": 7,
+    "cores_reserve": 1,
+    "cores_supply": 6,
     "action_cards": {
      "build": 1,
-     "moveBattle": 1,
+     "moveBattle": 2,
      "research": 1
     },
     "action_cards_played_this_round": [
@@ -1292,10 +1318,17 @@
     "heroes": [
      {
       "hero": "Motherboard",
-      "coord": "2,4",
+      "coord": "2,6",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Marshal Corvin Ashlock",
+      "coord": "2,6",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
      }
     ],
     "bases": [

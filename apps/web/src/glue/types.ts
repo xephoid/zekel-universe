@@ -244,6 +244,12 @@ export interface GameScreenProps {
    * draw belongs; the table draws none of its own when a screen is present.
    */
   onDraw?: () => void;
+  /**
+   * Ask the engine a read-only question about the decision being composed
+   * (Game.queryChoice): the answer, or null when it refused or could not be
+   * asked. Absent where there is no live table (the watch page, a preview).
+   */
+  ask?: (name: string, args: Record<string, unknown>) => Promise<{ answer: unknown } | { refused: string }>;
   /** a seat's display name, from its engine player id */
   nameFor(playerId: string): string;
 }

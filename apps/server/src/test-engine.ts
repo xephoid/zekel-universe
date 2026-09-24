@@ -29,6 +29,7 @@ export class FakeEngine implements EngineService {
   counter = 0;
   /** every apply_move call, in order */
   applied: Array<{ session: string; player: string; move: Record<string, unknown> }> = [];
+  queries: Array<{ session: string; player: string; name: string; args: Record<string, unknown> }> = [];
   aiTurns = 0;
   createdWith: Array<{ kind: string; table?: string; difficulty?: string }> = [];
   lastOptions: Record<string, unknown> | undefined;
@@ -142,6 +143,14 @@ export class FakeEngine implements EngineService {
       { move_id: 'pass', description: 'Pass', move: { type: 'pass' } },
       { move_id: 'win', description: 'Win', move: { type: 'win' } },
     ];
+  }
+
+  /** The scripted game answers one question, "echo", with its arguments. */
+  async queryChoice(sessionId: string, playerId: string, _token: string | undefined, name: string, args: Record<string, unknown>): Promise<{ answer: unknown }> {
+    this.session(sessionId);
+    if (name !== 'echo') throw new EngineError('ILLEGAL_MOVE', `The test game answers no question named "${name}"`);
+    this.queries.push({ session: sessionId, player: playerId, name, args });
+    return { answer: { playerId, args } };
   }
 
   async getLegalMoves(sessionId: string, playerId: string): Promise<LegalMovesResult> {

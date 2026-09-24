@@ -696,7 +696,10 @@
   "pending": {
    "kind": "second_purchase",
    "for": "p5",
-   "question": "p5 may make a second build purchase"
+   "question": "p5 may make a second build purchase",
+   "context": {
+    "action": "build"
+   }
   },
   "victory_status": {
    "p1": {
@@ -2009,7 +2012,10 @@
   "pending": {
    "kind": "second_purchase",
    "for": "p5",
-   "question": "p5 may make a second build purchase"
+   "question": "p5 may make a second build purchase",
+   "context": {
+    "action": "build"
+   }
   },
   "victory_status": {
    "p1": {

@@ -5,7 +5,7 @@
 // state and plays live from there.
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { GameReferenceResponse, MoveAck, TableEventWire, TableResponse, UndoAck } from '@universe/shared';
+import type { GameReferenceResponse, MoveAck, QueryAck, TableEventWire, TableResponse, UndoAck } from '@universe/shared';
 import { api, ApiRequestError } from '../api';
 import { connectTable, type TableConnection } from '../socket';
 import { usePlaybackQueue, type PlaybackApi } from '../playback/usePlaybackQueue';
@@ -42,6 +42,7 @@ export interface TableApi {
   error: string | null;
   refreshTable: () => Promise<void>;
   move: (move: Record<string, unknown>) => Promise<MoveAck>;
+  query: (name: string, args: Record<string, unknown>) => Promise<QueryAck>;
   undo: () => Promise<UndoAck>;
 }
 
@@ -137,6 +138,9 @@ export function useTable(tableId: string, enabled: boolean): TableApi {
     refreshTable,
     move: (move) => connRef.current
       ? connRef.current.move(mySeat ?? 0, move)
+      : Promise.resolve({ error: 'engine_unavailable', reason: 'Not connected to the table yet.' }),
+    query: (name, args) => connRef.current
+      ? connRef.current.query(mySeat ?? 0, name, args)
       : Promise.resolve({ error: 'engine_unavailable', reason: 'Not connected to the table yet.' }),
     undo: () => connRef.current ? connRef.current.undo() : Promise.resolve({ error: 'engine_unavailable', message: 'Not connected.' }),
   };

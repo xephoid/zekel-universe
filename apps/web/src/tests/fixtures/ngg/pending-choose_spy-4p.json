@@ -497,7 +497,10 @@
   "pending": {
    "kind": "choose_spy",
    "for": "p3",
-   "question": "p3 privately assigns their spy to one of their heroes"
+   "question": "p3 privately assigns their spy to one of their heroes",
+   "context": {
+    "source": "infiltrator"
+   }
   },
   "victory_status": {
    "p1": {

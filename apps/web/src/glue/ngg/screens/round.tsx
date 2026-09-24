@@ -417,6 +417,45 @@ function CoreReallocation({ ctx }: { ctx: ScreenCtx }) {
 }
 
 // ---------------------------------------------------------------------------
+// Setup Faction: each human picks their own, in seat order; the taken ones
+// are struck through with who holds them (the engine's own sentence)
+// ---------------------------------------------------------------------------
+
+function SetupFaction({ ctx }: { ctx: ScreenCtx }) {
+  const { v, ref } = ctx;
+  const options = v.pending?.options ?? [];
+  const [raw, setSel] = useScratch<string | null>(ctx, 'ngg:setup-faction', null);
+  const chosen = options.find((o) => o.id === raw && o.move) ?? null;
+  const listed = chosen ? listedMove(ctx, chosen.move) : undefined;
+  const decide = minePending(ctx, 'choose_faction');
+  const panel = (
+    <Panel title="Choose your faction" kicker="Three wizard factions, three robot factions">
+      {decide && <HowTo>Tap a faction, then take it.</HowTo>}
+      <div className="ngg-options">
+        {options.map((o) => {
+          const f = ref?.factions.find((x) => x.id === o.id) ?? null;
+          return (
+            <OptionRow key={o.id} mark={<FactionChip faction={o.label} size={24} />} title={o.label}
+              sub={[f ? `${f.species} · ${f.color}` : null, typeof o.detail['held_by'] === 'string' ? `held by ${ctx.person(o.detail['held_by'])}` : null].filter(Boolean).join(' · ') || undefined}
+              shutReason={o.blockedReason && ctx.say(o.blockedReason)}
+              selected={raw === o.id} disabled={!ctx.live || !decide} onPress={() => setSel(o.id)} />
+          );
+        })}
+      </div>
+      {decide && (
+        <Actions>
+          <Btn disabled={!ctx.live || !listed} onClick={() => { if (listed) { ctx.memory.delete('ngg:setup-faction'); ctx.send(listed); } }}>
+            {chosen ? `Play ${chosen.label}` : 'Take a faction'}
+          </Btn>
+        </Actions>
+      )}
+      <Rule>No two seats share a faction.</Rule>
+    </Panel>
+  );
+  return <TableLayout ctx={ctx} panel={panel} />;
+}
+
+// ---------------------------------------------------------------------------
 // Report Draw: the table's Draw button deals it; a physical seat reports it
 // ---------------------------------------------------------------------------
 
@@ -477,12 +516,19 @@ function TreatyResponse({ ctx }: { ctx: ScreenCtx }) {
   const accept = moves.find((m) => m.move['accept'] === true) ?? null;
   const decline = moves.find((m) => m.move['accept'] === false) ?? null;
   if (!ctx.route.interrupt) return <TableLayout ctx={ctx} />;
+  const c = ctx.v.pending?.context ?? {};
+  const proposer = typeof c['proposer'] === 'string' ? c['proposer'] : null;
+  const treaty = typeof c['treaty'] === 'string' ? c['treaty'] : null;
+  const income = num(c['culture_income']);
   const interrupt = (
-    <Panel title="A treaty offer" kicker="Not your turn — your answer" tone="urgent">
+    <Panel title={proposer && treaty ? `${ctx.seat(proposer)} offers you ${treaty}` : 'A treaty offer'} kicker="Not your turn — your answer" tone="urgent">
+      {income !== null && <p className="ngr-state">+{income} culture to each of you, every round it stands</p>}
+      {typeof c['effect'] === 'string' && <Rule>{c['effect']}</Rule>}
+      {typeof c['break_condition'] === 'string' && <Rule>To break it: {c['break_condition']}</Rule>}
       <HowTo>The table waits on your answer.</HowTo>
       <Actions>
         {decline && <Btn kind="secondary" disabled={!ctx.live} onClick={() => ctx.send(decline)}><span className="ngr-ic"><Icon name="Decline" size={14} /></span>Decline</Btn>}
-        {accept && <Btn disabled={!ctx.live} onClick={() => ctx.send(accept)}><span className="ngr-ic"><Icon name="Accept" size={14} /></span>Accept</Btn>}
+        {accept && <Btn disabled={!ctx.live} onClick={() => ctx.send(accept)}><span className="ngr-ic"><Icon name="Accept" size={14} /></span>{treaty ? `Accept ${treaty}` : 'Accept'}</Btn>}
       </Actions>
     </Panel>
   );
@@ -685,12 +731,15 @@ function OverlayChoice({ ctx }: { ctx: ScreenCtx }) {
           const name = str(m.move['hero']);
           const owner = v.players.find((p) => p.heroes.some((h) => h.name === name)) ?? null;
           const printed = heroByName(ref, name);
+          const option = v.pending?.options?.find((o) => o.label === name) ?? null;
+          const makes = option && typeof option.detail['resource'] === 'string' ? option.detail['resource'] : null;
           return (
             <div key={name} data-flip-id={`ngg-hero-card:${name}`}>
               <OptionRow
                 mark={<Token kind="hero" faction={owner?.faction ?? null} name={name} size={26} />}
                 title={name}
                 sub={<>{owner && <span className="ngr-hero-cat">{ctx.seat(owner.id)}</span>}{printed?.effect && <span className="ngr-effect">{printed.effect}</span>}</>}
+                aside={makes ? <ResourceChip resource={makes} /> : undefined}
                 selected={sel === m}
                 disabled={!ctx.live}
                 onPress={() => setSel(name)}
@@ -724,6 +773,8 @@ function SpyAssign({ ctx }: { ctx: ScreenCtx }) {
   const decide = minePending(ctx, 'choose_spy');
   const panel = decide ? (
     <Panel title="Which hero carries it" kicker="Only you see this" tone="hl">
+      {ctx.v.pending?.context['source'] === 'illusionist' && <Rule>An Illusionist's spy: its carrier may reveal it for a Decoy, or for Invisible once researched.</Rule>}
+      {ctx.v.pending?.context['source'] === 'infiltrator' && <Rule>An Infiltrator's spy: its carrier may reveal it for a Spy Attack, or to look at an opposing spy card.</Rule>}
       <HowTo>Tap a hero, then assign the spy.</HowTo>
       <div className="ngg-options">
         {moves.map((m) => {
@@ -755,9 +806,11 @@ function GameOver({ ctx }: { ctx: ScreenCtx }) {
   const { v } = ctx;
   const winners = isObj(v.result) && Array.isArray(v.result['winners']) ? v.result['winners'].filter((w): w is string => typeof w === 'string') : [];
   const ordered = [...v.players.filter((p) => winners.includes(p.id)), ...v.players.filter((p) => !winners.includes(p.id))];
-  const line = winners.length === 0 ? 'The game is over'
+  const kinds = isObj(v.result) && Array.isArray(v.result['kinds']) ? v.result['kinds'].filter((k): k is string => typeof k === 'string') : [];
+  const how = kinds.length > 0 ? ` — ${kinds.map((k) => `${k.toLowerCase()} victory`).join(' and ')}` : '';
+  const line = (winners.length === 0 ? 'The game is over'
     : winners.length === 1 ? `${ctx.seat(winners[0])} wins`
-      : `${winners.slice(0, -1).map((w) => ctx.seat(w)).join(', ')} and ${ctx.seat(winners[winners.length - 1])} win`;
+      : `${winners.slice(0, -1).map((w) => ctx.seat(w)).join(', ')} and ${ctx.seat(winners[winners.length - 1])} win`) + how;
   const panel = (
     <Panel title="The end" tone="hl">
       <p className="ngr-winner">{line}</p>
@@ -904,6 +957,7 @@ export function DiplomacyPanel({ ctx }: { ctx: ScreenCtx }) {
 
 export const ROUND_SCREENS: Partial<Record<ScreenKey, ComponentType<{ ctx: ScreenCtx }>>> = {
   'setup-table': SetupTable,
+  'setup-faction': SetupFaction,
   'setup-draft': SetupDraft,
   'setup-start': SetupStart,
   planning: Planning,

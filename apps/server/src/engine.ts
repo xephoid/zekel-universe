@@ -12,6 +12,7 @@ import type {
   GetStateResult,
   LegalMovesResult,
   ListGamesResult,
+  QueryChoiceResult,
   MoveArg,
   SeatConfig,
   UndoResult,
@@ -28,6 +29,8 @@ export type EngineService = {
   }): Promise<CreateSessionResult>;
   getState(sessionId: string, playerId: string, token?: string): Promise<GetStateResult>;
   getLegalMoves(sessionId: string, playerId: string, token?: string): Promise<LegalMovesResult>;
+  /** a read-only question about a decision the seat is composing; applies nothing */
+  queryChoice(sessionId: string, playerId: string, token: string | undefined, name: string, args: Record<string, unknown>): Promise<QueryChoiceResult>;
   applyMove(
     sessionId: string,
     playerId: string,

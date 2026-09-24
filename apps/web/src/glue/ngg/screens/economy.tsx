@@ -10,7 +10,7 @@
 // the items are the listed build moves, the spawn base or new-base site is
 // the listed moves' at_base, and the payment is the one the engine proposes.
 
-import { useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { LegalMove } from '../../types';
 import type { ComponentType } from 'react';
 import type { ScreenCtx } from '../ctx';
@@ -32,6 +32,9 @@ interface Draft {
   /** which listed purchase is chosen: an item name, a tech, or a fixed key */
   pick: string | null;
   stage: 'choose' | 'pay' | 'place';
+  /** the placements the person chose, in order; absent when the engine's
+   *  proposal is being committed as listed (no live engine to ask) */
+  payment?: Payment;
 }
 
 const KEY = 'ngg:purchase';
@@ -187,14 +190,20 @@ function Composer({ ctx, scope, title, kicker, skip, skipLabel, children }: {
   const needsPlace = places.length > 0;
 
   const back = () => setDraft({ pick: null, stage: 'choose' });
-  const commitPayment = () => {
+  /** Send a listed move: as listed, or with the payment the person chose —
+   *  the listed template with only its payment changed. */
+  const sendWith = (m: LegalMove, chosenPayment: Payment | undefined) => {
+    if (chosenPayment) ctx.sendForm(m, { ...m.move, payment: chosenPayment }, ['payment']);
+    else ctx.send(m);
+  };
+  const commitPayment = (chosenPayment?: Payment) => {
     if (!chosen || !first) return;
-    if (needsPlace) { setDraft({ pick: chosen.key, stage: 'place' }); return; }
-    ctx.send(first);
+    if (needsPlace) { setDraft({ pick: chosen.key, stage: 'place', payment: chosenPayment }); return; }
+    sendWith(first, chosenPayment);
   };
   const place = (coord: string) => {
     const m = chosen?.moves.find((x) => atBaseOf(x) === coord);
-    if (m) ctx.send(m);
+    if (m) sendWith(m, draft.payment);
   };
 
   if (stage === 'choose' || !chosen) {
@@ -225,6 +234,13 @@ function Composer({ ctx, scope, title, kicker, skip, skipLabel, children }: {
     );
   }
 
+  if (stage === 'pay' && ctx.ask) {
+    return (
+      <PayStage ctx={ctx} chosen={chosen} proposal={payment} needsPlace={needsPlace}
+        initial={draft.payment ?? []} onBack={back} onCommit={(pay) => commitPayment(pay)} />
+    );
+  }
+
   if (stage === 'pay') {
     return (
       <TableLayout
@@ -244,7 +260,7 @@ function Composer({ ctx, scope, title, kicker, skip, skipLabel, children }: {
             )}
             <Actions>
               <Btn kind="secondary" onClick={back}>Drop the purchase</Btn>
-              <Btn disabled={!ctx.live} onClick={commitPayment}>{needsPlace ? 'Commit payment, then place it' : chosen.kind === 'economic' ? 'Commit all eleven' : 'Commit payment'}</Btn>
+              <Btn disabled={!ctx.live} onClick={() => commitPayment()}>{needsPlace ? 'Commit payment, then place it' : chosen.kind === 'economic' ? 'Commit all eleven' : 'Commit payment'}</Btn>
             </Actions>
           </Panel>
         }
@@ -259,7 +275,7 @@ function Composer({ ctx, scope, title, kicker, skip, skipLabel, children }: {
       marks={{
         lit: new Set(places),
         greyRest: true,
-        proposals: proposalsOf(ctx, payment),
+        proposals: proposalsOf(ctx, draft.payment ?? payment),
         tags: new Map(places.map((c) => [c, chosen.kind === 'base' ? 'NEW BASE' : 'BASE'])),
         onTile: ctx.live ? place : undefined,
       }}
@@ -275,7 +291,159 @@ function Composer({ ctx, scope, title, kicker, skip, skipLabel, children }: {
           </div>
           <Rule>Nothing is spent until the hex is clicked.</Rule>
           <Actions>
-            <Btn kind="secondary" onClick={() => setDraft({ pick: chosen.key, stage: 'pay' })}>Put it back</Btn>
+            <Btn kind="secondary" onClick={() => setDraft({ pick: chosen.key, stage: 'pay', payment: draft.payment })}>Put it back</Btn>
+          </Actions>
+        </Panel>
+      }
+    />
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Paying: the person places each collector, one at a time, on a tile the
+// engine names. The chain rule (each placement makes its neighbours reachable)
+// stays in the engine: after every placement the screen asks where the
+// collectors still in hand may go next (Game.queryChoice "collector_reach").
+
+interface Reach {
+  collectors: Array<{ id: string; resource: string | null; placed_at: string | null }>;
+  next: Record<string, string[]>;
+  produced: Record<string, number>;
+  access_needed: Array<{ collectorId: string; coord: string; owner: string }>;
+}
+
+function readReach(x: unknown): Reach | null {
+  if (!x || typeof x !== 'object') return null;
+  const o = x as Record<string, unknown>;
+  if (!Array.isArray(o['collectors']) || !o['next'] || typeof o['next'] !== 'object') return null;
+  return {
+    collectors: o['collectors'] as Reach['collectors'],
+    next: o['next'] as Reach['next'],
+    produced: (o['produced'] ?? {}) as Reach['produced'],
+    access_needed: (Array.isArray(o['access_needed']) ? o['access_needed'] : []) as Reach['access_needed'],
+  };
+}
+
+function PayStage({ ctx, chosen, proposal, needsPlace, initial, onBack, onCommit }: {
+  ctx: ScreenCtx;
+  chosen: Purchase;
+  /** the engine's own proposed payment, offered as one press, never pre-chosen */
+  proposal: Payment;
+  needsPlace: boolean;
+  initial: Payment;
+  onBack: () => void;
+  onCommit: (payment: Payment) => void;
+}) {
+  const [placed, setPlaced] = useState<Payment>(initial);
+  const [holding, setHolding] = useState<string | null>(null);
+  const [reach, setReach] = useState<Reach | null>(null);
+  const [refused, setRefused] = useState<string | null>(null);
+  const key = JSON.stringify(placed);
+  const ask = ctx.ask;
+
+  useEffect(() => {
+    if (!ask) return;
+    let stop = false;
+    setReach(null);
+    void ask('collector_reach', { prior: placed }).then((r) => {
+      if (stop) return;
+      if ('answer' in r) { setReach(readReach(r.answer)); setRefused(null); } else { setRefused(r.refused); }
+    });
+    return () => { stop = true; };
+    // The question is the placements so far; a new round or stack is a new purchase.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key, ctx.v.round, ctx.v.stack.length]);
+
+  const inHand = reach ? reach.collectors.filter((c) => c.placed_at === null) : [];
+  // A wizard's Surfs are all alike: one kind in hand. A robot's collectors are
+  // typed: one kind per resource.
+  const kinds = new Map<string, string[]>();
+  for (const c of inHand) {
+    const k = c.resource ?? 'surf';
+    kinds.set(k, [...(kinds.get(k) ?? []), c.id]);
+  }
+  const holdingId = holding && inHand.some((c) => c.id === holding) ? holding : null;
+  const lit = new Set(holdingId && reach ? reach.next[holdingId] ?? [] : []);
+  const put = (coord: string) => {
+    if (!holdingId) return;
+    setPlaced([...placed, { collectorId: holdingId, coord }]);
+    // Another alike collector stays in hand; a different type is taken again.
+    const kind = inHand.find((c) => c.id === holdingId)?.resource ?? 'surf';
+    const same = (kinds.get(kind) ?? []).filter((id) => id !== holdingId);
+    setHolding(same[0] ?? null);
+  };
+  const removeFrom = (i: number) => { setPlaced(placed.slice(0, i)); setHolding(null); };
+  const nameFor = (resource: string | null) => (resource ? `${TERRAIN[resource]?.name ?? resource} collector` : 'Surf');
+  const owners = new Map((reach?.access_needed ?? []).map((a) => [a.collectorId, a.owner]));
+
+  return (
+    <TableLayout
+      ctx={ctx}
+      marks={{
+        lit,
+        greyRest: lit.size > 0,
+        proposals: placed.map((p): MapProposal => ({
+          coord: p.coord, owner: ctx.me ?? '', kind: 'collector', key: `pay:${p.collectorId}`,
+          name: collectorIcon(ctx, ctx.me, p.coord),
+        })),
+        tags: new Map(placed.map((p) => [p.coord, owners.has(p.collectorId) ? 'ASK' : 'PAY'])),
+        onTile: ctx.live ? put : undefined,
+      }}
+      panel={
+        <Panel title={chosen.kind === 'economic' ? 'Spend all five' : `Pay for ${chosen.label}`} kicker={KIND_WORDS[chosen.kind]}>
+          {chosen.cost && <div className="ngg-eco-costline"><span>Cost</span><CostChips cost={chosen.cost} /></div>}
+          <div className="ngg-eco-costline"><span>Produces</span>
+            {reach && Object.keys(reach.produced).length > 0 ? <CostChips cost={reach.produced as Cost} /> : <span className="ngg-cost-free">nothing yet</span>}
+          </div>
+          {refused && <p className="ngg-option-reason">{ctx.say(refused)}</p>}
+          <HowTo>{holdingId ? 'Click a lit hex to place it.' : 'Take a collector from your hand, then click a lit hex.'}</HowTo>
+          {kinds.size > 0 && (
+            <div className="ngg-eco-hand">
+              {[...kinds.entries()].map(([k, ids]) => {
+                const res = k === 'surf' ? null : k;
+                const held = holdingId !== null && ids.includes(holdingId);
+                const reachable = (reach?.next[ids[0]!] ?? []).length > 0;
+                return (
+                  <button key={k} type="button" className={`ngg-eco-take${held ? ' held' : ''}`} disabled={!ctx.live || !reachable}
+                    onClick={() => setHolding(held ? null : ids[0]!)} aria-pressed={held}>
+                    <Icon name={res ? `${TERRAIN[res]?.name ?? ''} collector` : 'Surf'} size={16} stroke={2} />
+                    {nameFor(res)}{ids.length > 1 ? ` ×${ids.length}` : ''}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+          {placed.length > 0 && (
+            <ul className="ngg-eco-pay">
+              {placed.map((p, i) => {
+                const tile = ctx.v.tiles.find((t) => t.coord === p.coord);
+                const owner = owners.get(p.collectorId);
+                return (
+                  <li key={p.collectorId} className={owner ? 'asked' : ''}>
+                    <span className="ngg-eco-pay-mark"><Icon name={collectorIcon(ctx, ctx.me, p.coord)} size={16} stroke={2} /></span>
+                    <b>{ctx.tile(p.coord)}</b>
+                    <ResourceChip resource={tile?.resource ?? null} />
+                    {owner && <span className="ngg-eco-owner">{ctx.seat(owner)} has to agree</span>}
+                    <button type="button" className="ngg-eco-remove" onClick={() => removeFrom(i)} disabled={!ctx.live}
+                      aria-label={`Take back ${ctx.tile(p.coord)}`}
+                      title={i < placed.length - 1 ? 'Take this back, and the ones placed after it' : 'Take this back'}>✕</button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+          <Rule>Nothing is spent until you commit. Collectors stay on the map until upkeep.</Rule>
+          {chosen.kind === 'economic' && ctx.mine && (
+            <Rule>{ctx.mine.leaderAlive ? 'Your Leader is alive.' : 'Your Leader is dead: this spend cannot win.'}</Rule>
+          )}
+          <Actions>
+            <Btn kind="secondary" onClick={onBack}>Drop the purchase</Btn>
+            {proposal.length > 0 && placed.length === 0 && (
+              <Btn kind="quiet" disabled={!ctx.live} onClick={() => { setPlaced(proposal); setHolding(null); }}>Use the engine’s proposal</Btn>
+            )}
+            <Btn disabled={!ctx.live || (placed.length === 0 && proposal.length > 0)} onClick={() => onCommit(placed)}>
+              {needsPlace ? 'Commit payment, then place it' : chosen.kind === 'economic' ? 'Commit all eleven' : 'Commit payment'}
+            </Btn>
           </Actions>
         </Panel>
       }

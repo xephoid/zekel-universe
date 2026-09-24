@@ -22,6 +22,7 @@ const FIXTURES = Object.entries(import.meta.glob<Fixture>('./fixtures/ngg/*.json
   .map(([path, f]) => ({ name: path.replace(/^.*\//, '').replace(/\.json$/, ''), f }));
 
 const EXPECTED: Record<string, ScreenKey> = {
+  'pending-choose_faction': 'setup-faction',
   'pending-choose_leader': 'setup-draft',
   'pending-choose_starting_location': 'setup-start',
   'pending-report_draw': 'report-draw',

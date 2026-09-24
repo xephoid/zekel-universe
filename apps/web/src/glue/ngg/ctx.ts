@@ -22,8 +22,12 @@ export interface ScreenCtx {
   sendForm(template: LegalMove, move: Record<string, unknown>, editableKeys: string[]): void;
   /** press Draw: the table sends the listed resolve_report; null when none is listed */
   draw: (() => void) | null;
+  /** ask the engine a read-only question about this decision; null where no live table can answer */
+  ask: ((name: string, args: Record<string, unknown>) => Promise<{ answer: unknown } | { refused: string }>) | null;
   /** a seat's faction name, or its display name before it has one */
   seat(playerId: string | null | undefined): string;
+  /** the person at a seat, by display name */
+  person(playerId: string | null | undefined): string;
   /** "D4" for a coord */
   tile(coord: string | null | undefined): string;
   /** the listed moves of one type */
@@ -52,11 +56,13 @@ export function makeCtx(props: GameScreenProps, v: NggView, route: Route): Scree
     send: props.onMove,
     sendForm: props.onForm,
     draw: props.yourTurn && props.interactive && props.onDraw ? props.onDraw : null,
+    ask: props.yourTurn && props.interactive && props.ask ? props.ask : null,
     seat: (pid) => {
       if (!pid) return '';
       const p = playerOf(v, pid);
       return p?.faction ?? props.nameFor(pid);
     },
+    person: (pid) => (pid ? props.nameFor(pid) : ''),
     tile: (coord) => labelOf(v, coord ?? null),
     movesOf: (type) => legal.filter((m) => moveType(m.move) === type),
     say: (text) => sayFor(v, text, (pid) => playerOf(v, pid)?.faction ?? props.nameFor(pid)),

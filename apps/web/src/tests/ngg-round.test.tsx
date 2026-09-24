@@ -436,3 +436,27 @@ describe('DiplomacyPanel', () => {
     cleanup();
   });
 });
+
+describe('NGnG: each human picks their own faction', () => {
+  it('strikes the taken faction with the engine reason and who holds it, and sends only the pressed pick', async () => {
+    const { render, fireEvent, screen, cleanup } = await import('@testing-library/react');
+    const { vi } = await import('vitest');
+    const { NggScreen } = await import('../glue/ngg/NggScreen');
+    const REF = (await import('./fixtures/ngg-reference.json')).default;
+    const f = (await import('./fixtures/ngg/pending-choose_faction.json')).default as unknown as {
+      viewer: string; view: unknown; legalMoves: Array<{ move_id: string; description: string; move: Record<string, unknown> }>;
+    };
+    const onMove = vi.fn();
+    render(<NggScreen input={{ view: f.view, previous: null, legalMoves: f.legalMoves, playerId: f.viewer, reference: REF as never, seq: 1, engineMove: null, actorPlayerId: null, memory: new Map() }}
+      yourTurn busy={false} interactive onMove={onMove} onForm={vi.fn()} nameFor={(p) => (p === 'p1' ? 'Ada' : p)} />);
+    expect(screen.getByText(/The Covenant is already taken/)).toBeTruthy();
+    expect(screen.getByText(/held by Ada/)).toBeTruthy();
+    const take = screen.getByRole('button', { name: 'Take a faction' }) as HTMLButtonElement;
+    expect(take.disabled).toBe(true);
+    fireEvent.click(screen.getAllByRole('button', { name: /^The Foundry/ })[0]!);
+    expect(onMove).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: 'Play The Foundry' }));
+    expect(onMove.mock.calls[0]![0].move).toEqual({ type: 'choose_faction', faction: 'foundry' });
+    cleanup();
+  });
+});
