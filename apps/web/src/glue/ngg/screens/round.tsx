@@ -530,7 +530,7 @@ function TreatyBreak({ ctx }: { ctx: ScreenCtx }) {
               title={o.label}
               sub={cond ? `To break: ${cond}` : undefined}
               aside={<>{income !== null && <span className="ngr-income">+{income}</span>}{move && !o.blockedReason && <span className="ngr-open">CAN BREAK</span>}</>}
-              shutReason={o.blockedReason}
+              shutReason={o.blockedReason && ctx.say(o.blockedReason)}
               selected={sel?.id === o.id}
               disabled={!ctx.live}
               onPress={move ? () => setSel(o.id) : undefined}

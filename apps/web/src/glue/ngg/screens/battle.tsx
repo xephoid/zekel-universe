@@ -45,19 +45,6 @@ function useStash<T>(ctx: ScreenCtx, key: string): [T | undefined, (t: T | undef
   return [val, set];
 }
 
-/**
- * An engine sentence, for display: player ids and "c,r" coords swapped for
- * the seat's faction and the tile's label. Nothing is read out of it.
- */
-function say(ctx: ScreenCtx, text: string): string {
-  let out = text;
-  for (const p of ctx.v.players) {
-    if (!p.id) continue;
-    out = out.replace(new RegExp(`(^|[^\\w-])${p.id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![\\w-])`, 'g'), (_m, pre: string) => `${pre}${ctx.seat(p.id)}`);
-  }
-  return out.replace(/-?\d+,-?\d+/g, (c) => (ctx.v.tiles.some((t) => t.coord === c) ? ctx.tile(c) : c));
-}
-
 function statLine(init: number | null, dmg: number | null, def: number | null): string | null {
   if (init === null && dmg === null && def === null) return null;
   return `INIT ${init ?? '—'} · DMG ${dmg ?? '—'} · DEF ${def ?? '—'}`;
@@ -475,7 +462,7 @@ function CommitScreen({ ctx }: { ctx: ScreenCtx }) {
   const handIdOf = (label: string) => handIds[v.hand.findIndex((c) => c.card === label)];
 
   const card = (o: NggOption, tag?: string) => {
-    const shut = o.blockedReason ? say(ctx, o.blockedReason) : null;
+    const shut = o.blockedReason ? ctx.say(o.blockedReason) : null;
     const count = asNum(o.detail['count']);
     const effect = asStr(o.detail['effect']) || cardByLabel(ctx.ref, o.label)?.effect;
     const flip = handIdOf(o.label);
@@ -590,7 +577,7 @@ function CounterScreen({ ctx }: { ctx: ScreenCtx }) {
                     label={cardOf(o)}
                     effect={cardByLabel(ctx.ref, cardOf(o))?.effect}
                     owner={<>{ctx.seat(by)}{state ? ` · ${state}` : ''}</>}
-                    shutReason={o.blockedReason ? say(ctx, o.blockedReason) : null}
+                    shutReason={o.blockedReason ? ctx.say(o.blockedReason) : null}
                     selected={picked?.id === o.id}
                     disabled={!live}
                     onPress={live && open(o) ? () => choose(o.id) : undefined}
@@ -665,7 +652,7 @@ function ExtraScreen({ ctx }: { ctx: ScreenCtx }) {
                 return (
                   <span key={o.id} className="ngb-flip" data-flip-id={flip}>
                     <CardFace label={o.label} effect={asStr(o.detail['effect']) || cardByLabel(ctx.ref, o.label)?.effect}
-                      count={asNum(o.detail['count'])} shutReason={o.blockedReason ? say(ctx, o.blockedReason) : null}
+                      count={asNum(o.detail['count'])} shutReason={o.blockedReason ? ctx.say(o.blockedReason) : null}
                       selected={n > 0} owner={n > 1 ? `×${n} CHOSEN` : undefined} disabled={!live}
                       onPress={!o.blockedReason && o.move ? () => tap(o) : undefined} />
                   </span>
@@ -959,7 +946,7 @@ function DefenseScreen({ ctx }: { ctx: ScreenCtx }) {
           {spyReveal && decoyText && <Rule>{decoyText}</Rule>}
           <div className="ngg-options">
             {rest.map((o) => (
-              <OptionRow key={o.id} title={say(ctx, o.label)} aside={aside(o)} shutReason={o.blockedReason ? say(ctx, o.blockedReason) : null}
+              <OptionRow key={o.id} title={ctx.say(o.label)} aside={aside(o)} shutReason={o.blockedReason ? ctx.say(o.blockedReason) : null}
                 selected={picked?.id === o.id} disabled={!live} onPress={open(o) ? () => choose(o.id) : undefined} />
             ))}
           </div>
@@ -968,7 +955,7 @@ function DefenseScreen({ ctx }: { ctx: ScreenCtx }) {
           {asStr(c['step']) === 'cleric' && <Rule>One save per Cleric per pass, and the Cleric&rsquo;s owner pays.</Rule>}
           <Actions>
             {none && <Btn kind="secondary" disabled={!live || !open(none)} onClick={() => send(none)}>{spyReveal ? 'Let it land' : none.label}</Btn>}
-            <Btn disabled={!live || !picked || picked.id === 'none'} onClick={() => send(picked)}>{picked && picked.id !== 'none' ? say(ctx, picked.label) : spyReveal ? 'Reveal the Decoy' : 'Defend'}</Btn>
+            <Btn disabled={!live || !picked || picked.id === 'none'} onClick={() => send(picked)}>{picked && picked.id !== 'none' ? ctx.say(picked.label) : spyReveal ? 'Reveal the Decoy' : 'Defend'}</Btn>
           </Actions>
         </>
       )}

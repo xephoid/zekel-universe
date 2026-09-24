@@ -74,7 +74,7 @@ export function GenericScreen({ ctx }: { ctx: ScreenCtx }) {
                 <OptionRow
                   key={o.id}
                   title={o.label}
-                  shutReason={o.blockedReason}
+                  shutReason={o.blockedReason && ctx.say(o.blockedReason)}
                   disabled={!ctx.live || !listed}
                   onPress={listed ? () => ctx.send(listed) : undefined}
                 />

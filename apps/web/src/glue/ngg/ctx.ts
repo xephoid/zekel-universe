@@ -26,6 +26,12 @@ export interface ScreenCtx {
   tile(coord: string | null | undefined): string;
   /** the listed moves of one type */
   movesOf(type: string): LegalMove[];
+  /**
+   * An engine sentence (a shut option's reason, a move's description) for a
+   * person: seat ids and "c,r" coords shown as faction names and tile labels.
+   * A display swap only; nothing is read out of the sentence.
+   */
+  say(text: string): string;
 }
 
 export function makeCtx(props: GameScreenProps, v: NggView, route: Route): ScreenCtx {
@@ -50,5 +56,19 @@ export function makeCtx(props: GameScreenProps, v: NggView, route: Route): Scree
     },
     tile: (coord) => labelOf(v, coord ?? null),
     movesOf: (type) => legal.filter((m) => moveType(m.move) === type),
+    say: (text) => sayFor(v, text, (pid) => playerOf(v, pid)?.faction ?? props.nameFor(pid)),
   };
+}
+
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function sayFor(v: NggView, text: string, seat: (pid: string) => string): string {
+  let out = text;
+  for (const p of v.players) {
+    if (!p.id) continue;
+    out = out.replace(new RegExp(`(^|[^\\w-])${escapeRegExp(p.id)}(?![\\w-])`, 'g'), (_m, pre: string) => `${pre}${seat(p.id)}`);
+  }
+  return out.replace(/-?\d+,-?\d+/g, (c) => (v.tiles.some((t) => t.coord === c) ? labelOf(v, c) : c));
 }

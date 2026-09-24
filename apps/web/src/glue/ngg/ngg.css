@@ -231,7 +231,7 @@ button.ngg-option:hover:not(:disabled) { border-color: var(--n-brand); }
 .ngg-option-aside { flex-shrink: 0; display: flex; align-items: center; gap: 6px; font: 600 11px var(--n-mono); color: var(--n-muted); }
 .ngg-option-check { width: 20px; height: 20px; border-radius: 50%; background: var(--n-brand); color: #fff; border: 1.5px solid var(--n-ink); display: grid; place-items: center; font-size: 11px; flex-shrink: 0; }
 .ngg-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; margin-top: 4px; }
-.ngg-btn { height: 40px; padding: 0 16px; border-radius: 9px; font: 600 13.5px var(--n-face); white-space: nowrap; flex-shrink: 0; cursor: pointer; }
+.ngg-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 40px; padding: 0 16px; border-radius: 9px; font: 600 13.5px var(--n-face); white-space: nowrap; flex-shrink: 0; cursor: pointer; }
 .ngg-btn.primary { border: none; background: var(--n-action); color: #fff; }
 .ngg-btn.secondary { border: 1.5px solid var(--n-ink); background: var(--n-surface); color: var(--n-text); }
 .ngg-btn.quiet { border: 1px solid var(--n-line); background: transparent; color: var(--n-text); }
@@ -246,7 +246,7 @@ button.ngg-option:hover:not(:disabled) { border-color: var(--n-brand); }
 
 /* ---------- cards ---------- */
 .ngg-cards { display: flex; flex-wrap: wrap; gap: 8px; }
-.ngg-card { width: 170px; min-height: 108px; padding: 11px 12px; border-radius: 11px; display: flex; flex-direction: column; gap: 4px; text-align: left; background: var(--n-surface); border: 1px solid var(--n-line); color: var(--n-text); font: inherit; transition: transform var(--motion-fast, 120ms) ease, box-shadow var(--motion-fast, 120ms) ease; }
+.ngg-card { width: 160px; min-height: 108px; padding: 11px 12px; border-radius: 11px; display: flex; flex-direction: column; gap: 4px; text-align: left; background: var(--n-surface); border: 1px solid var(--n-line); color: var(--n-text); font: inherit; transition: transform var(--motion-fast, 120ms) ease, box-shadow var(--motion-fast, 120ms) ease; }
 button.ngg-card { cursor: pointer; }
 .ngg-card.selected { border: 2px solid var(--n-brand); box-shadow: 0 8px 18px rgba(28,26,23,.16); transform: translateY(-4px); }
 .ngg-card.shut { background: transparent; border: 1.5px dashed var(--n-line); opacity: .72; }
