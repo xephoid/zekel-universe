@@ -8,7 +8,7 @@
 // its old hex to its new one and a new piece flies in from its owner's
 // supply: nothing appears in place.
 
-import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
 import type { NggPiece, NggTile, NggView, Species } from './read';
 import { TERRAIN, inkOfSeat } from './factions';
 import { Icon, Token } from './ui';
@@ -118,25 +118,44 @@ function TilePieces({ v, t, proposals }: { v: NggView; t: NggTile; proposals: Ma
   );
 }
 
-/** Scale the map to fit its box, whole, at every size. */
+/** The scale that fits the whole map in its box, at every size. */
 function useFit(w: number, h: number) {
   const box = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(1);
+  const [fit, setFit] = useState(1);
   useLayoutEffect(() => {
     const el = box.current;
     if (!el) return;
-    const fit = () => {
+    const measure = () => {
       const r = el.getBoundingClientRect();
       if (r.width === 0 || r.height === 0) return;
-      setScale(Math.max(0.3, Math.min(r.width / w, r.height / h, 1.6)));
+      setFit(Math.max(0.3, Math.min(r.width / w, r.height / h, 1.6)));
     };
-    fit();
+    measure();
     if (typeof ResizeObserver === 'undefined') return;
-    const ro = new ResizeObserver(fit);
+    const ro = new ResizeObserver(measure);
     ro.observe(el);
     return () => ro.disconnect();
   }, [w, h]);
-  return { box, scale };
+  return { box, fit };
+}
+
+/** Three fixed stops (the canvas's Map Zoom): the whole map, the board at
+ *  its own size, and one hex close up. No free zoom. */
+export type ZoomStop = 'whole' | 'board' | 'hex';
+const ZOOM_STOPS: Array<{ stop: ZoomStop; label: string }> = [
+  { stop: 'whole', label: 'Whole map' }, { stop: 'board', label: 'Board' }, { stop: 'hex', label: 'Hex' },
+];
+
+function ZoomControl({ zoom, setZoom }: { zoom: ZoomStop; setZoom: (z: ZoomStop) => void }) {
+  return (
+    <div className="ngg-zoom" role="group" aria-label="Map zoom">
+      {ZOOM_STOPS.map((z) => (
+        <button key={z.stop} type="button" className={zoom === z.stop ? 'on' : ''} aria-pressed={zoom === z.stop} onClick={() => setZoom(z.stop)}>
+          <i className={`ngg-zoom-hex ${z.stop}`} aria-hidden="true" />{z.label}
+        </button>
+      ))}
+    </div>
+  );
 }
 
 export function HexMap({ v, marks = {}, seatSpecies, overlay }: {
@@ -155,7 +174,53 @@ export function HexMap({ v, marks = {}, seatSpecies, overlay }: {
   const rMax = rs.length ? Math.max(...rs) : 0;
   const mapW = (cMax - cMin) * COLW + HEXW + GUTTER;
   const mapH = (rMax - rMin) * ROWH + HEXH + GUTTER;
-  const { box, scale } = useFit(mapW + 24, mapH + 24);
+  const { box, fit } = useFit(mapW + 24, mapH + 24);
+  const [zoom, setZoom] = useState<ZoomStop>('whole');
+  // Board is the map at its own size and Hex twice that, never smaller than the whole map.
+  const scale = zoom === 'whole' ? fit : Math.max(fit, zoom === 'board' ? 1 : 2);
+  const panned = scale > fit + 0.001;
+  const scroller = useRef<HTMLDivElement>(null);
+  // A new stop keeps what was in the middle in the middle, or starts centred.
+  const lastScale = useRef(scale);
+  useEffect(() => {
+    const el = scroller.current;
+    if (!el) return;
+    const ratio = scale / lastScale.current;
+    lastScale.current = scale;
+    const cx = (el.scrollLeft + el.clientWidth / 2) * ratio;
+    const cy = (el.scrollTop + el.clientHeight / 2) * ratio;
+    el.scrollLeft = Math.max(0, cx - el.clientWidth / 2);
+    el.scrollTop = Math.max(0, cy - el.clientHeight / 2);
+  }, [scale]);
+  // Drag to pan when zoomed in; a click on a hex is still a click.
+  const drag = useRef<{ x: number; y: number; left: number; top: number; moved: boolean } | null>(null);
+  const onPointerDown = (e: PointerEvent<HTMLDivElement>) => {
+    const el = scroller.current;
+    if (!panned || !el || e.button !== 0) return;
+    drag.current = { x: e.clientX, y: e.clientY, left: el.scrollLeft, top: el.scrollTop, moved: false };
+  };
+  const onPointerMove = (e: PointerEvent<HTMLDivElement>) => {
+    const el = scroller.current;
+    const d = drag.current;
+    if (!el || !d) return;
+    const dx = e.clientX - d.x;
+    const dy = e.clientY - d.y;
+    if (!d.moved && Math.abs(dx) + Math.abs(dy) < 5) return;
+    d.moved = true;
+    el.scrollLeft = d.left - dx;
+    el.scrollTop = d.top - dy;
+  };
+  const endDrag = () => { setTimeout(() => { drag.current = null; }, 0); };
+  const onClickCapture = (e: React.MouseEvent) => { if (drag.current?.moved) { e.stopPropagation(); e.preventDefault(); } };
+  const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    const order: ZoomStop[] = ['whole', 'board', 'hex'];
+    const i = order.indexOf(zoom);
+    if (e.key === '+' || e.key === '=') setZoom(order[Math.min(2, i + 1)]!);
+    else if (e.key === '-') setZoom(order[Math.max(0, i - 1)]!);
+    else if (e.key === '0') setZoom('whole');
+    else return;
+    e.preventDefault();
+  };
   const x = (c: number) => GUTTER + (c - cMin) * COLW;
   const y = (r: number) => GUTTER + (r - rMin) * ROWH;
 
@@ -164,7 +229,22 @@ export function HexMap({ v, marks = {}, seatSpecies, overlay }: {
 
   return (
     <div className="ngg-map-box" ref={box}>
-      <div className="ngg-map" style={{ width: mapW, height: mapH, transform: `translate(-50%, -50%) scale(${scale})` }}>
+      <div
+        className={`ngg-map-scroll${panned ? ' panned' : ''}`}
+        ref={scroller}
+        tabIndex={0}
+        aria-label="The map. Plus and minus change the zoom; zero shows the whole map."
+        onKeyDown={onKeyDown}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={endDrag}
+        onPointerLeave={endDrag}
+        onClickCapture={onClickCapture}
+      >
+      <div className="ngg-map-canvas" style={panned ? { width: mapW * scale + 48, height: mapH * scale + 48 } : undefined}>
+      <div className="ngg-map" style={panned
+        ? { width: mapW, height: mapH, left: 24, top: 24, transform: `scale(${scale})`, transformOrigin: 'top left' }
+        : { width: mapW, height: mapH, transform: `translate(-50%, -50%) scale(${scale})` }}>
         {columns.map((c) => (
           <span key={`col${c}`} className="ngg-map-col" style={{ left: x(c) + HEXW / 2 }}>{letterOf(c)}</span>
         ))}
@@ -199,7 +279,10 @@ export function HexMap({ v, marks = {}, seatSpecies, overlay }: {
             : <div key={t.coord} className={cls} style={style} title={title}>{inner}</div>;
         })}
       </div>
+      </div>
+      </div>
       {overlay}
+      <ZoomControl zoom={zoom} setZoom={setZoom} />
     </div>
   );
 }

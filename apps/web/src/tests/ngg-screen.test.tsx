@@ -3,10 +3,11 @@
 // watches, and nothing is ever sent without a press.
 
 import { describe, expect, it, vi } from 'vitest';
-import { render, cleanup } from '@testing-library/react';
+import { render, cleanup, fireEvent } from '@testing-library/react';
 import type { GameReferenceResponse, LegalMove } from '@universe/shared';
 import type { GlueInput } from '../glue';
 import { NggScreen } from '../glue/ngg/NggScreen';
+import nggGlue from '../glue/ngg';
 import REFERENCE from './fixtures/ngg-reference.json';
 
 interface Fixture {
@@ -54,6 +55,38 @@ describe('NGnG screen', () => {
     const reason = pending.options.find((o) => o.blocked_reason)!.blocked_reason!;
     const r = render(<NggScreen input={inputFor(f.view, f.viewer, f.legalMoves)} yourTurn busy={false} interactive onMove={vi.fn()} onForm={vi.fn()} nameFor={(p) => p} />);
     expect(r.container.textContent).toContain(reason);
+    cleanup();
+  });
+  it("gives the whole page the seat's own faction theme, and a watcher the plain one", () => {
+    const f = FIXTURES[0]!.f;
+    expect(nggGlue.themeFor!(inputFor(f.view, f.viewer, f.legalMoves))).toMatch(/^ngg-theme ngg-theme-(wizard|robot)$/);
+    expect(nggGlue.themeFor!(inputFor(null, 'nobody', []))).toBeNull();
+  });
+
+  it("places the table's move list in the column and the faction strip in the bench", () => {
+    const f = FIXTURES[0]!.f;
+    const bench = document.createElement('div');
+    document.body.appendChild(bench);
+    const r = render(<NggScreen input={inputFor(f.view, f.viewer, f.legalMoves)} yourTurn busy={false} interactive onMove={vi.fn()} onForm={vi.fn()} nameFor={(p) => p}
+      menu={<div data-testid="menu">Moves</div>} benchSlot={bench} />);
+    expect(r.container.querySelector('.ngg-column .ngg-menu [data-testid="menu"]')).not.toBeNull();
+    expect(bench.querySelector('.ngg-strip')).not.toBeNull();
+    expect(r.container.querySelector('.ngg-strip')).toBeNull();
+    cleanup();
+    bench.remove();
+  });
+
+  it('zooms the map by three stops, and pans only when zoomed in', () => {
+    const f = FIXTURES[0]!.f;
+    const r = render(<NggScreen input={inputFor(f.view, f.viewer, f.legalMoves)} yourTurn busy={false} interactive onMove={vi.fn()} onForm={vi.fn()} nameFor={(p) => p} />);
+    const stop = (name: string) => r.getByRole('button', { name });
+    expect(stop('Whole map').getAttribute('aria-pressed')).toBe('true');
+    expect(r.container.querySelector('.ngg-map-scroll.panned')).toBeNull();
+    fireEvent.click(stop('Hex'));
+    expect(stop('Hex').getAttribute('aria-pressed')).toBe('true');
+    expect(r.container.querySelector('.ngg-map-scroll.panned')).not.toBeNull();
+    fireEvent.keyDown(r.container.querySelector('.ngg-map-scroll')!, { key: '0' });
+    expect(stop('Whole map').getAttribute('aria-pressed')).toBe('true');
     cleanup();
   });
 });

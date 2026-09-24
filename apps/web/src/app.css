@@ -326,6 +326,9 @@ label.option-card { position: relative; padding-right: 40px; }
   padding: 12px 16px 14px; display: flex; gap: 18px; align-items: flex-end; overflow-x: auto; min-height: 176px;
   --zekel-card-w: 96px; --zekel-card-h: 136px;
 }
+/* A game-drawn screen fills the bench itself (a slot), so it keeps no empty height of its own. */
+.table-bench.slot { min-height: 0; padding: 0; border-top: none; display: block; }
+.table-bench.slot:empty { display: none; }
 /* your own tableau in the bench: a compact card, its counts in two columns */
 .table-bench .zk-tableau { width: 290px; flex: none; display: grid; grid-template-columns: 1fr 1fr; column-gap: 12px; align-content: start; }
 .table-bench .zk-tableau .zk-tableau-title, .table-bench .zk-tableau .zk-tableau-slot { grid-column: 1 / -1; }

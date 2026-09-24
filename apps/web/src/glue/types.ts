@@ -7,7 +7,7 @@ import type {
   BagData, CardZoneData, GridData, MapData, Palette, PoolData, SelectEvent, TableauData, TrackData,
 } from '@universe/primitives';
 import type { GameReferenceResponse, LegalMove } from '@universe/shared';
-import type { ComponentType } from 'react';
+import type { ComponentType, ReactNode } from 'react';
 
 export type { LegalMove, SelectEvent, Palette };
 
@@ -250,6 +250,10 @@ export interface GameScreenProps {
    * asked. Absent where there is no live table (the watch page, a preview).
    */
   ask?: (name: string, args: Record<string, unknown>) => Promise<{ answer: unknown } | { refused: string }>;
+  /** the numbered move menu, for the screen to place where it fits; absent when there is none */
+  menu?: ReactNode;
+  /** the bench along the bottom of the table, for the screen to fill (a portal target) */
+  benchSlot?: HTMLElement | null;
   /** a seat's display name, from its engine player id */
   nameFor(playerId: string): string;
 }
@@ -260,6 +264,9 @@ export interface GlueModule {
   /** A game whose table is more than the bench layout can hold draws its own
    *  screen. When present the table renders it instead of the plan's zones. */
   Screen?: ComponentType<GameScreenProps>;
+  /** A theme for the whole table page (a class on the table shell), from the
+   *  seat's own view: a seat's faction look covers every part of its page. */
+  themeFor?(input: GlueInput): string | null;
   /** Build a plan, or null when the view does not match this game's shape;
    *  the table then renders the generic JSON inspector. */
   plan(input: GlueInput): TablePlan | null;

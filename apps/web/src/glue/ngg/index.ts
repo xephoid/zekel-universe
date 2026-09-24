@@ -29,6 +29,14 @@ export const nggGlue: GlueModule = {
   title: 'Neither Guts nor Gears',
   Screen: NggScreen,
 
+  /** The seat's faction look for the whole page: Ink for a wizard seat, Oil
+   *  for a robot seat; the table's own look for a watcher or before a faction. */
+  themeFor(input) {
+    const v = readView(input.view);
+    const species = v?.players.find((p) => p.id === input.playerId)?.species ?? null;
+    return species ? `ngg-theme ngg-theme-${species}` : v ? 'ngg-theme' : null;
+  },
+
   plan(input): TablePlan | null {
     const v = readView(input.view);
     if (!v) return null;

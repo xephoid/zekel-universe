@@ -81,6 +81,8 @@ export function TablePage() {
   const [captionClamped, setCaptionClamped] = useState(false);
   const [captionFull, setCaptionFull] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  /** the bench, as an element a game-drawn screen can fill */
+  const [benchSlot, setBenchSlot] = useState<HTMLDivElement | null>(null);
   const [playAgainBusy, setPlayAgainBusy] = useState(false);
   const [showEnd, setShowEnd] = useState(true);
   /** a moment playing over the board; `resolve` lets the held event land */
@@ -282,7 +284,7 @@ export function TablePage() {
   }
 
   return (
-    <FlipRoot viewKey={state.tick} className="table-shell" style={paletteVars(plan?.palette)} reducedMotion={reduced}>
+    <FlipRoot viewKey={state.tick} className={`table-shell${glue?.themeFor?.(input) ? ` ${glue.themeFor(input)}` : ''}`} style={paletteVars(plan?.palette)} reducedMotion={reduced}>
       <div className="table-topbar">
         <Link to="/" className="brand" aria-label="zekel home" style={{ textDecoration: 'none', display: 'inline-flex' }}><Wordmark size={24} /></Link>
         <span className="divider" />
@@ -346,6 +348,8 @@ export function TablePage() {
                   const ack = await t.query(name, args);
                   return 'ok' in ack && ack.ok ? { answer: ack.answer } : { refused: ('reason' in ack && ack.reason) || ack.error };
                 }}
+                menu={yourTurn ? <MoveMenuList menu={current?.moveMenu ?? null} legalMoves={legalMoves} onPick={pick} disabled={busy} open={false} /> : null}
+                benchSlot={benchSlot}
               />
             : plan
             ? <BoardZones zones={plan.board} lit={lit} onSelect={onSelect} />
@@ -357,7 +361,7 @@ export function TablePage() {
               {/draw|deal/i.test(resolveReport.description ?? '') ? 'Draw' : 'Roll'}
             </button>
           )}
-          {yourTurn && <MoveMenuList menu={current?.moveMenu ?? null} legalMoves={legalMoves} onPick={pick} disabled={busy} open={!glue?.Screen && lit.length === 0 && !plan?.prompt?.actions.length} />}
+          {yourTurn && !glue?.Screen && <MoveMenuList menu={current?.moveMenu ?? null} legalMoves={legalMoves} onPick={pick} disabled={busy} open={lit.length === 0 && !plan?.prompt?.actions.length} />}
           {result && showEnd && table && !moment && (
             <div className="sheet-backdrop" role="presentation">
               <div className="sheet" role="dialog" aria-label="Game over">
@@ -381,7 +385,7 @@ export function TablePage() {
         </div>
       </div>
 
-      <div className="table-bench" onClickCapture={(e) => { lastTap.current = { x: e.clientX, y: e.clientY }; }}>
+      <div className={`table-bench${glue?.Screen ? ' slot' : ''}`} ref={glue?.Screen ? setBenchSlot : undefined} onClickCapture={(e) => { lastTap.current = { x: e.clientX, y: e.clientY }; }}>
         {!glue?.Screen && plan?.bench.map((z) => <ZoneRenderer key={z.id} zone={z} lit={lit} onSelect={onSelect} />)}
       </div>
 

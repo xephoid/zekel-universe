@@ -2,6 +2,7 @@
 // printed catalogue, and the two ways to send (a listed move, or a listed
 // template the person completed). Screens never touch raw JSON or the socket.
 
+import type { ReactNode } from 'react';
 import type { GameScreenProps, LegalMove } from '../types';
 import { labelOf, moveType, playerOf, type NggPlayer, type NggView } from './read';
 import { readRef, type NggRef } from './ref';
@@ -22,6 +23,10 @@ export interface ScreenCtx {
   sendForm(template: LegalMove, move: Record<string, unknown>, editableKeys: string[]): void;
   /** press Draw: the table sends the listed resolve_report; null when none is listed */
   draw: (() => void) | null;
+  /** the table's numbered move menu, placed in the column; null when there is none */
+  menu: ReactNode;
+  /** the bench along the bottom of the page, where the faction strip goes; null to draw it inline */
+  benchSlot: HTMLElement | null;
   /** ask the engine a read-only question about this decision; null where no live table can answer */
   ask: ((name: string, args: Record<string, unknown>) => Promise<{ answer: unknown } | { refused: string }>) | null;
   /** a seat's faction name, or its display name before it has one */
@@ -57,6 +62,8 @@ export function makeCtx(props: GameScreenProps, v: NggView, route: Route): Scree
     sendForm: props.onForm,
     draw: props.yourTurn && props.interactive && props.onDraw ? props.onDraw : null,
     ask: props.yourTurn && props.interactive && props.ask ? props.ask : null,
+    menu: props.menu ?? null,
+    benchSlot: props.benchSlot ?? null,
     seat: (pid) => {
       if (!pid) return '';
       const p = playerOf(v, pid);

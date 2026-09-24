@@ -5,6 +5,7 @@
 // never routed to, and they change underneath whatever decision is open.
 
 import { useState, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import type { ScreenCtx } from './ctx';
 import { HexMap, type MapMarks } from './HexMap';
 import { inkOf, inkOfSeat } from './factions';
@@ -141,9 +142,16 @@ export function TableLayout({ ctx, marks, panel, interrupt }: {
           {panel}
           <SeatsPanel ctx={ctx} />
           <CultureRace ctx={ctx} />
+          {/* The numbered list: every legal move in the engine's words, the
+              fallback for anything a screen does not draw. */}
+          {ctx.menu && <div className="ngg-menu">{ctx.menu}</div>}
         </div>
       </div>
-      {ctx.mine && <FactionStrip ctx={ctx} player={ctx.mine} onOpen={() => setBoardOpen(true)} />}
+      {/* The seat's faction board, folded: in the page's bench when the table
+          gives one, else along the bottom of the screen. */}
+      {ctx.mine && (ctx.benchSlot
+        ? createPortal(<FactionStrip ctx={ctx} player={ctx.mine} onOpen={() => setBoardOpen(true)} />, ctx.benchSlot)
+        : <FactionStrip ctx={ctx} player={ctx.mine} onOpen={() => setBoardOpen(true)} />)}
       {boardOpen && ctx.mine && (
         <div className="sheet-backdrop" role="presentation" onClick={() => setBoardOpen(false)}>
           <div className={`sheet ngg-board-sheet seat-${ctx.mine.species ?? 'wizard'}`} role="dialog" aria-label="Your faction board" onClick={(e) => e.stopPropagation()}>
