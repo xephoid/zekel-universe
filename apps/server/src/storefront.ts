@@ -39,6 +39,12 @@ export const ZEKEL_GAMES: Record<string, { designer: string; description: string
     playTime: '45–90 min',
     tags: ['solo', 'adventure', 'dice'],
   },
+  'neither-guts-nor-gears': {
+    designer: 'zekel-games',
+    description: 'Wizards and robots for two to six players on a hex map: collect five resources, build, research, fight in secret-card battles, hold treaties, and win by military, culture, economy or technology.',
+    playTime: '90–150 min',
+    tags: ['strategy', 'area control', 'hex map'],
+  },
   'sweetlands-imperium': {
     designer: 'zekel-games',
     description: 'Area control for two to five players on an 80-space candy kingdom: move your leader, knight and ambassador, play Intel, and hold the castle.',

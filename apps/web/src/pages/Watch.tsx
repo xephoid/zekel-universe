@@ -93,6 +93,9 @@ export function WatchPage() {
         <div className="table-board">
           {data.table.status === 'lobby' ? (
             <p className="muted">The table has not started. Players in the lobby: {data.seats.filter((s) => s.kind === 'human' && s.displayName).map((s) => s.displayName).join(', ') || 'none yet'}.</p>
+          ) : glue?.Screen && input && data.view ? (
+            <glue.Screen input={input} yourTurn={false} busy={false} interactive={false} onMove={() => {}} onForm={() => {}}
+              nameFor={(pid) => { const m = /^p(\d+)$/.exec(pid); const seat = m ? data.seats.find((x) => x.position === Number(m[1]) - 1) : undefined; return seat?.displayName ?? pid; }} />
           ) : plan ? (
             <div className="zones">{plan.board.map((z) => <ZoneRenderer key={z.id} zone={z} lit={[]} onSelect={() => {}} />)}</div>
           ) : data.view ? (
@@ -100,7 +103,7 @@ export function WatchPage() {
           ) : (
             <p className="muted">Nothing to show yet.</p>
           )}
-          {plan && plan.bench.length > 0 && (
+          {!glue?.Screen && plan && plan.bench.length > 0 && (
             <div className="zones">{plan.bench.map((z) => <ZoneRenderer key={z.id} zone={z} lit={[]} onSelect={() => {}} />)}</div>
           )}
         </div>
