@@ -77,7 +77,7 @@ for (let g = 0; g < games; g++) {
     const special = [
       ['action-build-wizard-mid', key === 'action-build' && species === 'wizard' && types.filter((t) => t === 'build').length >= 5],
       ['action-build-robot-mid', key === 'action-build' && species === 'robot' && types.filter((t) => t === 'build').length >= 5],
-      ['action-build-base', key === 'action-build' && legal.some((m) => m.move.type === 'build' && 'at_base' in m.move)],
+      ['action-build-base', key === 'action-build' && legal.some((m) => m.move.type === 'build' && (m.move.item === 'Castle' || m.move.item === 'Home'))],
       ['action-build-economic', legal.some((m) => m.move.type === 'economic_victory_spend')],
       ['action-research-tech', key === 'action-research' && legal.some((m) => m.move.type === 'research' && m.move.kind === 'tech')],
       ['action-research-card', key === 'action-research' && legal.some((m) => m.move.type === 'research' && m.move.kind === 'battle_card')],

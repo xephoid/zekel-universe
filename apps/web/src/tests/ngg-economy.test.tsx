@@ -81,6 +81,23 @@ describe('NGnG build composer', () => {
     expect(isSubmissionAllowed('tap', sent, legal)).toBe(true);
   });
 
+  it('places a new base only on a site the engine lists, even when there is one', () => {
+    const f = BUILD as Fixture;
+    const sites = f.legalMoves.filter((m) => m.move['item'] === 'Home').map((m) => m.move['at_base']);
+    expect(sites.length).toBeGreaterThan(0);
+    const { onMove } = draw(f);
+    press(/^Home/);
+    press('Choose Home');
+    press('Commit payment, then place it');
+    // One listed site is still a choice to press, not one made for you.
+    expect(onMove).not.toHaveBeenCalled();
+    expect(screen.getByText('Home is in hand')).toBeTruthy();
+    fireEvent.click(screen.getAllByRole('button', { name: /New base here/ })[0]!);
+    const sent = (onMove.mock.calls[0]![0] as LegalMove).move;
+    expect(sites).toContain(sent['at_base']);
+    expect(isSubmissionAllowed('tap', sent, f.legalMoves)).toBe(true);
+  });
+
   it('skips only when Skip is pressed', () => {
     const { onMove } = draw(BUILD as Fixture);
     expect(onMove).not.toHaveBeenCalled();
