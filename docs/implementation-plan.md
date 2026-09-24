@@ -795,6 +795,10 @@ Built, in the build order of `SCREEN-ROUTING.md` §12:
 `/dev/ngg` (dev server only) draws any captured view as the deciding seat or
 a watcher. `e2e/ngg.spec.ts` plays a live table through the screens alone.
 
+The wizard seat's type, IM Fell English, is bundled (regular only; nothing
+draws italic). Caveat, which the canvas uses only for margin notes, is not:
+the screens draw no margin notes.
+
 **Engine changes, on a branch not yet merged** (`claude/ngg-structured-view`
 in the engine): `resolving_action { card_kind, owner }` beside the
 `active_action` sentence; `battle.units[].ref`, the id battle moves name a
@@ -821,13 +825,10 @@ fields first and falls back to what the current engine sends.
   the resource each hero would make the tile.
 - **Shut reasons carry raw seat ids and coords** ("rob is in this battle…");
   the screens show them as faction names and tile labels for display only.
-- **A Counter with no possible target** leaves its owner owing a decision
-  with no legal move (captured in `pending-counter_target-4p`).
-- **The robot Infiltrator's look** (`use_detection`) is accepted by the
-  engine but never listed, so the screen omits it.
+- ~~A Counter with no possible target~~ and ~~the robot Infiltrator's look~~:
+  fixed on the engine branch (2026-09-24). The Counter resolves with no
+  target; the look is listed while the carrier hero is on the clock.
 - **One seat assigns every seat's faction** (`assign_setup_choices`); at a
   table with friends that is the host choosing for them.
 - **A new base may be listed on a tile that already holds one of your
   bases**; the engine's site rule does not exclude it. A rules question.
-- The Ink fonts (IM Fell English, Caveat) are not bundled yet; the wizard
-  seat falls back to a serif until they are added with their OFL credit.
