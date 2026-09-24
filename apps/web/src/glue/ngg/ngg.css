@@ -381,10 +381,11 @@ button.ngg-card { cursor: pointer; }
 
 /* ---------- the seat's theme over the whole table page ----------
    The table shell carries ngg-theme-wizard or ngg-theme-robot (glue
-   themeFor). Universe's own tokens are redefined there, so the top bar, the
+   themeFor). Universe's own tokens are redefined below the top bar, so the
    caption, the log, the sheets and every button follow the seat: a wizard's
-   page is written on, a robot's is machined. The map keeps its inks. */
-.table-shell.ngg-theme-wizard {
+   page is written on, a robot's is machined. The top bar holds Zekel's own
+   controls and keeps Zekel's look. The map keeps its inks. */
+.table-shell.ngg-theme-wizard > :not(.table-topbar) {
   --bg: #ddc9a3; --bg-raised: #e9d9ba; --card: #e9d9ba; --chip: #dfcca8;
   --fg: #33251a; --fg-muted: rgba(51,37,26,.62);
   --accent: #3d5c42; --accent-tint: #d9cfa8; --accent-tint-2: #d9cfa8; --highlight: #d9cfa8;
@@ -394,14 +395,17 @@ button.ngg-card { cursor: pointer; }
   --shadow-card: 0 1px 0 rgba(51,37,26,.16), 0 3px 10px rgba(90,62,32,.16);
   --font-body: 'IM Fell English', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
   --font-display: 'IM Fell English', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
-  background-color: var(--bg);
-  background-image: radial-gradient(52% 26% at 20% 8%, rgba(255,248,228,.45), transparent 64%),
-    radial-gradient(60% 28% at 58% 72%, rgba(112,78,40,.14), transparent 64%),
-    repeating-linear-gradient(101deg, rgba(112,78,40,.04) 0 1px, transparent 1px 7px);
   color: var(--fg);
   font-family: var(--font-body);
 }
-[data-theme='dark'] .table-shell.ngg-theme-wizard {
+.table-shell.ngg-theme-wizard {
+  background-color: #ddc9a3;
+  background-image: radial-gradient(52% 26% at 20% 8%, rgba(255,248,228,.45), transparent 64%),
+    radial-gradient(60% 28% at 58% 72%, rgba(112,78,40,.14), transparent 64%),
+    repeating-linear-gradient(101deg, rgba(112,78,40,.04) 0 1px, transparent 1px 7px);
+}
+[data-theme='dark'] .table-shell.ngg-theme-wizard { background-color: #2a2119; }
+[data-theme='dark'] .table-shell.ngg-theme-wizard > :not(.table-topbar) {
   --bg: #2a2119; --bg-raised: #33291f; --card: #33291f; --chip: #3b2f23;
   --fg: #ead8b6; --fg-muted: rgba(234,216,182,.64);
   --accent: #9db58f; --accent-tint: #3d3527; --accent-tint-2: #3d3527; --highlight: #3d3527;
@@ -409,7 +413,7 @@ button.ngg-card { cursor: pointer; }
   --brand-orange: #c98aa0; --brand-orange-hover: #a86d82; --lit: #c98aa0;
   --you-bg: #3d3527; --you-fg: #9db58f;
 }
-.table-shell.ngg-theme-robot {
+.table-shell.ngg-theme-robot > :not(.table-topbar) {
   --bg: #d3d6d2; --bg-raised: #e6e8e4; --card: #e6e8e4; --chip: #d8dbd7;
   --fg: #1b1f1e; --fg-muted: rgba(27,31,30,.6);
   --accent: #2f6f5e; --accent-tint: #cfd9d2; --accent-tint-2: #cfd9d2; --highlight: #cfd9d2;
@@ -419,12 +423,15 @@ button.ngg-card { cursor: pointer; }
   --shadow-card: 0 2px 0 rgba(27,31,30,.18);
   --font-display: 'IBM Plex Mono', ui-monospace, monospace;
   --radius-md: 0px; --radius-lg: 0px;
-  background-color: var(--bg);
-  background-image: repeating-linear-gradient(0deg, rgba(27,31,30,.04) 0 1px, transparent 1px 22px),
-    repeating-linear-gradient(90deg, rgba(27,31,30,.04) 0 1px, transparent 1px 22px);
   color: var(--fg);
 }
-[data-theme='dark'] .table-shell.ngg-theme-robot {
+.table-shell.ngg-theme-robot {
+  background-color: #d3d6d2;
+  background-image: repeating-linear-gradient(0deg, rgba(27,31,30,.04) 0 1px, transparent 1px 22px),
+    repeating-linear-gradient(90deg, rgba(27,31,30,.04) 0 1px, transparent 1px 22px);
+}
+[data-theme='dark'] .table-shell.ngg-theme-robot { background-color: #1d201f; }
+[data-theme='dark'] .table-shell.ngg-theme-robot > :not(.table-topbar) {
   --bg: #1d201f; --bg-raised: #272b2a; --card: #272b2a; --chip: #2f3433;
   --fg: #dfe1dd; --fg-muted: rgba(223,225,221,.62);
   --accent: #6fae99; --accent-tint: #2b3a35; --accent-tint-2: #2b3a35; --highlight: #2b3a35;
@@ -433,11 +440,10 @@ button.ngg-card { cursor: pointer; }
   --you-bg: #2b3a35; --you-fg: #6fae99;
 }
 /* The page's own chrome takes the theme's surfaces rather than fixed whites. */
-.ngg-theme .table-topbar, .ngg-theme .caption-card, .ngg-theme .table-side, .ngg-theme .move-menu,
+.ngg-theme .caption-card, .ngg-theme .table-side, .ngg-theme .move-menu,
 .ngg-theme .sheet, .ngg-theme .lesson-note, .ngg-theme .toast { background: var(--card); color: var(--fg); border-color: var(--line); }
 .ngg-theme .table-bench { background: transparent; }
-.ngg-theme-robot .chip-btn, .ngg-theme-robot .btn { border-radius: 0; }
-.ngg-theme-wizard .chip-btn, .ngg-theme-wizard .btn { border-radius: 3px; }
-.ngg-theme-robot .table-topbar .title { font-family: 'IBM Plex Mono', monospace; letter-spacing: .06em; }
+.ngg-theme-robot > :not(.table-topbar) :is(.chip-btn, .btn) { border-radius: 0; }
+.ngg-theme-wizard > :not(.table-topbar) :is(.chip-btn, .btn) { border-radius: 3px; }
 /* The strip sits in the page's bench: a bar across the foot of the page. */
 .table-bench.slot > .ngg-strip { margin: 0 16px 12px; }

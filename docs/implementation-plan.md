@@ -800,8 +800,9 @@ draws italic). Caveat, which the canvas uses only for margin notes, is not:
 the screens draw no margin notes.
 
 **Settled 2026-09-24, after play:** the seat's Ink or Oil covers the whole
-table page (the top bar, caption, log, sheets and buttons), not only the
-NGnG panels; a glue may name a page theme (`themeFor`). The numbered move
+table page below the top bar (the caption, log, sheets and buttons), not only the
+NGnG panels; the top bar holds Zekel's own controls and keeps Zekel's look.
+A glue may name a page theme (`themeFor`). The numbered move
 list sits at the foot of the NGnG column instead of floating over the table.
 The faction strip fills the page's bottom bar, so no empty bar is left. The
 map has three zoom stops (Whole map, Board, Hex) and pans by dragging when
