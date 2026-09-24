@@ -341,13 +341,14 @@ export function TablePage() {
                 nameFor={nameFor}
                 onMove={pick}
                 onForm={(template, move, editableKeys) => void send('form', move, { template: template.move, editableKeys })}
+                onDraw={resolveReport ? () => void send('resolve_report_button', resolveReport.move) : undefined}
               />
             : plan
             ? <BoardZones zones={plan.board} lit={lit} onSelect={onSelect} />
             : state.view
               ? <JsonInspector value={state.view} />
               : null}
-          {resolveReport && (
+          {resolveReport && !glue?.Screen && (
             <button className="btn big roll-button" onClick={() => void send('resolve_report_button', resolveReport.move)} disabled={busy}>
               {/draw|deal/i.test(resolveReport.description ?? '') ? 'Draw' : 'Roll'}
             </button>

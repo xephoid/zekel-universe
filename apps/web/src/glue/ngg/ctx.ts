@@ -20,6 +20,8 @@ export interface ScreenCtx {
   memory: Map<string, unknown>;
   send(move: LegalMove): void;
   sendForm(template: LegalMove, move: Record<string, unknown>, editableKeys: string[]): void;
+  /** press Draw: the table sends the listed resolve_report; null when none is listed */
+  draw: (() => void) | null;
   /** a seat's faction name, or its display name before it has one */
   seat(playerId: string | null | undefined): string;
   /** "D4" for a coord */
@@ -49,6 +51,7 @@ export function makeCtx(props: GameScreenProps, v: NggView, route: Route): Scree
     memory: input.memory,
     send: props.onMove,
     sendForm: props.onForm,
+    draw: props.yourTurn && props.interactive && props.onDraw ? props.onDraw : null,
     seat: (pid) => {
       if (!pid) return '';
       const p = playerOf(v, pid);

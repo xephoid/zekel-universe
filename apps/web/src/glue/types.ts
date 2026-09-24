@@ -238,6 +238,12 @@ export interface GameScreenProps {
   onMove(move: LegalMove): void;
   /** send a listed template with the answers the person gave */
   onForm(template: LegalMove, move: Record<string, unknown>, editableKeys: string[]): void;
+  /**
+   * Press Draw (or Roll): present only while the engine lists a
+   * resolve_report for this seat. The screen draws the button where the
+   * draw belongs; the table draws none of its own when a screen is present.
+   */
+  onDraw?: () => void;
   /** a seat's display name, from its engine player id */
   nameFor(playerId: string): string;
 }

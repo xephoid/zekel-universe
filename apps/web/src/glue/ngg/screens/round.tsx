@@ -444,6 +444,11 @@ function ReportDraw({ ctx }: { ctx: ScreenCtx }) {
   const panel = decide ? (
     <Panel title="Draw a battle card" kicker={drawFor(ctx)} tone="hl">
       {digital && <HowTo>Press Draw to take the top card of the deck.</HowTo>}
+      {digital && ctx.draw && (
+        <Actions>
+          <Btn disabled={!ctx.live} onClick={ctx.draw}>Draw</Btn>
+        </Actions>
+      )}
       {template && (
         <>
           <HowTo>Tap the card you drew.</HowTo>
