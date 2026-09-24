@@ -332,7 +332,17 @@ export function TablePage() {
           {dice && dice.length > 0 && (
             <div className="dice-row">{dice.map((d, i) => <Die key={i} value={d} rollKey={current?.seq} />)}</div>
           )}
-          {plan
+          {glue?.Screen && state.view
+            ? <glue.Screen
+                input={input}
+                yourTurn={yourTurn}
+                busy={busy}
+                interactive
+                nameFor={nameFor}
+                onMove={pick}
+                onForm={(template, move, editableKeys) => void send('form', move, { template: template.move, editableKeys })}
+              />
+            : plan
             ? <BoardZones zones={plan.board} lit={lit} onSelect={onSelect} />
             : state.view
               ? <JsonInspector value={state.view} />
@@ -342,7 +352,7 @@ export function TablePage() {
               {/draw|deal/i.test(resolveReport.description ?? '') ? 'Draw' : 'Roll'}
             </button>
           )}
-          {yourTurn && <MoveMenuList menu={current?.moveMenu ?? null} legalMoves={legalMoves} onPick={pick} disabled={busy} open={lit.length === 0 && !plan?.prompt?.actions.length} />}
+          {yourTurn && <MoveMenuList menu={current?.moveMenu ?? null} legalMoves={legalMoves} onPick={pick} disabled={busy} open={!glue?.Screen && lit.length === 0 && !plan?.prompt?.actions.length} />}
           {result && showEnd && table && !moment && (
             <div className="sheet-backdrop" role="presentation">
               <div className="sheet" role="dialog" aria-label="Game over">
@@ -353,7 +363,7 @@ export function TablePage() {
           )}
         </div>
         <LessonNote lessons={lessons} onDismiss={dismissLesson} />
-        {plan && (plan.steps || plan.prompt) && <ActionBar steps={plan.steps} prompt={plan.prompt} onAction={onAction} disabled={busy || !yourTurn} />}
+        {!glue?.Screen && plan && (plan.steps || plan.prompt) && <ActionBar steps={plan.steps} prompt={plan.prompt} onAction={onAction} disabled={busy || !yourTurn} />}
         </div>
         <div className={`table-side${sideOpen ? '' : ' collapsed'}`}>
           {sideOpen && (
@@ -367,7 +377,7 @@ export function TablePage() {
       </div>
 
       <div className="table-bench" onClickCapture={(e) => { lastTap.current = { x: e.clientX, y: e.clientY }; }}>
-        {plan?.bench.map((z) => <ZoneRenderer key={z.id} zone={z} lit={lit} onSelect={onSelect} />)}
+        {!glue?.Screen && plan?.bench.map((z) => <ZoneRenderer key={z.id} zone={z} lit={lit} onSelect={onSelect} />)}
       </div>
 
       <NoticeToast notice={notice} onClose={() => setNotice(null)} />

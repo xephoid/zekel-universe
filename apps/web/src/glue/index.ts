@@ -16,7 +16,7 @@ export function glueFor(gameId: string): GlueModule | null {
 }
 
 export { fracturedFistGlue, warbleWayGlue, sweetlandsGlue, cybernoirGlue };
-export type { GlueModule, GlueInput, TablePlan, Zone, SetupField, MultiOption, SetupSeat, SetupAnswers, LegalMove, SelectEvent, MoveForm, FormField, PlanStep, PlanPrompt, PromptAction, Moment, MomentInput, StrikeLane } from './types';
+export type { GlueModule, GameScreenProps, GlueInput, TablePlan, Zone, SetupField, MultiOption, SetupSeat, SetupAnswers, LegalMove, SelectEvent, MoveForm, FormField, PlanStep, PlanPrompt, PromptAction, Moment, MomentInput, StrikeLane } from './types';
 export { classifyMoves, completesTemplate, isSubmissionAllowed, movesEqual, submitMove, submissionLog } from './agency';
 export type { SubmissionTrigger, FormContext } from './agency';
 export { formForMove, movesForSelect, templateForm } from './forms';
