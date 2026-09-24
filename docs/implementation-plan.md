@@ -763,3 +763,71 @@ building:
   `"Name (owner)"` strings. `active_action` is still the string
   `"kind by owner"`; one tested reader handles it until the engine publishes a
   structured field.
+
+### Where NGnG stands (2026-09-23)
+
+Built, in the build order of `SCREEN-ROUTING.md` §12:
+
+1. **The shell.** The map (one map for every seat; pieces from the owners'
+   own lists; tokens slide between hexes and fly in from their owner's
+   supply), the action stack, the seats, the culture race, and the seat's
+   faction board as a strip and a full sheet, in Ink or Oil.
+2. **The router.** `route(view, seat, legalMoves)` is pure and tested
+   against views the engine produced (`scripts/ngg-fixtures.mjs` plays seeded
+   games and captures each decision; `scripts/ngg-fixtures-rare.mts` takes
+   the rare ones from the engine's hand-built states). A route without a
+   dedicated screen falls back to a chooser that lists the pending's options,
+   shut ones struck through with the engine's reason.
+3. **The purchase composer** (Build, Research, a second purchase, the
+   economic spend): choose, pay, place; one move on the last press; the draft
+   survives an interrupt. Access Request is the owner's interrupt, with the
+   declared purchase and its queue position; the buyer sees the same terms.
+4. **The battle**: Move Battle, Elara's spell, the secret commit and Shared
+   Tactics, the Counter, the Extra, the activation ladder with Detection
+   beside it, the Infiltrator, the defense (and the Spy Reveal) as an
+   interrupt, Retreat, Rally.
+5. **Everything else**: setup at the table, the Leader draft, starting
+   sites, planning, Core reallocation, the draw (the Draw button sits in the
+   decision that asks for it), the treaty offer as an interrupt, the
+   break window, Diplomacy and the offer composer, hero claims, a reserved
+   hero, the overlay, the spy, the end.
+
+`/dev/ngg` (dev server only) draws any captured view as the deciding seat or
+a watcher. `e2e/ngg.spec.ts` plays a live table through the screens alone.
+
+**Engine changes, on a branch not yet merged** (`claude/ngg-structured-view`
+in the engine): `resolving_action { card_kind, owner }` beside the
+`active_action` sentence; `battle.units[].ref`, the id battle moves name a
+unit by; and build moves that name where the piece goes — one per owned base
+for a unit, one per legal site for a new base, none at the base limit — so
+the engine never picks the spawn for the player. Universe reads the new
+fields first and falls back to what the current engine sends.
+
+**Open, and each needs the engine:**
+
+- **Collector reach.** The payment stage shows the engine's proposed
+  placements to commit or drop; the player cannot move a collector to another
+  tile, because reach is chained (each placement extends the next, §6.1) and
+  the view publishes none of it. Computing the chain here would be a second
+  copy of the rule. The engine needs to publish reach, or accept a proposal
+  and answer with the next legal tiles.
+- **A claimed hero is placed by the engine** at the first base, with no move
+  to choose (a player-agency gap). Hero Claim is built without a Place It step.
+- **Treaty Response** has no structured proposer or treaty type
+  (`pending.context`); the screen shows Accept and Decline only.
+- **Second purchase** does not say whether it is a build or a research;
+  **Spy Assign** does not publish the source (Illusionist or Infiltrator);
+  **The End** has no structured kind of win; **Overlay Choice** does not name
+  the resource each hero would make the tile.
+- **Shut reasons carry raw seat ids and coords** ("rob is in this battle…");
+  the screens show them as faction names and tile labels for display only.
+- **A Counter with no possible target** leaves its owner owing a decision
+  with no legal move (captured in `pending-counter_target-4p`).
+- **The robot Infiltrator's look** (`use_detection`) is accepted by the
+  engine but never listed, so the screen omits it.
+- **One seat assigns every seat's faction** (`assign_setup_choices`); at a
+  table with friends that is the host choosing for them.
+- **A new base may be listed on a tile that already holds one of your
+  bases**; the engine's site rule does not exclude it. A rules question.
+- The Ink fonts (IM Fell English, Caveat) are not bundled yet; the wizard
+  seat falls back to a serif until they are added with their OFL credit.

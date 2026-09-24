@@ -19,7 +19,6 @@ import { ProfilePage } from './pages/Profile';
 import { SignInPage, SignInCompletePage } from './pages/SignIn';
 import { GalleryPage } from './pages/Gallery';
 import { NotFoundPage } from './pages/NotFound';
-import { DevNggPage } from './pages/DevNgg';
 
 const router = createBrowserRouter([
   { path: '/', element: <HomePage /> },
@@ -36,8 +35,12 @@ const router = createBrowserRouter([
   { path: '/signin', element: <SignInPage /> },
   { path: '/signin/complete', element: <SignInCompletePage /> },
   { path: '/gallery', element: <GalleryPage /> },
-  // Development only: captured NGnG views, drawn without a game.
-  ...(import.meta.env.DEV ? [{ path: '/dev/ngg', element: <DevNggPage /> }] : []),
+  // Development only: captured NGnG views, drawn without a game. Loaded
+  // lazily inside the dev-only branch, so a production build drops the page
+  // and every captured view with it.
+  ...(import.meta.env.DEV
+    ? [{ path: '/dev/ngg', lazy: () => import('./pages/DevNgg').then((m) => ({ Component: m.DevNggPage })) }]
+    : []),
   { path: '*', element: <NotFoundPage /> },
 ]);
 
