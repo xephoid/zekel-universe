@@ -25,7 +25,10 @@ end screen shows the result over the final table. Sweetlands Imperium plays
 on its 80-space board with the faction portraits and treat art, and Warble
 Way Galaxy runs its season solo: every setup choice is asked in a form, a
 tap that could mean several moves asks which, and every die and every card
-waits for the Roll or Draw button. Signed-in players open
+waits for the Roll or Draw button. Neither Guts nor Gears draws its own
+table: a hex map, the action stack and each seat's faction board, with one
+screen per decision the rules give a player, from the Leader draft through
+purchases, secret battle cards and treaties. Signed-in players open
 tables with friends by link, invite, or friends list, and play live with
 each browser receiving only its own seat's private state, or by turns: the
 table starts itself when its seats fill, a player who is away when their
