@@ -829,9 +829,17 @@ is an off-map piece that can hold a Core, and every robot seat is asked
 about its Cores at each upkeep (the upkeep screen names collectors by type);
 a tied initiative is its own move (`choose_initiative_order`); a Counter
 target names who played the card and its batch. The engine now also gives
-a reason for each blocked purchase in its grey list (`item`); the server
-does not pass that list to the table yet, so the Research and Build screens
-still leave a blocked purchase out rather than show it struck through.
+a reason for each blocked purchase in its grey list (`item`).
+
+**Settled 2026-09-24: blocked purchases show with the engine's reason.** The
+server keeps the engine's grey list on the deciding seat's payload
+(`unavailable`: move type, optional item, reason; at most 100 entries of
+bounded text, anything malformed dropped) and it reaches only that seat.
+The Build, Research and second-purchase screens list what can be bought,
+then every blocked unit, building, technology, battle card or Economic
+victory struck through with the engine's own sentence. A struck line cannot
+be picked. Nothing is worked out in Universe: a line appears only when the
+engine names it.
 
 **Engine changes, on a branch not yet merged** (`claude/ngg-structured-view`
 in the engine): `resolving_action { card_kind, owner }` beside the

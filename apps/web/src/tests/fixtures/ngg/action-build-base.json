@@ -802,6 +802,41 @@
    }
   }
  ],
+ "unavailable": [
+  {
+   "moveType": "form_treaty",
+   "reason": "a treaty needs an unlock on one side — an Embassy or an active Envoy Sable Marrow; no one who could partner with you has one"
+  },
+  {
+   "moveType": "build",
+   "item": "Illusionist",
+   "reason": "Illusionist requires Library of Illusion first (you have: none)"
+  },
+  {
+   "moveType": "build",
+   "item": "Dragon",
+   "reason": "Dragon requires Dragon Hoard first (you have: none)"
+  },
+  {
+   "moveType": "build",
+   "item": "Enchantress",
+   "reason": "Enchantress requires Library of Enchantment first (you have: none)"
+  },
+  {
+   "moveType": "build",
+   "item": "Cleric",
+   "reason": "Cleric requires Temple first (you have: none)"
+  },
+  {
+   "moveType": "build",
+   "item": "Dragon Hoard",
+   "reason": "costs 1 water + 2 ore + 1 ether — your free collectors (surf-1, surf-2, surf-3, surf-4) cannot reach enough of it from your units, bases and earlier placements"
+  },
+  {
+   "moveType": "economic_victory_spend",
+   "reason": "needs 11 free collectors on 11 different tiles — you have 4"
+  }
+ ],
  "watcher": "p2",
  "watcherView": {
   "game_id": "neither-guts-nor-gears",

@@ -296,6 +296,18 @@ export interface GameOverResult {
 export type TableEventKind = 'setup' | 'move' | 'ai_move' | 'roll' | 'draw' | 'system' | 'undo';
 
 /**
+ * A move the engine says this seat cannot make right now, and why, in the
+ * engine's words. `item` names one blocked option of the type (a unit or
+ * building by printed name, a technology) while others of the type may still
+ * be offered; absent, the whole type is unavailable.
+ */
+export interface UnavailableMove {
+  moveType: string;
+  item?: string;
+  reason: string;
+}
+
+/**
  * What one seat may see of an event. Stored per seat on the event row and
  * sent only to that seat's connections.
  */
@@ -308,6 +320,8 @@ export interface SeatPayload {
   yourTurn?: boolean;
   /** the engine's player id for this seat, so the view can find "me" */
   playerId?: string;
+  /** what this seat cannot do right now, with the engine's reasons */
+  unavailable?: UnavailableMove[];
 }
 
 /** What a browser actually receives on the websocket and from the events feed. */
@@ -320,6 +334,8 @@ export interface TableEventWire {
   /** the receiving seat's view after this event */
   view: unknown;
   legalMoves: LegalMove[];
+  /** what the receiving seat cannot do right now, with the engine's reasons */
+  unavailable: UnavailableMove[];
   moveMenu: MoveMenu | null;
   briefing: RulesBriefing | null;
   yourTurn: boolean;

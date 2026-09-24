@@ -3,6 +3,7 @@
 // template the person completed). Screens never touch raw JSON or the socket.
 
 import type { ReactNode } from 'react';
+import type { UnavailableMove } from '@universe/shared';
 import type { GameScreenProps, LegalMove } from '../types';
 import { labelOf, moveType, playerOf, withViewer, type NggPlayer, type NggView } from './read';
 import { readRef, type NggRef } from './ref';
@@ -14,6 +15,8 @@ export interface ScreenCtx {
   mine: NggPlayer | null;
   route: Route;
   legal: LegalMove[];
+  /** what this seat cannot do right now, with the engine's reasons; empty off its turn */
+  unavailable: UnavailableMove[];
   ref: NggRef | null;
   /** controls are live: this seat's decision, a move not in flight, not a watcher page */
   live: boolean;
@@ -56,6 +59,7 @@ export function makeCtx(props: GameScreenProps, view: NggView, route: Route): Sc
     mine: playerOf(v, me),
     route,
     legal,
+    unavailable: props.yourTurn ? input.unavailable ?? [] : [],
     ref: readRef(input.reference),
     live: props.interactive && props.yourTurn && !props.busy,
     memory: input.memory,

@@ -562,6 +562,86 @@
    }
   }
  ],
+ "unavailable": [
+  {
+   "moveType": "form_treaty",
+   "reason": "a treaty needs an unlock on one side — a Diplomatic Research Station or an active Envoy Sable Marrow; no one who could partner with you has one"
+  },
+  {
+   "moveType": "build",
+   "item": "Ore collector",
+   "reason": "costs 1 wood — you have no free wood collector"
+  },
+  {
+   "moveType": "build",
+   "item": "Oil collector",
+   "reason": "costs 1 ore — you have no free ore collector"
+  },
+  {
+   "moveType": "build",
+   "item": "Ether collector",
+   "reason": "costs 1 oil — you have no free oil collector"
+  },
+  {
+   "moveType": "build",
+   "item": "Spinner Platform",
+   "reason": "Spinner Platform requires Combat Frame Production first (you have: none)"
+  },
+  {
+   "moveType": "build",
+   "item": "Spitter Platform",
+   "reason": "Spitter Platform requires Combat Frame Production first (you have: none)"
+  },
+  {
+   "moveType": "build",
+   "item": "Infiltrator Platform",
+   "reason": "Infiltrator Platform requires Diplomatic Research Station first (you have: none)"
+  },
+  {
+   "moveType": "build",
+   "item": "Immobile Combat Platform",
+   "reason": "costs 2 wood + 2 ore — that is 4 resources and you have 2 free collectors"
+  },
+  {
+   "moveType": "build",
+   "item": "Large Combat Platform",
+   "reason": "Large Combat Platform requires Combat Frame Production first (you have: none)"
+  },
+  {
+   "moveType": "build",
+   "item": "Wall Platform",
+   "reason": "Wall Platform requires Defense Research Station first (you have: none)"
+  },
+  {
+   "moveType": "build",
+   "item": "Home",
+   "reason": "A new base goes on a tile holding your unit or hero, no opposing unit and no base — no tile qualifies now (ruling 55)"
+  },
+  {
+   "moveType": "build",
+   "item": "Combat Frame Production",
+   "reason": "costs 2 wood + 1 ore — that is 3 resources and you have 2 free collectors"
+  },
+  {
+   "moveType": "build",
+   "item": "Diplomatic Research Station",
+   "reason": "costs 1 water + 2 wood — that is 3 resources and you have 2 free collectors"
+  },
+  {
+   "moveType": "build",
+   "item": "Defense Research Station",
+   "reason": "costs 2 wood + 1 ore — that is 3 resources and you have 2 free collectors"
+  },
+  {
+   "moveType": "build",
+   "item": "Third Space",
+   "reason": "costs 1 water + 3 wood + 1 ore — that is 5 resources and you have 2 free collectors"
+  },
+  {
+   "moveType": "economic_victory_spend",
+   "reason": "needs 11 free collectors on 11 different tiles — you have 2"
+  }
+ ],
  "watcher": "p1",
  "watcherView": {
   "game_id": "neither-guts-nor-gears",

@@ -17,6 +17,10 @@ const engineRoot = resolve(process.argv[2] ?? '../zekel');
 const games = Number(process.argv[3] ?? 12);
 const mod = await import(pathToFileURL(join(engineRoot, 'dist/games/neither-guts-nor-gears/index.js')).href);
 const game = new mod.NeitherGutsNorGearsGame();
+const { unavailableMoves } = await import(pathToFileURL(join(engineRoot, 'dist/core/moveGates.js')).href);
+/** The deciding seat's grey list, as the engine's MCP layer builds it for a human on the clock. */
+const greyOf = (s, who, legal) => (game.describeMoveGates ? unavailableMoves(game.describeMoveGates(s, who), legal) : [])
+  .map((g) => ({ moveType: g.move_type, ...(g.item !== undefined ? { item: g.item } : {}), reason: g.reason }));
 
 const outDir = resolve('apps/web/src/tests/fixtures/ngg');
 mkdirSync(outDir, { recursive: true });
@@ -46,6 +50,7 @@ function capture(s, key, who) {
     viewer: who,
     view: game.getPlayerView(s, who),
     legalMoves: game.getLegalMoves(s, who),
+    unavailable: greyOf(s, who, game.getLegalMoves(s, who)),
     watcher: others[0],
     watcherView: game.getPlayerView(s, others[0]),
     watcherLegalMoves: game.getLegalMoves(s, others[0]),

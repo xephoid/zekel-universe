@@ -10,7 +10,7 @@
 import { sql, type Kysely } from 'kysely';
 import { EngineError } from '@universe/engine-client';
 import type { AiTurnResult, AppliedMove, MoveArg, NextStep, RulesBriefing as EngineBriefing } from '@universe/engine-client';
-import type { GameOverResult, RulesBriefing, SeatPayload, TableEventKind } from '@universe/shared';
+import type { GameOverResult, RulesBriefing, SeatPayload, TableEventKind, UnavailableMove } from '@universe/shared';
 import type { DB } from './db/schema.js';
 import { isUniqueViolation, parseJson } from './db/index.js';
 import { newId, now, principalLabel, type Principal } from './identity.js';
@@ -48,6 +48,25 @@ function viewOf(state: Record<string, unknown>): Record<string, unknown> {
 function briefingOf(b: EngineBriefing | undefined | null): RulesBriefing | null {
   if (!b || !Array.isArray(b.sections) || b.sections.length === 0) return null;
   return { for_player: b.for_player, sections: b.sections, teach_note: b.teach_note };
+}
+
+/** The engine's grey list for a seat, kept only where it is well formed: at
+ *  most 100 entries, each a move type and reason (and an optional item) as
+ *  bounded text. Anything else from the engine is dropped. */
+export function unavailableOf(raw: unknown): UnavailableMove[] {
+  if (!Array.isArray(raw)) return [];
+  const text = (x: unknown, max: number): string | null => (typeof x === 'string' && x.length > 0 ? x.slice(0, max) : null);
+  const out: UnavailableMove[] = [];
+  for (const entry of raw.slice(0, 100)) {
+    if (!entry || typeof entry !== 'object') continue;
+    const e = entry as Record<string, unknown>;
+    const moveType = text(e['move_type'], 64);
+    const reason = text(e['reason'], 400);
+    if (!moveType || !reason) continue;
+    const item = text(e['item'], 120);
+    out.push(item ? { moveType, item, reason } : { moveType, reason });
+  }
+  return out;
 }
 
 function briefingText(b: RulesBriefing | null): string | undefined {
@@ -220,6 +239,7 @@ export class Realtime {
       if (theirTurn) {
         const legal = await this.engine.getLegalMoves(sessionId, playerId, token);
         payload.legalMoves = legal.legal_moves;
+        payload.unavailable = unavailableOf(legal.unavailable_moves);
         payload.moveMenu = (legal.move_menu as SeatPayload['moveMenu']) ?? null;
         payload.yourTurn = true;
         payload.briefing ??= briefingOf(legal.rules_briefing);

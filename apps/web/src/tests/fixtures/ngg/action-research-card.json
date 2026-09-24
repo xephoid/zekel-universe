@@ -1002,6 +1002,48 @@
    }
   }
  ],
+ "unavailable": [
+  {
+   "moveType": "break_treaty",
+   "item": "Open Borders with p3",
+   "reason": "Open Borders breaks only at end of round (after the culture phase, §5.6)"
+  },
+  {
+   "moveType": "break_treaty",
+   "item": "Peace with p2",
+   "reason": "Peace breaks only at end of round (after the culture phase, §5.6)"
+  },
+  {
+   "moveType": "research",
+   "item": "Ice Blast",
+   "reason": "Ice Blast requires Library of Evocation (you have: Embassy)"
+  },
+  {
+   "moveType": "research",
+   "item": "Fiery Explosion",
+   "reason": "Fiery Explosion requires Library of Evocation (you have: Embassy)"
+  },
+  {
+   "moveType": "research",
+   "item": "Mana Shield",
+   "reason": "Mana Shield requires Library of Evocation (you have: Embassy)"
+  },
+  {
+   "moveType": "research",
+   "item": "Invisible",
+   "reason": "Invisible requires Library of Illusion (you have: Embassy)"
+  },
+  {
+   "moveType": "research",
+   "item": "Dehance",
+   "reason": "Dehance requires Library of Enchantment (you have: Embassy)"
+  },
+  {
+   "moveType": "research",
+   "item": "Detection",
+   "reason": "Detection requires Library of Enchantment (you have: Embassy)"
+  }
+ ],
  "watcher": "p1",
  "watcherView": {
   "game_id": "neither-guts-nor-gears",

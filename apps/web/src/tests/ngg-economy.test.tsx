@@ -3,7 +3,7 @@
 
 import { describe, expect, it, vi, afterEach } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import type { GameReferenceResponse, LegalMove } from '@universe/shared';
+import type { GameReferenceResponse, LegalMove, UnavailableMove } from '@universe/shared';
 import type { GlueInput } from '../glue';
 import { isSubmissionAllowed } from '../glue/agency';
 import { NggScreen } from '../glue/ngg/NggScreen';
@@ -13,17 +13,22 @@ import BUILD from './fixtures/ngg-pinned/action-build-base.json';
 import ACCESS from './fixtures/ngg/pending-access_request-queue.json';
 import SMYTH from './fixtures/ngg/pending-smyth_reward-multi.json';
 
-interface Fixture { viewer: string; view: unknown; legalMoves: LegalMove[]; watcher: string; watcherView: unknown; watcherLegalMoves: LegalMove[] }
+interface Fixture { viewer: string; view: unknown; legalMoves: LegalMove[]; unavailable?: UnavailableMove[]; watcher: string; watcherView: unknown; watcherLegalMoves: LegalMove[] }
+
+const ALL_NGG: Record<string, Fixture> = Object.fromEntries(
+  Object.entries(import.meta.glob<Fixture>('./fixtures/ngg/*.json', { eager: true, import: 'default' }))
+    .map(([path, f]) => [path.replace(/^.*\//, '').replace(/\.json$/, ''), f]),
+);
 
 afterEach(cleanup);
 
-function draw(f: Fixture, opts: { as?: 'viewer' | 'watcher'; legal?: LegalMove[] } = {}) {
+function draw(f: Fixture, opts: { as?: 'viewer' | 'watcher'; legal?: LegalMove[]; unavailable?: UnavailableMove[] } = {}) {
   const watcher = opts.as === 'watcher';
   const legal = opts.legal ?? (watcher ? f.watcherLegalMoves : f.legalMoves);
   const onMove = vi.fn();
   const onForm = vi.fn();
   const input: GlueInput = {
-    view: watcher ? f.watcherView : f.view, previous: null, legalMoves: legal,
+    view: watcher ? f.watcherView : f.view, previous: null, legalMoves: legal, unavailable: opts.unavailable,
     playerId: watcher ? f.watcher : f.viewer, reference: REFERENCE as GameReferenceResponse,
     seq: 1, engineMove: null, actorPlayerId: null, memory: new Map(),
   };
@@ -248,5 +253,36 @@ describe('NGnG payment, placed by the person on tiles the engine names', () => {
     await waitForEnabled('Commit payment');
     press('Commit payment');
     expect(onForm.mock.calls[0]![1]['payment']).toEqual(payment);
+  });
+  it('Research: a blocked purchase is struck through with the engine\'s reason and cannot be picked', () => {
+    const f = ALL_NGG['action-research-tech']!;
+    const { onMove, onForm } = draw(f, { unavailable: f.unavailable });
+    const shut = f.unavailable!.find((u) => u.item === 'battle strategy card')!;
+    const row = screen.getByText('Draw a battle card').closest('.ngg-option')!;
+    expect(row.classList.contains('shut')).toBe(true);
+    expect(row.textContent!.toLowerCase()).toContain(shut.reason.toLowerCase());
+    expect(row.tagName).not.toBe('BUTTON');
+    fireEvent.click(row);
+    expect(document.querySelector('.ngg-option[aria-pressed="true"], .ngg-option.selected')).toBeNull();
+    expect(onMove).not.toHaveBeenCalled();
+    expect(onForm).not.toHaveBeenCalled();
+  });
+
+  it('Build: every blocked unit and building shows after the open ones, each with its reason', () => {
+    const f = ALL_NGG['action-build']!;
+    draw(f, { unavailable: f.unavailable });
+    const items = f.unavailable!.filter((u) => (u.moveType === 'build' && u.item) || u.moveType === 'economic_victory_spend');
+    expect(items.length).toBeGreaterThan(0);
+    const shutRows = [...document.querySelectorAll('.ngg-option.shut')];
+    expect(shutRows).toHaveLength(items.length);
+    const all = [...document.querySelectorAll('.ngg-option')];
+    // Open purchases first, then the shut ones.
+    expect(all.findIndex((r) => r.classList.contains('shut'))).toBe(all.length - shutRows.length);
+  });
+
+  it('a watcher sees no blocked purchases: the reasons are the deciding seat\'s own', () => {
+    const f = ALL_NGG['action-research-tech']!;
+    draw(f, { as: 'watcher', unavailable: f.unavailable });
+    expect(document.querySelectorAll('.ngg-option.shut')).toHaveLength(0);
   });
 });

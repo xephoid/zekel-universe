@@ -54,6 +54,7 @@ export function toWireEvent(event: EventRow, seatPosition: number | null): Table
     engineMove: event.engineMove,
     view: payload?.view ?? null,
     legalMoves: payload?.legalMoves ?? [],
+    unavailable: payload?.unavailable ?? [],
     moveMenu: payload?.moveMenu ?? null,
     briefing: payload?.briefing ?? null,
     yourTurn: payload?.yourTurn ?? false,

@@ -815,6 +815,86 @@
    }
   }
  ],
+ "unavailable": [
+  {
+   "moveType": "form_treaty",
+   "reason": "a treaty needs an unlock on one side — an Embassy or an active Envoy Sable Marrow; no one who could partner with you has one"
+  },
+  {
+   "moveType": "build",
+   "item": "Evoker",
+   "reason": "costs 2 wood + 1 ore — that is 3 resources and you have 2 free collectors"
+  },
+  {
+   "moveType": "build",
+   "item": "Illusionist",
+   "reason": "Illusionist requires Library of Illusion first (you have: none)"
+  },
+  {
+   "moveType": "build",
+   "item": "Dragon",
+   "reason": "Dragon requires Dragon Hoard first (you have: none)"
+  },
+  {
+   "moveType": "build",
+   "item": "Enchantress",
+   "reason": "Enchantress requires Library of Enchantment first (you have: none)"
+  },
+  {
+   "moveType": "build",
+   "item": "Cleric",
+   "reason": "Cleric requires Temple first (you have: none)"
+  },
+  {
+   "moveType": "build",
+   "item": "Castle",
+   "reason": "A new base goes on a tile holding your unit or hero, no opposing unit and no base — no tile qualifies now (ruling 55)"
+  },
+  {
+   "moveType": "build",
+   "item": "Library of Evocation",
+   "reason": "costs 1 water + 2 wood — that is 3 resources and you have 2 free collectors"
+  },
+  {
+   "moveType": "build",
+   "item": "Library of Illusion",
+   "reason": "costs 2 wood + 1 ore — that is 3 resources and you have 2 free collectors"
+  },
+  {
+   "moveType": "build",
+   "item": "Library of Enchantment",
+   "reason": "costs 2 wood + 1 ore — that is 3 resources and you have 2 free collectors"
+  },
+  {
+   "moveType": "build",
+   "item": "Dragon Hoard",
+   "reason": "costs 1 water + 2 ore + 1 ether — that is 4 resources and you have 2 free collectors"
+  },
+  {
+   "moveType": "build",
+   "item": "Temple",
+   "reason": "costs 2 water + 2 wood — that is 4 resources and you have 2 free collectors"
+  },
+  {
+   "moveType": "build",
+   "item": "Embassy",
+   "reason": "costs 2 wood — your free collectors (surf-1, surf-2) cannot reach enough of it from your units, bases and earlier placements"
+  },
+  {
+   "moveType": "build",
+   "item": "Amphitheatre",
+   "reason": "costs 1 water + 3 wood — that is 4 resources and you have 2 free collectors"
+  },
+  {
+   "moveType": "build",
+   "item": "Mana Reserve",
+   "reason": "costs 1 water + 2 wood — that is 3 resources and you have 2 free collectors"
+  },
+  {
+   "moveType": "economic_victory_spend",
+   "reason": "needs 11 free collectors on 11 different tiles — you have 2"
+  }
+ ],
  "watcher": "p1",
  "watcherView": {
   "game_id": "neither-guts-nor-gears",

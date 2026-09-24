@@ -6,7 +6,7 @@
 import type {
   BagData, CardZoneData, GridData, MapData, Palette, PoolData, SelectEvent, TableauData, TrackData,
 } from '@universe/primitives';
-import type { GameReferenceResponse, LegalMove } from '@universe/shared';
+import type { GameReferenceResponse, LegalMove, UnavailableMove } from '@universe/shared';
 import type { ComponentType, ReactNode } from 'react';
 
 export type { LegalMove, SelectEvent, Palette };
@@ -17,6 +17,8 @@ export interface GlueInput {
   previous: unknown;
   /** this seat's legal moves right now */
   legalMoves: LegalMove[];
+  /** what this seat cannot do right now, with the engine's reasons (on its turn) */
+  unavailable?: UnavailableMove[];
   /** the engine's player id for the viewing seat */
   playerId: string | null;
   /** the engine's reference data for the game, once loaded */

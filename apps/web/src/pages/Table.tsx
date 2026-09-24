@@ -100,6 +100,7 @@ export function TablePage() {
   const glue = gameId ? glueFor(gameId) : null;
   const myPlayerId = current?.playerId ?? null;
   const legalMoves: LegalMove[] = state.done && current?.yourTurn ? current.legalMoves : [];
+  const unavailable = useMemo(() => (state.done && current?.yourTurn ? current.unavailable ?? [] : []), [state.done, current]);
   const yourTurn = !!current?.yourTurn && state.done;
 
   // Rules lessons ride on events; the first time a rule matters it appears
@@ -126,6 +127,7 @@ export function TablePage() {
     view: state.view,
     previous: state.previousView,
     legalMoves,
+    unavailable,
     playerId: myPlayerId,
     reference: t.reference,
     seq: current?.seq ?? 0,
@@ -134,7 +136,7 @@ export function TablePage() {
       ? null
       : `p${current.actorSeatPosition + 1}`,
     memory: memory.current,
-  }), [state.view, state.previousView, legalMoves, myPlayerId, t.reference, current]);
+  }), [state.view, state.previousView, legalMoves, unavailable, myPlayerId, t.reference, current]);
 
   const plan = useMemo(() => (glue ? glue.plan(input) : null), [glue, input]);
   const lit = useMemo(() => (glue && yourTurn ? glue.litParts(input) : []), [glue, input, yourTurn]);

@@ -160,6 +160,12 @@ export class FakeEngine implements EngineService {
       legal_moves,
       is_their_turn: s.active === playerId,
       move_menu: { prompt: 'Your move', entries: legal_moves.map((m, i) => ({ key: String(i + 1), label: m.description, move_id: m.move_id })) },
+      unavailable_moves: [
+        { move_type: 'build', item: 'Dragon', reason: `blocked-for-${playerId}` },
+        { move_type: 'build' },
+        'not an entry',
+        { move_type: 'research', reason: 'x'.repeat(1000) },
+      ],
       ...(s.moves === 0 && s.active === playerId
         ? { rules_briefing: { for_player: playerId, sections: [{ id: 'first', title: 'First move', text: 'Play something.' }] } }
         : {}),

@@ -62,6 +62,8 @@ interface Purchase {
   text: string | null;
   /** every listed move for it; several when the engine lists one per place */
   moves: LegalMove[];
+  /** the engine's reason it cannot be bought now; such a purchase has no moves */
+  shut: string | null;
 }
 
 function paymentOf(m: LegalMove): Payment {
@@ -74,7 +76,10 @@ function atBaseOf(m: LegalMove): string | null {
   return typeof a === 'string' && a !== '' ? a : null;
 }
 
-function purchasesOf(ctx: ScreenCtx): Purchase[] {
+/** The move types a composer buys with: its blocked purchases show beside the open ones. */
+type Buys = 'build' | 'research';
+
+function purchasesOf(ctx: ScreenCtx, buys: Buys | null): Purchase[] {
   const out = new Map<string, Purchase>();
   for (const m of ctx.legal) {
     const t = moveType(m.move);
@@ -84,20 +89,50 @@ function purchasesOf(ctx: ScreenCtx): Purchase[] {
       const kind: Purchase['kind'] = found?.kind === 'building' ? (found.building.isBase ? 'base' : 'building') : 'unit';
       const cost = found ? (found.kind === 'unit' ? found.unit.cost : found.building.cost) : null;
       const text = found ? (found.kind === 'unit' ? found.unit.notes : found.building.effect) : null;
-      const p = out.get(name) ?? { key: name, label: name, kind, cost, text, moves: [] };
+      const p = out.get(name) ?? { key: name, label: name, kind, cost, text, moves: [], shut: null };
       p.moves.push(m);
       out.set(name, p);
     } else if (t === 'research' && m.move['kind'] === 'tech') {
       const name = String(m.move['tech'] ?? '');
       const r = researchByName(ctx.ref, name);
-      out.set(name, { key: name, label: name, kind: 'tech', cost: r?.cost ?? null, text: r?.effect ?? null, moves: [m] });
+      out.set(name, { key: name, label: name, kind: 'tech', cost: r?.cost ?? null, text: r?.effect ?? null, moves: [m], shut: null });
     } else if (t === 'research' && m.move['kind'] === 'battle_card') {
-      out.set('battle_card', { key: 'battle_card', label: 'Draw a battle card', kind: 'battle_card', cost: null, text: null, moves: [m] });
+      out.set('battle_card', { key: 'battle_card', label: 'Draw a battle card', kind: 'battle_card', cost: null, text: null, moves: [m], shut: null });
     } else if (t === 'economic_victory_spend') {
-      out.set('economic', { key: 'economic', label: 'Economic victory: spend all five', kind: 'economic', cost: ctx.ref?.economicSpend ?? null, text: null, moves: [m] });
+      out.set('economic', { key: 'economic', label: 'Economic victory: spend all five', kind: 'economic', cost: ctx.ref?.economicSpend ?? null, text: null, moves: [m], shut: null });
     }
   }
-  return [...out.values()];
+  // What cannot be bought now, struck through with the engine's reason, after
+  // what can. Only the engine's own entries: nothing here is worked out.
+  const shut: Purchase[] = [];
+  for (const u of buys ? ctx.unavailable : []) {
+    const reason = capitalize(ctx.say(u.reason));
+    if (buys === 'build' && u.moveType === 'build' && u.item) {
+      if (out.has(u.item)) continue;
+      const found = itemByName(ctx.ref, u.item);
+      const kind: Purchase['kind'] = found?.kind === 'building' ? (found.building.isBase ? 'base' : 'building') : 'unit';
+      const cost = found ? (found.kind === 'unit' ? found.unit.cost : found.building.cost) : null;
+      const text = found ? (found.kind === 'unit' ? found.unit.notes : found.building.effect) : null;
+      shut.push({ key: `shut:${u.item}`, label: u.item, kind, cost, text, moves: [], shut: reason });
+    } else if (buys === 'build' && u.moveType === 'economic_victory_spend') {
+      if (out.has('economic')) continue;
+      shut.push({ key: 'shut:economic', label: 'Economic victory: spend all five', kind: 'economic', cost: ctx.ref?.economicSpend ?? null, text: null, moves: [], shut: reason });
+    } else if (buys === 'research' && u.moveType === 'research' && u.item) {
+      if (u.item === 'battle strategy card') {
+        if (out.has('battle_card')) continue;
+        shut.push({ key: 'shut:battle_card', label: 'Draw a battle card', kind: 'battle_card', cost: null, text: null, moves: [], shut: reason });
+        continue;
+      }
+      if (out.has(u.item)) continue;
+      const r = researchByName(ctx.ref, u.item);
+      shut.push({ key: `shut:${u.item}`, label: u.item, kind: 'tech', cost: r?.cost ?? null, text: r?.effect ?? null, moves: [], shut: reason });
+    }
+  }
+  return [...out.values(), ...shut];
+}
+
+function capitalize(s: string): string {
+  return s ? s[0]!.toUpperCase() + s.slice(1) : s;
 }
 
 /** The Core a platform bought with its own Core (core_pairing) also costs. */
@@ -135,7 +170,8 @@ function PurchaseRow({ ctx, p, selected, onPick }: { ctx: ScreenCtx; p: Purchase
     <OptionRow
       selected={selected}
       disabled={!ctx.live}
-      onPress={onPick}
+      shutReason={p.shut}
+      onPress={p.shut ? undefined : onPick}
       mark={<Icon name={p.kind === 'battle_card' ? 'Battle card' : p.kind === 'economic' ? 'Build' : p.label} size={20} stroke={1.8} />}
       title={p.label}
       sub={p.text || undefined}
@@ -169,9 +205,11 @@ function PaymentList({ ctx, payment }: { ctx: ScreenCtx; payment: Payment }) {
   );
 }
 
-function Composer({ ctx, scope, title, kicker, skip, skipLabel, children }: {
+function Composer({ ctx, scope, buys, title, kicker, skip, skipLabel, children }: {
   ctx: ScreenCtx;
   scope: string;
+  /** which purchases this composer makes, for the blocked ones beside them */
+  buys: Buys | null;
   title: string;
   kicker?: string;
   /** the listed move that declines (skip_action) */
@@ -180,9 +218,10 @@ function Composer({ ctx, scope, title, kicker, skip, skipLabel, children }: {
   children?: ReactNode;
 }) {
   const [draft, setDraft] = useDraft(ctx, scope);
-  const purchases = useMemo(() => purchasesOf(ctx), [ctx]);
+  const purchases = useMemo(() => purchasesOf(ctx, buys), [ctx, buys]);
+  const open = purchases.filter((p) => !p.shut);
   // A pick the engine no longer lists (after a refusal, a new event) is gone.
-  const chosen = draft.pick ? purchases.find((p) => p.key === draft.pick) ?? null : null;
+  const chosen = draft.pick ? open.find((p) => p.key === draft.pick) ?? null : null;
   const stage = chosen ? draft.stage : 'choose';
   const first = chosen?.moves[0] ?? null;
   const payment = first ? paymentOf(first) : [];
@@ -219,6 +258,7 @@ function Composer({ ctx, scope, title, kicker, skip, skipLabel, children }: {
                     onPick={() => setDraft({ pick: p.key, stage: 'choose' })} />
                 ))}</div>
               : <HowTo>The engine lists nothing to buy this action.</HowTo>}
+            {purchases.length > 0 && open.length === 0 && <HowTo>Nothing can be bought this action; each line says why.</HowTo>}
             <Actions>
               {skip && <Btn kind="secondary" disabled={!ctx.live} onClick={() => ctx.send(skip)}>{skipLabel}</Btn>}
               <Btn disabled={!ctx.live || !draft.pick} onClick={() => draft.pick && setDraft({ pick: draft.pick, stage: 'pay' })}>
@@ -473,7 +513,7 @@ function skipOf(ctx: ScreenCtx): LegalMove | null {
 function BuildScreen({ ctx }: { ctx: ScreenCtx }) {
   if (ctx.route.perspective !== 'decide') return <TableLayout ctx={ctx} />;
   return (
-    <Composer ctx={ctx} scope={`build:${ctx.v.round}`} title="Buy one thing" kicker="Your Build card is resolving"
+    <Composer ctx={ctx} scope={`build:${ctx.v.round}`} buys="build" title="Buy one thing" kicker="Your Build card is resolving"
       skip={skipOf(ctx)} skipLabel="Skip this action">
       <Rule>One unit, building or base per Build action.</Rule>
     </Composer>
@@ -483,7 +523,7 @@ function BuildScreen({ ctx }: { ctx: ScreenCtx }) {
 function ResearchScreen({ ctx }: { ctx: ScreenCtx }) {
   if (ctx.route.perspective !== 'decide') return <TableLayout ctx={ctx} />;
   return (
-    <Composer ctx={ctx} scope={`research:${ctx.v.round}`} title="Unlock one technology, or draw a card" kicker="Your Research card is resolving"
+    <Composer ctx={ctx} scope={`research:${ctx.v.round}`} buys="research" title="Unlock one technology, or draw a card" kicker="Your Research card is resolving"
       skip={skipOf(ctx)} skipLabel="Skip this action">
       <Rule>One purchase per Research action.</Rule>
       <div className="ngg-eco-deck"><Icon name="Battle card" size={16} stroke={1.8} />{ctx.v.deckCount} battle cards in the deck · {ctx.v.hand.length} in your hand</div>
@@ -495,7 +535,7 @@ function SecondPurchaseScreen({ ctx }: { ctx: ScreenCtx }) {
   if (ctx.route.perspective !== 'decide') return <TableLayout ctx={ctx} />;
   const committed = ctx.mine?.collectors ?? [];
   return (
-    <Composer ctx={ctx} scope={`second:${ctx.v.round}`} title="A second purchase" kicker="One action, two purchases"
+    <Composer ctx={ctx} scope={`second:${ctx.v.round}`} buys={ctx.v.activeAction?.cardKind === 'research' ? 'research' : ctx.v.activeAction?.cardKind === 'build' ? 'build' : null} title="A second purchase" kicker="One action, two purchases"
       skip={skipOf(ctx)} skipLabel="Stop at one">
       <Rule>Separate collectors pay for each. The second falling through never undoes the first.</Rule>
       {committed.length > 0 && (

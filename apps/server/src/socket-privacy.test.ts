@@ -172,6 +172,13 @@ describe('socket privacy', () => {
     // B is up now and only B holds the legal moves.
     expect(evA.legalMoves).toEqual([]);
     expect(evB.legalMoves.length).toBeGreaterThan(0);
+    // The engine's reasons for what B cannot do go to B alone, well formed
+    // and bounded; malformed entries are dropped.
+    expect(evA.unavailable).toEqual([]);
+    expect(JSON.stringify(evA)).not.toContain('blocked-for-');
+    expect(evB.unavailable).toHaveLength(2);
+    expect(evB.unavailable[0]).toEqual({ moveType: 'build', item: 'Dragon', reason: 'blocked-for-p2' });
+    expect(evB.unavailable[1]!.reason.length).toBe(400);
   });
 
   it('one socket at two tables never receives a view for a seat it does not own', async () => {

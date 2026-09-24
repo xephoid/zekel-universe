@@ -7,14 +7,14 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import type { GameReferenceResponse, LegalMove } from '@universe/shared';
+import type { GameReferenceResponse, LegalMove, UnavailableMove } from '@universe/shared';
 import { FlipRoot } from '@universe/primitives';
 import type { GlueInput } from '../glue';
 import { NggScreen } from '../glue/ngg/NggScreen';
 import { api } from '../api';
 
 interface Fixture {
-  key: string; viewer: string; view: unknown; legalMoves: LegalMove[];
+  key: string; viewer: string; view: unknown; legalMoves: LegalMove[]; unavailable?: UnavailableMove[];
   watcher: string; watcherView: unknown; watcherLegalMoves: LegalMove[];
 }
 
@@ -49,6 +49,7 @@ export function DevNggPage() {
     view: as === 'watcher' ? fixture.watcherView : fixture.view,
     previous: null,
     legalMoves: as === 'watcher' ? fixture.watcherLegalMoves : fixture.legalMoves,
+    unavailable: as === 'watcher' ? [] : fixture.unavailable ?? [],
     playerId: as === 'watcher' ? fixture.watcher : fixture.viewer,
     reference, seq: 1, engineMove: null, actorPlayerId: null, memory: memory.current,
   } : null, [fixture, as, reference]);
