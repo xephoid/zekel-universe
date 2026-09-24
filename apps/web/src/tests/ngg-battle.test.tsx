@@ -65,7 +65,7 @@ function decider(name: string) {
 
 /** The enabled button whose text contains `text`. */
 function press(root: HTMLElement, text: string | RegExp) {
-  const buttons = [...root.querySelectorAll('button')].filter((b) => !b.disabled);
+  const buttons = [...root.querySelectorAll<HTMLButtonElement>('button:not([data-view-only])')].filter((b) => !b.disabled);
   const hit = buttons.find((b) => (typeof text === 'string' ? b.textContent?.includes(text) : text.test(b.textContent ?? '')));
   if (!hit) throw new Error(`no enabled button with "${String(text)}" among: ${buttons.map((b) => b.textContent).join(' | ')}`);
   fireEvent.click(hit);
@@ -89,7 +89,7 @@ describe('NGnG battle screens', () => {
       cleanup();
       const w = mount(f.watcherView, f.watcher, f.watcherLegalMoves, false);
       const column = w.container.querySelector('.ngg-column')!;
-      const live = [...column.querySelectorAll('button')].filter((b) => !b.disabled);
+      const live = [...column.querySelectorAll<HTMLButtonElement>('button:not([data-view-only])')].filter((b) => !b.disabled);
       expect(live).toHaveLength(0);
       expect(w.container.querySelectorAll('button.ngg-hex')).toHaveLength(0);
       expect(w.container.querySelector('.ngg-interrupt')).toBeNull();

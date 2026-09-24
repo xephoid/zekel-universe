@@ -67,6 +67,10 @@ export interface NggPlayer {
   heroes: Array<{ name: string; coord: string | null; leader: boolean; dead: boolean; stats: string | null }>;
   bases: string[];
   collectors: Array<{ id: string; coord: string; resource: string | null }>;
+  /** every collector the seat owns, on the map this round or on the board;
+   *  a robot's with its Core state. Null from an engine that does not publish
+   *  the list: then only the collectors placed this round are known. */
+  ownedCollectors: Array<{ id: string; type: string; placedAt: string | null; core: 'allocated' | 'CORELESS' | null }> | null;
 }
 
 export interface NggOption {
@@ -228,7 +232,20 @@ function readPlayer(p: Record<string, unknown>): NggPlayer {
       coord: asStr(c['coord']),
       resource: strOrNull(c['resource']),
     })),
+    ownedCollectors: !Array.isArray(p['collectors']) ? null : asArr(p['collectors']).filter(isObj).map((c) => ({
+      id: asStr(c['collector']),
+      type: asStr(c['type']),
+      placedAt: strOrNull(c['placed_at']),
+      core: c['core'] === 'allocated' || c['core'] === 'CORELESS' ? c['core'] : null,
+    })),
   };
+}
+
+/** A robot seat's Cores: fitted in a unit or collector, and spare in the reserve. */
+export function coresOf(p: NggPlayer): { used: number; free: number } {
+  const used = p.units.filter((u) => u.core === 'allocated').length
+    + (p.ownedCollectors ?? []).filter((c) => c.core === 'allocated').length;
+  return { used, free: p.coresReserve };
 }
 
 function readOption(o: Record<string, unknown>): NggOption {

@@ -89,4 +89,40 @@ describe('NGnG screen', () => {
     expect(stop('Whole map').getAttribute('aria-pressed')).toBe('true');
     cleanup();
   });
+  it('opens any seat\'s board from the seats, with a rival\'s hand face down', () => {
+    const f = FIXTURES.find((x) => x.name === 'action-build-robot-mid')!.f;
+    const view = structuredClone(f.view) as { players: Array<Record<string, unknown>>; your_hand?: unknown };
+    // A list of owned collectors, as a newer engine publishes it.
+    const rival = view.players.find((p) => p['player_id'] !== f.viewer)!;
+    rival['collectors'] = [
+      { collector: 'surf-1', type: 'Surf', placed_at: null },
+      { collector: 'surf-2', type: 'Surf', placed_at: null },
+      { collector: 'surf-3', type: 'Surf', placed_at: '3,5' },
+    ];
+    const r = render(<NggScreen input={inputFor(view, f.viewer, f.legalMoves)} yourTurn busy={false} interactive onMove={vi.fn()} onForm={vi.fn()} nameFor={(p) => p} />);
+    const open = [...r.container.querySelectorAll<HTMLButtonElement>('button.ngg-seat')].find((b) => !b.classList.contains('you'))!;
+    fireEvent.click(open);
+    const sheet = r.getByRole('dialog', { name: /faction board$/ });
+    expect(sheet.getAttribute('aria-label')).not.toBe('Your faction board');
+    const surf = [...sheet.querySelectorAll('.ngg-fb-unit')].find((u) => u.textContent?.includes('Surf'))!;
+    expect(surf.querySelector('.ngg-fb-count')!.textContent).toBe('×3');
+    expect(surf.textContent).toContain('1 on the map');
+    // Only card backs: a rival's hand is never named.
+    expect(sheet.querySelectorAll('.ngg-fb-card')).toHaveLength(0);
+    cleanup();
+  });
+
+  it('names a piece on hover and opens its details on a press where the hex is not part of the decision', () => {
+    const f = FIXTURES.find((x) => x.name === 'action-build-robot-mid')!.f;
+    const onMove = vi.fn();
+    const r = render(<NggScreen input={inputFor(f.watcherView, f.watcher, f.watcherLegalMoves)} yourTurn={false} busy={false} interactive onMove={onMove} onForm={vi.fn()} nameFor={(p) => p} />);
+    const piece = r.container.querySelector<HTMLButtonElement>('button.ngg-piece-btn')!;
+    expect(piece.querySelector('[title]')!.getAttribute('title')).toMatch(/ · /);
+    fireEvent.click(piece);
+    expect(r.getByRole('dialog', { name: /^Pieces at / })).toBeTruthy();
+    fireEvent.click(r.getByRole('button', { name: 'Close' }));
+    expect(r.queryByRole('dialog', { name: /^Pieces at / })).toBeNull();
+    expect(onMove).not.toHaveBeenCalled();
+    cleanup();
+  });
 });

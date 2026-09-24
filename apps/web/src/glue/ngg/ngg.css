@@ -447,3 +447,31 @@ button.ngg-card { cursor: pointer; }
 .ngg-theme-wizard > :not(.table-topbar) :is(.chip-btn, .btn) { border-radius: 3px; }
 /* The strip sits in the page's bench: a bar across the foot of the page. */
 .table-bench.slot > .ngg-strip { margin: 0 16px 12px; }
+
+/* ---------- pieces: a name on hover, details on a press ---------- */
+.ngg-tile-pieces .ngg-token, .ngg-tile-pieces .ngg-army-chip { pointer-events: auto; cursor: default; }
+.ngg-piece-btn { pointer-events: auto; padding: 0; margin: 0; border: 0; background: none; display: inline-grid; cursor: pointer; border-radius: 50%; }
+.ngg-piece-btn .ngg-token, .ngg-piece-btn .ngg-army-chip { cursor: pointer; }
+.ngg-piece-btn:focus-visible { outline: 2px solid var(--n-brand); outline-offset: 2px; }
+.ngg-piece-details { position: absolute; left: 14px; bottom: 60px; z-index: 5; width: min(320px, calc(100% - 28px)); max-height: 60%; overflow: auto; padding: 10px 12px; animation: ngg-details-in .18s ease-out; }
+@keyframes ngg-details-in { from { transform: translateY(12px); } to { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .ngg-piece-details { animation: none; } }
+.ngg-piece-details-head { display: flex; align-items: center; justify-content: space-between; }
+.ngg-piece-details-close { border: 0; background: none; color: var(--n-muted); cursor: pointer; font-size: 13px; }
+.ngg-piece-details ul { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.ngg-piece-details li { display: flex; flex-direction: column; gap: 3px; padding-top: 6px; border-top: 1px solid var(--n-line); }
+.ngg-piece-details li:first-child { border-top: 0; padding-top: 0; }
+.ngg-piece-details-name { display: flex; justify-content: space-between; gap: 8px; font: 600 13px var(--n-face); }
+.ngg-piece-details-name i { font: 500 10.5px var(--n-mono); color: var(--n-muted); font-style: normal; }
+.ngg-piece-details-stats { font: 600 11px var(--n-mono); }
+.ngg-piece-details-note { font: 400 11.5px/1.35 var(--n-face); color: var(--n-muted); }
+/* ---------- seats open their boards ---------- */
+.ngg-seats > li { list-style: none; }
+button.ngg-seat { width: 100%; text-align: left; color: inherit; font: inherit; cursor: pointer; }
+button.ngg-seat:hover { border-color: var(--n-line); }
+button.ngg-seat.you:hover { border-color: var(--n-brand); }
+button.ngg-seat:focus-visible { outline: 2px solid var(--n-brand); outline-offset: 1px; }
+/* ---------- the faction board's unit counts ---------- */
+.ngg-fb-unit { position: relative; }
+.ngg-fb-count { position: absolute; top: 6px; right: 8px; font: 700 15px var(--n-mono); color: var(--n-muted); }
+.ngg-fb-unit.owned .ngg-fb-count { color: var(--n-text); }

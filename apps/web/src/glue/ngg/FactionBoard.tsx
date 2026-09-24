@@ -1,11 +1,14 @@
 // A seat's faction board: folded into a strip under the table, and opened
 // whole in a sheet. A wizard's is a page somebody wrote on (Ink), a robot's a
 // part somebody machined (Oil); the difference is only the theme around it.
-// Everything is the seat's own view: counts, the printed catalogue, and the
-// private keys (hand, spy) only this seat receives.
+// Everything comes from the viewing seat's own view: public counts, the
+// printed catalogue, and, on the seat's own board only, the private keys
+// (hand, spy) only this seat receives. Another seat's board shows its hand as
+// card backs.
 
 import type { ScreenCtx } from './ctx';
-import type { NggPlayer } from './read';
+import { coresOf, type NggPlayer } from './read';
+import type { RefUnit } from './ref';
 import { inkOf } from './factions';
 import { CardBack, CostChips, FactionChip, Icon, Panel } from './ui';
 
@@ -26,15 +29,55 @@ function Pips({ have, max, cap }: { have: number; max: number; cap: number }) {
 }
 
 function Numbers({ p }: { p: NggPlayer }) {
+  const cores = coresOf(p);
   return (
     <div className="ngg-numbers">
       <span className="ngg-number"><i>CULTURE</i><b>{p.culture}</b></span>
       <span className="ngg-number"><i>TECH</i><b>{p.tech.total}{p.tech.target !== null ? <small>/{p.tech.target}</small> : null}</b></span>
       {p.species === 'robot'
-        ? <span className="ngg-number"><i>CORES</i><b>{p.units.filter((u) => u.core === 'allocated').length + p.coresReserve}<small> · {p.coresReserve} spare</small></b></span>
-        : <span className="ngg-number"><i>MANA</i><b>{p.manaCurrent}<small>/{p.manaMax}</small></b></span>}
+        ? (
+          <>
+            <span className="ngg-number"><i>CORES FREE</i><b>{cores.free}</b></span>
+            <span className="ngg-number"><i>CORES USED</i><b>{cores.used}</b></span>
+          </>
+        )
+        : (
+          <>
+            <span className="ngg-number"><i>MANA</i><b>{p.manaCurrent}<small>/{p.manaMax}</small></b></span>
+            <span className="ngg-number"><i>SURFS</i><b>{p.ownedCollectors ? p.ownedCollectors.length : '—'}</b></span>
+            <span className="ngg-number"><i>SUBJECTS</i><b>{p.subjects}</b></span>
+          </>
+        )}
     </div>
   );
+}
+
+/** How many of a unit type the seat owns: collectors by type, Subjects and
+ *  Cores off the map, every other unit on the map. */
+function ownedCount(p: NggPlayer, u: RefUnit): number | null {
+  if (u.collector) return p.ownedCollectors ? p.ownedCollectors.filter((c) => c.type === u.name).length : null;
+  if (u.id === 'subject') return p.subjects;
+  if (u.id === 'core') { const c = coresOf(p); return c.used + c.free; }
+  return p.units.filter((x) => x.type === u.name).length;
+}
+
+function ownedNote(p: NggPlayer, u: RefUnit): string {
+  if (u.collector) {
+    if (!p.ownedCollectors) return `${p.collectors.filter((c) => c.id && collectorType(p, c.resource) === u.name).length} on the map · up to ${u.maxPerPlayer}`;
+    const mine = p.ownedCollectors.filter((c) => c.type === u.name);
+    const placed = mine.filter((c) => c.placedAt).length;
+    const unpowered = mine.filter((c) => c.core === 'CORELESS').length;
+    return [`${placed} on the map`, unpowered ? `${unpowered} without a Core` : null, `up to ${u.maxPerPlayer}`].filter(Boolean).join(' · ');
+  }
+  if (u.id === 'subject') return 'on the faction board';
+  if (u.id === 'core') { const c = coresOf(p); return `${c.used} fitted · ${c.free} spare`; }
+  return `on the map · up to ${u.maxPerPlayer}`;
+}
+
+/** A placed collector's type: a wizard's is a Surf, a robot's names its resource. */
+function collectorType(p: NggPlayer, resource: string | null): string {
+  if (p.species === 'wizard') return 'Surf';
+  return resource ? `${resource[0]!.toUpperCase()}${resource.slice(1)} collector` : '';
 }
 
 function ActionCards({ p }: { p: NggPlayer }) {
@@ -86,13 +129,15 @@ export function FactionStrip({ ctx, player, onOpen }: { ctx: ScreenCtx; player: 
 
 export function FactionBoard({ ctx, player }: { ctx: ScreenCtx; player: NggPlayer }) {
   const { ref, v } = ctx;
+  // The hand and the spy are private: only the seat's own board shows them.
+  const own = player.id === ctx.me;
   const ink = inkOf(player.faction);
   const species = player.species ?? 'wizard';
   const buildings = (ref?.buildings ?? []).filter((b) => b.species === species);
   const research = (ref?.research ?? []).filter((r) => r.species === species);
   const units = (ref?.units ?? []).filter((u) => u.species === species);
   const treaties = v.treaties.filter((t) => t.partners.includes(player.id));
-  const spy = v.spies.find((s) => s.active) ?? null;
+  const spy = own ? v.spies.find((s) => s.active) ?? null : null;
   return (
     <div className={`ngg-faction-board seat-${species}`}>
       <span className="ngg-ground" aria-hidden="true" />
@@ -100,7 +145,7 @@ export function FactionBoard({ ctx, player }: { ctx: ScreenCtx; player: NggPlaye
         <span className="ngg-fb-mark" style={{ background: ink.fill, color: ink.on }}>{ink.mark && <Icon name={ink.mark} size={34} stroke={1.8} />}</span>
         <div>
           <div className="ngg-kicker">Faction board</div>
-          <h2>{player.faction ?? 'Your seat'}</h2>
+          <h2>{player.faction ?? (own ? 'Your seat' : ctx.seat(player.id))}</h2>
           <span className="ngg-tagchip">{species}</span>
         </div>
         <Numbers p={player} />
@@ -164,9 +209,10 @@ export function FactionBoard({ ctx, player }: { ctx: ScreenCtx; player: NggPlaye
       <Panel title="Units">
         <div className="ngg-fb-units">
           {units.map((u) => {
-            const onMap = player.units.filter((x) => x.type === u.name).length;
+            const owned = ownedCount(player, u);
             return (
-              <div key={u.id} className="ngg-fb-unit">
+              <div key={u.id} className={`ngg-fb-unit${owned ? ' owned' : ''}`}>
+                <span className="ngg-fb-count" aria-label={owned === null ? 'count not published' : `${owned} owned`}>×{owned ?? '—'}</span>
                 <span className="ngg-fb-list-mark"><Icon name={u.name} size={22} stroke={1.8} /></span>
                 <b>{u.name}</b>
                 {u.init !== null && (
@@ -175,7 +221,7 @@ export function FactionBoard({ ctx, player }: { ctx: ScreenCtx; player: NggPlaye
                   </span>
                 )}
                 <CostChips cost={u.cost} />
-                {!u.collector && u.id !== 'core' && u.id !== 'subject' && <i>{onMap} on the map · up to {u.maxPerPlayer}</i>}
+                <i>{ownedNote(player, u)}</i>
               </div>
             );
           })}
@@ -197,7 +243,7 @@ export function FactionBoard({ ctx, player }: { ctx: ScreenCtx; player: NggPlaye
         </Panel>
         <Panel title="Battle cards" kicker={`${player.handCount} held · ${v.deckCount} in the deck`}>
           <div className="ngg-fb-hand">
-            {v.hand.length > 0
+            {own && v.hand.length > 0
               ? v.hand.map((c, i) => (
                   <div key={i} className="ngg-fb-card"><b>{c.card}</b><i>{c.effect}</i></div>
                 ))

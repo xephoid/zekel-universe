@@ -806,7 +806,19 @@ A glue may name a page theme (`themeFor`). The numbered move
 list sits at the foot of the NGnG column instead of floating over the table.
 The faction strip fills the page's bottom bar, so no empty bar is left. The
 map has three zoom stops (Whole map, Board, Hex) and pans by dragging when
-zoomed in; no free zoom.
+zoomed in; no free zoom. Each stop is a real step: Board is about twice the
+whole map and Hex about four times.
+
+**Settled 2026-09-24, second pass:** a map piece names itself on hover (what
+it is, whose, its printed stats) and opens its details on a press wherever
+its hex is not part of the current decision; on a lit hex a press is still
+the decision. Pressing a seat in Seats opens that seat's faction board;
+a rival's hand shows only card backs. The faction board counts each unit
+type the seat owns. The strip shows Surfs and Subjects for a wizard seat
+and free and used Cores for a robot seat. The Surf count and the Cores in
+collectors need the engine's list of every owned collector (`collectors` in
+the seat view), which is not on the engine's main yet; until it is, the
+screen shows a dash, never a guessed number.
 
 **Engine changes, on a branch not yet merged** (`claude/ngg-structured-view`
 in the engine): `resolving_action { card_kind, owner }` beside the

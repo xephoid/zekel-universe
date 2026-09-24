@@ -56,7 +56,7 @@ function Pills({ ctx }: { ctx: ScreenCtx }) {
   );
 }
 
-function SeatsPanel({ ctx }: { ctx: ScreenCtx }) {
+function SeatsPanel({ ctx, onOpen }: { ctx: ScreenCtx; onOpen: (playerId: string) => void }) {
   const { v } = ctx;
   return (
     <Panel title="Seats">
@@ -65,7 +65,9 @@ function SeatsPanel({ ctx }: { ctx: ScreenCtx }) {
           const you = p.id === ctx.me;
           const deciding = v.pending ? v.pending.for === p.id : v.activePlayerId === p.id;
           return (
-            <li key={p.id} className={`ngg-seat${you ? ' you' : ''}${deciding ? ' deciding' : ''}`}>
+            <li key={p.id}>
+              <button type="button" data-view-only className={`ngg-seat${you ? ' you' : ''}${deciding ? ' deciding' : ''}`}
+                onClick={() => onOpen(p.id)} aria-label={`Open ${you ? 'your' : `${ctx.seat(p.id)}'s`} faction board`}>
               <span data-flip-id={`ngg-supply:${p.id}`}><FactionChip faction={p.faction} size={24} /></span>
               <span className="ngg-seat-name">
                 <span>{ctx.seat(p.id)}</span>
@@ -74,6 +76,7 @@ function SeatsPanel({ ctx }: { ctx: ScreenCtx }) {
               <span className="ngg-stat"><b>{p.culture}</b><i>CULT</i></span>
               <span className="ngg-stat"><b>{p.tech.total}{p.tech.target !== null ? `/${p.tech.target}` : ''}</b><i>TECH</i></span>
               <span className="ngg-stat"><b className={p.leaderAlive ? 'ok' : 'dead'}>{p.leaderAlive ? '✓' : '✕'}</b><i>LEAD</i></span>
+              </button>
             </li>
           );
         })}
@@ -129,18 +132,20 @@ export function TableLayout({ ctx, marks, panel, interrupt }: {
   /** an out-of-turn decision drawn above everything, leaving the rest in place */
   interrupt?: ReactNode;
 }) {
-  const [boardOpen, setBoardOpen] = useState(false);
+  // Whose faction board is open: the seat's own, or any other seat's.
+  const [boardFor, setBoardFor] = useState<string | null>(null);
+  const boardPlayer = boardFor ? ctx.v.players.find((p) => p.id === boardFor) ?? null : null;
   const species = ctx.mine?.species ?? null;
   return (
     <div className={`ngg-root${species ? ` seat-${species}` : ''}`}>
       <div className="ngg-main">
         <div className="ngg-board">
-          <HexMap v={ctx.v} marks={marks} seatSpecies={species} overlay={<><ActionStack ctx={ctx} /><Pills ctx={ctx} /></>} />
+          <HexMap v={ctx.v} marks={marks} seatSpecies={species} refs={ctx.ref} overlay={<><ActionStack ctx={ctx} /><Pills ctx={ctx} /></>} />
         </div>
         <div className="ngg-column">
           <WaitingLine ctx={ctx} />
           {panel}
-          <SeatsPanel ctx={ctx} />
+          <SeatsPanel ctx={ctx} onOpen={setBoardFor} />
           <CultureRace ctx={ctx} />
           {/* The numbered list: every legal move in the engine's words, the
               fallback for anything a screen does not draw. */}
@@ -150,13 +155,14 @@ export function TableLayout({ ctx, marks, panel, interrupt }: {
       {/* The seat's faction board, folded: in the page's bench when the table
           gives one, else along the bottom of the screen. */}
       {ctx.mine && (ctx.benchSlot
-        ? createPortal(<FactionStrip ctx={ctx} player={ctx.mine} onOpen={() => setBoardOpen(true)} />, ctx.benchSlot)
-        : <FactionStrip ctx={ctx} player={ctx.mine} onOpen={() => setBoardOpen(true)} />)}
-      {boardOpen && ctx.mine && (
-        <div className="sheet-backdrop" role="presentation" onClick={() => setBoardOpen(false)}>
-          <div className={`sheet ngg-board-sheet seat-${ctx.mine.species ?? 'wizard'}`} role="dialog" aria-label="Your faction board" onClick={(e) => e.stopPropagation()}>
-            <button type="button" className="btn secondary small close" onClick={() => setBoardOpen(false)} aria-label="Close the faction board">✕</button>
-            <FactionBoard ctx={ctx} player={ctx.mine} />
+        ? createPortal(<FactionStrip ctx={ctx} player={ctx.mine} onOpen={() => setBoardFor(ctx.me)} />, ctx.benchSlot)
+        : <FactionStrip ctx={ctx} player={ctx.mine} onOpen={() => setBoardFor(ctx.me)} />)}
+      {boardPlayer && (
+        <div className="sheet-backdrop" role="presentation" onClick={() => setBoardFor(null)}>
+          <div className={`sheet ngg-board-sheet seat-${boardPlayer.species ?? 'wizard'}`} role="dialog"
+            aria-label={boardPlayer.id === ctx.me ? 'Your faction board' : `${ctx.seat(boardPlayer.id)}'s faction board`} onClick={(e) => e.stopPropagation()}>
+            <button type="button" className="btn secondary small close" onClick={() => setBoardFor(null)} aria-label="Close the faction board">✕</button>
+            <FactionBoard ctx={ctx} player={boardPlayer} />
           </div>
         </div>
       )}

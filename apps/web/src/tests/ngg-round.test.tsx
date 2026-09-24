@@ -135,7 +135,7 @@ describe('NGnG round screens', () => {
     const { view } = setupFactionsView();
     const r = draw(view, 'p2', [], false);
     expect(r.column.querySelectorAll('[role="radio"]')).toHaveLength(0);
-    expect(r.column.querySelectorAll('button:not(:disabled)')).toHaveLength(0);
+    expect(r.column.querySelectorAll('button:not(:disabled):not([data-view-only])')).toHaveLength(0);
     cleanup();
   });
 
@@ -283,7 +283,7 @@ describe('NGnG round screens', () => {
     const f = fixture('pending-treaty_break_decision');
     const r = draw(f.watcherView, f.watcher, f.watcherLegalMoves, false);
     expect(r.column.textContent).toContain('Open Borders with The Foundry');
-    expect(r.column.querySelectorAll('button:not(:disabled)')).toHaveLength(0);
+    expect(r.column.querySelectorAll('button:not(:disabled):not([data-view-only])')).toHaveLength(0);
     cleanup();
   });
 
@@ -367,7 +367,7 @@ describe('NGnG round screens', () => {
     view['phase'] = 'culture';
     const r = draw(view, f.viewer, [], false);
     expect(r.column.textContent).toContain('Culture income');
-    expect(r.column.querySelectorAll('button')).toHaveLength(0);
+    expect(r.column.querySelectorAll('button:not([data-view-only])')).toHaveLength(0);
     cleanup();
   });
 
@@ -379,7 +379,7 @@ describe('NGnG round screens', () => {
     it(`${name}: a watcher has no live control and nothing is sent`, () => {
       const f = fixture(name);
       const r = draw(f.watcherView, f.watcher, f.watcherLegalMoves, false);
-      expect(r.column.querySelectorAll('button:not(:disabled)')).toHaveLength(0);
+      expect(r.column.querySelectorAll('button:not(:disabled):not([data-view-only])')).toHaveLength(0);
       expect(r.container.querySelectorAll('button.ngg-hex')).toHaveLength(0);
       expectNoRawIds(r.column);
       expect(r.onMove).not.toHaveBeenCalled();
@@ -440,7 +440,7 @@ describe('DiplomacyPanel', () => {
     const { ctx } = ctxFor(f, legal, false);
     const r = render(<DiplomacyPanel ctx={ctx} />);
     // Not live: makeCtx gives a non-deciding seat no legal moves, so nothing draws.
-    expect(r.container.querySelectorAll('button:not(:disabled)')).toHaveLength(0);
+    expect(r.container.querySelectorAll('button:not(:disabled):not([data-view-only])')).toHaveLength(0);
     cleanup();
   });
 });

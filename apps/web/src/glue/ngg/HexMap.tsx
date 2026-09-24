@@ -10,6 +10,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
 import type { NggPiece, NggTile, NggView, Species } from './read';
+import type { NggRef } from './ref';
 import { TERRAIN, inkOfSeat } from './factions';
 import { Icon, Token } from './ui';
 
@@ -65,9 +66,78 @@ function collectorIcon(species: Species | null, resource: string | null): string
   return r ? `${r} collector` : 'Collector';
 }
 
-function TilePieces({ v, t, proposals }: { v: NggView; t: NggTile; proposals: MapProposal[] }) {
+interface Inspect { coord: string; pieces: InspectPiece[] }
+type InspectPiece = NggPiece | { kind: 'base'; owner: string };
+
+/** A piece's name as a hover line: what it is and whose it is. */
+function pieceTitle(v: NggView, refs: NggRef | null, p: InspectPiece): string {
+  const faction = v.players.find((x) => x.id === p.owner)?.faction ?? p.owner;
+  if (p.kind === 'base') return `${faction} base`;
+  if (p.kind === 'hero') return `${p.name}${p.leader ? ' (Leader)' : ''} · ${faction}${p.stats ? ` · ${p.stats}` : ''}`;
+  if (p.kind === 'collector') {
+    const species = v.players.find((x) => x.id === p.owner)?.species ?? null;
+    const label = species === 'wizard' ? 'Surf' : p.resource ? `${TERRAIN[p.resource]?.name ?? p.resource} collector` : 'Collector';
+    return `${label} · ${faction}${p.resource ? ` · collecting ${p.resource}` : ''}`;
+  }
+  const u = refs?.units.find((x) => x.name === p.name);
+  const stats = u && u.init !== null ? ` · Init ${u.init} DMG ${u.dmg ?? '—'} DEF ${u.def ?? '—'}` : '';
+  return `${p.name} · ${faction}${stats}${p.core === 'CORELESS' ? ' · no Core' : ''}`;
+}
+
+/** A piece, pressable for its details where the hex is not part of the decision. */
+function PieceBtn({ onInspect, pieces, children }: { onInspect: ((p: InspectPiece[]) => void) | null; pieces: InspectPiece[]; children: ReactNode }) {
+  if (!onInspect) return <>{children}</>;
+  return (
+    <button type="button" className="ngg-piece-btn" data-view-only onClick={(e) => { e.stopPropagation(); onInspect(pieces); }}>
+      {children}
+    </button>
+  );
+}
+
+/** A piece's details: its printed card, from the catalogue, and its state. */
+function PieceDetails({ v, refs, inspect, onClose }: { v: NggView; refs: NggRef | null; inspect: Inspect; onClose: () => void }) {
+  const tile = v.tiles.find((t) => t.coord === inspect.coord);
+  return (
+    <div className="ngg-float ngg-piece-details" role="dialog" aria-label={`Pieces at ${tile?.label ?? inspect.coord}`}>
+      <div className="ngg-piece-details-head">
+        <span className="ngg-float-title">{tile?.label ?? inspect.coord}</span>
+        <button type="button" className="ngg-piece-details-close" onClick={onClose} aria-label="Close">✕</button>
+      </div>
+      <ul>
+        {inspect.pieces.map((p, i) => {
+          const faction = v.players.find((x) => x.id === p.owner)?.faction ?? null;
+          const unit = p.kind === 'unit' ? refs?.units.find((x) => x.name === p.name) ?? null : null;
+          const hero = p.kind === 'hero' ? refs?.heroes.find((x) => x.name === p.name) ?? null : null;
+          const name = pieceTitle(v, refs, p).split(' · ')[0];
+          return (
+            <li key={i}>
+              <span className="ngg-piece-details-name"><b>{name}</b><i>{faction ?? p.owner}</i></span>
+              {unit && unit.init !== null && (
+                <span className="ngg-statline">
+                  <span><i>INIT</i>{unit.init}</span><span><i>DMG</i>{unit.dmg ?? '—'}</span><span><i>DEF</i>{unit.def ?? '—'}</span>
+                </span>
+              )}
+              {p.kind === 'hero' && p.stats && <span className="ngg-piece-details-stats">{p.stats}</span>}
+              {p.kind === 'unit' && p.core === 'CORELESS' && <span className="ngg-piece-details-note">No Core: it cannot act until one is fitted.</span>}
+              {p.kind === 'collector' && p.resource && <span className="ngg-piece-details-note">Collecting {p.resource} this round.</span>}
+              {unit?.notes && <span className="ngg-piece-details-note">{unit.notes}</span>}
+              {hero?.effect && <span className="ngg-piece-details-note">{hero.effect}</span>}
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
+function TilePieces({ v, t, proposals, refs, onInspect }: {
+  v: NggView; t: NggTile; proposals: MapProposal[]; refs: NggRef | null;
+  /** open a piece's details; null where the hex is part of the decision */
+  onInspect: ((p: InspectPiece[]) => void) | null;
+}) {
   const { heroes, units, collector, speciesOf } = piecesOf(v, t);
   const factionOf = (pid: string) => v.players.find((p) => p.id === pid)?.faction ?? null;
+  const title = (p: InspectPiece) => pieceTitle(v, refs, p);
   const crowded = heroes.length + units.length > BUDGET;
   const armies = new Map<string, NggPiece[]>();
   for (const u of units) armies.set(u.owner, [...(armies.get(u.owner) ?? []), u]);
@@ -78,26 +148,34 @@ function TilePieces({ v, t, proposals }: { v: NggView; t: NggTile; proposals: Ma
       <div className="ngg-tile-army">
         {t.baseOwner && (
           <span data-flip-id={`ngg-base:${t.coord}`} data-flip-from={`ngg-supply:${t.baseOwner}`}>
-            <Token kind="base" faction={baseFaction} name="Base" size={20} title={`${baseFaction ?? ''} base`} />
+            <PieceBtn onInspect={onInspect} pieces={[{ kind: 'base', owner: t.baseOwner }]}>
+              <Token kind="base" faction={baseFaction} name="Base" size={20} title={title({ kind: 'base', owner: t.baseOwner })} />
+            </PieceBtn>
           </span>
         )}
         {heroes.map((h) => (
           <span key={h.name} data-flip-id={`ngg-hero:${h.name}`} data-flip-from={`ngg-supply:${h.owner}`}>
-            <Token kind="hero" faction={factionOf(h.owner)} name={h.name} leader={h.leader} size={22} title={`${h.name}${h.stats ? ` · ${h.stats}` : ''}`} />
+            <PieceBtn onInspect={onInspect} pieces={[h]}>
+              <Token kind="hero" faction={factionOf(h.owner)} name={h.name} leader={h.leader} size={22} title={title(h)} />
+            </PieceBtn>
           </span>
         ))}
         {crowded
           ? [...armies.entries()].map(([owner, list]) => {
               const ink = inkOfSeat(v, owner);
               return (
-                <span key={owner} className="ngg-army-chip" style={{ background: ink.fill, color: ink.on }} title={list.map((u) => u.name).join(', ')}>
-                  {list.length}
-                </span>
+                <PieceBtn key={owner} onInspect={onInspect} pieces={list}>
+                  <span className="ngg-army-chip" style={{ background: ink.fill, color: ink.on }} title={`${factionOf(owner) ?? owner}: ${list.map((u) => u.name).join(', ')}`}>
+                    {list.length}
+                  </span>
+                </PieceBtn>
               );
             })
           : units.map((u) => (
               <span key={u.id ?? u.name} data-flip-id={`ngg-unit:${u.id ?? u.name}`} data-flip-from={`ngg-supply:${u.owner}`}>
-                <Token kind="unit" faction={factionOf(u.owner)} name={u.name} size={22} title={`${u.name}${u.core === 'CORELESS' ? ' · no Core' : ''}`} />
+                <PieceBtn onInspect={onInspect} pieces={[u]}>
+                  <Token kind="unit" faction={factionOf(u.owner)} name={u.name} size={22} title={title(u)} />
+                </PieceBtn>
               </span>
             ))}
         {proposals.filter((p) => p.kind !== 'collector').map((p) => (
@@ -106,7 +184,9 @@ function TilePieces({ v, t, proposals }: { v: NggView; t: NggTile; proposals: Ma
       </div>
       {collector && (
         <span className="ngg-tile-collector" data-flip-id={`ngg-collector:${collector.id}`} data-flip-from={`ngg-supply:${collector.owner}`}>
-          <Token kind="collector" faction={factionOf(collector.owner)} name={collectorIcon(speciesOf(collector.owner), collector.resource)} size={18} title={collector.name} />
+          <PieceBtn onInspect={onInspect} pieces={[collector]}>
+            <Token kind="collector" faction={factionOf(collector.owner)} name={collectorIcon(speciesOf(collector.owner), collector.resource)} size={18} title={title(collector)} />
+          </PieceBtn>
         </span>
       )}
       {!collector && dashedCollector && (
@@ -150,7 +230,7 @@ function ZoomControl({ zoom, setZoom }: { zoom: ZoomStop; setZoom: (z: ZoomStop)
   return (
     <div className="ngg-zoom" role="group" aria-label="Map zoom">
       {ZOOM_STOPS.map((z) => (
-        <button key={z.stop} type="button" className={zoom === z.stop ? 'on' : ''} aria-pressed={zoom === z.stop} onClick={() => setZoom(z.stop)}>
+        <button key={z.stop} type="button" data-view-only className={zoom === z.stop ? 'on' : ''} aria-pressed={zoom === z.stop} onClick={() => setZoom(z.stop)}>
           <i className={`ngg-zoom-hex ${z.stop}`} aria-hidden="true" />{z.label}
         </button>
       ))}
@@ -158,9 +238,11 @@ function ZoomControl({ zoom, setZoom }: { zoom: ZoomStop; setZoom: (z: ZoomStop)
   );
 }
 
-export function HexMap({ v, marks = {}, seatSpecies, overlay }: {
+export function HexMap({ v, marks = {}, seatSpecies, overlay, refs = null }: {
   v: NggView;
   marks?: MapMarks;
+  /** the printed catalogue, for a piece's details */
+  refs?: NggRef | null;
   /** the viewing seat's species: its selection mark is inked or machined */
   seatSpecies?: Species | null;
   /** floating panels over the board (the action stack, pills) */
@@ -176,8 +258,18 @@ export function HexMap({ v, marks = {}, seatSpecies, overlay }: {
   const mapH = (rMax - rMin) * ROWH + HEXH + GUTTER;
   const { box, fit } = useFit(mapW + 24, mapH + 24);
   const [zoom, setZoom] = useState<ZoomStop>('whole');
-  // Board is the map at its own size and Hex twice that, never smaller than the whole map.
-  const scale = zoom === 'whole' ? fit : Math.max(fit, zoom === 'board' ? 1 : 2);
+  // Each stop is a step closer than the one before: Board about twice the
+  // whole map, Hex about four times, whatever the window.
+  const scale = zoom === 'whole' ? fit : zoom === 'board' ? Math.max(fit * 1.8, 1) : Math.max(fit * 3.6, 2.4);
+  // The piece whose details are open (a click on a piece where the hex is not
+  // part of the decision).
+  const [inspect, setInspect] = useState<Inspect | null>(null);
+  useEffect(() => {
+    if (!inspect) return;
+    const close = (e: globalThis.KeyboardEvent) => { if (e.key === 'Escape') setInspect(null); };
+    window.addEventListener('keydown', close);
+    return () => window.removeEventListener('keydown', close);
+  }, [inspect]);
   const panned = scale > fit + 0.001;
   const scroller = useRef<HTMLDivElement>(null);
   // A new stop keeps what was in the middle in the middle, or starts centred.
@@ -269,7 +361,8 @@ export function HexMap({ v, marks = {}, seatSpecies, overlay }: {
                 {t.start !== null && !t.baseOwner && <span className="ngg-hex-start">{t.start}</span>}
                 {shut && <span className="ngg-hex-bar" aria-hidden="true" />}
               </span>
-              <TilePieces v={v} t={t} proposals={proposals} />
+              <TilePieces v={v} t={t} proposals={proposals} refs={refs}
+                onInspect={lit && marks.onTile ? null : (pieces) => setInspect({ coord: t.coord, pieces })} />
               {marks.selected === t.coord && <SeatMark species={seatSpecies ?? null} />}
               {tag && <span className="ngg-hex-tag">{tag}</span>}
             </>
@@ -282,6 +375,7 @@ export function HexMap({ v, marks = {}, seatSpecies, overlay }: {
       </div>
       </div>
       {overlay}
+      {inspect && <PieceDetails v={v} refs={refs} inspect={inspect} onClose={() => setInspect(null)} />}
       <ZoomControl zoom={zoom} setZoom={setZoom} />
     </div>
   );
