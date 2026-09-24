@@ -49,9 +49,9 @@ a{color:var(--brand)}a:hover{color:var(--action)}
         <div style="padding:16px 22px 13px;border-bottom:1px solid var(--line);display:flex;align-items:flex-end;gap:16px">
           <div style="display:flex;flex-direction:column;gap:4px;flex-grow:1;min-width:0">
             <div style="font:700 20px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:var(--text)">Your three treaties</div>
-            <div style="font-size:11.5px;line-height:1.45;color:var(--muted)">One per player, each opening on its own condition. The window stays yours until you say you are done, so you may break every open one.</div>
+            <div style="font-size:11.5px;line-height:1.45;color:var(--muted)">Tick every open treaty you want to break. The window stays yours until you press Done.</div>
           </div>
-          <span style="{{ oneStyle }}">BREAK AS MANY AS ARE OPEN</span>
+          <span style="{{ oneStyle }}">{{ selText }}</span>
         </div>
 
         <div style="flex-grow:1;padding:14px 22px;display:flex;flex-direction:column;gap:10px;overflow:hidden">
@@ -84,9 +84,9 @@ a{color:var(--brand)}a:hover{color:var(--action)}
         </div>
 
         <div style="padding:13px 22px;border-top:1px solid var(--line);background:var(--surface2);display:flex;align-items:center;gap:12px">
-          <span style="font-size:11px;line-height:1.4;color:var(--muted);flex-grow:1">Each break takes that token back and stops its culture at the next income step. The screen stays open afterwards, with one treaty fewer on it.</span>
+          <span style="font-size:11px;line-height:1.4;color:var(--muted);flex-grow:1">Breaking takes the token back. Its culture stops at the next income step.</span>
           <button type="button" style="white-space:nowrap;flex-shrink:0;height:42px;padding:0 18px;border-radius:9px;border:1.5px solid var(--ink);background:var(--surface);font:600 13px 'IBM Plex Sans',sans-serif;color:var(--text);cursor:pointer">Done, keep the rest</button>
-          <button type="button" style="white-space:nowrap;flex-shrink:0;height:42px;padding:0 20px;border-radius:9px;border:none;background:var(--danger);color:#ffffff;font:600 13.5px 'IBM Plex Sans',sans-serif;cursor:pointer">Break Shared Tactics</button>
+          <button type="button" style="white-space:nowrap;flex-shrink:0;height:42px;padding:0 20px;border-radius:9px;border:none;background:var(--danger);color:#ffffff;font:600 13.5px 'IBM Plex Sans',sans-serif;cursor:pointer">{{ breakLabel }}</button>
         </div>
       </div>
     </div>
@@ -107,8 +107,8 @@ a{color:var(--brand)}a:hover{color:var(--action)}
       </div>
 
       <div style="padding:14px 16px 16px;border-radius:14px;background:var(--surface);border:1.5px solid var(--action);display:flex;flex-direction:column;gap:9px">
-        <div style="font:700 15px 'Bricolage Grotesque',sans-serif;letter-spacing:-.01em;color:var(--text)">You cannot swap one for another</div>
-        <span style="font-size:11.5px;line-height:1.45;color:var(--text)">Break the old one legally first, then form the new one at a later legal moment. Agreeing with your partner to trade them in one go is not a route around the condition.</span>
+        <div style="font:700 15px 'Bricolage Grotesque',sans-serif;letter-spacing:-.01em;color:var(--text)">Breaking and forming are separate</div>
+        <span style="font-size:11.5px;line-height:1.45;color:var(--text)">A treaty cannot be traded for another in one step. Break it in its window; form a new one in a forming window.</span>
         <div style="display:flex;flex-direction:column;gap:6px">
           <sc-for list="{{ gap }}" as="g" hint-placeholder-count="2">
             <div style="{{ g.rowStyle }}">
@@ -202,7 +202,7 @@ class Component extends DCLogic{
    const shut=verdict==='shut';
    const ic=ICO.icon(name);
    return {name:name,with:'with '+who,pay:pay,window:windowText,
-    verdict:reason,pick:picked?'BREAKING':(shut?'':'CAN BREAK'),
+    verdict:reason,pick:picked?'✓':'',
     d1:ic.d1,d2:ic.d2,d3:ic.d3,
     rowStyle:{display:'flex',alignItems:'center',gap:'12px',padding:'11px 13px',borderRadius:'11px',
       background:picked?'#fbeae8':(shut?'transparent':'var(--surface2)'),
@@ -217,19 +217,22 @@ class Component extends DCLogic{
       borderRadius:'5px',padding:'2px 7px',flexShrink:0},
     verdictStyle:{font:"600 10px 'IBM Plex Sans',sans-serif",
       color:shut?'var(--danger)':'var(--brand)'},
-    pickStyle:{font:"600 9px 'IBM Plex Mono',monospace",letterSpacing:'.06em',flexShrink:0,
-      padding:picked?'4px 9px':'0',borderRadius:'999px',
-      background:picked?'var(--danger)':'transparent',
-      color:picked?'#ffffff':'var(--brand)'}};
+    // A tick box on every open treaty, none on a shut one: this is a multi-select.
+    pickStyle:shut?{width:'0px',height:'0px',overflow:'hidden'}
+      :{width:'22px',height:'22px',borderRadius:'6px',flexShrink:0,display:'grid',
+      placeItems:'center',font:"700 13px 'IBM Plex Mono',monospace",
+      background:picked?'var(--danger)':'var(--surface)',
+      border:picked?'1.5px solid var(--danger)':'1.5px solid var(--ink)',
+      color:'#ffffff'}};
   }
 
   const mine=[
    treaty('st','Shared Tactics','The Unbolted','+5',
      'Printed window: end of round. No condition beyond the timing.',
-     'open','Open now. Nothing has to be true first.',true),
+     'open','Open.',true),
    treaty('ct','Culture Treaty','The Foundry','+10',
      'Printed window: any time outside the culture phase, and only when no action or battle is resolving.',
-     'open','Open now. The culture phase is over and nothing is resolving.',false),
+     'open','Open.',false),
    treaty('sr','Shared Resources','The Ledger','+5',
      'Printed window: end of round, and only if no unit is collecting from a partner’s space.',
      'shut','Shut. Your Surf is collecting on G4, where The Ledger stand.',false)];
@@ -268,8 +271,8 @@ class Component extends DCLogic{
       width:'54px',paddingTop:'1px',color:'var(--muted)'}};
   }
   const gap=[
-   gapRow('NOW','Breaking happens here, at the end of the round, with nobody taking an action. Both open ones may go.'),
-   gapRow('EARLIEST','Forming happens only at the start or end of an active player’s action, so the soonest anything replaces it is next round.')];
+   gapRow('BREAKING','In each treaty’s own window, printed on the treaty.'),
+   gapRow('FORMING','Only at the start or end of an active player’s action.')];
 
   function keep(tag,text){
    return {tag:tag,text:text,
@@ -279,7 +282,7 @@ class Component extends DCLogic{
   const keeps=[
    keep('THE TOKEN','It comes back to you free, and that type can go to somebody else later.'),
    keep('THE CULTURE','The +5 stops at the next income step. Nothing already paid is taken back.'),
-   keep('THE HANDS','What you learned from their hand while Shared Tactics stood, you keep. You simply stop seeing new cards.')];
+   keep('THE HANDS','What you learned from their hand while Shared Tactics stood, you keep. You stop seeing new cards.')];
 
   function num(n,text){
    return {num:n,text:text,
@@ -288,8 +291,15 @@ class Component extends DCLogic{
       font:"600 11px 'IBM Plex Mono',monospace",background:'var(--surface)',border:'1px solid var(--line)',color:'var(--text)'}};
   }
   const numbered=[num(1,'Break Shared Tactics with The Unbolted'),
-   num(2,'Break the Culture Treaty with The Foundry'),num(3,'Keep them all'),
+   num(2,'Break the Culture Treaty with The Foundry'),num(3,'Done, keep the rest'),
    num(4,'Why can’t I break Shared Resources?')];
+
+  // The selection drives the footer. Each break is its own engine move; the seat keeps the
+  // window until it passes, so Done is the pass.
+  const picked=['Shared Tactics'];
+  const openCount=2;
+  const selText='BREAK ANY NUMBER · '+picked.length+' OF '+openCount+' TICKED';
+  const breakLabel=picked.length===1?('Break '+picked[0]):('Break '+picked.length+' treaties');
 
   const brk=ICO.icon('Break a treaty');
   const spin=ICO.icon('Spinner Platform');
@@ -312,6 +322,7 @@ class Component extends DCLogic{
      padding:'4px 10px',borderRadius:'999px',background:'var(--surface2)',color:'var(--muted)'},
    tiles:tiles,blockRing:blockRing,blockInner:blockInner,blockCode:blockCode,blockWrap:blockWrap,
    ledDot:ledDot,surfDot:surfDot,
+   selText:selText,breakLabel:breakLabel,
    mine:mine,others:others,kinds:kinds,gap:gap,keeps:keeps,numbered:numbered};
  }
 }

@@ -39,8 +39,12 @@ a{color:var(--brand)}a:hover{color:var(--action)}
         <div style="padding:15px 20px 13px;display:flex;align-items:flex-start;gap:14px">
           <span style="{{ askChip }}"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ facD1 }}"></path><path d="{{ facD2 }}"></path><path d="{{ facD3 }}"></path></svg></span>
           <div style="display:flex;flex-direction:column;gap:4px;flex-grow:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
+              <span style="{{ queueStyle }}">{{ queueText }}</span>
+              <span style="font:500 11px 'IBM Plex Mono',monospace;color:var(--muted)">{{ queueNext }}</span>
+            </div>
             <div style="font:700 21px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:var(--text)">The Foundry asks to stand one collector on D4</div>
-            <div style="font-size:12px;line-height:1.45;color:var(--muted)">Your Evoker and your Cleric are on that tile, so it is yours to answer for. Nothing of theirs is placed and nothing of theirs is spent until you say.</div>
+            <div style="font-size:12px;line-height:1.45;color:var(--muted)">Your Evoker and Cleric are on D4. Nothing of theirs is placed or spent until every request is answered.</div>
           </div>
           <div style="display:flex;gap:9px;flex-shrink:0">
             <button type="button" style="white-space:nowrap;flex-shrink:0;height:44px;padding:0 20px;border-radius:10px;border:1.5px solid var(--ink);background:var(--surface);font:600 13.5px 'IBM Plex Sans',sans-serif;color:var(--text);cursor:pointer">Refuse</button>
@@ -80,6 +84,9 @@ a{color:var(--brand)}a:hover{color:var(--action)}
               </sc-for>
             </div>
           </sc-for>
+          <div style="{{ proposed2Wrap }}">
+            <span style="{{ proposed2Pin }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ waterD1 }}"></path><path d="{{ waterD2 }}"></path><path d="{{ waterD3 }}"></path></svg></span>
+          </div>
           <div style="{{ proposedWrap }}">
             <span style="{{ proposedRing }}"><span style="{{ proposedPin }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ etherD1 }}"></path><path d="{{ etherD2 }}"></path><path d="{{ etherD3 }}"></path></svg></span></span>
           </div>
@@ -106,11 +113,18 @@ a{color:var(--brand)}a:hover{color:var(--action)}
             <span style="{{ r.style }}"><span style="{{ r.dotStyle }}"></span>{{ r.label }}</span>
           </sc-for>
         </div>
-        <span style="font-size:11.5px;line-height:1.45;color:var(--text)">A Build action that pays all five resources and builds nothing. That is the <strong>economic victory condition</strong>, and their Leader is alive. If the payment completes, the game is over and The Foundry has won.</span>
+        <span style="font-size:11.5px;line-height:1.45;color:var(--text)">Purchase: <strong>Economic victory spend</strong>. A Build action paying all five resources and building nothing.</span>
         <div style="display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:10px;background:var(--surface2)">
-          <span style="{{ countChip }}">10</span>
-          <span style="font-size:10.5px;line-height:1.4;color:var(--text);flex-grow:1">of the eleven tiles are already theirs to use. D4 is the eleventh, and it is the only one that needs an answer.</span>
+          <span style="{{ countChip }}">9</span>
+          <span style="font-size:10.5px;line-height:1.4;color:var(--text);flex-grow:1">of the eleven tiles are already theirs to use. Two need an owner&rsquo;s answer, asked one at a time.</span>
         </div>
+        <sc-for list="{{ queue }}" as="q" hint-placeholder-count="2">
+          <div style="{{ q.rowStyle }}">
+            <span style="{{ q.numStyle }}">{{ q.num }}</span>
+            <span style="font-size:11px;line-height:1.35;color:var(--text);flex-grow:1">{{ q.text }}</span>
+            <span style="{{ q.stateStyle }}">{{ q.state }}</span>
+          </div>
+        </sc-for>
       </div>
 
       <div style="padding:14px 16px 16px;border-radius:14px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:9px">
@@ -125,9 +139,9 @@ a{color:var(--brand)}a:hover{color:var(--action)}
       </div>
 
       <div style="padding:14px 16px 16px;border-radius:14px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:9px">
-        <div style="font:700 15px 'Bricolage Grotesque',sans-serif;letter-spacing:-.01em;color:var(--text)">Refusing costs you nothing</div>
-        <span style="font-size:11.5px;line-height:1.45;color:var(--text)">They move the collector to another tile or drop the purchase and choose a different one. Every collector in the refused proposal stays unspent and free to pay for something else.</span>
-        <span style="font-size:10.5px;line-height:1.4;color:var(--muted)">Two treaties would have made this automatic and neither is in force between you: <strong>Open Borders</strong> and <strong>Shared Resources</strong>. Peace, a Culture Treaty and Shared Tactics grant nothing here.</span>
+        <div style="font:700 15px 'Bricolage Grotesque',sans-serif;letter-spacing:-.01em;color:var(--text)">If you refuse</div>
+        <span style="font-size:11.5px;line-height:1.45;color:var(--text)">Nothing commits. They revise the proposal or drop the purchase, and every collector in it stays unspent.</span>
+        <span style="font-size:10.5px;line-height:1.4;color:var(--muted)">No <strong>Open Borders</strong> or <strong>Shared Resources</strong> treaty stands between you.</span>
       </div>
 
       <div style="flex-grow:1;min-height:0;padding:14px 16px 16px;border-radius:14px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:10px">
@@ -246,7 +260,8 @@ class Component extends DCLogic{
    [1,11,[coll('fou','Or')]],[1,9,[coll('fou','Or')]],
    [2,2,[dot('led','H','base'),dot('led','L')]],[1,3,[coll('led','Wa')]],
    [-2,2,[dot('unb','H','base'),dot('unb','L')]],[-1,3,[coll('unb','Wa')]],
-   [-2,4,[coll('unb','Or')]],[0,2,[dot('unb','P')]],[1,7,[dot('unb','P')]]];
+   [-2,4,[coll('unb','Or')]],[0,2,[dot('unb','P')]],[1,7,[dot('unb','P')]],
+   [1,5,[dot('led','S')]]];
 
   const pieces=PIECES.map(function(p){
    const q=px(p[0],p[1]);
@@ -265,6 +280,35 @@ class Component extends DCLogic{
     display:'flex',alignItems:'flex-end',justifyContent:'center',paddingBottom:'2px',boxSizing:'border-box'};
   const proposedRing={padding:'2.5px',borderRadius:'50%',background:'#e0762b',
     display:'inline-grid',placeItems:'center',animation:'ngg-wait 1.8s ease-in-out infinite'};
+  // The second request in the queue: a Foundry water collector on F3, where The Ledger stand.
+  // Dashed, because it is not on the board yet; no orange ring, because it is not asked of you.
+  const ASK2=[1,5];
+  const ask2Pos=px(ASK2[0],ASK2[1]);
+  const waIc=ICO.icon('Water collector');
+  const proposed2Wrap={position:'absolute',left:ask2Pos.l,top:ask2Pos.t,width:HEXW+'px',height:HEXH+'px',
+    display:'flex',alignItems:'flex-end',justifyContent:'center',paddingBottom:'4px',boxSizing:'border-box'};
+  const proposed2Pin={width:'19px',height:'19px',borderRadius:'50%',background:FACS.fou,
+    border:'2px dashed #1c1a17',display:'grid',placeItems:'center',color:'#1c1a17',opacity:'.85'};
+
+  // ---- the queue: one request per owner, asked in turn (the engine's queue index/total) ----
+  const QUEUE={index:1,total:2};
+  const queueText='REQUEST '+QUEUE.index+' OF '+QUEUE.total;
+  const queueNext='Next: The Ledger, for F3';
+  const queueStyle={font:"600 9.5px 'IBM Plex Mono',monospace",letterSpacing:'.08em',
+    padding:'3px 9px',borderRadius:'999px',background:'#fbead9',color:'#8a4412'};
+  function qrow(num,text,state,now){
+   return {num:num,text:text,state:state,
+    rowStyle:{display:'flex',alignItems:'center',gap:'9px',padding:'7px 10px',borderRadius:'9px',
+      background:now?'#fbead9':'var(--surface2)',border:now?'1.5px solid #e0762b':'1px solid transparent'},
+    numStyle:{width:'19px',height:'19px',borderRadius:'50%',flexShrink:0,display:'grid',placeItems:'center',
+      font:"700 10px 'IBM Plex Mono',monospace",background:now?'#e0762b':'var(--surface)',
+      color:now?'#ffffff':'var(--muted)',border:'1px solid var(--line)'},
+    stateStyle:{font:"600 9px 'IBM Plex Mono',monospace",letterSpacing:'.05em',flexShrink:0,
+      color:now?'#8a4412':'var(--muted)'}};
+  }
+  const queue=[qrow('1','D4 · Ether collector · asks you','NOW',true),
+   qrow('2','F3 · Water collector · asks The Ledger','NEXT',false)];
+
   const proposedPin={width:'19px',height:'19px',borderRadius:'50%',background:FACS.fou,
     border:'2px dashed #1c1a17',display:'grid',placeItems:'center',color:'#1c1a17'};
 
@@ -307,7 +351,7 @@ class Component extends DCLogic{
   const allows=[
    allow('1','That one collector may stand on D4 and pay for this action.'),
    allow('2','Your Evoker and Cleric will not remove it for standing there unprotected. That holds until upkeep.'),
-   allow('3','It is not safe from an attack. Yours included, and anybody else&rsquo;s.')];
+   allow('3','It is not safe from an attack. Yours included, and anybody else’s.')];
 
   // ---- the two ether tiles ------------------------------------------------------------
   function ether(code,who,fac){
@@ -368,6 +412,9 @@ class Component extends DCLogic{
    etherD1:etIc.d1,etherD2:etIc.d2,etherD3:etIc.d3,
    tiles:tiles,asked:asked,pieces:pieces,gutter:gutterMarks(),
    proposedWrap:proposedWrap,proposedRing:proposedRing,proposedPin:proposedPin,
+   proposed2Wrap:proposed2Wrap,proposed2Pin:proposed2Pin,
+   waterD1:waIc.d1,waterD2:waIc.d2,waterD3:waIc.d3,
+   queueText:queueText,queueNext:queueNext,queueStyle:queueStyle,queue:queue,
    terms:terms,spend:spend,countChip:countChip,allows:allows,ethers:ethers,numbered:numbered};
  }
 }

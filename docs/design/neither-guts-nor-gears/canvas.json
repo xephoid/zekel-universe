@@ -889,6 +889,48 @@
    "y": 4960,
    "w": 470,
    "text": "THE MAP WAS THE REAL TEST, and it answered a question I had left open.\n\nTOKENS FOLLOW THEIR OWNER, NOT THE VIEWER. A Covenant piece is a drawn ring on paper and a Foundry piece is a cut plate — on every seat’s screen, including each other’s. That was not the plan; it fell out of applying the rule honestly, and it is the best thing on the board. Species becomes readable off the pieces themselves, with no legend and no colour lookup, which is exactly what six factions in two species need.\n\nTHE TILES DO NOT CHANGE. Same inks, same shapes, same labels, same positions, in all three panels. A four-player table is ONE board that four clients annotate. The moment terrain renders differently per seat, the table stops being shared and every conversation about it breaks.\n\nSO WHAT A SEAT OWNS IS: the frame around the board, the codes IT writes on the tiles, its selection and reach marks, and its own margin readout. A drawn hexagon with a wobble for her; four corner brackets for it. That is the whole licence, and it is enough.\n\nAND THE CONTRAST TRAP MOVED. The tile inks were tuned against a white ground. Against parchment the pale ones lose separation from the frame, and the codes sitting on them lose more. The pairs to measure are tile-to-frame and code-to-tile, not just text on panels — which is a different test from the one the other boards need."
+  },
+  "c25": {
+   "page": "choices",
+   "x": 5160,
+   "y": 14300,
+   "w": 460,
+   "text": "Corrected to match the engine (DESIGN-ALIGNMENT §3.1).\n\nThe seat may break any number of its breakable treaties, and the window stays with it until it passes. So every open treaty now has a tick box, the footer button breaks what is ticked (\"Break Shared Tactics\", or \"Break 2 treaties\"), and \"Done, keep the rest\" is the pass. The shut treaty keeps its strike and its reason, with no tick box.\n\nCopy pass: dropped the lines that explained the design or forecast what happens next (\"the soonest anything replaces it is next round\", \"both open ones may go\"). What is left is state, the printed windows, and the reason a treaty is shut."
+  },
+  "c26": {
+   "page": "choices",
+   "x": 5160,
+   "y": 12860,
+   "w": 460,
+   "text": "Corrected to match the engine (DESIGN-ALIGNMENT §3.2 and §3.3).\n\nONE GATE, NOT A LOCK PER CARD. The sample is now the moment before the owner commits. Their whole hand sits under one row carrying the engine's reason: they are in this battle and have not committed yet, and as the owner they decide first. Once they commit or pass, everything left in their hand is yours to play. The per-card locks are gone.\n\nNO LEAK. The screen no longer says you can tell what they committed from what is left. The view returns their whole hand, unmarked.\n\nCopy pass: removed the \"if they play it / if you play it\" preview and the outcome notes on the cards. Those are sums the client would be doing."
+  },
+  "c27": {
+   "page": "choices",
+   "x": 5160,
+   "y": 9980,
+   "w": 460,
+   "text": "Corrected to match the engine (DESIGN-ALIGNMENT §3.4 and §3.5).\n\nDETECTION IS BESIDE THE ACTIVATION. The engine offers use_detection as its own move, not as an option of the hero's activation. The activation list is now Attack, Spy Attack, Pass; Detection is a separate control with its own button, and its cost is printed on it: the carrying hero's activation and the spy assignment.\n\nTHE WIZARD CONDITION IS THE ENGINE'S. Not \"a battle that holds an opposing hero\". The inspecting wizard has researched Detection, an Enchantress of theirs is in the battle, and the target seat has an active spy assignment. The Ledger now shows as shut with the engine's reason: no active spy assignment to inspect.\n\nCopy pass: dropped \"you have no oil tile in reach\" and the attack-outcome forecast."
+  },
+  "c28": {
+   "page": "choices",
+   "x": 5160,
+   "y": 11420,
+   "w": 460,
+   "text": "Corrected to match the engine (DESIGN-ALIGNMENT §3.6). This closes the open question in the note beside this board.\n\nA proposal that needs two owners makes two requests, one after the other: the engine asks the first owner, and on a yes re-runs the purchase and asks the next. The screen prints the position, \"Request 1 of 2\", names the next one (The Ledger, for F3), and lists the queue in the rail. The second collector is drawn dashed on F3 with no orange ring, because it is not asked of you.\n\nCopy pass: removed \"if the payment completes, the game is over and The Foundry has won\". That is an outcome the client would compute. The purchase's name is state and stays."
+  },
+  "c29": {
+   "page": "choices",
+   "x": 5160,
+   "y": 1420,
+   "w": 460,
+   "text": "Corrected to match the engine (DESIGN-ALIGNMENT §3.4 and §3.5).\n\nThe rail panel is now a Detection control, apart from the Evoker's activation list. It is shut, struck through, with the engine's reason: wizard Detection needs your Enchantress in the battle. The condition is printed as the engine has it (research, an Enchantress in the battle, an opposing seat in the battle with an active spy assignment). \"Once a battle\" is gone; the engine has no such limit.\n\nCopy pass: removed the target forecasts (\"it will go last, after your Cleric\", \"slowing it down is worth nothing\") and \"shooting it changes nothing\". The Wall is now a plain target; if the engine shuts it, its reason goes there."
+  },
+  "c30": {
+   "page": "choices",
+   "x": 5160,
+   "y": 5680,
+   "w": 460,
+   "text": "Corrected to match the engine (DESIGN-ALIGNMENT §3.4). \"What can find it\" now gives the engine's condition: your assignment is active, and the opposing wizard has Detection researched and an Enchantress in the battle. The robot line says what the look costs them. Dropped \"you would never know it happened\" and \"theirs is a trade; a wizard's is free\"."
   }
  },
  "order": [

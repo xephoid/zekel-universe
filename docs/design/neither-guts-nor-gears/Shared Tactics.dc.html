@@ -50,7 +50,7 @@ a{color:var(--brand)}a:hover{color:var(--action)}
         <div style="padding:16px 22px 13px;border-bottom:1px solid var(--line);display:flex;align-items:flex-end;gap:16px">
           <div style="display:flex;flex-direction:column;gap:4px;flex-grow:1;min-width:0">
             <div style="font:700 20px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:var(--text)">Commit one card, or none</div>
-            <div style="font-size:11.5px;line-height:1.45;color:var(--muted)">Two hands are open to you and only one card leaves. It does not have to be yours.</div>
+            <div style="font-size:11.5px;line-height:1.45;color:var(--muted)">One card leaves, from your hand or, once they have committed, from theirs.</div>
           </div>
           <div style="display:flex;gap:7px;flex-shrink:0">
             <sc-for list="{{ committers }}" as="w" hint-placeholder-count="3">
@@ -67,13 +67,15 @@ a{color:var(--brand)}a:hover{color:var(--action)}
                 <span style="font:700 14px 'Bricolage Grotesque',sans-serif;letter-spacing:-.01em;color:var(--text)">{{ h.title }}</span>
                 <span style="{{ h.tagStyle }}">{{ h.tag }}</span>
               </div>
+              <div style="{{ h.gateStyle }}">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><rect x="4" y="10.5" width="16" height="10" rx="2.5"></rect><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"></path></svg>
+                <span style="flex-grow:1">{{ h.gate }}</span>
+              </div>
               <div style="display:flex;gap:12px;align-items:stretch">
                 <sc-for list="{{ h.cards }}" as="c" hint-placeholder-count="3">
                   <div style="{{ c.cardStyle }}">
                     <div style="display:flex;align-items:center;gap:7px">
                       <span style="{{ c.typeStyle }}">{{ c.type }}</span>
-                      <span style="flex-grow:1"></span>
-                      <span style="{{ c.lockStyle }}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><rect x="4" y="10.5" width="16" height="10" rx="2.5"></rect><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"></path></svg></span>
                     </div>
                     <span style="{{ c.nameStyle }}">{{ c.name }}</span>
                     <span style="{{ c.noteStyle }}">{{ c.note }}</span>
@@ -86,9 +88,9 @@ a{color:var(--brand)}a:hover{color:var(--action)}
         </div>
 
         <div style="padding:13px 22px;border-top:1px solid var(--line);background:var(--surface2);display:flex;align-items:center;gap:12px">
-          <span style="font-size:11px;line-height:1.4;color:var(--muted);flex-grow:1">Committing their card takes it out of <strong>their</strong> hand, and when it resolves it goes to the public discard like any other. It never becomes yours.</span>
+          <span style="font-size:11px;line-height:1.4;color:var(--muted);flex-grow:1">A card of theirs that you commit leaves <strong>their</strong> hand, not yours.</span>
           <button type="button" style="white-space:nowrap;flex-shrink:0;height:42px;padding:0 18px;border-radius:9px;border:1.5px solid var(--ink);background:var(--surface);font:600 13px 'IBM Plex Sans',sans-serif;color:var(--text);cursor:pointer">Commit no card</button>
-          <button type="button" style="white-space:nowrap;flex-shrink:0;height:42px;padding:0 20px;border-radius:9px;border:none;background:var(--action);color:#ffffff;font:600 13.5px 'IBM Plex Sans',sans-serif;cursor:pointer">Commit their Bonus</button>
+          <button type="button" style="white-space:nowrap;flex-shrink:0;height:42px;padding:0 20px;border-radius:9px;border:none;background:var(--action);color:#ffffff;font:600 13.5px 'IBM Plex Sans',sans-serif;cursor:pointer">Commit your Bonus</button>
         </div>
       </div>
     </div>
@@ -97,7 +99,7 @@ a{color:var(--brand)}a:hover{color:var(--action)}
 
       <div style="padding:14px 16px 16px;border-radius:14px;background:var(--surface);border:1.5px solid var(--action);display:flex;flex-direction:column;gap:10px">
         <div style="font:700 15px 'Bricolage Grotesque',sans-serif;letter-spacing:-.01em;color:var(--text)">The owner goes first</div>
-        <span style="font-size:11.5px;line-height:1.45;color:var(--text)">You are both in this battle, so the owner goes first. While their own commitment is still open, <strong>none</strong> of their hand is playable by you. The moment they commit, all of it is.</span>
+        <span style="font-size:11.5px;line-height:1.45;color:var(--text)">When you are both in the battle, the owner decides first. Until they commit or pass, <strong>none</strong> of their hand is playable by you. After that, all of it is.</span>
         <sc-for list="{{ locks }}" as="l" hint-placeholder-count="2">
           <div style="{{ l.rowStyle }}">
             <span style="{{ l.markStyle }}">{{ l.glyph }}</span>
@@ -112,15 +114,7 @@ a{color:var(--brand)}a:hover{color:var(--action)}
       <div style="padding:14px 16px 16px;border-radius:14px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:9px">
         <div style="font:700 15px 'Bricolage Grotesque',sans-serif;letter-spacing:-.01em;color:var(--text)">Whose card, whose effect</div>
         <span style="font-size:11.5px;line-height:1.45;color:var(--text)">A card says <strong>your</strong> units and <strong>opposing</strong> units. Played through this treaty, those words mean the player laying the card down, not the one who owns it.</span>
-        <div style="display:flex;flex-direction:column;gap:6px">
-          <sc-for list="{{ reading }}" as="r" hint-placeholder-count="2">
-            <div style="{{ r.rowStyle }}">
-              <span style="{{ r.whoStyle }}">{{ r.who }}</span>
-              <span style="font-size:11px;line-height:1.35;color:var(--text);flex-grow:1">{{ r.text }}</span>
-            </div>
-          </sc-for>
-        </div>
-        <div style="padding-top:9px;border-top:1px solid var(--line);font-size:10.5px;line-height:1.4;color:var(--muted)">Shared Tactics is not a military alliance. You are on opposite sides of this fight and still reading each other&rsquo;s hands.</div>
+        <div style="padding-top:9px;border-top:1px solid var(--line);font-size:10.5px;line-height:1.4;color:var(--muted)">Shared Tactics grants no military alliance.</div>
       </div>
 
       <div style="padding:14px 16px 16px;border-radius:14px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:9px">
@@ -185,11 +179,11 @@ class Component extends DCLogic{
   const contestInner={width:HEXW+'px',height:HEXH+'px',clipPath:CLIP,background:TER.Oi,
     filter:'saturate(1.1) brightness(1.3)'};
 
-  // state: 'picked' | 'free' | 'locked'
-  // LOCKED IS NOT HIDDEN. The card is face up to you, printed text and all; what is
-  // withheld is permission, and the reason is printed where the permission would be.
+  // state: 'picked' | 'free' | 'gated'
+  // GATED IS NOT HIDDEN. The card is face up to you, printed text and all. The gate is one
+  // row over the whole partner hand carrying the engine's reason, not a lock per card.
   function card(type,name,note,state,stateText){
-   const picked=state==='picked', locked=state==='locked';
+   const picked=state==='picked', locked=state==='gated';
    return {type:type,name:name,note:note,state:stateText,
     cardStyle:{width:'182px',flexShrink:0,display:'flex',flexDirection:'column',gap:'6px',
       minHeight:'118px',padding:'12px 13px',borderRadius:'11px',
@@ -200,18 +194,21 @@ class Component extends DCLogic{
       transform:picked?'translateY(-3px)':'none'},
     typeStyle:{font:"600 9px 'IBM Plex Mono',monospace",letterSpacing:'.08em',
       color:picked?'var(--brand)':'var(--muted)'},
-    lockStyle:locked?{flexShrink:0,color:'var(--danger)',display:'grid',placeItems:'center'}
-      :{width:'0px',height:'0px',overflow:'hidden'},
     nameStyle:{font:"700 13px 'Bricolage Grotesque',sans-serif",letterSpacing:'-.01em',
       lineHeight:'1.2',color:'var(--text)'},
     noteStyle:{fontSize:'10.5px',lineHeight:'1.4',color:'var(--muted)',flexGrow:'1'},
     stateStyle:{font:"600 8.5px 'IBM Plex Mono',monospace",letterSpacing:'.06em',
-      color:picked?'var(--brand)':(locked?'var(--danger)':'var(--muted)')}};
+      color:picked?'var(--brand)':'var(--muted)'}};
   }
 
-  function hand(fac,title,tag,cards,mine){
+  // gate: the engine's reason the whole partner hand is shut to you, or '' when it is open.
+  function hand(fac,title,tag,cards,mine,gate){
    const fi=ICO.icon(fac==='cov'?'The Covenant':'The Unbolted');
-   return {title:title,tag:tag,cards:cards,f1:fi.d1,f2:fi.d2,f3:fi.d3,
+   return {title:title,tag:tag,cards:cards,f1:fi.d1,f2:fi.d2,f3:fi.d3,gate:gate||'',
+    gateStyle:gate?{display:'flex',alignItems:'center',gap:'8px',padding:'8px 11px',borderRadius:'9px',
+      background:'var(--surface2)',border:'1.5px solid var(--danger)',
+      font:"600 11px 'IBM Plex Sans',sans-serif",lineHeight:'1.4',color:'var(--danger)'}
+      :{width:'0px',height:'0px',overflow:'hidden'},
     chipStyle:{width:'24px',height:'24px',borderRadius:'7px',flexShrink:0,background:FACS[fac],
       border:'1.5px solid var(--ink)',display:'grid',placeItems:'center',color:ink(fac)},
     tagStyle:{font:"600 9px 'IBM Plex Mono',monospace",letterSpacing:'.06em',padding:'3px 9px',
@@ -221,12 +218,14 @@ class Component extends DCLogic{
 
   const hands=[
    hand('cov','Your hand','THREE CARDS, YOURS TO SPEND',[
-     card('BONUS','+1 DMG to all your units','Your Dragon to 4, Chaimidious to 4. Nothing reaches a DMG-0 unit.','free','FREE'),
-     card('RALLY','Bring units in from next door','Any number of your mobile units, from any adjacent tile, into this battle.','free','FREE'),
-     card('INITIATIVE','−100 Initiative to all opposing units','Everything not yours acts after everything of yours, for the rest of the battle.','free','FREE')],true),
-   hand('unb','The Unbolted\u2019s hand','THEY HAVE COMMITTED — ALL OF IT IS OPEN TO YOU',[
-     card('COUNTER','Counter a card that has not resolved','Face up to you since the treaty formed, and playable now that they have gone.','free','THEIRS · YOURS TO PLAY'),
-     card('BONUS','−1 DEF to all opposing units','Laid down by you, it reads from you.','picked','THEIRS · YOURS TO PLAY')],false)];
+     card('BONUS','+1 DMG to all your units','','picked','YOURS'),
+     card('RALLY','Bring units in from next door','Any number of your mobile units, from any adjacent tile, into this battle.','free','YOURS'),
+     card('INITIATIVE','−100 Initiative to all opposing units','','free','YOURS')],true,''),
+   // The sample is the moment before the owner commits: the whole hand sits behind one gate.
+   hand('unb','The Unbolted\u2019s hand','THEIRS · FACE UP TO YOU',[
+     card('COUNTER','Counter a card that has not resolved','','gated','THEIRS'),
+     card('BONUS','−1 DEF to all opposing units','','gated','THEIRS')],false,
+     'The Unbolted are in this battle and have not committed yet — as the owner they decide first.')];
 
   function committer(fac,text,done){
    return {text:text,
@@ -237,10 +236,12 @@ class Component extends DCLogic{
     dotStyle:{width:'11px',height:'11px',borderRadius:'50%',flexShrink:0,background:FACS[fac],
       border:'1.5px solid var(--ink)'}};
   }
-  const committers=[committer('fou','Foundry in',true),committer('unb','Unbolted in',true),
+  const committers=[committer('fou','Foundry in',true),committer('unb','Unbolted deciding',false),
    committer('cov','Waiting on you',false)];
 
-  function lock(glyph,name,note,open){
+  // now: the state this sample is in.
+  function lock(glyph,name,note,now){
+   const open=now;
    return {glyph:glyph,name:name,note:note,
     rowStyle:{display:'flex',alignItems:'center',gap:'10px',padding:'8px 10px',borderRadius:'10px',
       background:open?'var(--hlbg)':'var(--surface2)',
@@ -249,19 +250,8 @@ class Component extends DCLogic{
       placeItems:'center',font:"700 12px 'IBM Plex Mono',monospace",
       background:'var(--surface)',color:open?'var(--brand)':'var(--danger)'}};
   }
-  const locks=[lock('✕','While they were deciding','Their whole hand was shut to you. The gate is one card of theirs — the one they commit — not each card in turn.',false),
-   lock('✓','Now that they have gone','Everything still in their hand is yours to commit, and one card of it is already spoken for.',true)];
-
-  function read(who,text,mine){
-   return {who:who,text:text,
-    rowStyle:{display:'flex',alignItems:'flex-start',gap:'9px',padding:'8px 10px',borderRadius:'9px',
-      background:'var(--surface2)'},
-    whoStyle:{font:"600 9px 'IBM Plex Mono',monospace",letterSpacing:'.05em',flexShrink:0,
-      width:'62px',paddingTop:'1px',color:mine?'var(--brand)':'var(--muted)'}};
-  }
-  const reading=[
-   read('IF THEY PLAY IT','−1 DEF lands on everything opposing The Unbolted. That is The Foundry and it is you.',false),
-   read('IF YOU PLAY IT','−1 DEF lands on everything opposing you. That is The Foundry and it is The Unbolted.',true)];
+  const locks=[lock('✕','Until they commit or pass','None of their hand is playable by you.',true),
+   lock('✓','Once they commit or pass','Everything still in their hand is yours to play.',false)];
 
   function fact(tag,text){
    return {tag:tag,text:text,
@@ -270,7 +260,6 @@ class Component extends DCLogic{
   }
   const facts=[
    fact('ON FORMING','Both hands opened at once, and every card either of you draws from now on is shown to the other.'),
-   fact('NOT MARKED','You see their whole hand, the card they have already committed included, and nothing says which one that is.'),
    fact('NOT YOURS','Ownership never moves. A card you play out of their hand leaves their hand, not yours.'),
    fact('+5 EACH','Paid to both of you every round at the income step, for as long as it stands.'),
    fact('BREAKING','End of round only, after the culture phase. Either of you, no condition to meet.')];
@@ -281,7 +270,7 @@ class Component extends DCLogic{
     numStyle:{width:'20px',height:'20px',borderRadius:'5px',flexShrink:0,display:'grid',placeItems:'center',
       font:"600 11px 'IBM Plex Mono',monospace",background:'var(--surface)',border:'1px solid var(--line)',color:'var(--text)'}};
   }
-  const numbered=[num(1,'Commit their defence card'),num(2,'Commit my damage bonus'),
+  const numbered=[num(1,'Commit my damage bonus'),num(2,'Commit my rally card'),
    num(3,'Commit no card'),num(4,'Read me what The Unbolted are holding')];
 
   const tre=ICO.icon('Shared Tactics');
@@ -298,7 +287,7 @@ class Component extends DCLogic{
      color:'var(--brand)'},
    tD1:tre.d1,tD2:tre.d2,tD3:tre.d3,
    tiles:tiles,contestRing:contestRing,contestInner:contestInner,
-   hands:hands,committers:committers,locks:locks,reading:reading,facts:facts,numbered:numbered};
+   hands:hands,committers:committers,locks:locks,facts:facts,numbered:numbered};
  }
 }
 </script>

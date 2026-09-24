@@ -138,10 +138,12 @@ a{color:var(--brand)}a:hover{color:var(--action)}
       <div style="padding:14px 16px 16px;border-radius:14px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:9px">
         <div style="display:flex;align-items:center;gap:9px">
           <span style="{{ spyMark }}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ spyD1 }}"></path><path d="{{ spyD2 }}"></path><path d="{{ spyD3 }}"></path><path d="{{ spyD4 }}" stroke-dasharray="3 2.4"></path></svg></span>
-          <div style="font:700 15px 'Bricolage Grotesque',sans-serif;letter-spacing:-.01em;color:var(--text);flex-grow:1">Spy cards in this fight</div>
-          <span style="font:600 9px 'IBM Plex Mono',monospace;letter-spacing:.05em;color:var(--muted)">NONE TO READ</span>
+          <div style="font:700 15px 'Bricolage Grotesque',sans-serif;letter-spacing:-.01em;color:var(--text);flex-grow:1">Detection</div>
+          <span style="font:600 9px 'IBM Plex Mono',monospace;letter-spacing:.05em;color:var(--muted)">NOT PART OF THE ACTIVATION</span>
         </div>
-        <div style="font-size:11.5px;line-height:1.45;color:var(--text)">No hero of The Foundry&rsquo;s is in this battle, so there is no card here to turn over. With your Enchantress present and Detection researched, an opposing carrier in a battle reads face up in your view alone, once a battle, and they are never told.</div>
+        <button type="button" disabled style="align-self:flex-start;white-space:nowrap;height:36px;padding:0 16px;border-radius:9px;border:1.5px solid var(--danger);background:transparent;font:600 12.5px 'IBM Plex Sans',sans-serif;color:var(--danger);text-decoration:line-through;cursor:not-allowed">Look at The Foundry&rsquo;s spy card</button>
+        <div style="font-size:11px;line-height:1.4;color:var(--danger)">Wizard Detection needs your Enchantress in the battle.</div>
+        <div style="font-size:11px;line-height:1.45;color:var(--muted)">Needs Detection researched, an Enchantress of yours in the battle, and an opposing seat in the battle with an active spy assignment. Any point in the battle; spends nothing.</div>
         <div style="display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:10px;background:var(--surface2)">
           <span style="{{ backChip }}"></span>
           <span style="font-size:10.5px;line-height:1.4;color:var(--muted);flex-grow:1">A face-down card by a seat&rsquo;s name is public. Only the name on it is not, and only opponents in this battle are ever legible.</span>
@@ -149,9 +151,9 @@ a{color:var(--brand)}a:hover{color:var(--action)}
       </div>
 
       <div style="padding:14px 16px 16px;border-radius:14px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:9px">
-        <div style="font:700 15px 'Bricolage Grotesque',sans-serif;letter-spacing:-.01em;color:var(--text)">Why the Wall is in the way</div>
-        <div style="font-size:11.5px;line-height:1.45;color:var(--text)">A standing Wall Platform has to be the target of every single-target attack. Your Wizard Missile does 2 against its defense of 5, so shooting it changes nothing.</div>
-        <div style="font-size:11.5px;line-height:1.45;color:var(--muted)">Ice Blast is not an attack. It can reach past the Wall.</div>
+        <div style="font:700 15px 'Bricolage Grotesque',sans-serif;letter-spacing:-.01em;color:var(--text)">The Wall</div>
+        <div style="font-size:11.5px;line-height:1.45;color:var(--text)">A standing Wall Platform has to be the target of every single-target attack.</div>
+        <div style="font-size:11.5px;line-height:1.45;color:var(--muted)">Ice Blast is not an attack.</div>
       </div>
 
       <div style="padding:14px 16px 16px;border-radius:14px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:10px">
@@ -202,9 +204,9 @@ function px(c,r){return {l:((c+2)*COLW)+'px',t:(r*ROWH)+'px'};}
 class Component extends DCLogic{
  renderVals(){
   const T=THEMES[this.props.theme||'light'];
-  // Detection is not a screen. For a wizard it is a thing you can already see, so it lives
-  // in the battle view as state; for a robot it is an option on the Infiltrator's own
-  // activation, because looking spends their assignment.
+  // Detection is its own move (use_detection) beside the activation, never an option in the
+  // activation's list. For a wizard it is a rail control, shut here with the engine's reason;
+  // for a robot it spends the carrying hero's activation and the assignment (Robot Infiltrator).
   const spyIc=(typeof NGG!=='undefined')?NGG.icon('Illusionist'):{d1:'',d2:'',d3:'',dd:''};
 
   // ---- actions ----
@@ -273,8 +275,8 @@ class Component extends DCLogic{
       color:locked?'var(--danger)':'var(--muted)'}};
   }
   const actions=[
-   action('Ice Blast','3 mana','Take 100 initiative off one unit, for the rest of the battle. Not an attack, so the Wall does not block it.','picked'),
-   action('Wizard Missile','1 mana','2 damage, single target — which means the Wall Platform, at defense 5. It would survive.','open'),
+   action('Ice Blast','3 mana','Take 100 initiative off one unit, for the rest of the battle. Not an attack.','picked'),
+   action('Wizard Missile','1 mana','2 damage, single target.','open'),
    action('Fiery Explosion','3 mana','Locked. Needs the Fiery Explosion research at your Library of Evocation.','locked'),
    action('Pass','free','Keep the mana. The activation is still spent for this pass.','open')];
 
@@ -303,9 +305,9 @@ class Component extends DCLogic{
       border:picked?'1.5px solid var(--ink)':'1.5px dashed var(--line)'}};
   }
   const targets=[
-   target('L','Large Combat Platform','60 / 2 AoE / 4','Drops to −040. It has already acted this pass, so the change bites from the next one — it will go last, after your Cleric.','picked'),
-   target('S','Spinner Platform','5 / 2 / 2','Drops to −95 and still acts before your Cleric.','open'),
-   target('W','Wall Platform','1 / 0 / 5','It has no attack. Slowing it down is worth nothing.','no')];
+   target('L','Large Combat Platform','60 / 2 AoE / 4','Acted this pass.','picked'),
+   target('S','Spinner Platform','5 / 2 / 2','Waiting.','open'),
+   target('W','Wall Platform','1 / 0 / 5','Waiting.','open')];
 
   const manaPips=[];
   for(let i=1;i<=20;i++){
