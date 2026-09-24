@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pressed</title>
+<script src="./support.js"></script>
+<script src="./icons.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:var(--brand)}a:hover{color:var(--action)}
+</style>
+</helmet>
+
+<div style="{{ rootStyle }}" data-screen-label="Direction B">
+
+  <div style="padding:22px 34px 16px;display:flex;align-items:flex-end;gap:20px">
+    <div style="display:flex;flex-direction:column;gap:5px;flex-grow:1;min-width:0">
+      <span style="{{ kickStyle }}">DIRECTION B</span>
+      <h1 style="margin:0;font:700 34px 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;color:{{ inkColor }}">Pressed</h1>
+      <p style="margin:0;max-width:900px;font-size:13px;line-height:1.5;color:{{ dimColor }}">Stop drawing an interface and start drawing the <strong>printed components</strong>. Four spot inks on board stock, screened rather than blended, with the marks a real print run leaves: registration ticks, trapping, a die line, ink that sits slightly off the plate. One vocabulary for both species.</p>
+    </div>
+    <span style="{{ pillStyle }}">FOUR INKS &middot; NO GRADIENTS</span>
+  </div>
+
+  <div style="flex-grow:1;padding:6px 34px 0;display:flex;flex-direction:column;gap:18px;min-height:0">
+
+    <div style="display:flex;gap:18px;align-items:stretch">
+
+      <div style="{{ plateStyle }}">
+        <span style="{{ capStyle }}">THE BOARD IS PRINTED</span>
+        <div style="position:relative;display:flex;align-items:center;gap:0;padding:14px 0">
+          <sc-for list="{{ hexes }}" as="h" hint-placeholder-count="5">
+            <div style="{{ h.wrapStyle }}">
+              <div style="{{ h.hexStyle }}"><span style="{{ h.screenStyle }}"></span><span style="{{ h.codeStyle }}">{{ h.code }}</span></div>
+            </div>
+          </sc-for>
+          <span style="{{ regMark }}">✛</span>
+        </div>
+        <span style="{{ bodyStyle }}">Each terrain is one ink at one of four screen percentages, so water at 80% and water at 40% are the same plate. The tone grid is visible at this size and disappears at table scale &mdash; which is exactly what happens to a printed board.</span>
+      </div>
+
+      <div style="{{ plateStyle }}">
+        <span style="{{ capStyle }}">TOKENS ARE PUNCHED</span>
+        <div style="display:flex;align-items:center;gap:13px;padding:14px 0">
+          <sc-for list="{{ tokens }}" as="t" hint-placeholder-count="5">
+            <span style="{{ t.style }}"><span style="{{ t.faceStyle }}">{{ t.glyph }}</span></span>
+          </sc-for>
+        </div>
+        <span style="{{ bodyStyle }}">A hard edge, a chipboard core showing at the rim, and the printed face sitting a hair off centre. The dashed &ldquo;not placed yet&rdquo; token becomes a token still on its sprue.</span>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:18px;align-items:stretch;flex-grow:1;min-height:0">
+
+      <div style="{{ plateStyle }}">
+        <span style="{{ capStyle }}">CARDS ARE CARD STOCK</span>
+        <div style="display:flex;gap:12px;padding:14px 0">
+          <div style="{{ cardFront }}">
+            <span style="{{ cardType }}">BONUS</span>
+            <span style="{{ cardTitle }}">+1 DEF to all your units</span>
+            <span style="{{ cardRule }}"></span>
+            <span style="{{ cardBody }}">Lasts the rest of the battle.</span>
+            <span style="{{ cardFoot }}">2 OF 20</span>
+          </div>
+          <div style="{{ cardBack }}"><span style="{{ backMark }}">✦</span></div>
+        </div>
+        <span style="{{ bodyStyle }}">A printed border inset from a die line, a rule under the title, a card count in the corner. Backs are one flat ink so a face-down card reads as a card and never as a hole.</span>
+      </div>
+
+      <div style="{{ plateStyle }}">
+        <span style="{{ capStyle }}">TYPE IS LETTERPRESS</span>
+        <div style="display:flex;flex-direction:column;gap:9px;padding:14px 0">
+          <span style="{{ pressBig }}">NEITHER GUTS NOR GEARS</span>
+          <div style="display:flex;align-items:baseline;gap:10px">
+            <span style="{{ pressStat }}">70</span><span style="{{ pressDot }}">·</span>
+            <span style="{{ pressStat }}">3</span><span style="{{ pressDot }}">·</span>
+            <span style="{{ pressStat }}">4</span>
+            <span style="flex-grow:1"></span>
+            <button type="button" style="{{ pressBtn }}">COMMIT ALL ELEVEN</button>
+          </div>
+        </div>
+        <span style="{{ bodyStyle }}">Ink pressed into stock: a one-pixel light edge above and a darker one below, no blur. The win button is the only object on the whole table printed in the fifth ink.</span>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:16px;padding-bottom:20px">
+      <sc-for list="{{ notes }}" as="n" hint-placeholder-count="4">
+        <div style="{{ n.boxStyle }}">
+          <span style="{{ n.headStyle }}">{{ n.head }}</span>
+          <span style="{{ n.textStyle }}">{{ n.text }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1040},"theme":{"editor":"enum","options":["light","dark"],"default":"light","tsType":"&#39;light&#39;|&#39;dark&#39;","section":"Screen"}}'>
+const CLIP='polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)';
+// Four spot inks and the stock they print on. Nothing blends; everything screens.
+const LIGHT={stock:'#e8dfcb',ink:'#221c14',dim:'rgba(34,28,20,.62)',
+  teal:'#2d6a5c',rust:'#b4511f',slate:'#3c4a52',plum:'#5d3a6b',
+  plate:'#f1ead9',hair:'rgba(34,28,20,.26)'};
+const DARK={stock:'#232622',ink:'#ece3cf',dim:'rgba(236,227,207,.62)',
+  teal:'#4f9c88',rust:'#d97a3c',slate:'#7d919c',plum:'#9a6cae',
+  plate:'#2c302b',hair:'rgba(236,227,207,.24)'};
+
+class Component extends DCLogic{
+ renderVals(){
+  const P=this.props.theme==='dark'?DARK:LIGHT;
+
+  const kickStyle={font:"600 10px 'IBM Plex Mono',monospace",letterSpacing:'.14em',color:P.dim};
+  const pillStyle={font:"600 9px 'IBM Plex Mono',monospace",letterSpacing:'.12em',flexShrink:0,
+    padding:'6px 13px',background:P.plate,color:P.dim,border:'1px solid '+P.hair};
+  const capStyle={font:"600 8.5px 'IBM Plex Mono',monospace",letterSpacing:'.16em',color:P.dim};
+  const bodyStyle={fontSize:'11px',lineHeight:'1.5',color:P.dim,marginTop:'auto',
+    paddingTop:'11px',borderTop:'1px solid '+P.hair};
+  // A plate is a printed panel: square, hairline, and a sliver of the stock showing.
+  const plateStyle={flexGrow:'1',flexBasis:'0',minWidth:'0',display:'flex',flexDirection:'column',
+    gap:'4px',padding:'15px 17px 16px',background:P.plate,border:'1px solid '+P.hair,
+    boxShadow:'3px 3px 0 '+P.hair};
+
+  // ---- the board, screened ----
+  // Same ink, four screen percentages. The dot grid IS the tint.
+  function hex(code,ink,pct,i){
+   return {code:code,
+    wrapStyle:{marginLeft:i===0?'0':'-14px',zIndex:String(9-i)},
+    hexStyle:{position:'relative',width:'88px',height:'76px',clipPath:CLIP,
+      background:P.stock,display:'grid',placeItems:'center',overflow:'hidden'},
+    screenStyle:{position:'absolute',left:'0',top:'0',right:'0',bottom:'0',
+      backgroundColor:ink,opacity:String(pct),
+      backgroundImage:'radial-gradient(circle at 1px 1px, rgba(255,255,255,.55) .9px, transparent 1px)',
+      backgroundSize:'4px 4px'},
+    codeStyle:{position:'relative',font:"600 10px 'IBM Plex Mono',monospace",
+      letterSpacing:'.12em',color:P.stock,
+      textShadow:'0 1px 0 rgba(0,0,0,.35)'}};
+  }
+  const hexes=[hex('C4',P.teal,.92,0),hex('D4',P.plum,.8,1),hex('E4',P.slate,.95,2),
+   hex('E5',P.slate,.62,3),hex('F4',P.teal,.5,4)];
+  const regMark={position:'absolute',right:'2px',top:'2px',
+    font:"400 15px 'IBM Plex Mono',monospace",color:P.hair};
+
+  // ---- tokens, punched ----
+  function token(ink,glyph,state){
+   const sprue=state==='sprue';
+   return {glyph:glyph,
+    style:{position:'relative',width:'42px',height:'42px',borderRadius:'50%',
+      background:sprue?'transparent':ink,
+      border:sprue?'2px dashed '+P.hair:'2px solid '+P.ink,
+      display:'grid',placeItems:'center',
+      boxShadow:sprue?'none':'0 3px 0 '+P.ink+', inset 0 0 0 3px '+P.stock},
+    faceStyle:{font:"700 15px 'IBM Plex Mono',monospace",
+      color:sprue?P.dim:P.stock,
+      transform:'translate(.5px,-.5px)'}};
+  }
+  const tokens=[token(P.teal,'S','on'),token(P.rust,'E','on'),token(P.slate,'W','on'),
+   token(P.plum,'C','on'),token(P.ink,'?','sprue')];
+
+  // ---- cards ----
+  const cardFront={position:'relative',width:'166px',height:'116px',flexShrink:0,
+    padding:'11px 12px',boxSizing:'border-box',background:P.stock,
+    border:'1px solid '+P.hair,
+    boxShadow:'inset 0 0 0 1px '+P.stock+', inset 0 0 0 2px '+P.hair,
+    display:'flex',flexDirection:'column',gap:'5px'};
+  const cardType={font:"600 8px 'IBM Plex Mono',monospace",letterSpacing:'.16em',color:P.rust};
+  const cardTitle={font:"700 13px 'Bricolage Grotesque',sans-serif",letterSpacing:'-.01em',
+    color:P.ink,lineHeight:'1.15'};
+  const cardRule={height:'2px',background:P.ink,width:'26px'};
+  const cardBody={fontSize:'10px',lineHeight:'1.35',color:P.dim};
+  const cardFoot={marginTop:'auto',font:"600 7.5px 'IBM Plex Mono',monospace",
+    letterSpacing:'.14em',color:P.dim};
+  const cardBack={width:'82px',height:'116px',flexShrink:0,background:P.teal,
+    border:'1px solid '+P.hair,display:'grid',placeItems:'center',
+    boxShadow:'inset 0 0 0 5px '+P.stock+', inset 0 0 0 6px '+P.teal};
+  const backMark={font:'22px serif',color:'rgba(255,255,255,.55)'};
+
+  // ---- letterpress ----
+  const pressBig={font:"700 27px 'Bricolage Grotesque',sans-serif",letterSpacing:'.02em',
+    color:P.ink,
+    textShadow:'0 1px 0 '+P.plate+', 0 -1px 0 rgba(0,0,0,.18)'};
+  const pressStat={font:"600 30px 'IBM Plex Mono',monospace",lineHeight:'1',color:P.ink,
+    textShadow:'0 1px 0 '+P.plate};
+  const pressDot={font:"600 20px 'IBM Plex Mono',monospace",color:P.hair};
+  const pressBtn={height:'44px',padding:'0 20px',border:'2px solid '+P.ink,borderRadius:'0',
+    background:P.rust,color:P.stock,
+    font:"600 12px 'IBM Plex Mono',monospace",letterSpacing:'.16em',cursor:'pointer',
+    boxShadow:'4px 4px 0 '+P.ink};
+
+  function note(head,text){
+   return {head:head,text:text,
+    boxStyle:{flexGrow:'1',flexBasis:'0',minWidth:'0',display:'flex',flexDirection:'column',gap:'5px',
+      padding:'12px 14px',background:P.plate,border:'1px solid '+P.hair},
+    headStyle:{font:"700 12.5px 'Bricolage Grotesque',sans-serif",letterSpacing:'-.01em',color:P.ink},
+    textStyle:{fontSize:'10.5px',lineHeight:'1.4',color:P.dim}};
+  }
+  const notes=[
+   note('Cheapest of the three','No new components, no second token set. It is a palette, a border rule and a shadow rule applied to what exists.'),
+   note('It scales down','Screened tints and hard edges survive a phone. Lighting and texture do not.'),
+   note('It says board game','What it does not say is wizards versus robots. The theme it carries is the medium, not the fiction.'),
+   note('Watch the contrast','Screened ink on stock loses contrast fast. Every tint here still has to clear 4.5:1 for anything set on it.')];
+
+  return {rootStyle:{width:'1440px',height:'1040px',boxSizing:'border-box',display:'flex',
+    flexDirection:'column',background:P.stock,fontFamily:"'IBM Plex Sans',sans-serif",
+    borderRadius:'12px',overflow:'hidden'},
+   inkColor:P.ink,dimColor:P.dim,
+   kickStyle:kickStyle,pillStyle:pillStyle,capStyle:capStyle,bodyStyle:bodyStyle,
+   plateStyle:plateStyle,hexes:hexes,regMark:regMark,tokens:tokens,
+   cardFront:cardFront,cardType:cardType,cardTitle:cardTitle,cardRule:cardRule,
+   cardBody:cardBody,cardFoot:cardFoot,cardBack:cardBack,backMark:backMark,
+   pressBig:pressBig,pressStat:pressStat,pressDot:pressDot,pressBtn:pressBtn,notes:notes};
+ }
+}
+</script>
+</body>
+</html>

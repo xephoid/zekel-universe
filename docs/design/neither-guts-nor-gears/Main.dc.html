@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Wizard faction board</title>
+<script src="./support.js"></script>
+<script src="./icons.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=IM+Fell+English:ital@0;1&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:var(--brand)}a:hover{color:var(--action)}
+</style>
+</helmet>
+
+<div style="{{ rootStyle }}" data-screen-label="Wizard faction board">
+
+  <!-- the sheet: four washes, two fibre weaves, a fold and two foxing spots -->
+  <div style="position:absolute;left:0;top:0;right:0;bottom:0;pointer-events:none;border-radius:3px;overflow:hidden">
+    <div style="position:absolute;left:0;top:0;right:0;bottom:0;background:radial-gradient(52% 26% at 20% 8%, rgba(255,248,228,.55), transparent 64%),radial-gradient(44% 22% at 84% 24%, rgba(150,110,58,.20), transparent 66%),radial-gradient(60% 28% at 58% 72%, rgba(112,78,40,.20), transparent 64%),radial-gradient(30% 16% at 6% 58%, rgba(255,250,232,.40), transparent 70%),repeating-linear-gradient(101deg, rgba(112,78,40,.05) 0 1px, transparent 1px 7px),repeating-linear-gradient(11deg, rgba(112,78,40,.04) 0 1px, transparent 1px 9px)"></div>
+    <div style="position:absolute;left:47%;top:0;width:26px;bottom:0;background:linear-gradient(90deg, transparent, rgba(112,78,40,.15) 45%, rgba(255,250,235,.36) 55%, transparent)"></div>
+    <div style="position:absolute;left:78%;top:16%;width:52px;height:36px;border-radius:50%;background:radial-gradient(circle, rgba(146,98,44,.22), transparent 68%)"></div>
+    <div style="position:absolute;left:10%;top:62%;width:34px;height:26px;border-radius:50%;background:radial-gradient(circle, rgba(146,98,44,.18), transparent 70%)"></div>
+  </div>
+
+  <!-- ============ HEADER ============ -->
+  <div style="display:flex;align-items:flex-start;gap:20px;border-bottom:1px solid var(--line);padding-bottom:22px">
+    <div style="width:68px;height:68px;border-radius:3px;background:{{ fac }};border:2px solid var(--ink);display:grid;place-items:center;flex-shrink:0;box-shadow:var(--shadow)">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#1c1a17" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20 18 6"></path><path d="M18 6l1.6-1.6"></path><circle cx="19.6" cy="4.4" r="2.2"></circle><path d="M8.5 15.5l-3 1 1-3"></path></svg>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:5px;flex-grow:1">
+      <div style="font:400 12px 'IM Fell English',serif;letter-spacing:.06em;color:var(--muted)">NEITHER GUTS NOR GEARS · FACTION BOARD</div>
+      <div style="font:400 34px 'IM Fell English',serif;letter-spacing:0;line-height:1;color:var(--text)">The Covenant</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;font:400 12px 'IM Fell English',serif;color:var(--muted)">
+        <span style="background:var(--tagbg);color:var(--tagfg);border-radius:3px;padding:2px 9px">Wizard</span>
+        <span style="background:var(--tagbg);color:var(--tagfg);border-radius:3px;padding:2px 9px">White</span>
+        <span>The binding old order of wizards.</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <div style="width:132px;padding:12px 14px;border-radius:3px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:2px">
+        <div style="font:400 11px 'IM Fell English',serif;letter-spacing:.06em;color:var(--muted)">CULTURE</div>
+        <div style="font:400 30px 'IM Fell English',serif;line-height:1;color:var(--text)">38</div>
+        <div style="font-size:11px;color:var(--muted)">+14 a round</div>
+      </div>
+      <div style="width:132px;padding:12px 14px;border-radius:3px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:2px">
+        <div style="font:400 11px 'IM Fell English',serif;letter-spacing:.06em;color:var(--muted)">TECHNOLOGY</div>
+        <div style="font:400 30px 'IM Fell English',serif;line-height:1;color:var(--text)">14<span style="font-size:16px;color:var(--muted)">/22</span></div>
+        <div style="font-size:11px;color:var(--muted)">unique types</div>
+      </div>
+      <div style="width:132px;padding:12px 14px;border-radius:3px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:2px">
+        <div style="font:400 11px 'IM Fell English',serif;letter-spacing:.06em;color:var(--muted)">MANA</div>
+        <div style="font:400 30px 'IM Fell English',serif;line-height:1;color:var(--text)">17<span style="font-size:16px;color:var(--muted)">/20</span></div>
+        <div style="font-size:11px;color:var(--muted)">resets at upkeep</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- a rule that was drawn, not set -->
+  <svg width="1152" height="12" viewBox="0 0 1152 12" fill="none" style="position:relative;margin-top:-10px" aria-hidden="true">
+    <path d="M3 7 C 190 3.4, 420 9.6, 620 5.2 S 980 8.6, 1149 4.4" stroke="#33251a" stroke-width="2" stroke-linecap="round" opacity=".62"></path>
+    <path d="M10 10 C 220 8.4, 470 11, 690 9" stroke="#33251a" stroke-width="1" stroke-linecap="round" opacity=".26"></path>
+  </svg>
+  <span style="position:relative;align-self:flex-end;margin-top:-4px;font:500 19px Caveat,cursive;color:rgba(51,37,26,.5);transform:rotate(-1.4deg)">kept by the archivist, and corrected in the margin</span>
+
+
+  <!-- ============ RESOURCE LEGEND ============ -->
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span style="font:400 12px 'IM Fell English',serif;letter-spacing:.06em;color:var(--muted);margin-right:2px">COSTS ARE PAID BY PLACING COLLECTORS</span>
+    <sc-for list="{{ legend }}" as="l" hint-placeholder-count="5">
+      <span style="display:inline-flex;align-items:center;gap:7px;padding:4px 10px 4px 4px;border-radius:3px;background:var(--surface);border:1px solid var(--line)">
+        <span style="{{ l.swatch }}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ l.g1 }}"></path><path d="{{ l.g2 }}"></path><path d="{{ l.g3 }}"></path></svg></span>
+        <span style="font-size:12px;color:var(--text)">{{ l.name }}</span>
+        <span style="font-size:11px;color:var(--muted)">{{ l.where }}</span>
+      </span>
+    </sc-for>
+  </div>
+
+  <!-- ============ TRACKS ROW ============ -->
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px">
+
+    <!-- Mana Reserve track -->
+    <div style="padding:18px 20px 20px;border-radius:3px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:baseline;gap:10px">
+        <div style="font:400 19px 'IM Fell English',serif;letter-spacing:0;color:var(--text)">Mana Reserve track</div>
+        <span style="font:400 11px 'IM Fell English',serif;background:var(--hlbg);color:var(--brand);border-radius:3px;padding:2px 8px">WIZARDS ONLY</span>
+      </div>
+      <div style="font-size:12.5px;line-height:1.5;color:var(--muted)">Maximum mana starts at 5. Each Mana Reserve built adds 5, up to four Reserves and a maximum of 25. Spending in every battle this round comes out of the one pool; upkeep fills it back to maximum.</div>
+
+      <div style="display:flex;gap:10px">
+        <sc-for list="{{ manaGroups }}" as="g" hint-placeholder-count="5">
+          <div style="display:flex;flex-direction:column;gap:6px;flex-grow:1">
+            <div style="display:flex;gap:3px">
+              <sc-for list="{{ g.pips }}" as="p" hint-placeholder-count="5">
+                <span style="{{ p.style }}"></span>
+              </sc-for>
+            </div>
+            <div style="{{ g.labelStyle }}">{{ g.label }}</div>
+            <div style="{{ g.slotStyle }}">{{ g.slotText }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;font:400 12px 'IM Fell English',serif;color:var(--muted)">
+        <span style="display:inline-flex;align-items:center;gap:6px"><span style="width:11px;height:16px;border-radius:3px;background:var(--brand);border:1px solid var(--ink);display:inline-block"></span>current 17</span>
+        <span style="display:inline-flex;align-items:center;gap:6px"><span style="width:11px;height:16px;border-radius:3px;background:var(--surface2);border:1px solid var(--line);display:inline-block"></span>free to maximum 20</span>
+        <span style="display:inline-flex;align-items:center;gap:6px"><span style="width:11px;height:16px;border-radius:3px;background:transparent;border:1px dashed var(--line);display:inline-block"></span>locked — build Reserve IV</span>
+      </div>
+    </div>
+
+    <!-- Technology track -->
+    <div style="padding:18px 20px 20px;border-radius:3px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:baseline;gap:10px">
+        <div style="font:400 19px 'IM Fell English',serif;letter-spacing:0;color:var(--text)">Technology point track</div>
+        <span style="font:400 11px 'IM Fell English',serif;background:var(--tagbg);color:var(--tagfg);border-radius:3px;padding:2px 8px">22 TO WIN</span>
+      </div>
+      <div style="font-size:12.5px;line-height:1.5;color:var(--muted)">One permanent point for each unique unit, building and research you have ever acquired. Losing the last piece of a type never takes its point back, and building a second one never adds a point.</div>
+
+      <div style="display:flex;flex-direction:column;gap:11px">
+        <sc-for list="{{ techGroups }}" as="g" hint-placeholder-count="3">
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline">
+              <span style="font:400 12px 'IM Fell English',serif;letter-spacing:.05em;color:var(--muted)">{{ g.label }}</span>
+              <span style="font:400 12px 'IM Fell English',serif;color:var(--text)">{{ g.score }}</span>
+            </div>
+            <div style="display:flex;gap:4px">
+              <sc-for list="{{ g.pips }}" as="p" hint-placeholder-count="7">
+                <span style="{{ p.style }}"></span>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:3px;background:var(--surface2)">
+        <span style="width:22px;height:22px;border-radius:50%;border:1.5px dashed var(--ink);display:grid;place-items:center;flex-shrink:0">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.6 5.6 6.1.8-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6L3.3 9.4l6.1-.8z"></path></svg>
+        </span>
+        <span style="font-size:12px;line-height:1.45;color:var(--text)">Two more points exist off this track: <strong>Motherboard</strong> and <strong>Technomancer Greymore</strong> each lend one while alive, owned and on the map. They can carry you to 22 with 20 real types — and they take the point back when they die.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ BUILDINGS + SUPPLY ============ -->
+  <div style="display:grid;grid-template-columns:minmax(0,1.62fr) minmax(0,1fr);gap:18px">
+
+    <div style="display:flex;flex-direction:column;gap:18px">
+
+    <!-- Buildings -->
+    <div style="padding:18px 20px 20px;border-radius:3px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+        <div style="font:400 19px 'IM Fell English',serif;letter-spacing:0;color:var(--text)">Buildings</div>
+        <span style="font-size:12.5px;color:var(--muted)">One of each, kept here and never lost, even when every base on the map is gone.</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
+        <sc-for list="{{ buildings }}" as="b" hint-placeholder-count="7">
+          <div style="{{ b.slotStyle }}">
+            <span style="{{ b.markStyle }}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ b.d1 }}"></path><path d="{{ b.d2 }}"></path><path d="{{ b.d3 }}"></path><path d="{{ b.d4 }}"></path><path d="{{ b.dd }}" stroke-dasharray="3 2.4"></path></svg></span>
+            <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0">
+              <div style="display:flex;align-items:baseline;gap:7px">
+                <div style="font:400 13px 'IM Fell English',serif;letter-spacing:0;line-height:1.15;color:var(--text)">{{ b.name }}</div>
+                <div style="{{ b.stateStyle }}">{{ b.state }}</div>
+              </div>
+              <div style="font-size:10.5px;line-height:1.35;color:var(--muted)">{{ b.unlocks }}</div>
+            </div>
+            <div style="display:flex;gap:3px;flex-shrink:0">
+              <sc-for list="{{ b.cost }}" as="c" hint-placeholder-count="3">
+                <span style="{{ c.style }}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ c.d1 }}"></path><path d="{{ c.d2 }}"></path><path d="{{ c.d3 }}"></path></svg><span style="{{ c.textStyle }}">{{ c.text }}</span></span>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+
+        <div style="display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:3px;background:var(--surface2)">
+          <span style="{{ castleMark }}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ castleD1 }}"></path><path d="{{ castleD2 }}"></path></svg></span>
+          <div style="font-size:10.5px;line-height:1.4;color:var(--text);flex-grow:1"><strong>Castle</strong> is a base and sits in the Bases supply. <strong>Mana Reserve</strong> has its four slots under the mana track.</div>
+        </div>
+      </div>
+      </div>
+
+    <!-- Battle strategy cards -->
+      <div style="padding:18px 20px 20px;border-radius:3px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="{{ bcMark }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ bcD1 }}"></path><path d="{{ bcD2 }}"></path><path d="{{ bcD3 }}"></path><path d="{{ bcD4 }}"></path></svg></span>
+          <div style="font:400 19px 'IM Fell English',serif;letter-spacing:0;color:var(--text);flex-grow:1">Battle strategy cards</div>
+          <span style="font:400 11px 'IM Fell English',serif;letter-spacing:.05em;color:var(--muted)">2 HELD &middot; 14 LEFT OF 20</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <sc-for list="{{ battleCards }}" as="b" hint-placeholder-count="2">
+            <div style="{{ b.rowStyle }}">
+              <span style="{{ b.faceStyle }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ b.d1 }}"></path><path d="{{ b.d2 }}"></path><path d="{{ b.d3 }}"></path><path d="{{ b.d4 }}"></path></svg></span>
+              <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0">
+                <span style="{{ b.typeStyle }}">{{ b.type }}</span>
+                <span style="font-size:11.5px;line-height:1.35;color:var(--text)">{{ b.text }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:3px;background:var(--surface2)">
+          <div style="display:flex;gap:5px;flex-shrink:0">
+            <sc-for list="{{ otherSees }}" as="o" hint-placeholder-count="2">
+              <span style="{{ o.style }}"></span>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0">
+            <span style="font:400 10px 'IM Fell English',serif;letter-spacing:.06em;color:var(--muted)">WHAT ANY OTHER SEAT SEES HERE</span>
+            <span style="font-size:11px;line-height:1.35;color:var(--text)">Two backs and nothing else. This is your board, so the faces are yours to read; the same panel on somebody else&rsquo;s screen never resolves them.</span>
+          </div>
+        </div>
+
+        <div style="font-size:11.5px;line-height:1.4;color:var(--muted);padding-top:8px;border-top:1px solid var(--line)">A Research action draws one blind from the deck the whole table shares, for one water, one wood, one ore and either ether or oil. Your Embassy is what allows it.</div>
+      </div>
+    </div>
+
+    <!-- Supply column -->
+    <div style="display:flex;flex-direction:column;gap:18px">
+
+      <!-- Off-map pieces -->
+      <div style="padding:18px 20px 20px;border-radius:3px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:15px">
+        <div style="font:400 19px 'IM Fell English',serif;letter-spacing:0;color:var(--text)">Off the map</div>
+
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline">
+            <span style="font:400 12px 'IM Fell English',serif;letter-spacing:.05em;color:var(--muted)">SUBJECTS</span>
+            <span style="font-size:11.5px;color:var(--muted)">+1 culture each · max 5</span>
+          </div>
+          <div style="display:flex;gap:6px">
+            <sc-for list="{{ subjects }}" as="s" hint-placeholder-count="5">
+              <span style="{{ s.style }}"></span>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline">
+            <span style="font:400 12px 'IM Fell English',serif;letter-spacing:.05em;color:var(--muted)">SURFS</span>
+            <span style="font-size:11.5px;color:var(--muted)">3 free · 5 committed · max 11</span>
+          </div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap">
+            <sc-for list="{{ surfs }}" as="s" hint-placeholder-count="11">
+              <span style="{{ s.style }}"></span>
+            </sc-for>
+          </div>
+          <div style="font-size:11.5px;line-height:1.4;color:var(--muted)">A Surf collects any resource. Once placed it stays on the map and cannot pay again until upkeep.</div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline">
+            <span style="font:400 12px 'IM Fell English',serif;letter-spacing:.05em;color:var(--muted)">BASES · CASTLES</span>
+            <span style="font-size:11.5px;color:var(--muted)">2 on the map · max 3</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <sc-for list="{{ bases }}" as="b" hint-placeholder-count="3">
+              <span style="{{ b.style }}"></span>
+            </sc-for>
+            <span style="display:flex;gap:4px;margin-left:4px">
+              <sc-for list="{{ baseCost }}" as="c" hint-placeholder-count="2">
+                <span style="{{ c.style }}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ c.d1 }}"></path><path d="{{ c.d2 }}"></path><path d="{{ c.d3 }}"></path></svg><span style="{{ c.textStyle }}">{{ c.text }}</span></span>
+              </sc-for>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Treaties -->
+      <div style="padding:18px 20px 20px;border-radius:3px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:baseline;gap:10px">
+          <div style="font:400 19px 'IM Fell English',serif;letter-spacing:0;color:var(--text)">Treaty tokens</div>
+          <span style="font-size:11.5px;color:var(--muted)">one of each · Embassy unlocks them</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <sc-for list="{{ treaties }}" as="t" hint-placeholder-count="5">
+            <div style="{{ t.rowStyle }}">
+              <span style="{{ t.dotStyle }}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ t.d1 }}"></path><path d="{{ t.d2 }}"></path><path d="{{ t.d3 }}"></path></svg></span>
+              <span style="font-size:12.5px;color:var(--text);flex-grow:1">{{ t.name }}</span>
+              <span style="font:400 11px 'IM Fell English',serif;color:var(--muted)">{{ t.culture }}</span>
+              <span style="{{ t.stateStyle }}">{{ t.state }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <!-- Action cards -->
+      <div style="padding:18px 20px 20px;border-radius:3px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:baseline;gap:10px">
+          <div style="font:400 19px 'IM Fell English',serif;letter-spacing:0;color:var(--text)">Action cards</div>
+          <span style="font-size:11.5px;color:var(--muted)">one on the stack per turn</span>
+        </div>
+        <div style="display:flex;gap:10px">
+          <sc-for list="{{ actions }}" as="a" hint-placeholder-count="3">
+            <div style="{{ a.cardStyle }}">
+              <span style="{{ a.markStyle }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ a.d1 }}"></path><path d="{{ a.d2 }}"></path><path d="{{ a.d3 }}"></path><path d="{{ a.d4 }}"></path></svg></span>
+              <div style="font:400 13px 'IM Fell English',serif;line-height:1.1;color:var(--text)">{{ a.name }}</div>
+              <div style="{{ a.stateStyle }}">{{ a.state }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-size:11.5px;line-height:1.4;color:var(--muted)">Marshal, Quartermaster and Archivist each add a fourth card while they live. None of them are yours yet, so the slot stays empty.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============ UNITS ============ -->
+  <div style="padding:18px 20px 20px;border-radius:3px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+      <div style="font:400 19px 'IM Fell English',serif;letter-spacing:0;color:var(--text)">Units</div>
+      <span style="font-size:12.5px;color:var(--muted)">A hit lands when damage is at least defense, and one hit kills. Lower initiative acts later.</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px">
+      <sc-for list="{{ units }}" as="u" hint-placeholder-count="7">
+        <div style="{{ u.tileStyle }}">
+          <div style="display:flex;align-items:flex-start;gap:9px">
+            <span style="{{ u.markStyle }}">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ u.d1 }}"></path><path d="{{ u.d2 }}"></path><path d="{{ u.d3 }}"></path><path d="{{ u.d4 }}"></path><path d="{{ u.dd }}" stroke-dasharray="3 2.4"></path></svg>
+            </span>
+            <div style="display:flex;flex-direction:column;gap:2px;flex-grow:1;min-width:0">
+              <div style="font:400 14px 'IM Fell English',serif;letter-spacing:0;line-height:1.1;color:var(--text)">{{ u.name }}</div>
+              <div style="font-size:10.5px;color:var(--muted)">{{ u.kind }}</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:3px">
+            <sc-for list="{{ u.stats }}" as="s" hint-placeholder-count="3">
+              <span style="{{ s.style }}"><span style="display:block;font-size:8px;letter-spacing:.06em;opacity:.7">{{ s.label }}</span>{{ s.value }}</span>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:3px;flex-wrap:wrap">
+            <sc-for list="{{ u.cost }}" as="c" hint-placeholder-count="3">
+              <span style="{{ c.style }}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ c.d1 }}"></path><path d="{{ c.d2 }}"></path><path d="{{ c.d3 }}"></path></svg><span style="{{ c.textStyle }}">{{ c.text }}</span></span>
+            </sc-for>
+          </div>
+          <div style="font-size:10.5px;line-height:1.35;color:var(--muted);margin-top:auto">{{ u.note }}</div>
+          <div style="display:flex;align-items:center;gap:5px">
+            <sc-for list="{{ u.supply }}" as="s" hint-placeholder-count="5">
+              <span style="{{ s.style }}"></span>
+            </sc-for>
+            <span style="font:400 10px 'IM Fell English',serif;color:var(--muted);margin-left:auto">{{ u.supplyText }}</span>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- ============ RESEARCH ============ -->
+  <div style="padding:18px 20px 20px;border-radius:3px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+      <div style="font:400 19px 'IM Fell English',serif;letter-spacing:0;color:var(--text)">Research</div>
+      <span style="font-size:12.5px;color:var(--muted)">A Research action buys one of these, or one battle strategy card for one water, one wood, one ore and either ether or oil.</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">
+      <sc-for list="{{ research }}" as="r" hint-placeholder-count="6">
+        <div style="{{ r.cardStyle }}">
+          <div style="display:flex;align-items:flex-start;gap:9px">
+            <span style="{{ r.markStyle }}">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ r.d1 }}"></path><path d="{{ r.d2 }}"></path><path d="{{ r.d3 }}"></path><path d="{{ r.d4 }}"></path><path d="{{ r.dd }}" stroke-dasharray="3 2.4"></path></svg>
+            </span>
+            <div style="font:400 15px 'IM Fell English',serif;letter-spacing:0;line-height:1.15;color:var(--text);flex-grow:1;min-width:0">{{ r.name }}</div>
+            <span style="{{ r.tokenStyle }}">{{ r.tokenMark }}</span>
+          </div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap">
+            <sc-for list="{{ r.cost }}" as="c" hint-placeholder-count="2">
+              <span style="{{ c.style }}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ c.d1 }}"></path><path d="{{ c.d2 }}"></path><path d="{{ c.d3 }}"></path></svg><span style="{{ c.textStyle }}">{{ c.text }}</span></span>
+            </sc-for>
+          </div>
+          <div style="font-size:11.5px;line-height:1.4;color:var(--muted)">{{ r.effect }}</div>
+          <div style="{{ r.stateStyle }}">{{ r.state }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- ============ HEROES ============ -->
+  <div style="padding:18px 20px 20px;border-radius:3px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+      <div style="font:400 19px 'IM Fell English',serif;letter-spacing:0;color:var(--text)">Heroes</div>
+      <span style="font-size:12.5px;color:var(--muted)">A Leader at setup, then one more at 5, 15, 30, 50 and 75 culture. Six at most, from a shared pool of twenty.</span>
+    </div>
+
+    <div style="{{ spyStrip }}">
+      <span style="{{ spyStripMark }}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ spyD1 }}"></path><path d="{{ spyD2 }}"></path><path d="{{ spyD3 }}"></path><path d="{{ spyD4 }}" stroke-dasharray="3 2.4"></path></svg></span>
+      <div style="display:flex;flex-direction:column;gap:2px;flex-grow:1;min-width:0">
+        <span style="font:400 13.5px 'IM Fell English',serif;letter-spacing:0;color:var(--text)">No hero is carrying a spy</span>
+        <span style="font-size:11.5px;line-height:1.4;color:var(--text)">You have no Illusionist, and an Illusionist needs a <strong>Library of Illusion</strong>, which is an empty slot above. Buy both and one hero here starts carrying the assignment.</span>
+      </div>
+      <div style="width:1px;align-self:stretch;background:var(--line);flex-shrink:0"></div>
+      <div style="display:flex;flex-direction:column;gap:2px;width:196px;flex-shrink:0">
+        <span style="font:400 10px 'IM Fell English',serif;letter-spacing:.06em;color:var(--muted)">NO CARD LIES BY YOUR NAME</span>
+        <span style="font-size:10.5px;line-height:1.35;color:var(--muted)">And the table can see that too. Buy an Illusionist and one appears face down for everyone, with the name on it for you alone.</span>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px">
+      <sc-for list="{{ heroes }}" as="h" hint-placeholder-count="6">
+        <div style="{{ h.tileStyle }}">
+          <span style="{{ h.avatarStyle }}">{{ h.initials }}</span>
+          <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0">
+            <div style="font:400 12px 'IM Fell English',serif;line-height:1.15;color:var(--text)">{{ h.name }}</div>
+            <div style="font:400 10px 'IM Fell English',serif;color:var(--muted)">{{ h.type }}</div>
+            <div style="{{ h.badgeStyle }}">{{ h.badge }}</div>
+          </div>
+          <span style="{{ h.spyStyle }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ spyD1 }}"></path><path d="{{ spyD2 }}"></path><path d="{{ spyD3 }}"></path><path d="{{ spyD4 }}" stroke-dasharray="3 2.4"></path></svg></span>
+        </div>
+      </sc-for>
+    </div>
+  </div><div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-top:4px">
+    <span style="font:400 12px 'IM Fell English',serif;letter-spacing:.06em;color:var(--muted)">THE SAME BOARD IN SIX COLORS</span>
+    <sc-for list="{{ factionKeys }}" as="f" hint-placeholder-count="6">
+      <span style="display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--text)">
+        <span style="{{ f.style }}"></span>{{ f.name }}
+      </span>
+    </sc-for>
+    <span style="font-size:11.5px;color:var(--muted)">White and yellow need the dark ring to hold their edge on a light table; every faction token carries it, so the set stays one family.</span>
+  </div>
+
+  <!-- ============ FOOTER: faction skins ============ -->
+  
+
+</div>
+</x-dc>
+
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1240,"height":1720},"theme":{"editor":"enum","options":["light","dark"],"default":"light","tsType":"&#39;light&#39;|&#39;dark&#39;","section":"Board"}}'>
+const THEMES={
+ light:{'--bg':'#ddc9a3','--surface':'#e9d9ba','--surface2':'#dfcca8','--text':'#33251a','--muted':'rgba(51,37,26,.62)','--brand':'#3d5c42','--action':'#7a3b52','--hl':'#3d5c42','--hlbg':'#d9cfa8','--tagbg':'#d8c49f','--tagfg':'rgba(51,37,26,.74)','--danger':'#8d2f28','--line':'rgba(51,37,26,.26)','--ink':'#33251a','--shadow':'0 1px 0 rgba(51,37,26,.16),0 3px 10px rgba(90,62,32,.16)'},
+ dark:{'--bg':'#2a2119','--surface':'#33291f','--surface2':'#3b2f23','--text':'#ead8b6','--muted':'rgba(234,216,182,.64)','--brand':'#9db58f','--action':'#c98aa0','--hl':'#9db58f','--hlbg':'#3d3527','--tagbg':'#3b3125','--tagfg':'rgba(234,216,182,.76)','--danger':'#d97a6e','--line':'rgba(234,216,182,.22)','--ink':'#1a140e','--shadow':'0 1px 0 rgba(0,0,0,.4),0 3px 10px rgba(0,0,0,.4)'}
+};
+const RES={wa:{c:'#2f6b91',code:'Wa',name:'Water',where:'rings the map'},
+           wo:{c:'#3f6730',code:'Wo',name:'Wood',where:'rings the map'},
+           or:{c:'#6f6858',code:'Or',name:'Ore',where:'8 tiles, centre'},
+           oi:{c:'#2f2a24',code:'Oi',name:'Oil',where:'2 tiles, centre'},
+           et:{c:'#6f43b5',code:'Et',name:'Ether',where:'2 tiles, centre'}};
+const FAC='#f0ece2';
+
+function chip(k,n){
+  const r=RES[k];
+  const ic=(typeof NGG!=='undefined')?NGG.icon(k):{d1:'',d2:'',d3:''};
+  return {text:n>1?('\u00d7'+n):'',d1:ic.d1,d2:ic.d2,d3:ic.d3,
+    textStyle:{marginLeft:n>1?'3px':'0',font:"600 11px 'IM Fell English',serif"},
+    style:{display:'inline-flex',alignItems:'center',font:"600 11px 'IM Fell English',serif",
+      color:'#ffffff',background:r.c,borderRadius:'3px',padding:'2px 6px',letterSpacing:'.02em'}};
+}
+function costs(list){return list.map(function(p){return chip(p[0],p[1]);});}
+
+function statBox(label,value,on){
+  return {label:label,value:value,
+    style:{flexGrow:1,textAlign:'center',font:"600 12px 'IM Fell English',serif",
+      color:on?'var(--text)':'var(--muted)',background:'var(--surface2)',borderRadius:'3px',
+      padding:'3px 0 4px',lineHeight:'1.15'}};
+}
+
+class Component extends DCLogic{
+ renderVals(){
+  const T=THEMES[this.props.theme||'light'];
+
+  // ---- units ----
+  // The icon registry lives in ./icons.js so every board draws the same mark. A hole is a
+  // dotted lookup and cannot carry markup, so what travels is the path DATA, not the svg.
+  const ICO=(typeof NGG!=='undefined')?NGG:{icon:function(n){return {name:n,d1:'',d2:'',d3:'',d4:'',dd:''};}};
+
+
+  // ---- mana track: base 5 then four reserves of 5 ----
+  const CUR=17, MAX=20;
+  const manaGroups=[0,1,2,3,4].map(function(g){
+    const built = g===0 || g<=3;              // base + Reserves I-III built
+    const pips=[0,1,2,3,4].map(function(i){
+      const n=g*5+i+1;
+      let bg='transparent', bd='1px dashed var(--line)';
+      if(n<=CUR){bg='var(--brand)';bd='1px solid var(--ink)';}
+      else if(n<=MAX){bg='var(--surface2)';bd='1px solid var(--line)';}
+      return {style:{flexGrow:1,height:'26px',borderRadius:'3px',background:bg,border:bd}};
+    });
+    return {pips:pips,
+      label:g===0?'base 5':['Reserve I','Reserve II','Reserve III','Reserve IV'][g-1],
+      labelStyle:{font:"600 11px 'IM Fell English',serif",color:'var(--muted)',textAlign:'center'},
+      slotText:g===0?'always on':(built?'built':'2 Wo + 1 Wa'),
+      slotStyle:{font:"600 10px 'IM Fell English',serif",textAlign:'center',borderRadius:'3px',
+        padding:'3px 0',color:built?'#ffffff':'var(--muted)',
+        background:built?'var(--brand)':'transparent',
+        border:built?'1px solid var(--ink)':'1px dashed var(--line)'}};
+  });
+
+  // ---- technology track ----
+  function techGroup(label,got,total){
+    const pips=[];
+    for(let i=0;i<total;i++){
+      const on=i<got;
+      pips.push({style:{flexGrow:1,height:'20px',borderRadius:'3px',
+        background:on?FAC:'transparent',
+        border:on?'1.5px solid var(--ink)':'1px dashed var(--line)'}});
+    }
+    return {label:label,score:got+' / '+total,pips:pips};
+  }
+  const techGroups=[techGroup('UNIT TYPES',5,7),techGroup('BUILDING TYPES',6,9),techGroup('RESEARCH',3,6)];
+
+  // ---- buildings ----
+  // A building is a row now, not a card: its own mark, the name, what it unlocks and the
+  // cost all on one line. Seven of these used to run 116px tall apiece.
+  function slot(name,cost,unlocks,built){
+    const ic=ICO.icon(name);
+    return {name:name,cost:costs(cost),unlocks:unlocks,
+      d1:ic.d1,d2:ic.d2,d3:ic.d3,d4:ic.d4,dd:ic.dd,
+      slotStyle:{display:'flex',alignItems:'center',gap:'10px',padding:'9px 11px',
+        borderRadius:'3px',background:built?'var(--surface)':'transparent',
+        border:built?'1px solid var(--line)':'1.5px dashed var(--line)',
+        boxShadow:built?'var(--shadow)':'none'},
+      markStyle:{width:'30px',height:'30px',borderRadius:'3px',flexShrink:0,display:'grid',
+        placeItems:'center',background:built?FAC:'transparent',color:'var(--text)',
+        border:built?'1.5px solid var(--ink)':'1.5px dashed var(--line)',
+        opacity:built?'1':'.6'},
+      state:built?'BUILT':'EMPTY',
+      stateStyle:{font:"600 9px 'IM Fell English',serif",letterSpacing:'.06em',
+        color:built?'var(--brand)':'var(--muted)'}};
+  }
+  const buildings=[
+    slot('Library of Evocation',[['wo',2],['wa',1]],'Ice Blast · Fiery Explosion · Mana Shield',true),
+    slot('Library of Enchantment',[['wo',2],['or',1]],'Enchantress · Dehance · Detection',true),
+    slot('Temple',[['wo',2],['wa',2]],'Cleric',true),
+    slot('Embassy',[['wo',2]],'Treaties · battle strategy cards',true),
+    slot('Library of Illusion',[['wo',2],['or',1]],'Illusionist · Invisible',false),
+    slot('Dragon Hoard',[['or',2],['wa',1],['et',1]],'Dragon',false),
+    slot('Amphitheatre',[['wo',3],['wa',1]],'Every Subject earns +2 culture instead of +1',false)
+  ];
+
+  // ---- off-map pieces ----
+  function token(state,shape){
+    const base={width:'22px',height:'22px',flexShrink:0,
+      borderRadius:shape==='square'?'5px':'50%'};
+    if(state==='have'){base.background=FAC;base.border='1.5px solid var(--ink)';}
+    else if(state==='out'){base.background='transparent';base.border='1.5px solid var(--ink)';base.opacity='.45';}
+    else {base.background='transparent';base.border='1px dashed var(--line)';}
+    return {style:base};
+  }
+  const subjects=['have','have','have','have','empty'].map(function(s){return token(s,'square');});
+  const surfs=['have','have','have','out','out','out','out','out','empty','empty','empty'].map(function(s){return token(s,'circle');});
+  const bases=['out','out','have'].map(function(s){return token(s,'square');});
+
+  // ---- treaties ----
+  function treaty(name,culture,partner){
+    const active=!!partner;
+    const ic=ICO.icon(name);
+    return {name:name,culture:culture,d1:ic.d1,d2:ic.d2,d3:ic.d3,
+      rowStyle:{display:'flex',alignItems:'center',gap:'9px',padding:'6px 10px',borderRadius:'3px',
+        background:active?'var(--hlbg)':'var(--surface2)'},
+      dotStyle:{width:'22px',height:'22px',borderRadius:'3px',flexShrink:0,display:'grid',
+        placeItems:'center',color:'var(--text)',
+        background:active?FAC:'transparent',
+        border:active?'1.5px solid var(--ink)':'1.5px dashed var(--line)'},
+      state:active?partner:'free',
+      stateStyle:{font:"600 10px 'IM Fell English',serif",letterSpacing:'.04em',
+        color:active?'var(--brand)':'var(--muted)'}};
+  }
+  const treaties=[treaty('Open Borders','+5','THE FOUNDRY'),treaty('Shared Resources','+5',null),
+    treaty('Peace','+5',null),treaty('Culture Treaty','+10',null),treaty('Shared Tactics','+5',null)];
+
+  // ---- action cards ----
+  function act(name,state){
+    const played=state==='on the stack';
+    const ic=ICO.icon(name);
+    return {name:name,state:state,d1:ic.d1,d2:ic.d2,d3:ic.d3,d4:ic.d4,
+      markStyle:{width:'26px',height:'26px',borderRadius:'3px',display:'grid',placeItems:'center',
+        background:'var(--surface2)',color:'var(--text)',marginBottom:'2px'},
+      cardStyle:{flexGrow:1,minHeight:'78px',display:'flex',flexDirection:'column',
+        justifyContent:'space-between',padding:'10px',borderRadius:'3px',
+        background:played?'var(--surface2)':'var(--surface)',
+        border:'1px solid var(--line)',
+        boxShadow:played?'none':'var(--shadow)',
+        opacity:played?'.6':'1'},
+      stateStyle:{font:"600 10px 'IM Fell English',serif",letterSpacing:'.05em',
+        color:played?'var(--muted)':'var(--brand)',textTransform:'uppercase'}};
+  }
+  const actions=[act('Build','on the stack'),act('Move / Battle','in hand'),act('Research','in hand')];
+
+  const markStyle={width:'30px',height:'30px',borderRadius:'3px',flexShrink:0,display:'grid',
+    placeItems:'center',background:'var(--surface2)',color:'var(--text)'};
+
+  function unit(name,kind,init,dmg,def,cost,note,have,cap){
+    const sup=[];
+    for(let i=0;i<cap;i++){
+      sup.push({style:{width:'9px',height:'9px',borderRadius:'50%',
+        background:i<have?FAC:'transparent',
+        border:i<have?'1.2px solid var(--ink)':'1px dashed var(--line)'}});
+    }
+    const ic=ICO.icon(name);
+    return {name:name,kind:kind,cost:costs(cost),note:note,
+      d1:ic.d1,d2:ic.d2,d3:ic.d3,d4:ic.d4,dd:ic.dd,markStyle:markStyle,
+      stats:[statBox('INIT',init,init!=='—'),statBox('DMG',dmg,dmg!=='—'),statBox('DEF',def,def!=='—')],
+      supply:sup,supplyText:have+' of '+cap,
+      tileStyle:{display:'flex',flexDirection:'column',gap:'7px',padding:'11px 12px',minHeight:'188px',
+        borderRadius:'3px',background:'var(--surface)',border:'1px solid var(--line)',boxShadow:'var(--shadow)'}};
+  }
+  const D='—';
+  const units=[
+    unit('Surf','collector',D,D,D,[['wa',2]],'Collects any resource. Dies to any hit.',8,11),
+    unit('Subject','faction board',D,D,D,[['wa',1],['wo',1]],'Never on the map, so never attacked.',4,5),
+    unit('Evoker','caster','50','2','1',[['wo',2],['or',1]],'Wizard Missile costs 1 mana a shot.',2,5),
+    unit('Illusionist','spy',D,D,D,[['wo',2],['or',1]],'Needs Library of Illusion. Hides a hero as a spy.',0,5),
+    unit('Dragon','beast','10','3 AoE','2',[['wo',2],['or',2],['et',1]],'Needs Dragon Hoard. Costs no mana.',0,5),
+    unit('Enchantress','support','75','0','1',[['wa',1],['wo',1],['et',1]],'Needs Library of Enchantment. Enhance for 2 mana.',1,5),
+    unit('Cleric','support','2','0','1',[['wa',2],['et',1]],'Needs Temple. 5 mana stops one death a pass.',1,5)
+  ];
+
+  // ---- research ----
+  function res(name,cost,effect,state){
+    const done=state==='researched';
+    const locked=state==='locked';
+    const ic=ICO.icon(name);
+    return {name:name,cost:costs(cost),effect:effect,state:state,
+      d1:ic.d1,d2:ic.d2,d3:ic.d3,d4:ic.d4,dd:ic.dd,
+      markStyle:Object.assign({},markStyle,{opacity:done?'1':'.6'}),
+      cardStyle:{display:'flex',flexDirection:'column',gap:'7px',padding:'13px 14px',minHeight:'108px',
+        borderRadius:'3px',background:done?'var(--surface)':'transparent',
+        border:done?'1px solid var(--line)':'1.5px dashed var(--line)',
+        boxShadow:done?'var(--shadow)':'none',opacity:locked?'.55':'1'},
+      tokenStyle:{width:'22px',height:'22px',borderRadius:'50%',flexShrink:0,
+        display:'grid',placeItems:'center',font:"700 12px 'IM Fell English',serif",color:'#1c1a17',
+        background:done?FAC:'transparent',
+        border:done?'1.5px solid var(--ink)':'1.5px dashed var(--line)'},
+      tokenMark:done?'✓':'',
+      stateStyle:{font:"600 10px 'IM Fell English',serif",letterSpacing:'.06em',textTransform:'uppercase',
+        color:done?'var(--brand)':(locked?'var(--danger)':'var(--muted)')}};
+  }
+  const research=[
+    res('Ice Blast',[['wa',1],['wo',1]],'Evoker spends 3 mana to drop one unit 100 initiative.','researched'),
+    res('Mana Shield',[['et',2]],'Evokers, Enchantresses and Clerics buy off damage, 1 mana a point.','researched'),
+    res('Dehance',[['wa',1],['wo',1]],'Enchantress spends 2 mana to take 1 defense off a unit.','researched'),
+    res('Fiery Explosion',[['wo',1],['or',1]],'Evoker spends 3 mana for a 2 damage area attack.','at Library of Evocation'),
+    res('Detection',[['wa',1],['wo',1]],'Enchantress reads an opposing spy card, privately.','at Library of Enchantment'),
+    res('Invisible',[['wa',1],['wo',1]],'Your spy hero reveals to kill an opposing hero outright.','locked · needs Library of Illusion')
+  ];
+
+  // ---- heroes ----
+  function hero(name,type,note,badge){
+    const lead=badge==='LEADER';
+    const empty=badge==='UNCLAIMED';
+    // A hero slot says who is in it and when it was earned. What the hero DOES is on the
+    // hero pool screen, where you are choosing; here it was 104px of restating. The one
+    // extra thing it owes its owner, and nobody else, is whether it carries the spy.
+    const spy=!!SPY_CARRIER && name===SPY_CARRIER;
+    return {name:empty?'Empty slot':name,type:empty?note:type,badge:badge,
+      spyStyle:spy?{width:'22px',height:'22px',borderRadius:'3px',flexShrink:0,display:'grid',
+        placeItems:'center',background:'var(--surface2)',color:'var(--text)',
+        border:'1px solid var(--line)'}:{width:'0px',height:'0px',overflow:'hidden'},
+      initials:empty?'':name.split(' ').map(function(w){return w[0];}).slice(0,2).join(''),
+      tileStyle:{display:'flex',alignItems:'center',gap:'9px',padding:'9px 10px',
+        borderRadius:'3px',background:empty?'transparent':'var(--surface)',
+        border:empty?'1.5px dashed var(--line)':(spy?'1.5px solid var(--action)':(lead?'1.5px solid var(--ink)':'1px solid var(--line)')),
+        boxShadow:empty?'none':'var(--shadow)'},
+      avatarStyle:{width:'28px',height:'28px',borderRadius:'50%',flexShrink:0,display:'grid',placeItems:'center',
+        font:"700 11px 'IM Fell English',serif",color:'#1c1a17',
+        background:empty?'transparent':FAC,
+        border:empty?'1px dashed var(--line)':'1.5px solid var(--ink)'},
+      badgeStyle:{font:"600 9px 'IM Fell English',serif",letterSpacing:'.06em',marginTop:'1px',
+        color:lead?'var(--brand)':'var(--muted)'}};
+  }
+  // Nobody is carrying it: The Covenant has no Illusionist to assign. The slot still
+  // exists, because a place where a secret will appear has to be visible before it does.
+  const SPY_CARRIER='';
+  const heroes=[
+    hero('Archmage Chaimidious','military · 70 / 3 / 6','Leader, so +2 defense. Gains a battle strategy card.','LEADER'),
+    hero('Envoy Sable Marrow','culture · 30 / 1 / 3','Unlocks treaties on her own, without an Embassy.','CLAIMED AT 5'),
+    hero('Chronicler Ottoline Vey','culture · 30 / 1 / 3','+5 culture a round. The only hero who pays income.','CLAIMED AT 15'),
+    hero('Conjurer Mayhew','economy · 30 / 1 / 3','Wherever he stands becomes an Ether tile.','CLAIMED AT 30'),
+    hero('','','next claim at 50','UNCLAIMED'),
+    hero('','','last claim at 75','UNCLAIMED')
+  ];
+
+  const legend=Object.keys(RES).map(function(k){
+    const r=RES[k];
+    const g=(typeof NGG!=='undefined')?NGG.icon(r.name):{d1:'',d2:'',d3:''};
+    return {code:r.code,name:r.name,where:r.where,g1:g.d1,g2:g.d2,g3:g.d3,
+      swatch:{width:'26px',height:'26px',borderRadius:'3px',display:'inline-grid',placeItems:'center',
+        color:'#ffffff',background:r.c,border:'1.5px solid var(--ink)'}};
+  });
+
+  const factionKeys=[['The Covenant','#f0ece2'],['The Schism','#c0392b'],['The Brass Circle','#2f6f9f'],
+    ['The Ledger','#6b4fa0'],['The Foundry','#d8a020'],['The Unbolted','#3f7d52']].map(function(f){
+    return {name:f[0],style:{width:'16px',height:'16px',borderRadius:'3px',background:f[1],border:'1.5px solid var(--ink)',display:'inline-block'}};
+  });
+
+  // A base costs three wood and an ore. That used to be two letters typed into the markup.
+  const baseCost=costs([['wo',3],['or',1]]);
+  const castle=ICO.icon('Base');
+  const castleMark={width:'28px',height:'28px',borderRadius:'3px',flexShrink:0,display:'grid',
+    placeItems:'center',background:'var(--surface)',border:'1px solid var(--line)',color:'var(--text)'};
+
+  // Battle strategy cards had nowhere to live on this board at all. They are held face
+  // down, so the slot shows backs and a count and never a name.
+  // The spy: public that you bought one, private which hero has it.
+  const spyIc=ICO.icon('Illusionist');
+  const spyStrip={display:'flex',alignItems:'center',gap:'13px',padding:'11px 14px',
+    borderRadius:'3px',background:'var(--surface2)',border:'1.5px dashed var(--line)'};
+  const spyStripMark={width:'30px',height:'30px',borderRadius:'3px',flexShrink:0,display:'grid',
+    placeItems:'center',background:'var(--surface)',color:'var(--muted)',
+    border:'1px solid var(--line)'};
+
+  const bc=ICO.icon('Battle card');
+  const bcMark={width:'30px',height:'30px',borderRadius:'3px',flexShrink:0,display:'grid',
+    placeItems:'center',background:'var(--surface2)',color:'var(--text)'};
+  // Face UP on your own board, because this is the one screen where you are the only
+  // person entitled to read them and you have to know what you are holding. The secrecy
+  // is against another seat opening this view, not against its owner — so the same panel
+  // rendered for anybody else resolves to backs and a count, and nothing more.
+  function card(type,text){
+   return {type:type,text:text,d1:bc.d1,d2:bc.d2,d3:bc.d3,d4:bc.d4,
+    rowStyle:{display:'flex',alignItems:'center',gap:'10px',padding:'8px 10px',borderRadius:'3px',
+      background:'var(--surface2)',border:'1px solid var(--line)'},
+    faceStyle:{width:'26px',height:'34px',borderRadius:'3px',flexShrink:0,display:'grid',
+      placeItems:'center',background:FAC,border:'1.5px solid var(--ink)',color:'#1c1a17'},
+    typeStyle:{font:"600 9px 'IM Fell English',serif",letterSpacing:'.06em',color:'var(--muted)'}};
+  }
+  const battleCards=[card('BONUS','+1 defense to all your units'),
+    card('RETREAT','Pull all your mobile units out')];
+  function back(){
+   return {style:{width:'26px',height:'34px',borderRadius:'3px',flexShrink:0,
+     background:FAC,border:'1.5px solid var(--ink)',boxShadow:'var(--shadow)'}};
+  }
+  const otherSees=[back(),back()];
+
+  return {
+   rootStyle:{...T,position:'relative',width:'1240px',minHeight:'1720px',boxSizing:'border-box',padding:'40px 44px 48px',
+     display:'flex',flexDirection:'column',gap:'20px',background:'var(--bg)',
+     fontFamily:"'IM Fell English',serif",borderRadius:'3px'},
+   fac:FAC,legend:legend,manaGroups:manaGroups,techGroups:techGroups,buildings:buildings,
+   subjects:subjects,surfs:surfs,bases:bases,treaties:treaties,actions:actions,
+   units:units,research:research,heroes:heroes,factionKeys:factionKeys,
+   baseCost:baseCost,castleMark:castleMark,castleD1:castle.d1,castleD2:castle.d2,
+   spyD1:spyIc.d1,spyD2:spyIc.d2,spyD3:spyIc.d3,spyD4:spyIc.dd,
+   spyStrip:spyStrip,spyStripMark:spyStripMark,
+   bcMark:bcMark,bcD1:bc.d1,bcD2:bc.d2,bcD3:bc.d3,bcD4:bc.d4,
+   battleCards:battleCards,otherSees:otherSees
+  };
+ }
+}
+</script>
+</body>
+</html>

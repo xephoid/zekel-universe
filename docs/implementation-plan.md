@@ -729,3 +729,37 @@ Still open:
   `docs/games/cybernoir-2127-build.md`; the engine naming it was that note's
   own recommendation, and Universe holds no second copy of the fact.
 - The phone pass (M6).
+
+## 16. Neither Guts nor Gears (decided 2026-09-23)
+
+The design canvas is `docs/design/neither-guts-nor-gears/`; how its boards
+become one client is `docs/design/SCREEN-ROUTING.md`. Decisions made before
+building:
+
+- **DECIDED: a bespoke screen inside the table.** The NGnG glue keeps a
+  `plan()` for Watch and the move-menu fallback, and adds a React screen that
+  replaces the board and bench: a pure `route(view, seat)`, client-side
+  composer stages (Build → Payment → Place It), and an interrupt layer above
+  them (access request, treaty response, battle defense). The top bar, log,
+  playback, undo and the numbered move menu stay shared with every game.
+- **DECIDED: Ink and Oil over Pressed.** Wizard seats read as inked pages,
+  robot seats as machined parts, tokens follow their owner on every seat's
+  screen, and the map stays one map. Done as tokens scoped to the NGnG table.
+- **DECIDED: faction on the setup page; Leader draft and starting sites in
+  the table.** The draft and the reverse-order starts are shared-pool picks
+  in turn, so they are in-table pendings.
+- **DECIDED: follow the engine where the canvas disagrees**
+  (`DESIGN-ALIGNMENT.md` §3 in the engine): treaties break several at a time
+  with a Done, one gate over a Shared Tactics partner's whole hand, no claim
+  that a partner's commitment is visible, Detection as its own control beside
+  the activation, and "request 1 of 2" on an access request.
+- **DECIDED: what a screen may print.** State the client holds, printed card
+  and rules text, the engine's reason an option is shut, and short how-to
+  lines ("Click a hex to place it"). No design commentary, no strategy advice.
+- **How the view's gaps are closed.** Pendings that publish `options` are read
+  from them; pendings that publish only a `question` take their option set from
+  the seat's legal moves. Map pieces come from `players[].units`, `heroes` and
+  `committed_collectors` joined to `map.tiles` by coord, never from the
+  `"Name (owner)"` strings. `active_action` is still the string
+  `"kind by owner"`; one tested reader handles it until the engine publishes a
+  structured field.

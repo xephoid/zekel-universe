@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Spell icons</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:var(--brand)}a:hover{color:var(--action)}
+</style>
+</helmet>
+
+<div style="{{ rootStyle }}" data-screen-label="Spell icons">
+
+  <div style="{{ s.header }}">
+    <div style="display:flex;flex-direction:column;gap:5px">
+      <span style="font:700 26px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:var(--text)">Spells &mdash; eleven things a wizard casts</span>
+      <span style="font-size:13px;line-height:1.45;color:var(--muted);max-width:720px">Five of these already had a mark on the research sheet, and they keep it exactly: a spell and the research that unlocks it are the same thing seen at two moments, so drawing them twice would teach a player that they were different. Six are new, and they are the ones that arrive with a unit or a hero rather than being bought.</span>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <span style="{{ s.pill }}">5 REUSED</span>
+      <span style="{{ s.pill }}">6 NEW</span>
+    </div>
+  </div>
+
+  <div style="{{ s.grid4 }}">
+
+    <!-- Wizard Missile -->
+    <div style="{{ s.card }}">
+      <div style="{{ s.head }}">
+        <span style="{{ s.tile }}">
+          <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7.4 16.6 9.2-9.2"></path><path d="M12.4 6.4h5v5"></path><path d="M3.6 14.4h3M4.8 18h4.4M8.4 20.4h3"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Wizard Missile</span>
+          <span style="{{ s.cost }}">1 MANA &middot; EVOKER</span>
+        </div>
+      </div>
+      <span style="{{ s.tagNew }}">NEW &middot; COMES WITH THE UNIT</span>
+      <span style="{{ s.note }}">A bolt with speed lines behind it. The cheapest thing in the game and the one cast most often, so it is the plainest mark on the sheet.</span>
+    </div>
+
+    <!-- Ice Blast -->
+    <div style="{{ s.card }}">
+      <div style="{{ s.head }}">
+        <span style="{{ s.tile }}">
+          <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5v17"></path><path d="M9.6 18.2 12 20.6l2.4-2.4"></path><path d="m6.2 7.4 11.6 6.7"></path><path d="m17.8 7.4-11.6 6.7"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Ice Blast</span>
+          <span style="{{ s.cost }}">3 MANA &middot; EVOKER</span>
+        </div>
+      </div>
+      <span style="{{ s.tagOld }}">SAME MARK AS THE RESEARCH</span>
+      <span style="{{ s.note }}">Drops one unit 100 initiative. The arm that points down is the whole message, and it is what tells this apart from Fiery Explosion at a glance.</span>
+    </div>
+
+    <!-- Fiery Explosion -->
+    <div style="{{ s.card }}">
+      <div style="{{ s.head }}">
+        <span style="{{ s.tile }}">
+          <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9.4c1.9 1.6 2.8 2.9 2.8 4.4a2.8 2.8 0 0 1-5.6 0c0-1 .4-1.9 1.2-2.7.2.8.6 1.3 1.1 1.6.2-1.2.3-2.3.5-3.3Z"></path><path d="M12 5.6V3.2M7 7.6 5.3 5.9M17 7.6l1.7-1.7M5.4 12.8H3M21 12.8h-2.4M7.4 17.8l-1.8 1.8M16.6 17.8l1.8 1.8"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Fiery Explosion</span>
+          <span style="{{ s.cost }}">3 MANA &middot; EVOKER</span>
+        </div>
+      </div>
+      <span style="{{ s.tagOld }}">SAME MARK AS THE RESEARCH</span>
+      <span style="{{ s.note }}">Two damage to an area. Rays going every way, because nothing about it has a direction &mdash; the deliberate opposite of Ice Blast.</span>
+    </div>
+
+    <!-- Mana Shield -->
+    <div style="{{ s.card }}">
+      <div style="{{ s.head }}">
+        <span style="{{ s.tile }}">
+          <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5 19.5 6v6c0 4.2-3 7.4-7.5 8.5C7.5 19.4 4.5 16.2 4.5 12V6Z" stroke-dasharray="3 2.4"></path><path d="m12 8.6 2.8 3.4L12 15.4 9.2 12Z"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Mana Shield</span>
+          <span style="{{ s.cost }}">1 MANA A POINT &middot; ANY CASTER</span>
+        </div>
+      </div>
+      <span style="{{ s.tagOld }}">SAME MARK AS THE RESEARCH</span>
+      <span style="{{ s.note }}">Evokers, Enchantresses and Clerics all buy damage off with it. The only spell on the sheet with three casters, and its cost is open-ended.</span>
+    </div>
+
+    <!-- Enhance -->
+    <div style="{{ s.card }}">
+      <div style="{{ s.head }}">
+        <span style="{{ s.tile }}">
+          <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.6 17.4 12 11l6.4 6.4"></path><path d="M5.6 11.4 12 5l6.4 6.4"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Enhance</span>
+          <span style="{{ s.cost }}">2 MANA &middot; ENCHANTRESS</span>
+        </div>
+      </div>
+      <span style="{{ s.tagNew }}">NEW &middot; COMES WITH THE UNIT</span>
+      <span style="{{ s.note }}">Two chevrons rising, and no body. That is the rule this sheet adds: a mark with a body is a unit, the effect alone is the spell.</span>
+    </div>
+
+    <!-- Dehance -->
+    <div style="{{ s.card }}">
+      <div style="{{ s.head }}">
+        <span style="{{ s.tile }}">
+          <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.6 6.6 12 13l6.4-6.4"></path><path d="M5.6 12.6 12 19l6.4-6.4"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Dehance</span>
+          <span style="{{ s.cost }}">2 MANA &middot; ENCHANTRESS</span>
+        </div>
+      </div>
+      <span style="{{ s.tagFix }}">REDRAWN &middot; BODY DROPPED</span>
+      <span style="{{ s.note }}">The same chevrons falling. Takes 1 defense off a unit. Its research card on the other sheet was carrying a body it should not have had.</span>
+    </div>
+
+    <!-- Detection -->
+    <div style="{{ s.card }}">
+      <div style="{{ s.head }}">
+        <span style="{{ s.tile }}">
+          <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.6 10.8s3.7-5.6 9.4-5.6 9.4 5.6 9.4 5.6-3.7 5.6-9.4 5.6-9.4-5.6-9.4-5.6Z"></path><circle cx="12" cy="10.8" r="2.6"></circle><path d="M6.6 19.8h10.8" stroke-dasharray="2.6 2.4"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Detection</span>
+          <span style="{{ s.cost }}">FREE &middot; ENCHANTRESS</span>
+        </div>
+      </div>
+      <span style="{{ s.tagOld }}">SAME MARK AS THE RESEARCH</span>
+      <span style="{{ s.note }}">The only spell here that costs no mana, which is why it gets a button on the battle screen rather than a place in the casting list.</span>
+    </div>
+
+    <!-- Cleric's save -->
+    <div style="{{ s.cardOpen }}">
+      <div style="{{ s.head }}">
+        <span style="{{ s.tile }}">
+          <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.4 16.6a7.6 7.6 0 0 1 15.2 0"></path><circle cx="12" cy="14.6" r="2.4"></circle><path d="M3 20.6h18"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">[CLERIC&rsquo;S SAVE]</span>
+          <span style="{{ s.cost }}">5 MANA &middot; CLERIC &middot; ONCE A PASS</span>
+        </div>
+      </div>
+      <span style="{{ s.tagNew }}">NEW &middot; NAME NEEDED</span>
+      <span style="{{ s.note }}">A dome over a standing figure. The faction board describes the effect but never names it, so the mark is drawn and the label is a slot.</span>
+    </div>
+
+    <!-- Decoy -->
+    <div style="{{ s.card }}">
+      <div style="{{ s.head }}">
+        <span style="{{ s.tile }}">
+          <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7.6" cy="7.8" r="3" stroke-dasharray="2.8 2.2"></circle><path d="M2.8 18.4a4.8 4.8 0 0 1 9.6 0" stroke-dasharray="2.8 2.2"></path><circle cx="16.4" cy="9.6" r="2.6"></circle><path d="M12.2 19.4a4.2 4.2 0 0 1 8.4 0"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Decoy</span>
+          <span style="{{ s.cost }}">ON REVEAL &middot; SPY HERO</span>
+        </div>
+      </div>
+      <span style="{{ s.tagNew }}">NEW &middot; COMES WITH THE SPY</span>
+      <span style="{{ s.note }}">A dashed figure left behind and a solid one stepped aside. The attack does nothing and she moves alone, never back the way it came.</span>
+    </div>
+
+    <!-- Elara's spell -->
+    <div style="{{ s.cardOpen }}">
+      <div style="{{ s.head }}">
+        <span style="{{ s.tile }}">
+          <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 4.5h4L10.5 8 8.5 11.5h-4L2.5 8Z"></path><path d="M15.5 12.5h4L21.5 16 19.5 19.5h-4L13.5 16Z"></path><path d="M11.4 8.6 12.8 11.2 11 12 13.7 14.8"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">[ELARA&rsquo;S REACH]</span>
+          <span style="{{ s.cost }}">5 MANA &middot; ARCHMAGE ELARA &middot; NOT A BATTLE</span>
+        </div>
+      </div>
+      <span style="{{ s.tagNew }}">NEW &middot; NAME NEEDED</span>
+      <span style="{{ s.note }}">Two hexes and a bolt across the seam. The only mark in the set with a hexagon in it, because it is the only thing a wizard casts that crosses a tile boundary.</span>
+    </div>
+
+    <!-- Invisible -->
+    <div style="{{ s.card }}">
+      <div style="{{ s.head }}">
+        <span style="{{ s.tile }}">
+          <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="7.6" r="3.4" stroke-dasharray="3 2.4"></circle><path d="M5.8 20.4a6.2 6.2 0 0 1 12.4 0" stroke-dasharray="3 2.4"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Invisible</span>
+          <span style="{{ s.cost }}">ON REVEAL &middot; SPY HERO</span>
+        </div>
+      </div>
+      <span style="{{ s.tagOld }}">SAME MARK AS THE RESEARCH</span>
+      <span style="{{ s.note }}">Kills one opposing hero outright. Fully dashed, and Decoy is half dashed, so the two spy powers read as a pair with a difference.</span>
+    </div>
+  </div>
+
+  <div style="{{ s.foot }}">
+    <div style="display:flex;flex-direction:column;gap:3px;flex-grow:1;min-width:0">
+      <span style="{{ s.footStrong }}">A spell and its research are one mark, not two.</span>
+      <span style="{{ s.footText }}">Ice Blast on the Research action, Ice Blast on the technology track, Ice Blast in the casting list during a battle, Ice Blast in the log afterwards &mdash; one drawing in all four places. Six of the eleven spells here are never bought at all: they arrive with the Evoker, the Enchantress, the Cleric, the spy or Elara herself, so they appear on this sheet and nowhere on the research one. That difference is the only thing the two sheets disagree about, and it is a real difference in the rules.</span>
+    </div>
+    <div style="width:1px;align-self:stretch;background:var(--line);flex-shrink:0"></div>
+    <div style="display:flex;flex-direction:column;gap:5px;width:300px;flex-shrink:0">
+      <span style="{{ s.footStrong }}">Two things need a decision</span>
+      <span style="{{ s.footText }}">Neither the Cleric&rsquo;s five-mana save nor Archmage Elara&rsquo;s spell has a name in the design document. Both need one before they can appear in a log line or a numbered voice list, because both have to say something out loud.</span>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900},"theme":{"editor":"enum","options":["light","dark"],"default":"light","tsType":"&#39;light&#39;|&#39;dark&#39;","section":"Sheet"}}'>
+const THEMES={
+ light:{'--bg':'#f7f1e6','--surface':'#ffffff','--surface2':'#efe7d8','--text':'#1c1a17','--muted':'#6b655b','--brand':'#1f4d3a','--action':'#e0762b','--hlbg':'#e6efe9','--danger':'#b3261e','--line':'rgba(28,26,23,.14)','--ink':'#1c1a17'},
+ dark:{'--bg':'#1a221c','--surface':'#232e26','--surface2':'#2c3a30','--text':'#f3ead9','--muted':'#b1ac9f','--brand':'#9bb08a','--action':'#ff8a3d','--hlbg':'#2f4a3a','--danger':'#ff7b6b','--line':'rgba(243,234,217,.16)','--ink':'#0f150f'}
+};
+
+class Component extends DCLogic{
+ renderVals(){
+  const T=THEMES[this.props.theme||'light'];
+
+  const tag={alignSelf:'flex-start',font:"600 8px 'IBM Plex Mono',monospace",letterSpacing:'.06em',
+    padding:'3px 7px',borderRadius:'999px'};
+
+  const s={
+   header:{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:'24px',flexShrink:0},
+   pill:{font:"600 9.5px 'IBM Plex Mono',monospace",letterSpacing:'.06em',padding:'5px 10px',
+     borderRadius:'999px',background:'var(--surface)',border:'1px solid var(--line)',color:'var(--muted)'},
+   grid4:{display:'grid',gridTemplateColumns:'repeat(4, 1fr)',gap:'14px',flexShrink:0},
+   card:{display:'flex',flexDirection:'column',gap:'8px',padding:'13px 14px 14px',
+     borderRadius:'13px',background:'var(--surface)',border:'1px solid var(--line)'},
+   cardOpen:{display:'flex',flexDirection:'column',gap:'8px',padding:'13px 14px 14px',
+     borderRadius:'13px',background:'var(--surface)',border:'1px dashed var(--line)'},
+   head:{display:'flex',alignItems:'center',gap:'11px'},
+   tile:{width:'54px',height:'54px',borderRadius:'11px',flexShrink:0,
+     background:'var(--surface2)',display:'grid',placeItems:'center',color:'var(--text)'},
+   meta:{display:'flex',flexDirection:'column',gap:'3px',flexGrow:1,minWidth:0},
+   name:{font:"700 14px 'Bricolage Grotesque',sans-serif",letterSpacing:'-.01em',lineHeight:'1.15',color:'var(--text)'},
+   cost:{font:"600 8px 'IBM Plex Mono',monospace",letterSpacing:'.05em',color:'var(--muted)',lineHeight:'1.3'},
+   note:{fontSize:'11px',lineHeight:'1.45',color:'var(--muted)'},
+
+   // The three tags are the point of the sheet: which marks are borrowed, which are
+   // invented here, and the one that had to be corrected on the research sheet.
+   tagOld:{...tag,background:'var(--surface2)',color:'var(--muted)'},
+   tagNew:{...tag,background:'var(--hlbg)',color:'var(--brand)'},
+   tagFix:{...tag,background:'transparent',color:'var(--action)',border:'1px solid var(--action)'},
+
+   foot:{display:'flex',alignItems:'flex-start',gap:'20px',padding:'14px 16px',borderRadius:'13px',
+     background:'var(--surface2)',border:'1px solid var(--line)',flexShrink:0},
+   footStrong:{font:"700 13px 'Bricolage Grotesque',sans-serif",letterSpacing:'-.01em',color:'var(--text)'},
+   footText:{fontSize:'11.5px',lineHeight:'1.45',color:'var(--muted)'}
+  };
+
+  return {
+   rootStyle:{...T,width:'1440px',height:'900px',boxSizing:'border-box',display:'flex',
+     flexDirection:'column',gap:'18px',padding:'32px 40px',background:'var(--bg)',
+     fontFamily:"'IBM Plex Sans',sans-serif",borderRadius:'12px',overflow:'hidden'},
+   s:s
+  };
+ }
+}
+</script>
+</body>
+</html>

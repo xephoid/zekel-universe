@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>One board, two seats</title>
+<script src="./support.js"></script>
+<script src="./icons.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&amp;family=Caveat:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IM+Fell+English:ital@0;1&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:var(--brand)}a:hover{color:var(--action)}
+</style>
+</helmet>
+
+<div style="{{ rootStyle }}" data-screen-label="Map treatments">
+
+  <div style="padding:22px 34px 16px;display:flex;align-items:flex-end;gap:20px;border-bottom:1px solid var(--line)">
+    <div style="display:flex;flex-direction:column;gap:5px;flex-grow:1;min-width:0">
+      <span style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.14em;color:var(--muted)">DIRECTION A &middot; APPLIED TO THE SHARED SURFACE</span>
+      <h1 style="margin:0;font:700 33px 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;color:var(--text)">One board, two seats</h1>
+      <p style="margin:0;max-width:940px;font-size:13px;line-height:1.5;color:var(--muted)">The same seven tiles and the same five pieces, three times. The tiles do not change, because four people are looking at them. What changes is the <strong>frame around the board</strong> and <strong>the marks a seat&rsquo;s own client draws on it</strong> &mdash; and the tokens, which follow their owner rather than whoever is looking.</p>
+    </div>
+    <span style="{{ pillStyle }}">SAME TILES &middot; SAME PIECES</span>
+  </div>
+
+  <div style="flex-grow:1;padding:20px 34px;display:flex;gap:18px;min-height:0">
+    <sc-for list="{{ panels }}" as="p" hint-placeholder-count="3">
+      <div style="{{ p.panelStyle }}">
+        <div style="{{ p.groundStyle }}"></div>
+
+        <div style="position:relative;display:flex;flex-direction:column;gap:11px;height:100%">
+          <div style="display:flex;align-items:baseline;gap:9px">
+            <span style="{{ p.capStyle }}">{{ p.cap }}</span>
+            <span style="flex-grow:1"></span>
+            <span style="{{ p.metaStyle }}">{{ p.meta }}</span>
+          </div>
+
+          <div style="{{ p.stageStyle }}">
+            <div style="{{ p.mapStyle }}">
+              <sc-for list="{{ p.tiles }}" as="t" hint-placeholder-count="7">
+                <div style="{{ t.style }}"><span style="{{ t.codeStyle }}">{{ t.code }}</span></div>
+              </sc-for>
+              <sc-for list="{{ p.brackets }}" as="b" hint-placeholder-count="4">
+                <span style="{{ b.style }}"></span>
+              </sc-for>
+              <sc-for list="{{ p.rings }}" as="r" hint-placeholder-count="3">
+                <svg width="104" height="90" viewBox="0 0 104 90" fill="none" style="{{ r.style }}" aria-hidden="true">
+                  <path d="{{ r.d }}" stroke="{{ r.stroke }}" stroke-width="2.6" stroke-linejoin="round" opacity=".9"></path>
+                </svg>
+              </sc-for>
+              <sc-for list="{{ p.tokens }}" as="k" hint-placeholder-count="6">
+                <span style="{{ k.style }}"><span style="{{ k.glyphStyle }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ k.d1 }}"></path><path d="{{ k.d2 }}"></path><path d="{{ k.d3 }}"></path></svg></span></span>
+              </sc-for>
+            </div>
+          </div>
+
+          <span style="{{ p.marginStyle }}">{{ p.margin }}</span>
+          <span style="{{ p.noteStyle }}">{{ p.note }}</span>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="padding:14px 34px 20px;border-top:1px solid var(--line);display:flex;gap:16px">
+    <sc-for list="{{ notes }}" as="n" hint-placeholder-count="4">
+      <div style="{{ n.boxStyle }}">
+        <span style="{{ n.headStyle }}">{{ n.head }}</span>
+        <span style="font-size:10.5px;line-height:1.4;color:var(--muted)">{{ n.text }}</span>
+      </div>
+    </sc-for>
+  </div>
+
+</div>
+</x-dc>
+
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1040},"theme":{"editor":"enum","options":["light","dark"],"default":"light","tsType":"&#39;light&#39;|&#39;dark&#39;","section":"Screen"}}'>
+const THEMES={
+ light:{'--bg':'#f7f1e6','--surface':'#ffffff','--surface2':'#efe7d8','--text':'#1c1a17','--muted':'#6b655b','--brand':'#1f4d3a','--action':'#e0762b','--line':'rgba(28,26,23,.14)','--ink':'#1c1a17'},
+ dark:{'--bg':'#1a221c','--surface':'#232e26','--surface2':'#2c3a30','--text':'#f3ead9','--muted':'#b1ac9f','--brand':'#9bb08a','--action':'#ff8a3d','--line':'rgba(243,234,217,.16)','--ink':'#0f150f'}
+};
+const CLIP='polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)';
+const HEXW=96,HEXH=83,COLW=72,ROWH=41.5;
+// The tile inks are the board's, not a seat's. They are identical in all three.
+const TER={Wa:'#4d86ab',Wo:'#57804a',Or:'#8d8577',Oi:'#3a342c',Et:'#7b55bd'};
+const FACS={cov:'#f0ece2',fou:'#d8a020',unb:'#3f7d52'};
+// A corner of the board: three columns, seven tiles.
+const FRAG=[[-1,1,'Wo'],[-1,3,'Wa'],[0,0,'Or'],[0,2,'Oi'],[0,4,'Or'],[1,1,'Et'],[1,3,'Wo']];
+function label(c,r){return String.fromCharCode(65+c+4)+(c%2===0?(r/2+1):((r+1)/2));}
+function pos(c,r){return {x:(c+1)*COLW,y:r*ROWH};}
+function ink(f){return (f==='cov'||f==='fou')?'#1c1a17':'#ffffff';}
+
+class Component extends DCLogic{
+ renderVals(){
+  const T=THEMES[this.props.theme||'light'];
+  const ICO=(typeof NGG!=='undefined')?NGG:{icon:function(n){return {name:n,has:false,d1:'',d2:'',d3:''};}};
+
+  const MAPW=2*COLW+HEXW, MAPH=4*ROWH+HEXH;
+
+  function tiles(codeFace){
+   return FRAG.map(function(t){
+    const p=pos(t[0],t[1]);
+    return {code:label(t[0],t[1]),
+     style:{position:'absolute',left:p.x+'px',top:p.y+'px',width:HEXW+'px',height:HEXH+'px',
+       clipPath:CLIP,background:TER[t[2]],display:'grid',placeItems:'center'},
+     codeStyle:{position:'absolute',left:'50%',top:'7px',transform:'translateX(-50%)',
+       pointerEvents:'none',color:'rgba(255,255,255,.82)',
+       font:codeFace==='ink'?"400 12px 'IM Fell English',serif"
+         :(codeFace==='stamp'?"600 9px 'IBM Plex Mono',monospace":"600 9.5px 'IBM Plex Mono',monospace"),
+       letterSpacing:codeFace==='ink'?'0':'.1em',
+       fontStyle:codeFace==='ink'?'italic':'normal'}};
+   });
+  }
+
+  // TOKENS FOLLOW THEIR OWNER. A wizard's piece is a drawn ring on paper and a
+  // robot's is a cut plate, on every seat's screen — which is how you read the
+  // species off the board without a legend.
+  const MARK={E:'Evoker',F:'Surf',S:'Spinner Platform',W:'Wall Platform',P:'Spitter Platform'};
+  function token(fac,mark,c,r,dx,dy){
+   const wiz=(fac==='cov');
+   const p=pos(c,r);
+   const ic=ICO.icon(MARK[mark]||'Hero');
+   return {d1:ic.d1,d2:ic.d2,d3:ic.d3,
+    glyphStyle:{display:'grid',placeItems:'center'},
+    style:wiz
+     ? {position:'absolute',left:(p.x+HEXW/2-13+(dx||0))+'px',top:(p.y+HEXH/2-13+(dy||0))+'px',
+        width:'26px',height:'26px',borderRadius:'50%',background:'#e7d6b4',
+        display:'grid',placeItems:'center',color:'#33251a',
+        boxShadow:'inset 0 0 0 2.4px rgba(51,37,26,.82), 0 2px 0 rgba(51,37,26,.3)'}
+     : {position:'absolute',left:(p.x+HEXW/2-13+(dx||0))+'px',top:(p.y+HEXH/2-13+(dy||0))+'px',
+        width:'26px',height:'26px',background:FACS[fac],
+        clipPath:'polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%)',
+        display:'grid',placeItems:'center',color:ink(fac),
+        boxShadow:'0 2px 0 rgba(0,0,0,.4)'}};
+  }
+  const CAST=[token('cov','E',-1,1,0,0),token('cov','F',-1,3,0,0),
+   token('fou','S',0,2,-9,0),token('fou','W',0,2,9,0),token('unb','P',1,3,0,0)];
+
+  // A wizard's selection is drawn: a hexagon stroked by hand, wobble and all.
+  function ring(c,r,stroke){
+   const p=pos(c,r);
+   return {stroke:stroke,
+    d:'M27 4 Q 51 1.4, 76 4.6 Q 101 43, 76 86 Q 51 88.6, 27 85.8 Q 2 44, 27 4 Z',
+    style:{position:'absolute',left:(p.x-4)+'px',top:(p.y-3)+'px',pointerEvents:'none'}};
+  }
+  // A robot's is machined: four corner brackets at a fixed offset.
+  function bracket(c,r,corner){
+   const p=pos(c,r), col='#1b1f1e';
+   const base={position:'absolute',width:'13px',height:'13px',pointerEvents:'none'};
+   const off=6;
+   if(corner==='tl') return {style:{...base,left:(p.x+14-off)+'px',top:(p.y-off)+'px',
+     borderLeft:'2.5px solid '+col,borderTop:'2.5px solid '+col}};
+   if(corner==='tr') return {style:{...base,left:(p.x+HEXW-27+off)+'px',top:(p.y-off)+'px',
+     borderRight:'2.5px solid '+col,borderTop:'2.5px solid '+col}};
+   if(corner==='bl') return {style:{...base,left:(p.x+14-off)+'px',top:(p.y+HEXH-13+off)+'px',
+     borderLeft:'2.5px solid '+col,borderBottom:'2.5px solid '+col}};
+   return {style:{...base,left:(p.x+HEXW-27+off)+'px',top:(p.y+HEXH-13+off)+'px',
+     borderRight:'2.5px solid '+col,borderBottom:'2.5px solid '+col}};
+  }
+
+  const PAPER='#e7d6b4', STEEL='#dfe1dd';
+
+  function panel(kind){
+   const wiz=kind==='wiz', rob=kind==='rob', plain=kind==='plain';
+   return {
+    cap:plain?'THE BOARD ITSELF':(wiz?'FROM THE COVENANT’S SEAT':'FROM THE UNBOLTED’S SEAT'),
+    meta:plain?'SHARED':(wiz?'wizard':'ROBOT'),
+    margin:plain?'No seat is looking. This is what the engine holds.'
+      :(wiz?'her Surf can still reach D2 — ask the Foundry about E2'
+      :'REACH F1 F2 E3 / E2 CONTESTED / TOL ±0'),
+    note:plain?'Seven tiles, five pieces, seven labels. Every seat sees exactly this underneath whatever its own client draws on top.'
+      :(wiz?'Parchment surround, a drawn rule, the tile codes in her own hand, and a hexagon stroked by hand around what she may reach. The tiles are untouched.'
+      :'Steel surround, stamped codes, corner brackets on what it may reach and a tolerance readout in the margin. The tiles are untouched.'),
+    panelStyle:{position:'relative',flexGrow:'1',flexBasis:'0',minWidth:'0',overflow:'hidden',
+      padding:'16px 18px 17px',
+      background:plain?'var(--surface)':(wiz?PAPER:STEEL),
+      border:plain?'1px solid var(--line)':(wiz?'none':'1px solid rgba(27,31,30,.3)'),
+      borderRadius:wiz?'3px':(rob?'0':'12px'),
+      boxShadow:plain?'none':(wiz?'0 2px 0 rgba(51,37,26,.2)':'3px 3px 0 rgba(27,31,30,.25)')},
+    groundStyle:plain?{display:'none'}
+      :(wiz?{position:'absolute',left:'0',top:'0',right:'0',bottom:'0',pointerEvents:'none',
+          background:'radial-gradient(56% 40% at 20% 12%, rgba(255,248,228,.6), transparent 62%),'
+            +'radial-gradient(46% 34% at 84% 30%, rgba(150,110,58,.2), transparent 66%),'
+            +'radial-gradient(62% 46% at 58% 86%, rgba(112,78,40,.2), transparent 64%),'
+            +'repeating-linear-gradient(101deg, rgba(112,78,40,.05) 0 1px, transparent 1px 7px)'}
+        :{position:'absolute',left:'0',top:'0',right:'0',bottom:'0',pointerEvents:'none',
+          background:'repeating-linear-gradient(0deg, rgba(27,31,30,.05) 0 1px, transparent 1px 22px),'
+            +'repeating-linear-gradient(90deg, rgba(27,31,30,.05) 0 1px, transparent 1px 22px)'}),
+    capStyle:{font:wiz?"400 14px 'IM Fell English',serif":"600 9.5px 'IBM Plex Mono',monospace",
+      letterSpacing:wiz?'0':'.14em',
+      color:plain?'var(--muted)':(wiz?'rgba(51,37,26,.7)':'rgba(27,31,30,.62)')},
+    metaStyle:{font:wiz?"500 15px Caveat,cursive":"600 8.5px 'IBM Plex Mono',monospace",
+      letterSpacing:wiz?'0':'.16em',
+      color:plain?'var(--muted)':(wiz?'rgba(122,59,82,.8)':'rgba(27,31,30,.5)')},
+    // The stage is the seat's material; the map inside it is nobody's.
+    stageStyle:{display:'grid',placeItems:'center',padding:'8px 0 2px'},
+    mapStyle:{position:'relative',width:MAPW+'px',height:MAPH+'px'},
+    tiles:tiles(plain?'plain':(wiz?'ink':'stamp')),
+    tokens:CAST,
+    rings:wiz?[ring(-1,1,'#7a3b52'),ring(-1,3,'#7a3b52')]:[],
+    brackets:rob?[bracket(1,1,'tl'),bracket(1,1,'tr'),bracket(1,1,'bl'),bracket(1,1,'br'),
+      bracket(1,3,'tl'),bracket(1,3,'tr'),bracket(1,3,'bl'),bracket(1,3,'br')]:[],
+    marginStyle:{font:wiz?"500 17px Caveat,cursive":(rob?"500 9.5px 'IBM Plex Mono',monospace":"400 11px 'IBM Plex Sans',sans-serif"),
+      letterSpacing:rob?'.12em':'0',
+      color:plain?'var(--muted)':(wiz?'rgba(51,37,26,.62)':'rgba(27,31,30,.58)'),
+      transform:wiz?'rotate(-1.2deg)':'none',transformOrigin:'left center'},
+    noteStyle:{marginTop:'auto',paddingTop:'11px',fontSize:'11px',lineHeight:'1.5',
+      borderTop:plain?'1px solid var(--line)':(wiz?'1px solid rgba(51,37,26,.22)':'1px solid rgba(27,31,30,.22)'),
+      color:plain?'var(--text)':(wiz?'rgba(51,37,26,.84)':'rgba(27,31,30,.8)')}};
+  }
+  const panels=[panel('plain'),panel('wiz'),panel('rob')];
+
+  const pillStyle={font:"600 9px 'IBM Plex Mono',monospace",letterSpacing:'.12em',flexShrink:0,
+    padding:'6px 13px',borderRadius:'999px',background:'var(--surface2)',color:'var(--muted)'};
+
+  function note(head,text,tone){
+   return {head:head,text:text,
+    boxStyle:{flexGrow:'1',flexBasis:'0',minWidth:'0',display:'flex',flexDirection:'column',gap:'5px',
+      padding:'12px 14px',borderRadius:'10px',background:'var(--surface2)',
+      borderLeft:'3px solid '+(tone==='warn'?'var(--action)':'var(--brand)')},
+    headStyle:{font:"700 12.5px 'Bricolage Grotesque',sans-serif",letterSpacing:'-.01em',
+      color:'var(--text)'}};
+  }
+  const notes=[
+   note('Tokens follow their owner','A Covenant piece is a drawn ring and a Foundry piece is a cut plate, on every screen. Species becomes readable off the board itself, with no legend and no colour lookup.','ok'),
+   note('The tiles never move','Same inks, same shapes, same labels, same positions. A four-player table is one board that four clients annotate, and the moment terrain changes per seat the table stops being shared.','ok'),
+   note('Selection is the seat’s own','A drawn hexagon for her, corner brackets for it. This is the one place a seat may mark the shared surface, because the mark belongs to the seat and not the board.','ok'),
+   note('The contrast trap moved','Tile inks were tuned against white. Against parchment the pale ones lose separation and the codes on them lose more. Measure the tile-to-frame pairs, not just text on panels.','warn')];
+
+  return {rootStyle:{...T,width:'1440px',height:'1040px',boxSizing:'border-box',display:'flex',
+    flexDirection:'column',background:'var(--bg)',fontFamily:"'IBM Plex Sans',sans-serif",
+    borderRadius:'12px',overflow:'hidden'},
+   pillStyle:pillStyle,panels:panels,notes:notes};
+ }
+}
+</script>
+</body>
+</html>

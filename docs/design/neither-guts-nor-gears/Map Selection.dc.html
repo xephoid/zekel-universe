@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Map selection</title>
+<script src="./support.js"></script>
+<script src="./icons.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:var(--brand)}a:hover{color:var(--action)}
+</style>
+</helmet>
+
+<div style="{{ rootStyle }}" data-screen-label="Map selection">
+
+  <div style="{{ s.header }}">
+    <div style="display:flex;flex-direction:column;gap:5px">
+      <span style="font:700 26px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:var(--text)">Selecting on the map &mdash; four states, one rule</span>
+      <span style="font-size:13px;line-height:1.5;color:var(--muted);max-width:780px">Greying the rest of the board is right, and it has one trap: this design already says illegal options are shown with their reason, never hidden. Grey has to mean <strong>not part of this choice</strong>, never <strong>gone</strong>. So a greyed hex keeps its label, its resource glyph and every piece standing on it &mdash; it loses its colour and its rim, and nothing else.</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0">
+      <span style="{{ s.pill }}">MOVE / BATTLE &middot; PICKING A DESTINATION</span>
+      <span style="{{ s.pill }}">ORIGIN D4 &middot; 5 LEGAL &middot; 1 SHUT</span>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:18px;flex-grow:1;min-height:0">
+
+    <!-- the map mid-selection -->
+    <div style="{{ s.board }}">
+      <div style="{{ s.mapStyle }}">
+        <sc-for list="{{ gutter }}" as="g" hint-placeholder-count="13">
+          <span style="{{ g.style }}">{{ g.text }}</span>
+        </sc-for>
+        <sc-for list="{{ tiles }}" as="t" hint-placeholder-count="34">
+          <div style="{{ t.ringStyle }}">
+            <div style="{{ t.style }}">
+              <span style="{{ t.codeStyle }}">{{ t.code }}</span>
+              <span style="{{ t.glyphStyle }}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ t.gp.g1 }}"></path><path d="{{ t.gp.g2 }}"></path><path d="{{ t.gp.g3 }}"></path></svg></span>
+              <span style="{{ t.shutStyle }}"></span>
+            </div>
+          </div>
+        </sc-for>
+        <sc-for list="{{ pieces }}" as="p" hint-placeholder-count="12">
+          <div style="{{ p.wrapStyle }}">
+            <sc-for list="{{ p.items }}" as="i" hint-placeholder-count="3">
+              <span style="{{ i.style }}"><span style="{{ i.glyphStyle }}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ i.d1 }}"></path><path d="{{ i.d2 }}"></path><path d="{{ i.d3 }}"></path><path d="{{ i.d4 }}"></path></svg></span><span style="{{ i.letterStyle }}">{{ i.letter }}</span></span>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="{{ s.caption }}">
+        <span style="{{ s.capTitle }}">Five tiles are yours to take</span>
+        <span style="{{ s.capText }}">E4 holds two Foundry platforms, so choosing it starts a battle. E5 is shut and says why. Everything grey is still readable &mdash; you can count the army on G6 without leaving this step.</span>
+      </div>
+    </div>
+
+    <!-- the four states -->
+    <div style="{{ s.rail }}">
+      <span style="{{ s.railHead }}">THE FOUR STATES</span>
+      <sc-for list="{{ states }}" as="x" hint-placeholder-count="4">
+        <div style="{{ x.cardStyle }}">
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="{{ x.specRing }}"><span style="{{ x.specStyle }}"><span style="{{ x.specShut }}"></span></span></span>
+            <div style="display:flex;flex-direction:column;gap:2px;flex-grow:1;min-width:0">
+              <span style="{{ s.stName }}">{{ x.name }}</span>
+              <span style="{{ x.tagStyle }}">{{ x.tag }}</span>
+            </div>
+          </div>
+          <span style="{{ s.stText }}">{{ x.text }}</span>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <sc-for list="{{ x.keeps }}" as="k" hint-placeholder-count="4">
+              <span style="{{ k.style }}">{{ k.text }}</span>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- the rules that make grey safe -->
+  <div style="{{ s.rules }}">
+    <div style="display:flex;flex-direction:column;gap:3px;width:172px;flex-shrink:0">
+      <span style="{{ s.rulesHead }}">What grey may never do</span>
+      <span style="{{ s.rulesSub }}">Three rules, and the third is the one that gets broken.</span>
+    </div>
+    <div style="width:1px;align-self:stretch;background:var(--line);flex-shrink:0"></div>
+    <div style="display:flex;gap:18px;flex-grow:1">
+      <sc-for list="{{ rules }}" as="r" hint-placeholder-count="3">
+        <div style="{{ s.ruleBox }}">
+          <span style="{{ s.ruleNum }}">{{ r.num }}</span>
+          <div style="display:flex;flex-direction:column;gap:2px;flex-grow:1;min-width:0">
+            <span style="{{ s.ruleTitle }}">{{ r.title }}</span>
+            <span style="{{ s.ruleText }}">{{ r.text }}</span>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000},"theme":{"editor":"enum","options":["light","dark"],"default":"light","tsType":"&#39;light&#39;|&#39;dark&#39;","section":"Screen"}}'>
+const THEMES={
+ light:{'--bg':'#f7f1e6','--surface':'#ffffff','--surface2':'#efe7d8','--text':'#1c1a17','--muted':'#6b655b','--brand':'#1f4d3a','--action':'#e0762b','--hlbg':'#e6efe9','--danger':'#b3261e','--line':'rgba(28,26,23,.14)','--ink':'#1c1a17','--boardbg':'#ffffff'},
+ dark:{'--bg':'#1a221c','--surface':'#232e26','--surface2':'#2c3a30','--text':'#f3ead9','--muted':'#b1ac9f','--brand':'#9bb08a','--action':'#ff8a3d','--hlbg':'#2f4a3a','--danger':'#ff7b6b','--line':'rgba(243,234,217,.16)','--ink':'#0f150f','--boardbg':'#2a352d'}
+};
+const HEXW=104,HEXH=90,COLW=78,ROWH=45,CLIP='polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)';
+const TER={Wa:'#4d86ab',Wo:'#57804a',Or:'#8d8577',Oi:'#3a342c',Et:'#7b55bd'};
+const FACS={cov:'#f0ece2',led:'#6b4fa0',fou:'#d8a020',unb:'#3f7d52'};
+const MAP=[[-2,2,'Wa'],[-2,4,'Or'],[-2,6,'Wa'],[-2,8,'Wa'],[-2,10,'Wo'],[-2,12,'Wa'],
+ [-1,1,'Wo'],[-1,3,'Wa'],[-1,5,'Wo'],[-1,7,'Et'],[-1,9,'Wo'],[-1,11,'Wo'],[-1,13,'Wo'],
+ [0,0,'Wa'],[0,2,'Or'],[0,4,'Or'],[0,6,'Oi'],[0,8,'Oi'],[0,10,'Or'],[0,12,'Or'],[0,14,'Wa'],
+ [1,1,'Wo'],[1,3,'Wa'],[1,5,'Wa'],[1,7,'Et'],[1,9,'Or'],[1,11,'Or'],[1,13,'Wo'],
+ [2,2,'Wa'],[2,4,'Wa'],[2,6,'Wo'],[2,8,'Wo'],[2,10,'Or'],[2,12,'Wa']];
+
+// The selection: standing on D4, picking where to go.
+const ORIGIN='-1,7';
+const ELIGIBLE={'-1,5':1,'-1,9':1,'-2,6':1,'-2,8':1,'0,6':1};
+const SHUT={'0,8':'Peace with The Foundry'};
+
+const RG=(typeof NGG!=='undefined')?NGG:{icon:function(){return {has:false,d1:'',d2:'',d3:'',d4:''};}};
+const WIZ={cov:1,sch:1,cir:1};
+const T_ANY={H:'Base',L:'Leader'};
+const T_WIZ={E:'Evoker',C:'Cleric',N:'Enchantress'};
+const T_ROB={S:'Spinner Platform',W:'Wall Platform',P:'Spitter Platform'};
+function tokenIcon(fac,mark){
+ const nm=T_ANY[mark]||(WIZ[fac]?T_WIZ[mark]:T_ROB[mark]);
+ return nm?RG.icon(nm):{has:false,d1:'',d2:'',d3:'',d4:''};
+}
+function tileLabel(c,r){return String.fromCharCode(65+c+4)+(c%2===0?(r/2+1):((r+1)/2));}
+function pos(c,r){return {l:((c+2)*COLW)+'px',t:(r*ROWH)+'px'};}
+
+class Component extends DCLogic{
+ renderVals(){
+  const T=THEMES[this.props.theme||'light'];
+
+  // Grey is a FILTER, not a colour. The tile keeps its own fill and simply stops carrying
+  // hue, so nothing has to be re-specified per terrain and a colour-blind player loses
+  // nothing they had — the glyph and the label are untouched either way.
+  const GREY='grayscale(1) brightness(1.14) contrast(.82)';
+  const GROW=1.096, OW=HEXW*GROW, OH=HEXH*GROW;
+
+  const tiles=MAP.map(function(t){
+   const key=t[0]+','+t[1], p=pos(t[0],t[1]);
+   const origin=key===ORIGIN, elig=!!ELIGIBLE[key], shut=!!SHUT[key];
+   const dim=!origin&&!elig&&!shut;
+   const g=RG.icon(t[2]);
+   // A rim is the only thing that says "you may take this". The origin gets an ink rim
+   // instead, because it is where you are, not somewhere you can go.
+   let rim='transparent';
+   if(elig) rim='#f7f1e6';
+   else if(origin) rim='var(--ink)';
+   else if(shut) rim='var(--danger)';
+   return {code:tileLabel(t[0],t[1]),gp:{g1:g.d1,g2:g.d2,g3:g.d3},
+    ringStyle:{position:'absolute',left:(parseFloat(p.l)-(OW-HEXW)/2)+'px',top:(parseFloat(p.t)-(OH-HEXH)/2)+'px',
+      width:OW+'px',height:OH+'px',clipPath:CLIP,background:rim,display:'grid',placeItems:'center'},
+    style:{width:HEXW+'px',height:HEXH+'px',clipPath:CLIP,background:TER[t[2]],
+      display:'grid',placeItems:'center',position:'relative',
+      filter:dim?GREY:(elig?'saturate(1.18) brightness(1.08)':'none')},
+    codeStyle:{position:'absolute',left:'50%',top:'6px',transform:'translateX(-50%)',
+      font:"600 10px 'IBM Plex Mono',monospace",color:'rgba(255,255,255,.82)',letterSpacing:'.06em'},
+    glyphStyle:{position:'absolute',left:'50%',bottom:'7px',transform:'translateX(-50%)',
+      opacity:'.5',color:'#ffffff',display:'grid',placeItems:'center'},
+    // The shut tile gets a bar, not a fade. A tile you could reasonably expect to take and
+    // cannot is the one case that needs a mark of its own.
+    shutStyle:shut?{position:'absolute',left:'14%',right:'14%',top:'calc(50% - 1.5px)',height:'3px',
+      background:'var(--danger)',borderRadius:'2px',transform:'rotate(-24deg)'}:{display:'none'}};
+  });
+
+  function gutterMarks(){
+   const out=[]; let i,n;
+   for(i=-2;i<=2;i++){ out.push({text:String.fromCharCode(65+i+4),
+    style:{position:'absolute',left:((i+2)*COLW+HEXW/2)+'px',top:'-25px',transform:'translateX(-50%)',
+      font:"600 12px 'IBM Plex Mono',monospace",color:'var(--muted)',letterSpacing:'.1em'}}); }
+   for(n=1;n<=8;n++){ out.push({text:String(n),
+    style:{position:'absolute',left:'-25px',top:((n-1)*2*ROWH+HEXH/2)+'px',transform:'translateY(-50%)',
+      font:"600 12px 'IBM Plex Mono',monospace",color:'var(--muted)'}}); }
+   return out;
+  }
+
+  // Pieces do NOT take the grey filter. Where every army stands is the thing you are
+  // deciding against, so it has to stay legible on a tile that is out of the running.
+  function dot(fac,mark,shape){
+   const ic=tokenIcon(fac,mark);
+   return {letter:mark,d1:ic.d1,d2:ic.d2,d3:ic.d3,d4:ic.d4,
+    glyphStyle:ic.has?{display:'grid',placeItems:'center'}:{display:'none'},
+    letterStyle:ic.has?{display:'none'}:{},
+    style:{width:'22px',height:'22px',borderRadius:shape==='base'?'5px':'50%',
+      background:FACS[fac],border:'1.5px solid #1c1a17',display:'grid',placeItems:'center',
+      font:"700 10px 'IBM Plex Mono',monospace",color:(fac==='cov'||fac==='fou')?'#1c1a17':'#ffffff',
+      boxShadow:'0 2px 4px rgba(0,0,0,.3)'}};
+  }
+  const PIECES=[
+   [-1,7,[dot('cov','E'),dot('cov','C')]],
+   [-2,12,[dot('cov','H','base'),dot('cov','L')]],
+   [0,6,[dot('fou','S'),dot('fou','W')]],
+   [0,8,[dot('fou','S')]],
+   [2,12,[dot('fou','H','base'),dot('fou','L')]],
+   [2,10,[dot('fou','S'),dot('fou','S'),dot('fou','W')]],
+   [2,2,[dot('led','H','base'),dot('led','L')]],
+   [-2,2,[dot('unb','H','base'),dot('unb','L')]]];
+  const pieces=PIECES.map(function(p){
+   const q=pos(p[0],p[1]);
+   return {items:p[2],
+    wrapStyle:{position:'absolute',left:q.l,top:q.t,width:HEXW+'px',height:HEXH+'px',
+      display:'flex',alignItems:'center',justifyContent:'center',gap:'3px',flexWrap:'wrap'}};
+  });
+
+  function keep(text,on){
+   return {text:text,
+    style:{font:"600 8.5px 'IBM Plex Mono',monospace",letterSpacing:'.05em',padding:'3px 7px',
+      borderRadius:'999px',
+      background:on?'var(--hlbg)':'transparent',color:on?'var(--brand)':'var(--muted)',
+      border:on?'none':'1px dashed var(--line)'}};
+  }
+  function state(name,tag,text,fill,rim,tone,shut,keeps){
+   return {name:name,tag:tag,text:text,keeps:keeps,
+    cardStyle:{display:'flex',flexDirection:'column',gap:'9px',padding:'13px 14px',
+      borderRadius:'12px',background:'var(--surface)',border:'1px solid var(--line)'},
+    specRing:{width:'54px',height:'47px',flexShrink:0,clipPath:CLIP,background:rim,
+      display:'grid',placeItems:'center'},
+    specStyle:{width:'48px',height:'42px',clipPath:CLIP,background:fill,position:'relative',
+      display:'grid',placeItems:'center',filter:tone},
+    specShut:shut?{position:'absolute',left:'14%',right:'14%',top:'calc(50% - 1.5px)',height:'3px',
+      background:'var(--danger)',borderRadius:'2px',transform:'rotate(-24deg)'}:{display:'none'},
+    tagStyle:{font:"600 8.5px 'IBM Plex Mono',monospace",letterSpacing:'.05em',
+      color:tag==='CHOOSE THIS'?'var(--brand)':(tag==='SHUT'?'var(--danger)':'var(--muted)')}};
+  }
+  const states=[
+   state('Eligible','CHOOSE THIS','Full colour, lifted a little, and a cream rim a full hexagon bigger. The rim is the only thing in the system that means take me.',
+     TER.Wo,'#f7f1e6','saturate(1.18) brightness(1.08)',false,
+     [keep('LABEL',true),keep('GLYPH',true),keep('PIECES',true),keep('RIM',true)]),
+   state('Where you are','ORIGIN','Full colour with an ink rim. You are standing here, so it must not look like somewhere you can go &mdash; different rim, not a dimmer one.',
+     TER.Et,'var(--ink)','none',false,
+     [keep('LABEL',true),keep('GLYPH',true),keep('PIECES',true),keep('INK RIM',true)]),
+   state('Shut','SHUT','Greyed AND struck through. This is the tile you would reasonably expect to take and cannot, so it earns a mark of its own and a reason on hover.',
+     TER.Oi,'var(--danger)','grayscale(1) brightness(1.14) contrast(.82)',true,
+     [keep('LABEL',true),keep('GLYPH',true),keep('PIECES',true),keep('REASON',true)]),
+   state('Not in this choice','GREY','Greyed, no rim, no mark. It is not wrong to pick, it is simply not part of the question being asked.',
+     TER.Wa,'transparent','grayscale(1) brightness(1.14) contrast(.82)',false,
+     [keep('LABEL',true),keep('GLYPH',true),keep('PIECES',true),keep('RIM',false)])];
+
+  function rule(num,title,text){return {num:num,title:title,text:text};}
+  const rules=[
+   rule('1','Grey never hides','The label, the resource glyph and every piece stay exactly as they were. Grey removes hue and the rim. It removes no information, and it is reversible the instant the step changes.'),
+   rule('2','Pieces keep their colour','A greyed tile still shows whose army is on it at full strength. Where everyone stands is what you are deciding against — dimming it would grey out the reason for the choice.'),
+   rule('3','A shut tile is not a grey tile','Grey means not part of this question. Shut means you expected to take this and cannot, and it owes you a reason. Collapsing the two is how a rule becomes invisible.')];
+
+  const s={
+   header:{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:'24px',flexShrink:0},
+   pill:{font:"600 9.5px 'IBM Plex Mono',monospace",letterSpacing:'.06em',padding:'5px 11px',
+     borderRadius:'999px',background:'var(--surface)',border:'1px solid var(--line)',color:'var(--muted)'},
+   board:{flexGrow:1,minWidth:0,position:'relative',borderRadius:'14px',background:'var(--boardbg)',
+     border:'1px solid var(--line)',display:'flex',flexDirection:'column',alignItems:'center',
+     justifyContent:'center',gap:'14px',padding:'30px 18px 16px',overflow:'hidden'},
+   mapStyle:{position:'relative',flexShrink:0,marginLeft:'25px',
+     width:(4*COLW+HEXW)+'px',height:(14*ROWH+HEXH)+'px'},
+   caption:{flexShrink:0,width:(4*COLW+HEXW+25)+'px',boxSizing:'border-box',display:'flex',
+     flexDirection:'column',gap:'3px',padding:'11px 14px',borderRadius:'12px',
+     background:'var(--hlbg)',border:'1.5px solid var(--brand)'},
+   capTitle:{font:"700 13px 'Bricolage Grotesque',sans-serif",color:'var(--text)'},
+   capText:{fontSize:'11.5px',lineHeight:'1.4',color:'var(--text)'},
+
+   rail:{width:400,flexShrink:0,display:'flex',flexDirection:'column',gap:'10px',minHeight:0},
+   railHead:{font:"600 9.5px 'IBM Plex Mono',monospace",letterSpacing:'.08em',color:'var(--muted)'},
+   stName:{font:"700 15px 'Bricolage Grotesque',sans-serif",letterSpacing:'-.01em',color:'var(--text)'},
+   stText:{fontSize:'11.5px',lineHeight:'1.45',color:'var(--muted)'},
+
+   rules:{display:'flex',alignItems:'flex-start',gap:'18px',padding:'13px 16px',borderRadius:'13px',
+     background:'var(--surface2)',border:'1px solid var(--line)',flexShrink:0},
+   rulesHead:{font:"700 14px 'Bricolage Grotesque',sans-serif",letterSpacing:'-.01em',color:'var(--text)'},
+   rulesSub:{fontSize:'11px',lineHeight:'1.35',color:'var(--muted)'},
+   ruleBox:{display:'flex',alignItems:'flex-start',gap:'9px',flexGrow:1,flexBasis:'0'},
+   ruleNum:{width:'19px',height:'19px',borderRadius:'50%',flexShrink:0,display:'grid',placeItems:'center',
+     font:"700 10px 'IBM Plex Mono',monospace",background:'var(--ink)',color:'var(--bg)'},
+   ruleTitle:{font:"700 12px 'Bricolage Grotesque',sans-serif",letterSpacing:'-.01em',color:'var(--text)'},
+   ruleText:{fontSize:'11px',lineHeight:'1.4',color:'var(--muted)'}
+  };
+
+  return {
+   rootStyle:{...T,width:'1440px',height:'1000px',boxSizing:'border-box',display:'flex',
+     flexDirection:'column',gap:'16px',padding:'30px 36px 26px',background:'var(--bg)',
+     fontFamily:"'IBM Plex Sans',sans-serif",borderRadius:'12px',overflow:'hidden'},
+   gutter:gutterMarks(),tiles:tiles,pieces:pieces,states:states,rules:rules,s:s
+  };
+ }
+}
+</script>
+</body>
+</html>

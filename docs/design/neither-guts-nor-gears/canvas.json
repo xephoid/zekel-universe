@@ -1,0 +1,974 @@
+{
+ "attachments": {},
+ "boards": {
+  "Action Icons.dc.html": {
+   "h": 700,
+   "page": "icons",
+   "title": "Actions — sixteen marks",
+   "w": 1440,
+   "x": 1520,
+   "y": 3480
+  },
+  "Battle Activation.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "Battle — activate a unit",
+   "w": 1440,
+   "x": 1520,
+   "y": 1420
+  },
+  "Battle Commit.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "Battle — commit a card in secret",
+   "w": 1440,
+   "x": 0,
+   "y": 1420
+  },
+  "Battle Defense.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "Battle — your defense, out of turn",
+   "w": 1440,
+   "x": 3040,
+   "y": 1420
+  },
+  "Choice Build.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "Build — choose what to buy",
+   "w": 1440,
+   "x": 1520,
+   "y": 0
+  },
+  "Choice Payment.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "Build — place collectors to pay",
+   "w": 1440,
+   "x": 3040,
+   "y": 0
+  },
+  "Choice Planning.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "Planning — place a card, or pass",
+   "w": 1440,
+   "x": 0,
+   "y": 0
+  },
+  "Choice Research.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "Research — unlock a technology, or draw a card",
+   "w": 1440,
+   "x": 1520,
+   "y": 7100
+  },
+  "Diplomacy.dc.html": {
+   "h": 1040,
+   "is_interactive": true,
+   "page": "choices",
+   "title": "Diplomacy — who owes whom",
+   "w": 1440,
+   "x": 0,
+   "y": 2840
+  },
+  "Faction Marks.dc.html": {
+   "h": 860,
+   "page": "icons",
+   "title": "Faction marks",
+   "w": 1440,
+   "x": 0,
+   "y": 0
+  },
+  "Hero Claim.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "Claim a hero from the pool",
+   "w": 1440,
+   "x": 0,
+   "y": 5680
+  },
+  "Main.dc.html": {
+   "h": 2478,
+   "title": "Wizard faction board — The Covenant",
+   "w": 1240,
+   "x": -1295,
+   "y": -2
+  },
+  "Map Selection.dc.html": {
+   "h": 1000,
+   "page": "grammar",
+   "title": "Selecting on the map — four states",
+   "w": 1440,
+   "x": 0,
+   "y": 1240
+  },
+  "Map Zoom.dc.html": {
+   "h": 1040,
+   "title": "Reading the board at three sizes",
+   "w": 1440,
+   "x": 37,
+   "y": 1911
+  },
+  "Move Battle.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "Move / Battle — from, to, who",
+   "w": 1440,
+   "x": 0,
+   "y": 4260
+  },
+  "Move Rally.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "Rally — bring in neighbours",
+   "w": 1440,
+   "x": 1520,
+   "y": 4260
+  },
+  "Move Retreat.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "Retreat — everyone, or nobody",
+   "w": 1440,
+   "x": 3040,
+   "y": 4260
+  },
+  "Place It.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "Placing — take it, then click a hex",
+   "w": 1440,
+   "x": 0,
+   "y": 7100
+  },
+  "Research Icons.dc.html": {
+   "h": 620,
+   "page": "icons",
+   "title": "Research — seven marks",
+   "w": 1440,
+   "x": 1520,
+   "y": 1700
+  },
+  "Resource Icons.dc.html": {
+   "h": 700,
+   "page": "icons",
+   "title": "Resources — five marks",
+   "w": 1440,
+   "x": 0,
+   "y": 4200
+  },
+  "Robot Board.dc.html": {
+   "h": 2556,
+   "title": "Robot faction board — The Unbolted",
+   "w": 1231,
+   "x": 1932,
+   "y": -2
+  },
+  "Robot Build.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "Build — a robot seat",
+   "w": 1440,
+   "x": 0,
+   "y": 8540
+  },
+  "Robot Payment.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "Pay with typed collectors",
+   "w": 1440,
+   "x": 1520,
+   "y": 8540
+  },
+  "Robot Unit Icons.dc.html": {
+   "h": 840,
+   "page": "icons",
+   "title": "Robot units — twelve marks",
+   "w": 1440,
+   "x": 1520,
+   "y": 760
+  },
+  "Setup Draft.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "Setup — draft your Leader",
+   "w": 1440,
+   "x": 1520,
+   "y": -1900
+  },
+  "Setup Start.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "Setup — choose where you start",
+   "w": 1440,
+   "x": 3040,
+   "y": -1900
+  },
+  "Setup Table.dc.html": {
+   "h": 1040,
+   "is_interactive": true,
+   "page": "choices",
+   "title": "Setup — seats and factions",
+   "w": 1440,
+   "x": 0,
+   "y": -1900
+  },
+  "Spell Icons.dc.html": {
+   "h": 900,
+   "page": "icons",
+   "title": "Spells — eleven marks",
+   "w": 1440,
+   "x": 1520,
+   "y": 2440
+  },
+  "Spy Assign.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "Choose your spy, in private",
+   "w": 1440,
+   "x": 1520,
+   "y": 5680
+  },
+  "Spy Reveal.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "Reveal the spy, or lose her",
+   "w": 1440,
+   "x": 3040,
+   "y": 7100
+  },
+  "Stacks.dc.html": {
+   "h": 1080,
+   "page": "grammar",
+   "title": "Crowded hexes — six tokens, thirty units",
+   "w": 1440,
+   "x": 0,
+   "y": 2360
+  },
+  "Table Six.dc.html": {
+   "h": 1060,
+   "title": "The table at six seats — 52 tiles",
+   "w": 1440,
+   "x": 170,
+   "y": 3500
+  },
+  "Table.dc.html": {
+   "h": 1060,
+   "is_interactive": true,
+   "title": "The table — board in context",
+   "w": 1440,
+   "x": 170,
+   "y": 622
+  },
+  "Token Grammar.dc.html": {
+   "h": 1120,
+   "page": "grammar",
+   "title": "Token grammar — the ten components",
+   "w": 1440,
+   "x": 0,
+   "y": 0
+  },
+  "Treaty Offer.dc.html": {
+   "h": 1040,
+   "is_interactive": true,
+   "page": "choices",
+   "title": "Offer a treaty",
+   "w": 1440,
+   "x": 1520,
+   "y": 2840
+  },
+  "Treaty Response.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "Answer an offer, out of turn",
+   "w": 1440,
+   "x": 3040,
+   "y": 2840
+  },
+  "Wizard Unit Icons.dc.html": {
+   "h": 640,
+   "page": "icons",
+   "title": "Wizard units — seven marks",
+   "w": 1440,
+   "x": 1520,
+   "y": 0
+  },
+  "Robot Infiltrator.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "Spy activation — the hero carries it",
+   "w": 1440,
+   "x": 0,
+   "y": 9980
+  },
+  "Access Request.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "Somebody wants your tile",
+   "w": 1440,
+   "x": 0,
+   "y": 11420
+  },
+  "Card Batch.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "Point the Counter",
+   "w": 1440,
+   "x": 0,
+   "y": 12860
+  },
+  "Shared Tactics.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "Two hands, one commit",
+   "w": 1440,
+   "x": 1520,
+   "y": 12860
+  },
+  "Treaty Break.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "The window to break one",
+   "w": 1440,
+   "x": 0,
+   "y": 14300
+  },
+  "Battle Extra.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "Extra — none, one or two",
+   "w": 1440,
+   "x": 3040,
+   "y": 14300
+  },
+  "Elara Spell.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "Five mana, one space",
+   "w": 1440,
+   "x": 0,
+   "y": 15740
+  },
+  "Smyth Reward.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "One free technology",
+   "w": 1440,
+   "x": 1520,
+   "y": 15740
+  },
+  "Overlay Choice.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "Two overlays, one tile",
+   "w": 1440,
+   "x": 3040,
+   "y": 15740
+  },
+  "Second Purchase.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "The second purchase",
+   "w": 1440,
+   "x": 0,
+   "y": 17180
+  },
+  "Core Reallocation.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "Move the Cores",
+   "w": 1440,
+   "x": 1520,
+   "y": 17180
+  },
+  "Reserved Hero.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "She has been waiting",
+   "w": 1440,
+   "x": 3040,
+   "y": 17180
+  },
+  "The End.dc.html": {
+   "h": 1040,
+   "page": "choices",
+   "title": "Eleven tiles, no building",
+   "w": 1440,
+   "x": 0,
+   "y": 18620
+  },
+  "Look Control.dc.html": {
+   "h": 1040,
+   "page": "look",
+   "title": "Control — why it reads flat",
+   "w": 1440,
+   "x": 0,
+   "y": 0
+  },
+  "Look Ink And Oil.dc.html": {
+   "h": 1040,
+   "page": "look",
+   "title": "A — Ink and Oil (revised)",
+   "w": 1440,
+   "x": 1520,
+   "y": 0
+  },
+  "Look Pressed.dc.html": {
+   "h": 1040,
+   "page": "look",
+   "title": "B — Pressed",
+   "w": 1440,
+   "x": 3040,
+   "y": 0
+  },
+  "Look Map.dc.html": {
+   "h": 1040,
+   "page": "look",
+   "title": "A — the shared board, two seats",
+   "w": 1440,
+   "x": 4560,
+   "y": 0
+  }
+ },
+ "createdOnFiles": {
+  "at": "2026-09-21T20:09:36Z",
+  "v": 1
+ },
+ "designSystems": [],
+ "launch": {
+  "view": "canvas"
+ },
+ "notes": {
+  "c0": {
+   "page": "choices",
+   "text": "Setup is three real choices, not a loading screen.\n\nThe faction decides which of the two faction boards you play for the rest of the game — mana and Surfs, or Cores and typed collectors. The Leader draft empties a shared pool of twenty that never refills, so taking Elara is also denying her. The starting sites go in reverse draft order, which is the game's only compensation for drafting late.\n\nNothing about these is auto-assigned, and no beginner setup is invented: the rulebook prints none, so the screens offer none.",
+   "w": 460,
+   "x": 4640,
+   "y": -1900
+  },
+  "c1": {
+   "page": "choices",
+   "text": "One rule shapes every screen on this page: a decision the printed rules give the player is never made for them.\n\nSo nothing here auto-resolves. The table stops for the collector payment, stops again for The Foundry's consent, stops for a secret card commitment, stops mid-attack for a defense the player will probably decline, and stops out of turn for a treaty offer. Those out-of-turn stops are the hard cases — it is another seat's turn, something is already declared, and the resolution is frozen until an answer comes back. If that handoff is not designed, the implementation will quietly resolve it with a default, and the game will be a slightly different game.\n\nEvery screen also carries the numbered list in the bench. It is the voice fallback, and it is also the honest test: if a choice cannot be said in one line, it is too tangled to tap.",
+   "w": 460,
+   "x": 4640,
+   "y": 0
+  },
+  "c10": {
+   "page": "choices",
+   "text": "The payment screen had four different circles on it and no way to tell them apart.\n\nTwo things were wrong, and both were grammar breaches rather than taste.\n\nThe floating Wa and Wo pills were a map token carrying TEXT. A thing on a hex is a faction-coloured shape with the unit's own mark inside it; the letters said which resource the tile was, which the tile's colour and its glyph already said twice. They are Surf tokens now — the same token as any Surf on the board, because that is what they are.\n\nThe dotted circles meant two opposite things. On the map, dashed said 'committed earlier this round'. In the tray, dashed said 'not filled in yet'. Dashed now means one thing everywhere, the same thing the placement board uses: NOT ON THE BOARD YET. Collectors already down went solid and gained their marks — a wizard's Surf is untyped so it carries the Surf mark, a robot's is typed so it carries that resource's collector mark, which is a rule you can now see on the map. The ring around a proposed Surf carries the consent state: green yours to confirm, orange waiting on the tile's owner.\n\nNine bare tokens off the defect list. 24 of 24 map tokens on this screen now carry a mark.",
+   "w": 460,
+   "x": 3680,
+   "y": 0
+  },
+  "c11": {
+   "page": "choices",
+   "text": "One collector to a tile.\n\nSeven boards were drawing two on one hex — The Foundry's pair on F6, The Unbolted's on D2, and on two boards a pair of your own. It was never a drawing choice; I had stacked them the way units stack, and collectors do not stack.\n\nThey are spread now, one to a hex, and the same four Surfs of yours sit on the same four tiles on every screen that shows round 12. Every collector on the canvas is a proper token: solid border, its own mark, 61 of them across eleven boards.\n\nThe rule has a consequence the payment screen was hiding. A tile in reach of a free Surf is still illegal if anything already collects there, yours included. C4 is water, one step away, and shut — so it now shows greyed and struck with the reason beside it, instead of being quietly left dark. That is the same treatment a tile shut by a treaty gets on the selection board, and it is the rule about illegal options being shown with their reason doing its job.",
+   "w": 460,
+   "x": 4260,
+   "y": 0
+  },
+  "c12": {
+   "page": "choices",
+   "text": "Collectors moved to the bottom of the hex.\n\nA collector now docks over the resource glyph instead of standing in the middle with the units. Sixty-two of them across eight boards. The middle of a hex is now the army's, which is what it is actually for — a stack of four with a collector in it used to wrap onto two rows and lose the plot.\n\nOne thing this costs, and it is worth knowing rather than discovering. The glyph at the bottom was the colour-blind redundancy for the tile's resource, and a collector now hides it. On a robot's tile nothing is lost, because a robot's collector is typed and its mark names the resource. On a wizard's tile the Surf mark says Surf, so the resource there is carried by the tile colour and the label alone. If that turns out to matter, the answer is the glyph moving to the bottom-left rather than the dock coming back.",
+   "w": 460,
+   "x": 4880,
+   "y": 0
+  },
+  "c13": {
+   "page": "choices",
+   "text": "Research was the missing third action card, and it made one decision for you.\n\nThe card buys either a technology or a battle strategy card, and the second one had no shape. I made it a DRAW, not a pick, and that is the part to argue with.\n\nThe reason is the commit screen. Battle cards are played face down and revealed together; the whole tension there is not knowing which of twenty is in somebody's hand. If you could choose your card at the Research action, every table would converge on the same two or three, and the secret commitment would stop being a bluff and start being an accounting step. A draw keeps the deck of twenty worth twenty. The cost of that is the opposite complaint: a Research action can hand you a card you cannot use, and that is a real loss of agency for a player who spent their card on it.\n\nThe draw resolves when the player presses the button and never before, which is the rule this project already has about randomness for digital seats.\n\nTwo things I did not settle. Whether a researched technology counts toward the twenty-two unique types a technology win needs — the counter on screen reads 14, which is the Build screen's arithmetic and says nothing about research either way; tell me and it is a one-line change. And the rate: a robot reaches battle cards through the Defense Research Station rather than an Embassy, which is a different building at a different point in their tree, so the two species do not get there at the same time.",
+   "w": 460,
+   "x": 3040,
+   "y": 7100
+  },
+  "c14": {
+   "page": "choices",
+   "text": "Revealing the spy, which is the part of the spy that had no screen.\n\nAssigning it existed, reading somebody else's existed, and the faction board names the carrier. Spending it did not. The moment is round 15: The Foundry's Spinner does 2, Captain Rook Malvane adds 2 to every other Foundry unit, and 4 against Elara's defence of 4 is a hit. No Cleric of yours is in that battle, so the Decoy is the only answer there is.\n\nThree things worth arguing with.\n\nIt is a two-part choice, and the second part is the map — the same pattern as claiming a hero. Revealing does not teleport her; it lights four hexes and she steps to one. So the screen shows where she could go BEFORE you commit, which is what makes 'nothing is spent until you press it' true rather than a slogan.\n\nThe rule people will trip over is drawn, not written: she may not step back into the hex the attack came from. E6 is struck through in red with that reason beside it, and E5 is struck too because a Foundry Spitter is standing on it. Two illegal-looking tiles, both saying why.\n\nAnd the cost of revealing is not the spy, it is the Build action. Another assignment means another Illusionist at two wood and one ore, which is a whole action gone. That is the number that should make this hard, so it is the first line in the panel rather than a footnote.\n\nInvisible is on the same screen as the other way to spend the same assignment, marked not researched. One spy, two triggers, one use.",
+   "w": 460,
+   "x": 4560,
+   "y": 7100
+  },
+  "c15": {
+   "page": "choices",
+   "text": "Detection is not a screen. The board is deleted.\n\nTwo corrections, and the second one removes the first one's subject. The readable cards are the ones belonging to seats IN THIS BATTLE with the detector — not the table at large, which is what the board I built was showing. And once that is true, the wizard side stops being a decision at all: it is free, it tells nobody, and it cannot be declined into anything better. A screen that asks you to press a button with no cost and no alternative is a screen that should have been a line of state.\n\nSo it splits by species, and neither half is its own screen.\n\nA WIZARD just sees it. With an Enchantress in the battle and Detection researched, an opposing carrier in that battle reads face up in your view, once a battle, and the owner is never told. It lives in the battle view; on the activation board it is a rail panel, currently in its empty state because no Foundry hero is in the round-12 fight at North Oil and your Enchantress is not either. She rallies into that battle in round 14 — if you want the live state drawn, the activation board has to move to that pass, and I did not move it because the battle log on it is round 12's.\n\nA ROBOT gets a choice, because looking spends the assignment. That belongs in the Infiltrator's own activation, one row in the action list beside attack and pass, priced SPENDS THE SPY. There is no robot activation screen yet, so this is a spec rather than a drawing, and it should be built with the robot seat.\n\nWhat is worth keeping from the deleted board: a face-down card by a seat's name is public, and only the name on it is hidden. That rule is now on both faction boards and in the activation panel, which is where a player meets it.",
+   "w": 460,
+   "x": 3680,
+   "y": 5680
+  },
+  "c16": {
+   "page": "choices",
+   "text": "The first two screens drawn from a robot seat, and the chrome survived it.\n\nHeader, map, catalogue, rail, voice list: all of it carried over unchanged. What changed is the economy underneath, and it changed more than I expected.\n\nREACH IS TWO NUMBERS. A wizard's Surf takes whatever the tile gives, so 'what you can reach' is a count of tiles. A robot's collector takes its own resource and nothing else, so it is a count of tiles AND a count of free collectors of that type, and what you actually have is the smaller one. The Unbolted have an Oil collector sitting free with no oil tile in reach: one free piece, zero usable. The panel is a table now, and it is the single biggest difference between the two species' Build screens.\n\nTHE CORE IS A DECISION A WIZARD NEVER MAKES. Every platform needs one. A spare Core pays 1 culture a round doing nothing, so fitting one is not free — income goes 8 to 7 — and the alternative is buying a new Core for a water, which spends a collector you were going to place anyway. Both options are on the purchase, with the cost of each stated.\n\nPAYING IS TYPED, SO THE LIT SET MOVES. A wizard drops four identical Surfs and the same tiles light every time. Here the Wood collector lights two wood tiles and nothing else; the Ore collector will light two ore tiles, which carry a dashed rim now so you can see the next step without being able to click it.\n\nWhat this leaves: the Infiltrator's activation, which is where Detection lives for a robot. That is the last piece of the spy system and it now has a seat to belong to.",
+   "w": 460,
+   "x": 3040,
+   "y": 8540
+  },
+  "c2": {
+   "page": "choices",
+   "text": "Illegal options are shown with their reason, never hidden.\n\nA greyed row that says 'needs two ore, and a Surf already sits on the other ore tile' teaches the economy. An option that silently vanishes teaches nothing and reads as a bug. The same goes for the Wall Platform on the battle screens: it keeps appearing as the only legal target, with the reason attached, until it falls.\n\nThe nine screens are one continuous game state, so the numbers line up across them. Four Surfs are free on the Build screen and four go down on the payment screen; the Foundry's Peace offer arrives before the Move/Battle that becomes the battle, and declining it is what puts you on the oil tile; the +1 defense card committed in the battle is already counted in the defense screen's arithmetic; and the mana runs 13 before the shields, 11 at the Evoker's activation, 8 after Ice Blast.\n\nOne thing the screens do not settle: the hex map is still the schematic from the faction-boards page. Real terrain art will change how much room the panels have.",
+   "w": 460,
+   "x": 4640,
+   "y": 720
+  },
+  "c3": {
+   "page": "choices",
+   "text": "Diplomacy is the intended winning path, and it was the surface nobody had designed.\n\nThe rules give the engine the formal acts — propose, accept, decline, break — and put the persuasion out of band. At a physical table the band is the room. Here there is no room: seats may be a day apart, and an AI seat cannot be talked round at all. So these screens supply the band, and keep it strictly beside the game. Table talk rides along with an offer, is shown with it, and changes nothing. Only the tokens bind, and the log records only the formal acts.\n\nThe offer sheet answers the question the rules text cannot: what does this treaty do to MY board. Open Borders or Shared Resources would light every tile you could newly collect from; Peace greys out every tile you could no longer enter; a Culture Treaty changes nothing on the map at all, which is worth showing rather than saying.\n\nThere is no counter-offer, because the rules do not allow one: an offer can only be made at the start or end of the offering player's own action. Declining costs a window, and the response screen says when your next one is. That is a real dramatic beat, so it is drawn rather than smoothed away.",
+   "w": 460,
+   "x": 4640,
+   "y": 1440
+  },
+  "c4": {
+   "page": "choices",
+   "text": "What the ring is for.\n\nTreaty income is the only source in the game that pays two players at once, so the table's relationships are the scoreboard behind the scoreboard. A list of your own treaties will not show you that the leader is being fed by someone else.\n\nThe state drawn here is deliberate: The Ledger's Leader is dead, so they can never win — and they hold three of the four standing treaties, earning more treaty income than anyone. Nobody can take it off them by force, because killing a player who is already out of the running costs an army and wins nothing. Section 12.6 says a dead-Leader player keeps everything and may help a partner win. This is what that looks like on screen, and it is the strongest argument the design has for the game's own thesis.",
+   "w": 460,
+   "x": 4640,
+   "y": 2160
+  },
+  "c5": {
+   "page": "choices",
+   "text": "Three shapes of the same move, and they are not interchangeable.\n\nA Move takes any number of units from ONE tile to ONE neighbour, so the screen reads from, to, who — with the unit list as the last step, because leaving the Cleric behind is a real decision.\n\nA Rally draws from EVERY neighbouring tile at once, which is why it gets its own layout grouped by source rather than a single origin. Its hidden cost is drawn on the screen: survivors of a stalemate return to the attack's origin hex, not to the tiles they came from.\n\nA Retreat is all-or-nothing — every mobile unit of yours, to one destination, with collectors and Immobile Combat Platforms left where they stand. The hex the attack came from is shut, and it is shown shut with its reason rather than quietly missing from the list.",
+   "w": 460,
+   "x": 4640,
+   "y": 4260
+  },
+  "c6": {
+   "page": "choices",
+   "text": "Two screens about scarcity and secrecy.\n\nThe hero claim is the culture clock made visible: twenty heroes for the whole table, six left, one dead and never coming back, and one of the six closed to you by species. The Ledger's row is the teaching case — no base, so they choose and reserve, and get nothing from the hero until they rebuild.\n\nThe spy screen is the engine's open question 1 drawn as a picture. It is set on a dark ground on purpose: this is the one screen whose content must never reach another seat, a log, a state summary or a legal-move label. In Universe each seat is its own browser, which solves it by construction — and the screen says plainly that on one shared laptop it is not solved at all.",
+   "w": 460,
+   "x": 4640,
+   "y": 4980
+  },
+  "c7": {
+   "page": "choices",
+   "text": "Tiles are named by column and row, not by the transcription coordinates.\n\nSection 13.2's (c, r) pairs are a developer convention for diffing tile data: negative columns, rows that skip every other number, and no relation between the label and where the tile is. They are gone from every screen.\n\nIn their place: fixed column letters and row numbers, read from the margins of the map. The letters run A to I across the widest layout and never move, so a tile keeps its name at any player count — which matters, because the twelve centre tiles are identical on all three maps. Rows are r/2+1 in even columns and (r+1)/2 in odd ones.\n\nTwo things the old labels hid come free. The four starting sites on this map are C2, C7, G2 and G7 — the four corners, symmetric at a glance. And adjacency becomes readable: E4's neighbours are E3, E5, D3, D4, F3 and F4. Same column either side, plus the two columns beside it at n and n-1.\n\nThe twelve centre tiles also have names, because they are what people say out loud: North Oil and South Oil, the West and East Cauldrons, and the eight of the Ore Ring. Cauldron and ore ring are the design document's own words, from the printed art key and from Ida Marrs's lore row, so nothing new enters the fiction.\n\nThis belongs in the ENGINE, not here. The port plan already makes coordinate labels an engine deliverable (row 100) and its resolvers already accept several spellings. The underlying (c, r) does not change; only the display name does. If Universe invents its own labels, the log, the voice readback and the tiles will drift apart.",
+   "w": 460,
+   "x": 4640,
+   "y": 5700
+  },
+  "c8": {
+   "page": "choices",
+   "text": "Detection is the first choice on this page that must not be a pending.\n\nEvery other stop here freezes the table until an answer comes back, and that is correct: the other seats are meant to know a decision is being made. Detection is the opposite. A wizard's read costs nothing and tells nobody, so a stop that halted the battle would announce the very thing the power is for. The first time it fired the table would learn who holds it, and from then on they would read the pause instead of the card.\n\nSo it is a button on your own battle screen, live for the whole fight, and pressing it advances nothing. The engine writes the result to one private view and to no shared log. That is a harder thing to build than a pending, and it is the reason this screen exists.\n\nThe observations beside each hero are things the player has already watched happen in the open. They are deliberately not ranked by likelihood: reading a tell is the player's job, and a screen that sorted the list would be making the choice.\n\nTwo things the rules still have to settle: whether a read is once per battle or once per hero, and whether a robot Infiltrator's read — which spends the spy — is silent too, or whether spending it is something the table sees. The screen assumes once per battle, and silent for both.",
+   "w": 460,
+   "x": 4640,
+   "y": 6420
+  },
+  "c9": {
+   "page": "choices",
+   "text": "What a screen is allowed to say.\n\nThree sources, and nothing else: the state the client already holds (counts, coordinates, what is on a tile, 11 mana becoming 8), the text printed on the card or in the rules (a Wall Platform has to be the target of every single-target attack), and the reason an option is illegal, which arrives from the engine with the legal moves.\n\nWhat came off these screens is everything outside those three. Strategy advice the client cannot compute — 'little gained', 'the obvious guess, which is the argument against it', 'Greymore would instead put you at 17 of 22'. And design commentary, which was me talking to you through the mock: 'that is the game working as designed', 'nothing here is auto-resolved', and the caption under every voice list explaining what a voice list is for. Eighteen lines deleted, thirteen trimmed, across the whole page. The arguments are not lost; they are in these notes, which is where they were always addressed.\n\nThe test to apply to a new line: name the field it comes from, or the card it is printed on. If neither, it does not go on the screen.",
+   "w": 460,
+   "x": 1640,
+   "y": 7100
+  },
+  "g1": {
+   "page": "grammar",
+   "text": "Why this page exists.\n\nThe icons went in screen by screen, and screen by screen is how you get five hundred one-off shapes. The fix is not more icons. It is naming the components, so an engineer builds ten things and every screen is an arrangement of them.\n\nThe grammar is four channels that never do each other's job. COLOUR is whose. The MARK is what. TEXT is which one. The BORDER is the state. Every inconsistency on this canvas was one channel doing another's job — a letter standing in for a mark, a mark repeated beside the token that already had it, a quantity dressed up as an identity.\n\nThe two exceptions are named rather than hidden. A hero token carries initials because a hero is an individual: there are twenty of them and what you need is WHICH, not what. A diagram node carries nothing because its name is already beside it. Those are 92 of the shapes on this canvas and they are correct as drawn.\n\nMeasured, not estimated: the audit runs every artboard's render in a plain JS harness, walks the values, and classifies every faction-coloured shape by size and role.",
+   "w": 470,
+   "x": 1520,
+   "y": 0
+  },
+  "g2": {
+   "page": "grammar",
+   "text": "The 36 that are still wrong — the build list.\n\nLETTER WITH NO MARK (8). The Ledger's 'Q' token on Move / Battle, which is the only Q anywhere and is either a unit the letter table does not cover or a typo. Archmage Chaimidious in three ladders and a victim list — he is a hero, so under the grammar he should be a HERO token with initials, not a roster token with a letter.\n\nBARE TOKENS (28). The building and base slots on both faction boards, and the culture lane markers. The slots are the real work: eleven buildings and the bases have no marks drawn yet, which is the same gap the Build screen has. The lane markers are arguably quantities and may belong under 'supply pip' rather than needing a mark — that is a grammar decision, not a drawing one.\n\nMARK ON A QUANTITY (8). Count pills on Table, Treaty Offer and Detection that inherited a mark from the object they were built beside. Small and mechanical.\n\nNone of these is a judgement call about how something should look. They are three named defects with a count each, and the audit re-runs in seconds, so the number goes down as they are fixed rather than drifting.",
+   "w": 470,
+   "x": 1520,
+   "y": 640
+  },
+  "g3": {
+   "page": "grammar",
+   "text": "Greying the map is right, and it collides with a rule already on this canvas: illegal options are shown with their reason, never hidden.\n\nSo grey has to mean NOT PART OF THIS CHOICE, never GONE. A greyed hex keeps its label, its resource glyph and every piece standing on it. What it loses is hue and its rim. Nothing else.\n\nThree decisions worth arguing with.\n\nGrey is a FILTER, not a colour: grayscale with a brightness lift, applied to the tile's own fill. Nothing has to be respecified per terrain, a colour-blind player loses nothing they had — the glyph and label are untouched — and it reverses the instant the step changes.\n\nPieces do NOT take the filter. Where every army stands is the thing you are deciding against, so a greyed tile still shows whose units are on it at full strength. Dimming them would grey out the reason for the choice. You can count the stack on G6 without leaving the step.\n\nA SHUT tile is not a grey tile. Grey is 'not part of this question'. Shut is 'you would reasonably expect to take this and cannot' — E5 here, closed by a Peace treaty. It is greyed AND struck through in danger red, and it owes a reason on hover. Collapsing shut into grey is exactly how a rule becomes invisible, which is the failure the original note warns about.\n\nThe fourth state is the origin: full colour, INK rim rather than the cream one. Where you are must not look like somewhere you can go, so it gets a different rim, not a dimmer one. A cream rim is the only thing in the whole system that means 'take me'.",
+   "w": 470,
+   "x": 1520,
+   "y": 1240
+  },
+  "g4": {
+   "page": "grammar",
+   "text": "The stack problem, and why the answer is a refusal.\n\nThe supply allows five each of five wizard unit types and five each of six robot ones. So one hex can legally hold twenty-five or thirty units of one faction, and a contested hex holds two of those. A hex at 1x fits six tokens once the label and the collector have their bands. There is no drawing technique that closes a gap that size.\n\nEvery clever option I tried is a way of pretending otherwise. Shrinking tokens kills the marks. Fanning them hides the marks it is trying to save and invents an order the rules do not have. Showing three and a +9 picks three units arbitrarily and looks like it is telling you the tile.\n\nSo past six the hex stops answering WHAT and answers HOW MANY: one chip per faction, carrying the total, with no mark on it because it is a quantity. Leaders and heroes never merge into it, because they are named things that decide a win. A contested hex gets one chip a side and the battle panel keeps the composition, which is where a player already looks during a fight.\n\nTwo things worth arguing with. The threshold of six is measured, not chosen, so it moves with the zoom: one at 0.5x, six at 1x, twelve at 2x, which means leaning in is the way to see a stack of nine rather than a menu. And the chip is a new component for the grammar sheet, the eleventh: a quantity on the map, the same family as the count chip and the supply pip.",
+   "w": 460,
+   "x": 1640,
+   "y": 2360
+  },
+  "i1": {
+   "page": "icons",
+   "text": "A draft, and drawn as code on purpose.\n\nEvery mark here is an inline SVG on a 24 px grid at 1.8 px stroke, which means it inherits the theme, takes the faction colour from its token, and costs nothing to ship. No image files, no icon font, nothing to keep in sync with a design tool. If an icon survives as code it survives everywhere the interface puts it.\n\nThe test that decided every shape was the 26 px token, not the 42 px sheet. Several first attempts read beautifully large and turned to mush on the map — a tree for the wood collector, a dragon's head, a filled crucible. What replaced them keeps two or three strokes of difference at token size and accepts being plainer up close.\n\nThree family decisions are worth arguing with. The five robot collectors share one bracket frame and differ only by the glyph inside; on the map they drop the frame entirely, because the tile colour has already said which resource is underneath. The Illusionist and the Infiltrator share a silhouette across species, so learning one teaches the other. And three of the research marks quote a unit rather than inventing a shape — Mana Shield is the Cleric's shield gone dashed, Dehance is the Enchantress upside down, Invisible borrows the spy's dashes.\n\nThe two wizard factions that were placeholders are drawn now, from the names on the setup screen. The Schism is the Covenant's wand snapped in two, which is what they are. The Brass Circle is a toothed ring with a spark inside it — the only mark that carries both species at once, which is exactly their position.",
+   "w": 460,
+   "x": 0,
+   "y": 980
+  },
+  "i2": {
+   "page": "icons",
+   "text": "Where these are meant to land.\n\nMap tokens at 26 px, the unit rows on both faction boards, the cost lines on the Build screen, the activation list in a battle, and the numbered voice list — which is the one place an icon is no help at all, so every mark here has a name that works spoken.\n\nResearch is the exception: it never stands on the map, so those marks need no token version. What they need instead is a state, and they borrow the three rings the technology track already uses — filled for acquired, hollow for available, dashed for gated behind a building.\n\nWhat is not drawn yet: the seven wizard buildings and the four robot ones, the five action cards, and the five treaty types. Buildings are the obvious next set, because both faction boards have slots that currently read as text alone.",
+   "w": 460,
+   "x": 0,
+   "y": 1560
+  },
+  "i3": {
+   "page": "icons",
+   "text": "One rule arrived while drawing the spells, and it sent me back to fix a mark.\n\nA mark with a BODY is a unit. The effect on its own is the spell. So the Enchantress keeps her circle and her rising chevrons, Enhance is those chevrons with no body, and Dehance is the same chevrons falling. The Dehance card on the research sheet was carrying a body it should not have had, and it is redrawn.\n\nThe bigger decision underneath: a spell and the research that unlocks it are ONE mark, not two. Ice Blast on the Research action, on the technology track, in the casting list during a battle and in the log afterwards is one drawing in all four places. Five of the ten spells are never bought at all — Wizard Missile, Enhance, the Cleric's save, Decoy and Invisible arrive with a unit or a spy — so they live on the spell sheet and nowhere on the research one. That is the only thing the two sheets disagree about, and it is a real difference in the rules rather than a drawing choice.\n\nTwo things still need names. The Cleric's five-mana save has none in the design document, and neither does Archmage Elara's spell — 5 mana, 4 damage to an adjacent space, and not a battle, so nothing on the far side can answer it. Her mark is two hexes with a bolt across the seam, the only hexagon in the whole set, because hers is the only thing a wizard casts that crosses a tile boundary. Neither can appear in a log line or a numbered voice list until it has a name, and both have to say something out loud.",
+   "w": 460,
+   "x": 0,
+   "y": 2200
+  },
+  "i4": {
+   "page": "icons",
+   "text": "Actions: four cards, twelve choices, and the difference is drawn.\n\nOnly Build, Move / Battle and Research are cards. Pass is not a card at all, but it occupies the same place in the hand and costs the same round, so it is drawn as one. The other twelve — Move, Rally, Retreat, Attack, Activate, Commit, Defend, Reveal, Offer, Accept, Decline, Break — are choices a card opens once it is already resolving. Cards get a heavy ink tile, choices a plain one. That one difference is the whole grammar.\n\nEvery one of the twelve already has a screen on the Player choices page and a line in the log, which is the test for whether a thing deserves a mark at all: if the interface has to name it, it needs one.\n\nHero cards add nothing new. Marshal Ashlock, Quartermaster Hollis and Archivist Dray each grant a fourth card, but it is a second copy of one of the three — same mark, with the hero's star in the corner.\n\nWhat is still undrawn: the seven wizard buildings and the four robot ones, the five treaty types, and the twenty battle strategy cards. Buildings are next, because both faction boards have slots that read as text alone.",
+   "w": 460,
+   "x": 0,
+   "y": 2820
+  },
+  "i5": {
+   "page": "icons",
+   "text": "The icons are a shared file, and the wiring is now checked by running it.\n\nproject/icons.js holds all 63 marks as plain SVG path data. A hole in an artboard is a dotted lookup and cannot carry markup, so what travels into a repeating row is the PATH DATA: each row renders four solid slots and one dashed slot, and the registry fills them. Circles and rects are written as paths on purpose, so one shape type covers everything and the markup never has to branch.\n\nTwo rules keep it from breaking. The registry helper is declared at the top of renderVals, before anything uses it — the first pass declared it halfway down and the Build screen threw, because a const used above its declaration is a dead board, not a missing icon. And a name with no mark collapses its tile to nothing rather than leaving an empty box.\n\nThe wiring is verified by executing every artboard's renderVals in a plain JS harness and checking that every hole a row uses is a key that row actually carries. That check is what caught two injections landing in the wrong function: a Build-screen filter pill and a payment-screen seat row both happened to return {name:name,} first, so a text search put the icon there instead of on the item and the resource tray.\n\nWired now: 19 boards, 81 icon slots, 56 of them drawing a mark. The other 25 are names the registry has no mark for yet — buildings, bases and most heroes — and they show as nothing rather than as a blank square.",
+   "w": 460,
+   "x": 0,
+   "y": 3440
+  },
+  "i6": {
+   "page": "icons",
+   "text": "The resources were already drawn. They were inside the collectors.\n\nThe rule that makes them a set is the one the spells follow: the glyph ALONE is the resource, the same glyph INSIDE the bracket frame is the collector that takes it. Lifting the frame off gave five marks with no new shapes to learn — a drop, a two-leaf sprig, a cut lump, a derrick and a four-point star.\n\nWhere it pays off is the cost line. A cost used to read 'Wo×2 Or×1': two abbreviations a player has to translate before they can compare anything. It now reads as two pictures and two numbers in the same coloured pill, so scanning nine buildable things for the one you can afford is looking rather than reading. A cost of one drops the number entirely, because the glyph already says one. Wired into both faction boards and the Build screen.\n\nTwo palettes, on purpose: the map tint is the tile you stand on, the pill tint is the same resource darkened so white numerals hold at 10 px.\n\nThe one compromise is oil. A derrick is an extraction shape standing in for the substance, and it is there because water and oil are the pair the eye confuses first — two drops do not survive beside each other at 11 px, and colour cannot carry it when the pills are already colour-coded and a colour-blind player would be left with nothing.",
+   "w": 460,
+   "x": 1520,
+   "y": 4200
+  },
+  "i7": {
+   "page": "icons",
+   "text": "The maps carry the resource glyph now, and where it sits was the whole decision.\n\nA hex has three things competing for it: the tile label, the tokens standing on it, and the terrain. The label took the top when the coordinates were redone. Tokens stack in the middle. So the glyph went to the BOTTOM, at half opacity — it is a confirmation of what the colour already said, not something competing with the pieces on top of it.\n\nThat half opacity is the point. Colour stays the primary channel because it reads fastest across a whole map; the glyph is there so the map does not depend on colour alone. A player who cannot tell the ore grey from the wood green now has a second channel on every one of the 52 tiles, and it costs three strokes.\n\nLit tiles needed their own copy. A legal-move hex is drawn as a second hexagon OVER the tile, so on the rally and retreat screens it was hiding the glyph underneath — those builders now carry their own.\n\nThe terrain key on both tables got the same treatment: the swatch is a small hex with the glyph inside it, so the legend is literally a picture of a tile rather than a colour sample beside a word.\n\nTen boards, 405 glyphs. Map Zoom is the one map left out: its three zoom steps draw tiles at three different sizes and the glyph needs a size rule per step, which is a decision about step 1 rather than a copy of this one.",
+   "w": 460,
+   "x": 1520,
+   "y": 4940
+  },
+  "i8": {
+   "page": "icons",
+   "text": "Map tokens are unit marks now, not letters. 116 of the 119 on the canvas.\n\nThe lookup had to go through the species, not the letter. Letters are faction-coded: the same S is a Spinner on a robot token and would be a Surf on a wizard one, so a flat letter table would have drawn the wrong unit and looked right while doing it. A token asks the registry for 'Spinner Platform', never for 'S'.\n\nThe letter is still there as the fallback. Anything the registry has no mark for keeps its letter rather than showing an empty circle, which is the same rule the tiles follow. Three tokens still use it: two are the tick on a picked rally unit, which is correct. The third is a 'Q' on The Ledger's base on the Move / Battle screen, and it is the only 'Q' anywhere — every other screen gives that seat an H and an L. Either it means a unit the letter table does not cover, or it is a typo that nothing surfaced until now.\n\nWorth arguing about: at 22 px a letter is unambiguous and a mark is not. A base, a Leader and a Wall read instantly as marks and are better for it. An Evoker against a Cleric against an Enchantress is three small stroke drawings at 12 px inside a 22 px circle, stacked two or three to a hex, and a letter may simply win there. The zoom board's step 3 is where this gets decided: if a hex opens to show its units at a readable size, the token can be a mark everywhere and the crowding problem is what the zoom is for. If it does not, the honest answer is marks for the pieces that carry the victory conditions and letters for ordinary units.",
+   "w": 460,
+   "x": 1520,
+   "y": 5620
+  },
+  "n1": {
+   "text": "What StarCraft lends, and what it does not.\n\nBorrowed: the faction sheet as the one place a player reads costs, unlocks and their own progress, so nobody hunts through a rulebook mid-turn. Every building has a printed slot with its cost and what it unlocks, so an empty slot is a legible want. Unit costs and stats sit in a fixed row that never moves.\n\nNot borrowed: the look. This is Zekel's warm-but-flat palette and type from the design brief — Bricolage display, Plex Sans body, Plex Mono for every number, the same tokens as the Primitives sheet. No metal, no rivets, no dark chrome.\n\nIn primitive terms the whole board is one Tableau with Tracks, Pools and a Card zone nested in it. It adds no new part.",
+   "w": 440,
+   "x": 3263,
+   "y": -2
+  },
+  "n2": {
+   "text": "The three tracks you asked for.\n\nMana Reserve (wizards only) reads as five blocks of five: the base 5 always on, then Reserve I to IV, each block dark until its building is bought. Current mana fills from the left in the faction color, the space between current and maximum is a lighter fill, and anything past maximum stays dashed and empty. One picture answers both 'how much do I have' and 'what would another Reserve buy me'.\n\nTechnology is split into unit, building and research groups rather than one 22-space line, because the question a player actually has is which group they are short in. The two hero bonus points sit off the track in a dashed star, since they can be taken back.\n\nCulture is the shared race, so it lives beside the map, one lane per seat, with hero-claim flags at 5, 15, 30, 50 and 75. The faction board carries only your own number and what you earn a round.\n\nThe robot board has no mana, so the Core bay takes that slot: unpurchased, spare and fitted as three separate pools, because the rules keep them separate and a destroyed Core goes back to unpurchased, not to spare.",
+   "w": 440,
+   "x": 3263,
+   "y": 618
+  },
+  "n3": {
+   "text": "Read as a draft, not as final data.\n\nThe costs, stats, caps, unlocks and hero effects are transcribed from the consolidated design document and should be correct. The game state shown — 38 culture, three Mana Reserves, who holds which treaty, the log entries — is invented to exercise every state the parts have: built and empty, free and committed, alive and dead, claimed and unclaimed.\n\nThe hex map on the table artboard is the real three-to-four player layout from section 13.4, all 34 tiles, with the four numbered starts in place. It is drawn to prove the map fits beside a 400 px bench, not to settle hex art.\n\nThe Covenant is drawn in white on purpose: it is the hardest faction color to hold on a light table. Every faction token carries the same dark ring so white and yellow keep their edge and the six still read as one set.",
+   "w": 440,
+   "x": 3263,
+   "y": 1298
+  },
+  "n4": {
+   "text": "Why three fixed steps and not free zoom.\n\nA hex can hold a whole army and an Open Borders ally's besides — six units on one tile is an ordinary battle in this game, not an edge case — so a single drawing cannot answer both 'who is winning the map' and 'what exactly is standing on E4'. Free zoom would answer neither well, and would make every screenshot, every lesson and every voice description a different picture.\n\nSo: three stops, each one honest about what it drops. Bases and heroes survive all the way down to step 1, because they are what the victory conditions are made of. Ordinary units collapse to a per-faction count at step 2 and disappear entirely at step 1. Committed collectors keep a dashed pip at every step, because 'this tile is already spent this round' is a planning fact, not a detail.\n\nThe rule that keeps it safe: zoom is a view, never a rule. The same moves are legal at every step, lit tiles stay lit, and the numbered list in the bench is identical at all three — so a voice player is at no step at all. The one thing the engine owes this design is that a move animating off screen brings the view with it.",
+   "w": 440,
+   "x": 1539,
+   "y": 2070
+  },
+  "n5": {
+   "text": "What the wide map breaks, and what it does not.\n\nThe five-to-six player map is 52 tiles across nine columns, A to I. It is 728 px wide against 416 for the three-to-four map — the middle five columns are that map unchanged, tile for tile, which is why the column letters are pinned. E4 is E4 on every layout.\n\nThe board pane is about 990 px wide, so the extra 312 px goes straight into the space the floating panels were using. Two things had to move, and both are better for it.\n\nThe action stack merged into the seats list. On six seats, 'who is playing next' and 'who is who' are the same question, and two separate lists asked the reader to match colours across the screen. One list, ordered by stack position, with a seat that has passed greyed at the bottom. It also saves the ~245 px the stack card was costing a bench that now has six culture lanes in it.\n\nThe legal-move caption docked under the map as a bar, and took the terrain key with it as five counts. Floating it bottom-right would have put it over column I.\n\nSix culture lanes at 20 px is the floor, and the rules cap the table at six, so the bench is proven at its worst case.\n\nAll six factions are named and coloured from the setup screen: The Covenant, The Schism and The Brass Circle for the wizards, The Ledger, The Foundry and The Unbolted for the robots. The two that needed checking hardest are the Schism's red and the Brass Circle's blue, because wood green and water blue are already on the map underneath them; both hold with the dark ring every token carries.\n\nOne thing still open: at 104 px a hex still reads, so six seats do not force zoom step 1 by default. That stays a player's choice, as the zoom board says.",
+   "w": 440,
+   "x": 1700,
+   "y": 3500
+  },
+  "n6": {
+   "page": "boards",
+   "text": "Three things on the faction boards.\n\nBATTLE STRATEGY CARDS had no home on either board — the robot board priced one in its Research section and then had nowhere to put it once drawn. Both boards now carry the hand: backs and a count, never a name, because they are held face down and the table is not supposed to know how many you hold either. The Covenant holds two with fourteen left in the shared deck; The Unbolted hold none, and the slot says why — a robot reaches the deck through the Defense Research Station rather than an Embassy, and theirs is not built.\n\nTHE ELEVEN BUILDINGS finally have marks, which closes the last bare row on the defect list. Three families do the work. The wizard Libraries share one roof and differ only by the school inside it — a flame for Evocation, the Enchantress's rising chevron for Enchantment, the spy's dashed circle for Illusion. The two robot Research Stations share a masted block and differ by what they open. And the two buildings that pay culture are both tiers of seating, curved for the wizards and stepped for the robots, so the pair reads as one idea twice. Resource legends, treaty tokens, action cards and three hard-coded cost chips all carry their marks now too.\n\nBUILDINGS AND HEROES were cards and are rows. A building slot ran 116px tall to say four things that fit on one line; a hero slot ran 104px, and most of that was restating what the hero does, which belongs on the pool screen where you are choosing one. What a slot owes you here is who is in it and when it was earned.\n\nOne thing I could not check from here: the artboard frames are still at their old heights. If there is blank space at the bottom of either board now, the frame wants dragging up — say how much and I will set it.",
+   "w": 460,
+   "x": 3400,
+   "y": -2
+  },
+  "n7": {
+   "page": "boards",
+   "text": "One board, two renditions.\n\nI had the privacy backwards. Showing you card backs on your OWN board protects you from nobody and costs you the one thing the panel is for: knowing what you are holding before a battle starts.\n\nThe rule is that the faction board is a per-seat view. Rendered for its owner, held cards sit face up with their text — The Covenant's two read +1 defense to all your units and pull all your mobile units out. Rendered for any other seat, the same panel resolves to backs and a count and nothing else: not the names, not the types, and the count only because the number of cards is already public from the draws.\n\nThat is the same model the spy assignment uses — a seat has its own credential and its own view, and secrets are withheld at the seat, never by drawing them differently for everybody. The wizard board shows both renditions, the owner's full size and the other seat's as a small inset, so an engineer can see they are the same panel.\n\nThe robot panel was buried inside the action-cards block and nobody could find it. It is its own panel in the supply column now, drawn as two empty slots with a dashed border, because a place where nothing has arrived yet still has to be visible. It says why it is empty: a robot reaches the deck through the Defense Research Station, not an Embassy, and The Unbolted have not built one.",
+   "w": 460,
+   "x": 3400,
+   "y": 700
+  },
+  "n8": {
+   "page": "boards",
+   "text": "The spy, on your own board.\n\nTwo secrets now live on a faction board and they behave the same way: the battle cards in hand, and which hero is carrying the spy. Both are face up to the seat that owns the board and absent — not masked, absent — for anybody else opening the same view. Buying the Illusionist or the Infiltrator was public; who carries the assignment is not, so another seat sees six heroes and no marker at all rather than a blanked-out one, which would tell them a carrier exists.\n\nIt shows in two places at once, on purpose. The carrier's own slot takes a small mark and an orange border, so you can find them while reading the roster; and a strip above the grid names them outright with what revealing does, because in a battle you need the rule, not a reminder.\n\nEach board carries one state, the way they already split the battle cards. The Unbolted bought an Infiltrator, so theirs is assigned to Marshal Corvin Ashlock — a hero who is actually in fights, which is the only place the assignment does anything. The Covenant have no Illusionist and no Library of Illusion, so their strip is the empty case with the reason and with where the name will appear once there is one.\n\nTwo numbers moved with it: The Unbolted are on 10 of 18 technology points rather than 9, since the Infiltrator is a new unique type, and the seats column on the Research screen had them at 11, which was wrong before this and is right now.",
+   "w": 460,
+   "x": 3400,
+   "y": 1500
+  },
+  "t1": {
+   "kind": "title1",
+   "maxW": 2560,
+   "text": "Neither Guts nor Gears — faction boards",
+   "w": 240,
+   "x": 0,
+   "y": -300
+  },
+  "t10": {
+   "kind": "title1",
+   "maxW": 1440,
+   "text": "The same table at six seats",
+   "w": 240,
+   "x": 170,
+   "y": 3200
+  },
+  "t11": {
+   "kind": "title1",
+   "maxW": 2960,
+   "page": "icons",
+   "text": "Twenty-five marks, one system",
+   "w": 240,
+   "x": 0,
+   "y": -300
+  },
+  "t2": {
+   "kind": "title1",
+   "maxW": 1440,
+   "text": "Where the board sits at the table",
+   "w": 240,
+   "x": 170,
+   "y": 322
+  },
+  "t3": {
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "choices",
+   "text": "Taking your action",
+   "w": 240,
+   "x": 0,
+   "y": -300
+  },
+  "t4": {
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "choices",
+   "text": "Battle, moment by moment",
+   "w": 240,
+   "x": 0,
+   "y": 1120
+  },
+  "t5": {
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "choices",
+   "text": "Diplomacy, the intended path",
+   "w": 240,
+   "x": 0,
+   "y": 2540
+  },
+  "t6": {
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "choices",
+   "text": "Before the first round",
+   "w": 240,
+   "x": 0,
+   "y": -2200
+  },
+  "t7": {
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "choices",
+   "text": "Moving, rallying, retreating",
+   "w": 240,
+   "x": 0,
+   "y": 3960
+  },
+  "t8": {
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "choices",
+   "text": "Claiming, and concealing",
+   "w": 240,
+   "x": 0,
+   "y": 5380
+  },
+  "t9": {
+   "kind": "title1",
+   "maxW": 1440,
+   "text": "Reading the board at three sizes",
+   "w": 240,
+   "x": 170,
+   "y": 1760
+  },
+  "c17": {
+   "page": "choices",
+   "x": 1520,
+   "y": 9980,
+   "w": 460,
+   "text": "The Detection screen is gone. This is what replaced it, and the design doc corrected me twice while I drew it.\n\nA SPY HAS NO PIECE. Section 7.1: a spy assignment has no separate combat piece, and the host hero keeps its own stats. So the unit acting here is Marshal Corvin Ashlock at 70 / 3 / 4, not an Infiltrator at nothing. The ladder puts him at 70, tied with the Foundry’s Warden, and the defender takes the tie. My earlier draft had the Infiltrator acting last on a printed dash. There is no dash. There is no piece.\n\nFOUR ACTIONS, NOT TWO. He can attack like the hero he is, or spend the activation on the spy: Detection looks at one opposing player’s face-down spy card, Spy Attack kills an opposing hero outright instead of attacking. Both reveal the assignment and use it up, and you get one or the other, never both.\n\nTHE ASYMMETRY IS A DIFFERENT UNIT. On the wizard side the look is not the spy’s at all: it belongs to an Enchantress who has researched Detection, costs no activation, reveals nothing and is not expended. That is why the wizard version needs no screen. The robot pays an activation, a public reveal and the assignment, so the robot version is a question.\n\nHERO STATS NOW SHOW. Hero Claim and the Leader draft both print the line, because it is the category’s line and nothing on the card said so: non-military 30 / 1 / 3, military 70 / 3 / 4, Evo Angel 80 / 4 / 4, a Leader +2 DEF and nothing else."
+  },
+  "c18": {
+   "page": "choices",
+   "x": 1520,
+   "y": 11420,
+   "w": 460,
+   "text": "The first screen in the whole design that arrives on somebody else’s turn.\n\nEvery other board answers a question the player went looking for. This one interrupts. Section 6.2: a purchase is declared and a complete payment proposed BEFORE any collector commits, and where the payment needs a tile someone else holds, that player is asked. Choice Payment already draws the asking end — the orange dashed Surf on a tile whose owner has not answered. This is the other end of the same token.\n\nTHE ASK IS NARROW AND THE SCREEN SAYS SO IN THREE CELLS. One named collector. One named tile. One named action. Not a treaty, not movement, not their next purchase. Everything a yes does NOT do is most of the rule, so most of the rail is that.\n\nTHE ONE THING A YES REALLY BUYS THEM is the passive-destruction clause: an authorised collector may stand beside the consenting player’s combat units until upkeep without being removed for having no protection of its own. Here that is literal — the tile they want has your Evoker and your Cleric on it. It stays attackable, by you and by anyone.\n\nTHE STAKES ARE STATE, NOT ADVICE. They declared 3 water, 3 wood, 3 ore, 1 ether, 1 oil and no build. That is the economic victory condition and their Leader is alive, so the screen says plainly that a completed payment ends the game. It does not say what you should answer. Refusing is free: they revise or drop the purchase and nothing of theirs is spent.\n\nOPEN QUESTION. Ten of their eleven tiles are shown as settled and only D4 is asked about. If a proposal ever needs two players’ consent, this screen becomes a queue and I have not drawn that."
+  },
+  "c19": {
+   "page": "choices",
+   "x": 4640,
+   "y": 12860,
+   "w": 460,
+   "text": "This sits between Battle Commit and Battle Activation, and it is the same battle as the spy screen two rows up — round 13, E2, the cards, before anything moves.\n\nTHE SCREEN IS THE BATCH. Section 10.2 is a loop, not a step: reveal, Counters first in first-player order, surviving Extras each add none, one or two cards revealed together, and those cards become the next batch. So the board is laid out as batches, one row each, and the row that is live is the one with the black tag.\n\nA COUNTER CHOOSES LATE. It picks its target when it resolves, having seen everything revealed — that is the whole reason this needs a screen rather than a prompt at commit time. It may hit a pending Extra, another unresolved Counter, or a Bonus, Rally, Retreat or Initiative that is sitting deferred. It may not hit anything already resolved, and the two Extras from batch one are drawn struck through with that reason on them.\n\nEVERY CARD IS FACE UP HERE. Battle Commit is the secret screen; once commitments reveal there is nothing left to hide, so grey on this board always means ineligible and never means unknown. The one secret still in play is what an Extra has NOT yet chosen from hand — and the rule that a countered Extra adds nothing and its cards stay secret is on the rail.\n\nNO MAP. The only board in the choices page without one. Nothing about this decision is geographic, and seven cards need the room. Worth deciding whether that is a principle or an exception.\n\nTHREE SIDES, NO TREATY, so every card is read from its owner: the Ledger’s −1 DMG hits you and The Foundry both. If Shared Tactics is ever in a battle, “your” means whoever plays the card, not whoever owns it — that case is not drawn."
+  },
+  "c20": {
+   "page": "choices",
+   "x": 4640,
+   "y": 13580,
+   "w": 460,
+   "text": "The case Point the Counter left undrawn. Same screen as Battle Commit, one treaty different.\n\nTWO HANDS, ONE COMMIT. Shared Tactics opens both hands at once and shows every later draw, so the commit screen stops being one hand and becomes two, with ownership on every card. Only one card leaves, and it does not have to be yours.\n\nLOCKED IS NOT HIDDEN. Their Counter is face up to you — printed text and all — and still unplayable, because the owner took it. What the treaty withholds is permission, not information, so the reason is printed where the permission would be. That is a different grey from every other board, where grey has meant ineligible-and-you-can-see-why; here it means somebody else got there first.\n\nTHE OWNER GOES FIRST, AND I HAD TO INVENT THE MOMENT. The rules say that when both partners are in a battle the owner decides first and the partner may play it only if the owner does not. Commitments are otherwise simultaneous and secret, so there has to be a sub-step inside the commit where the owner releases or keeps each card, before the partner commits. Nothing in the doc says how that is signalled at a physical table. The screen shows the state after it: they kept the Counter, they passed on the Bonus.\n\nSHARING A HAND LEAKS THEIR COMMITMENT. Two cards, one committed face down, and you can see the one that is left. That falls straight out of the rules and is worth knowing before anyone signs one of these.\n\nTHE PAYOFF IS THE PRONOUN. Section 10.3: played through this treaty, “your” means the player laying the card down, not its owner. Shared Tactics grants no military alliance, so these two are on opposite sides of this battle — and their −1 DEF card, played by you, lands on The Foundry AND on The Unbolted. The rail shows both readings side by side."
+  },
+  "c21": {
+   "page": "choices",
+   "x": 1520,
+   "y": 14300,
+   "w": 460,
+   "text": "The last visibly disabled control in the design. The Diplomacy screen has a dead Break button because that screen sits mid action phase and nothing was open; this is the same control at the moment it lights up — end of round, after the culture phase.\n\nTHE TWO BOARDS ARE ONE CONTROL AT TWO TIMES, and I left Diplomacy’s button disabled rather than linking it here. A disabled button that navigates would be a lie about the rule it is enforcing.\n\nTHE SCREEN IS A LIST OF WINDOWS. Five treaty types, five different conditions, and the engine answers per treaty rather than per screen: Shared Tactics and Peace open on timing alone, Open Borders needs your units and theirs not sharing a space, Shared Resources needs nobody collecting on a partner’s tile, and a Culture Treaty is the odd one — open almost any time EXCEPT the culture phase, and never between an attack being declared and its outcome.\n\nONE IS SHUT AND SAYS WHY, ON THE MAP. Your Surf is collecting on G4 where The Ledger stand, so Shared Resources will not open. Greyed, struck, danger red, tile ringed — the same refusal grammar as the shut tiles on Spy Reveal.\n\nTHE REAL COST IS THE GAP. You cannot trade one treaty for another in a single window, even by agreement: break legally now, form later. And forming only happens at the start or end of an active player’s action, which end of round is not — so the soonest anything replaces what you break is next round. That is state the engine holds, and it belongs on the screen where the break is made.\n\nWHAT A BREAK DOES NOT TOUCH is its own panel, because most of the surprise is there: the token comes back free, the culture stops only at the next income step, and what you already learned from a shared hand you keep."
+  },
+  "c22": {
+   "page": "choices",
+   "x": 4640,
+   "y": 14300,
+   "w": 460,
+   "text": "Two corrections the engine review forced, both on boards one row up.\n\nTREATY BREAK CAPPED THE DECISION AT ONE. It does not. The pending stays with the seat until it passes, and the engine’s own public question says the seat may break ANY of its breakable treaties. The footer is now “Done, keep the rest” and both open treaties can go.\n\nSHARED TACTICS HAD A RELEASE STEP I INVENTED. The engine gates the whole partner hand on one flag: while their own commitment is still open none of their cards are playable by you, and the moment they commit all of it is. That is a cleaner reading of “the owner decides first” and it needs no per-card step. The board now shows one gate, before and after.\n\nAND THE LEAK I CLAIMED IS NOT THERE. The view returns the partner’s whole hand with the committed card still in it and nothing marking which. Whether it SHOULD be marked is a real question — marking it is what would create the leak."
+  },
+  "c23": {
+   "page": "choices",
+   "x": 4640,
+   "y": 15740,
+   "w": 460,
+   "text": "The three that finish the loops already on this page.\n\nEXTRA is the step Point the Counter showed only as history: your Extra survived, and you pick none, one or two, in secret, revealed together. The spent Extra stays on screen struck through, because it is the reason you are choosing. Adding none is a real button — the Extra is spent either way and the cards you did not name are never revealed.\n\nELARA is the only targeting screen in the game whose rules exist nowhere else. It is explicitly NOT a battle, so a whole panel is what does not apply: no cards, no Clerics, no Decoy, no Wall-first. Four damage against printed defence, their Leader at 5 survives it, and the mana strip shows the five going out of twelve because that is the cost nobody talks about. Casting does not spend the Move — movement afterwards is still yours.\n\nSMYTH is the whole research list with no payment step under it. Cost struck, prerequisite struck, and a panel on what is NOT waived: it is not a Research action, and the point it earns counts exactly like a bought one. The reserved case is on it too, because a reserved Smyth’s reward waits and nothing is paid retroactively."
+  },
+  "c24": {
+   "page": "choices",
+   "x": 4640,
+   "y": 17180,
+   "w": 460,
+   "text": "The economy screens nobody thinks of as screens, and the end.\n\nSECOND PURCHASE is two purchases in one action drawn as two boxes, because that is the whole rule: separate collectors, separate access, separate failure. A collector bought in the first is available immediately and may pay for the second, which is the only reason Foreman is worth anything.\n\nCORE REALLOCATION is the only decision in upkeep and it is robot-only. Distance does not matter here and nowhere else, so the board is a list rather than a map. Coreless is drawn dashed and red: the platform is still standing, and it holds nothing, protects nothing and can be walked over.\n\nRESERVED HERO is the screen for the promise Hero Claim makes. Four rounds of Chronicler’s culture are printed as struck-through chips, because “do not award retroactively” is a sentence in the rules and a row of losses on the screen.\n\nTHE END is the economic win and the results behind it, on one board because the spend and the ending are the same instant. Eleven tiles, two of them agreed by other seats before a collector moved. It checks the living-Leader condition out loud, and the four cards left on the stack are named as never being turned over.\n\nSTILL NOT DRAWN, ON PURPOSE. The allied initiative tie is a state on the activation ladder, not a screen. Declining a queued action is a control on Choice Planning. Both are noted rather than built."
+  },
+  "L0": {
+   "page": "look",
+   "x": 0,
+   "y": -300,
+   "kind": "title1",
+   "maxW": 5900,
+   "text": "Three ways to stop looking like a spreadsheet"
+  },
+  "L1": {
+   "page": "look",
+   "x": 6160,
+   "y": 0,
+   "w": 470,
+   "text": "WHERE THIS LANDED.\n\nTWO DIRECTIONS, AND THEY STACK. Pressed is the floor and Ink and Oil is what stands on it. They were never alternatives — Pressed fixes the material problem, Ink and Oil carries the fiction, and a seat needs both.\n\nPRESSED ANSWERS THE DIAGNOSIS. Five of the six things that drained the old look are palette, edge and shadow rules: one ground for everything, one radius, one line weight, no material, no wear. Screened tints, square hairlines, a die line and a card back that reads as a back fix all five without adding a component. It also survives a phone.\n\nINK AND OIL CARRIES THE GAME. The client already branches on species for every rule; this makes the branch visible. A wizard seat is a page somebody wrote on, a robot seat is a part somebody machined. Applied to the SEAT’S OWN CHROME ONLY — the map stays one map, or a four-player table becomes unreadable.\n\nONE IDEA SURVIVES FROM THE DIRECTION WE DROPPED: card height. Resolving is lifted and casts a shadow, waiting lies flat, resolved has slid off the felt. Point the Counter currently spells the batch order out in words and three shadows would say it instead. Worth taking, and it needs no dark room to work.\n\nAND ONE THING WE ARE NOT TAKING. Grey means not-part-of-this-choice and it has exactly one meaning. Atmosphere does not get to borrow it."
+  },
+  "L2": {
+   "page": "look",
+   "x": 6160,
+   "y": 1240,
+   "w": 470,
+   "text": "GUARDRAILS, all of which these boards stay inside.\n\nWARM BUT FLAT IS DECIDED in the design brief. None of this is a licence to reopen it — Pressed is flat, Ink and Oil is flat, and Lantern is the one that pushes at it, which is why it is a donor rather than a direction.\n\nNO ART WE DO NOT OWN, and in fact no art at all here: every surface on these three boards is a gradient, a screened tint, a shadow or a border. Nothing needs an illustrator to exist, which means the whole thing can ship and be replaced later.\n\nTHE GRAMMAR DOES NOT MOVE. Grey is still not-part-of-this-choice, dashed is still not-on-the-board-yet, struck-and-red is still shut-with-a-reason. A treatment that redefines one of the four is not a treatment, it is a rewrite.\n\nCONTRAST IS THE FIRST THING THESE BREAK. Screened ink loses it, dim-on-dark loses it faster. Every tint on these boards is illustrative and needs checking at 4.5:1 — 3:1 at 24px and up — before any of it reaches a screen.\n\nAND THE COPY RULE IS UNTOUCHED. A prettier screen still may print only state, printed text, or the engine’s reason an option is illegal."
+  },
+  "L3": {
+   "page": "look",
+   "x": 6160,
+   "y": 2480,
+   "w": 470,
+   "text": "THE WIZARD SIDE, PUSHED. What was missing was not more decoration, it was that nothing had been DRAWN. Six changes, and five of them are strokes rather than styles.\n\nTHE PARCHMENT IS NOT ONE COLOUR. Four radial washes, two fibre weaves at odd angles, a fold crease down the sheet and two foxing spots. At full size it reads as texture; at thumbnail size it reads as warmth. No image file anywhere in it.\n\nEVERY LINE IS AN SVG STROKE WITH A WOBBLE. The rule under the title, the ring around the defence, the hex rim, the flask, the button outline. A CSS border cannot waver and a wavering line is the whole tell — this is the single change that does most of the work.\n\nTHE INK IS IRON-GALL, not black. #33251a, warm and browning, and nothing on that side is pure. The correction and the marginalia go in a wine red, which is the second nib.\n\nTHE HAND HAS TWO JOBS. IM Fell English carries everything you must read — it is a real 17th-century face with ink spread in its outlines, so it looks pressed rather than set. Caveat is for margins, corrections and asides ONLY. No information may depend on the script face, and it never goes below 16px.\n\nTHE PAGE KEEPS ITS MISTAKES. A struck-through initiative that was corrected at the claim, a note in the margin about Elara only getting one a round. A ledger that has been used looks used, and that costs nothing.\n\nAND THE SHEET TEARS where the steel begins. The seam between the two panes is a torn edge on the parchment side, not a divider.\n\nTHE RISK IS CONTRAST, and it is worse than on any other board here. Brown ink on a mottled low-value ground fails 4.5:1 faster than anything else in this project. Every value on that pane is illustrative and needs measuring before it goes near a screen."
+  },
+  "L4": {
+   "page": "look",
+   "x": 6160,
+   "y": 3720,
+   "w": 470,
+   "text": "BOTH FACTION BOARDS ARE NOW IN THEIR TREATMENT — the Faction boards page, not this one. Go and look at them side by side; that pair is the real test, because they are the densest screens in the design and if a treatment survives them it survives anything.\n\nAND IT WAS A TOKEN SWAP. That is the finding worth keeping. Neither board was rewritten. What changed on each was the theme object, the type families, the corner radii, and one ground element behind everything — four things, on boards of seven hundred lines. Every section, table, chip and meter followed on its own, because they were all drawn from the tokens already.\n\nTHE WIZARD BOARD is one hand throughout: IM Fell English at a single weight, no tight tracking, drawn boxes instead of rounded cards, and the sheet underneath with its washes, fold and foxing. A rule under the header is an SVG stroke with a wobble, and there is a note in the margin in a different hand.\n\nTHE ROBOT BOARD is the same board machined: mono display, square corners throughout, a rule grid ground and a registration tick in each corner, with a tolerance line under the header.\n\nWHAT TO CHECK BEFORE ANY OF IT SHIPS. Contrast on the wizard side, everywhere — brown ink on a mottled ground is the worst case in this project and every value on it is illustrative. Then the small sizes: IM Fell needs a point back at anything under 12px, which is already applied here, and the cursive must never carry information."
+  },
+  "L5": {
+   "page": "look",
+   "x": 6160,
+   "y": 4960,
+   "w": 470,
+   "text": "THE MAP WAS THE REAL TEST, and it answered a question I had left open.\n\nTOKENS FOLLOW THEIR OWNER, NOT THE VIEWER. A Covenant piece is a drawn ring on paper and a Foundry piece is a cut plate — on every seat’s screen, including each other’s. That was not the plan; it fell out of applying the rule honestly, and it is the best thing on the board. Species becomes readable off the pieces themselves, with no legend and no colour lookup, which is exactly what six factions in two species need.\n\nTHE TILES DO NOT CHANGE. Same inks, same shapes, same labels, same positions, in all three panels. A four-player table is ONE board that four clients annotate. The moment terrain renders differently per seat, the table stops being shared and every conversation about it breaks.\n\nSO WHAT A SEAT OWNS IS: the frame around the board, the codes IT writes on the tiles, its selection and reach marks, and its own margin readout. A drawn hexagon with a wobble for her; four corner brackets for it. That is the whole licence, and it is enough.\n\nAND THE CONTRAST TRAP MOVED. The tile inks were tuned against a white ground. Against parchment the pale ones lose separation from the frame, and the codes sitting on them lose more. The pairs to measure are tile-to-frame and code-to-tile, not just text on panels — which is a different test from the one the other boards need."
+  }
+ },
+ "order": [
+  "Choice Planning.dc.html",
+  "Choice Build.dc.html",
+  "Choice Payment.dc.html",
+  "Battle Commit.dc.html",
+  "Battle Activation.dc.html",
+  "Battle Defense.dc.html",
+  "Diplomacy.dc.html",
+  "Treaty Offer.dc.html",
+  "Treaty Response.dc.html",
+  "Setup Table.dc.html",
+  "Setup Draft.dc.html",
+  "Setup Start.dc.html",
+  "Move Battle.dc.html",
+  "Move Rally.dc.html",
+  "Move Retreat.dc.html",
+  "Hero Claim.dc.html",
+  "Spy Assign.dc.html",
+  "Faction Marks.dc.html",
+  "Wizard Unit Icons.dc.html",
+  "Robot Unit Icons.dc.html",
+  "Research Icons.dc.html",
+  "Spell Icons.dc.html",
+  "Action Icons.dc.html",
+  "Resource Icons.dc.html",
+  "Token Grammar.dc.html",
+  "Map Selection.dc.html",
+  "Place It.dc.html",
+  "Stacks.dc.html",
+  "Choice Research.dc.html",
+  "Main.dc.html",
+  "Robot Board.dc.html",
+  "Table.dc.html",
+  "Map Zoom.dc.html",
+  "Table Six.dc.html",
+  "Spy Reveal.dc.html",
+  "Robot Build.dc.html",
+  "Robot Payment.dc.html",
+  "Robot Infiltrator.dc.html",
+  "Access Request.dc.html",
+  "Card Batch.dc.html",
+  "Shared Tactics.dc.html",
+  "Treaty Break.dc.html",
+  "Battle Extra.dc.html",
+  "Elara Spell.dc.html",
+  "Smyth Reward.dc.html",
+  "Overlay Choice.dc.html",
+  "Second Purchase.dc.html",
+  "Core Reallocation.dc.html",
+  "Reserved Hero.dc.html",
+  "The End.dc.html",
+  "Look Control.dc.html",
+  "Look Ink And Oil.dc.html",
+  "Look Pressed.dc.html",
+  "Look Map.dc.html"
+ ],
+ "pages": [
+  {
+   "id": "boards",
+   "name": "Faction boards"
+  },
+  {
+   "id": "choices",
+   "name": "Player choices"
+  },
+  {
+   "id": "icons",
+   "name": "Icons"
+  },
+  {
+   "id": "grammar",
+   "name": "Token grammar"
+  },
+  {
+   "id": "look",
+   "name": "Look and feel"
+  }
+ ],
+ "title": "Neither Guts nor Gears — faction boards",
+ "v": 3
+}

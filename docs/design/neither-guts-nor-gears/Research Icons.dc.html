@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Research icons</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:var(--brand)}a:hover{color:var(--action)}
+</style>
+</helmet>
+
+<div style="{{ rootStyle }}" data-screen-label="Research icons">
+
+  <div style="{{ s.header }}">
+    <div style="display:flex;flex-direction:column;gap:5px">
+      <span style="font:700 26px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:var(--text)">Research &mdash; six wizard, one robot</span>
+      <span style="font-size:13px;line-height:1.45;color:var(--muted);max-width:700px">Research never stands on the map, so these marks live on the faction board, in the cost line of a Research action, and beside the effect in a battle log. The second chip on each card is the researched state: a filled ring, the same one the technology track uses.</span>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <span style="{{ s.pill }}">7 OF 7</span>
+      <span style="{{ s.pill }}">NEVER ON THE MAP</span>
+    </div>
+  </div>
+
+  <div style="{{ s.grid4 }}">
+
+    <!-- Ice Blast -->
+    <div style="{{ s.card }}">
+      <div style="{{ s.head }}">
+        <span style="{{ s.tile }}">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5v17"></path><path d="M9.6 18.2 12 20.6l2.4-2.4"></path><path d="m6.2 7.4 11.6 6.7"></path><path d="m17.8 7.4-11.6 6.7"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Ice Blast</span>
+          <span style="{{ s.kind }}">1 WA 1 WO &middot; EVOKER, 3 MANA</span>
+        </div>
+        <span style="{{ s.done }}"></span>
+      </div>
+      <span style="{{ s.note }}">An ice star whose lower arm is an arrowhead. Drops one unit 100 initiative, so the mark points down rather than out.</span>
+    </div>
+
+    <!-- Mana Shield -->
+    <div style="{{ s.card }}">
+      <div style="{{ s.head }}">
+        <span style="{{ s.tile }}">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5 19.5 6v6c0 4.2-3 7.4-7.5 8.5C7.5 19.4 4.5 16.2 4.5 12V6Z" stroke-dasharray="3 2.4"></path><path d="m12 8.6 2.8 3.4L12 15.4 9.2 12Z"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Mana Shield</span>
+          <span style="{{ s.kind }}">2 ETHER &middot; 1 MANA A POINT</span>
+        </div>
+        <span style="{{ s.done }}"></span>
+      </div>
+      <span style="{{ s.note }}">The Cleric&rsquo;s shield drawn dashed, with a mana diamond inside. Dashed because it is bought a point at a time and gone when the mana is.</span>
+    </div>
+
+    <!-- Dehance -->
+    <div style="{{ s.card }}">
+      <div style="{{ s.head }}">
+        <span style="{{ s.tile }}">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.6 6.6 12 13l6.4-6.4"></path><path d="M5.6 12.6 12 19l6.4-6.4"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Dehance</span>
+          <span style="{{ s.kind }}">1 WA 1 WO &middot; ENCHANTRESS, 2 MANA</span>
+        </div>
+        <span style="{{ s.done }}"></span>
+      </div>
+      <span style="{{ s.note }}">Two chevrons falling, and no body. A mark with a body is a unit; the effect on its own is the spell, so Enhance is these same chevrons rising.</span>
+    </div>
+
+    <!-- Fiery Explosion -->
+    <div style="{{ s.card }}">
+      <div style="{{ s.head }}">
+        <span style="{{ s.tile }}">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9.4c1.9 1.6 2.8 2.9 2.8 4.4a2.8 2.8 0 0 1-5.6 0c0-1 .4-1.9 1.2-2.7.2.8.6 1.3 1.1 1.6.2-1.2.3-2.3.5-3.3Z"></path><path d="M12 5.6V3.2M7 7.6 5.3 5.9M17 7.6l1.7-1.7M5.4 12.8H3M21 12.8h-2.4M7.4 17.8l-1.8 1.8M16.6 17.8l1.8 1.8"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Fiery Explosion</span>
+          <span style="{{ s.kind }}">1 WO 1 OR &middot; EVOKER, 3 MANA</span>
+        </div>
+        <span style="{{ s.open }}"></span>
+      </div>
+      <span style="{{ s.note }}">A flame with rays going every way. Area damage, so nothing in the mark has a direction &mdash; the opposite of Ice Blast on purpose.</span>
+    </div>
+
+    <!-- Detection -->
+    <div style="{{ s.card }}">
+      <div style="{{ s.head }}">
+        <span style="{{ s.tile }}">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.6 10.8s3.7-5.6 9.4-5.6 9.4 5.6 9.4 5.6-3.7 5.6-9.4 5.6-9.4-5.6-9.4-5.6Z"></path><circle cx="12" cy="10.8" r="2.6"></circle><path d="M6.6 19.8h10.8" stroke-dasharray="2.6 2.4"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Detection</span>
+          <span style="{{ s.kind }}">1 WA 1 WO &middot; ENCHANTRESS, FREE</span>
+        </div>
+        <span style="{{ s.open }}"></span>
+      </div>
+      <span style="{{ s.note }}">An eye over a dashed line &mdash; the hidden card it reads. The dashes are the spy&rsquo;s own language, borrowed to say what this undoes.</span>
+    </div>
+
+    <!-- Invisible -->
+    <div style="{{ s.card }}">
+      <div style="{{ s.head }}">
+        <span style="{{ s.tile }}">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="7.6" r="3.4" stroke-dasharray="3 2.4"></circle><path d="M5.8 20.4a6.2 6.2 0 0 1 12.4 0" stroke-dasharray="3 2.4"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Invisible</span>
+          <span style="{{ s.kind }}">1 WA 1 WO &middot; SPY HERO, ON REVEAL</span>
+        </div>
+        <span style="{{ s.locked }}"></span>
+      </div>
+      <span style="{{ s.note }}">A figure drawn entirely in dashes. The only fully dashed mark in the set, which is the whole idea: present, and not there.</span>
+    </div>
+
+    <!-- Metal Platforms -->
+    <div style="{{ s.cardAlt }}">
+      <div style="{{ s.head }}">
+        <span style="{{ s.tileAlt }}">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.4" y="13.4" width="17.2" height="6" rx="2"></rect><path d="M6.4 13.4v-2.6h11.2v2.6"></path><path d="M12 10.8V6.4"></path><path d="M8.4 8.6 12 5l3.6 3.6"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Metal Platforms</span>
+          <span style="{{ s.kind }}">2 WO 2 OI &middot; ROBOT &middot; AT HOME</span>
+        </div>
+        <span style="{{ s.open }}"></span>
+      </div>
+      <span style="{{ s.note }}">A chassis under a plate, with a chevron for the +1. The robots have exactly one research, so this mark has to carry the whole idea alone.</span>
+    </div>
+
+    <!-- Battle strategy card -->
+    <div style="{{ s.cardAlt }}">
+      <div style="{{ s.head }}">
+        <span style="{{ s.tileAlt }}">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3.4" width="14" height="17.2" rx="2.5"></rect><path d="M8.6 9h6.8M8.6 12.4h6.8M8.6 15.8h4.2" stroke-dasharray="2.4 2.2"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Battle strategy card</span>
+          <span style="{{ s.kind }}">NOT RESEARCH &middot; DRAWN BLIND</span>
+        </div>
+        <span style="{{ s.locked }}"></span>
+      </div>
+      <span style="{{ s.note }}">A card whose face is dashed, because you draw it without seeing it. A Research action can buy one instead, so it belongs on this sheet without being research.</span>
+    </div>
+  </div>
+
+  <div style="{{ s.foot }}">
+    <div style="display:flex;flex-direction:column;gap:3px;flex-grow:1;min-width:0">
+      <span style="{{ s.footStrong }}">Three marks quote a unit on purpose.</span>
+      <span style="{{ s.footText }}">Mana Shield is the Cleric&rsquo;s shield gone dashed. Dehance is the Enchantress upside down. Invisible borrows the spy&rsquo;s dashes. A player who knows the roster can read the research without being taught it twice, and the ones that quote nothing &mdash; Ice Blast, Fiery Explosion &mdash; are the two that change how a whole battle resolves.</span>
+    </div>
+    <div style="width:1px;align-self:stretch;background:var(--line);flex-shrink:0"></div>
+    <div style="display:flex;gap:18px;align-items:center;flex-shrink:0">
+      <div style="{{ s.state }}"><span style="{{ s.done }}"></span><span style="{{ s.stateText }}">researched</span></div>
+      <div style="{{ s.state }}"><span style="{{ s.open }}"></span><span style="{{ s.stateText }}">buildable now</span></div>
+      <div style="{{ s.state }}"><span style="{{ s.locked }}"></span><span style="{{ s.stateText }}">needs a building</span></div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":620},"theme":{"editor":"enum","options":["light","dark"],"default":"light","tsType":"&#39;light&#39;|&#39;dark&#39;","section":"Sheet"}}'>
+const THEMES={
+ light:{'--bg':'#f7f1e6','--surface':'#ffffff','--surface2':'#efe7d8','--text':'#1c1a17','--muted':'#6b655b','--brand':'#1f4d3a','--action':'#e0762b','--hlbg':'#e6efe9','--danger':'#b3261e','--line':'rgba(28,26,23,.14)','--ink':'#1c1a17'},
+ dark:{'--bg':'#1a221c','--surface':'#232e26','--surface2':'#2c3a30','--text':'#f3ead9','--muted':'#b1ac9f','--brand':'#9bb08a','--action':'#ff8a3d','--hlbg':'#2f4a3a','--danger':'#ff7b6b','--line':'rgba(243,234,217,.16)','--ink':'#0f150f'}
+};
+
+class Component extends DCLogic{
+ renderVals(){
+  const T=THEMES[this.props.theme||'light'];
+
+  // The three state rings are the ones already on the technology track: filled for
+  // acquired, hollow for available, dashed for gated behind a building. Research has no
+  // token, so the ring is the only state this sheet has to carry.
+  const ring={width:'22px',height:'22px',borderRadius:'50%',flexShrink:0};
+
+  const s={
+   header:{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:'24px',flexShrink:0},
+   pill:{font:"600 9.5px 'IBM Plex Mono',monospace",letterSpacing:'.06em',padding:'5px 10px',
+     borderRadius:'999px',background:'var(--surface)',border:'1px solid var(--line)',color:'var(--muted)'},
+   grid4:{display:'grid',gridTemplateColumns:'repeat(4, 1fr)',gap:'15px',flexShrink:0},
+   card:{display:'flex',flexDirection:'column',gap:'9px',padding:'13px 14px 14px',
+     borderRadius:'13px',background:'var(--surface)',border:'1px solid var(--line)'},
+   cardAlt:{display:'flex',flexDirection:'column',gap:'9px',padding:'13px 14px 14px',
+     borderRadius:'13px',background:'var(--surface)',border:'1px solid var(--line)',
+     borderLeft:'3px solid #d8a020'},
+   head:{display:'flex',alignItems:'center',gap:'12px'},
+   tile:{width:'60px',height:'60px',borderRadius:'12px',flexShrink:0,
+     background:'var(--surface2)',display:'grid',placeItems:'center',color:'var(--text)'},
+   tileAlt:{width:'60px',height:'60px',borderRadius:'12px',flexShrink:0,
+     background:'var(--surface2)',display:'grid',placeItems:'center',color:'var(--text)'},
+   meta:{display:'flex',flexDirection:'column',gap:'3px',flexGrow:1,minWidth:0},
+   name:{font:"700 15px 'Bricolage Grotesque',sans-serif",letterSpacing:'-.01em',color:'var(--text)'},
+   kind:{font:"600 8px 'IBM Plex Mono',monospace",letterSpacing:'.05em',color:'var(--muted)',lineHeight:'1.3'},
+   note:{fontSize:'11.5px',lineHeight:'1.45',color:'var(--muted)'},
+
+   done:{...ring,background:'var(--brand)',border:'1.5px solid var(--ink)'},
+   open:{...ring,background:'transparent',border:'1.5px solid var(--ink)'},
+   locked:{...ring,background:'transparent',border:'1.5px dashed var(--line)'},
+
+   foot:{display:'flex',alignItems:'center',gap:'20px',padding:'13px 16px',borderRadius:'13px',
+     background:'var(--surface2)',border:'1px solid var(--line)',flexShrink:0},
+   footStrong:{font:"700 13px 'Bricolage Grotesque',sans-serif",letterSpacing:'-.01em',color:'var(--text)'},
+   footText:{fontSize:'11.5px',lineHeight:'1.45',color:'var(--muted)'},
+   state:{display:'flex',alignItems:'center',gap:'8px'},
+   stateText:{font:"500 10.5px 'IBM Plex Mono',monospace",color:'var(--muted)'}
+  };
+
+  return {
+   rootStyle:{...T,width:'1440px',height:'620px',boxSizing:'border-box',display:'flex',
+     flexDirection:'column',gap:'18px',padding:'32px 40px',background:'var(--bg)',
+     fontFamily:"'IBM Plex Sans',sans-serif",borderRadius:'12px',overflow:'hidden'},
+   s:s
+  };
+ }
+}
+</script>
+</body>
+</html>
