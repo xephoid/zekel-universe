@@ -325,7 +325,7 @@ function KeyLog({ lines, currentSeq, me }: { lines: Array<{ line: LogLine; seq: 
             ? (mine && g.key.line.subjectHeadline ? g.key.line.subjectHeadline : g.key.line.headline!)
             : `${g.details.length} more ${g.details.length === 1 ? 'line' : 'lines'}`;
           const current = g.details.some((x) => x.seq === currentSeq);
-          const cls = [current ? 'current' : '', !g.key ? 'more' : '', mine && g.key?.line.loss ? 'loss' : '', mine ? 'yours' : ''].filter(Boolean).join(' ');
+          const cls = [current ? 'current' : '', !g.key ? 'more' : '', g.key?.line.category === 'phase' ? 'phase' : '', mine && g.key?.line.loss ? 'loss' : '', mine ? 'yours' : ''].filter(Boolean).join(' ');
           const expanded = open === id;
           return (
             <Fragment key={id}>

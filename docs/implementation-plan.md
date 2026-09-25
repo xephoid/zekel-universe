@@ -880,7 +880,8 @@ new `random` AI level is not offered on the setup page.
 log is the engine's own log, not one line per table event. The engine marks
 the entries that matter at a glance with a short `headline` (purchases,
 research, deaths and destruction, treaties, access answers, battles, battle
-cards revealed, attacks, spells and saves, hero claims, setup picks, the end)
+cards revealed, attacks, spells and saves, hero claims, setup picks, culture
+income, action cards placed, played and skipped, the phase changes, the end)
 and, for a line about one seat, that seat's reading (`subject_headline`,
 "Your base at C4 was destroyed!") and whether it was a loss. Every move
 returns the entries it produced (`log_entries`, engine branch
