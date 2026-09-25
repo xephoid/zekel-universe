@@ -1,12 +1,12 @@
 {
  "key": "action-research",
  "players": 4,
- "viewer": "p4",
+ "viewer": "p3",
  "view": {
   "game_id": "neither-guts-nor-gears",
   "phase": "action",
   "round": 1,
-  "active_player_id": "p4",
+  "active_player_id": "p3",
   "first_player_id": "p2",
   "layout": "threeFour",
   "map": {
@@ -31,7 +31,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [
-      "Technomancer Greymore (p4)"
+      "Motherboard (p4)"
      ],
      "collectors": []
     },
@@ -65,7 +65,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Quartermaster Bertram Hollis (p3)"
+     ],
      "collectors": []
     },
     {
@@ -76,9 +78,7 @@
      "start": 1,
      "base_owner": "p3",
      "units": [],
-     "heroes": [
-      "Motherboard (p3)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -266,9 +266,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "surf-1 (p2)"
-     ]
+     "collectors": []
     },
     {
      "coord": "1,5",
@@ -279,9 +277,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "surf-2 (p2)"
-     ]
+     "collectors": []
     },
     {
      "coord": "1,7",
@@ -336,7 +332,7 @@
      "base_owner": "p2",
      "units": [],
      "heroes": [
-      "Chronicler Ottoline Vey (p2)"
+      "Foreman Hadrik Stoll (p2)"
      ],
      "collectors": []
     },
@@ -381,7 +377,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Archmage Chaimidious (p1)"
+     ],
      "collectors": []
     },
     {
@@ -392,9 +390,7 @@
      "start": 2,
      "base_owner": "p1",
      "units": [],
-     "heroes": [
-      "Archmage Chaimidious (p1)"
-     ],
+     "heroes": [],
      "collectors": []
     }
    ]
@@ -409,12 +405,12 @@
    {
     "position": 2,
     "owner": "p3",
-    "face": "down"
+    "card_kind": "build"
    },
    {
     "position": 3,
     "owner": "p4",
-    "card_kind": "build"
+    "face": "down"
    },
    {
     "position": 4,
@@ -429,18 +425,33 @@
    {
     "position": 6,
     "owner": "p3",
-    "face": "down"
+    "card_kind": "build"
    },
    {
     "position": 7,
     "owner": "p4",
+    "face": "down"
+   },
+   {
+    "position": 8,
+    "owner": "p1",
+    "face": "down"
+   },
+   {
+    "position": 9,
+    "owner": "p2",
+    "face": "down"
+   },
+   {
+    "position": 10,
+    "owner": "p3",
     "card_kind": "research"
    }
   ],
-  "active_action": "research by p4",
+  "active_action": "research by p3",
   "resolving_action": {
    "card_kind": "research",
-   "owner": "p4"
+   "owner": "p3"
   },
   "treaties": [],
   "battle": null,
@@ -450,7 +461,7 @@
   "victory_status": {
    "p1": {
     "culture": 0,
-    "tech": 3,
+    "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
@@ -481,12 +492,13 @@
     "faction": "The Foundry",
     "species": "robot",
     "culture": 0,
+    "culture_target": 200,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -497,10 +509,11 @@
      "acquired_types": [
       "core",
       "water-collector",
+      "wood-collector",
       "home"
      ],
      "bonus_points_live": 0,
-     "total": 3,
+     "total": 4,
      "target": 18
     },
     "leader_kills": 0,
@@ -508,20 +521,20 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 13,
+    "cores_supply": 11,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_count": 2,
+    "action_cards_played_count": 3,
     "battle_hand_count": 1,
     "spy_recruitments": 0,
     "units": [],
     "heroes": [
      {
       "hero": "Archmage Chaimidious",
-      "coord": "2,12",
+      "coord": "2,10",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
@@ -542,6 +555,18 @@
       "type": "Water collector",
       "placed_at": null,
       "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-1",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-2",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
      }
     ],
     "committed_collectors": []
@@ -552,12 +577,13 @@
     "faction": "The Schism",
     "species": "wizard",
     "culture": 0,
+    "culture_target": 200,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -590,7 +616,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Chronicler Ottoline Vey",
+      "hero": "Foreman Hadrik Stoll",
       "coord": "2,2",
       "is_leader": true,
       "dead": false,
@@ -604,31 +630,15 @@
      {
       "collector": "surf-1",
       "type": "Surf",
-      "placed_at": "1,3"
+      "placed_at": null
      },
      {
       "collector": "surf-2",
-      "type": "Surf",
-      "placed_at": "1,5"
-     },
-     {
-      "collector": "surf-3",
       "type": "Surf",
       "placed_at": null
      }
     ],
-    "committed_collectors": [
-     {
-      "collector": "surf-1",
-      "coord": "1,3",
-      "resource": "water"
-     },
-     {
-      "collector": "surf-2",
-      "coord": "1,5",
-      "resource": "water"
-     }
-    ]
+    "committed_collectors": []
    },
    {
     "player_id": "p3",
@@ -636,12 +646,13 @@
     "faction": "The Ledger",
     "species": "robot",
     "culture": 0,
+    "culture_target": 200,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -652,9 +663,10 @@
      "acquired_types": [
       "core",
       "water-collector",
+      "wood-collector",
       "home"
      ],
-     "bonus_points_live": 1,
+     "bonus_points_live": 0,
      "total": 4,
      "target": 18
     },
@@ -663,20 +675,20 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 13,
+    "cores_supply": 11,
     "action_cards": {
-     "build": 1,
+     "build": 2,
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_count": 2,
+    "action_cards_played_count": 4,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Motherboard",
-      "coord": "-2,12",
+      "hero": "Quartermaster Bertram Hollis",
+      "coord": "-2,10",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
@@ -697,6 +709,18 @@
       "type": "Water collector",
       "placed_at": null,
       "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-1",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-2",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
      }
     ],
     "committed_collectors": []
@@ -707,12 +731,13 @@
     "faction": "The Brass Circle",
     "species": "wizard",
     "culture": 0,
+    "culture_target": 200,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -745,7 +770,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Technomancer Greymore",
+      "hero": "Motherboard",
       "coord": "-2,4",
       "is_leader": true,
       "dead": false,
@@ -773,6 +798,7 @@
   "your_battle_hand": [],
   "your_action_cards_played": [
    "build:base",
+   "build:hero_extra",
    "research:base",
    "move_battle:base"
   ],
@@ -792,42 +818,17 @@
  "unavailable": [
   {
    "moveType": "form_treaty",
-   "reason": "a treaty needs an unlock on one side — an Embassy or an active Envoy Sable Marrow; no one who could partner with you has one"
+   "reason": "a treaty needs an unlock on one side — a Diplomatic Research Station or an active Envoy Sable Marrow; no one who could partner with you has one"
   },
   {
    "moveType": "research",
-   "item": "Ice Blast",
-   "reason": "Ice Blast requires Library of Evocation (you have: none)"
-  },
-  {
-   "moveType": "research",
-   "item": "Fiery Explosion",
-   "reason": "Fiery Explosion requires Library of Evocation (you have: none)"
-  },
-  {
-   "moveType": "research",
-   "item": "Mana Shield",
-   "reason": "Mana Shield requires Library of Evocation (you have: none)"
-  },
-  {
-   "moveType": "research",
-   "item": "Invisible",
-   "reason": "Invisible requires Library of Illusion (you have: none)"
-  },
-  {
-   "moveType": "research",
-   "item": "Dehance",
-   "reason": "Dehance requires Library of Enchantment (you have: none)"
-  },
-  {
-   "moveType": "research",
-   "item": "Detection",
-   "reason": "Detection requires Library of Enchantment (you have: none)"
+   "item": "Metal Platforms",
+   "reason": "costs 2 wood + 1 ore + 1 oil — you have no free ore collector"
   },
   {
    "moveType": "research",
    "item": "battle strategy card",
-   "reason": "needs an Embassy first"
+   "reason": "needs a Defense Research Station first"
   }
  ],
  "watcher": "p1",
@@ -835,7 +836,7 @@
   "game_id": "neither-guts-nor-gears",
   "phase": "action",
   "round": 1,
-  "active_player_id": "p4",
+  "active_player_id": "p3",
   "first_player_id": "p2",
   "layout": "threeFour",
   "map": {
@@ -860,7 +861,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [
-      "Technomancer Greymore (p4)"
+      "Motherboard (p4)"
      ],
      "collectors": []
     },
@@ -894,7 +895,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Quartermaster Bertram Hollis (p3)"
+     ],
      "collectors": []
     },
     {
@@ -905,9 +908,7 @@
      "start": 1,
      "base_owner": "p3",
      "units": [],
-     "heroes": [
-      "Motherboard (p3)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -1095,9 +1096,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "surf-1 (p2)"
-     ]
+     "collectors": []
     },
     {
      "coord": "1,5",
@@ -1108,9 +1107,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "surf-2 (p2)"
-     ]
+     "collectors": []
     },
     {
      "coord": "1,7",
@@ -1165,7 +1162,7 @@
      "base_owner": "p2",
      "units": [],
      "heroes": [
-      "Chronicler Ottoline Vey (p2)"
+      "Foreman Hadrik Stoll (p2)"
      ],
      "collectors": []
     },
@@ -1210,7 +1207,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Archmage Chaimidious (p1)"
+     ],
      "collectors": []
     },
     {
@@ -1221,9 +1220,7 @@
      "start": 2,
      "base_owner": "p1",
      "units": [],
-     "heroes": [
-      "Archmage Chaimidious (p1)"
-     ],
+     "heroes": [],
      "collectors": []
     }
    ]
@@ -1248,7 +1245,7 @@
    {
     "position": 4,
     "owner": "p1",
-    "card_kind": "move_battle"
+    "card_kind": "build"
    },
    {
     "position": 5,
@@ -1263,13 +1260,28 @@
    {
     "position": 7,
     "owner": "p4",
+    "face": "down"
+   },
+   {
+    "position": 8,
+    "owner": "p1",
+    "card_kind": "research"
+   },
+   {
+    "position": 9,
+    "owner": "p2",
+    "face": "down"
+   },
+   {
+    "position": 10,
+    "owner": "p3",
     "card_kind": "research"
    }
   ],
-  "active_action": "research by p4",
+  "active_action": "research by p3",
   "resolving_action": {
    "card_kind": "research",
-   "owner": "p4"
+   "owner": "p3"
   },
   "treaties": [],
   "battle": null,
@@ -1279,7 +1291,7 @@
   "victory_status": {
    "p1": {
     "culture": 0,
-    "tech": 3,
+    "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
@@ -1310,12 +1322,13 @@
     "faction": "The Foundry",
     "species": "robot",
     "culture": 0,
+    "culture_target": 200,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -1326,10 +1339,11 @@
      "acquired_types": [
       "core",
       "water-collector",
+      "wood-collector",
       "home"
      ],
      "bonus_points_live": 0,
-     "total": 3,
+     "total": 4,
      "target": 18
     },
     "leader_kills": 0,
@@ -1337,20 +1351,20 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 13,
+    "cores_supply": 11,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_count": 2,
+    "action_cards_played_count": 3,
     "battle_hand_count": 1,
     "spy_recruitments": 0,
     "units": [],
     "heroes": [
      {
       "hero": "Archmage Chaimidious",
-      "coord": "2,12",
+      "coord": "2,10",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
@@ -1371,6 +1385,18 @@
       "type": "Water collector",
       "placed_at": null,
       "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-1",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-2",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
      }
     ],
     "committed_collectors": []
@@ -1381,12 +1407,13 @@
     "faction": "The Schism",
     "species": "wizard",
     "culture": 0,
+    "culture_target": 200,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -1419,7 +1446,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Chronicler Ottoline Vey",
+      "hero": "Foreman Hadrik Stoll",
       "coord": "2,2",
       "is_leader": true,
       "dead": false,
@@ -1433,31 +1460,15 @@
      {
       "collector": "surf-1",
       "type": "Surf",
-      "placed_at": "1,3"
+      "placed_at": null
      },
      {
       "collector": "surf-2",
-      "type": "Surf",
-      "placed_at": "1,5"
-     },
-     {
-      "collector": "surf-3",
       "type": "Surf",
       "placed_at": null
      }
     ],
-    "committed_collectors": [
-     {
-      "collector": "surf-1",
-      "coord": "1,3",
-      "resource": "water"
-     },
-     {
-      "collector": "surf-2",
-      "coord": "1,5",
-      "resource": "water"
-     }
-    ]
+    "committed_collectors": []
    },
    {
     "player_id": "p3",
@@ -1465,12 +1476,13 @@
     "faction": "The Ledger",
     "species": "robot",
     "culture": 0,
+    "culture_target": 200,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -1481,9 +1493,10 @@
      "acquired_types": [
       "core",
       "water-collector",
+      "wood-collector",
       "home"
      ],
-     "bonus_points_live": 1,
+     "bonus_points_live": 0,
      "total": 4,
      "target": 18
     },
@@ -1492,20 +1505,20 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 13,
+    "cores_supply": 11,
     "action_cards": {
-     "build": 1,
+     "build": 2,
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_count": 2,
+    "action_cards_played_count": 4,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Motherboard",
-      "coord": "-2,12",
+      "hero": "Quartermaster Bertram Hollis",
+      "coord": "-2,10",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
@@ -1526,6 +1539,18 @@
       "type": "Water collector",
       "placed_at": null,
       "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-1",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-2",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
      }
     ],
     "committed_collectors": []
@@ -1536,12 +1561,13 @@
     "faction": "The Brass Circle",
     "species": "wizard",
     "culture": 0,
+    "culture_target": 200,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -1574,7 +1600,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Technomancer Greymore",
+      "hero": "Motherboard",
       "coord": "-2,4",
       "is_leader": true,
       "dead": false,
@@ -1606,8 +1632,9 @@
    }
   ],
   "your_action_cards_played": [
-   "move_battle:base",
-   "build:base"
+   "build:base",
+   "research:base",
+   "move_battle:base"
   ],
   "your_spy_assignments": [],
   "your_knowledge": [],

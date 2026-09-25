@@ -31,8 +31,12 @@ export interface NggRef {
   heroes: RefHero[];
   cards: RefCard[];
   treaties: RefTreaty[];
+  /** an older engine's one milestone list and culture target */
   milestones: number[];
   cultureTarget: number;
+  /** the milestones and culture target by player count (they scale with it) */
+  milestonesByCount: Record<number, number[]>;
+  cultureTargetByCount: Record<number, number>;
   economicSpend: Cost;
   techTarget: Record<string, number>;
   militaryKillsNeeded: Record<string, number>;
@@ -91,6 +95,12 @@ export function readRef(reference: GameReferenceResponse | null): NggRef | null 
     })),
     milestones: asArr(victory['milestones']).map((m) => asNum(m)),
     cultureTarget: asNum(victory['culture_target'], 100),
+    milestonesByCount: isObj(victory['milestones_by_player_count'])
+      ? Object.fromEntries(Object.entries(victory['milestones_by_player_count']).map(([n, list]) => [Number(n), asArr(list).map((m) => asNum(m))]))
+      : {},
+    cultureTargetByCount: isObj(victory['culture_target_by_player_count'])
+      ? Object.fromEntries(Object.entries(victory['culture_target_by_player_count']).map(([n, t]) => [Number(n), asNum(t)]))
+      : {},
     economicSpend: cost(victory['economic_spend']),
     techTarget: isObj(victory['tech_target']) ? Object.fromEntries(Object.entries(victory['tech_target']).map(([k, v]) => [k, asNum(v)])) : {},
     militaryKillsNeeded: isObj(victory['military_kills_needed']) ? Object.fromEntries(Object.entries(victory['military_kills_needed']).map(([k, v]) => [k, asNum(v)])) : {},
@@ -127,4 +137,13 @@ export function treatyByName(ref: NggRef | null, name: string): RefTreaty | null
 /** A card by the label a move or a hand names it by ("Counter", "Bonus (+1 DEF …)"). */
 export function cardByLabel(ref: NggRef | null, label: string): RefCard | null {
   return ref?.cards.find((c) => c.label === label) ?? null;
+}
+
+/** This table's culture target and milestones: the seat view's own target
+ *  first, then the catalogue's entry for this many players, then an older
+ *  engine's single values. */
+export function cultureRaceOf(ref: NggRef | null, playerCount: number, viewTarget: number | null): { target: number; milestones: number[] } {
+  const target = viewTarget ?? ref?.cultureTargetByCount[playerCount] ?? ref?.cultureTarget ?? 100;
+  const milestones = ref?.milestonesByCount[playerCount] ?? ref?.milestones ?? [];
+  return { target, milestones };
 }

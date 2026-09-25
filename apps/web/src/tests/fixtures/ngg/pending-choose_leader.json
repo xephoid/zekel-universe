@@ -312,6 +312,7 @@
     "faction": "The Covenant",
     "species": "wizard",
     "culture": 0,
+    "culture_target": 100,
     "next_milestones": [
      5,
      15,
@@ -367,6 +368,7 @@
     "faction": "The Foundry",
     "species": "robot",
     "culture": 0,
+    "culture_target": 100,
     "next_milestones": [
      5,
      15,
@@ -402,7 +404,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Chronicler Ottoline Vey",
+      "hero": "Foreman Hadrik Stoll",
       "coord": "reserved",
       "is_leader": true,
       "dead": false,
@@ -471,10 +473,10 @@
   },
   {
    "move_id": "",
-   "description": "Choose Foreman Hadrik Stoll as Leader — May make two unit or building purchases per Build action, each paid with separate collectors. A collector bought in the first purchase may help pay the second.",
+   "description": "Choose Chronicler Ottoline Vey as Leader (recommended) — +2 culture per round during the income step. No income while reserved.",
    "move": {
     "type": "choose_leader",
-    "hero": "Foreman Hadrik Stoll"
+    "hero": "Chronicler Ottoline Vey"
    }
   },
   {
@@ -870,6 +872,7 @@
     "faction": "The Covenant",
     "species": "wizard",
     "culture": 0,
+    "culture_target": 100,
     "next_milestones": [
      5,
      15,
@@ -925,6 +928,7 @@
     "faction": "The Foundry",
     "species": "robot",
     "culture": 0,
+    "culture_target": 100,
     "next_milestones": [
      5,
      15,
@@ -960,7 +964,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Chronicler Ottoline Vey",
+      "hero": "Foreman Hadrik Stoll",
       "coord": "reserved",
       "is_leader": true,
       "dead": false,
@@ -977,7 +981,7 @@
   "your_spy_assignments": [],
   "your_knowledge": [],
   "your_reserved_heroes": [
-   "Chronicler Ottoline Vey"
+   "Foreman Hadrik Stoll"
   ]
  },
  "watcherLegalMoves": []

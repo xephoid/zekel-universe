@@ -11,7 +11,8 @@ import REFERENCE from './fixtures/ngg-reference.json';
 // A pinned view: these tests name the items it offers (fixtures/ngg-pinned/README.md).
 import BUILD from './fixtures/ngg-pinned/action-build-base.json';
 import ACCESS from './fixtures/ngg/pending-access_request-queue.json';
-import SMYTH from './fixtures/ngg/pending-smyth_reward-multi.json';
+import SMYTH from './fixtures/ngg-pinned/pending-smyth_reward-multi.json';
+import ROBOT_MID from './fixtures/ngg-pinned/action-build-robot-mid.json';
 
 interface Fixture { viewer: string; view: unknown; legalMoves: LegalMove[]; unavailable?: UnavailableMove[]; watcher: string; watcherView: unknown; watcherLegalMoves: LegalMove[] }
 
@@ -286,7 +287,7 @@ describe('NGnG payment, placed by the person on tiles the engine names', () => {
     expect(document.querySelectorAll('.ngg-option.shut')).toHaveLength(0);
   });
   it('a platform the engine lists both ways asks which Core, choosing nothing for the person', () => {
-    const f = ALL_NGG['action-build-robot-mid']!;
+    const f = ROBOT_MID as Fixture;
     for (const way of ['buy', 'reserve'] as const) {
       const { onMove, onForm } = draw(f);
       fireEvent.click(screen.getAllByRole('button', { name: /^Water collector/ })[0]!);

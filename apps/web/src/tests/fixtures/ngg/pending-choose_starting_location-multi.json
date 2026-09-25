@@ -20,7 +20,7 @@
      "base_owner": "p4",
      "units": [],
      "heroes": [
-      "Technomancer Greymore (p4)"
+      "Motherboard (p4)"
      ],
      "collectors": []
     },
@@ -77,7 +77,7 @@
      "base_owner": "p3",
      "units": [],
      "heroes": [
-      "Motherboard (p3)"
+      "Quartermaster Bertram Hollis (p3)"
      ],
      "collectors": []
     },
@@ -332,7 +332,7 @@
      "base_owner": "p2",
      "units": [],
      "heroes": [
-      "Chronicler Ottoline Vey (p2)"
+      "Foreman Hadrik Stoll (p2)"
      ],
      "collectors": []
     },
@@ -440,12 +440,13 @@
     "faction": "The Foundry",
     "species": "robot",
     "culture": 0,
+    "culture_target": 200,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -492,12 +493,13 @@
     "faction": "The Schism",
     "species": "wizard",
     "culture": 0,
+    "culture_target": 200,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -530,7 +532,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Chronicler Ottoline Vey",
+      "hero": "Foreman Hadrik Stoll",
       "coord": "2,2",
       "is_leader": true,
       "dead": false,
@@ -560,12 +562,13 @@
     "faction": "The Ledger",
     "species": "robot",
     "culture": 0,
+    "culture_target": 200,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -576,9 +579,10 @@
      "acquired_types": [
       "core",
       "water-collector",
+      "wood-collector",
       "home"
      ],
-     "bonus_points_live": 1,
+     "bonus_points_live": 0,
      "total": 4,
      "target": 18
     },
@@ -587,9 +591,9 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 13,
+    "cores_supply": 11,
     "action_cards": {
-     "build": 1,
+     "build": 2,
      "moveBattle": 1,
      "research": 1
     },
@@ -599,7 +603,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Motherboard",
+      "hero": "Quartermaster Bertram Hollis",
       "coord": "-2,12",
       "is_leader": true,
       "dead": false,
@@ -621,6 +625,18 @@
       "type": "Water collector",
       "placed_at": null,
       "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-1",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-2",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
      }
     ],
     "committed_collectors": []
@@ -631,12 +647,13 @@
     "faction": "The Brass Circle",
     "species": "wizard",
     "culture": 0,
+    "culture_target": 200,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -669,7 +686,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Technomancer Greymore",
+      "hero": "Motherboard",
       "coord": "-2,2",
       "is_leader": true,
       "dead": false,
@@ -737,7 +754,7 @@
      "base_owner": "p4",
      "units": [],
      "heroes": [
-      "Technomancer Greymore (p4)"
+      "Motherboard (p4)"
      ],
      "collectors": []
     },
@@ -794,7 +811,7 @@
      "base_owner": "p3",
      "units": [],
      "heroes": [
-      "Motherboard (p3)"
+      "Quartermaster Bertram Hollis (p3)"
      ],
      "collectors": []
     },
@@ -1049,7 +1066,7 @@
      "base_owner": "p2",
      "units": [],
      "heroes": [
-      "Chronicler Ottoline Vey (p2)"
+      "Foreman Hadrik Stoll (p2)"
      ],
      "collectors": []
     },
@@ -1157,12 +1174,13 @@
     "faction": "The Foundry",
     "species": "robot",
     "culture": 0,
+    "culture_target": 200,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -1209,12 +1227,13 @@
     "faction": "The Schism",
     "species": "wizard",
     "culture": 0,
+    "culture_target": 200,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -1247,7 +1266,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Chronicler Ottoline Vey",
+      "hero": "Foreman Hadrik Stoll",
       "coord": "2,2",
       "is_leader": true,
       "dead": false,
@@ -1277,12 +1296,13 @@
     "faction": "The Ledger",
     "species": "robot",
     "culture": 0,
+    "culture_target": 200,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -1293,9 +1313,10 @@
      "acquired_types": [
       "core",
       "water-collector",
+      "wood-collector",
       "home"
      ],
-     "bonus_points_live": 1,
+     "bonus_points_live": 0,
      "total": 4,
      "target": 18
     },
@@ -1304,9 +1325,9 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 13,
+    "cores_supply": 11,
     "action_cards": {
-     "build": 1,
+     "build": 2,
      "moveBattle": 1,
      "research": 1
     },
@@ -1316,7 +1337,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Motherboard",
+      "hero": "Quartermaster Bertram Hollis",
       "coord": "-2,12",
       "is_leader": true,
       "dead": false,
@@ -1338,6 +1359,18 @@
       "type": "Water collector",
       "placed_at": null,
       "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-1",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-2",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
      }
     ],
     "committed_collectors": []
@@ -1348,12 +1381,13 @@
     "faction": "The Brass Circle",
     "species": "wizard",
     "culture": 0,
+    "culture_target": 200,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -1386,7 +1420,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Technomancer Greymore",
+      "hero": "Motherboard",
       "coord": "-2,2",
       "is_leader": true,
       "dead": false,

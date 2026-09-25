@@ -11,6 +11,7 @@ import { HexMap, type MapMarks } from './HexMap';
 import { inkOf, inkOfSeat } from './factions';
 import { WAITING_ON } from './route';
 import { CardBack, FactionChip, Icon, Panel } from './ui';
+import { cultureRaceOf } from './ref';
 import { FactionBoard, FactionStrip } from './FactionBoard';
 
 const CARD_ICON: Record<string, string> = { build: 'Build', research: 'Research', move_battle: 'Move / Battle' };
@@ -87,8 +88,9 @@ function SeatsPanel({ ctx, onOpen }: { ctx: ScreenCtx; onOpen: (playerId: string
 
 function CultureRace({ ctx }: { ctx: ScreenCtx }) {
   const { v, ref } = ctx;
-  const target = ref?.cultureTarget ?? 100;
-  const marks = [...(ref?.milestones ?? []), target];
+  // The target and milestones scale with the number of players.
+  const { target, milestones } = cultureRaceOf(ref, v.players.length, v.players.find((p) => p.cultureTarget !== null)?.cultureTarget ?? null);
+  const marks = [...milestones, target];
   const lanes = [...v.players].sort((a, b) => b.culture - a.culture);
   const pct = (n: number) => `${Math.min(100, (n / target) * 100)}%`;
   return (

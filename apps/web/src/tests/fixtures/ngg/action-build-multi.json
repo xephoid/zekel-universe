@@ -1,12 +1,12 @@
 {
  "key": "action-build",
  "players": 4,
- "viewer": "p2",
+ "viewer": "p3",
  "view": {
   "game_id": "neither-guts-nor-gears",
   "phase": "action",
   "round": 1,
-  "active_player_id": "p2",
+  "active_player_id": "p3",
   "first_player_id": "p2",
   "layout": "threeFour",
   "map": {
@@ -31,7 +31,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [
-      "Technomancer Greymore (p4)"
+      "Motherboard (p4)"
      ],
      "collectors": []
     },
@@ -65,7 +65,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Quartermaster Bertram Hollis (p3)"
+     ],
      "collectors": []
     },
     {
@@ -76,9 +78,7 @@
      "start": 1,
      "base_owner": "p3",
      "units": [],
-     "heroes": [
-      "Motherboard (p3)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -331,9 +331,7 @@
      "start": 3,
      "base_owner": "p2",
      "units": [],
-     "heroes": [
-      "Chronicler Ottoline Vey (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -344,7 +342,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Foreman Hadrik Stoll (p2)"
+     ],
      "collectors": []
     },
     {
@@ -377,7 +377,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Archmage Chaimidious (p1)"
+     ],
      "collectors": []
     },
     {
@@ -388,9 +390,7 @@
      "start": 2,
      "base_owner": "p1",
      "units": [],
-     "heroes": [
-      "Archmage Chaimidious (p1)"
-     ],
+     "heroes": [],
      "collectors": []
     }
    ]
@@ -400,12 +400,12 @@
    {
     "position": 1,
     "owner": "p2",
-    "card_kind": "move_battle"
+    "face": "down"
    },
    {
     "position": 2,
     "owner": "p3",
-    "face": "down"
+    "card_kind": "build"
    },
    {
     "position": 3,
@@ -420,33 +420,18 @@
    {
     "position": 5,
     "owner": "p2",
-    "card_kind": "research"
+    "face": "down"
    },
    {
     "position": 6,
     "owner": "p3",
-    "face": "down"
-   },
-   {
-    "position": 7,
-    "owner": "p4",
-    "face": "down"
-   },
-   {
-    "position": 8,
-    "owner": "p1",
-    "face": "down"
-   },
-   {
-    "position": 9,
-    "owner": "p2",
     "card_kind": "build"
    }
   ],
-  "active_action": "build by p2",
+  "active_action": "build by p3",
   "resolving_action": {
    "card_kind": "build",
-   "owner": "p2"
+   "owner": "p3"
   },
   "treaties": [],
   "battle": null,
@@ -456,7 +441,7 @@
   "victory_status": {
    "p1": {
     "culture": 0,
-    "tech": 3,
+    "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
@@ -487,12 +472,13 @@
     "faction": "The Foundry",
     "species": "robot",
     "culture": 0,
+    "culture_target": 200,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -503,10 +489,11 @@
      "acquired_types": [
       "core",
       "water-collector",
+      "wood-collector",
       "home"
      ],
      "bonus_points_live": 0,
-     "total": 3,
+     "total": 4,
      "target": 18
     },
     "leader_kills": 0,
@@ -514,20 +501,20 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 13,
+    "cores_supply": 11,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_count": 2,
+    "action_cards_played_count": 3,
     "battle_hand_count": 1,
     "spy_recruitments": 0,
     "units": [],
     "heroes": [
      {
       "hero": "Archmage Chaimidious",
-      "coord": "2,12",
+      "coord": "2,10",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
@@ -548,6 +535,18 @@
       "type": "Water collector",
       "placed_at": null,
       "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-1",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-2",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
      }
     ],
     "committed_collectors": []
@@ -558,12 +557,13 @@
     "faction": "The Schism",
     "species": "wizard",
     "culture": 0,
+    "culture_target": 200,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -596,8 +596,8 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Chronicler Ottoline Vey",
-      "coord": "2,2",
+      "hero": "Foreman Hadrik Stoll",
+      "coord": "2,4",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
@@ -626,12 +626,13 @@
     "faction": "The Ledger",
     "species": "robot",
     "culture": 0,
+    "culture_target": 200,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -642,9 +643,10 @@
      "acquired_types": [
       "core",
       "water-collector",
+      "wood-collector",
       "home"
      ],
-     "bonus_points_live": 1,
+     "bonus_points_live": 0,
      "total": 4,
      "target": 18
     },
@@ -653,20 +655,20 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 13,
+    "cores_supply": 11,
     "action_cards": {
-     "build": 1,
+     "build": 2,
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_count": 2,
+    "action_cards_played_count": 4,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Motherboard",
-      "coord": "-2,12",
+      "hero": "Quartermaster Bertram Hollis",
+      "coord": "-2,10",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
@@ -687,6 +689,18 @@
       "type": "Water collector",
       "placed_at": null,
       "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-1",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-2",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
      }
     ],
     "committed_collectors": []
@@ -697,12 +711,13 @@
     "faction": "The Brass Circle",
     "species": "wizard",
     "culture": 0,
+    "culture_target": 200,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -735,7 +750,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Technomancer Greymore",
+      "hero": "Motherboard",
       "coord": "-2,4",
       "is_leader": true,
       "dead": false,
@@ -762,9 +777,10 @@
   ],
   "your_battle_hand": [],
   "your_action_cards_played": [
-   "move_battle:base",
+   "build:base",
+   "build:hero_extra",
    "research:base",
-   "build:base"
+   "move_battle:base"
   ],
   "your_spy_assignments": [],
   "your_knowledge": [],
@@ -773,36 +789,93 @@
  "legalMoves": [
   {
    "move_id": "",
-   "description": "Build Surf for 2 water (available collectors: surf-1, surf-2; edit payment placements as needed).",
+   "description": "Build Core for 1 water (available collectors: water-collector-1, water-collector-2, wood-collector-1, wood-collector-2; edit payment placements as needed).",
    "move": {
     "type": "build",
-    "item": "Surf",
+    "item": "Core",
     "payment": [
      {
-      "collectorId": "surf-1",
-      "coord": "1,3"
-     },
-     {
-      "collectorId": "surf-2",
-      "coord": "1,5"
+      "collectorId": "water-collector-1",
+      "coord": "-2,8"
      }
     ]
    }
   },
   {
    "move_id": "",
-   "description": "Build Subject for 1 water + 1 wood (available collectors: surf-1, surf-2; edit payment placements as needed).",
+   "description": "Build Water collector for 1 water + a new Core bought with it (core_pairing, +1 water) (available collectors: water-collector-1, water-collector-2, wood-collector-1, wood-collector-2; edit payment placements as needed).",
    "move": {
     "type": "build",
-    "item": "Subject",
+    "item": "Water collector",
     "payment": [
      {
-      "collectorId": "surf-1",
-      "coord": "1,1"
+      "collectorId": "water-collector-1",
+      "coord": "-2,8"
      },
      {
-      "collectorId": "surf-2",
-      "coord": "0,0"
+      "collectorId": "water-collector-2",
+      "coord": "-2,6"
+     }
+    ],
+    "core_pairing": true
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Build Wood collector for 1 water + a new Core bought with it (core_pairing, +1 water) (available collectors: water-collector-1, water-collector-2, wood-collector-1, wood-collector-2; edit payment placements as needed).",
+   "move": {
+    "type": "build",
+    "item": "Wood collector",
+    "payment": [
+     {
+      "collectorId": "water-collector-1",
+      "coord": "-2,8"
+     },
+     {
+      "collectorId": "water-collector-2",
+      "coord": "-2,6"
+     }
+    ],
+    "core_pairing": true
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Build Ore collector for 1 wood + a new Core bought with it (core_pairing, +1 water) (available collectors: water-collector-1, water-collector-2, wood-collector-1, wood-collector-2; edit payment placements as needed).",
+   "move": {
+    "type": "build",
+    "item": "Ore collector",
+    "payment": [
+     {
+      "collectorId": "water-collector-1",
+      "coord": "-2,8"
+     },
+     {
+      "collectorId": "wood-collector-1",
+      "coord": "-2,10"
+     }
+    ],
+    "core_pairing": true
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Build Diplomatic Research Station for 1 water + 2 wood.",
+   "move": {
+    "type": "build",
+    "item": "Diplomatic Research Station",
+    "payment": [
+     {
+      "collectorId": "water-collector-1",
+      "coord": "-2,8"
+     },
+     {
+      "collectorId": "wood-collector-1",
+      "coord": "-2,10"
+     },
+     {
+      "collectorId": "wood-collector-2",
+      "coord": "-1,9"
      }
     ]
    }
@@ -818,81 +891,71 @@
  "unavailable": [
   {
    "moveType": "form_treaty",
-   "reason": "a treaty needs an unlock on one side — an Embassy or an active Envoy Sable Marrow; no one who could partner with you has one"
+   "reason": "a treaty needs an unlock on one side — a Diplomatic Research Station or an active Envoy Sable Marrow; no one who could partner with you has one"
   },
   {
    "moveType": "build",
-   "item": "Evoker",
-   "reason": "costs 2 wood + 1 ore — that is 3 resources and you have 2 free collectors"
+   "item": "Oil collector",
+   "reason": "costs 1 water + 1 ore (with the Core bought with it) — you have no free ore collector"
   },
   {
    "moveType": "build",
-   "item": "Illusionist",
-   "reason": "Illusionist requires Library of Illusion first (you have: none)"
+   "item": "Ether collector",
+   "reason": "costs 1 water + 1 oil (with the Core bought with it) — you have no free oil collector"
   },
   {
    "moveType": "build",
-   "item": "Dragon",
-   "reason": "Dragon requires Dragon Hoard first (you have: none)"
+   "item": "Spinner Platform",
+   "reason": "Spinner Platform requires Combat Frame Production first (you have: none)"
   },
   {
    "moveType": "build",
-   "item": "Enchantress",
-   "reason": "Enchantress requires Library of Enchantment first (you have: none)"
+   "item": "Spitter Platform",
+   "reason": "Spitter Platform requires Combat Frame Production first (you have: none)"
   },
   {
    "moveType": "build",
-   "item": "Cleric",
-   "reason": "Cleric requires Temple first (you have: none)"
+   "item": "Infiltrator Platform",
+   "reason": "Infiltrator Platform requires Diplomatic Research Station first (you have: none)"
   },
   {
    "moveType": "build",
-   "item": "Castle",
-   "reason": "A new base goes on a tile holding your unit or hero, no opposing unit and no base — no tile qualifies now (ruling 55)"
+   "item": "Immobile Combat Platform",
+   "reason": "costs 1 water + 2 wood + 2 ore (with the Core bought with it) — that is 5 resources and you have 4 free collectors"
   },
   {
    "moveType": "build",
-   "item": "Library of Evocation",
-   "reason": "costs 1 water + 2 wood — that is 3 resources and you have 2 free collectors"
+   "item": "Large Combat Platform",
+   "reason": "Large Combat Platform requires Combat Frame Production first (you have: none)"
   },
   {
    "moveType": "build",
-   "item": "Library of Illusion",
-   "reason": "costs 2 wood + 1 ore — that is 3 resources and you have 2 free collectors"
+   "item": "Wall Platform",
+   "reason": "Wall Platform requires Defense Research Station first (you have: none)"
   },
   {
    "moveType": "build",
-   "item": "Library of Enchantment",
-   "reason": "costs 2 wood + 1 ore — that is 3 resources and you have 2 free collectors"
+   "item": "Home",
+   "reason": "costs 3 wood + 1 ore — you have only 2 free wood collectors"
   },
   {
    "moveType": "build",
-   "item": "Dragon Hoard",
-   "reason": "costs 1 water + 2 ore + 1 ether — that is 4 resources and you have 2 free collectors"
+   "item": "Combat Frame Production",
+   "reason": "costs 2 wood + 1 ore — you have no free ore collector"
   },
   {
    "moveType": "build",
-   "item": "Temple",
-   "reason": "costs 2 water + 2 wood — that is 4 resources and you have 2 free collectors"
+   "item": "Defense Research Station",
+   "reason": "costs 2 wood + 1 ore — you have no free ore collector"
   },
   {
    "moveType": "build",
-   "item": "Embassy",
-   "reason": "costs 2 wood — your free collectors (surf-1, surf-2) cannot reach enough of it from your units, bases and earlier placements"
-  },
-  {
-   "moveType": "build",
-   "item": "Amphitheatre",
-   "reason": "costs 1 water + 3 wood — that is 4 resources and you have 2 free collectors"
-  },
-  {
-   "moveType": "build",
-   "item": "Mana Reserve",
-   "reason": "costs 1 water + 2 wood — that is 3 resources and you have 2 free collectors"
+   "item": "Third Space",
+   "reason": "costs 1 water + 3 wood + 1 ore — that is 5 resources and you have 4 free collectors"
   },
   {
    "moveType": "economic_victory_spend",
-   "reason": "needs 11 free collectors on 11 different tiles — you have 2"
+   "reason": "needs 11 free collectors on 11 different tiles — you have 4"
   }
  ],
  "watcher": "p1",
@@ -900,7 +963,7 @@
   "game_id": "neither-guts-nor-gears",
   "phase": "action",
   "round": 1,
-  "active_player_id": "p2",
+  "active_player_id": "p3",
   "first_player_id": "p2",
   "layout": "threeFour",
   "map": {
@@ -925,7 +988,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [
-      "Technomancer Greymore (p4)"
+      "Motherboard (p4)"
      ],
      "collectors": []
     },
@@ -959,7 +1022,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Quartermaster Bertram Hollis (p3)"
+     ],
      "collectors": []
     },
     {
@@ -970,9 +1035,7 @@
      "start": 1,
      "base_owner": "p3",
      "units": [],
-     "heroes": [
-      "Motherboard (p3)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -1225,9 +1288,7 @@
      "start": 3,
      "base_owner": "p2",
      "units": [],
-     "heroes": [
-      "Chronicler Ottoline Vey (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -1238,7 +1299,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Foreman Hadrik Stoll (p2)"
+     ],
      "collectors": []
     },
     {
@@ -1271,7 +1334,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Archmage Chaimidious (p1)"
+     ],
      "collectors": []
     },
     {
@@ -1282,9 +1347,7 @@
      "start": 2,
      "base_owner": "p1",
      "units": [],
-     "heroes": [
-      "Archmage Chaimidious (p1)"
-     ],
+     "heroes": [],
      "collectors": []
     }
    ]
@@ -1309,7 +1372,7 @@
    {
     "position": 4,
     "owner": "p1",
-    "card_kind": "move_battle"
+    "card_kind": "build"
    },
    {
     "position": 5,
@@ -1319,28 +1382,13 @@
    {
     "position": 6,
     "owner": "p3",
-    "face": "down"
-   },
-   {
-    "position": 7,
-    "owner": "p4",
-    "face": "down"
-   },
-   {
-    "position": 8,
-    "owner": "p1",
-    "card_kind": "build"
-   },
-   {
-    "position": 9,
-    "owner": "p2",
     "card_kind": "build"
    }
   ],
-  "active_action": "build by p2",
+  "active_action": "build by p3",
   "resolving_action": {
    "card_kind": "build",
-   "owner": "p2"
+   "owner": "p3"
   },
   "treaties": [],
   "battle": null,
@@ -1350,7 +1398,7 @@
   "victory_status": {
    "p1": {
     "culture": 0,
-    "tech": 3,
+    "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
@@ -1381,12 +1429,13 @@
     "faction": "The Foundry",
     "species": "robot",
     "culture": 0,
+    "culture_target": 200,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -1397,10 +1446,11 @@
      "acquired_types": [
       "core",
       "water-collector",
+      "wood-collector",
       "home"
      ],
      "bonus_points_live": 0,
-     "total": 3,
+     "total": 4,
      "target": 18
     },
     "leader_kills": 0,
@@ -1408,20 +1458,20 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 13,
+    "cores_supply": 11,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_count": 2,
+    "action_cards_played_count": 3,
     "battle_hand_count": 1,
     "spy_recruitments": 0,
     "units": [],
     "heroes": [
      {
       "hero": "Archmage Chaimidious",
-      "coord": "2,12",
+      "coord": "2,10",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
@@ -1442,6 +1492,18 @@
       "type": "Water collector",
       "placed_at": null,
       "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-1",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-2",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
      }
     ],
     "committed_collectors": []
@@ -1452,12 +1514,13 @@
     "faction": "The Schism",
     "species": "wizard",
     "culture": 0,
+    "culture_target": 200,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -1490,8 +1553,8 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Chronicler Ottoline Vey",
-      "coord": "2,2",
+      "hero": "Foreman Hadrik Stoll",
+      "coord": "2,4",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
@@ -1520,12 +1583,13 @@
     "faction": "The Ledger",
     "species": "robot",
     "culture": 0,
+    "culture_target": 200,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -1536,9 +1600,10 @@
      "acquired_types": [
       "core",
       "water-collector",
+      "wood-collector",
       "home"
      ],
-     "bonus_points_live": 1,
+     "bonus_points_live": 0,
      "total": 4,
      "target": 18
     },
@@ -1547,20 +1612,20 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 13,
+    "cores_supply": 11,
     "action_cards": {
-     "build": 1,
+     "build": 2,
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_count": 2,
+    "action_cards_played_count": 4,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Motherboard",
-      "coord": "-2,12",
+      "hero": "Quartermaster Bertram Hollis",
+      "coord": "-2,10",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
@@ -1581,6 +1646,18 @@
       "type": "Water collector",
       "placed_at": null,
       "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-1",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-2",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
      }
     ],
     "committed_collectors": []
@@ -1591,12 +1668,13 @@
     "faction": "The Brass Circle",
     "species": "wizard",
     "culture": 0,
+    "culture_target": 200,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -1629,7 +1707,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Technomancer Greymore",
+      "hero": "Motherboard",
       "coord": "-2,4",
       "is_leader": true,
       "dead": false,
@@ -1661,8 +1739,9 @@
    }
   ],
   "your_action_cards_played": [
-   "move_battle:base",
-   "build:base"
+   "build:base",
+   "research:base",
+   "move_battle:base"
   ],
   "your_spy_assignments": [],
   "your_knowledge": [],

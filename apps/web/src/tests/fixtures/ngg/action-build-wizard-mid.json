@@ -5,7 +5,7 @@
  "view": {
   "game_id": "neither-guts-nor-gears",
   "phase": "action",
-  "round": 4,
+  "round": 2,
   "active_player_id": "p1",
   "first_player_id": "p2",
   "layout": "two",
@@ -187,9 +187,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "water-collector-1 (p2)"
-     ]
+     "collectors": []
     },
     {
      "coord": "1,5",
@@ -200,9 +198,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "water-collector-2 (p2)"
-     ]
+     "collectors": []
     },
     {
      "coord": "1,7",
@@ -245,7 +241,9 @@
      "start": 2,
      "base_owner": "p2",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Foreman Hadrik Stoll (p2)"
+     ],
      "collectors": []
     },
     {
@@ -256,11 +254,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Chronicler Ottoline Vey (p2)",
-      "Foreman Hadrik Stoll (p2)",
-      "Quartermaster Bertram Hollis (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -287,7 +281,7 @@
     }
    ]
   },
-  "hero_pool_count": 16,
+  "hero_pool_count": 18,
   "action_stack": [
    {
     "position": 1,
@@ -296,16 +290,6 @@
    },
    {
     "position": 2,
-    "owner": "p1",
-    "card_kind": "move_battle"
-   },
-   {
-    "position": 3,
-    "owner": "p2",
-    "face": "down"
-   },
-   {
-    "position": 4,
     "owner": "p1",
     "card_kind": "build"
    }
@@ -322,14 +306,14 @@
   "pending": null,
   "victory_status": {
    "p1": {
-    "culture": 3,
-    "tech": 3,
+    "culture": 0,
+    "tech": 2,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p2": {
-    "culture": 20,
-    "tech": 3,
+    "culture": 2,
+    "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -341,7 +325,8 @@
     "kind": "human",
     "faction": "The Covenant",
     "species": "wizard",
-    "culture": 3,
+    "culture": 0,
+    "culture_target": 100,
     "next_milestones": [
      5,
      15,
@@ -357,17 +342,16 @@
     "tech_progress": {
      "acquired_types": [
       "surf",
-      "castle",
-      "subject"
+      "castle"
      ],
      "bonus_points_live": 0,
-     "total": 3,
+     "total": 2,
      "target": 22
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
     "leader_alive": true,
-    "subjects": 1,
+    "subjects": 0,
     "cores_reserve": 0,
     "cores_supply": 15,
     "action_cards": {
@@ -415,8 +399,11 @@
     "kind": "ai",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 20,
+    "culture": 2,
+    "culture_target": 100,
     "next_milestones": [
+     5,
+     15,
      30,
      50,
      75
@@ -430,48 +417,35 @@
      "acquired_types": [
       "core",
       "water-collector",
+      "wood-collector",
       "home"
      ],
      "bonus_points_live": 0,
-     "total": 3,
+     "total": 4,
      "target": 18
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
     "leader_alive": true,
     "subjects": 0,
-    "cores_reserve": 5,
-    "cores_supply": 7,
+    "cores_reserve": 2,
+    "cores_supply": 9,
     "action_cards": {
-     "build": 2,
+     "build": 1,
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_count": 4,
+    "action_cards_played_count": 3,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Chronicler Ottoline Vey",
-      "coord": "2,6",
+      "hero": "Foreman Hadrik Stoll",
+      "coord": "2,4",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
-     },
-     {
-      "hero": "Foreman Hadrik Stoll",
-      "coord": "2,6",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 30 DMG 1 DEF 3"
-     },
-     {
-      "hero": "Quartermaster Bertram Hollis",
-      "coord": "2,6",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
@@ -481,34 +455,29 @@
      {
       "collector": "water-collector-1",
       "type": "Water collector",
-      "placed_at": "1,3",
+      "placed_at": null,
       "core": "allocated"
      },
      {
       "collector": "water-collector-2",
       "type": "Water collector",
-      "placed_at": "1,5",
+      "placed_at": null,
       "core": "allocated"
      },
      {
-      "collector": "water-collector-3",
-      "type": "Water collector",
+      "collector": "wood-collector-1",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-2",
+      "type": "Wood collector",
       "placed_at": null,
       "core": "allocated"
      }
     ],
-    "committed_collectors": [
-     {
-      "collector": "water-collector-1",
-      "coord": "1,3",
-      "resource": "water"
-     },
-     {
-      "collector": "water-collector-2",
-      "coord": "1,5",
-      "resource": "water"
-     }
-    ]
+    "committed_collectors": []
    }
   ],
   "your_battle_hand": [
@@ -518,9 +487,9 @@
    }
   ],
   "your_action_cards_played": [
-   "move_battle:base",
    "build:base",
-   "research:base"
+   "research:base",
+   "move_battle:base"
   ],
   "your_spy_assignments": [],
   "your_knowledge": [],
@@ -754,7 +723,7 @@
  "watcherView": {
   "game_id": "neither-guts-nor-gears",
   "phase": "action",
-  "round": 4,
+  "round": 2,
   "active_player_id": "p1",
   "first_player_id": "p2",
   "layout": "two",
@@ -936,9 +905,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "water-collector-1 (p2)"
-     ]
+     "collectors": []
     },
     {
      "coord": "1,5",
@@ -949,9 +916,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "water-collector-2 (p2)"
-     ]
+     "collectors": []
     },
     {
      "coord": "1,7",
@@ -994,7 +959,9 @@
      "start": 2,
      "base_owner": "p2",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Foreman Hadrik Stoll (p2)"
+     ],
      "collectors": []
     },
     {
@@ -1005,11 +972,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Chronicler Ottoline Vey (p2)",
-      "Foreman Hadrik Stoll (p2)",
-      "Quartermaster Bertram Hollis (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -1036,25 +999,15 @@
     }
    ]
   },
-  "hero_pool_count": 16,
+  "hero_pool_count": 18,
   "action_stack": [
    {
     "position": 1,
     "owner": "p2",
-    "card_kind": "research"
-   },
-   {
-    "position": 2,
-    "owner": "p1",
-    "face": "down"
-   },
-   {
-    "position": 3,
-    "owner": "p2",
     "card_kind": "build"
    },
    {
-    "position": 4,
+    "position": 2,
     "owner": "p1",
     "card_kind": "build"
    }
@@ -1071,14 +1024,14 @@
   "pending": null,
   "victory_status": {
    "p1": {
-    "culture": 3,
-    "tech": 3,
+    "culture": 0,
+    "tech": 2,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p2": {
-    "culture": 20,
-    "tech": 3,
+    "culture": 2,
+    "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -1090,7 +1043,8 @@
     "kind": "human",
     "faction": "The Covenant",
     "species": "wizard",
-    "culture": 3,
+    "culture": 0,
+    "culture_target": 100,
     "next_milestones": [
      5,
      15,
@@ -1106,17 +1060,16 @@
     "tech_progress": {
      "acquired_types": [
       "surf",
-      "castle",
-      "subject"
+      "castle"
      ],
      "bonus_points_live": 0,
-     "total": 3,
+     "total": 2,
      "target": 22
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
     "leader_alive": true,
-    "subjects": 1,
+    "subjects": 0,
     "cores_reserve": 0,
     "cores_supply": 15,
     "action_cards": {
@@ -1164,8 +1117,11 @@
     "kind": "ai",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 20,
+    "culture": 2,
+    "culture_target": 100,
     "next_milestones": [
+     5,
+     15,
      30,
      50,
      75
@@ -1179,48 +1135,35 @@
      "acquired_types": [
       "core",
       "water-collector",
+      "wood-collector",
       "home"
      ],
      "bonus_points_live": 0,
-     "total": 3,
+     "total": 4,
      "target": 18
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
     "leader_alive": true,
     "subjects": 0,
-    "cores_reserve": 5,
-    "cores_supply": 7,
+    "cores_reserve": 2,
+    "cores_supply": 9,
     "action_cards": {
-     "build": 2,
+     "build": 1,
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_count": 4,
+    "action_cards_played_count": 3,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Chronicler Ottoline Vey",
-      "coord": "2,6",
+      "hero": "Foreman Hadrik Stoll",
+      "coord": "2,4",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
-     },
-     {
-      "hero": "Foreman Hadrik Stoll",
-      "coord": "2,6",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 30 DMG 1 DEF 3"
-     },
-     {
-      "hero": "Quartermaster Bertram Hollis",
-      "coord": "2,6",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
@@ -1230,42 +1173,36 @@
      {
       "collector": "water-collector-1",
       "type": "Water collector",
-      "placed_at": "1,3",
+      "placed_at": null,
       "core": "allocated"
      },
      {
       "collector": "water-collector-2",
       "type": "Water collector",
-      "placed_at": "1,5",
+      "placed_at": null,
       "core": "allocated"
      },
      {
-      "collector": "water-collector-3",
-      "type": "Water collector",
+      "collector": "wood-collector-1",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-2",
+      "type": "Wood collector",
       "placed_at": null,
       "core": "allocated"
      }
     ],
-    "committed_collectors": [
-     {
-      "collector": "water-collector-1",
-      "coord": "1,3",
-      "resource": "water"
-     },
-     {
-      "collector": "water-collector-2",
-      "coord": "1,5",
-      "resource": "water"
-     }
-    ]
+    "committed_collectors": []
    }
   ],
   "your_battle_hand": [],
   "your_action_cards_played": [
+   "build:base",
    "research:base",
-   "build:hero_extra",
-   "move_battle:base",
-   "build:base"
+   "move_battle:base"
   ],
   "your_spy_assignments": [],
   "your_knowledge": [],

@@ -239,7 +239,7 @@ describe('NGnG battle screens', () => {
   });
 
   it('Rally: a subset the engine did not list whole is a listed template with only units changed', () => {
-    const f = fx('pending-rally_selection-multi');
+    const f = fx('pinned:pending-rally_selection-multi');
     // Drop the listed pair, so bringing exactly those two is a form on a template.
     const legal: LegalMove[] = f.legalMoves.filter((m) => {
       const units = m.move['units'] as string[] | undefined;
@@ -278,7 +278,7 @@ describe('NGnG battle screens', () => {
 
   it('Move Battle: leaving a unit behind sends the listed template with only units changed', () => {
     // Two of the seat's heroes share the origin; the listed move takes both.
-    const f = fx('action-move_battle-mid');
+    const f = fx('pinned:action-move_battle-mid');
     const view = structuredClone(f.view) as { players: Array<{ player_id: string; heroes: Array<{ hero: string; coord: string }> }> };
     const me = view.players.find((p) => p.player_id === f.viewer)!;
     me.heroes.find((h) => h.hero === 'Foreman Hadrik Stoll')!.coord = '2,6';

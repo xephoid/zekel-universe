@@ -1,13 +1,13 @@
 {
- "key": "battle-activations",
+ "key": "action-move_battle-mid",
  "players": 2,
- "viewer": "rob",
+ "viewer": "p2",
  "view": {
   "game_id": "neither-guts-nor-gears",
-  "phase": "planning",
-  "round": 1,
-  "active_player_id": "rob",
-  "first_player_id": "rob",
+  "phase": "action",
+  "round": 2,
+  "active_player_id": "p2",
+  "first_player_id": "p2",
   "layout": "two",
   "map": {
    "tiles": [
@@ -41,7 +41,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Archmage Chaimidious (p1)"
+     ],
      "collectors": []
     },
     {
@@ -50,11 +52,9 @@
      "printed_resource": "wood",
      "current_resource": "wood",
      "start": 1,
-     "base_owner": "wiz",
+     "base_owner": "p1",
      "units": [],
-     "heroes": [
-      "Warden Hesper Quill (wiz)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -119,9 +119,7 @@
      "current_resource": "ore",
      "start": null,
      "base_owner": null,
-     "units": [
-      "Evoker (wiz)"
-     ],
+     "units": [],
      "heroes": [],
      "collectors": []
     },
@@ -241,9 +239,11 @@
      "printed_resource": "water",
      "current_resource": "water",
      "start": 2,
-     "base_owner": "rob",
+     "base_owner": "p2",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Foreman Hadrik Stoll (p2)"
+     ],
      "collectors": []
     },
     {
@@ -254,7 +254,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Chronicler Ottoline Vey (p2)"
+     ],
      "collectors": []
     },
     {
@@ -281,66 +283,49 @@
     }
    ]
   },
-  "hero_pool_count": 18,
-  "action_stack": [],
-  "active_action": null,
-  "resolving_action": null,
-  "treaties": [],
-  "battle": {
-   "coord": "0,2",
-   "origin": "0,0",
-   "phase": "activations",
-   "pass": 1,
-   "units": [
-    {
-     "unit": "Spitter Platform",
-     "ref": "u-spitter-rob-1",
-     "owner": "rob",
-     "side": "attackers",
-     "init": 95,
-     "dmg": 3,
-     "def": 1,
-     "activated": false
-    },
-    {
-     "unit": "Kestrel Nine",
-     "ref": "kestrel",
-     "owner": "rob",
-     "side": "attackers",
-     "init": 70,
-     "dmg": 3,
-     "def": 6,
-     "activated": false
-    },
-    {
-     "unit": "Evoker",
-     "ref": "u-evoker-wiz-1",
-     "owner": "wiz",
-     "side": "defenders",
-     "init": 50,
-     "dmg": 2,
-     "def": 1,
-     "activated": false
-    }
-   ],
-   "commitments": {
-    "rob": "pending",
-    "wiz": "pending"
+  "hero_pool_count": 17,
+  "action_stack": [
+   {
+    "position": 1,
+    "owner": "p2",
+    "card_kind": "build"
+   },
+   {
+    "position": 2,
+    "owner": "p1",
+    "face": "down"
+   },
+   {
+    "position": 3,
+    "owner": "p2",
+    "card_kind": "research"
+   },
+   {
+    "position": 4,
+    "owner": "p2",
+    "card_kind": "move_battle"
    }
+  ],
+  "active_action": "move_battle by p2",
+  "resolving_action": {
+   "card_kind": "move_battle",
+   "owner": "p2"
   },
-  "battle_deck_count": 20,
+  "treaties": [],
+  "battle": null,
+  "battle_deck_count": 19,
   "battle_discard": [],
   "pending": null,
   "victory_status": {
-   "wiz": {
-    "culture": 0,
-    "tech": 2,
+   "p1": {
+    "culture": 1,
+    "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
    },
-   "rob": {
-    "culture": 0,
-    "tech": 4,
+   "p2": {
+    "culture": 6,
+    "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -348,12 +333,11 @@
   "result": null,
   "players": [
    {
-    "player_id": "wiz",
+    "player_id": "p1",
     "kind": "human",
     "faction": "The Covenant",
     "species": "wizard",
-    "culture": 0,
-    "culture_target": 100,
+    "culture": 1,
     "next_milestones": [
      5,
      15,
@@ -369,16 +353,17 @@
     "tech_progress": {
      "acquired_types": [
       "surf",
-      "castle"
+      "castle",
+      "subject"
      ],
      "bonus_points_live": 0,
-     "total": 2,
+     "total": 3,
      "target": 22
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
     "leader_alive": true,
-    "subjects": 0,
+    "subjects": 1,
     "cores_reserve": 0,
     "cores_supply": 15,
     "action_cards": {
@@ -386,21 +371,14 @@
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_count": 0,
-    "battle_hand_count": 0,
-    "spy_recruitments": 1,
-    "units": [
-     {
-      "id": "u-evoker-wiz-1",
-      "type": "Evoker",
-      "coord": "0,2",
-      "core": null
-     }
-    ],
+    "action_cards_played_count": 1,
+    "battle_hand_count": 1,
+    "spy_recruitments": 0,
+    "units": [],
     "heroes": [
      {
-      "hero": "Warden Hesper Quill",
-      "coord": "-2,10",
+      "hero": "Archmage Chaimidious",
+      "coord": "-2,8",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
@@ -424,14 +402,12 @@
     "committed_collectors": []
    },
    {
-    "player_id": "rob",
-    "kind": "human",
-    "faction": "The Ledger",
+    "player_id": "p2",
+    "kind": "ai",
+    "faction": "The Foundry",
     "species": "robot",
-    "culture": 0,
-    "culture_target": 100,
+    "culture": 6,
     "next_milestones": [
-     5,
      15,
      30,
      50,
@@ -446,42 +422,41 @@
      "acquired_types": [
       "core",
       "water-collector",
-      "wood-collector",
       "home"
      ],
      "bonus_points_live": 0,
-     "total": 4,
+     "total": 3,
      "target": 18
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
     "leader_alive": true,
     "subjects": 0,
-    "cores_reserve": 0,
-    "cores_supply": 11,
+    "cores_reserve": 1,
+    "cores_supply": 12,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_count": 0,
+    "action_cards_played_count": 3,
     "battle_hand_count": 0,
-    "spy_recruitments": 1,
-    "units": [
-     {
-      "id": "u-spitter-rob-1",
-      "type": "Spitter Platform",
-      "coord": "0,0",
-      "core": "allocated"
-     }
-    ],
+    "spy_recruitments": 0,
+    "units": [],
     "heroes": [
      {
-      "hero": "Kestrel Nine",
-      "coord": "0,0",
+      "hero": "Chronicler Ottoline Vey",
+      "coord": "2,6",
       "is_leader": true,
       "dead": false,
-      "stats": "Init 70 DMG 3 DEF 6"
+      "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Foreman Hadrik Stoll",
+      "coord": "2,4",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
@@ -499,75 +474,127 @@
       "type": "Water collector",
       "placed_at": null,
       "core": "allocated"
-     },
-     {
-      "collector": "wood-collector-1",
-      "type": "Wood collector",
-      "placed_at": null,
-      "core": "allocated"
-     },
-     {
-      "collector": "wood-collector-2",
-      "type": "Wood collector",
-      "placed_at": null,
-      "core": "allocated"
      }
     ],
     "committed_collectors": []
    }
   ],
   "your_battle_hand": [],
-  "your_action_cards_played": [],
-  "your_spy_assignments": [
-   {
-    "source": "infiltrator",
-    "hero": "Kestrel Nine",
-    "active": true
-   }
+  "your_action_cards_played": [
+   "build:base",
+   "research:base",
+   "move_battle:base"
   ],
+  "your_spy_assignments": [],
   "your_knowledge": [],
   "your_reserved_heroes": []
  },
  "legalMoves": [
   {
    "move_id": "",
-   "description": "Kestrel Nine attacks Evoker (wiz) — DMG 3 vs DEF 1.",
+   "description": "Move Chronicler Ottoline Vey from G4 to G3 (water).",
    "move": {
-    "type": "battle_activation",
-    "unit": "kestrel",
-    "action": {
-     "kind": "attack",
-     "target": "u-evoker-wiz-1"
-    }
+    "type": "move_units",
+    "from": "2,6",
+    "to": "2,4",
+    "units": [
+     "chronicler"
+    ]
    }
   },
   {
    "move_id": "",
-   "description": "Kestrel Nine passes its activation (used for the pass).",
+   "description": "Move Chronicler Ottoline Vey from G4 to G5 (wood).",
    "move": {
-    "type": "battle_activation",
-    "unit": "kestrel",
-    "action": {
-     "kind": "pass"
-    }
+    "type": "move_units",
+    "from": "2,6",
+    "to": "2,8",
+    "units": [
+     "chronicler"
+    ]
    }
   },
   {
    "move_id": "",
-   "description": "Detection: your Infiltrator's hero privately inspects The Covenant's spy card — spends this activation and your spy assignment.",
+   "description": "Move Chronicler Ottoline Vey from G4 to F3 (water).",
    "move": {
-    "type": "use_detection",
-    "target_player": "wiz"
+    "type": "move_units",
+    "from": "2,6",
+    "to": "1,5",
+    "units": [
+     "chronicler"
+    ]
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Move Chronicler Ottoline Vey from G4 to F4 (ether).",
+   "move": {
+    "type": "move_units",
+    "from": "2,6",
+    "to": "1,7",
+    "units": [
+     "chronicler"
+    ]
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Move Foreman Hadrik Stoll from G3 to G4 (wood).",
+   "move": {
+    "type": "move_units",
+    "from": "2,4",
+    "to": "2,6",
+    "units": [
+     "foreman"
+    ]
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Move Foreman Hadrik Stoll from G3 to F2 (water).",
+   "move": {
+    "type": "move_units",
+    "from": "2,4",
+    "to": "1,3",
+    "units": [
+     "foreman"
+    ]
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Move Foreman Hadrik Stoll from G3 to F3 (water).",
+   "move": {
+    "type": "move_units",
+    "from": "2,4",
+    "to": "1,5",
+    "units": [
+     "foreman"
+    ]
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Skip this Move/Battle action.",
+   "move": {
+    "type": "skip_action"
    }
   }
  ],
- "watcher": "wiz",
+ "unavailable": [
+  {
+   "moveType": "form_treaty",
+   "reason": "a treaty needs an unlock on one side — a Diplomatic Research Station or an active Envoy Sable Marrow; no one who could partner with you has one"
+  }
+ ],
+ "watcher": "p1",
  "watcherView": {
   "game_id": "neither-guts-nor-gears",
-  "phase": "planning",
-  "round": 1,
-  "active_player_id": "rob",
-  "first_player_id": "rob",
+  "phase": "action",
+  "round": 2,
+  "active_player_id": "p2",
+  "first_player_id": "p2",
   "layout": "two",
   "map": {
    "tiles": [
@@ -601,7 +628,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Archmage Chaimidious (p1)"
+     ],
      "collectors": []
     },
     {
@@ -610,11 +639,9 @@
      "printed_resource": "wood",
      "current_resource": "wood",
      "start": 1,
-     "base_owner": "wiz",
+     "base_owner": "p1",
      "units": [],
-     "heroes": [
-      "Warden Hesper Quill (wiz)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -679,9 +706,7 @@
      "current_resource": "ore",
      "start": null,
      "base_owner": null,
-     "units": [
-      "Evoker (wiz)"
-     ],
+     "units": [],
      "heroes": [],
      "collectors": []
     },
@@ -801,9 +826,11 @@
      "printed_resource": "water",
      "current_resource": "water",
      "start": 2,
-     "base_owner": "rob",
+     "base_owner": "p2",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Foreman Hadrik Stoll (p2)"
+     ],
      "collectors": []
     },
     {
@@ -814,7 +841,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Chronicler Ottoline Vey (p2)"
+     ],
      "collectors": []
     },
     {
@@ -841,66 +870,49 @@
     }
    ]
   },
-  "hero_pool_count": 18,
-  "action_stack": [],
-  "active_action": null,
-  "resolving_action": null,
-  "treaties": [],
-  "battle": {
-   "coord": "0,2",
-   "origin": "0,0",
-   "phase": "activations",
-   "pass": 1,
-   "units": [
-    {
-     "unit": "Spitter Platform",
-     "ref": "u-spitter-rob-1",
-     "owner": "rob",
-     "side": "attackers",
-     "init": 95,
-     "dmg": 3,
-     "def": 1,
-     "activated": false
-    },
-    {
-     "unit": "Kestrel Nine",
-     "ref": "kestrel",
-     "owner": "rob",
-     "side": "attackers",
-     "init": 70,
-     "dmg": 3,
-     "def": 6,
-     "activated": false
-    },
-    {
-     "unit": "Evoker",
-     "ref": "u-evoker-wiz-1",
-     "owner": "wiz",
-     "side": "defenders",
-     "init": 50,
-     "dmg": 2,
-     "def": 1,
-     "activated": false
-    }
-   ],
-   "commitments": {
-    "rob": "pending",
-    "wiz": "pending"
+  "hero_pool_count": 17,
+  "action_stack": [
+   {
+    "position": 1,
+    "owner": "p2",
+    "face": "down"
+   },
+   {
+    "position": 2,
+    "owner": "p1",
+    "card_kind": "move_battle"
+   },
+   {
+    "position": 3,
+    "owner": "p2",
+    "face": "down"
+   },
+   {
+    "position": 4,
+    "owner": "p2",
+    "card_kind": "move_battle"
    }
+  ],
+  "active_action": "move_battle by p2",
+  "resolving_action": {
+   "card_kind": "move_battle",
+   "owner": "p2"
   },
-  "battle_deck_count": 20,
+  "treaties": [],
+  "battle": null,
+  "battle_deck_count": 19,
   "battle_discard": [],
   "pending": null,
   "victory_status": {
-   "wiz": {
-    "culture": 0,
-    "tech": 2,
+   "p1": {
+    "culture": 1,
+    "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
    },
-   "rob": {
-    "culture": 0,
-    "tech": 4,
+   "p2": {
+    "culture": 6,
+    "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -908,12 +920,11 @@
   "result": null,
   "players": [
    {
-    "player_id": "wiz",
+    "player_id": "p1",
     "kind": "human",
     "faction": "The Covenant",
     "species": "wizard",
-    "culture": 0,
-    "culture_target": 100,
+    "culture": 1,
     "next_milestones": [
      5,
      15,
@@ -929,16 +940,17 @@
     "tech_progress": {
      "acquired_types": [
       "surf",
-      "castle"
+      "castle",
+      "subject"
      ],
      "bonus_points_live": 0,
-     "total": 2,
+     "total": 3,
      "target": 22
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
     "leader_alive": true,
-    "subjects": 0,
+    "subjects": 1,
     "cores_reserve": 0,
     "cores_supply": 15,
     "action_cards": {
@@ -946,21 +958,14 @@
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_count": 0,
-    "battle_hand_count": 0,
-    "spy_recruitments": 1,
-    "units": [
-     {
-      "id": "u-evoker-wiz-1",
-      "type": "Evoker",
-      "coord": "0,2",
-      "core": null
-     }
-    ],
+    "action_cards_played_count": 1,
+    "battle_hand_count": 1,
+    "spy_recruitments": 0,
+    "units": [],
     "heroes": [
      {
-      "hero": "Warden Hesper Quill",
-      "coord": "-2,10",
+      "hero": "Archmage Chaimidious",
+      "coord": "-2,8",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
@@ -984,14 +989,12 @@
     "committed_collectors": []
    },
    {
-    "player_id": "rob",
-    "kind": "human",
-    "faction": "The Ledger",
+    "player_id": "p2",
+    "kind": "ai",
+    "faction": "The Foundry",
     "species": "robot",
-    "culture": 0,
-    "culture_target": 100,
+    "culture": 6,
     "next_milestones": [
-     5,
      15,
      30,
      50,
@@ -1006,42 +1009,41 @@
      "acquired_types": [
       "core",
       "water-collector",
-      "wood-collector",
       "home"
      ],
      "bonus_points_live": 0,
-     "total": 4,
+     "total": 3,
      "target": 18
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
     "leader_alive": true,
     "subjects": 0,
-    "cores_reserve": 0,
-    "cores_supply": 11,
+    "cores_reserve": 1,
+    "cores_supply": 12,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
      "research": 1
     },
-    "action_cards_played_count": 0,
+    "action_cards_played_count": 3,
     "battle_hand_count": 0,
-    "spy_recruitments": 1,
-    "units": [
-     {
-      "id": "u-spitter-rob-1",
-      "type": "Spitter Platform",
-      "coord": "0,0",
-      "core": "allocated"
-     }
-    ],
+    "spy_recruitments": 0,
+    "units": [],
     "heroes": [
      {
-      "hero": "Kestrel Nine",
-      "coord": "0,0",
+      "hero": "Chronicler Ottoline Vey",
+      "coord": "2,6",
       "is_leader": true,
       "dead": false,
-      "stats": "Init 70 DMG 3 DEF 6"
+      "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Foreman Hadrik Stoll",
+      "coord": "2,4",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
@@ -1059,32 +1061,21 @@
       "type": "Water collector",
       "placed_at": null,
       "core": "allocated"
-     },
-     {
-      "collector": "wood-collector-1",
-      "type": "Wood collector",
-      "placed_at": null,
-      "core": "allocated"
-     },
-     {
-      "collector": "wood-collector-2",
-      "type": "Wood collector",
-      "placed_at": null,
-      "core": "allocated"
      }
     ],
     "committed_collectors": []
    }
   ],
-  "your_battle_hand": [],
-  "your_action_cards_played": [],
-  "your_spy_assignments": [
+  "your_battle_hand": [
    {
-    "source": "illusionist",
-    "hero": "Warden Hesper Quill",
-    "active": true
+    "card": "Rally",
+    "effect": "Move any number of your own eligible mobile units from adjacent locations into this battle."
    }
   ],
+  "your_action_cards_played": [
+   "move_battle:base"
+  ],
+  "your_spy_assignments": [],
   "your_knowledge": [],
   "your_reserved_heroes": []
  },

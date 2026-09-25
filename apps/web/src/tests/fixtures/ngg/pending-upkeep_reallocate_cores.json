@@ -242,7 +242,7 @@
      "base_owner": "p2",
      "units": [],
      "heroes": [
-      "Chronicler Ottoline Vey (p2)"
+      "Foreman Hadrik Stoll (p2)"
      ],
      "collectors": []
     },
@@ -303,7 +303,7 @@
    },
    "p2": {
     "culture": 0,
-    "tech": 3,
+    "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -316,6 +316,7 @@
     "faction": "The Covenant",
     "species": "wizard",
     "culture": 0,
+    "culture_target": 100,
     "next_milestones": [
      5,
      15,
@@ -384,6 +385,7 @@
     "faction": "The Foundry",
     "species": "robot",
     "culture": 0,
+    "culture_target": 100,
     "next_milestones": [
      5,
      15,
@@ -400,10 +402,11 @@
      "acquired_types": [
       "core",
       "water-collector",
+      "wood-collector",
       "home"
      ],
      "bonus_points_live": 0,
-     "total": 3,
+     "total": 4,
      "target": 18
     },
     "leader_kills": 0,
@@ -411,7 +414,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 13,
+    "cores_supply": 11,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -423,7 +426,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Chronicler Ottoline Vey",
+      "hero": "Foreman Hadrik Stoll",
       "coord": "2,4",
       "is_leader": true,
       "dead": false,
@@ -445,6 +448,18 @@
       "type": "Water collector",
       "placed_at": null,
       "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-1",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-2",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
      }
     ],
     "committed_collectors": []
@@ -459,12 +474,14 @@
  "legalMoves": [
   {
    "move_id": "",
-   "description": "Keep the Cores where they are (0 in reserve, 2 of 2 powered).",
+   "description": "Keep the Cores where they are (0 in reserve, 4 of 4 powered).",
    "move": {
     "type": "reallocate_cores",
     "allocations": {
      "water-collector-1": true,
-     "water-collector-2": true
+     "water-collector-2": true,
+     "wood-collector-1": true,
+     "wood-collector-2": true
     }
    }
   },
@@ -475,7 +492,9 @@
     "type": "reallocate_cores",
     "allocations": {
      "water-collector-1": false,
-     "water-collector-2": true
+     "water-collector-2": true,
+     "wood-collector-1": true,
+     "wood-collector-2": true
     }
    }
   },
@@ -486,7 +505,35 @@
     "type": "reallocate_cores",
     "allocations": {
      "water-collector-1": true,
-     "water-collector-2": false
+     "water-collector-2": false,
+     "wood-collector-1": true,
+     "wood-collector-2": true
+    }
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Take the Core out of Wood collector (wood-collector-1) into the reserve (+1 culture per round while there).",
+   "move": {
+    "type": "reallocate_cores",
+    "allocations": {
+     "water-collector-1": true,
+     "water-collector-2": true,
+     "wood-collector-1": false,
+     "wood-collector-2": true
+    }
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Take the Core out of Wood collector (wood-collector-2) into the reserve (+1 culture per round while there).",
+   "move": {
+    "type": "reallocate_cores",
+    "allocations": {
+     "water-collector-1": true,
+     "water-collector-2": true,
+     "wood-collector-1": true,
+     "wood-collector-2": false
     }
    }
   }
@@ -733,7 +780,7 @@
      "base_owner": "p2",
      "units": [],
      "heroes": [
-      "Chronicler Ottoline Vey (p2)"
+      "Foreman Hadrik Stoll (p2)"
      ],
      "collectors": []
     },
@@ -794,7 +841,7 @@
    },
    "p2": {
     "culture": 0,
-    "tech": 3,
+    "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -807,6 +854,7 @@
     "faction": "The Covenant",
     "species": "wizard",
     "culture": 0,
+    "culture_target": 100,
     "next_milestones": [
      5,
      15,
@@ -875,6 +923,7 @@
     "faction": "The Foundry",
     "species": "robot",
     "culture": 0,
+    "culture_target": 100,
     "next_milestones": [
      5,
      15,
@@ -891,10 +940,11 @@
      "acquired_types": [
       "core",
       "water-collector",
+      "wood-collector",
       "home"
      ],
      "bonus_points_live": 0,
-     "total": 3,
+     "total": 4,
      "target": 18
     },
     "leader_kills": 0,
@@ -902,7 +952,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 13,
+    "cores_supply": 11,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -914,7 +964,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Chronicler Ottoline Vey",
+      "hero": "Foreman Hadrik Stoll",
       "coord": "2,4",
       "is_leader": true,
       "dead": false,
@@ -934,6 +984,18 @@
      {
       "collector": "water-collector-2",
       "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-1",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-2",
+      "type": "Wood collector",
       "placed_at": null,
       "core": "allocated"
      }

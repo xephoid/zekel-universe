@@ -47,6 +47,8 @@ export interface NggPlayer {
   species: Species | null;
   culture: number;
   nextMilestones: number[];
+  /** the culture that wins at this table; null from an engine that does not publish it */
+  cultureTarget: number | null;
   manaCurrent: number;
   manaMax: number;
   buildings: string[];
@@ -193,6 +195,7 @@ function readPlayer(p: Record<string, unknown>): NggPlayer {
     species: species === 'wizard' || species === 'robot' ? species : null,
     culture: asNum(p['culture']),
     nextMilestones: asArr(p['next_milestones']).map((m) => asNum(m)),
+    cultureTarget: typeof p['culture_target'] === 'number' ? p['culture_target'] : null,
     manaCurrent: asNum(p['mana_current']),
     manaMax: asNum(p['mana_max']),
     buildings: asArr(p['buildings']).map((b) => asStr(b)),

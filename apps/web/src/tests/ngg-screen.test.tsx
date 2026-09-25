@@ -138,4 +138,19 @@ describe('NGnG screen', () => {
     expect(sheet.textContent).not.toContain('on the stack');
     cleanup();
   });
+  it('draws the culture race to the target and milestones for this many players', () => {
+    for (const name of ['phase-planning', 'phase-planning-multi']) {
+      const f = FIXTURES.find((x) => x.name === name)!.f;
+      const players = (f.view as { players: Array<{ culture_target?: number }> }).players;
+      const target = players[0]!.culture_target!;
+      expect(target).toBe(50 * players.length);
+      const r = render(<NggScreen input={inputFor(f.view, f.viewer, f.legalMoves)} yourTurn busy={false} interactive onMove={vi.fn()} onForm={vi.fn()} nameFor={(p) => p} />);
+      const marks = [...r.container.querySelectorAll('.ngg-race-axis span')].map((s) => Number(s.textContent));
+      expect(marks[marks.length - 1]).toBe(target);
+      const ref = (REFERENCE as { referenceData: { victory: { milestones_by_player_count: Record<string, number[]> } } }).referenceData.victory;
+      expect(marks.slice(0, -1)).toEqual(ref.milestones_by_player_count[String(players.length)]);
+      expect(r.container.textContent).toContain(`${target} wins`);
+      cleanup();
+    }
+  });
 });

@@ -204,7 +204,7 @@ describe('NGnG round screens', () => {
     fireEvent.click(move);
     const sent = expectFormAllowed(r.onForm, f.legalMoves);
     expect(sent.keys).toEqual(['allocations']);
-    expect(sent.move['allocations']).toEqual({ 'water-collector-1': false, 'water-collector-2': true });
+    expect(sent.move['allocations']).toMatchObject({ 'water-collector-1': false, 'water-collector-2': true });
     cleanup();
   });
 

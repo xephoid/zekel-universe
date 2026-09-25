@@ -383,7 +383,7 @@
    },
    "rob": {
     "culture": 0,
-    "tech": 3,
+    "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -396,6 +396,7 @@
     "faction": "The Covenant",
     "species": "wizard",
     "culture": 0,
+    "culture_target": 100,
     "next_milestones": [
      5,
      15,
@@ -471,6 +472,7 @@
     "faction": "The Ledger",
     "species": "robot",
     "culture": 0,
+    "culture_target": 100,
     "next_milestones": [
      5,
      15,
@@ -487,10 +489,11 @@
      "acquired_types": [
       "core",
       "water-collector",
+      "wood-collector",
       "home"
      ],
      "bonus_points_live": 0,
-     "total": 3,
+     "total": 4,
      "target": 18
     },
     "leader_kills": 0,
@@ -498,7 +501,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 13,
+    "cores_supply": 11,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -537,6 +540,18 @@
      {
       "collector": "water-collector-2",
       "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-1",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-2",
+      "type": "Wood collector",
       "placed_at": null,
       "core": "allocated"
      }
@@ -925,7 +940,7 @@
    },
    "rob": {
     "culture": 0,
-    "tech": 3,
+    "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -938,6 +953,7 @@
     "faction": "The Covenant",
     "species": "wizard",
     "culture": 0,
+    "culture_target": 100,
     "next_milestones": [
      5,
      15,
@@ -1013,6 +1029,7 @@
     "faction": "The Ledger",
     "species": "robot",
     "culture": 0,
+    "culture_target": 100,
     "next_milestones": [
      5,
      15,
@@ -1029,10 +1046,11 @@
      "acquired_types": [
       "core",
       "water-collector",
+      "wood-collector",
       "home"
      ],
      "bonus_points_live": 0,
-     "total": 3,
+     "total": 4,
      "target": 18
     },
     "leader_kills": 0,
@@ -1040,7 +1058,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 13,
+    "cores_supply": 11,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -1079,6 +1097,18 @@
      {
       "collector": "water-collector-2",
       "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-1",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-2",
+      "type": "Wood collector",
       "placed_at": null,
       "core": "allocated"
      }

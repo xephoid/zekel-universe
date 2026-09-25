@@ -849,6 +849,15 @@ person answers. With only one way listed there is nothing to ask. (A
 platform always takes a Core when built, §7.7; only the Infiltrator needs
 none.)
 
+**Checked against engine b7cf17c (2026-09-25):** the culture target and
+milestones now scale with the number of players (50 culture per player;
+each two-player milestone times players ÷ 2, rounded up). The seat view
+carries `culture_target`, and the catalogue gives both by player count; the
+culture race reads them, falling back to an older engine's single values.
+The engine's rebuilt AI plays the seeded capture games differently, so
+views tests name heroes or items from are pinned. The engine's
+new `random` AI level is not offered on the setup page.
+
 **Engine changes, on a branch not yet merged** (`claude/ngg-structured-view`
 in the engine): `resolving_action { card_kind, owner }` beside the
 `active_action` sentence; `battle.units[].ref`, the id battle moves name a
