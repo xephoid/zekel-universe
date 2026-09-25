@@ -468,4 +468,30 @@ describe('NGnG: each human picks their own faction', () => {
     expect(onMove.mock.calls[0]![0].move).toEqual({ type: 'choose_faction', faction: 'foundry' });
     cleanup();
   });
+  it('Action Done: a finished action offers End turn, which sends the listed finish', () => {
+    const f = fixture('action-build');
+    const view = f.view as { resolving_action: Record<string, unknown> };
+    view.resolving_action = { ...view.resolving_action, finished: true };
+    const legal: LegalMove[] = [{ move_id: 'end', description: 'Finish the build action without offering a treaty.', move: { type: 'skip_action' } }];
+    const r = draw(view, f.viewer, legal);
+    expect(r.column.textContent).toContain('Your Build action is done');
+    expect(within(r.column).queryByRole('button', { name: /Skip/ })).toBeNull();
+    press(r.column, 'End turn');
+    expectSentListed(r.onMove, legal, { type: 'skip_action' });
+    cleanup();
+  });
+
+  it('Treaty Response: the offer shows who is offering by their faction mark and colour', () => {
+    const f = fixture('pending-treaty_response');
+    const r = draw(f.view, f.viewer, f.legalMoves);
+    const box = r.container.querySelector('.ngg-interrupt') as HTMLElement;
+    const band = box.querySelector('.ngr-proposer') as HTMLElement;
+    expect(band).not.toBeNull();
+    expect(band.querySelector('.ngg-chip')).not.toBeNull();
+    const proposer = (f.view as { pending: { context: { proposer: string } } }).pending.context.proposer;
+    const faction = (f.view as { players: Array<{ player_id: string; faction: string }> }).players.find((p) => p.player_id === proposer)!.faction;
+    expect(band.textContent).toContain(faction);
+    expect(band.style.borderColor).not.toBe('');
+    cleanup();
+  });
 });

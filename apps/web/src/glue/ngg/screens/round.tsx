@@ -21,7 +21,7 @@ import type { ScreenCtx } from '../ctx';
 import type { ScreenKey } from '../route';
 import type { MapMarks } from '../HexMap';
 import { TableLayout } from '../Layout';
-import { TREATY_INK } from '../factions';
+import { TREATY_INK, inkOfSeat } from '../factions';
 import { heroByName, treatyByName, type RefHero } from '../ref';
 import { Actions, Btn, CardFace, FactionChip, HowTo, Icon, OptionRow, Panel, ResourceChip, Rule, Token } from '../ui';
 import './round.css';
@@ -527,8 +527,18 @@ function TreatyResponse({ ctx }: { ctx: ScreenCtx }) {
   const proposer = typeof c['proposer'] === 'string' ? c['proposer'] : null;
   const treaty = typeof c['treaty'] === 'string' ? c['treaty'] : null;
   const income = num(c['culture_income']);
+  // Who is offering, at a glance: their faction's mark and colour.
+  const ink = inkOfSeat(ctx.v, proposer);
+  const faction = ctx.v.players.find((p) => p.id === proposer)?.faction ?? null;
   const interrupt = (
     <Panel title={proposer && treaty ? `${ctx.seat(proposer)} offers you ${treaty}` : 'A treaty offer'} kicker="Not your turn — your answer" tone="urgent">
+      {proposer && (
+        <div className="ngr-proposer" style={{ borderColor: ink.fill }}>
+          <FactionChip faction={faction} size={40} />
+          <span className="ngr-proposer-name" style={{ color: ink.fill }}>{ctx.seat(proposer)}</span>
+          {treaty && <span className="ngr-proposer-treaty"><span style={{ color: TREATY_INK[treaty] ?? 'inherit' }}><Icon name={treaty} size={18} /></span>{treaty}</span>}
+        </div>
+      )}
       {income !== null && <p className="ngr-state">+{income} culture to each of you, every round it stands</p>}
       {typeof c['effect'] === 'string' && <Rule>{c['effect']}</Rule>}
       {typeof c['break_condition'] === 'string' && <Rule>To break it: {c['break_condition']}</Rule>}
@@ -962,7 +972,32 @@ export function DiplomacyPanel({ ctx }: { ctx: ScreenCtx }) {
   );
 }
 
+// ---------------------------------------------------------------------------
+// Action Done: the action's effects are over; offer a treaty, or end the turn
+// ---------------------------------------------------------------------------
+
+const ACTION_NAMES: Record<string, string> = { build: 'Build', research: 'Research', move_battle: 'Move/Battle' };
+
+function ActionDone({ ctx }: { ctx: ScreenCtx }) {
+  const kind = ctx.v.activeAction?.cardKind ?? 'build';
+  const name = ACTION_NAMES[kind] ?? kind;
+  const end = ctx.movesOf('skip_action')[0] ?? null;
+  const mine = ctx.route.perspective === 'decide';
+  const panel = (
+    <Panel title={mine ? `Your ${name} action is done` : `${ctx.seat(ctx.route.owner)}'s ${name} action is done`} kicker="End of the action">
+      {mine && <HowTo>{ctx.movesOf('form_treaty').length > 0 ? 'Offer a treaty now, or end your turn.' : 'End your turn.'}</HowTo>}
+      {mine && end && (
+        <Actions>
+          <Btn disabled={!ctx.live} onClick={() => ctx.send(end)}>End turn</Btn>
+        </Actions>
+      )}
+    </Panel>
+  );
+  return <TableLayout ctx={ctx} panel={<>{panel}{mine && <DiplomacyPanel ctx={ctx} />}</>} />;
+}
+
 export const ROUND_SCREENS: Partial<Record<ScreenKey, ComponentType<{ ctx: ScreenCtx }>>> = {
+  'action-done': ActionDone,
   'setup-table': SetupTable,
   'setup-faction': SetupFaction,
   'setup-draft': SetupDraft,

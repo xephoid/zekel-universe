@@ -138,7 +138,8 @@ export interface NggView {
   tiles: NggTile[];
   players: NggPlayer[];
   stack: NggStackEntry[];
-  activeAction: { cardKind: CardKind; owner: string } | null;
+  /** the resolving action card; `finished` once only its end-of-action treaty window remains */
+  activeAction: { cardKind: CardKind; owner: string; finished: boolean } | null;
   treaties: NggTreaty[];
   battle: NggBattle | null;
   deckCount: number;
@@ -165,15 +166,15 @@ const CARD_KINDS: CardKind[] = ['build', 'research', 'move_battle'];
  * sends only the sentence "build by p2", and this is the one place that
  * sentence is read.
  */
-export function activeActionOf(raw: unknown): { cardKind: CardKind; owner: string } | null {
+export function activeActionOf(raw: unknown): { cardKind: CardKind; owner: string; finished: boolean } | null {
   if (isObj(raw)) {
     const kind = asStr(raw['card_kind']);
     const owner = asStr(raw['owner']);
-    return CARD_KINDS.includes(kind as CardKind) && owner ? { cardKind: kind as CardKind, owner } : null;
+    return CARD_KINDS.includes(kind as CardKind) && owner ? { cardKind: kind as CardKind, owner, finished: raw['finished'] === true } : null;
   }
   if (typeof raw !== 'string') return null;
   const m = /^(build|research|move_battle) by (\S+)$/.exec(raw);
-  return m ? { cardKind: m[1] as CardKind, owner: m[2]! } : null;
+  return m ? { cardKind: m[1] as CardKind, owner: m[2]!, finished: false } : null;
 }
 
 function coordParts(coord: string): { c: number; r: number } {

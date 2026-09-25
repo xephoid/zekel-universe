@@ -69,6 +69,22 @@ export function unavailableOf(raw: unknown): UnavailableMove[] {
   return out;
 }
 
+/** The opening entry of a table's log: what the engine logged while the
+ *  table was set up (an AI seat's draft pick made before any person moved,
+ *  a deal), after "The table is set." The engine's log is public by its
+ *  contract. At most 20 entries of bounded text. */
+export function openingSummary(log: unknown): string {
+  const lines: string[] = [];
+  for (const entry of Array.isArray(log) ? log.slice(0, 20) : []) {
+    if (!entry || typeof entry !== 'object') continue;
+    const text = (entry as Record<string, unknown>)['summary'];
+    if (typeof text !== 'string' || text.trim() === '') continue;
+    const line = text.trim().slice(0, 300);
+    lines.push(/[.!?]$/.test(line) ? line : `${line}.`);
+  }
+  return ['The table is set.', ...lines].join(' ');
+}
+
 function briefingText(b: RulesBriefing | null): string | undefined {
   if (!b) return undefined;
   const text = b.sections.map((s) => s.text).filter(Boolean).join('\n\n');
@@ -267,16 +283,19 @@ export class Realtime {
     const firstHuman = seats.find((s) => s.kind === 'human');
     const probe = await this.engine.getState(sessionId, firstHuman?.enginePlayerId ?? 'p1', token);
     const nextStep = probe.next_step ?? null;
+    // Anything the engine did while setting up (an AI seat that drafts before
+    // any person moves) goes in the opening entry, so the log misses nothing.
+    const opening = openingSummary(probe.log);
     if (nextStep?.status === 'ai_to_move' && nextStep.active_player_id) {
       const { payloads } = await this.seatPayloads(tableId, null);
       await this.appendEvent(tableId, {
-        kind: 'setup', actorSeatPosition: null, summary: 'The table is set. An AI opens.',
+        kind: 'setup', actorSeatPosition: null, summary: `${opening} An AI opens.`,
         engineMove: null, payloads, nextActorPosition: null, gameOver: null, rewindToSeq: null,
       });
       await this.runAiTurns(tableId, nextStep.active_player_id);
       return;
     }
-    await this.endFlow(tableId, 'setup', null, 'The table is set.', null, nextStep, undefined, undefined, null);
+    await this.endFlow(tableId, 'setup', null, opening, null, nextStep, undefined, undefined, null);
   }
 
   /**

@@ -256,6 +256,8 @@ export interface GameScreenProps {
   menu?: ReactNode;
   /** the bench along the bottom of the table, for the screen to fill (a portal target) */
   benchSlot?: HTMLElement | null;
+  /** the top of the side column, above the log, for the screen's standings (a portal target) */
+  sideSlot?: HTMLElement | null;
   /** a seat's display name, from its engine player id */
   nameFor(playerId: string): string;
 }

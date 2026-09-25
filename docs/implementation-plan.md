@@ -858,6 +858,21 @@ The engine's rebuilt AI plays the seeded capture games differently, so
 views tests name heroes or items from are pinned. The engine's
 new `random` AI level is not offered on the setup page.
 
+**Settled 2026-09-25, after play:**
+- The opening log entry lists what the engine logged while the table was
+  set up (an AI seat drafting its Leader before any person moves), not only
+  "The table is set." (at most 20 lines of bounded text; the engine's log is
+  public by its contract).
+- A game-drawn screen may put its standings in the side column above the log
+  (`sideSlot`); NGnG puts Seats and the culture race there. The last move and
+  the playback speed sit at the foot of the side column, under the log. With
+  the side column hidden, both return to where they were.
+- When the engine says the resolving action is finished (`resolving_action.
+  finished`, engine branch `claude/ngg-action-finished`), its owner sees
+  "Your … action is done", any treaty offer, and End turn, not Skip.
+- A treaty offer shows the proposer's faction mark and colour.
+- An NGnG button's label wraps rather than spilling out of the button.
+
 **Engine changes, on a branch not yet merged** (`claude/ngg-structured-view`
 in the engine): `resolving_action { card_kind, owner }` beside the
 `active_action` sentence; `battle.units[].ref`, the id battle moves name a

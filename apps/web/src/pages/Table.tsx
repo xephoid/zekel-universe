@@ -83,6 +83,8 @@ export function TablePage() {
   const [busy, setBusy] = useState(false);
   /** the bench, as an element a game-drawn screen can fill */
   const [benchSlot, setBenchSlot] = useState<HTMLDivElement | null>(null);
+  /** the top of the side column, where a game-drawn screen may put its standings */
+  const [sideSlot, setSideSlot] = useState<HTMLDivElement | null>(null);
   const [playAgainBusy, setPlayAgainBusy] = useState(false);
   const [showEnd, setShowEnd] = useState(true);
   /** a moment playing over the board; `resolve` lets the held event land */
@@ -285,6 +287,32 @@ export function TablePage() {
     );
   }
 
+  // A game-drawn screen keeps the last move and the playback speed at the foot
+  // of the side column, under the log; any other table shows them over the board.
+  const captionInSide = !!glue?.Screen && sideOpen;
+  const captionCard = (
+    <div className={`caption-card${state.done ? '' : ' pending'}`} aria-live="polite">
+      {current?.actorSeatPosition !== null && current?.actorSeatPosition !== undefined && table ? (
+        <ActorChip seat={table.seats.find((s) => s.position === current.actorSeatPosition)} you={yourTurn} />
+      ) : null}
+      <div className="caption-text">
+        <CaptionWords text={captionText} onClamped={setCaptionClamped} />
+        {/* Always drawn, so the card's height never changes between a
+            move playing and a move landed: a change would shift the
+            whole board and read as a jitter on every move. */}
+        <div className="caption-controls">
+          <PaceControl pace={playback.pace} setPace={playback.setPace} />
+          <button className="chip-btn" onClick={playback.replayLast} disabled={!current || !!moment}>
+            {current && current.seq === momentSeq ? 'Replay the strike' : 'Replay last'}
+          </button>
+          {captionClamped && (
+            <button className="chip-btn" onClick={() => setCaptionFull(captionText)}>Read it all</button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <FlipRoot viewKey={state.tick} className={`table-shell${glue?.themeFor?.(input) ? ` ${glue.themeFor(input)}` : ''}`} style={paletteVars(plan?.palette)} reducedMotion={reduced}>
       <div className="table-topbar">
@@ -311,28 +339,7 @@ export function TablePage() {
       <div className="table-main">
         <div className="table-play">
         <div className="table-board">
-          {result === null && (
-            <div className={`caption-card${state.done ? '' : ' pending'}`} aria-live="polite">
-              {current?.actorSeatPosition !== null && current?.actorSeatPosition !== undefined && table ? (
-                <ActorChip seat={table.seats.find((s) => s.position === current.actorSeatPosition)} you={yourTurn} />
-              ) : null}
-              <div className="caption-text">
-                <CaptionWords text={captionText} onClamped={setCaptionClamped} />
-                {/* Always drawn, so the card's height never changes between a
-                    move playing and a move landed: a change would shift the
-                    whole board and read as a jitter on every move. */}
-                <div className="caption-controls">
-                  <PaceControl pace={playback.pace} setPace={playback.setPace} />
-                  <button className="chip-btn" onClick={playback.replayLast} disabled={!current || !!moment}>
-                    {current && current.seq === momentSeq ? 'Replay the strike' : 'Replay last'}
-                  </button>
-                  {captionClamped && (
-                    <button className="chip-btn" onClick={() => setCaptionFull(captionText)}>Read it all</button>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
+          {result === null && !captionInSide && captionCard}
           {dice && dice.length > 0 && (
             <div className="dice-row">{dice.map((d, i) => <Die key={i} value={d} rollKey={current?.seq} />)}</div>
           )}
@@ -352,6 +359,7 @@ export function TablePage() {
                 }}
                 menu={yourTurn ? <MoveMenuList menu={current?.moveMenu ?? null} legalMoves={legalMoves} onPick={pick} disabled={busy} open={false} /> : null}
                 benchSlot={benchSlot}
+                sideSlot={sideOpen ? sideSlot : null}
               />
             : plan
             ? <BoardZones zones={plan.board} lit={lit} onSelect={onSelect} />
@@ -379,9 +387,11 @@ export function TablePage() {
         <div className={`table-side${sideOpen ? '' : ' collapsed'}`}>
           {sideOpen && (
             <>
+              {glue?.Screen && <div className="table-side-slot" ref={setSideSlot} />}
               {plan?.side.map((z) => <ZoneRenderer key={z.id} zone={z} lit={lit} onSelect={onSelect} />)}
               {plan?.points && <ZoneRenderer zone={plan.points} lit={lit} onSelect={onSelect} />}
               <Log events={state.applied} currentSeq={current?.seq ?? null} />
+              {result === null && captionInSide && captionCard}
             </>
           )}
         </div>

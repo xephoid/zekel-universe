@@ -47,6 +47,7 @@ const TITLES: Record<ScreenKey, string> = {
   'overlay-choice': 'Choose the overlay',
   'spy-assign': 'Assign your spy',
   'report-draw': 'Draw a battle card',
+  'action-done': 'The action is done',
   table: 'The table',
   'game-over': 'The end',
 };

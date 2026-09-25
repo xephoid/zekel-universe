@@ -326,6 +326,11 @@ label.option-card { position: relative; padding-right: 40px; }
   padding: 12px 16px 14px; display: flex; gap: 18px; align-items: flex-end; overflow-x: auto; min-height: 176px;
   --zekel-card-w: 96px; --zekel-card-h: 136px;
 }
+/* A game-drawn screen's standings sit at the top of the side column. */
+.table-side-slot { display: flex; flex-direction: column; gap: 12px; }
+.table-side-slot:empty { display: none; }
+/* The last move and playback, at the foot of the side column under the log. */
+.table-side > .caption-card { position: static; width: auto; align-self: stretch; margin-top: auto; }
 /* A game-drawn screen fills the bench itself (a slot), so it keeps no empty height of its own. */
 .table-bench.slot { min-height: 0; padding: 0; border-top: none; display: block; }
 .table-bench.slot:empty { display: none; }

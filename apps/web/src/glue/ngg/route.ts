@@ -29,6 +29,8 @@ export type ScreenKey =
   | 'hero-claim' | 'reserved-hero' | 'overlay-choice' | 'spy-assign'
   // draws
   | 'report-draw'
+  // an action whose effects are over: a treaty offer, or ending the turn
+  | 'action-done'
   // the table with nothing to decide, and the end
   | 'table' | 'game-over';
 
@@ -138,7 +140,7 @@ export function route(v: NggView, me: string | null, legalMoves: LegalMove[] = [
 
   // 3c/3d. Then the phase, and inside an action the card that resolves.
   if (v.phase === 'action' && v.activeAction) {
-    const screen = ACTION_SCREENS[v.activeAction.cardKind] ?? 'table';
+    const screen = v.activeAction.finished ? 'action-done' : ACTION_SCREENS[v.activeAction.cardKind] ?? 'table';
     const mine = me !== null && v.activeAction.owner === me;
     return { screen, perspective: mine ? 'decide' : 'watch', owner: v.activeAction.owner, interrupt: false };
   }

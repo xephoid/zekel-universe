@@ -81,3 +81,8 @@ button.ngr-plan-card:hover:not(:disabled) { border-color: var(--n-action); trans
 .ngr-won { font: 700 9.5px var(--n-mono); letter-spacing: .06em; color: var(--n-brand); }
 .ngr-dead { font: 700 9.5px var(--n-mono); letter-spacing: .06em; color: var(--n-danger); }
 .ngr-ic { display: inline-flex; vertical-align: -2px; margin-right: 6px; }
+
+/* A treaty offer names who is offering by their faction's mark and colour. */
+.ngr-proposer { display: flex; align-items: center; gap: 12px; padding: 8px 12px; margin: 2px 0 8px; border-left: 6px solid; border-radius: 8px; background: var(--n-surface2); }
+.ngr-proposer-name { font: 700 17px var(--n-face); flex: 1; min-width: 0; }
+.ngr-proposer-treaty { display: inline-flex; align-items: center; gap: 6px; font: 600 12.5px var(--n-face); }

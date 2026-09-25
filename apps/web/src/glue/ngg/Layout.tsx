@@ -147,8 +147,11 @@ export function TableLayout({ ctx, marks, panel, interrupt }: {
         <div className="ngg-column">
           <WaitingLine ctx={ctx} />
           {panel}
-          <SeatsPanel ctx={ctx} onOpen={setBoardFor} />
-          <CultureRace ctx={ctx} />
+          {/* The standings: above the log in the side column when the table
+              gives one, else here under the decision. */}
+          {ctx.sideSlot
+            ? createPortal(<div className={`ngg-side${species ? ` seat-${species}` : ''}`}><SeatsPanel ctx={ctx} onOpen={setBoardFor} /><CultureRace ctx={ctx} /></div>, ctx.sideSlot)
+            : <><SeatsPanel ctx={ctx} onOpen={setBoardFor} /><CultureRace ctx={ctx} /></>}
           {/* The numbered list: every legal move in the engine's words, the
               fallback for anything a screen does not draw. */}
           {ctx.menu && <div className="ngg-menu">{ctx.menu}</div>}

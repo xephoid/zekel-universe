@@ -5,7 +5,7 @@
    robot seat. A seat theme is a token swap: the variables, the type, the
    corner radius and one ground element. The map is one map for every seat. */
 
-.ngg-root, .ngg-board-sheet {
+.ngg-root, .ngg-board-sheet, .ngg-side {
   --n-surface: #ffffff;
   --n-surface2: #efe7d8;
   --n-text: #1c1a17;
@@ -28,7 +28,7 @@
   color: var(--n-text);
   font-family: var(--n-face);
 }
-[data-theme='dark'] .ngg-root, [data-theme='dark'] .ngg-board-sheet {
+[data-theme='dark'] .ngg-root, [data-theme='dark'] .ngg-board-sheet, [data-theme='dark'] .ngg-side {
   --n-surface: #232e26;
   --n-surface2: #2c3a30;
   --n-text: #f3ead9;
@@ -47,7 +47,7 @@
 
 /* Ink: a wizard seat is a page somebody wrote on. */
 .seat-wizard.ngg-strip, .seat-wizard.ngg-faction-board, .ngg-board-sheet.seat-wizard,
-.ngg-theme-wizard .ngg-root, .ngg-theme-wizard .ngg-board-sheet {
+.ngg-theme-wizard .ngg-root, .ngg-theme-wizard .ngg-board-sheet, .ngg-theme-wizard .ngg-side {
   --n-boardbg: #efe2c6;
   --n-cream: #f3e6cb;
   --n-surface: #e9d9ba;
@@ -70,7 +70,7 @@
   background: #ddc9a3;
 }
 [data-theme='dark'] .seat-wizard.ngg-strip, [data-theme='dark'] .seat-wizard.ngg-faction-board, [data-theme='dark'] .ngg-board-sheet.seat-wizard,
-[data-theme='dark'] .ngg-theme-wizard .ngg-root, [data-theme='dark'] .ngg-theme-wizard .ngg-board-sheet {
+[data-theme='dark'] .ngg-theme-wizard .ngg-root, [data-theme='dark'] .ngg-theme-wizard .ngg-board-sheet, [data-theme='dark'] .ngg-theme-wizard .ngg-side {
   --n-boardbg: #2e251c;
   --n-surface: #33291f;
   --n-surface2: #3b2f23;
@@ -89,7 +89,7 @@
 
 /* Oil: a robot seat is a part somebody machined. */
 .seat-robot.ngg-strip, .seat-robot.ngg-faction-board, .ngg-board-sheet.seat-robot,
-.ngg-theme-robot .ngg-root, .ngg-theme-robot .ngg-board-sheet {
+.ngg-theme-robot .ngg-root, .ngg-theme-robot .ngg-board-sheet, .ngg-theme-robot .ngg-side {
   --n-boardbg: #e6e8e4;
   --n-surface: #e6e8e4;
   --n-surface2: #d8dbd7;
@@ -109,7 +109,7 @@
   background: #d3d6d2;
 }
 [data-theme='dark'] .seat-robot.ngg-strip, [data-theme='dark'] .seat-robot.ngg-faction-board, [data-theme='dark'] .ngg-board-sheet.seat-robot,
-[data-theme='dark'] .ngg-theme-robot .ngg-root, [data-theme='dark'] .ngg-theme-robot .ngg-board-sheet {
+[data-theme='dark'] .ngg-theme-robot .ngg-root, [data-theme='dark'] .ngg-theme-robot .ngg-board-sheet, [data-theme='dark'] .ngg-theme-robot .ngg-side {
   --n-boardbg: #232726;
   --n-surface: #272b2a;
   --n-surface2: #2f3433;
@@ -240,7 +240,8 @@ button.ngg-option:hover:not(:disabled) { border-color: var(--n-brand); }
 .ngg-option-aside { flex-shrink: 0; display: flex; align-items: center; gap: 6px; font: 600 11px var(--n-mono); color: var(--n-muted); }
 .ngg-option-check { width: 20px; height: 20px; border-radius: 50%; background: var(--n-brand); color: #fff; border: 1.5px solid var(--n-ink); display: grid; place-items: center; font-size: 11px; flex-shrink: 0; }
 .ngg-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; margin-top: 4px; }
-.ngg-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 40px; padding: 0 16px; border-radius: 9px; font: 600 13.5px var(--n-face); white-space: nowrap; flex-shrink: 0; cursor: pointer; }
+/* A long label wraps to a second line rather than spilling out of its button or the column. */
+.ngg-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; max-width: 100%; padding: 6px 16px; border-radius: 9px; font: 600 13.5px var(--n-face); line-height: 1.2; text-align: center; white-space: normal; overflow-wrap: anywhere; flex-shrink: 1; min-width: 0; cursor: pointer; }
 .ngg-btn.primary { border: none; background: var(--n-action); color: #fff; }
 .ngg-btn.secondary { border: 1.5px solid var(--n-ink); background: var(--n-surface); color: var(--n-text); }
 .ngg-btn.quiet { border: 1px solid var(--n-line); background: transparent; color: var(--n-text); }
@@ -475,3 +476,6 @@ button.ngg-seat:focus-visible { outline: 2px solid var(--n-brand); outline-offse
 .ngg-fb-unit { position: relative; }
 .ngg-fb-count { position: absolute; top: 6px; right: 8px; font: 700 15px var(--n-mono); color: var(--n-muted); }
 .ngg-fb-unit.owned .ngg-fb-count { color: var(--n-text); }
+
+/* Seats and the culture race, drawn in the page's side column: the table's own tokens and type. */
+.ngg-side { display: flex; flex-direction: column; gap: 12px; font-family: var(--n-face); color: var(--n-text); }

@@ -30,6 +30,8 @@ export interface ScreenCtx {
   menu: ReactNode;
   /** the bench along the bottom of the page, where the faction strip goes; null to draw it inline */
   benchSlot: HTMLElement | null;
+  /** the top of the side column, above the log: Seats and the culture race go there; null to draw them in the column */
+  sideSlot: HTMLElement | null;
   /** ask the engine a read-only question about this decision; null where no live table can answer */
   ask: ((name: string, args: Record<string, unknown>) => Promise<{ answer: unknown } | { refused: string }>) | null;
   /** a seat's faction name, or its display name before it has one */
@@ -69,6 +71,7 @@ export function makeCtx(props: GameScreenProps, view: NggView, route: Route): Sc
     ask: props.yourTurn && props.interactive && props.ask ? props.ask : null,
     menu: props.menu ?? null,
     benchSlot: props.benchSlot ?? null,
+    sideSlot: props.sideSlot ?? null,
     seat: (pid) => {
       if (!pid) return '';
       const p = playerOf(v, pid);

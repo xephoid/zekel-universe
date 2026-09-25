@@ -90,8 +90,9 @@ describe('NGnG route', () => {
 
 describe('NGnG view reading', () => {
   it('reads the resolving card from the string the engine sends, and from a structured field', () => {
-    expect(activeActionOf('move_battle by p3')).toEqual({ cardKind: 'move_battle', owner: 'p3' });
-    expect(activeActionOf({ card_kind: 'build', owner: 'p2' })).toEqual({ cardKind: 'build', owner: 'p2' });
+    expect(activeActionOf('move_battle by p3')).toEqual({ cardKind: 'move_battle', owner: 'p3', finished: false });
+    expect(activeActionOf({ card_kind: 'build', owner: 'p2' })).toEqual({ cardKind: 'build', owner: 'p2', finished: false });
+    expect(activeActionOf({ card_kind: 'build', owner: 'p2', finished: true })).toEqual({ cardKind: 'build', owner: 'p2', finished: true });
     expect(activeActionOf('something else')).toBeNull();
     expect(activeActionOf(null)).toBeNull();
   });
@@ -112,5 +113,15 @@ describe('NGnG view reading', () => {
   it('is not a view of another game', () => {
     expect(readView({ game_id: 'fractured-fist' })).toBeNull();
     expect(readView(null)).toBeNull();
+  });
+  it('routes a finished action to the end-of-action screen for its owner and a watcher alike', () => {
+    const f = FIXTURES.find((x) => x.f.key === 'action-build')!.f;
+    const view = structuredClone(f.view) as { resolving_action: Record<string, unknown> };
+    view.resolving_action = { ...view.resolving_action, finished: true };
+    const v = readView(view)!;
+    const owner = v.activeAction!.owner;
+    expect(route(v, owner, [])).toMatchObject({ screen: 'action-done', perspective: 'decide', owner });
+    const other = v.players.find((p) => p.id !== owner)!.id;
+    expect(route(v, other, [])).toMatchObject({ screen: 'action-done', perspective: 'watch', owner });
   });
 });
