@@ -153,4 +153,17 @@ describe('NGnG screen', () => {
       cleanup();
     }
   });
+  it('tracks Economic progress for every seat: collectors owned against the count the spend takes', () => {
+    const f = FIXTURES.find((x) => x.name === 'action-build-robot-mid')!.f;
+    const need = (REFERENCE as { referenceData: { victory: { economic_collectors: number } } }).referenceData.victory.economic_collectors;
+    const r = render(<NggScreen input={inputFor(f.view, f.viewer, f.legalMoves)} yourTurn busy={false} interactive onMove={vi.fn()} onForm={vi.fn()} nameFor={(p) => p} />);
+    const players = (f.view as { players: Array<{ player_id: string; collectors?: unknown[] }> }).players;
+    const rows = [...r.container.querySelectorAll('button.ngg-seat')];
+    expect(rows).toHaveLength(players.length);
+    players.forEach((p, i) => {
+      const econ = [...rows[i]!.querySelectorAll('.ngg-stat')].find((s) => s.textContent?.endsWith('ECON'))!;
+      expect(econ.textContent).toBe(`${p.collectors ? p.collectors.length : '—'}/${need}ECON`);
+    });
+    cleanup();
+  });
 });

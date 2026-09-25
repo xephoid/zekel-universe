@@ -7,7 +7,7 @@
 // card backs.
 
 import type { ScreenCtx } from './ctx';
-import { coresOf, type NggPlayer } from './read';
+import { coresOf, econOf, type NggPlayer } from './read';
 import type { RefUnit } from './ref';
 import { inkOf } from './factions';
 import { CardBack, CostChips, FactionChip, Icon, Panel } from './ui';
@@ -28,8 +28,10 @@ function Pips({ have, max, cap }: { have: number; max: number; cap: number }) {
   );
 }
 
-function Numbers({ p }: { p: NggPlayer }) {
+function Numbers({ p, need }: { p: NggPlayer; need: number | null }) {
   const cores = coresOf(p);
+  const econ = econOf(p);
+  const of = need ? <small>/{need}</small> : null;
   return (
     <div className="ngg-numbers">
       <span className="ngg-number"><i>CULTURE</i><b>{p.culture}</b></span>
@@ -39,12 +41,13 @@ function Numbers({ p }: { p: NggPlayer }) {
           <>
             <span className="ngg-number"><i>CORES FREE</i><b>{cores.free}</b></span>
             <span className="ngg-number"><i>CORES USED</i><b>{cores.used}</b></span>
+            <span className="ngg-number" title="Collectors owned, against the Economic victory's count"><i>COLLECTORS</i><b>{econ ? econ.owned : '—'}{of}</b></span>
           </>
         )
         : (
           <>
             <span className="ngg-number"><i>MANA</i><b>{p.manaCurrent}<small>/{p.manaMax}</small></b></span>
-            <span className="ngg-number"><i>SURFS</i><b>{p.ownedCollectors ? p.ownedCollectors.length : '—'}</b></span>
+            <span className="ngg-number" title="Surfs owned, against the Economic victory's count"><i>SURFS</i><b>{econ ? econ.owned : '—'}{of}</b></span>
             <span className="ngg-number"><i>SUBJECTS</i><b>{p.subjects}</b></span>
           </>
         )}
@@ -134,7 +137,7 @@ export function FactionStrip({ ctx, player, onOpen }: { ctx: ScreenCtx; player: 
         <span className="ngg-strip-mark" style={{ background: ink.fill, color: ink.on }}>{ink.mark && <Icon name={ink.mark} size={22} stroke={1.8} />}</span>
         <span><b>{player.faction ?? 'Your seat'}</b><i>you · {player.species ?? 'no faction yet'}</i></span>
       </div>
-      <Numbers p={player} />
+      <Numbers p={player} need={ctx.ref?.economicCollectors ?? null} />
       <ActionCards p={player} />
       <div className="ngg-strip-hand" title={`${player.handCount} battle card${player.handCount === 1 ? '' : 's'} in hand`}>
         {ctx.v.hand.length > 0
@@ -167,7 +170,7 @@ export function FactionBoard({ ctx, player }: { ctx: ScreenCtx; player: NggPlaye
           <h2>{player.faction ?? (own ? 'Your seat' : ctx.seat(player.id))}</h2>
           <span className="ngg-tagchip">{species}</span>
         </div>
-        <Numbers p={player} />
+        <Numbers p={player} need={ctx.ref?.economicCollectors ?? null} />
       </header>
 
       {species === 'wizard'

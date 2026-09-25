@@ -262,6 +262,14 @@ export function withViewer(v: NggView, me: string | null): NggView {
   return { ...v, players: v.players.map((p) => (p.id === me ? { ...p, actionCardsPlayed: own } : p)) };
 }
 
+/** Economic progress: the collectors the seat owns (a robot's without a Core
+ *  counted apart, since they cannot pay). Null where the engine does not
+ *  publish the owned list. */
+export function econOf(p: NggPlayer): { owned: number; unpowered: number } | null {
+  if (!p.ownedCollectors) return null;
+  return { owned: p.ownedCollectors.length, unpowered: p.ownedCollectors.filter((c) => c.core === 'CORELESS').length };
+}
+
 /** A robot seat's Cores: fitted in a unit or collector, and spare in the reserve. */
 export function coresOf(p: NggPlayer): { used: number; free: number } {
   const used = p.units.filter((u) => u.core === 'allocated').length

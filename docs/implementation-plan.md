@@ -872,6 +872,9 @@ new `random` AI level is not offered on the setup page.
   "Your … action is done", any treaty offer, and End turn, not Skip.
 - A treaty offer shows the proposer's faction mark and colour.
 - An NGnG button's label wraps rather than spilling out of the button.
+- Economic progress is tracked as collectors owned against the count the
+  Economic spend takes (`economic_collectors`, 11): an ECON column in Seats
+  for every seat, and on the seat's own strip (Surfs or Collectors, n/11).
 
 **Engine changes, on a branch not yet merged** (`claude/ngg-structured-view`
 in the engine): `resolving_action { card_kind, owner }` beside the

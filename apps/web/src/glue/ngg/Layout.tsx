@@ -12,6 +12,7 @@ import { inkOf, inkOfSeat } from './factions';
 import { WAITING_ON } from './route';
 import { CardBack, FactionChip, Icon, Panel } from './ui';
 import { cultureRaceOf } from './ref';
+import { econOf, type NggPlayer } from './read';
 import { FactionBoard, FactionStrip } from './FactionBoard';
 
 const CARD_ICON: Record<string, string> = { build: 'Build', research: 'Research', move_battle: 'Move / Battle' };
@@ -76,6 +77,7 @@ function SeatsPanel({ ctx, onOpen }: { ctx: ScreenCtx; onOpen: (playerId: string
               </span>
               <span className="ngg-stat"><b>{p.culture}</b><i>CULT</i></span>
               <span className="ngg-stat"><b>{p.tech.total}{p.tech.target !== null ? `/${p.tech.target}` : ''}</b><i>TECH</i></span>
+              <EconStat ctx={ctx} p={p} />
               <span className="ngg-stat"><b className={p.leaderAlive ? 'ok' : 'dead'}>{p.leaderAlive ? '✓' : '✕'}</b><i>LEAD</i></span>
               </button>
             </li>
@@ -83,6 +85,21 @@ function SeatsPanel({ ctx, onOpen }: { ctx: ScreenCtx; onOpen: (playerId: string
         })}
       </ul>
     </Panel>
+  );
+}
+
+/** Economic progress: collectors owned against the number the Economic spend
+ *  takes (11 collectors on 11 different tiles). */
+function EconStat({ ctx, p }: { ctx: ScreenCtx; p: NggPlayer }) {
+  const econ = econOf(p);
+  const need = ctx.ref?.economicCollectors ?? null;
+  const title = econ
+    ? `${econ.owned} collector${econ.owned === 1 ? '' : 's'} owned${econ.unpowered ? ` (${econ.unpowered} without a Core)` : ''}${need ? `; the Economic victory spends ${need} on ${need} different tiles` : ''}`
+    : 'Collector count not published by this engine';
+  return (
+    <span className="ngg-stat" title={title}>
+      <b>{econ ? econ.owned : '—'}{need ? `/${need}` : ''}</b><i>ECON</i>
+    </span>
   );
 }
 

@@ -38,6 +38,8 @@ export interface NggRef {
   milestonesByCount: Record<number, number[]>;
   cultureTargetByCount: Record<number, number>;
   economicSpend: Cost;
+  /** how many collectors, on as many different tiles, the Economic spend takes; null when not published */
+  economicCollectors: number | null;
   techTarget: Record<string, number>;
   militaryKillsNeeded: Record<string, number>;
 }
@@ -102,6 +104,7 @@ export function readRef(reference: GameReferenceResponse | null): NggRef | null 
       ? Object.fromEntries(Object.entries(victory['culture_target_by_player_count']).map(([n, t]) => [Number(n), asNum(t)]))
       : {},
     economicSpend: cost(victory['economic_spend']),
+    economicCollectors: typeof victory['economic_collectors'] === 'number' ? victory['economic_collectors'] : null,
     techTarget: isObj(victory['tech_target']) ? Object.fromEntries(Object.entries(victory['tech_target']).map(([k, v]) => [k, asNum(v)])) : {},
     militaryKillsNeeded: isObj(victory['military_kills_needed']) ? Object.fromEntries(Object.entries(victory['military_kills_needed']).map(([k, v]) => [k, asNum(v)])) : {},
   };
