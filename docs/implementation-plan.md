@@ -865,7 +865,7 @@ new `random` AI level is not offered on the setup page.
   public by its contract).
 - A game-drawn screen may put its standings in the side column above the log
   (`sideSlot`); NGnG puts Seats and the culture race there. The last move and
-  the playback speed sit at the foot of the side column, under the log. With
+  the playback speed sit under them, just above the log. With
   the side column hidden, both return to where they were.
 - When the engine says the resolving action is finished (`resolving_action.
   finished`, engine branch `claude/ngg-action-finished`), its owner sees

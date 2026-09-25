@@ -287,8 +287,8 @@ export function TablePage() {
     );
   }
 
-  // A game-drawn screen keeps the last move and the playback speed at the foot
-  // of the side column, under the log; any other table shows them over the board.
+  // A game-drawn screen keeps the last move and the playback speed in the side
+  // column, just above the log; any other table shows them over the board.
   const captionInSide = !!glue?.Screen && sideOpen;
   const captionCard = (
     <div className={`caption-card${state.done ? '' : ' pending'}`} aria-live="polite">
@@ -390,8 +390,8 @@ export function TablePage() {
               {glue?.Screen && <div className="table-side-slot" ref={setSideSlot} />}
               {plan?.side.map((z) => <ZoneRenderer key={z.id} zone={z} lit={lit} onSelect={onSelect} />)}
               {plan?.points && <ZoneRenderer zone={plan.points} lit={lit} onSelect={onSelect} />}
-              <Log events={state.applied} currentSeq={current?.seq ?? null} />
               {result === null && captionInSide && captionCard}
+              <Log events={state.applied} currentSeq={current?.seq ?? null} />
             </>
           )}
         </div>
