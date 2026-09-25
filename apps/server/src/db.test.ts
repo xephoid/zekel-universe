@@ -64,6 +64,34 @@ describe('schema migration', () => {
   });
 });
 
+describe('schema 5', () => {
+  it('adds the log column to an existing events table, keeping its rows', async () => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'universe-db-'));
+    const file = path.join(dir, 'v4.db');
+    const raw = new Database(file);
+    raw.exec(`CREATE TABLE schema_version (version integer NOT NULL);
+      INSERT INTO schema_version VALUES (4);
+      CREATE TABLE tables (id text PRIMARY KEY, setup_moves text);
+      CREATE TABLE notifications (id text PRIMARY KEY, user_id text, guest_id text, kind text NOT NULL,
+        table_id text, read integer NOT NULL DEFAULT 0, created_at text NOT NULL, emailed_at text);
+      CREATE TABLE table_events (id text PRIMARY KEY, table_id text NOT NULL, seq integer NOT NULL, kind text NOT NULL,
+        actor_seat_position integer, summary text NOT NULL DEFAULT '', engine_move text, payloads text NOT NULL DEFAULT '{}',
+        next_actor_position integer, game_over text, rewind_to_seq integer, created_at text NOT NULL);
+      INSERT INTO tables (id) VALUES ('t1');
+      INSERT INTO table_events (id, table_id, seq, kind, created_at) VALUES ('e1', 't1', 1, 'setup', 'then');`);
+    raw.close();
+    const upgraded = await createDatabase(`sqlite:${file}`);
+    try {
+      const row = await upgraded.db.selectFrom('table_events').selectAll().where('id', '=', 'e1').executeTakeFirst();
+      expect(row?.log_entries).toBe('[]');
+      expect((await upgraded.db.selectFrom('schema_version').select('version').executeTakeFirst())?.version).toBe(SCHEMA_VERSION);
+    } finally {
+      await upgraded.close();
+      rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
+    }
+  });
+});
+
 const PG = process.env.TEST_DATABASE_URL;
 
 describe.skipIf(!PG)('postgres', () => {

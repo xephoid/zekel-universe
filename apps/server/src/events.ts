@@ -3,7 +3,7 @@
 // a seat its owner owns, and a wire event carries only its owner's payload.
 
 import type { Principal } from './identity.js';
-import type { GameOverResult, SeatPayload, TableEventKind, TableEventWire } from '@universe/shared';
+import type { GameOverResult, LogLine, SeatPayload, TableEventKind, TableEventWire } from '@universe/shared';
 
 export interface SeatRow {
   position: number;
@@ -37,6 +37,8 @@ export interface EventRow {
   gameOver: GameOverResult | null;
   rewindToSeq: number | null;
   createdAt: string;
+  /** the engine's log entries this event produced; public, the same for every seat */
+  logEntries: LogLine[];
 }
 
 /**
@@ -55,6 +57,7 @@ export function toWireEvent(event: EventRow, seatPosition: number | null): Table
     view: payload?.view ?? null,
     legalMoves: payload?.legalMoves ?? [],
     unavailable: payload?.unavailable ?? [],
+    log: event.logEntries,
     moveMenu: payload?.moveMenu ?? null,
     briefing: payload?.briefing ?? null,
     yourTurn: payload?.yourTurn ?? false,

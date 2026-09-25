@@ -131,6 +131,7 @@ export interface TableEventsTable {
   game_over: string | null; // JSON GameOverResult
   rewind_to_seq: number | null;
   created_at: string;
+  log_entries: string; // JSON LogLine[] (public)
 }
 
 export interface NotificationsTable {

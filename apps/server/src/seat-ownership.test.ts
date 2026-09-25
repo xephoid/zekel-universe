@@ -38,6 +38,7 @@ describe('per-seat payload stripping', () => {
     kind: 'move',
     actorSeatPosition: 0,
     summary: 'Seat 0 plays a card.',
+    logEntries: [],
     engineMove: { action: 'play' },
     payloads: {
       '0': { view: { hand: ['secret-a'] }, legalMoves: [{ move_id: 'x', move: { type: 'x' } }], yourTurn: true, playerId: 'p1' },

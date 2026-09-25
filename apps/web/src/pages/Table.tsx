@@ -391,7 +391,7 @@ export function TablePage() {
               {plan?.side.map((z) => <ZoneRenderer key={z.id} zone={z} lit={lit} onSelect={onSelect} />)}
               {plan?.points && <ZoneRenderer zone={plan.points} lit={lit} onSelect={onSelect} />}
               {result === null && captionInSide && captionCard}
-              <Log events={state.applied} currentSeq={current?.seq ?? null} />
+              <Log events={state.applied} currentSeq={current?.seq ?? null} me={myPlayerId} />
             </>
           )}
         </div>

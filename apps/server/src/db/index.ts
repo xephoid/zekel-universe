@@ -23,7 +23,7 @@ export interface DatabaseClient {
 }
 
 /** Bump when the DDL below changes in a way an existing database cannot absorb. */
-export const SCHEMA_VERSION = 4;
+export const SCHEMA_VERSION = 5;
 
 export function parseDatabaseUrl(url: string): { dialect: DatabaseDialect; target: string } {
   const trimmed = url.trim();
@@ -162,7 +162,8 @@ const TABLES: string[] = [
     next_actor_position integer,
     game_over text,
     rewind_to_seq integer,
-    created_at text NOT NULL
+    created_at text NOT NULL,
+    log_entries text NOT NULL DEFAULT '[]'
   )`,
   // The unique index is what makes sequence numbers safe under concurrent
   // writers on Postgres: two writers computing the same MAX+1 cannot both
@@ -183,9 +184,23 @@ const TABLES: string[] = [
 /** Statements that take a database from version N-1 to N. Both dialects
  *  must accept each one; the DDL above already describes the latest shape
  *  for a fresh database. */
-const MIGRATIONS: Record<number, string[]> = {
+/** A step is a statement, or a function for a step that must look first. */
+type MigrationStep = string | ((db: Kysely<DB>) => Promise<void>);
+
+/** Add a column unless the table already has it (a table created fresh by
+ *  TABLES in this same run already carries every current column). */
+function addColumn(table: string, column: string, definition: string): MigrationStep {
+  return async (db) => {
+    const meta = (await db.introspection.getTables()).find((t) => t.name === table);
+    if (meta?.columns.some((c) => c.name === column)) return;
+    await sql.raw(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`).execute(db);
+  };
+}
+
+const MIGRATIONS: Record<number, MigrationStep[]> = {
   3: ['ALTER TABLE notifications ADD COLUMN emailed_at text'],
   4: ['ALTER TABLE tables ADD COLUMN setup_moves text'],
+  5: [addColumn('table_events', 'log_entries', "text NOT NULL DEFAULT '[]'")],
 };
 
 async function migrate(db: Kysely<DB>): Promise<void> {
@@ -218,7 +233,10 @@ async function migrate(db: Kysely<DB>): Promise<void> {
             'Delete the local database (or drop the Postgres schema) and restart.',
         );
       }
-      for (const statement of steps) await sql.raw(statement).execute(db);
+      for (const step of steps) {
+        if (typeof step === 'string') await sql.raw(step).execute(db);
+        else await step(db);
+      }
       await db.updateTable('schema_version').set({ version: v }).execute();
     }
   }

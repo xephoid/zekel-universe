@@ -198,6 +198,7 @@ export class FakeEngine implements EngineService {
     return {
       applied: true,
       state_summary: `${playerId} passes.`,
+      log_entries: [{ seq: s.moves, turn: 1, category: 'pass', actor: playerId, summary: `${playerId} passes.`, headline: `${playerId} passed`, subject: playerId, subject_headline: 'You passed' }],
       next_step: this.nextStep(s),
       game_over: false,
       ...(s.moves === 1 ? { rules_briefing: { for_player: playerId, sections: [{ id: 'pass', title: 'Passing', text: 'A pass ends your turn.' }] } } : {}),

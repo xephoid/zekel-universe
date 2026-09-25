@@ -2,9 +2,9 @@
 // rules lessons, the rejection notice, the log, the sheets, and the
 // end-of-game panel.
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import type { GameOverResult, LegalMove, MoveMenu, MoveMenuEntry, RulesBriefing, SeatSummary, TableEventWire } from '@universe/shared';
+import type { GameOverResult, LegalMove, LogLine, MoveMenu, MoveMenuEntry, RulesBriefing, SeatSummary, TableEventWire } from '@universe/shared';
 import type { MoveForm, PlanPrompt, PlanStep, PromptAction } from '../glue';
 import { PACES, type Pace } from '../playback/PlaybackQueue';
 import { Avatar } from '../ui';
@@ -274,7 +274,11 @@ export function CaptionWords({ text, onClamped }: { text: string; onClamped: (cl
   return <div className="caption-words" ref={ref}>{text}</div>;
 }
 
-export function Log({ events, currentSeq }: { events: TableEventWire[]; currentSeq: number | null }) {
+export function Log({ events, currentSeq, me = null }: { events: TableEventWire[]; currentSeq: number | null; me?: string | null }) {
+  const lines = events.flatMap((e) => (e.log ?? []).map((line) => ({ line, seq: e.seq })));
+  // A game whose engine marks its key entries gets the short log; any other
+  // shows one line per event, as before.
+  if (lines.some((x) => x.line.headline)) return <KeyLog lines={lines} currentSeq={currentSeq} me={me} />;
   return (
     <div className="side-section">
       <h3>Log</h3>
@@ -282,6 +286,63 @@ export function Log({ events, currentSeq }: { events: TableEventWire[]; currentS
         {[...events].reverse().slice(0, 40).map((e) => (
           <li key={e.seq} className={e.seq === currentSeq ? 'current' : undefined}>{e.summary}</li>
         ))}
+      </ul>
+    </div>
+  );
+}
+
+interface LogGroup {
+  /** the key entry; null for the details after the last key entry */
+  key: { line: LogLine; seq: number } | null;
+  /** every entry up to and including the key one: what the key line opens to */
+  details: Array<{ line: LogLine; seq: number }>;
+}
+
+/** The engine's key entries, newest first, one short line each; a line opens
+ *  to the engine's full sentences for everything that led up to it (a
+ *  purchase's payment, a battle's rolls). A line about you reads as yours. */
+function KeyLog({ lines, currentSeq, me }: { lines: Array<{ line: LogLine; seq: number }>; currentSeq: number | null; me: string | null }) {
+  const [open, setOpen] = useState<number | null>(null);
+  const groups: LogGroup[] = [];
+  let pending: LogGroup['details'] = [];
+  for (const x of lines) {
+    pending.push(x);
+    if (x.line.headline) { groups.push({ key: x, details: pending }); pending = []; }
+  }
+  if (pending.length > 0) groups.push({ key: null, details: pending });
+  const shown = [...groups].reverse().slice(0, 80);
+  return (
+    <div className="side-section">
+      <h3>Log</h3>
+      <ul className="log key-log">
+        {shown.map((g, i) => {
+          const id = g.details[0]!.line.seq;
+          const round = (g.key ?? g.details[g.details.length - 1]!).line.round;
+          // Newest first: a round's label heads its first (newest) line.
+          const newerRound = i > 0 ? (shown[i - 1]!.key ?? shown[i - 1]!.details[shown[i - 1]!.details.length - 1]!).line.round : null;
+          const mine = !!g.key && !!me && g.key.line.subject === me;
+          const text = g.key
+            ? (mine && g.key.line.subjectHeadline ? g.key.line.subjectHeadline : g.key.line.headline!)
+            : `${g.details.length} more ${g.details.length === 1 ? 'line' : 'lines'}`;
+          const current = g.details.some((x) => x.seq === currentSeq);
+          const cls = [current ? 'current' : '', !g.key ? 'more' : '', mine && g.key?.line.loss ? 'loss' : '', mine ? 'yours' : ''].filter(Boolean).join(' ');
+          const expanded = open === id;
+          return (
+            <Fragment key={id}>
+              {round > 0 && newerRound !== round && <li className="log-round" aria-hidden="true">Round {round}</li>}
+              <li className={cls || undefined}>
+                <button type="button" className="log-line" aria-expanded={expanded} onClick={() => setOpen(expanded ? null : id)}>
+                  {text}
+                </button>
+                {expanded && (
+                  <ul className="log-detail">
+                    {g.details.map((x) => <li key={x.line.seq}>{x.line.summary}</li>)}
+                  </ul>
+                )}
+              </li>
+            </Fragment>
+          );
+        })}
       </ul>
     </div>
   );

@@ -876,6 +876,20 @@ new `random` AI level is not offered on the setup page.
   Economic spend takes (`economic_collectors`, 11): an ECON column in Seats
   for every seat, and on the seat's own strip (Surfs or Collectors, n/11).
 
+**Settled 2026-09-25: the log shows key events in short lines.** The table's
+log is the engine's own log, not one line per table event. The engine marks
+the entries that matter at a glance with a short `headline` (purchases,
+research, deaths and destruction, treaties, access answers, battles, battle
+cards revealed, attacks, spells and saves, hero claims, setup picks, the end)
+and, for a line about one seat, that seat's reading (`subject_headline`,
+"Your base at C4 was destroyed!") and whether it was a loss. Every move
+returns the entries it produced (`log_entries`, engine branch
+`claude/ngg-log-headlines`); the server keeps them with the event they belong
+to (a public `log_entries` column, schema 5), so the log follows the replay
+step by step. Each short line opens to the engine's full sentences for
+everything that led up to it, payments included; the full summaries stay for
+MCP play. A game whose engine marks no key entries keeps one line per event.
+
 **Engine changes, on a branch not yet merged** (`claude/ngg-structured-view`
 in the engine): `resolving_action { card_kind, owner }` beside the
 `active_action` sentence; `battle.units[].ref`, the id battle moves name a

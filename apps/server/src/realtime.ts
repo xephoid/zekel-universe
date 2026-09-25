@@ -10,7 +10,7 @@
 import { sql, type Kysely } from 'kysely';
 import { EngineError } from '@universe/engine-client';
 import type { AiTurnResult, AppliedMove, MoveArg, NextStep, RulesBriefing as EngineBriefing } from '@universe/engine-client';
-import type { GameOverResult, RulesBriefing, SeatPayload, TableEventKind, UnavailableMove } from '@universe/shared';
+import type { GameOverResult, LogLine, RulesBriefing, SeatPayload, TableEventKind, UnavailableMove } from '@universe/shared';
 import type { DB } from './db/schema.js';
 import { isUniqueViolation, parseJson } from './db/index.js';
 import { newId, now, principalLabel, type Principal } from './identity.js';
@@ -65,6 +65,33 @@ export function unavailableOf(raw: unknown): UnavailableMove[] {
     if (!moveType || !reason) continue;
     const item = text(e['item'], 120);
     out.push(item ? { moveType, item, reason } : { moveType, reason });
+  }
+  return out;
+}
+
+/** The engine's log entries for one event, kept only where well formed: at
+ *  most 200 entries, each needing a numeric seq and a summary, every text
+ *  bounded. The engine's log is public by its contract. */
+export function logLinesOf(raw: unknown): LogLine[] {
+  if (!Array.isArray(raw)) return [];
+  const text = (x: unknown, max: number): string | undefined => (typeof x === 'string' && x !== '' ? x.slice(0, max) : undefined);
+  const out: LogLine[] = [];
+  for (const entry of raw.slice(0, 200)) {
+    if (!entry || typeof entry !== 'object') continue;
+    const e = entry as Record<string, unknown>;
+    const summary = text(e['summary'], 1000);
+    if (typeof e['seq'] !== 'number' || !summary) continue;
+    const line: LogLine = {
+      seq: e['seq'], round: typeof e['turn'] === 'number' ? e['turn'] : 0,
+      category: text(e['category'], 40) ?? '', actor: text(e['actor'], 40) ?? null, summary,
+    };
+    const headline = text(e['headline'], 200);
+    if (headline) line.headline = headline;
+    const subject = text(e['subject'], 40);
+    const subjectHeadline = text(e['subject_headline'], 200);
+    if (subject && subjectHeadline) { line.subject = subject; line.subjectHeadline = subjectHeadline; }
+    if (e['tone'] === 'loss' && line.subject) line.loss = true;
+    out.push(line);
   }
   return out;
 }
@@ -166,8 +193,9 @@ export class Realtime {
    */
   async appendEvent(
     tableId: string,
-    input: Omit<EventRow, 'seq' | 'createdAt'>,
+    input: Omit<EventRow, 'seq' | 'createdAt' | 'logEntries'> & { logEntries?: LogLine[] },
   ): Promise<EventRow> {
+    const logEntries = input.logEntries ?? [];
     const id = newId();
     const createdAt = now();
     let seq: number | undefined;
@@ -176,11 +204,12 @@ export class Realtime {
         const result = await sql<{ seq: number }>`
           INSERT INTO table_events
             (id, table_id, seq, kind, actor_seat_position, summary, engine_move, payloads,
-             next_actor_position, game_over, rewind_to_seq, created_at)
+             next_actor_position, game_over, rewind_to_seq, created_at, log_entries)
           SELECT ${id}, ${tableId}, COALESCE(MAX(seq), 0) + 1, ${input.kind}, ${input.actorSeatPosition},
             ${input.summary}, ${input.engineMove === null ? null : JSON.stringify(input.engineMove)},
             ${JSON.stringify(input.payloads)}, ${input.nextActorPosition},
-            ${input.gameOver === null ? null : JSON.stringify(input.gameOver)}, ${input.rewindToSeq}, ${createdAt}
+            ${input.gameOver === null ? null : JSON.stringify(input.gameOver)}, ${input.rewindToSeq}, ${createdAt},
+            ${JSON.stringify(logEntries)}
           FROM table_events WHERE table_id = ${tableId}
           RETURNING seq
         `.execute(this.db);
@@ -189,7 +218,7 @@ export class Realtime {
         if (!isUniqueViolation(err) || attempt === 4) throw err;
       }
     }
-    const event: EventRow = { ...input, seq: seq!, createdAt };
+    const event: EventRow = { ...input, logEntries, seq: seq!, createdAt };
     this.broadcast(tableId, event);
     return event;
   }
@@ -212,6 +241,7 @@ export class Realtime {
       gameOver: parseJson<GameOverResult | null>(r.game_over, null),
       rewindToSeq: r.rewind_to_seq,
       createdAt: r.created_at,
+      logEntries: parseJson<LogLine[]>(r.log_entries, []),
     }));
   }
 
@@ -291,11 +321,12 @@ export class Realtime {
       await this.appendEvent(tableId, {
         kind: 'setup', actorSeatPosition: null, summary: `${opening} An AI opens.`,
         engineMove: null, payloads, nextActorPosition: null, gameOver: null, rewindToSeq: null,
+        logEntries: logLinesOf(probe.log),
       });
       await this.runAiTurns(tableId, nextStep.active_player_id);
       return;
     }
-    await this.endFlow(tableId, 'setup', null, opening, null, nextStep, undefined, undefined, null);
+    await this.endFlow(tableId, 'setup', null, opening, null, nextStep, undefined, undefined, null, logLinesOf(probe.log));
   }
 
   /**
@@ -390,18 +421,19 @@ export class Realtime {
   ): Promise<EventRow> {
     const nextStep = applied.next_step ?? null;
     const result = await this.resultOf(tableId, applied);
+    const logEntries = logLinesOf(applied.log_entries);
     if (result) {
-      return this.finishGame(tableId, kind, actorSeatPosition, summary, engineMove, result, briefings);
+      return this.finishGame(tableId, kind, actorSeatPosition, summary, engineMove, result, briefings, undefined, logEntries);
     }
     if (nextStep?.status === 'ai_to_move' && nextStep.active_player_id) {
       const { payloads } = await this.seatPayloads(tableId, null, undefined, briefings);
       await this.appendEvent(tableId, {
         kind, actorSeatPosition, summary, engineMove, payloads,
-        nextActorPosition: null, gameOver: null, rewindToSeq: null,
+        nextActorPosition: null, gameOver: null, rewindToSeq: null, logEntries,
       });
       return this.runAiTurns(tableId, nextStep.active_player_id);
     }
-    return this.endFlow(tableId, kind, actorSeatPosition, summary, engineMove, nextStep, undefined, briefings, null);
+    return this.endFlow(tableId, kind, actorSeatPosition, summary, engineMove, nextStep, undefined, briefings, null, logEntries);
   }
 
   /** Write the last event of a flow: views plus legal moves for whoever is up. */
@@ -415,10 +447,11 @@ export class Realtime {
     snapshots: Record<string, unknown> | undefined,
     briefings: Record<string, RulesBriefing | null> | undefined,
     rewindToSeq: number | null,
+    logEntries: LogLine[] = [],
   ): Promise<EventRow> {
     const { payloads, nextActorPosition } = await this.seatPayloads(tableId, nextStep, snapshots, briefings);
     const event = await this.appendEvent(tableId, {
-      kind, actorSeatPosition, summary, engineMove, payloads, nextActorPosition, gameOver: null, rewindToSeq,
+      kind, actorSeatPosition, summary, engineMove, payloads, nextActorPosition, gameOver: null, rewindToSeq, logEntries,
     });
     await this.tableService.setNextActor(tableId, nextActorPosition);
     if (nextActorPosition !== null) await this.notifyTurnIfDisconnected(tableId, nextActorPosition);
@@ -458,28 +491,29 @@ export class Realtime {
         const engineMove = (step.move_taken as Record<string, unknown> | undefined) ?? null;
         const kind: TableEventKind = 'ai_move';
         const snapshots = this.snapshotsOf(step);
+        const logEntries = logLinesOf(step.log_entries);
         if (!isLast) {
           const { payloads } = await this.seatPayloads(tableId, null, snapshots);
           last = await this.appendEvent(tableId, {
             kind, actorSeatPosition: null, summary: step.state_summary, engineMove, payloads,
-            nextActorPosition: null, gameOver: null, rewindToSeq: null,
+            nextActorPosition: null, gameOver: null, rewindToSeq: null, logEntries,
           });
           continue;
         }
         if (result) {
-          last = await this.finishGame(tableId, kind, null, step.state_summary, engineMove, result, briefings, snapshots);
+          last = await this.finishGame(tableId, kind, null, step.state_summary, engineMove, result, briefings, snapshots, logEntries);
           return last;
         }
         if (nextStep?.status === 'ai_to_move' && nextStep.active_player_id) {
           const { payloads } = await this.seatPayloads(tableId, null, snapshots);
           last = await this.appendEvent(tableId, {
             kind, actorSeatPosition: null, summary: step.state_summary, engineMove, payloads,
-            nextActorPosition: null, gameOver: null, rewindToSeq: null,
+            nextActorPosition: null, gameOver: null, rewindToSeq: null, logEntries,
           });
           aiPlayerId = nextStep.active_player_id;
           break;
         }
-        last = await this.endFlow(tableId, kind, null, step.state_summary, engineMove, nextStep, snapshots, briefings, null);
+        last = await this.endFlow(tableId, kind, null, step.state_summary, engineMove, nextStep, snapshots, briefings, null, logEntries);
         return last;
       }
       if (moves.length === 0) {
@@ -518,12 +552,13 @@ export class Realtime {
     result: GameOverResult,
     briefings?: Record<string, RulesBriefing | null>,
     snapshots?: Record<string, unknown>,
+    logEntries: LogLine[] = [],
   ): Promise<EventRow> {
     const { payloads } = await this.seatPayloads(tableId, null, snapshots, briefings);
     const event = await this.appendEvent(tableId, {
       kind, actorSeatPosition,
       summary: `${summary} The game is over. ${result.summary}`.trim(),
-      engineMove, payloads, nextActorPosition: null, gameOver: result, rewindToSeq: null,
+      engineMove, payloads, nextActorPosition: null, gameOver: result, rewindToSeq: null, logEntries,
     });
     await this.tableService.markFinished(tableId, result);
     for (const seat of await this.tableService.getSeats(tableId)) {

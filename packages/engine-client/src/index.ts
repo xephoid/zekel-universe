@@ -249,6 +249,8 @@ export const appliedMoveSchema = z.object({
   session_id: z.string().optional(),
   applied: z.literal(true),
   state_summary: z.string(),
+  /** The game's log entries this move produced (games with a rich log). */
+  log_entries: z.array(z.unknown()).optional(),
   report_to_human: z.string().optional(),
   next_active_player_id: z.string().optional(),
   next_step: nextStepSchema.optional(),
@@ -266,6 +268,8 @@ export const aiTurnStepSchema = z.object({
   state_summary: z.string(),
   /** One view per digital human seat, keyed by PLAYER_ID. */
   player_views: z.record(z.unknown()).optional(),
+  /** The game's log entries this move produced (games with a rich log). */
+  log_entries: z.array(z.unknown()).optional(),
 }).passthrough();
 
 export const aiTurnResultSchema = z.object({

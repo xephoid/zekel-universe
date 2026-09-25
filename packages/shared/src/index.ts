@@ -296,6 +296,24 @@ export interface GameOverResult {
 export type TableEventKind = 'setup' | 'move' | 'ai_move' | 'roll' | 'draw' | 'system' | 'undo';
 
 /**
+ * One entry of the engine's own game log, as a table shows it. Public by the
+ * engine's contract. `headline` is set on the entries that matter at a glance;
+ * `summary` keeps every detail. A line about one seat also reads in the second
+ * person for that seat (`subjectHeadline`), and `loss` marks what it lost.
+ */
+export interface LogLine {
+  seq: number;
+  round: number;
+  category: string;
+  actor: string | null;
+  summary: string;
+  headline?: string;
+  subject?: string;
+  subjectHeadline?: string;
+  loss?: boolean;
+}
+
+/**
  * A move the engine says this seat cannot make right now, and why, in the
  * engine's words. `item` names one blocked option of the type (a unit or
  * building by printed name, a technology) while others of the type may still
@@ -336,6 +354,8 @@ export interface TableEventWire {
   legalMoves: LegalMove[];
   /** what the receiving seat cannot do right now, with the engine's reasons */
   unavailable: UnavailableMove[];
+  /** the engine's log entries this event produced (public; the same for every seat) */
+  log: LogLine[];
   moveMenu: MoveMenu | null;
   briefing: RulesBriefing | null;
   yourTurn: boolean;

@@ -179,6 +179,10 @@ describe('socket privacy', () => {
     expect(evB.unavailable).toHaveLength(2);
     expect(evB.unavailable[0]).toEqual({ moveType: 'build', item: 'Dragon', reason: 'blocked-for-p2' });
     expect(evB.unavailable[1]!.reason.length).toBe(400);
+    // The engine's log lines are public: both seats get the same ones.
+    expect(evA.log).toHaveLength(1);
+    expect(evA.log).toEqual(evB.log);
+    expect(evA.log[0]).toMatchObject({ headline: 'p1 passed', subject: 'p1', subjectHeadline: 'You passed' });
   });
 
   it('one socket at two tables never receives a view for a seat it does not own', async () => {
