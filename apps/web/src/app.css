@@ -357,7 +357,7 @@ label.option-card { position: relative; padding-right: 40px; }
   overflow: hidden; overflow-wrap: anywhere;
 }
 .caption-full { margin: 0; font-size: 14px; line-height: 1.45; }
-.caption-controls { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
+.caption-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; }
 .actor-chip { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13px; white-space: nowrap; }
 .actor-chip .avatar { width: 28px; height: 28px; font-size: 12px; }
 .roll-button {

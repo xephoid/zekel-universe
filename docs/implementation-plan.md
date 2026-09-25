@@ -898,6 +898,15 @@ the faction board's Battle cards panel and the Research screen's battle card
 line show it as resource chips ("+ either" ether or oil). Universe keeps no
 copy of the price.
 
+**Settled 2026-09-25: the faction board shows what is locked, and explains
+each item.** The engine publishes, per seat, what it has not unlocked and what
+it needs (`players[].locked`: units and technologies by printed name, treaty
+formation, the battle-card purchase; engine branch `claude/ngg-locked-status`).
+The board marks each unit and technology Locked (with the need) or Unlocked,
+and says the same for treaties and battle cards. Pressing a unit, building,
+technology or hero opens a card with everything the catalogue says about it
+and where the seat stands. The payment stage's shortcut is "Choose for me".
+
 **Engine changes, on a branch not yet merged** (`claude/ngg-structured-view`
 in the engine): `resolving_action { card_kind, owner }` beside the
 `active_action` sentence; `battle.units[].ref`, the id battle moves name a

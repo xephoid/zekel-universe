@@ -249,7 +249,7 @@ describe('NGnG payment, placed by the person on tiles the engine names', () => {
     const { onForm } = drawLive(f, ask);
     press(new RegExp(`^${esc(item)}`));
     press(`Choose ${item}`);
-    fireEvent.click(await screen.findByRole('button', { name: 'Use the engine’s proposal' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Choose for me' }));
     await screen.findAllByRole('button', { name: /^Take back/ });
     await waitForEnabled('Commit payment');
     press('Commit payment');

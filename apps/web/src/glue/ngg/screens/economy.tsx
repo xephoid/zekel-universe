@@ -550,7 +550,7 @@ function PayStage({ ctx, chosen, purchase, proposal, needsPlace, initial, onBack
           <Actions>
             <Btn kind="secondary" onClick={onBack}>Drop the purchase</Btn>
             {proposal.length > 0 && placed.length === 0 && (
-              <Btn kind="quiet" disabled={!ctx.live} onClick={() => { setPlaced(proposal); setHolding(null); }}>Use the engine’s proposal</Btn>
+              <Btn kind="quiet" disabled={!ctx.live} onClick={() => { setPlaced(proposal); setHolding(null); }}>Choose for me</Btn>
             )}
             <Btn disabled={!ctx.live || !reach || reach.covers === false || (reach.covers === undefined && placed.length === 0 && proposal.length > 0)} onClick={() => onCommit(placed)}>
               {needsPlace ? 'Commit payment, then place it' : chosen.kind === 'economic' ? 'Commit all eleven' : 'Commit payment'}

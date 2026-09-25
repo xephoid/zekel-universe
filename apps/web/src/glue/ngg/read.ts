@@ -73,6 +73,9 @@ export interface NggPlayer {
   heroes: Array<{ name: string; coord: string | null; leader: boolean; dead: boolean; stats: string | null }>;
   bases: string[];
   collectors: Array<{ id: string; coord: string; resource: string | null }>;
+  /** what the seat has not unlocked yet, each with what it needs (units and
+   *  technologies by printed name); null from an engine that does not publish it */
+  locked: { units: Record<string, string>; research: Record<string, string>; treaties: string | null; battleCards: string | null } | null;
   /** every collector the seat owns, on the map this round or on the board;
    *  a robot's with its Core state. Null from an engine that does not publish
    *  the list: then only the collectors placed this round are known. */
@@ -245,6 +248,12 @@ function readPlayer(p: Record<string, unknown>): NggPlayer {
       coord: asStr(c['coord']),
       resource: strOrNull(c['resource']),
     })),
+    locked: !isObj(p['locked']) ? null : {
+      units: isObj(p['locked']['units']) ? Object.fromEntries(Object.entries(p['locked']['units']).map(([k, v]) => [k, asStr(v)])) : {},
+      research: isObj(p['locked']['research']) ? Object.fromEntries(Object.entries(p['locked']['research']).map(([k, v]) => [k, asStr(v)])) : {},
+      treaties: strOrNull(p['locked']['treaties']),
+      battleCards: strOrNull(p['locked']['battle_cards']),
+    },
     ownedCollectors: !Array.isArray(p['collectors']) ? null : asArr(p['collectors']).filter(isObj).map((c) => ({
       id: asStr(c['collector']),
       type: asStr(c['type']),

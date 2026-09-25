@@ -3,7 +3,7 @@
 // watches, and nothing is ever sent without a press.
 
 import { describe, expect, it, vi } from 'vitest';
-import { render, cleanup, fireEvent } from '@testing-library/react';
+import { render, cleanup, fireEvent, within } from '@testing-library/react';
 import type { GameReferenceResponse, LegalMove } from '@universe/shared';
 import type { GlueInput } from '../glue';
 import { NggScreen } from '../glue/ngg/NggScreen';
@@ -178,6 +178,45 @@ describe('NGnG screen', () => {
     // One chip per fixed resource, then one per either-or resource.
     expect(price.querySelectorAll('.ngg-res')).toHaveLength(Object.keys(purchase.cost).length + purchase.either.length);
     expect(price.textContent).toContain('+ either');
+    cleanup();
+  });
+  it("marks on the faction board what the seat has and has not unlocked, from the engine's own list", () => {
+    const f = FIXTURES.find((x) => x.name === 'phase-planning')!.f;
+    const view = structuredClone(f.view) as { players: Array<Record<string, unknown>> };
+    const me = view.players.find((p) => p['player_id'] === f.viewer)!;
+    const species = me['species'] as string;
+    const units = (REFERENCE as unknown as { referenceData: Record<string, Array<{ name: string }>> }).referenceData[`${species}_units`]!;
+    const [lockedUnit, openUnit] = [units[units.length - 1]!.name, units[0]!.name];
+    me['locked'] = { units: { [lockedUnit]: 'needs a Temple' }, research: {}, treaties: 'needs an Embassy', battle_cards: null };
+    const r = render(<NggScreen input={inputFor(view, f.viewer, f.legalMoves)} yourTurn busy={false} interactive onMove={vi.fn()} onForm={vi.fn()} nameFor={(p) => p} />);
+    fireEvent.click(r.container.querySelector<HTMLButtonElement>('button.ngg-seat.you')!);
+    const board = r.getByRole('dialog', { name: 'Your faction board' });
+    const card = (name: string) => [...board.querySelectorAll('.ngg-fb-unit')].find((u) => u.querySelector('b')?.textContent === name)!;
+    expect(card(lockedUnit).classList.contains('locked')).toBe(true);
+    expect(card(lockedUnit).textContent).toContain('Locked · needs a Temple');
+    expect(card(openUnit).textContent).toContain('Unlocked');
+    expect(board.querySelector('.ngg-fb-treaty-lock')!.textContent).toContain('Locked · needs an Embassy');
+    expect(board.querySelector('.ngg-fb-card-cost')!.textContent).toContain('Unlocked');
+    cleanup();
+  });
+
+  it('opens a board item for everything the catalogue says about it', () => {
+    const f = FIXTURES.find((x) => x.name === 'phase-planning')!.f;
+    const r = render(<NggScreen input={inputFor(f.view, f.viewer, f.legalMoves)} yourTurn busy={false} interactive onMove={vi.fn()} onForm={vi.fn()} nameFor={(p) => p} />);
+    fireEvent.click(r.container.querySelector<HTMLButtonElement>('button.ngg-seat.you')!);
+    const board = r.getByRole('dialog', { name: 'Your faction board' });
+    const unit = board.querySelector<HTMLElement>('.ngg-fb-unit')!;
+    const name = unit.querySelector('b')!.textContent!;
+    fireEvent.click(unit);
+    const detail = r.getByRole('dialog', { name });
+    expect(detail.textContent).toContain('Cost');
+    expect(detail.textContent).toContain('Owned');
+    fireEvent.click(within(detail).getByRole('button', { name: 'Close' }));
+    expect(r.queryByRole('dialog', { name })).toBeNull();
+    // Buildings, technologies and heroes open the same way, by keyboard too.
+    const building = board.querySelector<HTMLElement>('.ngg-fb-list li.pressable')!;
+    fireEvent.keyDown(building, { key: 'Enter' });
+    expect(r.getByRole('dialog', { name: building.querySelector('b')!.textContent! }).textContent).toContain('Cost');
     cleanup();
   });
 });

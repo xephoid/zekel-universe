@@ -8,7 +8,8 @@
 
 import type { ScreenCtx } from './ctx';
 import { coresOf, econOf, type NggPlayer } from './read';
-import type { RefUnit } from './ref';
+import type { RefBuilding, RefResearch, RefUnit } from './ref';
+import { useState, type KeyboardEvent } from 'react';
 import { inkOf } from './factions';
 import { BattleCardPrice, CardBack, CostChips, FactionChip, Icon, Panel } from './ui';
 
@@ -120,6 +121,93 @@ function ActionCards({ p }: { p: NggPlayer }) {
   );
 }
 
+/** Whether the seat has unlocked a thing, from the engine's own list: a
+ *  lock with what it needs, or a quiet check. Nothing when the engine does
+ *  not say. */
+function LockTag({ why }: { why: string | null | undefined }) {
+  if (why === undefined) return null;
+  return why
+    ? <span className="ngg-lock locked" title={why}>Locked · {why}</span>
+    : <span className="ngg-lock open">✓ Unlocked</span>;
+}
+
+/** A board item that opens its details on a press (and Enter or Space). */
+function pressable(onPress: () => void) {
+  return {
+    role: 'button' as const, tabIndex: 0, onClick: onPress,
+    onKeyDown: (e: KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onPress(); } },
+  };
+}
+
+type Detail =
+  | { kind: 'unit'; unit: RefUnit }
+  | { kind: 'building'; building: RefBuilding }
+  | { kind: 'research'; research: RefResearch }
+  | { kind: 'hero'; name: string };
+
+/** Everything the engine's catalogue says about one board item, and where
+ *  the seat stands with it. */
+function ItemDetail({ ctx, player, detail, onClose }: { ctx: ScreenCtx; player: NggPlayer; detail: Detail; onClose: () => void }) {
+  const lines: Array<[string, React.ReactNode]> = [];
+  let title = '';
+  let body: string | null = null;
+  if (detail.kind === 'unit') {
+    const u = detail.unit;
+    title = u.name;
+    body = u.notes || null;
+    if (u.init !== null) lines.push(['Stats', `Init ${u.init} · DMG ${u.dmg ?? '—'} · DEF ${u.def ?? '—'}`]);
+    lines.push(['Cost', <CostChips key="c" cost={u.cost} />]);
+    if (u.needsCore) lines.push(['Core', 'Needs a Core to act']);
+    if (u.requiresBuilding) lines.push(['Needs', u.requiresBuilding]);
+    if (u.collector) lines.push(['Collects', u.collectorResource ?? 'any resource']);
+    if (u.immobile) lines.push(['Moves', 'Never (immobile)']);
+    lines.push(['Owned', `${ownedCount(player, u) ?? '—'} · ${ownedNote(player, u)}`]);
+    const why = player.locked?.units[u.name];
+    if (player.locked) lines.push(['Status', why ? `Locked · ${why}` : 'Unlocked']);
+  } else if (detail.kind === 'building') {
+    const b = detail.building;
+    title = b.name;
+    body = b.effect || null;
+    lines.push(['Cost', <CostChips key="c" cost={b.cost} />]);
+    if (b.isBase) lines.push(['Kind', 'A base']);
+    if (b.repeatableMax !== null) lines.push(['Up to', String(b.repeatableMax)]);
+    const n = b.isBase ? player.bases.length : player.buildingCounts[b.id] ?? (player.buildings.includes(b.name) ? 1 : 0);
+    lines.push(['Built', String(n)]);
+  } else if (detail.kind === 'research') {
+    const r = detail.research;
+    title = r.name;
+    body = r.effect || null;
+    lines.push(['Cost', <CostChips key="c" cost={r.cost} />]);
+    lines.push(['Needs', r.prerequisite]);
+    const done = player.research.includes(r.name) || player.research.includes(r.id);
+    const why = player.locked?.research[r.name];
+    lines.push(['Status', done ? 'Researched' : why ? `Locked · ${why}` : player.locked ? 'Unlocked' : 'Not researched']);
+  } else {
+    const h = player.heroes.find((x) => x.name === detail.name);
+    const ref = ctx.ref?.heroes.find((x) => x.name === detail.name);
+    title = detail.name;
+    body = ref?.effect ?? null;
+    if (h?.stats) lines.push(['Stats', h.stats]);
+    if (ref) lines.push(['Kind', `${ref.category}${ref.species ? ` · ${ref.species} only` : ''}`]);
+    if (h) lines.push(['Status', h.dead ? 'Killed' : h.coord === null ? 'Reserved: no base to place it' : `On ${ctx.tile(h.coord)}${h.leader ? ' · Leader (+2 DEF)' : ''}`]);
+  }
+  return (
+    <div className="ngg-fb-detail-backdrop" role="presentation" onClick={(e) => { e.stopPropagation(); onClose(); }}>
+      <div className="ngg-fb-detail" role="dialog" aria-label={title} onClick={(e) => e.stopPropagation()}>
+        <div className="ngg-fb-detail-head">
+          <span className="ngg-fb-list-mark"><Icon name={detail.kind === 'hero' ? 'Leader' : title} size={22} stroke={1.8} /></span>
+          <h3>{title}</h3>
+          <button type="button" className="ngg-fb-detail-close" onClick={onClose} aria-label="Close">✕</button>
+        </div>
+        {body && <p>{body}</p>}
+        <dl>
+          {lines.map(([k, val]) => <div key={k}><dt>{k}</dt><dd>{val}</dd></div>)}
+        </dl>
+      </div>
+    </div>
+  );
+}
+
 /** A unit, building or technology id, by its printed name. */
 function nameOfType(ctx: ScreenCtx, id: string): string {
   const ref = ctx.ref;
@@ -160,6 +248,8 @@ export function FactionBoard({ ctx, player }: { ctx: ScreenCtx; player: NggPlaye
   const units = (ref?.units ?? []).filter((u) => u.species === species);
   const treaties = v.treaties.filter((t) => t.partners.includes(player.id));
   const spy = own ? v.spies.find((s) => s.active) ?? null : null;
+  const [detail, setDetail] = useState<Detail | null>(null);
+  const locked = player.locked;
   return (
     <div className={`ngg-faction-board seat-${species}`}>
       <span className="ngg-ground" aria-hidden="true" />
@@ -203,7 +293,7 @@ export function FactionBoard({ ctx, player }: { ctx: ScreenCtx; player: NggPlaye
               // A base is counted on the map, not among the buildings.
               const n = b.isBase ? player.bases.length : player.buildingCounts[b.id] ?? (player.buildings.includes(b.name) ? 1 : 0);
               return (
-                <li key={b.id} className={n > 0 ? 'on' : 'off'}>
+                <li key={b.id} className={`${n > 0 ? 'on' : 'off'} pressable`} {...pressable(() => setDetail({ kind: 'building', building: b }))}>
                   <span className="ngg-fb-list-mark"><Icon name={b.name} size={20} stroke={1.8} /></span>
                   <span><b>{b.name}</b>{n > 1 ? ` ×${n}` : ''}<i>{b.effect}</i></span>
                   <span className="ngg-fb-state">{n > 0 ? 'BUILT' : <CostChips cost={b.cost} />}</span>
@@ -217,9 +307,9 @@ export function FactionBoard({ ctx, player }: { ctx: ScreenCtx; player: NggPlaye
             {research.map((r) => {
               const on = player.research.includes(r.name) || player.research.includes(r.id);
               return (
-                <li key={r.id} className={on ? 'on' : 'off'}>
+                <li key={r.id} className={`${on ? 'on' : 'off'}${!on && locked?.research[r.name] ? ' locked' : ''} pressable`} {...pressable(() => setDetail({ kind: 'research', research: r }))}>
                   <span className="ngg-fb-list-mark"><Icon name={r.name} size={20} stroke={1.8} /></span>
-                  <span><b>{r.name}</b><i>{r.effect}</i><i>Needs {r.prerequisite}</i></span>
+                  <span><b>{r.name}</b><i>{r.effect}</i>{!on && <LockTag why={locked ? locked.research[r.name] ?? null : undefined} />}{!locked && <i>Needs {r.prerequisite}</i>}</span>
                   <span className="ngg-fb-state">{on ? 'RESEARCHED' : <CostChips cost={r.cost} />}</span>
                 </li>
               );
@@ -233,7 +323,7 @@ export function FactionBoard({ ctx, player }: { ctx: ScreenCtx; player: NggPlaye
           {units.map((u) => {
             const owned = ownedCount(player, u);
             return (
-              <div key={u.id} className={`ngg-fb-unit${owned ? ' owned' : ''}`}>
+              <div key={u.id} className={`ngg-fb-unit${owned ? ' owned' : ''}${locked?.units[u.name] ? ' locked' : ''} pressable`} {...pressable(() => setDetail({ kind: 'unit', unit: u }))}>
                 <span className="ngg-fb-count" aria-label={owned === null ? 'count not published' : `${owned} owned`}>×{owned ?? '—'}</span>
                 <span className="ngg-fb-list-mark"><Icon name={u.name} size={22} stroke={1.8} /></span>
                 <b>{u.name}</b>
@@ -244,6 +334,7 @@ export function FactionBoard({ ctx, player }: { ctx: ScreenCtx; player: NggPlaye
                 )}
                 <CostChips cost={u.cost} />
                 <i>{ownedNote(player, u)}</i>
+                <LockTag why={locked ? locked.units[u.name] ?? null : undefined} />
               </div>
             );
           })}
@@ -255,7 +346,7 @@ export function FactionBoard({ ctx, player }: { ctx: ScreenCtx; player: NggPlaye
           <ul className="ngg-fb-heroes">
             {player.heroes.length === 0 && <li className="muted">None yet</li>}
             {player.heroes.map((h) => (
-              <li key={h.name} className={`${h.leader ? 'leader' : ''}${h.dead ? ' dead' : ''}${spy?.hero === h.name ? ' spy' : ''}`}>
+              <li key={h.name} className={`${h.leader ? 'leader' : ''}${h.dead ? ' dead' : ''}${spy?.hero === h.name ? ' spy' : ''} pressable`} {...pressable(() => setDetail({ kind: 'hero', name: h.name }))}>
                 <span className="ngg-avatar" style={{ background: ink.fill, color: ink.on }}>{h.name.split(/\s+/).map((w) => w[0]).slice(-2).join('')}</span>
                 <span><b>{h.name}</b><i>{h.dead ? 'Killed' : h.stats ?? ''}{h.coord === null && !h.dead ? ' · reserved' : ''}</i></span>
                 <span className="ngg-fb-state">{h.leader ? 'LEADER' : spy?.hero === h.name ? 'SPY' : ''}</span>
@@ -268,7 +359,9 @@ export function FactionBoard({ ctx, player }: { ctx: ScreenCtx; player: NggPlaye
             <div className="ngg-fb-card-cost">
               <span>Buy one on a Research action</span>
               <BattleCardPrice cost={ref.battleCardPurchase.cost} either={ref.battleCardPurchase.either} />
-              {ref.battleCardPurchase.unlockedBy[species] && <i>Needs the {ref.battleCardPurchase.unlockedBy[species]}</i>}
+              {locked
+                ? <LockTag why={locked.battleCards} />
+                : ref.battleCardPurchase.unlockedBy[species] && <i>Needs the {ref.battleCardPurchase.unlockedBy[species]}</i>}
             </div>
           )}
           <div className="ngg-fb-hand">
@@ -281,6 +374,7 @@ export function FactionBoard({ ctx, player }: { ctx: ScreenCtx; player: NggPlaye
           </div>
         </Panel>
         <Panel title="Treaties">
+          {locked && <div className="ngg-fb-treaty-lock"><LockTag why={locked.treaties} /></div>}
           <ul className="ngg-fb-list">
             {(ref?.treaties ?? []).map((t) => {
               const held = treaties.find((x) => x.name === t.name);
@@ -298,6 +392,7 @@ export function FactionBoard({ ctx, player }: { ctx: ScreenCtx; player: NggPlaye
       </div>
 
       <Panel title="Action cards"><ActionCards p={player} /></Panel>
+      {detail && <ItemDetail ctx={ctx} player={player} detail={detail} onClose={() => setDetail(null)} />}
     </div>
   );
 }
