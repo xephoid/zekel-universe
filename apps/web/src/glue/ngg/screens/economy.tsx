@@ -19,7 +19,7 @@ import type { MapProposal } from '../HexMap';
 import { TableLayout } from '../Layout';
 import { itemByName, researchByName, heroById, type Cost } from '../ref';
 import { TERRAIN } from '../factions';
-import { Actions, Btn, CostChips, HowTo, Icon, OptionRow, Panel, ResourceChip, Rule } from '../ui';
+import { Actions, BattleCardPrice, Btn, CostChips, HowTo, Icon, OptionRow, Panel, ResourceChip, Rule } from '../ui';
 import { moveType } from '../read';
 import { DiplomacyPanel } from './round';
 import './economy.css';
@@ -69,6 +69,8 @@ interface Purchase {
   moves: LegalMove[];
   /** the engine's reason it cannot be bought now; such a purchase has no moves */
   shut: string | null;
+  /** a battle card's either-or leg, shown after its cost */
+  either?: string[];
 }
 
 /** How a listed platform purchase gets its Core. */
@@ -120,7 +122,7 @@ function purchasesOf(ctx: ScreenCtx, buys: Buys | null): Purchase[] {
       const r = researchByName(ctx.ref, name);
       out.set(name, { key: name, label: name, kind: 'tech', cost: r?.cost ?? null, text: r?.effect ?? null, moves: [m], shut: null });
     } else if (t === 'research' && m.move['kind'] === 'battle_card') {
-      out.set('battle_card', { key: 'battle_card', label: 'Draw a battle card', kind: 'battle_card', cost: null, text: null, moves: [m], shut: null });
+      out.set('battle_card', { key: 'battle_card', label: 'Draw a battle card', kind: 'battle_card', cost: ctx.ref?.battleCardPurchase?.cost ?? null, either: ctx.ref?.battleCardPurchase?.either, text: null, moves: [m], shut: null });
     } else if (t === 'economic_victory_spend') {
       out.set('economic', { key: 'economic', label: 'Economic victory: spend all five', kind: 'economic', cost: ctx.ref?.economicSpend ?? null, text: null, moves: [m], shut: null });
     }
@@ -143,7 +145,7 @@ function purchasesOf(ctx: ScreenCtx, buys: Buys | null): Purchase[] {
     } else if (buys === 'research' && u.moveType === 'research' && u.item) {
       if (u.item === 'battle strategy card') {
         if (out.has('battle_card')) continue;
-        shut.push({ key: 'shut:battle_card', label: 'Draw a battle card', kind: 'battle_card', cost: null, text: null, moves: [], shut: reason });
+        shut.push({ key: 'shut:battle_card', label: 'Draw a battle card', kind: 'battle_card', cost: ctx.ref?.battleCardPurchase?.cost ?? null, either: ctx.ref?.battleCardPurchase?.either, text: null, moves: [], shut: reason });
         continue;
       }
       if (out.has(u.item)) continue;
@@ -202,7 +204,7 @@ function PurchaseRow({ ctx, p, selected, onPick }: { ctx: ScreenCtx; p: Purchase
       aside={
         <span className="ngg-eco-cost">
           <span className="ngg-eco-kind">{KIND_WORDS[p.kind]}</span>
-          {p.cost && <CostChips cost={p.cost} />}
+          {p.cost && (p.either?.length ? <BattleCardPrice cost={p.cost} either={p.either} /> : <CostChips cost={p.cost} />)}
           {core && <span className="ngg-eco-core">+ Core <CostChips cost={core} /></span>}
           {ways.length > 1 && <span className="ngg-eco-core">Core: yours or bought</span>}
         </span>

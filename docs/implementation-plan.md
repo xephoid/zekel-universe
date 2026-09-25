@@ -891,6 +891,13 @@ step by step. Each short line opens to the engine's full sentences for
 everything that led up to it, payments included; the full summaries stay for
 MCP play. A game whose engine marks no key entries keeps one line per event.
 
+**Settled 2026-09-25: a battle card's price is shown, from the engine.** The
+engine publishes what one battle card costs on a Research action and what
+unlocks it (`battle_card_purchase`, engine branch `claude/ngg-battle-card-price`);
+the faction board's Battle cards panel and the Research screen's battle card
+line show it as resource chips ("+ either" ether or oil). Universe keeps no
+copy of the price.
+
 **Engine changes, on a branch not yet merged** (`claude/ngg-structured-view`
 in the engine): `resolving_action { card_kind, owner }` beside the
 `active_action` sentence; `battle.units[].ref`, the id battle moves name a

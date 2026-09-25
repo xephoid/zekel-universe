@@ -166,4 +166,18 @@ describe('NGnG screen', () => {
     });
     cleanup();
   });
+  it("shows on the faction board what a battle card costs and what unlocks it, from the engine's catalogue", () => {
+    const f = FIXTURES.find((x) => x.name === 'phase-planning')!.f;
+    const r = render(<NggScreen input={inputFor(f.view, f.viewer, f.legalMoves)} yourTurn busy={false} interactive onMove={vi.fn()} onForm={vi.fn()} nameFor={(p) => p} />);
+    fireEvent.click(r.container.querySelector<HTMLButtonElement>('button.ngg-seat.you')!);
+    const price = r.getByRole('dialog', { name: 'Your faction board' }).querySelector('.ngg-fb-card-cost')!;
+    const purchase = (REFERENCE as { referenceData: { battle_card_purchase: { cost: Record<string, number>; either: string[]; unlocked_by: Record<string, string> } } }).referenceData.battle_card_purchase;
+    const species = (f.view as { players: Array<{ player_id: string; species: string }> }).players.find((p) => p.player_id === f.viewer)!.species;
+    expect(price.textContent).toContain('Buy one on a Research action');
+    expect(price.textContent).toContain(`Needs the ${purchase.unlocked_by[species]}`);
+    // One chip per fixed resource, then one per either-or resource.
+    expect(price.querySelectorAll('.ngg-res')).toHaveLength(Object.keys(purchase.cost).length + purchase.either.length);
+    expect(price.textContent).toContain('+ either');
+    cleanup();
+  });
 });

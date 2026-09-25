@@ -10,7 +10,7 @@ import type { ScreenCtx } from './ctx';
 import { coresOf, econOf, type NggPlayer } from './read';
 import type { RefUnit } from './ref';
 import { inkOf } from './factions';
-import { CardBack, CostChips, FactionChip, Icon, Panel } from './ui';
+import { BattleCardPrice, CardBack, CostChips, FactionChip, Icon, Panel } from './ui';
 
 const ACTION_CARDS: Array<{ key: string; played: string; name: string; icon: string }> = [
   { key: 'build', played: 'build', name: 'Build', icon: 'Build' },
@@ -264,6 +264,13 @@ export function FactionBoard({ ctx, player }: { ctx: ScreenCtx; player: NggPlaye
           </ul>
         </Panel>
         <Panel title="Battle cards" kicker={`${player.handCount} held · ${v.deckCount} in the deck`}>
+          {ref?.battleCardPurchase && (
+            <div className="ngg-fb-card-cost">
+              <span>Buy one on a Research action</span>
+              <BattleCardPrice cost={ref.battleCardPurchase.cost} either={ref.battleCardPurchase.either} />
+              {ref.battleCardPurchase.unlockedBy[species] && <i>Needs the {ref.battleCardPurchase.unlockedBy[species]}</i>}
+            </div>
+          )}
           <div className="ngg-fb-hand">
             {own && v.hand.length > 0
               ? v.hand.map((c, i) => (

@@ -1586,6 +1586,21 @@
     "effect": "−100 Initiative to all opposing units in the battle."
    }
   ],
+  "battle_card_purchase": {
+   "cost": {
+    "water": 1,
+    "wood": 1,
+    "ore": 1
+   },
+   "either": [
+    "ether",
+    "oil"
+   ],
+   "unlocked_by": {
+    "wizard": "Embassy",
+    "robot": "Defense Research Station"
+   }
+  },
   "treaties": [
    {
     "id": "open-borders",

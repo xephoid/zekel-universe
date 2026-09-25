@@ -68,6 +68,27 @@ export function Token({ kind, faction, name, leader, state = 'solid', size = 22,
   );
 }
 
+/** A battle card's price: the fixed resources, then "+ either" one of the
+ *  others, as resource chips. */
+export function BattleCardPrice({ cost, either }: { cost: Cost; either: string[] }) {
+  return (
+    <span className="ngg-card-price">
+      <CostChips cost={cost} />
+      {either.length > 0 && (
+        <>
+          <span className="ngg-card-price-or">+ either</span>
+          {either.map((r, i) => (
+            <span key={r} className="ngg-card-price-leg">
+              {i > 0 && <span className="ngg-card-price-or">or</span>}
+              <CostChips cost={{ [r]: 1 } as Cost} />
+            </span>
+          ))}
+        </>
+      )}
+    </span>
+  );
+}
+
 /** The printed cost, as resource chips in the order the rules list them. */
 export function CostChips({ cost }: { cost: Cost }) {
   const parts = RESOURCES.filter((r) => (cost[r] ?? 0) > 0);

@@ -479,3 +479,10 @@ button.ngg-seat:focus-visible { outline: 2px solid var(--n-brand); outline-offse
 
 /* Seats and the culture race, drawn in the page's side column: the table's own tokens and type. */
 .ngg-side { display: flex; flex-direction: column; gap: 12px; font-family: var(--n-face); color: var(--n-text); }
+
+/* A battle card's price: the fixed resources, + either one of the others. */
+.ngg-card-price { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 4px; }
+.ngg-card-price-leg { display: inline-flex; align-items: center; gap: 4px; }
+.ngg-card-price-or { font: 600 10.5px var(--n-mono); color: var(--n-muted); }
+.ngg-fb-card-cost { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 0 0 10px; font: 500 12px var(--n-face); }
+.ngg-fb-card-cost i { color: var(--n-muted); font-style: normal; font-size: 11.5px; }
