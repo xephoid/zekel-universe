@@ -921,6 +921,22 @@ and where the seat stands. The payment stage's shortcut is "Choose for me".
 - The treaty income, tech targets, leader kills, unit stats and the smaller
   3-4 player map come from the engine's data and view as before.
 
+**Settled 2026-09-25, after play:**
+- The log drops the lines of moves an Undo took back (the undo event's
+  rewind point), so it keeps its order.
+- A finished action's button reads End action.
+- Seats has a Treaties link: every standing treaty, who with whom, and its
+  income.
+- A seat that recruited a spy not yet publicly revealed or spent shows a
+  spy mark (engine `unrevealed_spies`, branch `claude/ngg-spy-status`). A spy
+  that ended with its hero's death still counts: that end is not announced,
+  so the mark never names the hero.
+- Movement lists one row per destination tile.
+- Map pieces animate only when they move on the board: the motion root
+  measures a piece inside a `data-flip-frame` (the NGnG map) in the frame's
+  own units, so the map shifting or zooming on the page does not slide every
+  piece, and a slide is the right length at any zoom.
+
 **Engine changes, on a branch not yet merged** (`claude/ngg-structured-view`
 in the engine): `resolving_action { card_kind, owner }` beside the
 `active_action` sentence; `battle.units[].ref`, the id battle moves name a

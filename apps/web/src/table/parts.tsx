@@ -275,7 +275,16 @@ export function CaptionWords({ text, onClamped }: { text: string; onClamped: (cl
 }
 
 export function Log({ events, currentSeq, me = null }: { events: TableEventWire[]; currentSeq: number | null; me?: string | null }) {
-  const lines = events.flatMap((e) => (e.log ?? []).map((line) => ({ line, seq: e.seq })));
+  // An Undo rewinds the table to an earlier event: the lines of the moves it
+  // took back leave the log (their engine entries were rewound too).
+  const lines: Array<{ line: LogLine; seq: number }> = [];
+  for (const e of events) {
+    if (e.rewindToSeq !== null && e.rewindToSeq !== undefined) {
+      const keep = e.rewindToSeq;
+      for (let i = lines.length - 1; i >= 0; i--) if (lines[i]!.seq > keep) lines.splice(i, 1);
+    }
+    for (const line of e.log ?? []) lines.push({ line, seq: e.seq });
+  }
   // A game whose engine marks its key entries gets the short log; any other
   // shows one line per event, as before.
   if (lines.some((x) => x.line.headline)) return <KeyLog lines={lines} currentSeq={currentSeq} me={me} />;

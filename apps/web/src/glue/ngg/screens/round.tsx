@@ -987,10 +987,10 @@ function ActionDone({ ctx }: { ctx: ScreenCtx }) {
   const mine = ctx.route.perspective === 'decide';
   const panel = (
     <Panel title={mine ? `Your ${name} action is done` : `${ctx.seat(ctx.route.owner)}'s ${name} action is done`} kicker="End of the action">
-      {mine && <HowTo>{ctx.movesOf('form_treaty').length > 0 ? 'Offer a treaty now, or end your turn.' : 'End your turn.'}</HowTo>}
+      {mine && <HowTo>{ctx.movesOf('form_treaty').length > 0 ? 'Offer a treaty now, or end the action.' : 'End the action.'}</HowTo>}
       {mine && end && (
         <Actions>
-          <Btn disabled={!ctx.live} onClick={() => ctx.send(end)}>End turn</Btn>
+          <Btn disabled={!ctx.live} onClick={() => ctx.send(end)}>End action</Btn>
         </Actions>
       )}
     </Panel>

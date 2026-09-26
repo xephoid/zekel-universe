@@ -334,7 +334,7 @@ export function HexMap({ v, marks = {}, seatSpecies, overlay, refs = null }: {
         onClickCapture={onClickCapture}
       >
       <div className="ngg-map-canvas" style={panned ? { width: mapW * scale + 48, height: mapH * scale + 48 } : undefined}>
-      <div className="ngg-map" style={panned
+      <div className="ngg-map" data-flip-frame="ngg-map" style={panned
         ? { width: mapW, height: mapH, left: 24, top: 24, transform: `scale(${scale})`, transformOrigin: 'top left' }
         : { width: mapW, height: mapH, transform: `translate(-50%, -50%) scale(${scale})` }}>
         {columns.map((c) => (

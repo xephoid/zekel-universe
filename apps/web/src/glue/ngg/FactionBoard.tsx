@@ -11,7 +11,7 @@ import { coresOf, econOf, type NggPlayer } from './read';
 import { economicCollectorsFor, type RefBuilding, type RefResearch, type RefUnit } from './ref';
 import { useState, type KeyboardEvent } from 'react';
 import { inkOf } from './factions';
-import { BattleCardPrice, CardBack, CostChips, FactionChip, Icon, Panel } from './ui';
+import { BattleCardPrice, CardBack, CostChips, FactionChip, Icon, Panel, SpyMark } from './ui';
 
 const ACTION_CARDS: Array<{ key: string; played: string; name: string; icon: string }> = [
   { key: 'build', played: 'build', name: 'Build', icon: 'Build' },
@@ -349,6 +349,11 @@ export function FactionBoard({ ctx, player }: { ctx: ScreenCtx; player: NggPlaye
 
       <div className="ngg-fb-grid">
         <Panel title="Heroes">
+          {(player.unrevealedSpies ?? 0) > 0 && (
+            <div className="ngg-fb-spy"><SpyMark species={species} count={player.unrevealedSpies ?? 0} size={16} />
+              <span>{own ? 'Your spy is marked SPY below.' : 'A spy rides one of these heroes; which one is secret.'}</span>
+            </div>
+          )}
           <ul className="ngg-fb-heroes">
             {player.heroes.length === 0 && <li className="muted">None yet</li>}
             {player.heroes.map((h) => (

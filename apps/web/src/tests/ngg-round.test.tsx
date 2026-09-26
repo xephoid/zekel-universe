@@ -468,7 +468,7 @@ describe('NGnG: each human picks their own faction', () => {
     expect(onMove.mock.calls[0]![0].move).toEqual({ type: 'choose_faction', faction: 'foundry' });
     cleanup();
   });
-  it('Action Done: a finished action offers End turn, which sends the listed finish', () => {
+  it('Action Done: a finished action offers End action, which sends the listed finish', () => {
     const f = fixture('action-build');
     const view = f.view as { resolving_action: Record<string, unknown> };
     view.resolving_action = { ...view.resolving_action, finished: true };
@@ -476,7 +476,7 @@ describe('NGnG: each human picks their own faction', () => {
     const r = draw(view, f.viewer, legal);
     expect(r.column.textContent).toContain('Your Build action is done');
     expect(within(r.column).queryByRole('button', { name: /Skip/ })).toBeNull();
-    press(r.column, 'End turn');
+    press(r.column, 'End action');
     expectSentListed(r.onMove, legal, { type: 'skip_action' });
     cleanup();
   });

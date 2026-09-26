@@ -68,6 +68,19 @@ export function Token({ kind, faction, name, leader, state = 'solid', size = 22,
   );
 }
 
+/** A mark that a seat holds a spy the table has not seen revealed (which hero
+ *  carries it stays secret). */
+export function SpyMark({ species, count, size = 14 }: { species: string | null; count: number; size?: number }) {
+  if (count <= 0) return null;
+  const what = species === 'robot' ? 'Infiltrator' : 'Illusionist';
+  const title = `${count === 1 ? 'An' : count} unrevealed ${what} spy${count === 1 ? '' : ' assignments'} — which hero carries it is secret`;
+  return (
+    <span className="ngg-spy-mark" title={title} aria-label={title}>
+      <Icon name={what} size={size} stroke={2} />{count > 1 ? <b>{count}</b> : null}
+    </span>
+  );
+}
+
 /** A battle card's price: the fixed resources, then "+ either" one of the
  *  others, as resource chips. */
 export function BattleCardPrice({ cost, either }: { cost: Cost; either: string[] }) {

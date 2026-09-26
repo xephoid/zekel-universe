@@ -200,16 +200,19 @@ function PurchaseRow({ ctx, p, selected, onPick }: { ctx: ScreenCtx; p: Purchase
       onPress={p.shut ? undefined : onPick}
       mark={<Icon name={p.kind === 'battle_card' ? 'Battle card' : p.kind === 'economic' ? 'Build' : p.label} size={20} stroke={1.8} />}
       title={p.label}
-      sub={p.text || undefined}
+      sub={p.text ? <span className="ngg-eco-text">{p.text}</span> : undefined}
       aside={
         <span className="ngg-eco-cost">
           <span className="ngg-eco-kind">{KIND_WORDS[p.kind]}</span>
-          {p.cost && (p.either?.length ? <BattleCardPrice cost={p.cost} either={p.either} /> : <CostChips cost={p.cost} />)}
+          {p.cost && !p.either?.length && <CostChips cost={p.cost} />}
           {core && <span className="ngg-eco-core">+ Core <CostChips cost={core} /></span>}
           {ways.length > 1 && <span className="ngg-eco-core">Core: yours or bought</span>}
         </span>
       }
-    />
+    >
+      {/* A long "+ either" price sits under the name, so the text keeps its width. */}
+      {p.cost && p.either?.length ? <span className="ngg-eco-price"><BattleCardPrice cost={p.cost} either={p.either} /></span> : null}
+    </OptionRow>
   );
 }
 

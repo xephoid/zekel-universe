@@ -310,4 +310,14 @@ describe('NGnG battle screens', () => {
     press(s.container, 'Do not cast');
     expect(sentListed(s.onMove, s.legalMoves)).toEqual({ type: 'cast_elara_spell', target_location: null, skip: true });
   });
+  it('Move Battle: one row per destination tile even when the engine lists several moves there', () => {
+    const f = fx('pinned:action-move_battle-mid');
+    const moves = f.legalMoves.filter((m) => m.move['type'] === 'move_units');
+    const first = moves[0]!;
+    const legal: LegalMove[] = [...f.legalMoves, { move_id: 'dup', description: 'again', move: { ...first.move } }];
+    const r = mount(f.view, f.viewer, legal);
+    fireEvent.click(r.container.querySelector('button.ngg-hex')!);
+    const titles = [...r.container.querySelectorAll('.ngg-column .ngg-option-title')].map((t) => t.textContent);
+    expect(new Set(titles).size).toBe(titles.length);
+  });
 });

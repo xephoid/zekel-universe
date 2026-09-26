@@ -238,7 +238,18 @@ function MoveBattleScreen({ ctx }: { ctx: ScreenCtx }) {
   const origins = [...new Set(moves.map((m) => asStr(m.move['from'])))];
   const from = st.from && origins.includes(st.from) ? st.from : undefined;
   const fromMoves = from ? moves.filter((m) => m.move['from'] === from) : [];
-  const template = st.to ? fromMoves.find((m) => m.move['to'] === st.to) : undefined;
+  // The engine may list several moves to one tile (different units): one row
+  // per tile, and the move that takes the most units is the template the
+  // person leaves units out of.
+  const unitsOf = (m: LegalMove) => asArr(m.move['units']).length;
+  const byTile = new Map<string, LegalMove>();
+  for (const m of fromMoves) {
+    const c = asStr(m.move['to']);
+    const had = byTile.get(c);
+    if (!had || unitsOf(m) > unitsOf(had)) byTile.set(c, m);
+  }
+  const destinations = [...byTile.values()];
+  const template = st.to ? byTile.get(st.to) : undefined;
   const to = template ? st.to : undefined;
   const movers = template ? asArr(template.move['units']).map((u) => asStr(u)) : [];
   const left = st.left.filter((id) => movers.includes(id));
@@ -262,7 +273,7 @@ function MoveBattleScreen({ ctx }: { ctx: ScreenCtx }) {
   if (!live || moves.length === 0) marks = {};
   else if (!from) marks = { lit: new Set(origins), greyRest: true, onTile: pickFrom };
   else {
-    const tos = fromMoves.map((m) => asStr(m.move['to']));
+    const tos = [...byTile.keys()];
     marks = { origin: from, lit: new Set(tos), greyRest: true, onTile: pickTo, selected: to ?? null, tags: new Map([[from, 'FROM']]) };
   }
 
@@ -289,7 +300,7 @@ function MoveBattleScreen({ ctx }: { ctx: ScreenCtx }) {
           </div>
           <div className="ngb-step"><span className="ngb-num">2</span><span>{to ? <>To <b>{ctx.tile(to)}</b></> : 'Click a lit tile to go there'}</span></div>
           <div className="ngg-options">
-            {fromMoves.map((m) => {
+            {destinations.map((m) => {
               const c = asStr(m.move['to']);
               const others = othersOn(ctx, c);
               return (

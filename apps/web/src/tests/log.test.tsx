@@ -57,4 +57,15 @@ describe('Log', () => {
     expect(screen.getByText('Seat 2 passes.')).toBeTruthy();
     expect(screen.queryAllByRole('button')).toHaveLength(0);
   });
+  it('drops the lines of moves an Undo took back', () => {
+    const undone = [
+      ev(1, 'one', { log: [line(1, 'A builds', { headline: 'A recruited a Surf' })] }),
+      ev(2, 'two', { log: [line(2, 'B builds', { headline: 'B recruited a Surf' })] }),
+      ev(3, 'undo', { kind: 'undo', rewindToSeq: 1, log: [] }),
+      ev(4, 'again', { log: [line(2, 'B moves', { headline: 'B moved 1 unit from C4 to C5' })] }),
+    ];
+    render(<Log events={undone} currentSeq={4} me={null} />);
+    const items = screen.getAllByRole('button').map((b) => b.textContent);
+    expect(items).toEqual(['B moved 1 unit from C4 to C5', 'A recruited a Surf']);
+  });
 });

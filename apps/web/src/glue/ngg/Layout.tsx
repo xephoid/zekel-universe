@@ -8,9 +8,9 @@ import { useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import type { ScreenCtx } from './ctx';
 import { HexMap, type MapMarks } from './HexMap';
-import { inkOf, inkOfSeat } from './factions';
+import { TREATY_INK, inkOf, inkOfSeat } from './factions';
 import { WAITING_ON } from './route';
-import { CardBack, FactionChip, Icon, Panel } from './ui';
+import { CardBack, FactionChip, Icon, Panel, SpyMark } from './ui';
 import { cultureRaceOf, economicCollectorsFor } from './ref';
 import { econOf, type NggPlayer } from './read';
 import { FactionBoard, FactionStrip } from './FactionBoard';
@@ -58,8 +58,40 @@ function Pills({ ctx }: { ctx: ScreenCtx }) {
   );
 }
 
+/** Every standing treaty: who holds it with whom, and what it pays. */
+function TreatiesSheet({ ctx, onClose }: { ctx: ScreenCtx; onClose: () => void }) {
+  const { v } = ctx;
+  const factionOf = (pid: string) => v.players.find((p) => p.id === pid)?.faction ?? null;
+  return (
+    <div className="sheet-backdrop" role="presentation" onClick={onClose}>
+      <div className="sheet ngg-treaties-sheet ngg-side" role="dialog" aria-label="Treaties" onClick={(e) => e.stopPropagation()}>
+        <button type="button" className="btn secondary small close" onClick={onClose} aria-label="Close the treaties">✕</button>
+        <h2>Treaties</h2>
+        {v.treaties.length === 0
+          ? <p className="muted">No treaties stand at this table.</p>
+          : (
+            <ul className="ngg-treaty-pairs">
+              {v.treaties.map((t) => (
+                <li key={`${t.name}:${[...t.partners].sort().join('+')}`}>
+                  <span className="ngg-treaty-side"><FactionChip faction={factionOf(t.partners[0])} size={22} /><b>{ctx.seat(t.partners[0])}</b></span>
+                  <span className="ngg-treaty-kind">
+                    <span style={{ color: TREATY_INK[t.name] ?? 'inherit' }}><Icon name={t.name} size={16} /></span>
+                    {t.name}
+                    <i>+{t.cultureIncome} culture each a round</i>
+                  </span>
+                  <span className="ngg-treaty-side"><FactionChip faction={factionOf(t.partners[1])} size={22} /><b>{ctx.seat(t.partners[1])}</b></span>
+                </li>
+              ))}
+            </ul>
+          )}
+      </div>
+    </div>
+  );
+}
+
 function SeatsPanel({ ctx, onOpen }: { ctx: ScreenCtx; onOpen: (playerId: string) => void }) {
   const { v } = ctx;
+  const [treatiesOpen, setTreatiesOpen] = useState(false);
   return (
     <Panel title="Seats">
       <ul className="ngg-seats">
@@ -72,7 +104,7 @@ function SeatsPanel({ ctx, onOpen }: { ctx: ScreenCtx; onOpen: (playerId: string
                 onClick={() => onOpen(p.id)} aria-label={`Open ${you ? 'your' : `${ctx.seat(p.id)}'s`} faction board`}>
               <span data-flip-id={`ngg-supply:${p.id}`}><FactionChip faction={p.faction} size={24} /></span>
               <span className="ngg-seat-name">
-                <span>{ctx.seat(p.id)}</span>
+                <span>{ctx.seat(p.id)}<SpyMark species={p.species} count={p.unrevealedSpies ?? 0} /></span>
                 <span className="ngg-seat-detail">{[you ? 'you' : null, p.species, `${p.bases.length} base${p.bases.length === 1 ? '' : 's'}`].filter(Boolean).join(' · ')}</span>
               </span>
               <span className="ngg-stat"><b>{p.culture}</b><i>CULT</i></span>
@@ -84,6 +116,12 @@ function SeatsPanel({ ctx, onOpen }: { ctx: ScreenCtx; onOpen: (playerId: string
           );
         })}
       </ul>
+      <div className="ngg-seats-foot">
+        <button type="button" data-view-only className="ngg-link" onClick={() => setTreatiesOpen(true)}>
+          Treaties{v.treaties.length > 0 ? ` (${v.treaties.length})` : ''}
+        </button>
+      </div>
+      {treatiesOpen && <TreatiesSheet ctx={ctx} onClose={() => setTreatiesOpen(false)} />}
     </Panel>
   );
 }

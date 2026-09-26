@@ -72,6 +72,8 @@ export interface NggPlayer {
   actionCardsPlayedCount: number;
   handCount: number;
   spyRecruitments: number;
+  /** spies recruited and not publicly revealed or spent; null from an older engine */
+  unrevealedSpies: number | null;
   units: Array<{ id: string; type: string; coord: string; core: 'allocated' | 'CORELESS' | null }>;
   heroes: Array<{ name: string; coord: string | null; leader: boolean; dead: boolean; stats: string | null }>;
   bases: string[];
@@ -235,6 +237,7 @@ function readPlayer(p: Record<string, unknown>): NggPlayer {
     actionCardsPlayedCount: Array.isArray(p['action_cards_played_this_round']) ? asArr(p['action_cards_played_this_round']).length : asNum(p['action_cards_played_count']),
     handCount: asNum(p['battle_hand_count']),
     spyRecruitments: asNum(p['spy_recruitments']),
+    unrevealedSpies: typeof p['unrevealed_spies'] === 'number' ? p['unrevealed_spies'] : null,
     units: asArr(p['units']).filter(isObj).map((u) => ({
       id: asStr(u['id']),
       type: asStr(u['type']),

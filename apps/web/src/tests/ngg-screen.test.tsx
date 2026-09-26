@@ -225,4 +225,30 @@ describe('NGnG screen', () => {
     expect(r.getByRole('dialog', { name: building.querySelector('b')!.textContent! }).textContent).toContain('Cost');
     cleanup();
   });
+  it('opens a list of every treaty, who with whom, from the Treaties link under Seats', () => {
+    const f = FIXTURES.find((x) => x.name === 'phase-planning')!.f;
+    const view = structuredClone(f.view) as { treaties: unknown[]; players: Array<{ player_id: string }> };
+    const [a, b] = view.players.map((p) => p.player_id);
+    view.treaties = [{ treaty: 'Peace', partners: [a, b], culture_income: 2 }];
+    const r = render(<NggScreen input={inputFor(view, f.viewer, f.legalMoves)} yourTurn busy={false} interactive onMove={vi.fn()} onForm={vi.fn()} nameFor={(p) => p} />);
+    fireEvent.click(r.getByRole('button', { name: 'Treaties (1)' }));
+    const sheet = r.getByRole('dialog', { name: 'Treaties' });
+    expect(sheet.textContent).toContain('Peace');
+    expect(sheet.textContent).toContain('+2 culture each a round');
+    expect(sheet.querySelectorAll('.ngg-chip')).toHaveLength(2);
+    cleanup();
+  });
+
+  it('marks a seat holding an unrevealed spy, without naming the hero', () => {
+    const f = FIXTURES.find((x) => x.name === 'phase-planning')!.f;
+    const view = structuredClone(f.view) as { players: Array<Record<string, unknown>> };
+    const rival = view.players.find((p) => p['player_id'] !== f.viewer)!;
+    rival['unrevealed_spies'] = 1;
+    const r = render(<NggScreen input={inputFor(view, f.viewer, f.legalMoves)} yourTurn busy={false} interactive onMove={vi.fn()} onForm={vi.fn()} nameFor={(p) => p} />);
+    const row = [...r.container.querySelectorAll('button.ngg-seat')].find((b) => !b.classList.contains('you'))!;
+    const mark = row.querySelector('.ngg-spy-mark')!;
+    expect(mark.getAttribute('title')).toMatch(/unrevealed .* spy — which hero carries it is secret/);
+    expect(r.container.querySelector('button.ngg-seat.you .ngg-spy-mark')).toBeNull();
+    cleanup();
+  });
 });

@@ -59,11 +59,35 @@ interface FlipRootProps {
   style?: React.CSSProperties;
 }
 
-interface Rect { left: number; top: number; width: number; height: number }
+/** A part's position. `frame` is set for a part inside a moving, scaling
+ *  frame (an element marked data-flip-frame, such as a zoomable map): its
+ *  place in the frame's own units, so the frame shifting or zooming on the
+ *  page is not read as the part moving. */
+interface Rect {
+  left: number; top: number; width: number; height: number;
+  frame?: { id: string; x: number; y: number };
+}
 
 function rectOf(el: Element): Rect {
   const r = el.getBoundingClientRect();
-  return { left: r.left, top: r.top, width: r.width, height: r.height };
+  const rect: Rect = { left: r.left, top: r.top, width: r.width, height: r.height };
+  const frame = el.parentElement?.closest<HTMLElement>('[data-flip-frame]');
+  if (frame) {
+    const f = frame.getBoundingClientRect();
+    const scale = frame.offsetWidth > 0 ? f.width / frame.offsetWidth : 1;
+    if (scale > 0) rect.frame = { id: frame.dataset.flipFrame ?? '', x: (r.left - f.left) / scale, y: (r.top - f.top) / scale };
+  }
+  return rect;
+}
+
+/** How far a part moved since `prev`, as the translate to slide it back from:
+ *  in its frame's own units when both positions are in the same frame (a
+ *  translate inside a scaled frame is scaled with it), else on the page. */
+function moveOf(prev: Rect, rect: Rect): { dx: number; dy: number } {
+  if (prev.frame && rect.frame && prev.frame.id === rect.frame.id) {
+    return { dx: prev.frame.x - rect.frame.x, dy: prev.frame.y - rect.frame.y };
+  }
+  return { dx: prev.left - rect.left, dy: prev.top - rect.top };
 }
 
 function center(r: Rect): { x: number; y: number } {
@@ -142,15 +166,16 @@ export function FlipRoot({ viewKey, reducedMotion, children, className, style }:
     const flying = new Set<string>();
     if (keyChanged && !firstMeasure) {
       for (const { id, rect, prev } of measured) {
-        if (prev ? Math.abs(prev.left - rect.left) >= 1 || Math.abs(prev.top - rect.top) >= 1 : true) flying.add(id);
+        const d = prev ? moveOf(prev, rect) : null;
+        if (d ? Math.abs(d.dx) >= 1 || Math.abs(d.dy) >= 1 : true) flying.add(id);
       }
     }
     for (const { el, rect, prev } of measured) {
       if (!keyChanged || firstMeasure) continue;
       if (prev) {
         // Moved: slide from where it was to where it is, lifting on the way.
-        const dx = prev.left - rect.left;
-        const dy = prev.top - rect.top;
+        // Inside a frame only a move within the frame counts.
+        const { dx, dy } = moveOf(prev, rect);
         if (Math.abs(dx) < 1 && Math.abs(dy) < 1) continue;
         if (reduced) {
           fade(el, ms, ease);
