@@ -1,12 +1,12 @@
 {
  "key": "pending-second_purchase",
  "players": 4,
- "viewer": "p2",
+ "viewer": "p3",
  "view": {
   "game_id": "neither-guts-nor-gears",
   "phase": "action",
   "round": 1,
-  "active_player_id": "p2",
+  "active_player_id": "p3",
   "first_player_id": "p2",
   "layout": "threeFour",
   "map": {
@@ -33,7 +33,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [
-      "Archivist Solenne Dray (p4)"
+      "Quartermaster Bertram Hollis (p4)"
      ],
      "collectors": [
       "surf-2 (p4)"
@@ -61,7 +61,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [
-      "Quartermaster Bertram Hollis (p3)"
+      "Foreman Hadrik Stoll (p3)"
      ],
      "collectors": []
     },
@@ -74,9 +74,7 @@
      "base_owner": "p3",
      "units": [],
      "heroes": [],
-     "collectors": [
-      "water-collector-2 (p3)"
-     ]
+     "collectors": []
     },
     {
      "coord": "-1,3",
@@ -307,11 +305,9 @@
      "base_owner": null,
      "units": [],
      "heroes": [
-      "Foreman Hadrik Stoll (p2)"
+      "Chronicler Ottoline Vey (p2)"
      ],
-     "collectors": [
-      "surf-1 (p2)"
-     ]
+     "collectors": []
     },
     {
      "coord": "2,8",
@@ -322,9 +318,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "surf-2 (p2)"
-     ]
+     "collectors": []
     },
     {
      "coord": "2,10",
@@ -359,13 +353,18 @@
    {
     "position": 1,
     "owner": "p2",
+    "face": "down"
+   },
+   {
+    "position": 2,
+    "owner": "p3",
     "card_kind": "build"
    }
   ],
-  "active_action": "build by p2",
+  "active_action": "build by p3",
   "resolving_action": {
    "card_kind": "build",
-   "owner": "p2",
+   "owner": "p3",
    "finished": false
   },
   "treaties": [],
@@ -374,8 +373,8 @@
   "battle_discard": [],
   "pending": {
    "kind": "second_purchase",
-   "for": "p2",
-   "question": "p2 may make a second build purchase",
+   "for": "p3",
+   "question": "p3 may make a second build purchase",
    "context": {
     "action": "build"
    }
@@ -389,7 +388,7 @@
    },
    "p2": {
     "culture": 0,
-    "tech": 3,
+    "tech": 2,
     "leader_kills": 0,
     "leader_alive": true
    },
@@ -414,14 +413,14 @@
     "faction": "The Foundry",
     "species": "robot",
     "culture": 0,
-    "culture_target": 200,
+    "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
-     10,
+     5,
+     15,
      30,
-     60,
-     100,
-     150
+     50,
+     75
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -470,6 +469,7 @@
     "action_cards_played_count": 3,
     "battle_hand_count": 1,
     "spy_recruitments": 0,
+    "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
@@ -539,37 +539,31 @@
     "faction": "The Schism",
     "species": "wizard",
     "culture": 0,
-    "culture_target": 200,
+    "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
-     10,
+     5,
+     15,
      30,
-     60,
-     100,
-     150
+     50,
+     75
     ],
     "mana_current": 5,
     "mana_max": 5,
-    "buildings": [
-     "Embassy"
-    ],
-    "building_counts": {
-     "embassy": 1
-    },
+    "buildings": [],
+    "building_counts": {},
     "research": [],
     "tech_progress": {
      "acquired_types": [
       "surf",
-      "castle",
-      "embassy"
+      "castle"
      ],
      "acquired_type_names": [
       "Surf",
-      "Castle",
-      "Embassy"
+      "Castle"
      ],
      "bonus_points_live": 0,
-     "total": 3,
+     "total": 2,
      "target": 22
     },
     "leader_kills": 0,
@@ -597,10 +591,11 @@
     "action_cards_played_count": 3,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
+    "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Foreman Hadrik Stoll",
+      "hero": "Chronicler Ottoline Vey",
       "coord": "2,6",
       "is_leader": true,
       "dead": false,
@@ -628,33 +623,22 @@
       "Extra Research Card": "needs a Library of Illusion",
       "Extra Build Card": "needs a Library of Enchantment"
      },
-     "treaties": null,
-     "battle_cards": null
+     "treaties": "needs an Embassy or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
+     "battle_cards": "needs an Embassy"
     },
     "collectors": [
      {
       "collector": "surf-1",
       "type": "Surf",
-      "placed_at": "2,6"
+      "placed_at": null
      },
      {
       "collector": "surf-2",
       "type": "Surf",
-      "placed_at": "2,8"
+      "placed_at": null
      }
     ],
-    "committed_collectors": [
-     {
-      "collector": "surf-1",
-      "coord": "2,6",
-      "resource": "wood"
-     },
-     {
-      "collector": "surf-2",
-      "coord": "2,8",
-      "resource": "wood"
-     }
-    ]
+    "committed_collectors": []
    },
    {
     "player_id": "p3",
@@ -662,14 +646,14 @@
     "faction": "The Ledger",
     "species": "robot",
     "culture": 0,
-    "culture_target": 200,
+    "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
-     10,
+     5,
+     15,
      30,
-     60,
-     100,
-     150
+     50,
+     75
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -697,17 +681,16 @@
     "military_kills_needed": 2,
     "leader_alive": true,
     "subjects": 0,
-    "cores_reserve": 2,
-    "cores_supply": 18,
+    "cores_reserve": 1,
+    "cores_supply": 19,
     "action_cards": {
-     "build": 2,
+     "build": 1,
      "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base",
-      "hero_extra"
+      "base"
      ],
      "moveBattle": [
       "base"
@@ -716,13 +699,14 @@
       "base"
      ]
     },
-    "action_cards_played_count": 4,
+    "action_cards_played_count": 3,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
+    "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Quartermaster Bertram Hollis",
+      "hero": "Foreman Hadrik Stoll",
       "coord": "-2,10",
       "is_leader": true,
       "dead": false,
@@ -758,7 +742,7 @@
      {
       "collector": "water-collector-2",
       "type": "Water collector",
-      "placed_at": "-2,12",
+      "placed_at": null,
       "core": "allocated"
      },
      {
@@ -779,11 +763,6 @@
       "collector": "water-collector-1",
       "coord": "-2,8",
       "resource": "water"
-     },
-     {
-      "collector": "water-collector-2",
-      "coord": "-2,12",
-      "resource": "water"
      }
     ]
    },
@@ -793,14 +772,14 @@
     "faction": "The Brass Circle",
     "species": "wizard",
     "culture": 0,
-    "culture_target": 200,
+    "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
-     10,
+     5,
+     15,
      30,
-     60,
-     100,
-     150
+     50,
+     75
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -827,29 +806,30 @@
     "cores_reserve": 0,
     "cores_supply": 24,
     "action_cards": {
-     "build": 1,
+     "build": 2,
      "moveBattle": 1,
-     "research": 2
+     "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base"
+      "base",
+      "hero_extra"
      ],
      "moveBattle": [
       "base"
      ],
      "research": [
-      "base",
-      "hero_extra"
+      "base"
      ]
     },
     "action_cards_played_count": 4,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
+    "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Archivist Solenne Dray",
+      "hero": "Quartermaster Bertram Hollis",
       "coord": "-2,6",
       "is_leader": true,
       "dead": false,
@@ -928,92 +908,174 @@
    "move": {
     "type": "skip_action"
    }
+  },
+  {
+   "move_id": "",
+   "description": "Build Core for 1 water (available collectors: water-collector-2, wood-collector-1, wood-collector-2; edit payment placements as needed).",
+   "move": {
+    "type": "build",
+    "item": "Core",
+    "payment": [
+     {
+      "collectorId": "water-collector-2",
+      "coord": "-2,12"
+     }
+    ]
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Build Water collector for 1 water using a reserve Core (available collectors: water-collector-2, wood-collector-1, wood-collector-2; edit payment placements as needed).",
+   "move": {
+    "type": "build",
+    "item": "Water collector",
+    "payment": [
+     {
+      "collectorId": "water-collector-2",
+      "coord": "-2,12"
+     }
+    ]
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Build Wood collector for 1 water using a reserve Core (available collectors: water-collector-2, wood-collector-1, wood-collector-2; edit payment placements as needed).",
+   "move": {
+    "type": "build",
+    "item": "Wood collector",
+    "payment": [
+     {
+      "collectorId": "water-collector-2",
+      "coord": "-2,12"
+     }
+    ]
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Build Ore collector for 1 wood using a reserve Core (available collectors: water-collector-2, wood-collector-1, wood-collector-2; edit payment placements as needed).",
+   "move": {
+    "type": "build",
+    "item": "Ore collector",
+    "payment": [
+     {
+      "collectorId": "wood-collector-1",
+      "coord": "-2,10"
+     }
+    ]
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Build Ore collector for 1 wood + a new Core bought with it (core_pairing, +1 water) (available collectors: water-collector-2, wood-collector-1, wood-collector-2; edit payment placements as needed).",
+   "move": {
+    "type": "build",
+    "item": "Ore collector",
+    "payment": [
+     {
+      "collectorId": "wood-collector-1",
+      "coord": "-2,10"
+     },
+     {
+      "collectorId": "water-collector-2",
+      "coord": "-2,12"
+     }
+    ],
+    "core_pairing": true
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Build Diplomatic Research Station for 1 water + 2 wood.",
+   "move": {
+    "type": "build",
+    "item": "Diplomatic Research Station",
+    "payment": [
+     {
+      "collectorId": "wood-collector-1",
+      "coord": "-2,10"
+     },
+     {
+      "collectorId": "water-collector-2",
+      "coord": "-2,12"
+     },
+     {
+      "collectorId": "wood-collector-2",
+      "coord": "-1,9"
+     }
+    ]
+   }
   }
  ],
  "unavailable": [
   {
    "moveType": "build",
-   "item": "Surf",
-   "reason": "costs 2 water — you have no collector free to pay (all placed this round)"
+   "item": "Oil collector",
+   "reason": "costs 1 ore — you have no free ore collector"
   },
   {
    "moveType": "build",
-   "item": "Subject",
-   "reason": "costs 1 water + 1 wood — you have no collector free to pay (all placed this round)"
+   "item": "Ether collector",
+   "reason": "costs 1 oil — you have no free oil collector"
   },
   {
    "moveType": "build",
-   "item": "Evoker",
-   "reason": "costs 2 wood + 1 ore — you have no collector free to pay (all placed this round)"
+   "item": "Spinner Platform",
+   "reason": "Spinner Platform requires Combat Frame Production first (you have: none)"
   },
   {
    "moveType": "build",
-   "item": "Illusionist",
-   "reason": "Illusionist requires Library of Illusion first (you have: Embassy)"
+   "item": "Spitter Platform",
+   "reason": "Spitter Platform requires Combat Frame Production first (you have: none)"
   },
   {
    "moveType": "build",
-   "item": "Dragon",
-   "reason": "Dragon requires Dragon Hoard first (you have: Embassy)"
+   "item": "Infiltrator Platform",
+   "reason": "Infiltrator Platform requires Diplomatic Research Station first (you have: none)"
   },
   {
    "moveType": "build",
-   "item": "Enchantress",
-   "reason": "Enchantress requires Library of Enchantment first (you have: Embassy)"
+   "item": "Immobile Combat Platform",
+   "reason": "costs 2 wood + 2 ore — that is 4 resources and you have 3 free collectors"
   },
   {
    "moveType": "build",
-   "item": "Cleric",
-   "reason": "Cleric requires Temple first (you have: Embassy)"
+   "item": "Large Combat Platform",
+   "reason": "Large Combat Platform requires Combat Frame Production first (you have: none)"
   },
   {
    "moveType": "build",
-   "item": "Castle",
-   "reason": "costs 3 wood + 1 ore — you have no collector free to pay (all placed this round)"
+   "item": "Wall Platform",
+   "reason": "Wall Platform requires Defense Research Station first (you have: none)"
   },
   {
    "moveType": "build",
-   "item": "Library of Evocation",
-   "reason": "costs 1 water + 2 wood — you have no collector free to pay (all placed this round)"
+   "item": "Home",
+   "reason": "costs 3 wood + 1 ore — that is 4 resources and you have 3 free collectors"
   },
   {
    "moveType": "build",
-   "item": "Library of Illusion",
-   "reason": "costs 2 wood + 1 ore — you have no collector free to pay (all placed this round)"
+   "item": "Combat Frame Production",
+   "reason": "costs 2 wood + 1 ore — you have no free ore collector"
   },
   {
    "moveType": "build",
-   "item": "Library of Enchantment",
-   "reason": "costs 2 wood + 1 ore — you have no collector free to pay (all placed this round)"
+   "item": "Defense Research Station",
+   "reason": "costs 2 wood + 1 ore — you have no free ore collector"
   },
   {
    "moveType": "build",
-   "item": "Dragon Hoard",
-   "reason": "costs 1 water + 2 ore + 1 ether — you have no collector free to pay (all placed this round)"
+   "item": "Third Space",
+   "reason": "costs 1 water + 3 wood + 1 ore — that is 5 resources and you have 3 free collectors"
   },
   {
    "moveType": "build",
-   "item": "Temple",
-   "reason": "costs 2 water + 2 wood — you have no collector free to pay (all placed this round)"
-  },
-  {
-   "moveType": "build",
-   "item": "Embassy",
-   "reason": "You already have Embassy (one per player)"
-  },
-  {
-   "moveType": "build",
-   "item": "Amphitheatre",
-   "reason": "costs 1 water + 3 wood — you have no collector free to pay (all placed this round)"
-  },
-  {
-   "moveType": "build",
-   "item": "Mana Reserve",
-   "reason": "costs 1 water + 2 wood — you have no collector free to pay (all placed this round)"
+   "item": "Advanced Research Station",
+   "reason": "costs 1 wood + 2 ore — you have no free ore collector"
   },
   {
    "moveType": "economic_victory_spend",
-   "reason": "needs 20 free collectors on 20 different tiles — you have 0"
+   "reason": "needs 20 free collectors on 20 different tiles — you have 3"
   }
  ],
  "watcher": "p1",
@@ -1021,7 +1083,7 @@
   "game_id": "neither-guts-nor-gears",
   "phase": "action",
   "round": 1,
-  "active_player_id": "p2",
+  "active_player_id": "p3",
   "first_player_id": "p2",
   "layout": "threeFour",
   "map": {
@@ -1048,7 +1110,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [
-      "Archivist Solenne Dray (p4)"
+      "Quartermaster Bertram Hollis (p4)"
      ],
      "collectors": [
       "surf-2 (p4)"
@@ -1076,7 +1138,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [
-      "Quartermaster Bertram Hollis (p3)"
+      "Foreman Hadrik Stoll (p3)"
      ],
      "collectors": []
     },
@@ -1089,9 +1151,7 @@
      "base_owner": "p3",
      "units": [],
      "heroes": [],
-     "collectors": [
-      "water-collector-2 (p3)"
-     ]
+     "collectors": []
     },
     {
      "coord": "-1,3",
@@ -1322,11 +1382,9 @@
      "base_owner": null,
      "units": [],
      "heroes": [
-      "Foreman Hadrik Stoll (p2)"
+      "Chronicler Ottoline Vey (p2)"
      ],
-     "collectors": [
-      "surf-1 (p2)"
-     ]
+     "collectors": []
     },
     {
      "coord": "2,8",
@@ -1337,9 +1395,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "surf-2 (p2)"
-     ]
+     "collectors": []
     },
     {
      "coord": "2,10",
@@ -1374,13 +1430,18 @@
    {
     "position": 1,
     "owner": "p2",
+    "face": "down"
+   },
+   {
+    "position": 2,
+    "owner": "p3",
     "card_kind": "build"
    }
   ],
-  "active_action": "build by p2",
+  "active_action": "build by p3",
   "resolving_action": {
    "card_kind": "build",
-   "owner": "p2",
+   "owner": "p3",
    "finished": false
   },
   "treaties": [],
@@ -1389,8 +1450,8 @@
   "battle_discard": [],
   "pending": {
    "kind": "second_purchase",
-   "for": "p2",
-   "question": "p2 may make a second build purchase",
+   "for": "p3",
+   "question": "p3 may make a second build purchase",
    "context": {
     "action": "build"
    }
@@ -1404,7 +1465,7 @@
    },
    "p2": {
     "culture": 0,
-    "tech": 3,
+    "tech": 2,
     "leader_kills": 0,
     "leader_alive": true
    },
@@ -1429,14 +1490,14 @@
     "faction": "The Foundry",
     "species": "robot",
     "culture": 0,
-    "culture_target": 200,
+    "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
-     10,
+     5,
+     15,
      30,
-     60,
-     100,
-     150
+     50,
+     75
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -1485,6 +1546,7 @@
     "action_cards_played_count": 3,
     "battle_hand_count": 1,
     "spy_recruitments": 0,
+    "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
@@ -1554,37 +1616,31 @@
     "faction": "The Schism",
     "species": "wizard",
     "culture": 0,
-    "culture_target": 200,
+    "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
-     10,
+     5,
+     15,
      30,
-     60,
-     100,
-     150
+     50,
+     75
     ],
     "mana_current": 5,
     "mana_max": 5,
-    "buildings": [
-     "Embassy"
-    ],
-    "building_counts": {
-     "embassy": 1
-    },
+    "buildings": [],
+    "building_counts": {},
     "research": [],
     "tech_progress": {
      "acquired_types": [
       "surf",
-      "castle",
-      "embassy"
+      "castle"
      ],
      "acquired_type_names": [
       "Surf",
-      "Castle",
-      "Embassy"
+      "Castle"
      ],
      "bonus_points_live": 0,
-     "total": 3,
+     "total": 2,
      "target": 22
     },
     "leader_kills": 0,
@@ -1612,10 +1668,11 @@
     "action_cards_played_count": 3,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
+    "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Foreman Hadrik Stoll",
+      "hero": "Chronicler Ottoline Vey",
       "coord": "2,6",
       "is_leader": true,
       "dead": false,
@@ -1643,33 +1700,22 @@
       "Extra Research Card": "needs a Library of Illusion",
       "Extra Build Card": "needs a Library of Enchantment"
      },
-     "treaties": null,
-     "battle_cards": null
+     "treaties": "needs an Embassy or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
+     "battle_cards": "needs an Embassy"
     },
     "collectors": [
      {
       "collector": "surf-1",
       "type": "Surf",
-      "placed_at": "2,6"
+      "placed_at": null
      },
      {
       "collector": "surf-2",
       "type": "Surf",
-      "placed_at": "2,8"
+      "placed_at": null
      }
     ],
-    "committed_collectors": [
-     {
-      "collector": "surf-1",
-      "coord": "2,6",
-      "resource": "wood"
-     },
-     {
-      "collector": "surf-2",
-      "coord": "2,8",
-      "resource": "wood"
-     }
-    ]
+    "committed_collectors": []
    },
    {
     "player_id": "p3",
@@ -1677,14 +1723,14 @@
     "faction": "The Ledger",
     "species": "robot",
     "culture": 0,
-    "culture_target": 200,
+    "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
-     10,
+     5,
+     15,
      30,
-     60,
-     100,
-     150
+     50,
+     75
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -1712,17 +1758,16 @@
     "military_kills_needed": 2,
     "leader_alive": true,
     "subjects": 0,
-    "cores_reserve": 2,
-    "cores_supply": 18,
+    "cores_reserve": 1,
+    "cores_supply": 19,
     "action_cards": {
-     "build": 2,
+     "build": 1,
      "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base",
-      "hero_extra"
+      "base"
      ],
      "moveBattle": [
       "base"
@@ -1731,13 +1776,14 @@
       "base"
      ]
     },
-    "action_cards_played_count": 4,
+    "action_cards_played_count": 3,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
+    "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Quartermaster Bertram Hollis",
+      "hero": "Foreman Hadrik Stoll",
       "coord": "-2,10",
       "is_leader": true,
       "dead": false,
@@ -1773,7 +1819,7 @@
      {
       "collector": "water-collector-2",
       "type": "Water collector",
-      "placed_at": "-2,12",
+      "placed_at": null,
       "core": "allocated"
      },
      {
@@ -1794,11 +1840,6 @@
       "collector": "water-collector-1",
       "coord": "-2,8",
       "resource": "water"
-     },
-     {
-      "collector": "water-collector-2",
-      "coord": "-2,12",
-      "resource": "water"
      }
     ]
    },
@@ -1808,14 +1849,14 @@
     "faction": "The Brass Circle",
     "species": "wizard",
     "culture": 0,
-    "culture_target": 200,
+    "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
-     10,
+     5,
+     15,
      30,
-     60,
-     100,
-     150
+     50,
+     75
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -1842,29 +1883,30 @@
     "cores_reserve": 0,
     "cores_supply": 24,
     "action_cards": {
-     "build": 1,
+     "build": 2,
      "moveBattle": 1,
-     "research": 2
+     "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base"
+      "base",
+      "hero_extra"
      ],
      "moveBattle": [
       "base"
      ],
      "research": [
-      "base",
-      "hero_extra"
+      "base"
      ]
     },
     "action_cards_played_count": 4,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
+    "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Archivist Solenne Dray",
+      "hero": "Quartermaster Bertram Hollis",
       "coord": "-2,6",
       "is_leader": true,
       "dead": false,

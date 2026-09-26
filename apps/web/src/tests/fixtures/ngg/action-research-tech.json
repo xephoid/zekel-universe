@@ -5,9 +5,9 @@
  "view": {
   "game_id": "neither-guts-nor-gears",
   "phase": "action",
-  "round": 9,
+  "round": 8,
   "active_player_id": "p2",
-  "first_player_id": "p1",
+  "first_player_id": "p2",
   "layout": "two",
   "map": {
    "tiles": [
@@ -55,9 +55,9 @@
      "base_owner": "p1",
      "units": [],
      "heroes": [
-      "Marshal Corvin Ashlock (p1)",
       "Archmage Elara (p1)",
-      "Captain Rook Malvane (p1)"
+      "Captain Rook Malvane (p1)",
+      "Kestrel Nine (p1)"
      ],
      "collectors": []
     },
@@ -251,6 +251,7 @@
       "Foreman Hadrik Stoll (p2)",
       "Chronicler Ottoline Vey (p2)",
       "Quartermaster Bertram Hollis (p2)",
+      "Marshal Corvin Ashlock (p2)",
       "Evo Angel (p2)",
       "Warden Hesper Quill (p2)"
      ],
@@ -291,35 +292,30 @@
     }
    ]
   },
-  "hero_pool_count": 11,
+  "hero_pool_count": 10,
   "action_stack": [
    {
     "position": 1,
-    "owner": "p1",
-    "face": "down"
+    "owner": "p2",
+    "card_kind": "build"
    },
    {
     "position": 2,
-    "owner": "p2",
-    "card_kind": "build"
+    "owner": "p1",
+    "face": "down"
    },
    {
     "position": 3,
-    "owner": "p1",
-    "face": "down"
-   },
-   {
-    "position": 4,
     "owner": "p2",
     "card_kind": "build"
    },
    {
-    "position": 5,
+    "position": 4,
     "owner": "p1",
     "face": "down"
    },
    {
-    "position": 6,
+    "position": 5,
     "owner": "p2",
     "card_kind": "research"
    }
@@ -337,14 +333,14 @@
   "pending": null,
   "victory_status": {
    "p1": {
-    "culture": 30,
+    "culture": 20,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p2": {
-    "culture": 60,
-    "tech": 11,
+    "culture": 44,
+    "tech": 10,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -356,12 +352,12 @@
     "kind": "human",
     "faction": "The Covenant",
     "species": "wizard",
-    "culture": 30,
-    "culture_target": 100,
+    "culture": 20,
+    "culture_target": 50,
     "economic_collectors": 12,
     "next_milestones": [
-     50,
-     75
+     25,
+     38
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -392,12 +388,12 @@
     "leader_kills": 0,
     "military_kills_needed": 1,
     "leader_alive": true,
-    "subjects": 5,
+    "subjects": 4,
     "cores_reserve": 0,
     "cores_supply": 16,
     "action_cards": {
      "build": 1,
-     "moveBattle": 2,
+     "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
@@ -405,16 +401,16 @@
       "base"
      ],
      "moveBattle": [
-      "base",
-      "hero_extra"
+      "base"
      ],
      "research": [
       "base"
      ]
     },
-    "action_cards_played_count": 4,
+    "action_cards_played_count": 3,
     "battle_hand_count": 1,
     "spy_recruitments": 0,
+    "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
@@ -425,13 +421,6 @@
       "stats": "Init 70 DMG 3 DEF 6"
      },
      {
-      "hero": "Marshal Corvin Ashlock",
-      "coord": "-2,10",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 70 DMG 3 DEF 4"
-     },
-     {
       "hero": "Archmage Elara",
       "coord": "-2,10",
       "is_leader": false,
@@ -440,6 +429,13 @@
      },
      {
       "hero": "Captain Rook Malvane",
+      "coord": "-2,10",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
+     },
+     {
+      "hero": "Kestrel Nine",
       "coord": "-2,10",
       "is_leader": false,
       "dead": false,
@@ -499,23 +495,21 @@
     "kind": "ai",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 60,
-    "culture_target": 100,
+    "culture": 44,
+    "culture_target": 50,
     "economic_collectors": 12,
-    "next_milestones": [
-     75
-    ],
+    "next_milestones": [],
     "mana_current": 0,
     "mana_max": 0,
     "buildings": [
      "Advanced Research Station",
      "Combat Frame Production",
-     "Third Space"
+     "Diplomatic Research Station"
     ],
     "building_counts": {
      "advanced-research-station": 1,
      "combat-frame-production": 1,
-     "third-space": 1
+     "diplomatic-research-station": 1
     },
     "research": [],
     "tech_progress": {
@@ -527,10 +521,9 @@
       "ore-collector",
       "advanced-research-station",
       "combat-frame-production",
+      "diplomatic-research-station",
       "spitter",
-      "third-space",
-      "oil-collector",
-      "ether-collector"
+      "oil-collector"
      ],
      "acquired_type_names": [
       "Core",
@@ -540,13 +533,12 @@
       "Ore collector",
       "Advanced Research Station",
       "Combat Frame Production",
+      "Diplomatic Research Station",
       "Spitter Platform",
-      "Third Space",
-      "Oil collector",
-      "Ether collector"
+      "Oil collector"
      ],
      "bonus_points_live": 0,
-     "total": 11,
+     "total": 10,
      "target": 18
     },
     "leader_kills": 0,
@@ -557,7 +549,7 @@
     "cores_supply": 1,
     "action_cards": {
      "build": 2,
-     "moveBattle": 1,
+     "moveBattle": 2,
      "research": 1
     },
     "action_card_slots": {
@@ -566,15 +558,17 @@
       "hero_extra"
      ],
      "moveBattle": [
-      "base"
+      "base",
+      "hero_extra"
      ],
      "research": [
       "base"
      ]
     },
-    "action_cards_played_count": 4,
+    "action_cards_played_count": 5,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
+    "unrevealed_spies": 0,
     "units": [
      {
       "id": "u-spitter-p2-1",
@@ -606,6 +600,13 @@
       "stats": "Init 30 DMG 1 DEF 3"
      },
      {
+      "hero": "Marshal Corvin Ashlock",
+      "coord": "2,4",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
+     },
+     {
       "hero": "Evo Angel",
       "coord": "2,4",
       "is_leader": false,
@@ -625,11 +626,10 @@
     ],
     "locked": {
      "units": {
-      "Infiltrator Platform": "needs a Diplomatic Research Station",
       "Wall Platform": "needs a Defense Research Station"
      },
      "research": {},
-     "treaties": "needs a Diplomatic Research Station or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
+     "treaties": null,
      "battle_cards": "needs a Defense Research Station"
     },
     "collectors": [
@@ -670,6 +670,12 @@
       "core": "allocated"
      },
      {
+      "collector": "ore-collector-3",
+      "type": "Ore collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
       "collector": "water-collector-3",
       "type": "Water collector",
       "placed_at": null,
@@ -692,12 +698,6 @@
       "type": "Oil collector",
       "placed_at": null,
       "core": "allocated"
-     },
-     {
-      "collector": "ether-collector-1",
-      "type": "Ether collector",
-      "placed_at": null,
-      "core": "allocated"
      }
     ],
     "committed_collectors": []
@@ -708,7 +708,8 @@
    "build:base",
    "build:hero_extra",
    "research:base",
-   "move_battle:base"
+   "move_battle:base",
+   "move_battle:hero_extra"
   ],
   "your_spy_assignments": [],
   "your_knowledge": [],
@@ -738,33 +739,6 @@
      {
       "collectorId": "oil-collector-1",
       "coord": "0,8"
-     }
-    ]
-   }
-  },
-  {
-   "move_id": "",
-   "description": "Research Extra Build Card for 1 water + 1 wood + 1 ore + 1 ether — Gain a second Build action card for the rest of the game (with Quartermaster's, three). Counts as a research type for technology without raising the target (ruling #87)..",
-   "move": {
-    "type": "research",
-    "kind": "tech",
-    "tech": "Extra Build Card",
-    "payment": [
-     {
-      "collectorId": "water-collector-1",
-      "coord": "1,3"
-     },
-     {
-      "collectorId": "ore-collector-1",
-      "coord": "0,2"
-     },
-     {
-      "collectorId": "wood-collector-1",
-      "coord": "2,6"
-     },
-     {
-      "collectorId": "ether-collector-1",
-      "coord": "1,7"
      }
     ]
    }
@@ -814,33 +788,6 @@
   },
   {
    "move_id": "",
-   "description": "Research Extra Move/Battle Card for 1 water + 1 wood + 1 ore + 1 ether — Gain a second Move/Battle action card for the rest of the game (with Marshal's, three). Counts as a research type for technology without raising the target (ruling #87)..",
-   "move": {
-    "type": "research",
-    "kind": "tech",
-    "tech": "Extra Move/Battle Card",
-    "payment": [
-     {
-      "collectorId": "water-collector-1",
-      "coord": "1,3"
-     },
-     {
-      "collectorId": "ore-collector-1",
-      "coord": "0,2"
-     },
-     {
-      "collectorId": "wood-collector-1",
-      "coord": "2,6"
-     },
-     {
-      "collectorId": "ether-collector-1",
-      "coord": "1,7"
-     }
-    ]
-   }
-  },
-  {
-   "move_id": "",
    "description": "Research Extra Move/Battle Card for 1 water + 1 wood + 1 ore + 1 oil — Gain a second Move/Battle action card for the rest of the game (with Marshal's, three). Counts as a research type for technology without raising the target (ruling #87)..",
    "move": {
     "type": "research",
@@ -878,33 +825,6 @@
      {
       "collectorId": "oil-collector-1",
       "coord": "0,6"
-     }
-    ]
-   }
-  },
-  {
-   "move_id": "",
-   "description": "Research Extra Research Card for 1 water + 1 wood + 1 ore + 1 ether — Gain a second Research action card for the rest of the game (with Archivist's, three). Counts as a research type for technology without raising the target (ruling #87)..",
-   "move": {
-    "type": "research",
-    "kind": "tech",
-    "tech": "Extra Research Card",
-    "payment": [
-     {
-      "collectorId": "water-collector-1",
-      "coord": "1,3"
-     },
-     {
-      "collectorId": "ore-collector-1",
-      "coord": "0,2"
-     },
-     {
-      "collectorId": "wood-collector-1",
-      "coord": "2,6"
-     },
-     {
-      "collectorId": "ether-collector-1",
-      "coord": "1,7"
      }
     ]
    }
@@ -963,7 +883,7 @@
  "unavailable": [
   {
    "moveType": "form_treaty",
-   "reason": "a treaty needs an unlock on one side — a Diplomatic Research Station or an active Envoy Sable Marrow; no one who could partner with you has one"
+   "reason": "every treaty you could offer is already committed, or was turned down this round (offer it again next round — ruling 80)"
   },
   {
    "moveType": "research",
@@ -975,9 +895,9 @@
  "watcherView": {
   "game_id": "neither-guts-nor-gears",
   "phase": "action",
-  "round": 9,
+  "round": 8,
   "active_player_id": "p2",
-  "first_player_id": "p1",
+  "first_player_id": "p2",
   "layout": "two",
   "map": {
    "tiles": [
@@ -1025,9 +945,9 @@
      "base_owner": "p1",
      "units": [],
      "heroes": [
-      "Marshal Corvin Ashlock (p1)",
       "Archmage Elara (p1)",
-      "Captain Rook Malvane (p1)"
+      "Captain Rook Malvane (p1)",
+      "Kestrel Nine (p1)"
      ],
      "collectors": []
     },
@@ -1221,6 +1141,7 @@
       "Foreman Hadrik Stoll (p2)",
       "Chronicler Ottoline Vey (p2)",
       "Quartermaster Bertram Hollis (p2)",
+      "Marshal Corvin Ashlock (p2)",
       "Evo Angel (p2)",
       "Warden Hesper Quill (p2)"
      ],
@@ -1261,35 +1182,30 @@
     }
    ]
   },
-  "hero_pool_count": 11,
+  "hero_pool_count": 10,
   "action_stack": [
    {
     "position": 1,
+    "owner": "p2",
+    "face": "down"
+   },
+   {
+    "position": 2,
     "owner": "p1",
     "card_kind": "build"
    },
    {
-    "position": 2,
+    "position": 3,
     "owner": "p2",
     "face": "down"
    },
    {
-    "position": 3,
+    "position": 4,
     "owner": "p1",
     "card_kind": "research"
    },
    {
-    "position": 4,
-    "owner": "p2",
-    "face": "down"
-   },
-   {
     "position": 5,
-    "owner": "p1",
-    "card_kind": "move_battle"
-   },
-   {
-    "position": 6,
     "owner": "p2",
     "card_kind": "research"
    }
@@ -1307,14 +1223,14 @@
   "pending": null,
   "victory_status": {
    "p1": {
-    "culture": 30,
+    "culture": 20,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p2": {
-    "culture": 60,
-    "tech": 11,
+    "culture": 44,
+    "tech": 10,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -1326,12 +1242,12 @@
     "kind": "human",
     "faction": "The Covenant",
     "species": "wizard",
-    "culture": 30,
-    "culture_target": 100,
+    "culture": 20,
+    "culture_target": 50,
     "economic_collectors": 12,
     "next_milestones": [
-     50,
-     75
+     25,
+     38
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -1362,12 +1278,12 @@
     "leader_kills": 0,
     "military_kills_needed": 1,
     "leader_alive": true,
-    "subjects": 5,
+    "subjects": 4,
     "cores_reserve": 0,
     "cores_supply": 16,
     "action_cards": {
      "build": 1,
-     "moveBattle": 2,
+     "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
@@ -1375,16 +1291,16 @@
       "base"
      ],
      "moveBattle": [
-      "base",
-      "hero_extra"
+      "base"
      ],
      "research": [
       "base"
      ]
     },
-    "action_cards_played_count": 4,
+    "action_cards_played_count": 3,
     "battle_hand_count": 1,
     "spy_recruitments": 0,
+    "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
@@ -1395,13 +1311,6 @@
       "stats": "Init 70 DMG 3 DEF 6"
      },
      {
-      "hero": "Marshal Corvin Ashlock",
-      "coord": "-2,10",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 70 DMG 3 DEF 4"
-     },
-     {
       "hero": "Archmage Elara",
       "coord": "-2,10",
       "is_leader": false,
@@ -1410,6 +1319,13 @@
      },
      {
       "hero": "Captain Rook Malvane",
+      "coord": "-2,10",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
+     },
+     {
+      "hero": "Kestrel Nine",
       "coord": "-2,10",
       "is_leader": false,
       "dead": false,
@@ -1469,23 +1385,21 @@
     "kind": "ai",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 60,
-    "culture_target": 100,
+    "culture": 44,
+    "culture_target": 50,
     "economic_collectors": 12,
-    "next_milestones": [
-     75
-    ],
+    "next_milestones": [],
     "mana_current": 0,
     "mana_max": 0,
     "buildings": [
      "Advanced Research Station",
      "Combat Frame Production",
-     "Third Space"
+     "Diplomatic Research Station"
     ],
     "building_counts": {
      "advanced-research-station": 1,
      "combat-frame-production": 1,
-     "third-space": 1
+     "diplomatic-research-station": 1
     },
     "research": [],
     "tech_progress": {
@@ -1497,10 +1411,9 @@
       "ore-collector",
       "advanced-research-station",
       "combat-frame-production",
+      "diplomatic-research-station",
       "spitter",
-      "third-space",
-      "oil-collector",
-      "ether-collector"
+      "oil-collector"
      ],
      "acquired_type_names": [
       "Core",
@@ -1510,13 +1423,12 @@
       "Ore collector",
       "Advanced Research Station",
       "Combat Frame Production",
+      "Diplomatic Research Station",
       "Spitter Platform",
-      "Third Space",
-      "Oil collector",
-      "Ether collector"
+      "Oil collector"
      ],
      "bonus_points_live": 0,
-     "total": 11,
+     "total": 10,
      "target": 18
     },
     "leader_kills": 0,
@@ -1527,7 +1439,7 @@
     "cores_supply": 1,
     "action_cards": {
      "build": 2,
-     "moveBattle": 1,
+     "moveBattle": 2,
      "research": 1
     },
     "action_card_slots": {
@@ -1536,15 +1448,17 @@
       "hero_extra"
      ],
      "moveBattle": [
-      "base"
+      "base",
+      "hero_extra"
      ],
      "research": [
       "base"
      ]
     },
-    "action_cards_played_count": 4,
+    "action_cards_played_count": 5,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
+    "unrevealed_spies": 0,
     "units": [
      {
       "id": "u-spitter-p2-1",
@@ -1576,6 +1490,13 @@
       "stats": "Init 30 DMG 1 DEF 3"
      },
      {
+      "hero": "Marshal Corvin Ashlock",
+      "coord": "2,4",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
+     },
+     {
       "hero": "Evo Angel",
       "coord": "2,4",
       "is_leader": false,
@@ -1595,11 +1516,10 @@
     ],
     "locked": {
      "units": {
-      "Infiltrator Platform": "needs a Diplomatic Research Station",
       "Wall Platform": "needs a Defense Research Station"
      },
      "research": {},
-     "treaties": "needs a Diplomatic Research Station or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
+     "treaties": null,
      "battle_cards": "needs a Defense Research Station"
     },
     "collectors": [
@@ -1640,6 +1560,12 @@
       "core": "allocated"
      },
      {
+      "collector": "ore-collector-3",
+      "type": "Ore collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
       "collector": "water-collector-3",
       "type": "Water collector",
       "placed_at": null,
@@ -1662,12 +1588,6 @@
       "type": "Oil collector",
       "placed_at": null,
       "core": "allocated"
-     },
-     {
-      "collector": "ether-collector-1",
-      "type": "Ether collector",
-      "placed_at": null,
-      "core": "allocated"
      }
     ],
     "committed_collectors": []
@@ -1682,8 +1602,7 @@
   "your_action_cards_played": [
    "build:base",
    "research:base",
-   "move_battle:base",
-   "move_battle:hero_extra"
+   "move_battle:base"
   ],
   "your_spy_assignments": [],
   "your_knowledge": [],

@@ -1,12 +1,12 @@
 {
  "key": "pending-access_request",
  "players": 4,
- "viewer": "p4",
+ "viewer": "p3",
  "view": {
   "game_id": "neither-guts-nor-gears",
   "phase": "action",
   "round": 2,
-  "active_player_id": "p4",
+  "active_player_id": "p3",
   "first_player_id": "p3",
   "layout": "threeFour",
   "map": {
@@ -42,7 +42,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [
-      "Archivist Solenne Dray (p4)"
+      "Quartermaster Bertram Hollis (p4)"
      ],
      "collectors": []
     },
@@ -55,7 +55,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [
-      "Quartermaster Bertram Hollis (p3)"
+      "Foreman Hadrik Stoll (p3)"
      ],
      "collectors": []
     },
@@ -254,7 +254,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Chronicler Ottoline Vey (p2)"
+     ],
      "collectors": []
     },
     {
@@ -287,7 +289,9 @@
      "start": 3,
      "base_owner": "p2",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Marshal Corvin Ashlock (p2)"
+     ],
      "collectors": []
     },
     {
@@ -309,9 +313,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Foreman Hadrik Stoll (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -340,17 +342,17 @@
     }
    ]
   },
-  "hero_pool_count": 16,
+  "hero_pool_count": 15,
   "action_stack": [
    {
     "position": 1,
     "owner": "p3",
-    "face": "down"
+    "card_kind": "build"
    },
    {
     "position": 2,
     "owner": "p4",
-    "card_kind": "build"
+    "face": "down"
    },
    {
     "position": 3,
@@ -365,13 +367,18 @@
    {
     "position": 5,
     "owner": "p3",
+    "card_kind": "research"
+   },
+   {
+    "position": 6,
+    "owner": "p4",
     "card_kind": "build"
    }
   ],
-  "active_action": "build by p3",
+  "active_action": "build by p4",
   "resolving_action": {
    "card_kind": "build",
-   "owner": "p3",
+   "owner": "p4",
    "finished": false
   },
   "treaties": [
@@ -407,22 +414,28 @@
   ],
   "pending": {
    "kind": "access_request",
-   "for": "p4",
-   "question": "p4 decides whether p3's water-collector-1 may collect at -2,8",
+   "for": "p3",
+   "question": "p3 decides whether p4's surf-1 may collect at -2,10",
    "context": {
-    "buyer": "p3",
+    "buyer": "p4",
     "action": "build",
-    "item": "Core",
+    "item": "Embassy",
     "this_request": {
-     "collector": "water-collector-1",
-     "tile": "C5"
+     "collector": "surf-1",
+     "tile": "C6"
     },
     "placements": [
      {
-      "collector": "water-collector-1",
-      "tile": "C5",
-      "resource": "water",
-      "location_owner": "p4"
+      "collector": "surf-1",
+      "tile": "C6",
+      "resource": "wood",
+      "location_owner": "p3"
+     },
+     {
+      "collector": "surf-2",
+      "tile": "D3",
+      "resource": "wood",
+      "location_owner": null
      }
     ],
     "queue": {
@@ -439,7 +452,7 @@
     "leader_alive": true
    },
    "p2": {
-    "culture": 6,
+    "culture": 8,
     "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
@@ -465,14 +478,14 @@
     "faction": "The Foundry",
     "species": "robot",
     "culture": 3,
-    "culture_target": 200,
+    "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
-     10,
+     5,
+     15,
      30,
-     60,
-     100,
-     150
+     50,
+     75
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -521,6 +534,7 @@
     "action_cards_played_count": 3,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
+    "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
@@ -583,15 +597,14 @@
     "kind": "ai",
     "faction": "The Schism",
     "species": "wizard",
-    "culture": 6,
-    "culture_target": 200,
+    "culture": 8,
+    "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
-     10,
+     15,
      30,
-     60,
-     100,
-     150
+     50,
+     75
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -625,7 +638,7 @@
     "cores_supply": 24,
     "action_cards": {
      "build": 1,
-     "moveBattle": 1,
+     "moveBattle": 2,
      "research": 1
     },
     "action_card_slots": {
@@ -633,23 +646,32 @@
       "base"
      ],
      "moveBattle": [
-      "base"
+      "base",
+      "hero_extra"
      ],
      "research": [
       "base"
      ]
     },
-    "action_cards_played_count": 3,
+    "action_cards_played_count": 4,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
+    "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Foreman Hadrik Stoll",
-      "coord": "2,8",
+      "hero": "Chronicler Ottoline Vey",
+      "coord": "1,9",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Marshal Corvin Ashlock",
+      "coord": "2,4",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
      }
     ],
     "bases": [
@@ -696,14 +718,14 @@
     "faction": "The Ledger",
     "species": "robot",
     "culture": 4,
-    "culture_target": 200,
+    "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
-     10,
+     5,
+     15,
      30,
-     60,
-     100,
-     150
+     50,
+     75
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -734,14 +756,13 @@
     "cores_reserve": 2,
     "cores_supply": 18,
     "action_cards": {
-     "build": 2,
+     "build": 1,
      "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base",
-      "hero_extra"
+      "base"
      ],
      "moveBattle": [
       "base"
@@ -750,13 +771,14 @@
       "base"
      ]
     },
-    "action_cards_played_count": 4,
+    "action_cards_played_count": 3,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
+    "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Quartermaster Bertram Hollis",
+      "hero": "Foreman Hadrik Stoll",
       "coord": "-2,10",
       "is_leader": true,
       "dead": false,
@@ -816,14 +838,14 @@
     "faction": "The Brass Circle",
     "species": "wizard",
     "culture": 2,
-    "culture_target": 200,
+    "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
-     10,
+     5,
+     15,
      30,
-     60,
-     100,
-     150
+     50,
+     75
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -850,29 +872,30 @@
     "cores_reserve": 0,
     "cores_supply": 24,
     "action_cards": {
-     "build": 1,
+     "build": 2,
      "moveBattle": 1,
-     "research": 2
+     "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base"
+      "base",
+      "hero_extra"
      ],
      "moveBattle": [
       "base"
      ],
      "research": [
-      "base",
-      "hero_extra"
+      "base"
      ]
     },
     "action_cards_played_count": 4,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
+    "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Archivist Solenne Dray",
+      "hero": "Quartermaster Bertram Hollis",
       "coord": "-2,8",
       "is_leader": true,
       "dead": false,
@@ -927,7 +950,6 @@
   "your_action_cards_played": [
    "build:base",
    "research:base",
-   "research:hero_extra",
    "move_battle:base"
   ],
   "your_spy_assignments": [],
@@ -937,7 +959,7 @@
  "legalMoves": [
   {
    "move_id": "",
-   "description": "Grant The Ledger collection access at C5 (their collector stays safely beside your units until upkeep).",
+   "description": "Grant The Brass Circle collection access at C6 (their collector stays safely beside your units until upkeep).",
    "move": {
     "type": "respond_access_request",
     "grant": true
@@ -945,7 +967,7 @@
   },
   {
    "move_id": "",
-   "description": "Refuse The Ledger access at C5 — nothing commits.",
+   "description": "Refuse The Brass Circle access at C6 — nothing commits.",
    "move": {
     "type": "respond_access_request",
     "grant": false
@@ -958,7 +980,7 @@
   "game_id": "neither-guts-nor-gears",
   "phase": "action",
   "round": 2,
-  "active_player_id": "p4",
+  "active_player_id": "p3",
   "first_player_id": "p3",
   "layout": "threeFour",
   "map": {
@@ -994,7 +1016,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [
-      "Archivist Solenne Dray (p4)"
+      "Quartermaster Bertram Hollis (p4)"
      ],
      "collectors": []
     },
@@ -1007,7 +1029,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [
-      "Quartermaster Bertram Hollis (p3)"
+      "Foreman Hadrik Stoll (p3)"
      ],
      "collectors": []
     },
@@ -1206,7 +1228,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Chronicler Ottoline Vey (p2)"
+     ],
      "collectors": []
     },
     {
@@ -1239,7 +1263,9 @@
      "start": 3,
      "base_owner": "p2",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Marshal Corvin Ashlock (p2)"
+     ],
      "collectors": []
     },
     {
@@ -1261,9 +1287,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Foreman Hadrik Stoll (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -1292,7 +1316,7 @@
     }
    ]
   },
-  "hero_pool_count": 16,
+  "hero_pool_count": 15,
   "action_stack": [
    {
     "position": 1,
@@ -1317,13 +1341,18 @@
    {
     "position": 5,
     "owner": "p3",
+    "face": "down"
+   },
+   {
+    "position": 6,
+    "owner": "p4",
     "card_kind": "build"
    }
   ],
-  "active_action": "build by p3",
+  "active_action": "build by p4",
   "resolving_action": {
    "card_kind": "build",
-   "owner": "p3",
+   "owner": "p4",
    "finished": false
   },
   "treaties": [
@@ -1359,8 +1388,8 @@
   ],
   "pending": {
    "kind": "access_request",
-   "for": "p4",
-   "question": "p4 decides whether p3's water-collector-1 may collect at -2,8"
+   "for": "p3",
+   "question": "p3 decides whether p4's surf-1 may collect at -2,10"
   },
   "victory_status": {
    "p1": {
@@ -1370,7 +1399,7 @@
     "leader_alive": true
    },
    "p2": {
-    "culture": 6,
+    "culture": 8,
     "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
@@ -1396,14 +1425,14 @@
     "faction": "The Foundry",
     "species": "robot",
     "culture": 3,
-    "culture_target": 200,
+    "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
-     10,
+     5,
+     15,
      30,
-     60,
-     100,
-     150
+     50,
+     75
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -1452,6 +1481,7 @@
     "action_cards_played_count": 3,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
+    "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
@@ -1514,15 +1544,14 @@
     "kind": "ai",
     "faction": "The Schism",
     "species": "wizard",
-    "culture": 6,
-    "culture_target": 200,
+    "culture": 8,
+    "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
-     10,
+     15,
      30,
-     60,
-     100,
-     150
+     50,
+     75
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -1556,7 +1585,7 @@
     "cores_supply": 24,
     "action_cards": {
      "build": 1,
-     "moveBattle": 1,
+     "moveBattle": 2,
      "research": 1
     },
     "action_card_slots": {
@@ -1564,23 +1593,32 @@
       "base"
      ],
      "moveBattle": [
-      "base"
+      "base",
+      "hero_extra"
      ],
      "research": [
       "base"
      ]
     },
-    "action_cards_played_count": 3,
+    "action_cards_played_count": 4,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
+    "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Foreman Hadrik Stoll",
-      "coord": "2,8",
+      "hero": "Chronicler Ottoline Vey",
+      "coord": "1,9",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Marshal Corvin Ashlock",
+      "coord": "2,4",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
      }
     ],
     "bases": [
@@ -1627,14 +1665,14 @@
     "faction": "The Ledger",
     "species": "robot",
     "culture": 4,
-    "culture_target": 200,
+    "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
-     10,
+     5,
+     15,
      30,
-     60,
-     100,
-     150
+     50,
+     75
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -1665,14 +1703,13 @@
     "cores_reserve": 2,
     "cores_supply": 18,
     "action_cards": {
-     "build": 2,
+     "build": 1,
      "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base",
-      "hero_extra"
+      "base"
      ],
      "moveBattle": [
       "base"
@@ -1681,13 +1718,14 @@
       "base"
      ]
     },
-    "action_cards_played_count": 4,
+    "action_cards_played_count": 3,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
+    "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Quartermaster Bertram Hollis",
+      "hero": "Foreman Hadrik Stoll",
       "coord": "-2,10",
       "is_leader": true,
       "dead": false,
@@ -1747,14 +1785,14 @@
     "faction": "The Brass Circle",
     "species": "wizard",
     "culture": 2,
-    "culture_target": 200,
+    "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
-     10,
+     5,
+     15,
      30,
-     60,
-     100,
-     150
+     50,
+     75
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -1781,29 +1819,30 @@
     "cores_reserve": 0,
     "cores_supply": 24,
     "action_cards": {
-     "build": 1,
+     "build": 2,
      "moveBattle": 1,
-     "research": 2
+     "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base"
+      "base",
+      "hero_extra"
      ],
      "moveBattle": [
       "base"
      ],
      "research": [
-      "base",
-      "hero_extra"
+      "base"
      ]
     },
     "action_cards_played_count": 4,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
+    "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Archivist Solenne Dray",
+      "hero": "Quartermaster Bertram Hollis",
       "coord": "-2,8",
       "is_leader": true,
       "dead": false,

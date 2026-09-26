@@ -143,7 +143,9 @@ describe('NGnG screen', () => {
       const f = FIXTURES.find((x) => x.name === name)!.f;
       const players = (f.view as { players: Array<{ culture_target?: number }> }).players;
       const target = players[0]!.culture_target!;
-      expect(target).toBe(50 * players.length);
+      // The target scales with the number of players, as the engine publishes it.
+      const byCount = (REFERENCE as { referenceData: { victory: { culture_target_by_player_count: Record<string, number> } } }).referenceData.victory.culture_target_by_player_count;
+      expect(target).toBe(byCount[String(players.length)]);
       const r = render(<NggScreen input={inputFor(f.view, f.viewer, f.legalMoves)} yourTurn busy={false} interactive onMove={vi.fn()} onForm={vi.fn()} nameFor={(p) => p} />);
       const marks = [...r.container.querySelectorAll('.ngg-race-axis span')].map((s) => Number(s.textContent));
       expect(marks[marks.length - 1]).toBe(target);

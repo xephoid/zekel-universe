@@ -937,6 +937,12 @@ and where the seat stands. The payment stage's shortcut is "Choose for me".
   own units, so the map shifting or zooming on the page does not slide every
   piece, and a slide is the right length at any zoom.
 
+**Checked against engine 632231e (2026-09-25):** Cultural victory is 25
+culture per player (50 at two players to 150 at six) and the hero milestones
+are shares of it. The culture race reads both from the engine, so nothing in
+Universe changed; the test views are recaptured and the culture test reads
+the target from the catalogue rather than a fixed 50 per player.
+
 **Engine changes, on a branch not yet merged** (`claude/ngg-structured-view`
 in the engine): `resolving_action { card_kind, owner }` beside the
 `active_action` sentence; `battle.units[].ref`, the id battle moves name a
