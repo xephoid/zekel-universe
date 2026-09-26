@@ -735,6 +735,14 @@ function actionOf(m: LegalMove): Record<string, unknown> {
   return isObj(a) ? a : {};
 }
 
+/** The unit an action is aimed at; null for one aimed at nobody (an area
+ *  attack hits every opposing unit, and the engine lists it with an empty
+ *  target). */
+function targetOf(m: LegalMove): string | null {
+  const t = actionOf(m)['target'];
+  return typeof t === 'string' && t !== '' ? t : null;
+}
+
 function groupKey(m: LegalMove): string {
   const a = actionOf(m);
   const kind = asStr(a['kind']);
@@ -834,9 +842,9 @@ function ActivationScreen({ ctx }: { ctx: ScreenCtx }) {
   }
   const group = st.group && groups.has(st.group) ? st.group : null;
   const gMoves = group ? groups.get(group)! : [];
-  const targeted = gMoves.some((m) => typeof actionOf(m)['target'] === 'string');
-  const target = targeted && st.target && gMoves.some((m) => actionOf(m)['target'] === st.target) ? st.target : null;
-  const chosen = group ? (targeted ? gMoves.find((m) => actionOf(m)['target'] === target) : gMoves[0]) : undefined;
+  const targeted = gMoves.some((m) => targetOf(m) !== null);
+  const target = targeted && st.target && gMoves.some((m) => targetOf(m) === st.target) ? st.target : null;
+  const chosen = group ? (targeted ? gMoves.find((m) => targetOf(m) === target) : gMoves[0]) : undefined;
   const nameOf = (k: string) => ACTION_NAMES[k] ?? k.replace(/^ability:/, '').replace(/_/g, ' ');
   const spyTag = (k: string) => (k === 'spy_attack' || k === 'invisible' ? 'REVEALS AND SPENDS THE SPY' : infiltrator ? 'SPY UNTOUCHED' : undefined);
   const go = (m: LegalMove | undefined) => { if (m) { setStash(undefined); ctx.send(m); } };
@@ -851,7 +859,9 @@ function ActivationScreen({ ctx }: { ctx: ScreenCtx }) {
           <Rule>One attack or one ability, not both. Passing spends the activation too.</Rule>
           <div className="ngg-options">
             {[...groups.keys()].map((k) => {
-              const text = actionText(ctx, k);
+              // An action aimed at nobody (an area attack) says what it does, in the engine's words.
+              const aimless = groups.get(k)!.every((m) => targetOf(m) === null) && k === 'attack';
+              const text = actionText(ctx, k) ?? (aimless ? ctx.say(groups.get(k)![0]!.description ?? '') || null : null);
               return (
                 <OptionRow key={k} title={nameOf(k)} sub={[spyTag(k), text].filter(Boolean).join(' · ') || undefined}
                   selected={group === k} disabled={!live} onPress={() => setStash({ stamp, group: k })} />
@@ -862,8 +872,8 @@ function ActivationScreen({ ctx }: { ctx: ScreenCtx }) {
             <div className="ngb-block">
               <span className="ngg-kicker">Pick a target · for {nameOf(group)}</span>
               <div className="ngg-options">
-                {gMoves.map((m) => {
-                  const t = asStr(actionOf(m)['target']);
+                {gMoves.filter((m) => targetOf(m) !== null).map((m) => {
+                  const t = targetOf(m)!;
                   const bu = battleUnit(ctx, t);
                   return (
                     <OptionRow key={t} title={bu?.label ?? piece(ctx, t).name}

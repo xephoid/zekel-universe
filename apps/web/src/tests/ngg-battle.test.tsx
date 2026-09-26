@@ -320,4 +320,22 @@ describe('NGnG battle screens', () => {
     const titles = [...r.container.querySelectorAll('.ngg-column .ngg-option-title')].map((t) => t.textContent);
     expect(new Set(titles).size).toBe(titles.length);
   });
+  it('Activation: an area attack aims at nobody, shows no blank target, and is sent on its press', () => {
+    const f = fx('battle-activations-multi');
+    const acting = f.legalMoves.find((m) => m.move['type'] === 'battle_activation')!.move['unit'] as string;
+    const legal: LegalMove[] = [
+      { move_id: 'a', description: 'Dragon makes its area attack — 5 DMG to every opposing unit here.', move: { type: 'battle_activation', unit: acting, action: { kind: 'attack', target: '' } } },
+      { move_id: 'p', description: 'pass', move: { type: 'battle_activation', unit: acting, action: { kind: 'pass' } } },
+    ];
+    const r = mount(f.view, f.viewer, legal);
+    press(r.container, /^Attack/);
+    // No target to pick, and no button without a name.
+    for (const b of r.container.querySelectorAll('.ngg-column button:not([data-view-only])')) expect((b.textContent ?? '').trim().length, b.outerHTML.slice(0, 80)).toBeGreaterThan(0);
+    expect(r.container.textContent).not.toContain('Pick a target');
+    expect(r.container.textContent).toContain('area attack');
+    const act = [...r.container.querySelectorAll<HTMLButtonElement>('button.ngg-btn.primary')].find((b) => b.textContent === 'Attack')!;
+    expect(act.disabled).toBe(false);
+    fireEvent.click(act);
+    expect(sentListed(r.onMove, legal)).toEqual({ type: 'battle_activation', unit: acting, action: { kind: 'attack', target: '' } });
+  });
 });
