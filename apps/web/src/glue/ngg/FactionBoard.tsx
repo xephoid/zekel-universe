@@ -295,7 +295,7 @@ export function FactionBoard({ ctx, player }: { ctx: ScreenCtx; player: NggPlaye
               return (
                 <li key={b.id} className={`${n > 0 ? 'on' : 'off'} pressable`} {...pressable(() => setDetail({ kind: 'building', building: b }))}>
                   <span className="ngg-fb-list-mark"><Icon name={b.name} size={20} stroke={1.8} /></span>
-                  <span><b>{b.name}</b>{n > 1 ? ` ×${n}` : ''}<i>{b.effect}</i></span>
+                  <span><b>{b.name}</b>{n > 1 ? ` ×${n}` : ''}<i className="ngg-fb-effect">{b.effect}</i></span>
                   <span className="ngg-fb-state">{n > 0 ? 'BUILT' : <CostChips cost={b.cost} />}</span>
                 </li>
               );
@@ -309,8 +309,14 @@ export function FactionBoard({ ctx, player }: { ctx: ScreenCtx; player: NggPlaye
               return (
                 <li key={r.id} className={`${on ? 'on' : 'off'}${!on && locked?.research[r.name] ? ' locked' : ''} pressable`} {...pressable(() => setDetail({ kind: 'research', research: r }))}>
                   <span className="ngg-fb-list-mark"><Icon name={r.name} size={20} stroke={1.8} /></span>
-                  <span><b>{r.name}</b><i>{r.effect}</i>{!on && <LockTag why={locked ? locked.research[r.name] ?? null : undefined} />}{!locked && <i>Needs {r.prerequisite}</i>}</span>
-                  <span className="ngg-fb-state">{on ? 'RESEARCHED' : r.either.length ? <BattleCardPrice cost={r.cost} either={r.either} /> : <CostChips cost={r.cost} />}</span>
+                  <span>
+                    <b>{r.name}</b>
+                    {/* A long "+ either" price sits under the name, so the text keeps its width. */}
+                    {!on && r.either.length > 0 && <span className="ngg-fb-price"><BattleCardPrice cost={r.cost} either={r.either} /></span>}
+                    <i className="ngg-fb-effect">{r.effect}</i>
+                    {!on && <LockTag why={locked ? locked.research[r.name] ?? null : undefined} />}{!locked && <i>Needs {r.prerequisite}</i>}
+                  </span>
+                  <span className="ngg-fb-state">{on ? 'RESEARCHED' : r.either.length ? null : <CostChips cost={r.cost} />}</span>
                 </li>
               );
             })}
