@@ -28,5 +28,10 @@ describe('logLinesOf', () => {
     expect(out[0]!.loss).toBeUndefined();
     expect(out.length).toBeLessThanOrEqual(200);
     expect(logLinesOf('nope')).toEqual([]);
+    // The seats to tell: a bounded list of ids; anything else is dropped.
+    const told = logLinesOf([{ seq: 1, summary: 's', notify: ['p1', 7, 'x'.repeat(99), ...Array.from({ length: 20 }, (_, i) => `p${i}`)] }]);
+    expect(told[0]!.notify!.length).toBeLessThanOrEqual(10);
+    expect(told[0]!.notify![0]).toBe('p1');
+    expect(told[0]!.notify!.every((x) => typeof x === 'string' && x.length <= 40)).toBe(true);
   });
 });

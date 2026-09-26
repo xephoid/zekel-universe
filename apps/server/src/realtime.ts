@@ -91,6 +91,10 @@ export function logLinesOf(raw: unknown): LogLine[] {
     const subjectHeadline = text(e['subject_headline'], 200);
     if (subject && subjectHeadline) { line.subject = subject; line.subjectHeadline = subjectHeadline; }
     if (e['tone'] === 'loss' && line.subject) line.loss = true;
+    if (Array.isArray(e['notify'])) {
+      const notify = e['notify'].slice(0, 10).map((x) => text(x, 40)).filter((x): x is string => !!x);
+      if (notify.length) line.notify = notify;
+    }
     out.push(line);
   }
   return out;

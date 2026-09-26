@@ -68,13 +68,22 @@ test('NGnG: factions on the setup page, the draft and the start at the table, th
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   const seen = new Set<string>();
+  const notices: string[] = [];
   for (let step = 0; step < 120; step++) {
     if (await page.getByRole('dialog', { name: 'Game over' }).isVisible()) break;
     await expect(page.locator('.turn-pill')).toHaveText(/^(Your move|Game over)/, { timeout: 90_000 });
     if (await page.getByRole('dialog', { name: 'Game over' }).isVisible()) break;
+    // What happened that this seat must acknowledge: read it, then OK.
+    const notice = page.getByRole('alertdialog', { name: 'What happened' });
+    if (await notice.isVisible()) {
+      notices.push(...(await notice.locator('li').allInnerTexts()));
+      await notice.getByRole('button', { name: 'OK' }).click();
+      continue;
+    }
     await pressWhatTheScreenOffers(page, seen);
     await expect(page.getByRole('alert')).toHaveCount(0);
   }
+  console.log('NOTICES', JSON.stringify(notices));
   expect(errors).toEqual([]);
   // Several different decisions were met and answered on their own screens,
   // and at least one purchase was paid by placing a collector on a tile the

@@ -275,16 +275,7 @@ export function CaptionWords({ text, onClamped }: { text: string; onClamped: (cl
 }
 
 export function Log({ events, currentSeq, me = null }: { events: TableEventWire[]; currentSeq: number | null; me?: string | null }) {
-  // An Undo rewinds the table to an earlier event: the lines of the moves it
-  // took back leave the log (their engine entries were rewound too).
-  const lines: Array<{ line: LogLine; seq: number }> = [];
-  for (const e of events) {
-    if (e.rewindToSeq !== null && e.rewindToSeq !== undefined) {
-      const keep = e.rewindToSeq;
-      for (let i = lines.length - 1; i >= 0; i--) if (lines[i]!.seq > keep) lines.splice(i, 1);
-    }
-    for (const line of e.log ?? []) lines.push({ line, seq: e.seq });
-  }
+  const lines = logLinesOf(events);
   // A game whose engine marks its key entries gets the short log; any other
   // shows one line per event, as before.
   if (lines.some((x) => x.line.headline)) return <KeyLog lines={lines} currentSeq={currentSeq} me={me} />;
@@ -296,6 +287,58 @@ export function Log({ events, currentSeq, me = null }: { events: TableEventWire[
           <li key={e.seq} className={e.seq === currentSeq ? 'current' : undefined}>{e.summary}</li>
         ))}
       </ul>
+    </div>
+  );
+}
+
+/** The engine's log lines of the events on the table, in order. An Undo
+ *  rewinds the table to an earlier event: the lines of the moves it took back
+ *  leave (their engine entries were rewound too). */
+export function logLinesOf(events: TableEventWire[]): Array<{ line: LogLine; seq: number }> {
+  const lines: Array<{ line: LogLine; seq: number }> = [];
+  for (const e of events) {
+    if (e.rewindToSeq !== null && e.rewindToSeq !== undefined) {
+      const keep = e.rewindToSeq;
+      for (let i = lines.length - 1; i >= 0; i--) if (lines[i]!.seq > keep) lines.splice(i, 1);
+    }
+    for (const line of e.log ?? []) lines.push({ line, seq: e.seq });
+  }
+  return lines;
+}
+
+/**
+ * What happened that this seat must be told of and acknowledge (the engine
+ * names the seats on each line): shown once the table has played up to it,
+ * one dialog for everything new, with one OK. Acknowledged lines are
+ * remembered on this device by the event they arrived with.
+ */
+export function Notices({ events, me, storeKey }: { events: TableEventWire[]; me: string | null; storeKey: string }) {
+  const [acked, setAcked] = useState<number>(() => {
+    try { return Number(localStorage.getItem(storeKey)) || 0; } catch { return 0; }
+  });
+  if (!me) return null;
+  const pending = logLinesOf(events).filter((x) => x.seq > acked && x.line.notify?.includes(me));
+  if (pending.length === 0) return null;
+  const shown = pending.slice(-8);
+  const ack = () => {
+    const last = events.length ? events[events.length - 1]!.seq : acked;
+    try { localStorage.setItem(storeKey, String(last)); } catch { /* storage unavailable */ }
+    setAcked(last);
+  };
+  return (
+    <div className="sheet-backdrop notice-backdrop" role="presentation">
+      <div className="sheet notice-sheet" role="alertdialog" aria-label="What happened" aria-describedby="notice-list">
+        <h2>What happened</h2>
+        <ul id="notice-list" className="notice-list">
+          {shown.map(({ line }) => {
+            const mine = line.subject === me;
+            const text = (mine && line.subjectHeadline) || line.headline || line.summary;
+            return <li key={`${line.seq}`} className={mine && line.loss ? 'loss' : undefined}>{text}</li>;
+          })}
+        </ul>
+        {pending.length > shown.length && <p className="muted">…and {pending.length - shown.length} earlier, in the log.</p>}
+        <div className="notice-actions"><button type="button" className="btn" onClick={ack} autoFocus>OK</button></div>
+      </div>
     </div>
   );
 }

@@ -15,7 +15,7 @@ import { glueFor, submitMove, type GlueInput, formForMove, movesForSelect } from
 import type { MoveForm, FormContext, Moment, PromptAction } from '../glue';
 import { BoardZones, JsonInspector, ZoneRenderer } from '../glue/ZoneRenderer';
 import { useTable } from '../table/useTable';
-import { ActionBar, CaptionWords, LessonNote, EndPanel, Log, MoveChooser, MoveFormSheet, MoveMenuList, NoticeToast, PaceControl, Sheet, lessonsOf, type Lesson, type Notice } from '../table/parts';
+import { ActionBar, CaptionWords, LessonNote, EndPanel, Log, MoveChooser, MoveFormSheet, MoveMenuList, NoticeToast, PaceControl, Sheet, lessonsOf, type Lesson, type Notice, Notices } from '../table/parts';
 import { StrikeOverlay } from '../table/StrikeMoment';
 import { api } from '../api';
 import { useSession } from '../session';
@@ -402,6 +402,8 @@ export function TablePage() {
       </div>
 
       <NoticeToast notice={notice} onClose={() => setNotice(null)} />
+      {/* What happened that this seat must acknowledge (a loss, an answer, a spy). */}
+      {id && <Notices events={state.applied} me={myPlayerId} storeKey={`zk-notices:${id}`} />}
 
       {moment && table && (
         <StrikeOverlay key={`${moment.seq}:${state.tick}`} moment={moment.m} nameFor={nameFor} youPid={myPlayerId} pace={playback.pace} setPace={playback.setPace} onDone={momentDone} reduced={reduced} />

@@ -311,6 +311,8 @@ export interface LogLine {
   subject?: string;
   subjectHeadline?: string;
   loss?: boolean;
+  /** the seats (engine player ids) that must be told of this and acknowledge it */
+  notify?: string[];
 }
 
 /**
