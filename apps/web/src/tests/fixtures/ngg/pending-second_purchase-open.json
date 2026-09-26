@@ -14,8 +14,8 @@
     {
      "coord": "-2,4",
      "label": "C3",
-     "printed_resource": "ore",
-     "current_resource": "ore",
+     "printed_resource": "water",
+     "current_resource": "water",
      "start": null,
      "base_owner": null,
      "units": [],
@@ -299,7 +299,8 @@
   "active_action": "build by p2",
   "resolving_action": {
    "card_kind": "build",
-   "owner": "p2"
+   "owner": "p2",
+   "finished": false
   },
   "treaties": [],
   "battle": null,
@@ -336,6 +337,7 @@
     "species": "wizard",
     "culture": 0,
     "culture_target": 100,
+    "economic_collectors": 12,
     "next_milestones": [
      5,
      15,
@@ -353,6 +355,10 @@
       "surf",
       "castle"
      ],
+     "acquired_type_names": [
+      "Surf",
+      "Castle"
+     ],
      "bonus_points_live": 0,
      "total": 2,
      "target": 22
@@ -362,11 +368,22 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 15,
+    "cores_supply": 16,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
      "research": 1
+    },
+    "action_card_slots": {
+     "build": [
+      "base"
+     ],
+     "moveBattle": [
+      "base"
+     ],
+     "research": [
+      "base"
+     ]
     },
     "action_cards_played_count": 3,
     "battle_hand_count": 1,
@@ -384,6 +401,27 @@
     "bases": [
      "-2,10"
     ],
+    "locked": {
+     "units": {
+      "Illusionist": "needs a Library of Illusion",
+      "Dragon": "needs a Dragon Hoard",
+      "Enchantress": "needs a Library of Enchantment",
+      "Cleric": "needs a Temple"
+     },
+     "research": {
+      "Ice Blast": "needs a Library of Evocation",
+      "Fiery Explosion": "needs a Library of Evocation",
+      "Mana Shield": "needs a Library of Evocation",
+      "Invisible": "needs a Library of Illusion",
+      "Dehance": "needs a Library of Enchantment",
+      "Detection": "needs a Library of Enchantment",
+      "Extra Move/Battle Card": "needs a Library of Evocation",
+      "Extra Research Card": "needs a Library of Illusion",
+      "Extra Build Card": "needs a Library of Enchantment"
+     },
+     "treaties": "needs an Embassy or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
+     "battle_cards": "needs an Embassy"
+    },
     "collectors": [
      {
       "collector": "surf-1",
@@ -405,6 +443,7 @@
     "species": "robot",
     "culture": 0,
     "culture_target": 100,
+    "economic_collectors": 12,
     "next_milestones": [
      5,
      15,
@@ -424,6 +463,12 @@
       "wood-collector",
       "home"
      ],
+     "acquired_type_names": [
+      "Core",
+      "Water collector",
+      "Wood collector",
+      "Home"
+     ],
      "bonus_points_live": 0,
      "total": 4,
      "target": 18
@@ -433,11 +478,22 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 1,
-    "cores_supply": 10,
+    "cores_supply": 11,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
      "research": 1
+    },
+    "action_card_slots": {
+     "build": [
+      "base"
+     ],
+     "moveBattle": [
+      "base"
+     ],
+     "research": [
+      "base"
+     ]
     },
     "action_cards_played_count": 3,
     "battle_hand_count": 0,
@@ -455,6 +511,22 @@
     "bases": [
      "2,4"
     ],
+    "locked": {
+     "units": {
+      "Spinner Platform": "needs a Combat Frame Production",
+      "Spitter Platform": "needs a Combat Frame Production",
+      "Infiltrator Platform": "needs a Diplomatic Research Station",
+      "Large Combat Platform": "needs a Combat Frame Production",
+      "Wall Platform": "needs a Defense Research Station"
+     },
+     "research": {
+      "Extra Build Card": "needs an Advanced Research Station",
+      "Extra Move/Battle Card": "needs an Advanced Research Station",
+      "Extra Research Card": "needs an Advanced Research Station"
+     },
+     "treaties": "needs a Diplomatic Research Station or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
+     "battle_cards": "needs a Defense Research Station"
+    },
     "collectors": [
      {
       "collector": "water-collector-1",
@@ -668,8 +740,13 @@
    "reason": "costs 1 water + 3 wood + 1 ore — that is 5 resources and you have 3 free collectors"
   },
   {
+   "moveType": "build",
+   "item": "Advanced Research Station",
+   "reason": "costs 1 wood + 2 ore — you have no free ore collector"
+  },
+  {
    "moveType": "economic_victory_spend",
-   "reason": "needs 11 free collectors on 11 different tiles — you have 3"
+   "reason": "needs 12 free collectors on 12 different tiles — you have 3"
   }
  ],
  "watcher": "p1",
@@ -685,8 +762,8 @@
     {
      "coord": "-2,4",
      "label": "C3",
-     "printed_resource": "ore",
-     "current_resource": "ore",
+     "printed_resource": "water",
+     "current_resource": "water",
      "start": null,
      "base_owner": null,
      "units": [],
@@ -970,7 +1047,8 @@
   "active_action": "build by p2",
   "resolving_action": {
    "card_kind": "build",
-   "owner": "p2"
+   "owner": "p2",
+   "finished": false
   },
   "treaties": [],
   "battle": null,
@@ -1007,6 +1085,7 @@
     "species": "wizard",
     "culture": 0,
     "culture_target": 100,
+    "economic_collectors": 12,
     "next_milestones": [
      5,
      15,
@@ -1024,6 +1103,10 @@
       "surf",
       "castle"
      ],
+     "acquired_type_names": [
+      "Surf",
+      "Castle"
+     ],
      "bonus_points_live": 0,
      "total": 2,
      "target": 22
@@ -1033,11 +1116,22 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 15,
+    "cores_supply": 16,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
      "research": 1
+    },
+    "action_card_slots": {
+     "build": [
+      "base"
+     ],
+     "moveBattle": [
+      "base"
+     ],
+     "research": [
+      "base"
+     ]
     },
     "action_cards_played_count": 3,
     "battle_hand_count": 1,
@@ -1055,6 +1149,27 @@
     "bases": [
      "-2,10"
     ],
+    "locked": {
+     "units": {
+      "Illusionist": "needs a Library of Illusion",
+      "Dragon": "needs a Dragon Hoard",
+      "Enchantress": "needs a Library of Enchantment",
+      "Cleric": "needs a Temple"
+     },
+     "research": {
+      "Ice Blast": "needs a Library of Evocation",
+      "Fiery Explosion": "needs a Library of Evocation",
+      "Mana Shield": "needs a Library of Evocation",
+      "Invisible": "needs a Library of Illusion",
+      "Dehance": "needs a Library of Enchantment",
+      "Detection": "needs a Library of Enchantment",
+      "Extra Move/Battle Card": "needs a Library of Evocation",
+      "Extra Research Card": "needs a Library of Illusion",
+      "Extra Build Card": "needs a Library of Enchantment"
+     },
+     "treaties": "needs an Embassy or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
+     "battle_cards": "needs an Embassy"
+    },
     "collectors": [
      {
       "collector": "surf-1",
@@ -1076,6 +1191,7 @@
     "species": "robot",
     "culture": 0,
     "culture_target": 100,
+    "economic_collectors": 12,
     "next_milestones": [
      5,
      15,
@@ -1095,6 +1211,12 @@
       "wood-collector",
       "home"
      ],
+     "acquired_type_names": [
+      "Core",
+      "Water collector",
+      "Wood collector",
+      "Home"
+     ],
      "bonus_points_live": 0,
      "total": 4,
      "target": 18
@@ -1104,11 +1226,22 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 1,
-    "cores_supply": 10,
+    "cores_supply": 11,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
      "research": 1
+    },
+    "action_card_slots": {
+     "build": [
+      "base"
+     ],
+     "moveBattle": [
+      "base"
+     ],
+     "research": [
+      "base"
+     ]
     },
     "action_cards_played_count": 3,
     "battle_hand_count": 0,
@@ -1126,6 +1259,22 @@
     "bases": [
      "2,4"
     ],
+    "locked": {
+     "units": {
+      "Spinner Platform": "needs a Combat Frame Production",
+      "Spitter Platform": "needs a Combat Frame Production",
+      "Infiltrator Platform": "needs a Diplomatic Research Station",
+      "Large Combat Platform": "needs a Combat Frame Production",
+      "Wall Platform": "needs a Defense Research Station"
+     },
+     "research": {
+      "Extra Build Card": "needs an Advanced Research Station",
+      "Extra Move/Battle Card": "needs an Advanced Research Station",
+      "Extra Research Card": "needs an Advanced Research Station"
+     },
+     "treaties": "needs a Diplomatic Research Station or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
+     "battle_cards": "needs a Defense Research Station"
+    },
     "collectors": [
      {
       "collector": "water-collector-1",

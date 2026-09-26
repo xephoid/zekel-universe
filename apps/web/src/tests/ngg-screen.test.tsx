@@ -155,7 +155,10 @@ describe('NGnG screen', () => {
   });
   it('tracks Economic progress for every seat: collectors owned against the count the spend takes', () => {
     const f = FIXTURES.find((x) => x.name === 'action-build-robot-mid')!.f;
-    const need = (REFERENCE as { referenceData: { victory: { economic_collectors: number } } }).referenceData.victory.economic_collectors;
+    // The count scales with the map: the catalogue gives it by layout.
+    const byLayout = (REFERENCE as { referenceData: { victory: { economic_collectors_by_layout: Record<string, number> } } }).referenceData.victory.economic_collectors_by_layout;
+    const need = byLayout[(f.view as { layout: string }).layout];
+    expect(need).toBeGreaterThan(0);
     const r = render(<NggScreen input={inputFor(f.view, f.viewer, f.legalMoves)} yourTurn busy={false} interactive onMove={vi.fn()} onForm={vi.fn()} nameFor={(p) => p} />);
     const players = (f.view as { players: Array<{ player_id: string; collectors?: unknown[] }> }).players;
     const rows = [...r.container.querySelectorAll('button.ngg-seat')];
@@ -174,7 +177,10 @@ describe('NGnG screen', () => {
     const purchase = (REFERENCE as { referenceData: { battle_card_purchase: { cost: Record<string, number>; either: string[]; unlocked_by: Record<string, string> } } }).referenceData.battle_card_purchase;
     const species = (f.view as { players: Array<{ player_id: string; species: string }> }).players.find((p) => p.player_id === f.viewer)!.species;
     expect(price.textContent).toContain('Buy one on a Research action');
-    expect(price.textContent).toContain(`Needs the ${purchase.unlocked_by[species]}`);
+    // Whether this seat can buy one, from the engine's own list.
+    const me = (f.view as { players: Array<{ player_id: string; locked: { battle_cards: string | null } }> }).players.find((p) => p.player_id === f.viewer)!;
+    if (me.locked.battle_cards) expect(price.textContent).toMatch(new RegExp(`Locked · needs an? ${purchase.unlocked_by[species]}`));
+    else expect(price.textContent).toContain('Unlocked');
     // One chip per fixed resource, then one per either-or resource.
     expect(price.querySelectorAll('.ngg-res')).toHaveLength(Object.keys(purchase.cost).length + purchase.either.length);
     expect(price.textContent).toContain('+ either');

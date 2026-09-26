@@ -12,22 +12,11 @@
   "map": {
    "tiles": [
     {
-     "coord": "-2,2",
-     "label": "C2",
+     "coord": "-2,4",
+     "label": "C3",
      "printed_resource": "water",
      "current_resource": "water",
      "start": 4,
-     "base_owner": null,
-     "units": [],
-     "heroes": [],
-     "collectors": []
-    },
-    {
-     "coord": "-2,4",
-     "label": "C3",
-     "printed_resource": "ore",
-     "current_resource": "ore",
-     "start": null,
      "base_owner": null,
      "units": [],
      "heroes": [],
@@ -72,17 +61,6 @@
      "printed_resource": "water",
      "current_resource": "water",
      "start": 1,
-     "base_owner": null,
-     "units": [],
-     "heroes": [],
-     "collectors": []
-    },
-    {
-     "coord": "-1,1",
-     "label": "D1",
-     "printed_resource": "wood",
-     "current_resource": "wood",
-     "start": null,
      "base_owner": null,
      "units": [],
      "heroes": [],
@@ -148,17 +126,6 @@
      "label": "D7",
      "printed_resource": "wood",
      "current_resource": "wood",
-     "start": null,
-     "base_owner": null,
-     "units": [],
-     "heroes": [],
-     "collectors": []
-    },
-    {
-     "coord": "0,0",
-     "label": "E1",
-     "printed_resource": "water",
-     "current_resource": "water",
      "start": null,
      "base_owner": null,
      "units": [],
@@ -243,17 +210,6 @@
      "collectors": []
     },
     {
-     "coord": "1,1",
-     "label": "F1",
-     "printed_resource": "wood",
-     "current_resource": "wood",
-     "start": null,
-     "base_owner": null,
-     "units": [],
-     "heroes": [],
-     "collectors": []
-    },
-    {
      "coord": "1,3",
      "label": "F2",
      "printed_resource": "water",
@@ -320,22 +276,11 @@
      "collectors": []
     },
     {
-     "coord": "2,2",
-     "label": "G2",
-     "printed_resource": "water",
-     "current_resource": "water",
-     "start": 3,
-     "base_owner": null,
-     "units": [],
-     "heroes": [],
-     "collectors": []
-    },
-    {
      "coord": "2,4",
      "label": "G3",
      "printed_resource": "water",
      "current_resource": "water",
-     "start": null,
+     "start": 3,
      "base_owner": null,
      "units": [],
      "heroes": [],
@@ -435,6 +380,7 @@
     "species": "robot",
     "culture": 0,
     "culture_target": 200,
+    "economic_collectors": 20,
     "next_milestones": [
      10,
      30,
@@ -449,6 +395,7 @@
     "research": [],
     "tech_progress": {
      "acquired_types": [],
+     "acquired_type_names": [],
      "bonus_points_live": 0,
      "total": 0,
      "target": 18
@@ -458,11 +405,22 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 15,
+    "cores_supply": 24,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
      "research": 1
+    },
+    "action_card_slots": {
+     "build": [
+      "base"
+     ],
+     "moveBattle": [
+      "base"
+     ],
+     "research": [
+      "base"
+     ]
     },
     "action_cards_played_count": 0,
     "battle_hand_count": 0,
@@ -478,6 +436,23 @@
      }
     ],
     "bases": [],
+    "locked": {
+     "units": {
+      "Spinner Platform": "needs a Combat Frame Production",
+      "Spitter Platform": "needs a Combat Frame Production",
+      "Infiltrator Platform": "needs a Diplomatic Research Station",
+      "Large Combat Platform": "needs a Combat Frame Production",
+      "Wall Platform": "needs a Defense Research Station"
+     },
+     "research": {
+      "Metal Platforms": "needs a Home on the map",
+      "Extra Build Card": "needs an Advanced Research Station",
+      "Extra Move/Battle Card": "needs an Advanced Research Station",
+      "Extra Research Card": "needs an Advanced Research Station"
+     },
+     "treaties": "needs a Diplomatic Research Station or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
+     "battle_cards": "needs a Defense Research Station"
+    },
     "collectors": [],
     "committed_collectors": []
    },
@@ -488,6 +463,7 @@
     "species": "wizard",
     "culture": 0,
     "culture_target": 200,
+    "economic_collectors": 20,
     "next_milestones": [
      10,
      30,
@@ -502,6 +478,7 @@
     "research": [],
     "tech_progress": {
      "acquired_types": [],
+     "acquired_type_names": [],
      "bonus_points_live": 0,
      "total": 0,
      "target": 22
@@ -511,11 +488,22 @@
     "leader_alive": false,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 15,
+    "cores_supply": 24,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
      "research": 1
+    },
+    "action_card_slots": {
+     "build": [
+      "base"
+     ],
+     "moveBattle": [
+      "base"
+     ],
+     "research": [
+      "base"
+     ]
     },
     "action_cards_played_count": 0,
     "battle_hand_count": 0,
@@ -523,6 +511,27 @@
     "units": [],
     "heroes": [],
     "bases": [],
+    "locked": {
+     "units": {
+      "Illusionist": "needs a Library of Illusion",
+      "Dragon": "needs a Dragon Hoard",
+      "Enchantress": "needs a Library of Enchantment",
+      "Cleric": "needs a Temple"
+     },
+     "research": {
+      "Ice Blast": "needs a Library of Evocation",
+      "Fiery Explosion": "needs a Library of Evocation",
+      "Mana Shield": "needs a Library of Evocation",
+      "Invisible": "needs a Library of Illusion",
+      "Dehance": "needs a Library of Enchantment",
+      "Detection": "needs a Library of Enchantment",
+      "Extra Move/Battle Card": "needs a Library of Evocation",
+      "Extra Research Card": "needs a Library of Illusion",
+      "Extra Build Card": "needs a Library of Enchantment"
+     },
+     "treaties": "needs an Embassy or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
+     "battle_cards": "needs an Embassy"
+    },
     "collectors": [
      {
       "collector": "surf-1",
@@ -544,6 +553,7 @@
     "species": "robot",
     "culture": 0,
     "culture_target": 200,
+    "economic_collectors": 20,
     "next_milestones": [
      10,
      30,
@@ -558,6 +568,7 @@
     "research": [],
     "tech_progress": {
      "acquired_types": [],
+     "acquired_type_names": [],
      "bonus_points_live": 0,
      "total": 0,
      "target": 18
@@ -567,11 +578,22 @@
     "leader_alive": false,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 15,
+    "cores_supply": 24,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
      "research": 1
+    },
+    "action_card_slots": {
+     "build": [
+      "base"
+     ],
+     "moveBattle": [
+      "base"
+     ],
+     "research": [
+      "base"
+     ]
     },
     "action_cards_played_count": 0,
     "battle_hand_count": 0,
@@ -579,6 +601,23 @@
     "units": [],
     "heroes": [],
     "bases": [],
+    "locked": {
+     "units": {
+      "Spinner Platform": "needs a Combat Frame Production",
+      "Spitter Platform": "needs a Combat Frame Production",
+      "Infiltrator Platform": "needs a Diplomatic Research Station",
+      "Large Combat Platform": "needs a Combat Frame Production",
+      "Wall Platform": "needs a Defense Research Station"
+     },
+     "research": {
+      "Metal Platforms": "needs a Home on the map",
+      "Extra Build Card": "needs an Advanced Research Station",
+      "Extra Move/Battle Card": "needs an Advanced Research Station",
+      "Extra Research Card": "needs an Advanced Research Station"
+     },
+     "treaties": "needs a Diplomatic Research Station or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
+     "battle_cards": "needs a Defense Research Station"
+    },
     "collectors": [],
     "committed_collectors": []
    },
@@ -589,6 +628,7 @@
     "species": "wizard",
     "culture": 0,
     "culture_target": 200,
+    "economic_collectors": 20,
     "next_milestones": [
      10,
      30,
@@ -603,6 +643,7 @@
     "research": [],
     "tech_progress": {
      "acquired_types": [],
+     "acquired_type_names": [],
      "bonus_points_live": 0,
      "total": 0,
      "target": 22
@@ -612,11 +653,22 @@
     "leader_alive": false,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 15,
+    "cores_supply": 24,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
      "research": 1
+    },
+    "action_card_slots": {
+     "build": [
+      "base"
+     ],
+     "moveBattle": [
+      "base"
+     ],
+     "research": [
+      "base"
+     ]
     },
     "action_cards_played_count": 0,
     "battle_hand_count": 0,
@@ -624,6 +676,27 @@
     "units": [],
     "heroes": [],
     "bases": [],
+    "locked": {
+     "units": {
+      "Illusionist": "needs a Library of Illusion",
+      "Dragon": "needs a Dragon Hoard",
+      "Enchantress": "needs a Library of Enchantment",
+      "Cleric": "needs a Temple"
+     },
+     "research": {
+      "Ice Blast": "needs a Library of Evocation",
+      "Fiery Explosion": "needs a Library of Evocation",
+      "Mana Shield": "needs a Library of Evocation",
+      "Invisible": "needs a Library of Illusion",
+      "Dehance": "needs a Library of Enchantment",
+      "Detection": "needs a Library of Enchantment",
+      "Extra Move/Battle Card": "needs a Library of Evocation",
+      "Extra Research Card": "needs a Library of Illusion",
+      "Extra Build Card": "needs a Library of Enchantment"
+     },
+     "treaties": "needs an Embassy or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
+     "battle_cards": "needs an Embassy"
+    },
     "collectors": [
      {
       "collector": "surf-1",
@@ -668,22 +741,11 @@
   "map": {
    "tiles": [
     {
-     "coord": "-2,2",
-     "label": "C2",
+     "coord": "-2,4",
+     "label": "C3",
      "printed_resource": "water",
      "current_resource": "water",
      "start": 4,
-     "base_owner": null,
-     "units": [],
-     "heroes": [],
-     "collectors": []
-    },
-    {
-     "coord": "-2,4",
-     "label": "C3",
-     "printed_resource": "ore",
-     "current_resource": "ore",
-     "start": null,
      "base_owner": null,
      "units": [],
      "heroes": [],
@@ -728,17 +790,6 @@
      "printed_resource": "water",
      "current_resource": "water",
      "start": 1,
-     "base_owner": null,
-     "units": [],
-     "heroes": [],
-     "collectors": []
-    },
-    {
-     "coord": "-1,1",
-     "label": "D1",
-     "printed_resource": "wood",
-     "current_resource": "wood",
-     "start": null,
      "base_owner": null,
      "units": [],
      "heroes": [],
@@ -804,17 +855,6 @@
      "label": "D7",
      "printed_resource": "wood",
      "current_resource": "wood",
-     "start": null,
-     "base_owner": null,
-     "units": [],
-     "heroes": [],
-     "collectors": []
-    },
-    {
-     "coord": "0,0",
-     "label": "E1",
-     "printed_resource": "water",
-     "current_resource": "water",
      "start": null,
      "base_owner": null,
      "units": [],
@@ -899,17 +939,6 @@
      "collectors": []
     },
     {
-     "coord": "1,1",
-     "label": "F1",
-     "printed_resource": "wood",
-     "current_resource": "wood",
-     "start": null,
-     "base_owner": null,
-     "units": [],
-     "heroes": [],
-     "collectors": []
-    },
-    {
      "coord": "1,3",
      "label": "F2",
      "printed_resource": "water",
@@ -976,22 +1005,11 @@
      "collectors": []
     },
     {
-     "coord": "2,2",
-     "label": "G2",
-     "printed_resource": "water",
-     "current_resource": "water",
-     "start": 3,
-     "base_owner": null,
-     "units": [],
-     "heroes": [],
-     "collectors": []
-    },
-    {
      "coord": "2,4",
      "label": "G3",
      "printed_resource": "water",
      "current_resource": "water",
-     "start": null,
+     "start": 3,
      "base_owner": null,
      "units": [],
      "heroes": [],
@@ -1091,6 +1109,7 @@
     "species": "robot",
     "culture": 0,
     "culture_target": 200,
+    "economic_collectors": 20,
     "next_milestones": [
      10,
      30,
@@ -1105,6 +1124,7 @@
     "research": [],
     "tech_progress": {
      "acquired_types": [],
+     "acquired_type_names": [],
      "bonus_points_live": 0,
      "total": 0,
      "target": 18
@@ -1114,11 +1134,22 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 15,
+    "cores_supply": 24,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
      "research": 1
+    },
+    "action_card_slots": {
+     "build": [
+      "base"
+     ],
+     "moveBattle": [
+      "base"
+     ],
+     "research": [
+      "base"
+     ]
     },
     "action_cards_played_count": 0,
     "battle_hand_count": 0,
@@ -1134,6 +1165,23 @@
      }
     ],
     "bases": [],
+    "locked": {
+     "units": {
+      "Spinner Platform": "needs a Combat Frame Production",
+      "Spitter Platform": "needs a Combat Frame Production",
+      "Infiltrator Platform": "needs a Diplomatic Research Station",
+      "Large Combat Platform": "needs a Combat Frame Production",
+      "Wall Platform": "needs a Defense Research Station"
+     },
+     "research": {
+      "Metal Platforms": "needs a Home on the map",
+      "Extra Build Card": "needs an Advanced Research Station",
+      "Extra Move/Battle Card": "needs an Advanced Research Station",
+      "Extra Research Card": "needs an Advanced Research Station"
+     },
+     "treaties": "needs a Diplomatic Research Station or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
+     "battle_cards": "needs a Defense Research Station"
+    },
     "collectors": [],
     "committed_collectors": []
    },
@@ -1144,6 +1192,7 @@
     "species": "wizard",
     "culture": 0,
     "culture_target": 200,
+    "economic_collectors": 20,
     "next_milestones": [
      10,
      30,
@@ -1158,6 +1207,7 @@
     "research": [],
     "tech_progress": {
      "acquired_types": [],
+     "acquired_type_names": [],
      "bonus_points_live": 0,
      "total": 0,
      "target": 22
@@ -1167,11 +1217,22 @@
     "leader_alive": false,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 15,
+    "cores_supply": 24,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
      "research": 1
+    },
+    "action_card_slots": {
+     "build": [
+      "base"
+     ],
+     "moveBattle": [
+      "base"
+     ],
+     "research": [
+      "base"
+     ]
     },
     "action_cards_played_count": 0,
     "battle_hand_count": 0,
@@ -1179,6 +1240,27 @@
     "units": [],
     "heroes": [],
     "bases": [],
+    "locked": {
+     "units": {
+      "Illusionist": "needs a Library of Illusion",
+      "Dragon": "needs a Dragon Hoard",
+      "Enchantress": "needs a Library of Enchantment",
+      "Cleric": "needs a Temple"
+     },
+     "research": {
+      "Ice Blast": "needs a Library of Evocation",
+      "Fiery Explosion": "needs a Library of Evocation",
+      "Mana Shield": "needs a Library of Evocation",
+      "Invisible": "needs a Library of Illusion",
+      "Dehance": "needs a Library of Enchantment",
+      "Detection": "needs a Library of Enchantment",
+      "Extra Move/Battle Card": "needs a Library of Evocation",
+      "Extra Research Card": "needs a Library of Illusion",
+      "Extra Build Card": "needs a Library of Enchantment"
+     },
+     "treaties": "needs an Embassy or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
+     "battle_cards": "needs an Embassy"
+    },
     "collectors": [
      {
       "collector": "surf-1",
@@ -1200,6 +1282,7 @@
     "species": "robot",
     "culture": 0,
     "culture_target": 200,
+    "economic_collectors": 20,
     "next_milestones": [
      10,
      30,
@@ -1214,6 +1297,7 @@
     "research": [],
     "tech_progress": {
      "acquired_types": [],
+     "acquired_type_names": [],
      "bonus_points_live": 0,
      "total": 0,
      "target": 18
@@ -1223,11 +1307,22 @@
     "leader_alive": false,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 15,
+    "cores_supply": 24,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
      "research": 1
+    },
+    "action_card_slots": {
+     "build": [
+      "base"
+     ],
+     "moveBattle": [
+      "base"
+     ],
+     "research": [
+      "base"
+     ]
     },
     "action_cards_played_count": 0,
     "battle_hand_count": 0,
@@ -1235,6 +1330,23 @@
     "units": [],
     "heroes": [],
     "bases": [],
+    "locked": {
+     "units": {
+      "Spinner Platform": "needs a Combat Frame Production",
+      "Spitter Platform": "needs a Combat Frame Production",
+      "Infiltrator Platform": "needs a Diplomatic Research Station",
+      "Large Combat Platform": "needs a Combat Frame Production",
+      "Wall Platform": "needs a Defense Research Station"
+     },
+     "research": {
+      "Metal Platforms": "needs a Home on the map",
+      "Extra Build Card": "needs an Advanced Research Station",
+      "Extra Move/Battle Card": "needs an Advanced Research Station",
+      "Extra Research Card": "needs an Advanced Research Station"
+     },
+     "treaties": "needs a Diplomatic Research Station or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
+     "battle_cards": "needs a Defense Research Station"
+    },
     "collectors": [],
     "committed_collectors": []
    },
@@ -1245,6 +1357,7 @@
     "species": "wizard",
     "culture": 0,
     "culture_target": 200,
+    "economic_collectors": 20,
     "next_milestones": [
      10,
      30,
@@ -1259,6 +1372,7 @@
     "research": [],
     "tech_progress": {
      "acquired_types": [],
+     "acquired_type_names": [],
      "bonus_points_live": 0,
      "total": 0,
      "target": 22
@@ -1268,11 +1382,22 @@
     "leader_alive": false,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 15,
+    "cores_supply": 24,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
      "research": 1
+    },
+    "action_card_slots": {
+     "build": [
+      "base"
+     ],
+     "moveBattle": [
+      "base"
+     ],
+     "research": [
+      "base"
+     ]
     },
     "action_cards_played_count": 0,
     "battle_hand_count": 0,
@@ -1280,6 +1405,27 @@
     "units": [],
     "heroes": [],
     "bases": [],
+    "locked": {
+     "units": {
+      "Illusionist": "needs a Library of Illusion",
+      "Dragon": "needs a Dragon Hoard",
+      "Enchantress": "needs a Library of Enchantment",
+      "Cleric": "needs a Temple"
+     },
+     "research": {
+      "Ice Blast": "needs a Library of Evocation",
+      "Fiery Explosion": "needs a Library of Evocation",
+      "Mana Shield": "needs a Library of Evocation",
+      "Invisible": "needs a Library of Illusion",
+      "Dehance": "needs a Library of Enchantment",
+      "Detection": "needs a Library of Enchantment",
+      "Extra Move/Battle Card": "needs a Library of Evocation",
+      "Extra Research Card": "needs a Library of Illusion",
+      "Extra Build Card": "needs a Library of Enchantment"
+     },
+     "treaties": "needs an Embassy or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
+     "battle_cards": "needs an Embassy"
+    },
     "collectors": [
      {
       "collector": "surf-1",

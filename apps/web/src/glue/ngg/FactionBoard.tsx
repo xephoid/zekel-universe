@@ -8,7 +8,7 @@
 
 import type { ScreenCtx } from './ctx';
 import { coresOf, econOf, type NggPlayer } from './read';
-import type { RefBuilding, RefResearch, RefUnit } from './ref';
+import { economicCollectorsFor, type RefBuilding, type RefResearch, type RefUnit } from './ref';
 import { useState, type KeyboardEvent } from 'react';
 import { inkOf } from './factions';
 import { BattleCardPrice, CardBack, CostChips, FactionChip, Icon, Panel } from './ui';
@@ -177,7 +177,7 @@ function ItemDetail({ ctx, player, detail, onClose }: { ctx: ScreenCtx; player: 
     const r = detail.research;
     title = r.name;
     body = r.effect || null;
-    lines.push(['Cost', <CostChips key="c" cost={r.cost} />]);
+    lines.push(['Cost', r.either.length ? <BattleCardPrice key="c" cost={r.cost} either={r.either} /> : <CostChips key="c" cost={r.cost} />]);
     lines.push(['Needs', r.prerequisite]);
     const done = player.research.includes(r.name) || player.research.includes(r.id);
     const why = player.locked?.research[r.name];
@@ -225,7 +225,7 @@ export function FactionStrip({ ctx, player, onOpen }: { ctx: ScreenCtx; player: 
         <span className="ngg-strip-mark" style={{ background: ink.fill, color: ink.on }}>{ink.mark && <Icon name={ink.mark} size={22} stroke={1.8} />}</span>
         <span><b>{player.faction ?? 'Your seat'}</b><i>you · {player.species ?? 'no faction yet'}</i></span>
       </div>
-      <Numbers p={player} need={ctx.ref?.economicCollectors ?? null} />
+      <Numbers p={player} need={economicCollectorsFor(ctx.ref, ctx.v.layout)} />
       <ActionCards p={player} />
       <div className="ngg-strip-hand" title={`${player.handCount} battle card${player.handCount === 1 ? '' : 's'} in hand`}>
         {ctx.v.hand.length > 0
@@ -260,7 +260,7 @@ export function FactionBoard({ ctx, player }: { ctx: ScreenCtx; player: NggPlaye
           <h2>{player.faction ?? (own ? 'Your seat' : ctx.seat(player.id))}</h2>
           <span className="ngg-tagchip">{species}</span>
         </div>
-        <Numbers p={player} need={ctx.ref?.economicCollectors ?? null} />
+        <Numbers p={player} need={economicCollectorsFor(ctx.ref, ctx.v.layout)} />
       </header>
 
       {species === 'wizard'
@@ -282,7 +282,7 @@ export function FactionBoard({ ctx, player }: { ctx: ScreenCtx; player: NggPlaye
       <Panel title="Technology" kicker={`${player.tech.total}${player.tech.target !== null ? ` of ${player.tech.target}` : ''} unique types`}>
         <Pips have={player.tech.total} max={player.tech.target ?? player.tech.total} cap={player.tech.target ?? player.tech.total} />
         {player.tech.acquiredTypes.length > 0 && (
-          <p className="ngg-fb-note">{player.tech.acquiredTypes.map((id) => nameOfType(ctx, id)).join(' · ')}</p>
+          <p className="ngg-fb-note">{(player.tech.acquiredTypeNames ?? player.tech.acquiredTypes.map((id) => nameOfType(ctx, id))).join(' · ')}</p>
         )}
       </Panel>
 
@@ -310,7 +310,7 @@ export function FactionBoard({ ctx, player }: { ctx: ScreenCtx; player: NggPlaye
                 <li key={r.id} className={`${on ? 'on' : 'off'}${!on && locked?.research[r.name] ? ' locked' : ''} pressable`} {...pressable(() => setDetail({ kind: 'research', research: r }))}>
                   <span className="ngg-fb-list-mark"><Icon name={r.name} size={20} stroke={1.8} /></span>
                   <span><b>{r.name}</b><i>{r.effect}</i>{!on && <LockTag why={locked ? locked.research[r.name] ?? null : undefined} />}{!locked && <i>Needs {r.prerequisite}</i>}</span>
-                  <span className="ngg-fb-state">{on ? 'RESEARCHED' : <CostChips cost={r.cost} />}</span>
+                  <span className="ngg-fb-state">{on ? 'RESEARCHED' : r.either.length ? <BattleCardPrice cost={r.cost} either={r.either} /> : <CostChips cost={r.cost} />}</span>
                 </li>
               );
             })}

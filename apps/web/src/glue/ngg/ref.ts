@@ -17,7 +17,8 @@ export interface RefUnit {
   needsCore: boolean; requiresBuilding: string | null; immobile: boolean; notes: string;
 }
 export interface RefBuilding { id: string; name: string; species: string; cost: Cost; isBase: boolean; repeatableMax: number | null; effect: string }
-export interface RefResearch { id: string; name: string; species: string; prerequisite: string; cost: Cost; effect: string }
+/** `either`: one more resource, any one of these, on top of `cost` (an Extra action card, ruling #86). */
+export interface RefResearch { id: string; name: string; species: string; prerequisite: string; cost: Cost; either: string[]; effect: string }
 export interface RefHero { num: number; id: string; name: string; category: string; species: string | null; recommendedLeader: boolean; effect: string }
 export interface RefCard { id: string; label: string; copies: number; effect: string }
 export interface RefTreaty { id: string; name: string; cultureIncome: number; effect: string; breakingCondition: string }
@@ -40,6 +41,8 @@ export interface NggRef {
   economicSpend: Cost;
   /** how many collectors, on as many different tiles, the Economic spend takes; null when not published */
   economicCollectors: number | null;
+  /** the Economic spend's collector count by map layout (it scales with the map) */
+  economicCollectorsByLayout: Record<string, number>;
   /** what one battle card costs on a Research action: the fixed resources, one
    *  of `either`, and the building that unlocks it per species; null when not published */
   battleCardPurchase: { cost: Cost; either: string[]; unlockedBy: Record<string, string> } | null;
@@ -81,7 +84,7 @@ export function readRef(reference: GameReferenceResponse | null): NggRef | null 
   }));
   const research = [...asArr(rd['wizard_research']), ...asArr(rd['robot_research'])].filter(isObj).map((r): RefResearch => ({
     id: asStr(r['id']), name: asStr(r['name']), species: asStr(r['species']), prerequisite: asStr(r['prerequisite']),
-    cost: cost(r['cost']), effect: asStr(r['effect']),
+    cost: cost(r['cost']), either: asArr(r['either']).map((x) => asStr(x)), effect: asStr(r['effect']),
   }));
   const victory = isObj(rd['victory']) ? rd['victory'] : {};
   const out: NggRef = {
@@ -108,6 +111,9 @@ export function readRef(reference: GameReferenceResponse | null): NggRef | null 
       : {},
     economicSpend: cost(victory['economic_spend']),
     economicCollectors: typeof victory['economic_collectors'] === 'number' ? victory['economic_collectors'] : null,
+    economicCollectorsByLayout: isObj(victory['economic_collectors_by_layout'])
+      ? Object.fromEntries(Object.entries(victory['economic_collectors_by_layout']).map(([k, n]) => [k, asNum(n)]))
+      : {},
     battleCardPurchase: isObj(rd['battle_card_purchase']) ? {
       cost: cost(rd['battle_card_purchase']['cost']),
       either: asArr(rd['battle_card_purchase']['either']).map((r) => asStr(r)),
@@ -159,4 +165,10 @@ export function cultureRaceOf(ref: NggRef | null, playerCount: number, viewTarge
   const target = viewTarget ?? ref?.cultureTargetByCount[playerCount] ?? ref?.cultureTarget ?? 100;
   const milestones = ref?.milestonesByCount[playerCount] ?? ref?.milestones ?? [];
   return { target, milestones };
+}
+
+/** How many collectors, on as many tiles, the Economic spend takes on this
+ *  table's map (the engine publishes it by layout), or an older engine's one number. */
+export function economicCollectorsFor(ref: NggRef | null, layout: string): number | null {
+  return ref?.economicCollectorsByLayout[layout] ?? ref?.economicCollectors ?? null;
 }

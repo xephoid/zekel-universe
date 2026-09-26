@@ -907,6 +907,20 @@ and says the same for treaties and battle cards. Pressing a unit, building,
 technology or hero opens a card with everything the catalogue says about it
 and where the seat stands. The payment stage's shortcut is "Choose for me".
 
+**Checked against engine rulings #86–#97 (2026-09-25):**
+- The Economic spend's collector count depends on the map (12 / 20 / 26 by
+  layout, `economic_collectors_by_layout`); the ECON column, the strip and
+  the Economic button read it for this table's layout.
+- A technology may cost "+ either" one of two resources (the Extra action
+  cards, ruling #86); the Research screen and the board show it as for a
+  battle card.
+- Action card copies are named by slot (base, hero extra, researched extra);
+  the engine publishes each seat's copies (`action_card_slots`) and planning
+  shows one card per copy and sends its slot. Technology types arrive named
+  (`acquired_type_names`), the battle strategy card type included.
+- The treaty income, tech targets, leader kills, unit stats and the smaller
+  3-4 player map come from the engine's data and view as before.
+
 **Engine changes, on a branch not yet merged** (`claude/ngg-structured-view`
 in the engine): `resolving_action { card_kind, owner }` beside the
 `active_action` sentence; `battle.units[].ref`, the id battle moves name a

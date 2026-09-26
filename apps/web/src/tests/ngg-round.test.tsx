@@ -494,4 +494,21 @@ describe('NGnG: each human picks their own faction', () => {
     expect(band.style.borderColor).not.toBe('');
     cleanup();
   });
+  it('Planning: each action card copy is its own card, sent by the slot the engine names it', () => {
+    const f = fixture('phase-planning');
+    const view = f.view as { players: Array<Record<string, unknown>> };
+    const me = view.players.find((p) => p['player_id'] === f.viewer)!;
+    me['action_cards'] = { build: 2, moveBattle: 1, research: 1 };
+    me['action_card_slots'] = { build: ['base', 'researched_extra'], moveBattle: ['base'], research: ['base'] };
+    const legal: LegalMove[] = [
+      { move_id: 'b1', description: 'base', move: { type: 'plan_action', card: 'build', which: 'base' } },
+      { move_id: 'b2', description: 'researched', move: { type: 'plan_action', card: 'build', which: 'researched_extra' } },
+      { move_id: 'p', description: 'pass', move: { type: 'plan_action', card: 'pass' } },
+    ];
+    const r = draw(view, f.viewer, legal);
+    const extra = within(r.column).getAllByRole('button').find((b) => b.textContent?.includes('Researched extra'))!;
+    fireEvent.click(extra);
+    expectSentListed(r.onMove, legal, { type: 'plan_action', card: 'build', which: 'researched_extra' });
+    cleanup();
+  });
 });

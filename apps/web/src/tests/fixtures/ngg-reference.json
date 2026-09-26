@@ -1,6 +1,6 @@
 {
  "gameId": "neither-guts-nor-gears",
- "rules": "## Setup: factions, Leader draft, starting locations\n\nPick the map for your player count. Each player chooses a faction; the Leader draft runs in player order (starred heroes are recommended, species restrictions are enforced); starting locations run in reverse order. Wizards start with 2 Surfs and max mana 5; robots with 4 Cores in two water and two wood collector platforms. Starting pieces count toward technology type progress.\n\n## Round structure: upkeep, planning, LIFO stack, income, claims\n\nUpkeep rotates the first-player token (including before round one), retrieves collectors, lets robots reallocate Cores, resets wizard mana, and returns played action cards. Planning places one card per player in turn or a final pass onto an Action Stack. The Action phase pops the stack last-in, first-out; an owner may decline a queued action (skipping commits no collectors). Culture income is awarded in first-player order before any milestone hero claim; claims alternate one per player per cycle.\n\n## Collectors: produce on commitment, placement anchors, expiry\n\nBuild and Research place available collectors onto eligible map locations; each produces one resource of that tile's current type and stays committed until upkeep (it can anchor later placements but cannot pay again). Resources never carry over between actions — unspent production expires. Two collectors never share a location. A placement is legal on or adjacent to an owned unit or owned base, adjacent to another collector committed this round, or adjacent to a partner's units under Shared Resources or Open Borders. Surplus placement to extend reach is legal.\n\n## Access and complete payment before commitment\n\nFor each purchase, declare the purchase and propose a complete legal collector payment; obtain any required access agreement BEFORE committing. Refusal leaves everything uncommitted and the action re-opens. Shared Resources and Open Borders grant automatic collection access; other treaties do not. A one-off agreement authorizes a specified collector on a specified location for Build or Research and protects that collector's stay until upkeep — it grants no other rights. Two-purchase abilities settle the procedure separately per purchase.\n\n## Build: one purchase, prerequisites, spawn placement, bases\n\nA Build action buys one unit, building, or base at its listed cost; Foreman permits two paid separately, and Core+platform is one combined purchase. New map units spawn at any owned base; Subjects go to the faction board; unallocated Cores to the reserve; spies are hero assignments. A new base goes on a tile holding an owned unit, no opposing unit and no base — even when you have no bases (there is no adjacent-placement recovery). Maximum three bases including the free starting base; a baseless player cannot place new map units or heroes until rebuilt.\n\n## Move or battle: adjacent movement and entry consequences\n\nMove any number of your eligible mobile units from one location to one adjacent location. Immobile Combat Platforms and collectors cannot move; a Coreless platform cannot act. Entering opposing combat units begins a battle; Open Borders permits shared occupation; Peace forbids entering a partner's location or attacking it. Entering only unprotected opposing non-combat pieces or Coreless platforms sweeps them without battle. Elara's spell fires at the start of a Move/Battle action before movement.\n\n## Research: technology unlocks and the battle-card purchase\n\nResearch makes one purchase: unlock one eligible unresearched technology (paying its cost, meeting its building prerequisite), or buy one battle strategy card for 1 water + 1 wood + 1 ore + either 1 ether or 1 oil (requires the Embassy or Defense Research Station) and draw from the shared deck. Kettering permits two purchases of either mix, each from separate collectors. Smyth's free research waives cost AND prerequisite.\n\n## Battle strategy cards: commitment, Counter/Extra batches, order\n\nEach battle participant secretly commits one eligible card or no card; reveal together, then resolve each batch's Counters first in first-player order, then surviving Extras (each picks 0–2 added cards, chosen and revealed together, which form the next batch). A countered Extra reveals nothing. After batches, resolve Rally, then Retreat, then Bonus, then Initiative — first-player order within each type. The deck holds exactly 20 cards; played cards go to the public discard; the discard reshuffles when the deck depletes.\n\n## Battle: initiative passes, one activation each, targeting, reactions\n\nActivate from highest to lowest current initiative; defenders win opposing ties, allied ties go by agreement or the earlier first-player-order owner. Each unit gets one activation per pass: one attack OR one activated ability, or it may pass (the activation is used). A standing opposing Wall Platform must be the single-target target while it stands; AoE attacks hit every opposing unit including the Wall. Mana Shield, Decoy, and Cleric saves are reactions that follow their own timing and never consume an activation. Ice Blast immediately reorders a not-yet-activated target for the rest of the battle.\n\n## Retreat and stalemate\n\nAfter an initiative pass with both sides alive, defenders declare first; each allied player decides independently. Retreat withdraws ALL of that player's mobile units together to one adjacent destination — allied-unit space first, then an eligible empty adjacent (your or an Open-Borders partner's bases and Coreless platforms count as empty; nobody can use the attack's origin hex). Immobile Combat Platforms and collectors always stay; a Decoy can move only its own hero. A full pass with no kill ends the battle in stalemate: all surviving attackers return to the origin hex together.\n\n## Spies and Detection\n\nRecruiting an Illusionist or Infiltrator is public, but you privately choose which owned hero carries the spy; only one active assignment per player, and revealing ends it. The wizard Decoy reveals to avoid an attack and optionally move the hero; the wizard's Invisible replaces a normal attack to instantly kill an opposing hero. Wizard Detection is a non-blocking observation usable at ANY battle point (it never exposes or expends the target). The robot Infiltrator's Spy Attack and Detection BOTH reveal and expend the assignment — robot Detection is an activation action like Spy Attack, not a free observation.\n\n## Heroes: milestones, reservation, benefits, lore\n\nThere are 20 unique heroes in a shared pool. You choose one Leader at setup and earn one additional hero at each of five culture milestones — maximum six heroes per player. The milestones scale with player count: 5, 15, 30, 50, 75 at two players; each is multiplied by (players ÷ 2) and rounded up, so 8, 23, 45, 75, 113 at three; 10, 30, 60, 100, 150 at four; 13, 38, 75, 125, 188 at five; 15, 45, 90, 150, 225 at six. A claimed hero places at any owned base; with no base, the hero is reserved with NO benefits until placed — no culture, no tech point, no action card, no treaty unlock, no purchase bonus, and one-time rewards like Smyth's wait. A killed non-Leader hero never returns; Leaders cannot be replaced.\n\n## Treaties: formation windows, effects, breaking conditions\n\nTreaties are binding two-player agreements formed only at the start or end of the ACTIVE player's action, one active treaty per pair, one token per treaty type, and one partner needs an unlock (Embassy, Diplomatic Research Station, or active Envoy) — the unlock is needed to form, not to maintain. Open Borders and Peace make military allies; Shared Resources and Open Borders grant collection access; the Culture Treaty (4+ players only) shares a direct partner's victory; Shared Tactics privately shares hands. Breaking happens only at each treaty's printed window — and never to bypass a condition by a mutual replacement.\n\n## Victory: four paths, eligibility, draws\n\nOnly a player with a living Leader can INITIATE any victory. Military: kill enough other Leaders (2p/3p: the first kill ends the game; 4p: 2; 5–6p: 3). Cultural: reach 50 culture per player (100 at two players, 150 at three, 200 at four, 250 at five, 300 at six). Economic: in one Build action spend 3 water + 3 wood + 3 ore + 1 ether + 1 oil from eleven collectors on eleven distinct tiles including oil and ether, building nothing. Technological: one permanent point per unique acquired type (units + buildings + research), 22 for wizards and 18 for robots, with Motherboard and Greymore each adding one live bonus. A completed victory is never replaced by a later draw; if every Leader dies with no winner, the game is a draw.",
+ "rules": "## Setup: factions, Leader draft, starting locations\n\nPick the map for your player count. Each player chooses a faction; the Leader draft runs in player order (starred heroes are recommended, species restrictions are enforced); starting locations run in reverse order. Wizards start with 2 Surfs and max mana 5; robots with 4 Cores in two water and two wood collector platforms. Starting pieces count toward technology type progress.\n\n## Round structure: upkeep, planning, LIFO stack, income, claims\n\nUpkeep rotates the first-player token (including before round one), retrieves collectors, lets robots reallocate Cores, resets wizard mana, and returns played action cards. Planning places one card per player in turn or a final pass onto an Action Stack; a player may hold up to three of each card — the printed one, a hero's (Marshal / Quartermaster / Archivist) and a researched one (see Research) — and each card goes down once per round. The Action phase pops the stack last-in, first-out; an owner may decline a queued action (skipping commits no collectors). Culture income is awarded in first-player order before any milestone hero claim; claims alternate one per player per cycle.\n\n## Collectors: produce on commitment, placement anchors, expiry\n\nBuild and Research place available collectors onto eligible map locations; each produces one resource of that tile's current type and stays committed until upkeep (it can anchor later placements but cannot pay again). Resources never carry over between actions — unspent production expires. Two collectors never share a location. A placement is legal on or adjacent to an owned unit or owned base, adjacent to another collector committed this round, or adjacent to a partner's units under Shared Resources or Open Borders. Surplus placement to extend reach is legal.\n\n## Access and complete payment before commitment\n\nFor each purchase, declare the purchase and propose a complete legal collector payment; obtain any required access agreement BEFORE committing. Refusal leaves everything uncommitted and the action re-opens. Shared Resources and Open Borders grant automatic collection access; other treaties do not. A one-off agreement authorizes a specified collector on a specified location for Build or Research and protects that collector's stay until upkeep — it grants no other rights. Two-purchase abilities settle the procedure separately per purchase.\n\n## Build: one purchase, prerequisites, spawn placement, bases\n\nA Build action buys one unit, building, or base at its listed cost; Foreman permits two paid separately, and Core+platform is one combined purchase. New map units spawn at any owned base; Subjects go to the faction board; unallocated Cores to the reserve; spies are hero assignments. A new base goes on a tile holding an owned unit, no opposing unit and no base — even when you have no bases (there is no adjacent-placement recovery). Maximum three bases including the free starting base; a baseless player cannot place new map units or heroes until rebuilt.\n\n## Move or battle: adjacent movement and entry consequences\n\nMove any number of your eligible mobile units from one location to one adjacent location. Immobile Combat Platforms and collectors cannot move; a Coreless platform cannot act. Entering opposing combat units begins a battle; Open Borders permits shared occupation; Peace forbids entering a partner's location or attacking it. Entering only unprotected opposing non-combat pieces or Coreless platforms sweeps them without battle. Elara's spell fires at the start of a Move/Battle action before movement.\n\n## Research: technology unlocks and the battle-card purchase\n\nResearch makes one purchase: unlock one eligible unresearched technology (paying its cost, meeting its building prerequisite), or buy one battle strategy card for 1 water + 1 wood + 1 ore + either 1 ether or 1 oil (requires the Embassy or Defense Research Station) and draw from the shared deck. Three technologies each grant a permanent second action card — Extra Build, Extra Move/Battle, Extra Research — priced like a battle card (1 water + 1 wood + 1 ore + either 1 ether or 1 oil): a wizard unlocks them through the Library of Enchantment (Build), Library of Evocation (Move/Battle) and Library of Illusion (Research); a robot through the Advanced Research Station (2 ore + 1 wood, all three). Kettering permits two purchases of either mix, each from separate collectors. Smyth's free research waives cost AND prerequisite.\n\n## Battle strategy cards: commitment, Counter/Extra batches, order\n\nEach battle participant secretly commits one eligible card or no card; reveal together, then resolve each batch's Counters first in first-player order, then surviving Extras (each picks 0–2 added cards, chosen and revealed together, which form the next batch). A countered Extra reveals nothing. After batches, resolve Rally, then Retreat, then Bonus, then Initiative — first-player order within each type. The deck holds exactly 20 cards; played cards go to the public discard; the discard reshuffles when the deck depletes.\n\n## Battle: initiative passes, one activation each, targeting, reactions\n\nActivate from highest to lowest current initiative; defenders win opposing ties, allied ties go by agreement or the earlier first-player-order owner. Each unit gets one activation per pass: one attack OR one activated ability, or it may pass (the activation is used). A standing opposing Wall Platform must be the single-target target while it stands; AoE attacks hit every opposing unit including the Wall. Mana Shield, Decoy, and Cleric saves are reactions that follow their own timing and never consume an activation. Ice Blast immediately reorders a not-yet-activated target for the rest of the battle.\n\n## Retreat and stalemate\n\nAfter an initiative pass with both sides alive, defenders declare first; each allied player decides independently. Retreat withdraws ALL of that player's mobile units together to one adjacent destination — allied-unit space first, then an eligible empty adjacent (your or an Open-Borders partner's bases and Coreless platforms count as empty; nobody can use the attack's origin hex). Immobile Combat Platforms and collectors always stay; a Decoy can move only its own hero. A full pass with no kill ends the battle in stalemate: all surviving attackers return to the origin hex together.\n\n## Spies and Detection\n\nRecruiting an Illusionist or Infiltrator is public, but you privately choose which owned hero carries the spy; only one active assignment per player, and revealing ends it. The wizard Decoy reveals to avoid an attack and optionally move the hero; the wizard's Invisible replaces a normal attack to instantly kill an opposing hero. A standing Wall Platform stops spies: while one stands on a side, neither Invisible nor Spy Attack can kill a hero on that side (ruling #93). Wizard Detection is a non-blocking observation usable at ANY battle point (it never exposes or expends the target). The robot Infiltrator's Spy Attack and Detection BOTH reveal and expend the assignment — robot Detection is an activation action like Spy Attack, not a free observation.\n\n## Heroes: milestones, reservation, benefits, lore\n\nThere are 20 unique heroes in a shared pool. You choose one Leader at setup and earn one additional hero at each of five culture milestones — maximum six heroes per player. The milestones scale with player count: 5, 15, 30, 50, 75 at two players; each is multiplied by (players ÷ 2) and rounded up, so 8, 23, 45, 75, 113 at three; 10, 30, 60, 100, 150 at four; 13, 38, 75, 125, 188 at five; 15, 45, 90, 150, 225 at six. A claimed hero places at any owned base; with no base, the hero is reserved with NO benefits until placed — no culture, no tech point, no action card, no treaty unlock, no purchase bonus, and one-time rewards like Smyth's wait. A killed non-Leader hero never returns; Leaders cannot be replaced.\n\n## Treaties: formation windows, effects, breaking conditions\n\nTreaties are binding two-player agreements formed only at the start or end of the ACTIVE player's action, one active treaty per pair, one token per treaty type, and one partner needs an unlock (Embassy, Diplomatic Research Station, or active Envoy) — the unlock is needed to form, not to maintain. Every active treaty pays each partner +2 culture a round. Open Borders and Peace make military allies; Shared Resources and Open Borders grant collection access; the Culture Treaty (4+ players only) shares a direct partner's victory; Shared Tactics privately shares hands. Breaking happens only at each treaty's printed window — and never to bypass a condition by a mutual replacement.\n\n## Victory: four paths, eligibility, draws\n\nOnly a player with a living Leader can INITIATE any victory. Military: kill enough other Leaders (2p/3p: the first kill ends the game; 4–6p: 2). Cultural: reach 50 culture per player (100 at two players, 150 at three, 200 at four, 250 at five, 300 at six). Economic: in one Build action commit half the map's worth of collectors on distinct tiles (12 at two players, 20 at three to four, 26 at five to six) producing at least 3 water + 3 wood + 3 ore + 1 ether + 1 oil (the rest may collect anything), building nothing. Technological: one permanent point per unique acquired type (units + buildings + research), 25 for wizards and 22 for robots, with Motherboard and Greymore each adding one live bonus; the first battle strategy card a player buys counts as a type without raising the target. A completed victory is never replaced by a later draw; if every Leader dies with no winner, the game is a draw.",
  "moveSchema": {
   "oneOf": [
    {
@@ -125,7 +125,8 @@
      "which": {
       "enum": [
        "base",
-       "hero_extra"
+       "hero_extra",
+       "researched_extra"
       ]
      }
     }
@@ -608,6 +609,11 @@
    "setupFirstPlayerId": {
     "type": "string",
     "description": "Tests/harness: pin the setup first player. Default: server seeded RNG."
+   },
+   "economicCollectors": {
+    "type": "integer",
+    "minimum": 11,
+    "description": "Experimental override: collectors the Economic spend needs. Default is half the map (12 / 20 / 26 by player count, rulings #89 and #91); supply caps grow to match."
    }
   }
  },
@@ -670,7 +676,7 @@
     "immobile": false,
     "wallFirst": false,
     "grantsSpy": false,
-    "notes": "Collector; may collect any resource. Maximum 11."
+    "notes": "Collector; may collect any resource. Maximum = the Economic spend on this map: 12 / 20 / 26 (rulings #89, #91)."
    },
    {
     "id": "subject",
@@ -830,7 +836,7 @@
     },
     "isBase": false,
     "repeatableMax": null,
-    "effect": "Permits Ice Blast, Fiery Explosion, and Mana Shield research."
+    "effect": "Permits Ice Blast, Fiery Explosion, Mana Shield and Extra Move/Battle Card research."
    },
    {
     "id": "library-of-illusion",
@@ -842,7 +848,7 @@
     },
     "isBase": false,
     "repeatableMax": null,
-    "effect": "Unlocks Illusionist recruitment and Invisible research."
+    "effect": "Unlocks Illusionist recruitment and Invisible and Extra Research Card research."
    },
    {
     "id": "library-of-enchantment",
@@ -854,7 +860,7 @@
     },
     "isBase": false,
     "repeatableMax": null,
-    "effect": "Unlocks Enchantress recruitment and Dehance and Detection research."
+    "effect": "Unlocks Enchantress recruitment and Dehance, Detection and Extra Build Card research."
    },
    {
     "id": "dragon-hoard",
@@ -982,6 +988,54 @@
      "wood": 1
     },
     "effect": "Enchantress may privately inspect an eligible opposing spy card during battle."
+   },
+   {
+    "id": "extra-move-battle-card",
+    "name": "Extra Move/Battle Card",
+    "species": "wizard",
+    "prerequisite": "Library of Evocation",
+    "cost": {
+     "water": 1,
+     "wood": 1,
+     "ore": 1
+    },
+    "either": [
+     "ether",
+     "oil"
+    ],
+    "effect": "Gain a second Move/Battle action card for the rest of the game (with Marshal's, three). Counts as a research type for technology without raising the target (ruling #87)."
+   },
+   {
+    "id": "extra-research-card",
+    "name": "Extra Research Card",
+    "species": "wizard",
+    "prerequisite": "Library of Illusion",
+    "cost": {
+     "water": 1,
+     "wood": 1,
+     "ore": 1
+    },
+    "either": [
+     "ether",
+     "oil"
+    ],
+    "effect": "Gain a second Research action card for the rest of the game (with Archivist's, three). Counts as a research type for technology without raising the target (ruling #87)."
+   },
+   {
+    "id": "extra-build-card",
+    "name": "Extra Build Card",
+    "species": "wizard",
+    "prerequisite": "Library of Enchantment",
+    "cost": {
+     "water": 1,
+     "wood": 1,
+     "ore": 1
+    },
+    "either": [
+     "ether",
+     "oil"
+    ],
+    "effect": "Gain a second Build action card for the rest of the game (with Quartermaster's, three). Counts as a research type for technology without raising the target (ruling #87)."
    }
   ],
   "robot_units": [
@@ -1186,8 +1240,8 @@
      "ore": 2
     },
     "init": 98,
-    "dmg": 3,
-    "def": 3,
+    "dmg": 6,
+    "def": 1,
     "aoe": false,
     "maxPerPlayer": 5,
     "collector": false,
@@ -1305,6 +1359,18 @@
     "isBase": false,
     "repeatableMax": null,
     "effect": "+5 culture per round."
+   },
+   {
+    "id": "advanced-research-station",
+    "name": "Advanced Research Station",
+    "species": "robot",
+    "cost": {
+     "ore": 2,
+     "wood": 1
+    },
+    "isBase": false,
+    "repeatableMax": null,
+    "effect": "Unlocks research of the Extra Build, Extra Move/Battle and Extra Research cards. As a new building type it raises the robot technology target from 18 to 19."
    }
   ],
   "robot_research": [
@@ -1319,6 +1385,54 @@
      "oil": 1
     },
     "effect": "All robot platforms gain +1 DEF. Heroes are not affected. This does not give statless pieces a combat stat line."
+   },
+   {
+    "id": "extra-build-card",
+    "name": "Extra Build Card",
+    "species": "robot",
+    "prerequisite": "Advanced Research Station",
+    "cost": {
+     "water": 1,
+     "wood": 1,
+     "ore": 1
+    },
+    "either": [
+     "ether",
+     "oil"
+    ],
+    "effect": "Gain a second Build action card for the rest of the game (with Quartermaster's, three). Counts as a research type for technology without raising the target (ruling #87)."
+   },
+   {
+    "id": "extra-move-battle-card",
+    "name": "Extra Move/Battle Card",
+    "species": "robot",
+    "prerequisite": "Advanced Research Station",
+    "cost": {
+     "water": 1,
+     "wood": 1,
+     "ore": 1
+    },
+    "either": [
+     "ether",
+     "oil"
+    ],
+    "effect": "Gain a second Move/Battle action card for the rest of the game (with Marshal's, three). Counts as a research type for technology without raising the target (ruling #87)."
+   },
+   {
+    "id": "extra-research-card",
+    "name": "Extra Research Card",
+    "species": "robot",
+    "prerequisite": "Advanced Research Station",
+    "cost": {
+     "water": 1,
+     "wood": 1,
+     "ore": 1
+    },
+    "either": [
+     "ether",
+     "oil"
+    ],
+    "effect": "Gain a second Research action card for the rest of the game (with Archivist's, three). Counts as a research type for technology without raising the target (ruling #87)."
    }
   ],
   "robot_collector_supply": {
@@ -1601,39 +1715,44 @@
     "robot": "Defense Research Station"
    }
   },
+  "treaty_unlocked_by": {
+   "wizard": "Embassy",
+   "robot": "Diplomatic Research Station",
+   "hero": "Envoy Sable Marrow"
+  },
   "treaties": [
    {
     "id": "open-borders",
     "name": "Open Borders",
-    "cultureIncome": 5,
+    "cultureIncome": 2,
     "effect": "Units may share locations without battle and must fight on the same side when attacked there. Allied combat units protect the partner's bases and pieces. Grants collection access to the partner's locations and collector placement adjacent to the partner's units. Does not share battle cards or victory.",
     "breakingCondition": "End of round, provided allied units do not share a space."
    },
    {
     "id": "shared-resources",
     "name": "Shared Resources",
-    "cultureIncome": 5,
+    "cultureIncome": 2,
     "effect": "Grants collection on the partner's locations and collector placement adjacent to the partner's units. Does not create military allies or general movement access.",
     "breakingCondition": "End of round, if no unit is collecting from a partner's space."
    },
    {
     "id": "peace",
     "name": "Peace",
-    "cultureIncome": 5,
+    "cultureIncome": 2,
     "effect": "No combat between partners. Partners' units may not enter each other's locations. No automatic collection access; a one-off collection agreement may be made.",
     "breakingCondition": "End of round only."
    },
    {
     "id": "culture-treaty",
     "name": "Culture Treaty",
-    "cultureIncome": 5,
+    "cultureIncome": 2,
     "effect": "Direct partners share an eligible partner's victory. Does not create military allies; partners may fight. Shared victory does not chain. Available only at four or more players. No automatic collection access.",
     "breakingCondition": "Outside the culture phase, only when no action or battle is resolving."
    },
    {
     "id": "shared-tactics",
     "name": "Shared Tactics",
-    "cultureIncome": 5,
+    "cultureIncome": 2,
     "effect": "Partners privately share existing hands immediately and show new draws while active. Either may play a card the other owns. If both are in a battle, the card's owner decides first whether to play it; the partner may play it only if the owner does not. No automatic collection access or military alliance.",
     "breakingCondition": "End of round."
    }
@@ -1687,8 +1806,8 @@
     "2": 1,
     "3": 1,
     "4": 2,
-    "5": 3,
-    "6": 3
+    "5": 2,
+    "6": 2
    },
    "economic_spend": {
     "water": 3,
@@ -1697,10 +1816,14 @@
     "ether": 1,
     "oil": 1
    },
-   "economic_collectors": 11,
+   "economic_collectors_by_layout": {
+    "two": 12,
+    "threeFour": 20,
+    "fiveSix": 26
+   },
    "tech_target": {
-    "wizard": 22,
-    "robot": 18
+    "wizard": 25,
+    "robot": 22
    }
   },
   "maps": {
@@ -1708,7 +1831,7 @@
     {
      "c": -2,
      "r": 4,
-     "resource": "ore",
+     "resource": "water",
      "label": "C3"
     },
     {
@@ -1855,15 +1978,9 @@
    "3-4p": [
     {
      "c": -2,
-     "r": 2,
+     "r": 4,
      "resource": "water",
      "start": 4,
-     "label": "C2"
-    },
-    {
-     "c": -2,
-     "r": 4,
-     "resource": "ore",
      "label": "C3"
     },
     {
@@ -1890,12 +2007,6 @@
      "resource": "water",
      "start": 1,
      "label": "C7"
-    },
-    {
-     "c": -1,
-     "r": 1,
-     "resource": "wood",
-     "label": "D1"
     },
     {
      "c": -1,
@@ -1932,12 +2043,6 @@
      "r": 13,
      "resource": "wood",
      "label": "D7"
-    },
-    {
-     "c": 0,
-     "r": 0,
-     "resource": "water",
-     "label": "E1"
     },
     {
      "c": 0,
@@ -1983,12 +2088,6 @@
     },
     {
      "c": 1,
-     "r": 1,
-     "resource": "wood",
-     "label": "F1"
-    },
-    {
-     "c": 1,
      "r": 3,
      "resource": "water",
      "label": "F2"
@@ -2025,15 +2124,9 @@
     },
     {
      "c": 2,
-     "r": 2,
-     "resource": "water",
-     "start": 3,
-     "label": "G2"
-    },
-    {
-     "c": 2,
      "r": 4,
      "resource": "water",
+     "start": 3,
      "label": "G3"
     },
     {
@@ -2122,13 +2215,13 @@
     {
      "c": -2,
      "r": 2,
-     "resource": "water",
+     "resource": "ore",
      "label": "C2"
     },
     {
      "c": -2,
      "r": 4,
-     "resource": "ore",
+     "resource": "water",
      "label": "C3"
     },
     {

@@ -54,7 +54,10 @@ export interface NggPlayer {
   buildings: string[];
   buildingCounts: Record<string, number>;
   research: string[];
-  tech: { acquiredTypes: string[]; bonusLive: number; total: number; target: number | null };
+  /** acquiredTypeNames: each type by printed name; null from an engine that gives only ids */
+  tech: { acquiredTypes: string[]; acquiredTypeNames: string[] | null; bonusLive: number; total: number; target: number | null };
+  /** each action card kind's copies by slot ('base', 'hero_extra', 'researched_extra'); null from an older engine */
+  actionCardSlots: Record<string, string[]> | null;
   leaderKills: number;
   militaryKillsNeeded: number;
   leaderAlive: boolean;
@@ -209,10 +212,14 @@ function readPlayer(p: Record<string, unknown>): NggPlayer {
     research: asArr(p['research']).map((r) => asStr(r)),
     tech: {
       acquiredTypes: asArr(tech['acquired_types']).map((t) => asStr(t)),
+      acquiredTypeNames: Array.isArray(tech['acquired_type_names']) ? asArr(tech['acquired_type_names']).map((t) => asStr(t)) : null,
       bonusLive: asNum(tech['bonus_points_live']),
       total: asNum(tech['total']),
       target: typeof tech['target'] === 'number' ? tech['target'] : null,
     },
+    actionCardSlots: isObj(p['action_card_slots'])
+      ? Object.fromEntries(Object.entries(p['action_card_slots']).map(([k, v]) => [k, asArr(v).map((x) => asStr(x))]))
+      : null,
     leaderKills: asNum(p['leader_kills']),
     militaryKillsNeeded: asNum(p['military_kills_needed']),
     leaderAlive: asBool(p['leader_alive']),

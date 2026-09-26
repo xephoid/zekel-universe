@@ -11,7 +11,7 @@ import { HexMap, type MapMarks } from './HexMap';
 import { inkOf, inkOfSeat } from './factions';
 import { WAITING_ON } from './route';
 import { CardBack, FactionChip, Icon, Panel } from './ui';
-import { cultureRaceOf } from './ref';
+import { cultureRaceOf, economicCollectorsFor } from './ref';
 import { econOf, type NggPlayer } from './read';
 import { FactionBoard, FactionStrip } from './FactionBoard';
 
@@ -89,10 +89,10 @@ function SeatsPanel({ ctx, onOpen }: { ctx: ScreenCtx; onOpen: (playerId: string
 }
 
 /** Economic progress: collectors owned against the number the Economic spend
- *  takes (11 collectors on 11 different tiles). */
+ *  takes on this map (as many collectors on as many different tiles). */
 function EconStat({ ctx, p }: { ctx: ScreenCtx; p: NggPlayer }) {
   const econ = econOf(p);
-  const need = ctx.ref?.economicCollectors ?? null;
+  const need = economicCollectorsFor(ctx.ref, ctx.v.layout);
   const title = econ
     ? `${econ.owned} collector${econ.owned === 1 ? '' : 's'} owned${econ.unpowered ? ` (${econ.unpowered} without a Core)` : ''}${need ? `; the Economic victory spends ${need} on ${need} different tiles` : ''}`
     : 'Collector count not published by this engine';

@@ -17,7 +17,7 @@ import type { ScreenCtx } from '../ctx';
 import type { ScreenKey } from '../route';
 import type { MapProposal } from '../HexMap';
 import { TableLayout } from '../Layout';
-import { itemByName, researchByName, heroById, type Cost } from '../ref';
+import { economicCollectorsFor, itemByName, researchByName, heroById, type Cost } from '../ref';
 import { TERRAIN } from '../factions';
 import { Actions, BattleCardPrice, Btn, CostChips, HowTo, Icon, OptionRow, Panel, ResourceChip, Rule } from '../ui';
 import { moveType } from '../read';
@@ -120,7 +120,7 @@ function purchasesOf(ctx: ScreenCtx, buys: Buys | null): Purchase[] {
     } else if (t === 'research' && m.move['kind'] === 'tech') {
       const name = String(m.move['tech'] ?? '');
       const r = researchByName(ctx.ref, name);
-      out.set(name, { key: name, label: name, kind: 'tech', cost: r?.cost ?? null, text: r?.effect ?? null, moves: [m], shut: null });
+      out.set(name, { key: name, label: name, kind: 'tech', cost: r?.cost ?? null, either: r?.either, text: r?.effect ?? null, moves: [m], shut: null });
     } else if (t === 'research' && m.move['kind'] === 'battle_card') {
       out.set('battle_card', { key: 'battle_card', label: 'Draw a battle card', kind: 'battle_card', cost: ctx.ref?.battleCardPurchase?.cost ?? null, either: ctx.ref?.battleCardPurchase?.either, text: null, moves: [m], shut: null });
     } else if (t === 'economic_victory_spend') {
@@ -150,7 +150,7 @@ function purchasesOf(ctx: ScreenCtx, buys: Buys | null): Purchase[] {
       }
       if (out.has(u.item)) continue;
       const r = researchByName(ctx.ref, u.item);
-      shut.push({ key: `shut:${u.item}`, label: u.item, kind: 'tech', cost: r?.cost ?? null, text: r?.effect ?? null, moves: [], shut: reason });
+      shut.push({ key: `shut:${u.item}`, label: u.item, kind: 'tech', cost: r?.cost ?? null, either: r?.either, text: r?.effect ?? null, moves: [], shut: reason });
     }
   }
   return [...out.values(), ...shut];
@@ -356,7 +356,7 @@ function Composer({ ctx, scope, buys, title, kicker, skip, skipLabel, children }
             )}
             <Actions>
               <Btn kind="secondary" onClick={back}>Drop the purchase</Btn>
-              <Btn disabled={!ctx.live} onClick={() => commitPayment()}>{needsPlace ? 'Commit payment, then place it' : chosen.kind === 'economic' ? 'Commit all eleven' : 'Commit payment'}</Btn>
+              <Btn disabled={!ctx.live} onClick={() => commitPayment()}>{needsPlace ? 'Commit payment, then place it' : chosen.kind === 'economic' ? `Commit all ${economicCollectorsFor(ctx.ref, ctx.v.layout) ?? ''}`.trim() : 'Commit payment'}</Btn>
             </Actions>
           </Panel>
         }
@@ -553,7 +553,7 @@ function PayStage({ ctx, chosen, purchase, proposal, needsPlace, initial, onBack
               <Btn kind="quiet" disabled={!ctx.live} onClick={() => { setPlaced(proposal); setHolding(null); }}>Choose for me</Btn>
             )}
             <Btn disabled={!ctx.live || !reach || reach.covers === false || (reach.covers === undefined && placed.length === 0 && proposal.length > 0)} onClick={() => onCommit(placed)}>
-              {needsPlace ? 'Commit payment, then place it' : chosen.kind === 'economic' ? 'Commit all eleven' : 'Commit payment'}
+              {needsPlace ? 'Commit payment, then place it' : chosen.kind === 'economic' ? `Commit all ${economicCollectorsFor(ctx.ref, ctx.v.layout) ?? ''}`.trim() : 'Commit payment'}
             </Btn>
           </Actions>
         </Panel>

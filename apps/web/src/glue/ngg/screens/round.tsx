@@ -302,13 +302,15 @@ function Planning({ ctx }: { ctx: ScreenCtx }) {
   const moves = ctx.movesOf('plan_action');
   const pass = moves.find((m) => m.move['card'] === 'pass') ?? null;
   const decide = moves.length > 0;
-  // Every action card this seat holds, one per copy; a copy the engine lists
-  // is open, a copy already played is on the stack.
+  // Every action card this seat holds, one per copy, by the slot the engine
+  // names it with (the printed card, a hero's extra, a researched extra); a
+  // copy the engine lists is open, a copy already played is on the stack.
   const cards = mine
     ? PLAN_CARDS.flatMap(({ kind, key }) => {
         const held = mine.actionCards[key] ?? 0;
-        return Array.from({ length: held }, (_, i) => {
-          const which = i === 0 ? 'base' : 'hero_extra';
+        const slots = mine.actionCardSlots?.[key]
+          ?? Array.from({ length: held }, (_, i) => (i === 0 ? 'base' : 'hero_extra'));
+        return slots.map((which) => {
           const played = mine.actionCardsPlayed?.includes(`${kind}:${which}`) ?? false;
           const move = moves.find((m) => m.move['card'] === kind && m.move['which'] === which) ?? null;
           return { kind, which, played, move };
@@ -325,7 +327,7 @@ function Planning({ ctx }: { ctx: ScreenCtx }) {
             <>
               <Icon name={CARD_ICON[c.kind] ?? 'Build'} size={22} stroke={1.8} />
               <b>{CARD_NAME[c.kind]}</b>
-              <i>{c.played ? 'On the stack' : c.which === 'hero_extra' ? 'Hero extra' : 'In hand'}</i>
+              <i>{c.played ? 'On the stack' : c.which === 'hero_extra' ? 'Hero extra' : c.which === 'researched_extra' ? 'Researched extra' : 'In hand'}</i>
             </>
           );
           const id = `ngg-plan:${ctx.me}:${c.kind}:${c.which}`;
