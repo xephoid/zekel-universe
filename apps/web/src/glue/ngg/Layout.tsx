@@ -89,9 +89,57 @@ function TreatiesSheet({ ctx, onClose }: { ctx: ScreenCtx; onClose: () => void }
   );
 }
 
+/** Every hero in the game: its printed ability, and who holds it (as Leader,
+ *  held, reserved or killed) or that it is still in the pool. A hero leaves the
+ *  pool only when a seat takes it, so one no seat lists is in the pool; the
+ *  engine's pool count must agree, else the screen does not claim it. */
+function HeroesSheet({ ctx, onClose }: { ctx: ScreenCtx; onClose: () => void }) {
+  const { v, ref } = ctx;
+  const heroes = [...(ref?.heroes ?? [])].sort((a, b) => a.num - b.num);
+  const holder = new Map<string, { owner: string; leader: boolean; dead: boolean; reserved: boolean }>();
+  for (const p of v.players) for (const h of p.heroes) holder.set(h.name, { owner: p.id, leader: h.leader, dead: h.dead, reserved: h.coord === null && !h.dead });
+  const unheld = heroes.filter((h) => !holder.has(h.name)).length;
+  const poolKnown = unheld === v.heroPoolCount;
+  return (
+    <div className="sheet-backdrop" role="presentation" onClick={onClose}>
+      <div className="sheet ngg-heroes-sheet ngg-side" role="dialog" aria-label="Heroes" onClick={(e) => e.stopPropagation()}>
+        <button type="button" className="btn secondary small close" onClick={onClose} aria-label="Close the heroes">✕</button>
+        <h2>Heroes</h2>
+        <p className="muted">{v.heroPoolCount} in the pool · {heroes.length - unheld} taken</p>
+        <ul className="ngg-hero-list">
+          {heroes.map((h) => {
+            const held = holder.get(h.name);
+            const ink = held ? inkOfSeat(v, held.owner) : null;
+            const status = held
+              ? `${held.dead ? 'Killed' : held.leader ? 'Leader' : held.reserved ? 'Reserved' : 'Held'} · ${ctx.seat(held.owner)}`
+              : poolKnown ? 'In the pool' : 'Not held';
+            return (
+              <li key={h.id} className={`${held ? 'taken' : 'free'}${held?.dead ? ' dead' : ''}`}>
+                <span className="ngg-avatar" style={ink ? { background: ink.fill, color: ink.on } : undefined}>
+                  {h.name.split(/\s+/).map((w) => w[0]).slice(-2).join('')}
+                </span>
+                <span className="ngg-hero-body">
+                  <b>{h.name}{h.recommendedLeader ? <span className="ngg-hero-star" title="Recommended Leader"> ★</span> : null}</b>
+                  <i>{[h.category, h.species ? `${h.species}s only` : null].filter(Boolean).join(' · ')}</i>
+                  <span className="ngg-hero-effect">{h.effect}</span>
+                </span>
+                <span className="ngg-hero-status">
+                  {held && <FactionChip faction={v.players.find((p) => p.id === held.owner)?.faction ?? null} size={18} />}
+                  {status}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
 function SeatsPanel({ ctx, onOpen }: { ctx: ScreenCtx; onOpen: (playerId: string) => void }) {
   const { v } = ctx;
   const [treatiesOpen, setTreatiesOpen] = useState(false);
+  const [heroesOpen, setHeroesOpen] = useState(false);
   return (
     <Panel title="Seats">
       <ul className="ngg-seats">
@@ -117,11 +165,13 @@ function SeatsPanel({ ctx, onOpen }: { ctx: ScreenCtx; onOpen: (playerId: string
         })}
       </ul>
       <div className="ngg-seats-foot">
+        <button type="button" data-view-only className="ngg-link" onClick={() => setHeroesOpen(true)}>Heroes</button>
         <button type="button" data-view-only className="ngg-link" onClick={() => setTreatiesOpen(true)}>
           Treaties{v.treaties.length > 0 ? ` (${v.treaties.length})` : ''}
         </button>
       </div>
       {treatiesOpen && <TreatiesSheet ctx={ctx} onClose={() => setTreatiesOpen(false)} />}
+      {heroesOpen && <HeroesSheet ctx={ctx} onClose={() => setHeroesOpen(false)} />}
     </Panel>
   );
 }

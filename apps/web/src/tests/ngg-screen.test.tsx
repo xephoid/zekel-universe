@@ -253,4 +253,20 @@ describe('NGnG screen', () => {
     expect(r.container.querySelector('button.ngg-seat.you .ngg-spy-mark')).toBeNull();
     cleanup();
   });
+  it('lists every hero from the Heroes link, who holds each, and what is still in the pool', () => {
+    const f = FIXTURES.find((x) => x.name === 'action-build-robot-mid')!.f;
+    const r = render(<NggScreen input={inputFor(f.view, f.viewer, f.legalMoves)} yourTurn busy={false} interactive onMove={vi.fn()} onForm={vi.fn()} nameFor={(p) => p} />);
+    fireEvent.click(r.getByRole('button', { name: 'Heroes' }));
+    const sheet = r.getByRole('dialog', { name: 'Heroes' });
+    const all = (REFERENCE as unknown as { referenceData: { heroes: Array<{ name: string }> } }).referenceData.heroes;
+    const rows = [...sheet.querySelectorAll('.ngg-hero-list li')];
+    expect(rows).toHaveLength(all.length);
+    const view = f.view as { hero_pool_count: number; players: Array<{ faction: string; heroes: Array<{ hero: string }> }> };
+    for (const p of view.players) for (const h of p.heroes) {
+      const row = rows.find((li) => li.querySelector('b')?.textContent?.replace(' ★', '') === h.hero)!;
+      expect(row.textContent).toContain(p.faction);
+    }
+    expect(rows.filter((li) => li.textContent?.includes('In the pool'))).toHaveLength(view.hero_pool_count);
+    cleanup();
+  });
 });
