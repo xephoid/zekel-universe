@@ -983,6 +983,17 @@ and where the seat stands. The payment stage's shortcut is "Choose for me".
 - Three starting Surfs, Envoy and the Wall's DEF 3 need nothing from
   Universe.
 
+**Checked against engine 7c4f7d8 (rulings #108-#111, 2026-09-27):**
+- Self Destruct (#111) is offered in the activation list by name, with the
+  engine's sentence (which carries the damage) and a warning that it hits
+  every side and loses the unit. A seat defending against the blast is told
+  it is a Self Destruct (engine `self_destruct` in the defense context, on
+  branch `claude/ngg-haste-bank`). Its research has a stand-in mark until
+  the designer draws one.
+- Culture back to 50 per player (#108), Enhance +2 (#109), bonus heroes +4
+  (#110) and the robot target of 25 all come from the engine's data and
+  view; nothing in Universe held those numbers.
+
 **Checked against engine 632231e (2026-09-25):** Cultural victory is 25
 culture per player (50 at two players to 150 at six) and the hero milestones
 are shares of it. The culture race reads both from the engine, so nothing in

@@ -205,6 +205,13 @@
                            'M10.1 12a1.9 1.9 0 1 0 3.8 0 1.9 1.9 0 1 0-3.8 0Z',
                            'M12 2.2v3M10.4 3.8 12 5.4l1.6-1.6'];
 
+  // ---------- research added 2026-09-27 ----------
+  // Self Destruct (#111): a stand-in until the designer draws one. The Core mark,
+  // small, with a burst around it: the unit gives itself up and hits everything.
+  P['Self Destruct'] = ['M12 8.6 14.9 10.3v3.4L12 15.4l-2.9-1.7v-3.4Z',
+                        'M12 2.6v3.2M12 18.2v3.2M2.6 12h3.2M18.2 12h3.2',
+                        'M5.4 5.4l2.2 2.2M16.4 16.4l2.2 2.2M18.6 5.4l-2.2 2.2M7.6 16.4l-2.2 2.2'];
+
   // A battle strategy card is drawn face down and only ever seen by its holder, so the
   // mark is the card itself with a blade on it rather than any one card's effect.
   P['Battle card'] = ['M6.6 3.8h10.8a1.9 1.9 0 0 1 1.9 1.9v12.6a1.9 1.9 0 0 1-1.9 1.9H6.6a1.9 1.9 0 0 1-1.9-1.9V5.7a1.9 1.9 0 0 1 1.9-1.9Z',

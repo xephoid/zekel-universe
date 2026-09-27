@@ -347,6 +347,30 @@ describe('NGnG screen', () => {
     cleanup();
   });
 
+  it('Self Destruct: offered by name with the engine damage and a warning, sent only on press', () => {
+    const f = FIXTURES.find((x) => x.name === 'battle-activations-self_destruct')!.f;
+    const onMove = vi.fn();
+    const r = render(<NggScreen input={inputFor(f.view, f.viewer, f.legalMoves)} yourTurn busy={false} interactive onMove={onMove} onForm={vi.fn()} nameFor={(p) => p} />);
+    const listed = f.legalMoves.find((m) => (m.move['action'] as { kind?: string } | undefined)?.kind === 'self_destruct')!;
+    expect(listed).toBeTruthy();
+    const row = r.getByText('Self Destruct').closest('.ngg-option') as HTMLElement;
+    expect(row.textContent).toContain('HITS EVERY SIDE');
+    expect(row.textContent).toMatch(/\d+ DMG/);
+    fireEvent.click(row);
+    expect(onMove).not.toHaveBeenCalled();
+    fireEvent.click(r.getByRole('button', { name: 'Self Destruct' }));
+    expect(onMove.mock.calls[0]![0].move).toEqual(listed.move);
+    cleanup();
+  });
+
+  it('a defense against a Self Destruct says what hit it', () => {
+    const f = FIXTURES.find((x) => x.name === 'pending-battle_defense-self_destruct')!.f;
+    const r = render(<NggScreen input={inputFor(f.view, f.viewer, f.legalMoves)} yourTurn busy={false} interactive onMove={vi.fn()} onForm={vi.fn()} nameFor={(p) => p} />);
+    expect(r.container.textContent).toMatch(/Self Destruct · .* blows itself up, hitting every side/);
+    expect(r.container.textContent).toMatch(/'s blast hits /);
+    cleanup();
+  });
+
   it("a Haste wizard's bank shows on the faction strip, and only when it holds something", () => {
     const { f } = FIXTURES.find((x) => (x.f.view as { players: Array<{ player_id: string; species?: string }> }).players.some((p) => p.player_id === x.f.viewer && p.species === 'wizard'))!;
     const draw = (bank: Record<string, number>) => {

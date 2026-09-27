@@ -728,6 +728,7 @@ const ACTION_NAMES: Record<string, string> = {
   'ability:dehance': 'Dehance',
   spy_attack: 'Spy Attack',
   invisible: 'Invisible',
+  self_destruct: 'Self Destruct',
 };
 
 function actionOf(m: LegalMove): Record<string, unknown> {
@@ -846,7 +847,8 @@ function ActivationScreen({ ctx }: { ctx: ScreenCtx }) {
   const target = targeted && st.target && gMoves.some((m) => targetOf(m) === st.target) ? st.target : null;
   const chosen = group ? (targeted ? gMoves.find((m) => targetOf(m) === target) : gMoves[0]) : undefined;
   const nameOf = (k: string) => ACTION_NAMES[k] ?? k.replace(/^ability:/, '').replace(/_/g, ' ');
-  const spyTag = (k: string) => (k === 'spy_attack' || k === 'invisible' ? 'REVEALS AND SPENDS THE SPY' : infiltrator ? 'SPY UNTOUCHED' : undefined);
+  const spyTag = (k: string) => (k === 'spy_attack' || k === 'invisible' ? 'REVEALS AND SPENDS THE SPY'
+    : k === 'self_destruct' ? 'HITS EVERY SIDE · THIS UNIT IS LOST' : infiltrator ? 'SPY UNTOUCHED' : undefined);
   const go = (m: LegalMove | undefined) => { if (m) { setStash(undefined); ctx.send(m); } };
 
   const acting = unit;
@@ -859,9 +861,10 @@ function ActivationScreen({ ctx }: { ctx: ScreenCtx }) {
           <Rule>One attack or one ability, not both. Passing spends the activation too.</Rule>
           <div className="ngg-options">
             {[...groups.keys()].map((k) => {
-              // An action aimed at nobody (an area attack) says what it does, in the engine's words.
-              const aimless = groups.get(k)!.every((m) => targetOf(m) === null) && k === 'attack';
-              const text = actionText(ctx, k) ?? (aimless ? ctx.say(groups.get(k)![0]!.description ?? '') || null : null);
+              // An action aimed at nobody (an area attack, a Self Destruct) says
+              // what it does in the engine's words, which carry the damage.
+              const aimless = groups.get(k)!.every((m) => targetOf(m) === null) && (k === 'attack' || k === 'self_destruct');
+              const text = (aimless ? ctx.say(groups.get(k)![0]!.description ?? '') || null : null) ?? actionText(ctx, k);
               return (
                 <OptionRow key={k} title={nameOf(k)} sub={[spyTag(k), text].filter(Boolean).join(' · ') || undefined}
                   selected={group === k} disabled={!live} onPress={() => setStash({ stamp, group: k })} />
@@ -961,11 +964,12 @@ function DefenseScreen({ ctx }: { ctx: ScreenCtx }) {
 
   const body = (
     <Panel kicker={<>{mine ? 'The table is stopped · ON YOU' : battleKicker(ctx, true)} <Mana ctx={ctx} /></>}
-      title={mine ? (spyReveal ? `${asStr(c['target'])} is the target` : `${asStr(c['attacker'])} attacks ${asStr(c['target'])}`) : 'A defense is being decided'}
+      title={mine ? (spyReveal ? `${asStr(c['target'])} is the target` : c['self_destruct'] === true ? `${asStr(c['attacker'])}'s blast hits ${asStr(c['target'])}` : `${asStr(c['attacker'])} attacks ${asStr(c['target'])}`) : 'A defense is being decided'}
       tone={mine ? 'urgent' : undefined}>
       {mine && (
         <>
           {spyReveal && <span className="ngg-kicker">{asStr(c['attacker'])} attacks</span>}
+          {c['self_destruct'] === true && <span className="ngg-kicker">Self Destruct · {asStr(c['attacker'])} blows itself up, hitting every side</span>}
           <div className="ngb-hit">
             {typeof dmg === 'number'
               ? <><b>{dmg}</b> damage vs DEF <b>{asNum(c['target_def'])}</b></>

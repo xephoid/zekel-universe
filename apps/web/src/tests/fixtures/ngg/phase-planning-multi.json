@@ -20,7 +20,7 @@
      "base_owner": "p4",
      "units": [],
      "heroes": [
-      "Quartermaster Bertram Hollis (p4)"
+      "Motherboard (p4)"
      ],
      "collectors": []
     },
@@ -66,7 +66,7 @@
      "base_owner": "p3",
      "units": [],
      "heroes": [
-      "Foreman Hadrik Stoll (p3)"
+      "Quartermaster Bertram Hollis (p3)"
      ],
      "collectors": []
     },
@@ -288,7 +288,7 @@
      "base_owner": "p2",
      "units": [],
      "heroes": [
-      "Chronicler Ottoline Vey (p2)"
+      "Foreman Hadrik Stoll (p2)"
      ],
      "collectors": []
     },
@@ -370,7 +370,7 @@
    },
    "p4": {
     "culture": 0,
-    "tech": 2,
+    "tech": 6,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -383,14 +383,14 @@
     "faction": "The Foundry",
     "species": "robot",
     "culture": 0,
-    "culture_target": 100,
+    "culture_target": 200,
     "economic_collectors": 20,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -412,7 +412,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 24
+     "target": 25
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -507,14 +507,14 @@
     "faction": "The Schism",
     "species": "wizard",
     "culture": 0,
-    "culture_target": 100,
+    "culture_target": 200,
     "economic_collectors": 20,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -563,7 +563,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Chronicler Ottoline Vey",
+      "hero": "Foreman Hadrik Stoll",
       "coord": "2,4",
       "is_leader": true,
       "dead": false,
@@ -622,14 +622,14 @@
     "faction": "The Ledger",
     "species": "robot",
     "culture": 0,
-    "culture_target": 100,
+    "culture_target": 200,
     "economic_collectors": 20,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -651,7 +651,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 24
+     "target": 25
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -660,13 +660,14 @@
     "cores_reserve": 0,
     "cores_supply": 20,
     "action_cards": {
-     "build": 1,
+     "build": 2,
      "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base"
+      "base",
+      "hero_extra"
      ],
      "moveBattle": [
       "base"
@@ -682,7 +683,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Foreman Hadrik Stoll",
+      "hero": "Quartermaster Bertram Hollis",
       "coord": "-2,12",
       "is_leader": true,
       "dead": false,
@@ -746,14 +747,14 @@
     "faction": "The Brass Circle",
     "species": "wizard",
     "culture": 0,
-    "culture_target": 100,
+    "culture_target": 200,
     "economic_collectors": 20,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -769,8 +770,8 @@
       "Surf",
       "Castle"
      ],
-     "bonus_points_live": 0,
-     "total": 2,
+     "bonus_points_live": 4,
+     "total": 6,
      "target": 26
     },
     "leader_kills": 0,
@@ -780,14 +781,13 @@
     "cores_reserve": 0,
     "cores_supply": 24,
     "action_cards": {
-     "build": 2,
+     "build": 1,
      "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base",
-      "hero_extra"
+      "base"
      ],
      "moveBattle": [
       "base"
@@ -803,7 +803,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Quartermaster Bertram Hollis",
+      "hero": "Motherboard",
       "coord": "-2,4",
       "is_leader": true,
       "dead": false,
@@ -920,7 +920,7 @@
      "base_owner": "p4",
      "units": [],
      "heroes": [
-      "Quartermaster Bertram Hollis (p4)"
+      "Motherboard (p4)"
      ],
      "collectors": []
     },
@@ -966,7 +966,7 @@
      "base_owner": "p3",
      "units": [],
      "heroes": [
-      "Foreman Hadrik Stoll (p3)"
+      "Quartermaster Bertram Hollis (p3)"
      ],
      "collectors": []
     },
@@ -1188,7 +1188,7 @@
      "base_owner": "p2",
      "units": [],
      "heroes": [
-      "Chronicler Ottoline Vey (p2)"
+      "Foreman Hadrik Stoll (p2)"
      ],
      "collectors": []
     },
@@ -1270,7 +1270,7 @@
    },
    "p4": {
     "culture": 0,
-    "tech": 2,
+    "tech": 6,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -1283,14 +1283,14 @@
     "faction": "The Foundry",
     "species": "robot",
     "culture": 0,
-    "culture_target": 100,
+    "culture_target": 200,
     "economic_collectors": 20,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -1312,7 +1312,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 24
+     "target": 25
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -1407,14 +1407,14 @@
     "faction": "The Schism",
     "species": "wizard",
     "culture": 0,
-    "culture_target": 100,
+    "culture_target": 200,
     "economic_collectors": 20,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -1463,7 +1463,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Chronicler Ottoline Vey",
+      "hero": "Foreman Hadrik Stoll",
       "coord": "2,4",
       "is_leader": true,
       "dead": false,
@@ -1522,14 +1522,14 @@
     "faction": "The Ledger",
     "species": "robot",
     "culture": 0,
-    "culture_target": 100,
+    "culture_target": 200,
     "economic_collectors": 20,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -1551,7 +1551,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 24
+     "target": 25
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -1560,13 +1560,14 @@
     "cores_reserve": 0,
     "cores_supply": 20,
     "action_cards": {
-     "build": 1,
+     "build": 2,
      "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base"
+      "base",
+      "hero_extra"
      ],
      "moveBattle": [
       "base"
@@ -1582,7 +1583,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Foreman Hadrik Stoll",
+      "hero": "Quartermaster Bertram Hollis",
       "coord": "-2,12",
       "is_leader": true,
       "dead": false,
@@ -1646,14 +1647,14 @@
     "faction": "The Brass Circle",
     "species": "wizard",
     "culture": 0,
-    "culture_target": 100,
+    "culture_target": 200,
     "economic_collectors": 20,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -1669,8 +1670,8 @@
       "Surf",
       "Castle"
      ],
-     "bonus_points_live": 0,
-     "total": 2,
+     "bonus_points_live": 4,
+     "total": 6,
      "target": 26
     },
     "leader_kills": 0,
@@ -1680,14 +1681,13 @@
     "cores_reserve": 0,
     "cores_supply": 24,
     "action_cards": {
-     "build": 2,
+     "build": 1,
      "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base",
-      "hero_extra"
+      "base"
      ],
      "moveBattle": [
       "base"
@@ -1703,7 +1703,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Quartermaster Bertram Hollis",
+      "hero": "Motherboard",
       "coord": "-2,4",
       "is_leader": true,
       "dead": false,

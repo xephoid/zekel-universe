@@ -1,28 +1,146 @@
 {
  "key": "pending-overlay_choice",
- "players": 4,
- "viewer": "p3",
+ "players": 6,
+ "viewer": "p1",
  "view": {
   "game_id": "neither-guts-nor-gears",
   "phase": "planning",
-  "round": 5,
-  "active_player_id": "p3",
-  "first_player_id": "p2",
-  "layout": "threeFour",
+  "round": 10,
+  "active_player_id": "p1",
+  "first_player_id": "p1",
+  "layout": "fiveSix",
   "map": {
    "tiles": [
+    {
+     "coord": "-4,4",
+     "label": "A3",
+     "printed_resource": "water",
+     "current_resource": "ether",
+     "start": 5,
+     "base_owner": "p2",
+     "units": [],
+     "heroes": [
+      "Chronicler Ottoline Vey (p2)",
+      "Archmage Elara (p2)",
+      "Conjurer Mayhew (p2)"
+     ],
+     "collectors": []
+    },
+    {
+     "coord": "-4,6",
+     "label": "A4",
+     "printed_resource": "wood",
+     "current_resource": "wood",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": []
+    },
+    {
+     "coord": "-4,8",
+     "label": "A5",
+     "printed_resource": "wood",
+     "current_resource": "wood",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": []
+    },
+    {
+     "coord": "-4,10",
+     "label": "A6",
+     "printed_resource": "water",
+     "current_resource": "water",
+     "start": 6,
+     "base_owner": "p1",
+     "units": [],
+     "heroes": [
+      "Evo Angel (p1)",
+      "Dowser Wren Calloway (p1)",
+      "Derrick Prime (p1)"
+     ],
+     "collectors": []
+    },
+    {
+     "coord": "-3,3",
+     "label": "B2",
+     "printed_resource": "wood",
+     "current_resource": "wood",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": []
+    },
+    {
+     "coord": "-3,5",
+     "label": "B3",
+     "printed_resource": "water",
+     "current_resource": "water",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [
+      "Archmage Chaimidious (p1)",
+      "Archivist Solenne Dray (p2)"
+     ],
+     "collectors": []
+    },
+    {
+     "coord": "-3,7",
+     "label": "B4",
+     "printed_resource": "water",
+     "current_resource": "water",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": []
+    },
+    {
+     "coord": "-3,9",
+     "label": "B5",
+     "printed_resource": "water",
+     "current_resource": "water",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": []
+    },
+    {
+     "coord": "-3,11",
+     "label": "B6",
+     "printed_resource": "wood",
+     "current_resource": "wood",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": []
+    },
+    {
+     "coord": "-2,2",
+     "label": "C2",
+     "printed_resource": "ore",
+     "current_resource": "ore",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": []
+    },
     {
      "coord": "-2,4",
      "label": "C3",
      "printed_resource": "water",
      "current_resource": "water",
-     "start": 4,
-     "base_owner": "p4",
+     "start": null,
+     "base_owner": null,
      "units": [],
-     "heroes": [
-      "Archmage Elara (p4)",
-      "Kestrel Nine (p4)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -44,9 +162,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Quartermaster Bertram Hollis (p4)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -57,9 +173,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Foreman Hadrik Stoll (p3)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -67,14 +181,21 @@
      "label": "C7",
      "printed_resource": "water",
      "current_resource": "water",
-     "start": 1,
-     "base_owner": "p3",
+     "start": null,
+     "base_owner": null,
      "units": [],
-     "heroes": [
-      "Evo Angel (p3)",
-      "Dowser Wren Calloway (p3)",
-      "Derrick Prime (p3)"
-     ],
+     "heroes": [],
+     "collectors": []
+    },
+    {
+     "coord": "-1,1",
+     "label": "D1",
+     "printed_resource": "wood",
+     "current_resource": "wood",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -144,6 +265,21 @@
      "collectors": []
     },
     {
+     "coord": "0,0",
+     "label": "E1",
+     "printed_resource": "water",
+     "current_resource": "water",
+     "start": 4,
+     "base_owner": "p6",
+     "units": [],
+     "heroes": [
+      "Technomancer Greymore (p6)",
+      "Envoy Sable Marrow (p6)",
+      "Dr. Elayn Smyth (p6)"
+     ],
+     "collectors": []
+    },
+    {
      "coord": "0,2",
      "label": "E2",
      "printed_resource": "ore",
@@ -151,7 +287,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Quartermaster Bertram Hollis (p5)"
+     ],
      "collectors": []
     },
     {
@@ -184,10 +322,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Archmage Chaimidious (p1)",
-      "Chronicler Ottoline Vey (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -216,7 +351,22 @@
      "coord": "0,14",
      "label": "E8",
      "printed_resource": "water",
-     "current_resource": "water",
+     "current_resource": "ore",
+     "start": 1,
+     "base_owner": "p5",
+     "units": [],
+     "heroes": [
+      "Warden Hesper Quill (p5)",
+      "Kestrel Nine (p5)",
+      "Prospector Ida Marrs (p5)"
+     ],
+     "collectors": []
+    },
+    {
+     "coord": "1,1",
+     "label": "F1",
+     "printed_resource": "wood",
+     "current_resource": "wood",
      "start": null,
      "base_owner": null,
      "units": [],
@@ -290,18 +440,25 @@
      "collectors": []
     },
     {
+     "coord": "2,2",
+     "label": "G2",
+     "printed_resource": "water",
+     "current_resource": "water",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": []
+    },
+    {
      "coord": "2,4",
      "label": "G3",
      "printed_resource": "water",
-     "current_resource": "ore",
-     "start": 3,
-     "base_owner": "p2",
+     "current_resource": "water",
+     "start": null,
+     "base_owner": null,
      "units": [],
-     "heroes": [
-      "Marshal Corvin Ashlock (p2)",
-      "Captain Rook Malvane (p2)",
-      "Prospector Ida Marrs (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -342,27 +499,130 @@
      "label": "G7",
      "printed_resource": "water",
      "current_resource": "water",
-     "start": 2,
-     "base_owner": "p1",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": []
+    },
+    {
+     "coord": "3,3",
+     "label": "H2",
+     "printed_resource": "wood",
+     "current_resource": "wood",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": []
+    },
+    {
+     "coord": "3,5",
+     "label": "H3",
+     "printed_resource": "wood",
+     "current_resource": "wood",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": []
+    },
+    {
+     "coord": "3,7",
+     "label": "H4",
+     "printed_resource": "wood",
+     "current_resource": "wood",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": []
+    },
+    {
+     "coord": "3,9",
+     "label": "H5",
+     "printed_resource": "wood",
+     "current_resource": "wood",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": []
+    },
+    {
+     "coord": "3,11",
+     "label": "H6",
+     "printed_resource": "wood",
+     "current_resource": "wood",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": []
+    },
+    {
+     "coord": "4,4",
+     "label": "I3",
+     "printed_resource": "water",
+     "current_resource": "water",
+     "start": 3,
+     "base_owner": "p4",
      "units": [],
      "heroes": [
-      "Warden Hesper Quill (p1)",
-      "Envoy Sable Marrow (p1)"
+      "Motherboard (p3)",
+      "Marshal Corvin Ashlock (p4)",
+      "Captain Rook Malvane (p4)"
      ],
+     "collectors": []
+    },
+    {
+     "coord": "4,6",
+     "label": "I4",
+     "printed_resource": "water",
+     "current_resource": "water",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": []
+    },
+    {
+     "coord": "4,8",
+     "label": "I5",
+     "printed_resource": "water",
+     "current_resource": "water",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [
+      "Foreman Hadrik Stoll (p4)",
+      "Professor Anselm Kettering (p3)"
+     ],
+     "collectors": []
+    },
+    {
+     "coord": "4,10",
+     "label": "I6",
+     "printed_resource": "water",
+     "current_resource": "water",
+     "start": 2,
+     "base_owner": "p3",
+     "units": [],
+     "heroes": [],
      "collectors": []
     }
    ]
   },
-  "hero_pool_count": 6,
+  "hero_pool_count": 0,
   "action_stack": [],
   "active_action": null,
   "resolving_action": null,
   "treaties": [
    {
-    "treaty": "Shared Resources",
+    "treaty": "Culture Treaty",
     "partners": [
-     "p4",
-     "p3"
+     "p2",
+     "p5"
     ],
     "culture_income": 2
    },
@@ -381,22 +641,51 @@
      "p1"
     ],
     "culture_income": 2
+   },
+   {
+    "treaty": "Shared Resources",
+    "partners": [
+     "p5",
+     "p1"
+    ],
+    "culture_income": 2
+   },
+   {
+    "treaty": "Open Borders",
+    "partners": [
+     "p4",
+     "p3"
+    ],
+    "culture_income": 2
+   },
+   {
+    "treaty": "Culture Treaty",
+    "partners": [
+     "p3",
+     "p6"
+    ],
+    "culture_income": 2
    }
   ],
   "battle": null,
-  "battle_deck_count": 15,
+  "battle_deck_count": 5,
   "battle_discard": [
+   "Initiative",
    "Counter",
-   "Rally",
+   "Extra",
+   "Extra",
+   "Bonus (−1 DMG to all opposing units)",
+   "Counter",
+   "Bonus (+1 DMG to all your units)",
    "Bonus (−1 DEF to all opposing units)",
    "Bonus (+1 DEF to all your units)"
   ],
   "pending": {
    "kind": "overlay_choice",
-   "for": "p3",
-   "question": "p3 picks the active Economy overlay",
+   "for": "p1",
+   "question": "p1 picks the active Economy overlay",
    "context": {
-    "tile": "C7",
+    "tile": "A6",
     "printed_resource": "water"
    },
    "options": [
@@ -404,7 +693,7 @@
      "option_id": "wren",
      "label": "Dowser Wren Calloway",
      "detail": {
-      "owner": "p3",
+      "owner": "p1",
       "resource": null
      },
      "move": {
@@ -416,7 +705,7 @@
      "option_id": "derrick",
      "label": "Derrick Prime",
      "detail": {
-      "owner": "p3",
+      "owner": "p1",
       "resource": "oil"
      },
      "move": {
@@ -428,26 +717,38 @@
   },
   "victory_status": {
    "p1": {
-    "culture": 27,
-    "tech": 5,
+    "culture": 93,
+    "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p2": {
-    "culture": 32,
+    "culture": 104,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p3": {
-    "culture": 31,
-    "tech": 6,
+    "culture": 48,
+    "tech": 8,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p4": {
-    "culture": 27,
+    "culture": 94,
     "tech": 5,
+    "leader_kills": 0,
+    "leader_alive": true
+   },
+   "p5": {
+    "culture": 120,
+    "tech": 5,
+    "leader_kills": 0,
+    "leader_alive": true
+   },
+   "p6": {
+    "culture": 54,
+    "tech": 13,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -457,50 +758,43 @@
    {
     "player_id": "p1",
     "kind": "human",
-    "faction": "The Foundry",
+    "faction": "The Ledger",
     "species": "robot",
-    "culture": 27,
-    "culture_target": 100,
-    "economic_collectors": 20,
+    "culture": 93,
+    "culture_target": 300,
+    "economic_collectors": 26,
     "next_milestones": [
-     30,
-     50,
-     75
+     150,
+     225
     ],
     "mana_current": 0,
     "mana_max": 0,
-    "buildings": [
-     "Diplomatic Research Station"
-    ],
-    "building_counts": {
-     "diplomatic-research-station": 1
-    },
+    "buildings": [],
+    "building_counts": {},
     "research": [],
     "tech_progress": {
      "acquired_types": [
       "core",
       "water-collector",
       "wood-collector",
-      "home",
-      "diplomatic-research-station"
+      "home"
      ],
      "acquired_type_names": [
       "Core",
       "Water collector",
       "Wood collector",
-      "Home",
-      "Diplomatic Research Station"
+      "Home"
      ],
      "bonus_points_live": 0,
-     "total": 5,
-     "target": 24
+     "total": 4,
+     "target": 25
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
     "leader_alive": true,
     "subjects": 0,
-    "cores_reserve": 3,
-    "cores_supply": 17,
+    "cores_reserve": 9,
+    "cores_supply": 16,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -525,33 +819,41 @@
     "heroes": [
      {
       "hero": "Archmage Chaimidious",
-      "coord": "0,8",
+      "coord": "-3,5",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
      },
      {
-      "hero": "Warden Hesper Quill",
-      "coord": "2,12",
+      "hero": "Evo Angel",
+      "coord": "-4,10",
       "is_leader": false,
       "dead": false,
-      "stats": "Init 70 DMG 3 DEF 4"
+      "stats": "Init 80 DMG 4 DEF 4"
      },
      {
-      "hero": "Envoy Sable Marrow",
-      "coord": "2,12",
+      "hero": "Dowser Wren Calloway",
+      "coord": "-4,10",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 30 DMG 1 DEF 3"
+     },
+     {
+      "hero": "Derrick Prime",
+      "coord": "-4,10",
       "is_leader": false,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
-     "2,12"
+     "-4,10"
     ],
     "locked": {
      "units": {
       "Spinner Platform": "needs a Combat Frame Production",
       "Spitter Platform": "needs a Combat Frame Production",
+      "Infiltrator Platform": "needs a Diplomatic Research Station",
       "Large Combat Platform": "needs a Combat Frame Production",
       "Wall Platform": "needs a Defense Research Station"
      },
@@ -560,7 +862,7 @@
       "Extra Move/Battle Card": "needs an Advanced Research Station",
       "Extra Research Card": "needs an Advanced Research Station"
      },
-     "treaties": null,
+     "treaties": "needs a Diplomatic Research Station or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
      "battle_cards": "needs a Defense Research Station"
     },
     "collectors": [
@@ -587,6 +889,12 @@
       "type": "Wood collector",
       "placed_at": null,
       "core": "allocated"
+     },
+     {
+      "collector": "water-collector-3",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
      }
     ],
     "committed_collectors": [],
@@ -598,14 +906,14 @@
    {
     "player_id": "p2",
     "kind": "ai",
-    "faction": "The Schism",
+    "faction": "The Brass Circle",
     "species": "wizard",
-    "culture": 32,
-    "culture_target": 100,
-    "economic_collectors": 20,
+    "culture": 104,
+    "culture_target": 300,
+    "economic_collectors": 26,
     "next_milestones": [
-     50,
-     75
+     150,
+     225
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -638,61 +946,61 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 24,
+    "cores_supply": 30,
     "action_cards": {
      "build": 1,
-     "moveBattle": 2,
-     "research": 1
+     "moveBattle": 1,
+     "research": 2
     },
     "action_card_slots": {
      "build": [
       "base"
      ],
      "moveBattle": [
-      "base",
-      "hero_extra"
+      "base"
      ],
      "research": [
-      "base"
+      "base",
+      "hero_extra"
      ]
     },
     "action_cards_played_count": 0,
-    "battle_hand_count": 1,
+    "battle_hand_count": 2,
     "spy_recruitments": 0,
     "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Chronicler Ottoline Vey",
-      "coord": "0,8",
+      "hero": "Archivist Solenne Dray",
+      "coord": "-3,5",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
      },
      {
-      "hero": "Marshal Corvin Ashlock",
-      "coord": "2,4",
+      "hero": "Chronicler Ottoline Vey",
+      "coord": "-4,4",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 30 DMG 1 DEF 3"
+     },
+     {
+      "hero": "Archmage Elara",
+      "coord": "-4,4",
       "is_leader": false,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 4"
      },
      {
-      "hero": "Captain Rook Malvane",
-      "coord": "2,4",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 70 DMG 3 DEF 4"
-     },
-     {
-      "hero": "Prospector Ida Marrs",
-      "coord": "2,4",
+      "hero": "Conjurer Mayhew",
+      "coord": "-4,4",
       "is_leader": false,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
-     "2,4"
+     "-4,4"
     ],
     "locked": {
      "units": {
@@ -745,51 +1053,44 @@
    {
     "player_id": "p3",
     "kind": "ai",
-    "faction": "The Ledger",
+    "faction": "The Unbolted",
     "species": "robot",
-    "culture": 31,
-    "culture_target": 100,
-    "economic_collectors": 20,
+    "culture": 48,
+    "culture_target": 300,
+    "economic_collectors": 26,
     "next_milestones": [
-     50,
-     75
+     90,
+     150,
+     225
     ],
     "mana_current": 0,
     "mana_max": 0,
-    "buildings": [
-     "Diplomatic Research Station"
-    ],
-    "building_counts": {
-     "diplomatic-research-station": 1
-    },
+    "buildings": [],
+    "building_counts": {},
     "research": [],
     "tech_progress": {
      "acquired_types": [
       "core",
       "water-collector",
       "wood-collector",
-      "home",
-      "ore-collector",
-      "diplomatic-research-station"
+      "home"
      ],
      "acquired_type_names": [
       "Core",
       "Water collector",
       "Wood collector",
-      "Home",
-      "Ore collector",
-      "Diplomatic Research Station"
+      "Home"
      ],
-     "bonus_points_live": 0,
-     "total": 6,
-     "target": 24
+     "bonus_points_live": 4,
+     "total": 8,
+     "target": 25
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
     "leader_alive": true,
     "subjects": 0,
-    "cores_reserve": 5,
-    "cores_supply": 13,
+    "cores_reserve": 0,
+    "cores_supply": 17,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -813,36 +1114,367 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Foreman Hadrik Stoll",
-      "coord": "-2,10",
+      "hero": "Motherboard",
+      "coord": "4,4",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
      },
      {
-      "hero": "Evo Angel",
-      "coord": "-2,12",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 80 DMG 4 DEF 4"
-     },
-     {
-      "hero": "Dowser Wren Calloway",
-      "coord": "-2,12",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 30 DMG 1 DEF 3"
-     },
-     {
-      "hero": "Derrick Prime",
-      "coord": "-2,12",
+      "hero": "Professor Anselm Kettering",
+      "coord": "4,8",
       "is_leader": false,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
-     "-2,12"
+     "4,10"
+    ],
+    "locked": {
+     "units": {
+      "Spinner Platform": "needs a Combat Frame Production",
+      "Spitter Platform": "needs a Combat Frame Production",
+      "Infiltrator Platform": "needs a Diplomatic Research Station",
+      "Large Combat Platform": "needs a Combat Frame Production",
+      "Wall Platform": "needs a Defense Research Station"
+     },
+     "research": {
+      "Extra Build Card": "needs an Advanced Research Station",
+      "Extra Move/Battle Card": "needs an Advanced Research Station",
+      "Extra Research Card": "needs an Advanced Research Station"
+     },
+     "treaties": "needs a Diplomatic Research Station or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
+     "battle_cards": "needs a Defense Research Station"
+    },
+    "collectors": [
+     {
+      "collector": "water-collector-1",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-2",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-1",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-2",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-3",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-4",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-5",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-6",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-7",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-8",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-9",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-10",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-3",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
+     }
+    ],
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": {
+     "water": 1
+    }
+   },
+   {
+    "player_id": "p4",
+    "kind": "ai",
+    "faction": "The Covenant",
+    "species": "wizard",
+    "culture": 94,
+    "culture_target": 300,
+    "economic_collectors": 26,
+    "next_milestones": [
+     150,
+     225
+    ],
+    "mana_current": 5,
+    "mana_max": 5,
+    "buildings": [
+     "Embassy"
+    ],
+    "building_counts": {
+     "embassy": 1
+    },
+    "research": [],
+    "tech_progress": {
+     "acquired_types": [
+      "surf",
+      "castle",
+      "embassy",
+      "subject",
+      "battle-strategy-card"
+     ],
+     "acquired_type_names": [
+      "Surf",
+      "Castle",
+      "Embassy",
+      "Subject",
+      "Battle strategy card"
+     ],
+     "bonus_points_live": 0,
+     "total": 5,
+     "target": 26
+    },
+    "leader_kills": 0,
+    "military_kills_needed": 2,
+    "leader_alive": true,
+    "subjects": 1,
+    "cores_reserve": 0,
+    "cores_supply": 30,
+    "action_cards": {
+     "build": 1,
+     "moveBattle": 2,
+     "research": 1
+    },
+    "action_card_slots": {
+     "build": [
+      "base"
+     ],
+     "moveBattle": [
+      "base",
+      "hero_extra"
+     ],
+     "research": [
+      "base"
+     ]
+    },
+    "action_cards_played_count": 0,
+    "battle_hand_count": 4,
+    "spy_recruitments": 0,
+    "unrevealed_spies": 0,
+    "units": [],
+    "heroes": [
+     {
+      "hero": "Foreman Hadrik Stoll",
+      "coord": "4,8",
+      "is_leader": true,
+      "dead": false,
+      "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Marshal Corvin Ashlock",
+      "coord": "4,4",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
+     },
+     {
+      "hero": "Captain Rook Malvane",
+      "coord": "4,4",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
+     }
+    ],
+    "bases": [
+     "4,4"
+    ],
+    "locked": {
+     "units": {
+      "Illusionist": "needs a Library of Illusion",
+      "Dragon": "needs a Dragon Hoard",
+      "Enchantress": "needs a Library of Enchantment",
+      "Cleric": "needs a Temple"
+     },
+     "research": {
+      "Ice Blast": "needs a Library of Evocation",
+      "Fiery Explosion": "needs a Library of Evocation",
+      "Mana Shield": "needs a Library of Evocation",
+      "Invisible": "needs a Library of Illusion",
+      "Dehance": "needs a Library of Enchantment",
+      "Detection": "needs a Library of Enchantment",
+      "Extra Move/Battle Card": "needs a Library of Evocation",
+      "Extra Research Card": "needs a Library of Illusion",
+      "Extra Build Card": "needs a Library of Enchantment",
+      "Haste": "needs a Library of Enchantment"
+     },
+     "treaties": null,
+     "battle_cards": null
+    },
+    "collectors": [
+     {
+      "collector": "surf-1",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-2",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-3",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-4",
+      "type": "Surf",
+      "placed_at": null
+     }
+    ],
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": null
+   },
+   {
+    "player_id": "p5",
+    "kind": "ai",
+    "faction": "The Foundry",
+    "species": "robot",
+    "culture": 120,
+    "culture_target": 300,
+    "economic_collectors": 26,
+    "next_milestones": [
+     150,
+     225
+    ],
+    "mana_current": 0,
+    "mana_max": 0,
+    "buildings": [
+     "Diplomatic Research Station"
+    ],
+    "building_counts": {
+     "diplomatic-research-station": 1
+    },
+    "research": [],
+    "tech_progress": {
+     "acquired_types": [
+      "core",
+      "water-collector",
+      "wood-collector",
+      "home",
+      "diplomatic-research-station"
+     ],
+     "acquired_type_names": [
+      "Core",
+      "Water collector",
+      "Wood collector",
+      "Home",
+      "Diplomatic Research Station"
+     ],
+     "bonus_points_live": 0,
+     "total": 5,
+     "target": 25
+    },
+    "leader_kills": 0,
+    "military_kills_needed": 2,
+    "leader_alive": true,
+    "subjects": 0,
+    "cores_reserve": 5,
+    "cores_supply": 15,
+    "action_cards": {
+     "build": 2,
+     "moveBattle": 1,
+     "research": 1
+    },
+    "action_card_slots": {
+     "build": [
+      "base",
+      "hero_extra"
+     ],
+     "moveBattle": [
+      "base"
+     ],
+     "research": [
+      "base"
+     ]
+    },
+    "action_cards_played_count": 0,
+    "battle_hand_count": 0,
+    "spy_recruitments": 0,
+    "unrevealed_spies": 0,
+    "units": [],
+    "heroes": [
+     {
+      "hero": "Quartermaster Bertram Hollis",
+      "coord": "0,2",
+      "is_leader": true,
+      "dead": false,
+      "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Warden Hesper Quill",
+      "coord": "0,14",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
+     },
+     {
+      "hero": "Kestrel Nine",
+      "coord": "0,14",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
+     },
+     {
+      "hero": "Prospector Ida Marrs",
+      "coord": "0,14",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 30 DMG 1 DEF 3"
+     }
+    ],
+    "bases": [
+     "0,14"
     ],
     "locked": {
      "units": {
@@ -885,13 +1517,37 @@
       "core": "allocated"
      },
      {
-      "collector": "ore-collector-1",
-      "type": "Ore collector",
+      "collector": "water-collector-3",
+      "type": "Water collector",
       "placed_at": null,
       "core": "allocated"
      },
      {
-      "collector": "water-collector-3",
+      "collector": "water-collector-4",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-5",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-6",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-7",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-8",
       "type": "Water collector",
       "placed_at": null,
       "core": "allocated"
@@ -904,67 +1560,86 @@
     }
    },
    {
-    "player_id": "p4",
+    "player_id": "p6",
     "kind": "ai",
-    "faction": "The Brass Circle",
+    "faction": "The Schism",
     "species": "wizard",
-    "culture": 27,
-    "culture_target": 100,
-    "economic_collectors": 20,
+    "culture": 54,
+    "culture_target": 300,
+    "economic_collectors": 26,
     "next_milestones": [
-     30,
-     50,
-     75
+     90,
+     150,
+     225
     ],
     "mana_current": 5,
     "mana_max": 5,
     "buildings": [
-     "Embassy"
+     "Library of Illusion",
+     "Library of Evocation",
+     "Library of Enchantment"
     ],
     "building_counts": {
-     "embassy": 1
+     "library-of-illusion": 1,
+     "library-of-evocation": 1,
+     "library-of-enchantment": 1
     },
-    "research": [],
+    "research": [
+     "invisible",
+     "extra-move-battle-card",
+     "extra-research-card",
+     "extra-build-card"
+    ],
     "tech_progress": {
      "acquired_types": [
       "surf",
       "castle",
-      "embassy",
-      "subject",
-      "battle-strategy-card"
+      "library-of-illusion",
+      "invisible",
+      "library-of-evocation",
+      "extra-move-battle-card",
+      "library-of-enchantment",
+      "extra-research-card",
+      "extra-build-card"
      ],
      "acquired_type_names": [
       "Surf",
       "Castle",
-      "Embassy",
-      "Subject",
-      "Battle strategy card"
+      "Library of Illusion",
+      "Invisible",
+      "Library of Evocation",
+      "Extra Move/Battle Card",
+      "Library of Enchantment",
+      "Extra Research Card",
+      "Extra Build Card"
      ],
-     "bonus_points_live": 0,
-     "total": 5,
+     "bonus_points_live": 4,
+     "total": 13,
      "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
     "leader_alive": true,
-    "subjects": 1,
+    "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 24,
+    "cores_supply": 30,
     "action_cards": {
      "build": 2,
-     "moveBattle": 1,
-     "research": 1
+     "moveBattle": 2,
+     "research": 2
     },
     "action_card_slots": {
      "build": [
       "base",
-      "hero_extra"
+      "researched_extra"
      ],
      "moveBattle": [
-      "base"
+      "base",
+      "researched_extra"
      ],
      "research": [
-      "base"
+      "base",
+      "researched_extra"
      ]
     },
     "action_cards_played_count": 0,
@@ -974,51 +1649,38 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Quartermaster Bertram Hollis",
-      "coord": "-2,8",
+      "hero": "Technomancer Greymore",
+      "coord": "0,0",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
      },
      {
-      "hero": "Archmage Elara",
-      "coord": "-2,4",
+      "hero": "Envoy Sable Marrow",
+      "coord": "0,0",
       "is_leader": false,
       "dead": false,
-      "stats": "Init 70 DMG 3 DEF 4"
+      "stats": "Init 30 DMG 1 DEF 3"
      },
      {
-      "hero": "Kestrel Nine",
-      "coord": "-2,4",
+      "hero": "Dr. Elayn Smyth",
+      "coord": "0,0",
       "is_leader": false,
       "dead": false,
-      "stats": "Init 70 DMG 3 DEF 4"
+      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
-     "-2,4"
+     "0,0"
     ],
     "locked": {
      "units": {
-      "Illusionist": "needs a Library of Illusion",
       "Dragon": "needs a Dragon Hoard",
-      "Enchantress": "needs a Library of Enchantment",
       "Cleric": "needs a Temple"
      },
-     "research": {
-      "Ice Blast": "needs a Library of Evocation",
-      "Fiery Explosion": "needs a Library of Evocation",
-      "Mana Shield": "needs a Library of Evocation",
-      "Invisible": "needs a Library of Illusion",
-      "Dehance": "needs a Library of Enchantment",
-      "Detection": "needs a Library of Enchantment",
-      "Extra Move/Battle Card": "needs a Library of Evocation",
-      "Extra Research Card": "needs a Library of Illusion",
-      "Extra Build Card": "needs a Library of Enchantment",
-      "Haste": "needs a Library of Enchantment"
-     },
+     "research": {},
      "treaties": null,
-     "battle_cards": null
+     "battle_cards": "needs an Embassy"
     },
     "collectors": [
      {
@@ -1038,6 +1700,31 @@
      },
      {
       "collector": "surf-4",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-5",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-6",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-7",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-8",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-9",
       "type": "Surf",
       "placed_at": null
      }
@@ -1072,28 +1759,146 @@
   }
  ],
  "unavailable": [],
- "watcher": "p1",
+ "watcher": "p2",
  "watcherView": {
   "game_id": "neither-guts-nor-gears",
   "phase": "planning",
-  "round": 5,
-  "active_player_id": "p3",
-  "first_player_id": "p2",
-  "layout": "threeFour",
+  "round": 10,
+  "active_player_id": "p1",
+  "first_player_id": "p1",
+  "layout": "fiveSix",
   "map": {
    "tiles": [
+    {
+     "coord": "-4,4",
+     "label": "A3",
+     "printed_resource": "water",
+     "current_resource": "ether",
+     "start": 5,
+     "base_owner": "p2",
+     "units": [],
+     "heroes": [
+      "Chronicler Ottoline Vey (p2)",
+      "Archmage Elara (p2)",
+      "Conjurer Mayhew (p2)"
+     ],
+     "collectors": []
+    },
+    {
+     "coord": "-4,6",
+     "label": "A4",
+     "printed_resource": "wood",
+     "current_resource": "wood",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": []
+    },
+    {
+     "coord": "-4,8",
+     "label": "A5",
+     "printed_resource": "wood",
+     "current_resource": "wood",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": []
+    },
+    {
+     "coord": "-4,10",
+     "label": "A6",
+     "printed_resource": "water",
+     "current_resource": "water",
+     "start": 6,
+     "base_owner": "p1",
+     "units": [],
+     "heroes": [
+      "Evo Angel (p1)",
+      "Dowser Wren Calloway (p1)",
+      "Derrick Prime (p1)"
+     ],
+     "collectors": []
+    },
+    {
+     "coord": "-3,3",
+     "label": "B2",
+     "printed_resource": "wood",
+     "current_resource": "wood",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": []
+    },
+    {
+     "coord": "-3,5",
+     "label": "B3",
+     "printed_resource": "water",
+     "current_resource": "water",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [
+      "Archmage Chaimidious (p1)",
+      "Archivist Solenne Dray (p2)"
+     ],
+     "collectors": []
+    },
+    {
+     "coord": "-3,7",
+     "label": "B4",
+     "printed_resource": "water",
+     "current_resource": "water",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": []
+    },
+    {
+     "coord": "-3,9",
+     "label": "B5",
+     "printed_resource": "water",
+     "current_resource": "water",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": []
+    },
+    {
+     "coord": "-3,11",
+     "label": "B6",
+     "printed_resource": "wood",
+     "current_resource": "wood",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": []
+    },
+    {
+     "coord": "-2,2",
+     "label": "C2",
+     "printed_resource": "ore",
+     "current_resource": "ore",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": []
+    },
     {
      "coord": "-2,4",
      "label": "C3",
      "printed_resource": "water",
      "current_resource": "water",
-     "start": 4,
-     "base_owner": "p4",
+     "start": null,
+     "base_owner": null,
      "units": [],
-     "heroes": [
-      "Archmage Elara (p4)",
-      "Kestrel Nine (p4)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -1115,9 +1920,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Quartermaster Bertram Hollis (p4)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -1128,9 +1931,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Foreman Hadrik Stoll (p3)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -1138,14 +1939,21 @@
      "label": "C7",
      "printed_resource": "water",
      "current_resource": "water",
-     "start": 1,
-     "base_owner": "p3",
+     "start": null,
+     "base_owner": null,
      "units": [],
-     "heroes": [
-      "Evo Angel (p3)",
-      "Dowser Wren Calloway (p3)",
-      "Derrick Prime (p3)"
-     ],
+     "heroes": [],
+     "collectors": []
+    },
+    {
+     "coord": "-1,1",
+     "label": "D1",
+     "printed_resource": "wood",
+     "current_resource": "wood",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -1215,6 +2023,21 @@
      "collectors": []
     },
     {
+     "coord": "0,0",
+     "label": "E1",
+     "printed_resource": "water",
+     "current_resource": "water",
+     "start": 4,
+     "base_owner": "p6",
+     "units": [],
+     "heroes": [
+      "Technomancer Greymore (p6)",
+      "Envoy Sable Marrow (p6)",
+      "Dr. Elayn Smyth (p6)"
+     ],
+     "collectors": []
+    },
+    {
      "coord": "0,2",
      "label": "E2",
      "printed_resource": "ore",
@@ -1222,7 +2045,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Quartermaster Bertram Hollis (p5)"
+     ],
      "collectors": []
     },
     {
@@ -1255,10 +2080,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Archmage Chaimidious (p1)",
-      "Chronicler Ottoline Vey (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -1287,7 +2109,22 @@
      "coord": "0,14",
      "label": "E8",
      "printed_resource": "water",
-     "current_resource": "water",
+     "current_resource": "ore",
+     "start": 1,
+     "base_owner": "p5",
+     "units": [],
+     "heroes": [
+      "Warden Hesper Quill (p5)",
+      "Kestrel Nine (p5)",
+      "Prospector Ida Marrs (p5)"
+     ],
+     "collectors": []
+    },
+    {
+     "coord": "1,1",
+     "label": "F1",
+     "printed_resource": "wood",
+     "current_resource": "wood",
      "start": null,
      "base_owner": null,
      "units": [],
@@ -1361,18 +2198,25 @@
      "collectors": []
     },
     {
+     "coord": "2,2",
+     "label": "G2",
+     "printed_resource": "water",
+     "current_resource": "water",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": []
+    },
+    {
      "coord": "2,4",
      "label": "G3",
      "printed_resource": "water",
-     "current_resource": "ore",
-     "start": 3,
-     "base_owner": "p2",
+     "current_resource": "water",
+     "start": null,
+     "base_owner": null,
      "units": [],
-     "heroes": [
-      "Marshal Corvin Ashlock (p2)",
-      "Captain Rook Malvane (p2)",
-      "Prospector Ida Marrs (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -1413,27 +2257,130 @@
      "label": "G7",
      "printed_resource": "water",
      "current_resource": "water",
-     "start": 2,
-     "base_owner": "p1",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": []
+    },
+    {
+     "coord": "3,3",
+     "label": "H2",
+     "printed_resource": "wood",
+     "current_resource": "wood",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": []
+    },
+    {
+     "coord": "3,5",
+     "label": "H3",
+     "printed_resource": "wood",
+     "current_resource": "wood",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": []
+    },
+    {
+     "coord": "3,7",
+     "label": "H4",
+     "printed_resource": "wood",
+     "current_resource": "wood",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": []
+    },
+    {
+     "coord": "3,9",
+     "label": "H5",
+     "printed_resource": "wood",
+     "current_resource": "wood",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": []
+    },
+    {
+     "coord": "3,11",
+     "label": "H6",
+     "printed_resource": "wood",
+     "current_resource": "wood",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": []
+    },
+    {
+     "coord": "4,4",
+     "label": "I3",
+     "printed_resource": "water",
+     "current_resource": "water",
+     "start": 3,
+     "base_owner": "p4",
      "units": [],
      "heroes": [
-      "Warden Hesper Quill (p1)",
-      "Envoy Sable Marrow (p1)"
+      "Motherboard (p3)",
+      "Marshal Corvin Ashlock (p4)",
+      "Captain Rook Malvane (p4)"
      ],
+     "collectors": []
+    },
+    {
+     "coord": "4,6",
+     "label": "I4",
+     "printed_resource": "water",
+     "current_resource": "water",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": []
+    },
+    {
+     "coord": "4,8",
+     "label": "I5",
+     "printed_resource": "water",
+     "current_resource": "water",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [
+      "Foreman Hadrik Stoll (p4)",
+      "Professor Anselm Kettering (p3)"
+     ],
+     "collectors": []
+    },
+    {
+     "coord": "4,10",
+     "label": "I6",
+     "printed_resource": "water",
+     "current_resource": "water",
+     "start": 2,
+     "base_owner": "p3",
+     "units": [],
+     "heroes": [],
      "collectors": []
     }
    ]
   },
-  "hero_pool_count": 6,
+  "hero_pool_count": 0,
   "action_stack": [],
   "active_action": null,
   "resolving_action": null,
   "treaties": [
    {
-    "treaty": "Shared Resources",
+    "treaty": "Culture Treaty",
     "partners": [
-     "p4",
-     "p3"
+     "p2",
+     "p5"
     ],
     "culture_income": 2
    },
@@ -1452,22 +2399,51 @@
      "p1"
     ],
     "culture_income": 2
+   },
+   {
+    "treaty": "Shared Resources",
+    "partners": [
+     "p5",
+     "p1"
+    ],
+    "culture_income": 2
+   },
+   {
+    "treaty": "Open Borders",
+    "partners": [
+     "p4",
+     "p3"
+    ],
+    "culture_income": 2
+   },
+   {
+    "treaty": "Culture Treaty",
+    "partners": [
+     "p3",
+     "p6"
+    ],
+    "culture_income": 2
    }
   ],
   "battle": null,
-  "battle_deck_count": 15,
+  "battle_deck_count": 5,
   "battle_discard": [
+   "Initiative",
    "Counter",
-   "Rally",
+   "Extra",
+   "Extra",
+   "Bonus (−1 DMG to all opposing units)",
+   "Counter",
+   "Bonus (+1 DMG to all your units)",
    "Bonus (−1 DEF to all opposing units)",
    "Bonus (+1 DEF to all your units)"
   ],
   "pending": {
    "kind": "overlay_choice",
-   "for": "p3",
-   "question": "p3 picks the active Economy overlay",
+   "for": "p1",
+   "question": "p1 picks the active Economy overlay",
    "context": {
-    "tile": "C7",
+    "tile": "A6",
     "printed_resource": "water"
    },
    "options": [
@@ -1475,7 +2451,7 @@
      "option_id": "wren",
      "label": "Dowser Wren Calloway",
      "detail": {
-      "owner": "p3",
+      "owner": "p1",
       "resource": null
      }
     },
@@ -1483,7 +2459,7 @@
      "option_id": "derrick",
      "label": "Derrick Prime",
      "detail": {
-      "owner": "p3",
+      "owner": "p1",
       "resource": "oil"
      }
     }
@@ -1491,26 +2467,38 @@
   },
   "victory_status": {
    "p1": {
-    "culture": 27,
-    "tech": 5,
+    "culture": 93,
+    "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p2": {
-    "culture": 32,
+    "culture": 104,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p3": {
-    "culture": 31,
-    "tech": 6,
+    "culture": 48,
+    "tech": 8,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p4": {
-    "culture": 27,
+    "culture": 94,
     "tech": 5,
+    "leader_kills": 0,
+    "leader_alive": true
+   },
+   "p5": {
+    "culture": 120,
+    "tech": 5,
+    "leader_kills": 0,
+    "leader_alive": true
+   },
+   "p6": {
+    "culture": 54,
+    "tech": 13,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -1520,50 +2508,43 @@
    {
     "player_id": "p1",
     "kind": "human",
-    "faction": "The Foundry",
+    "faction": "The Ledger",
     "species": "robot",
-    "culture": 27,
-    "culture_target": 100,
-    "economic_collectors": 20,
+    "culture": 93,
+    "culture_target": 300,
+    "economic_collectors": 26,
     "next_milestones": [
-     30,
-     50,
-     75
+     150,
+     225
     ],
     "mana_current": 0,
     "mana_max": 0,
-    "buildings": [
-     "Diplomatic Research Station"
-    ],
-    "building_counts": {
-     "diplomatic-research-station": 1
-    },
+    "buildings": [],
+    "building_counts": {},
     "research": [],
     "tech_progress": {
      "acquired_types": [
       "core",
       "water-collector",
       "wood-collector",
-      "home",
-      "diplomatic-research-station"
+      "home"
      ],
      "acquired_type_names": [
       "Core",
       "Water collector",
       "Wood collector",
-      "Home",
-      "Diplomatic Research Station"
+      "Home"
      ],
      "bonus_points_live": 0,
-     "total": 5,
-     "target": 24
+     "total": 4,
+     "target": 25
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
     "leader_alive": true,
     "subjects": 0,
-    "cores_reserve": 3,
-    "cores_supply": 17,
+    "cores_reserve": 9,
+    "cores_supply": 16,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -1588,33 +2569,41 @@
     "heroes": [
      {
       "hero": "Archmage Chaimidious",
-      "coord": "0,8",
+      "coord": "-3,5",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
      },
      {
-      "hero": "Warden Hesper Quill",
-      "coord": "2,12",
+      "hero": "Evo Angel",
+      "coord": "-4,10",
       "is_leader": false,
       "dead": false,
-      "stats": "Init 70 DMG 3 DEF 4"
+      "stats": "Init 80 DMG 4 DEF 4"
      },
      {
-      "hero": "Envoy Sable Marrow",
-      "coord": "2,12",
+      "hero": "Dowser Wren Calloway",
+      "coord": "-4,10",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 30 DMG 1 DEF 3"
+     },
+     {
+      "hero": "Derrick Prime",
+      "coord": "-4,10",
       "is_leader": false,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
-     "2,12"
+     "-4,10"
     ],
     "locked": {
      "units": {
       "Spinner Platform": "needs a Combat Frame Production",
       "Spitter Platform": "needs a Combat Frame Production",
+      "Infiltrator Platform": "needs a Diplomatic Research Station",
       "Large Combat Platform": "needs a Combat Frame Production",
       "Wall Platform": "needs a Defense Research Station"
      },
@@ -1623,7 +2612,7 @@
       "Extra Move/Battle Card": "needs an Advanced Research Station",
       "Extra Research Card": "needs an Advanced Research Station"
      },
-     "treaties": null,
+     "treaties": "needs a Diplomatic Research Station or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
      "battle_cards": "needs a Defense Research Station"
     },
     "collectors": [
@@ -1650,6 +2639,12 @@
       "type": "Wood collector",
       "placed_at": null,
       "core": "allocated"
+     },
+     {
+      "collector": "water-collector-3",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
      }
     ],
     "committed_collectors": [],
@@ -1661,14 +2656,14 @@
    {
     "player_id": "p2",
     "kind": "ai",
-    "faction": "The Schism",
+    "faction": "The Brass Circle",
     "species": "wizard",
-    "culture": 32,
-    "culture_target": 100,
-    "economic_collectors": 20,
+    "culture": 104,
+    "culture_target": 300,
+    "economic_collectors": 26,
     "next_milestones": [
-     50,
-     75
+     150,
+     225
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -1701,61 +2696,61 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 24,
+    "cores_supply": 30,
     "action_cards": {
      "build": 1,
-     "moveBattle": 2,
-     "research": 1
+     "moveBattle": 1,
+     "research": 2
     },
     "action_card_slots": {
      "build": [
       "base"
      ],
      "moveBattle": [
-      "base",
-      "hero_extra"
+      "base"
      ],
      "research": [
-      "base"
+      "base",
+      "hero_extra"
      ]
     },
     "action_cards_played_count": 0,
-    "battle_hand_count": 1,
+    "battle_hand_count": 2,
     "spy_recruitments": 0,
     "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Chronicler Ottoline Vey",
-      "coord": "0,8",
+      "hero": "Archivist Solenne Dray",
+      "coord": "-3,5",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
      },
      {
-      "hero": "Marshal Corvin Ashlock",
-      "coord": "2,4",
+      "hero": "Chronicler Ottoline Vey",
+      "coord": "-4,4",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 30 DMG 1 DEF 3"
+     },
+     {
+      "hero": "Archmage Elara",
+      "coord": "-4,4",
       "is_leader": false,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 4"
      },
      {
-      "hero": "Captain Rook Malvane",
-      "coord": "2,4",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 70 DMG 3 DEF 4"
-     },
-     {
-      "hero": "Prospector Ida Marrs",
-      "coord": "2,4",
+      "hero": "Conjurer Mayhew",
+      "coord": "-4,4",
       "is_leader": false,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
-     "2,4"
+     "-4,4"
     ],
     "locked": {
      "units": {
@@ -1808,51 +2803,44 @@
    {
     "player_id": "p3",
     "kind": "ai",
-    "faction": "The Ledger",
+    "faction": "The Unbolted",
     "species": "robot",
-    "culture": 31,
-    "culture_target": 100,
-    "economic_collectors": 20,
+    "culture": 48,
+    "culture_target": 300,
+    "economic_collectors": 26,
     "next_milestones": [
-     50,
-     75
+     90,
+     150,
+     225
     ],
     "mana_current": 0,
     "mana_max": 0,
-    "buildings": [
-     "Diplomatic Research Station"
-    ],
-    "building_counts": {
-     "diplomatic-research-station": 1
-    },
+    "buildings": [],
+    "building_counts": {},
     "research": [],
     "tech_progress": {
      "acquired_types": [
       "core",
       "water-collector",
       "wood-collector",
-      "home",
-      "ore-collector",
-      "diplomatic-research-station"
+      "home"
      ],
      "acquired_type_names": [
       "Core",
       "Water collector",
       "Wood collector",
-      "Home",
-      "Ore collector",
-      "Diplomatic Research Station"
+      "Home"
      ],
-     "bonus_points_live": 0,
-     "total": 6,
-     "target": 24
+     "bonus_points_live": 4,
+     "total": 8,
+     "target": 25
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
     "leader_alive": true,
     "subjects": 0,
-    "cores_reserve": 5,
-    "cores_supply": 13,
+    "cores_reserve": 0,
+    "cores_supply": 17,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -1876,41 +2864,28 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Foreman Hadrik Stoll",
-      "coord": "-2,10",
+      "hero": "Motherboard",
+      "coord": "4,4",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
      },
      {
-      "hero": "Evo Angel",
-      "coord": "-2,12",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 80 DMG 4 DEF 4"
-     },
-     {
-      "hero": "Dowser Wren Calloway",
-      "coord": "-2,12",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 30 DMG 1 DEF 3"
-     },
-     {
-      "hero": "Derrick Prime",
-      "coord": "-2,12",
+      "hero": "Professor Anselm Kettering",
+      "coord": "4,8",
       "is_leader": false,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
-     "-2,12"
+     "4,10"
     ],
     "locked": {
      "units": {
       "Spinner Platform": "needs a Combat Frame Production",
       "Spitter Platform": "needs a Combat Frame Production",
+      "Infiltrator Platform": "needs a Diplomatic Research Station",
       "Large Combat Platform": "needs a Combat Frame Production",
       "Wall Platform": "needs a Defense Research Station"
      },
@@ -1919,7 +2894,7 @@
       "Extra Move/Battle Card": "needs an Advanced Research Station",
       "Extra Research Card": "needs an Advanced Research Station"
      },
-     "treaties": null,
+     "treaties": "needs a Diplomatic Research Station or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
      "battle_cards": "needs a Defense Research Station"
     },
     "collectors": [
@@ -1948,14 +2923,56 @@
       "core": "allocated"
      },
      {
-      "collector": "ore-collector-1",
-      "type": "Ore collector",
+      "collector": "water-collector-3",
+      "type": "Water collector",
       "placed_at": null,
       "core": "allocated"
      },
      {
-      "collector": "water-collector-3",
+      "collector": "water-collector-4",
       "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-5",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-6",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-7",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-8",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-9",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-10",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-3",
+      "type": "Wood collector",
       "placed_at": null,
       "core": "allocated"
      }
@@ -1969,15 +2986,14 @@
    {
     "player_id": "p4",
     "kind": "ai",
-    "faction": "The Brass Circle",
+    "faction": "The Covenant",
     "species": "wizard",
-    "culture": 27,
-    "culture_target": 100,
-    "economic_collectors": 20,
+    "culture": 94,
+    "culture_target": 300,
+    "economic_collectors": 26,
     "next_milestones": [
-     30,
-     50,
-     75
+     150,
+     225
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -2012,54 +3028,54 @@
     "leader_alive": true,
     "subjects": 1,
     "cores_reserve": 0,
-    "cores_supply": 24,
+    "cores_supply": 30,
     "action_cards": {
-     "build": 2,
-     "moveBattle": 1,
+     "build": 1,
+     "moveBattle": 2,
      "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base",
-      "hero_extra"
+      "base"
      ],
      "moveBattle": [
-      "base"
+      "base",
+      "hero_extra"
      ],
      "research": [
       "base"
      ]
     },
     "action_cards_played_count": 0,
-    "battle_hand_count": 0,
+    "battle_hand_count": 4,
     "spy_recruitments": 0,
     "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Quartermaster Bertram Hollis",
-      "coord": "-2,8",
+      "hero": "Foreman Hadrik Stoll",
+      "coord": "4,8",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
      },
      {
-      "hero": "Archmage Elara",
-      "coord": "-2,4",
+      "hero": "Marshal Corvin Ashlock",
+      "coord": "4,4",
       "is_leader": false,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 4"
      },
      {
-      "hero": "Kestrel Nine",
-      "coord": "-2,4",
+      "hero": "Captain Rook Malvane",
+      "coord": "4,4",
       "is_leader": false,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 4"
      }
     ],
     "bases": [
-     "-2,4"
+     "4,4"
     ],
     "locked": {
      "units": {
@@ -2108,9 +3124,376 @@
     "committed_collectors": [],
     "bank": {},
     "paired_core_cost": null
+   },
+   {
+    "player_id": "p5",
+    "kind": "ai",
+    "faction": "The Foundry",
+    "species": "robot",
+    "culture": 120,
+    "culture_target": 300,
+    "economic_collectors": 26,
+    "next_milestones": [
+     150,
+     225
+    ],
+    "mana_current": 0,
+    "mana_max": 0,
+    "buildings": [
+     "Diplomatic Research Station"
+    ],
+    "building_counts": {
+     "diplomatic-research-station": 1
+    },
+    "research": [],
+    "tech_progress": {
+     "acquired_types": [
+      "core",
+      "water-collector",
+      "wood-collector",
+      "home",
+      "diplomatic-research-station"
+     ],
+     "acquired_type_names": [
+      "Core",
+      "Water collector",
+      "Wood collector",
+      "Home",
+      "Diplomatic Research Station"
+     ],
+     "bonus_points_live": 0,
+     "total": 5,
+     "target": 25
+    },
+    "leader_kills": 0,
+    "military_kills_needed": 2,
+    "leader_alive": true,
+    "subjects": 0,
+    "cores_reserve": 5,
+    "cores_supply": 15,
+    "action_cards": {
+     "build": 2,
+     "moveBattle": 1,
+     "research": 1
+    },
+    "action_card_slots": {
+     "build": [
+      "base",
+      "hero_extra"
+     ],
+     "moveBattle": [
+      "base"
+     ],
+     "research": [
+      "base"
+     ]
+    },
+    "action_cards_played_count": 0,
+    "battle_hand_count": 0,
+    "spy_recruitments": 0,
+    "unrevealed_spies": 0,
+    "units": [],
+    "heroes": [
+     {
+      "hero": "Quartermaster Bertram Hollis",
+      "coord": "0,2",
+      "is_leader": true,
+      "dead": false,
+      "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Warden Hesper Quill",
+      "coord": "0,14",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
+     },
+     {
+      "hero": "Kestrel Nine",
+      "coord": "0,14",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
+     },
+     {
+      "hero": "Prospector Ida Marrs",
+      "coord": "0,14",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 30 DMG 1 DEF 3"
+     }
+    ],
+    "bases": [
+     "0,14"
+    ],
+    "locked": {
+     "units": {
+      "Spinner Platform": "needs a Combat Frame Production",
+      "Spitter Platform": "needs a Combat Frame Production",
+      "Large Combat Platform": "needs a Combat Frame Production",
+      "Wall Platform": "needs a Defense Research Station"
+     },
+     "research": {
+      "Extra Build Card": "needs an Advanced Research Station",
+      "Extra Move/Battle Card": "needs an Advanced Research Station",
+      "Extra Research Card": "needs an Advanced Research Station"
+     },
+     "treaties": null,
+     "battle_cards": "needs a Defense Research Station"
+    },
+    "collectors": [
+     {
+      "collector": "water-collector-1",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-2",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-1",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "wood-collector-2",
+      "type": "Wood collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-3",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-4",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-5",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-6",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-7",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-8",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
+     }
+    ],
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": {
+     "water": 1
+    }
+   },
+   {
+    "player_id": "p6",
+    "kind": "ai",
+    "faction": "The Schism",
+    "species": "wizard",
+    "culture": 54,
+    "culture_target": 300,
+    "economic_collectors": 26,
+    "next_milestones": [
+     90,
+     150,
+     225
+    ],
+    "mana_current": 5,
+    "mana_max": 5,
+    "buildings": [
+     "Library of Illusion",
+     "Library of Evocation",
+     "Library of Enchantment"
+    ],
+    "building_counts": {
+     "library-of-illusion": 1,
+     "library-of-evocation": 1,
+     "library-of-enchantment": 1
+    },
+    "research": [
+     "invisible",
+     "extra-move-battle-card",
+     "extra-research-card",
+     "extra-build-card"
+    ],
+    "tech_progress": {
+     "acquired_types": [
+      "surf",
+      "castle",
+      "library-of-illusion",
+      "invisible",
+      "library-of-evocation",
+      "extra-move-battle-card",
+      "library-of-enchantment",
+      "extra-research-card",
+      "extra-build-card"
+     ],
+     "acquired_type_names": [
+      "Surf",
+      "Castle",
+      "Library of Illusion",
+      "Invisible",
+      "Library of Evocation",
+      "Extra Move/Battle Card",
+      "Library of Enchantment",
+      "Extra Research Card",
+      "Extra Build Card"
+     ],
+     "bonus_points_live": 4,
+     "total": 13,
+     "target": 26
+    },
+    "leader_kills": 0,
+    "military_kills_needed": 2,
+    "leader_alive": true,
+    "subjects": 0,
+    "cores_reserve": 0,
+    "cores_supply": 30,
+    "action_cards": {
+     "build": 2,
+     "moveBattle": 2,
+     "research": 2
+    },
+    "action_card_slots": {
+     "build": [
+      "base",
+      "researched_extra"
+     ],
+     "moveBattle": [
+      "base",
+      "researched_extra"
+     ],
+     "research": [
+      "base",
+      "researched_extra"
+     ]
+    },
+    "action_cards_played_count": 0,
+    "battle_hand_count": 0,
+    "spy_recruitments": 0,
+    "unrevealed_spies": 0,
+    "units": [],
+    "heroes": [
+     {
+      "hero": "Technomancer Greymore",
+      "coord": "0,0",
+      "is_leader": true,
+      "dead": false,
+      "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Envoy Sable Marrow",
+      "coord": "0,0",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 30 DMG 1 DEF 3"
+     },
+     {
+      "hero": "Dr. Elayn Smyth",
+      "coord": "0,0",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 30 DMG 1 DEF 3"
+     }
+    ],
+    "bases": [
+     "0,0"
+    ],
+    "locked": {
+     "units": {
+      "Dragon": "needs a Dragon Hoard",
+      "Cleric": "needs a Temple"
+     },
+     "research": {},
+     "treaties": null,
+     "battle_cards": "needs an Embassy"
+    },
+    "collectors": [
+     {
+      "collector": "surf-1",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-2",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-3",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-4",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-5",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-6",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-7",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-8",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-9",
+      "type": "Surf",
+      "placed_at": null
+     }
+    ],
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": null
    }
   ],
-  "your_battle_hand": [],
+  "your_battle_hand": [
+   {
+    "card": "Retreat",
+    "effect": "Immediately retreat all your mobile units from this battle using normal retreat rules."
+   },
+   {
+    "card": "Bonus (−1 DMG to all opposing units)",
+    "effect": "−1 DMG to all opposing units in the battle."
+   }
+  ],
   "your_action_cards_played": [],
   "your_spy_assignments": [],
   "your_knowledge": [],

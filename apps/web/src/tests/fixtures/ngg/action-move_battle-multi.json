@@ -1,12 +1,12 @@
 {
  "key": "action-move_battle",
  "players": 4,
- "viewer": "p4",
+ "viewer": "p3",
  "view": {
   "game_id": "neither-guts-nor-gears",
   "phase": "action",
   "round": 1,
-  "active_player_id": "p4",
+  "active_player_id": "p3",
   "first_player_id": "p2",
   "layout": "threeFour",
   "map": {
@@ -20,7 +20,7 @@
      "base_owner": "p4",
      "units": [],
      "heroes": [
-      "Quartermaster Bertram Hollis (p4)"
+      "Motherboard (p4)"
      ],
      "collectors": []
     },
@@ -66,7 +66,7 @@
      "base_owner": "p3",
      "units": [],
      "heroes": [
-      "Foreman Hadrik Stoll (p3)"
+      "Quartermaster Bertram Hollis (p3)"
      ],
      "collectors": []
     },
@@ -288,7 +288,7 @@
      "base_owner": "p2",
      "units": [],
      "heroes": [
-      "Chronicler Ottoline Vey (p2)"
+      "Foreman Hadrik Stoll (p2)"
      ],
      "collectors": []
     },
@@ -350,12 +350,12 @@
    {
     "position": 2,
     "owner": "p3",
-    "face": "down"
+    "card_kind": "build"
    },
    {
     "position": 3,
     "owner": "p4",
-    "card_kind": "build"
+    "face": "down"
    },
    {
     "position": 4,
@@ -370,12 +370,12 @@
    {
     "position": 6,
     "owner": "p3",
-    "face": "down"
+    "card_kind": "build"
    },
    {
     "position": 7,
     "owner": "p4",
-    "card_kind": "build"
+    "face": "down"
    },
    {
     "position": 8,
@@ -390,12 +390,12 @@
    {
     "position": 10,
     "owner": "p3",
-    "face": "down"
+    "card_kind": "research"
    },
    {
     "position": 11,
     "owner": "p4",
-    "card_kind": "research"
+    "face": "down"
    },
    {
     "position": 12,
@@ -404,14 +404,14 @@
    },
    {
     "position": 13,
-    "owner": "p4",
+    "owner": "p3",
     "card_kind": "move_battle"
    }
   ],
-  "active_action": "move_battle by p4",
+  "active_action": "move_battle by p3",
   "resolving_action": {
    "card_kind": "move_battle",
-   "owner": "p4",
+   "owner": "p3",
    "finished": false
   },
   "treaties": [],
@@ -440,7 +440,7 @@
    },
    "p4": {
     "culture": 0,
-    "tech": 2,
+    "tech": 6,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -453,14 +453,14 @@
     "faction": "The Foundry",
     "species": "robot",
     "culture": 0,
-    "culture_target": 100,
+    "culture_target": 200,
     "economic_collectors": 20,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -482,7 +482,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 24
+     "target": 25
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -577,14 +577,14 @@
     "faction": "The Schism",
     "species": "wizard",
     "culture": 0,
-    "culture_target": 100,
+    "culture_target": 200,
     "economic_collectors": 20,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -633,7 +633,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Chronicler Ottoline Vey",
+      "hero": "Foreman Hadrik Stoll",
       "coord": "2,4",
       "is_leader": true,
       "dead": false,
@@ -692,14 +692,14 @@
     "faction": "The Ledger",
     "species": "robot",
     "culture": 0,
-    "culture_target": 100,
+    "culture_target": 200,
     "economic_collectors": 20,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -721,7 +721,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 24
+     "target": 25
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -730,13 +730,14 @@
     "cores_reserve": 0,
     "cores_supply": 20,
     "action_cards": {
-     "build": 1,
+     "build": 2,
      "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base"
+      "base",
+      "hero_extra"
      ],
      "moveBattle": [
       "base"
@@ -745,14 +746,14 @@
       "base"
      ]
     },
-    "action_cards_played_count": 3,
+    "action_cards_played_count": 4,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Foreman Hadrik Stoll",
+      "hero": "Quartermaster Bertram Hollis",
       "coord": "-2,12",
       "is_leader": true,
       "dead": false,
@@ -816,14 +817,14 @@
     "faction": "The Brass Circle",
     "species": "wizard",
     "culture": 0,
-    "culture_target": 100,
+    "culture_target": 200,
     "economic_collectors": 20,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -839,8 +840,8 @@
       "Surf",
       "Castle"
      ],
-     "bonus_points_live": 0,
-     "total": 2,
+     "bonus_points_live": 4,
+     "total": 6,
      "target": 26
     },
     "leader_kills": 0,
@@ -850,14 +851,13 @@
     "cores_reserve": 0,
     "cores_supply": 24,
     "action_cards": {
-     "build": 2,
+     "build": 1,
      "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base",
-      "hero_extra"
+      "base"
      ],
      "moveBattle": [
       "base"
@@ -866,14 +866,14 @@
       "base"
      ]
     },
-    "action_cards_played_count": 4,
+    "action_cards_played_count": 3,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Quartermaster Bertram Hollis",
+      "hero": "Motherboard",
       "coord": "-2,4",
       "is_leader": true,
       "dead": false,
@@ -941,11 +941,11 @@
  "legalMoves": [
   {
    "move_id": "",
-   "description": "Move Quartermaster Bertram Hollis from C3 to C4 (water).",
+   "description": "Move Quartermaster Bertram Hollis from C7 to C6 (wood).",
    "move": {
     "type": "move_units",
-    "from": "-2,4",
-    "to": "-2,6",
+    "from": "-2,12",
+    "to": "-2,10",
     "units": [
      "quartermaster"
     ]
@@ -953,11 +953,11 @@
   },
   {
    "move_id": "",
-   "description": "Move Quartermaster Bertram Hollis from C3 to D2 (water).",
+   "description": "Move Quartermaster Bertram Hollis from C7 to D6 (wood).",
    "move": {
     "type": "move_units",
-    "from": "-2,4",
-    "to": "-1,3",
+    "from": "-2,12",
+    "to": "-1,11",
     "units": [
      "quartermaster"
     ]
@@ -965,11 +965,11 @@
   },
   {
    "move_id": "",
-   "description": "Move Quartermaster Bertram Hollis from C3 to D3 (wood).",
+   "description": "Move Quartermaster Bertram Hollis from C7 to D7 (wood).",
    "move": {
     "type": "move_units",
-    "from": "-2,4",
-    "to": "-1,5",
+    "from": "-2,12",
+    "to": "-1,13",
     "units": [
      "quartermaster"
     ]
@@ -986,7 +986,7 @@
  "unavailable": [
   {
    "moveType": "form_treaty",
-   "reason": "a treaty needs an unlock on one side — an Embassy or an active Envoy Sable Marrow; no one who could partner with you has one"
+   "reason": "a treaty needs an unlock on one side — a Diplomatic Research Station or an active Envoy Sable Marrow; no one who could partner with you has one"
   }
  ],
  "watcher": "p1",
@@ -994,7 +994,7 @@
   "game_id": "neither-guts-nor-gears",
   "phase": "action",
   "round": 1,
-  "active_player_id": "p4",
+  "active_player_id": "p3",
   "first_player_id": "p2",
   "layout": "threeFour",
   "map": {
@@ -1008,7 +1008,7 @@
      "base_owner": "p4",
      "units": [],
      "heroes": [
-      "Quartermaster Bertram Hollis (p4)"
+      "Motherboard (p4)"
      ],
      "collectors": []
     },
@@ -1054,7 +1054,7 @@
      "base_owner": "p3",
      "units": [],
      "heroes": [
-      "Foreman Hadrik Stoll (p3)"
+      "Quartermaster Bertram Hollis (p3)"
      ],
      "collectors": []
     },
@@ -1276,7 +1276,7 @@
      "base_owner": "p2",
      "units": [],
      "heroes": [
-      "Chronicler Ottoline Vey (p2)"
+      "Foreman Hadrik Stoll (p2)"
      ],
      "collectors": []
     },
@@ -1392,14 +1392,14 @@
    },
    {
     "position": 13,
-    "owner": "p4",
+    "owner": "p3",
     "card_kind": "move_battle"
    }
   ],
-  "active_action": "move_battle by p4",
+  "active_action": "move_battle by p3",
   "resolving_action": {
    "card_kind": "move_battle",
-   "owner": "p4",
+   "owner": "p3",
    "finished": false
   },
   "treaties": [],
@@ -1428,7 +1428,7 @@
    },
    "p4": {
     "culture": 0,
-    "tech": 2,
+    "tech": 6,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -1441,14 +1441,14 @@
     "faction": "The Foundry",
     "species": "robot",
     "culture": 0,
-    "culture_target": 100,
+    "culture_target": 200,
     "economic_collectors": 20,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -1470,7 +1470,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 24
+     "target": 25
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -1565,14 +1565,14 @@
     "faction": "The Schism",
     "species": "wizard",
     "culture": 0,
-    "culture_target": 100,
+    "culture_target": 200,
     "economic_collectors": 20,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -1621,7 +1621,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Chronicler Ottoline Vey",
+      "hero": "Foreman Hadrik Stoll",
       "coord": "2,4",
       "is_leader": true,
       "dead": false,
@@ -1680,14 +1680,14 @@
     "faction": "The Ledger",
     "species": "robot",
     "culture": 0,
-    "culture_target": 100,
+    "culture_target": 200,
     "economic_collectors": 20,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -1709,7 +1709,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 24
+     "target": 25
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -1718,13 +1718,14 @@
     "cores_reserve": 0,
     "cores_supply": 20,
     "action_cards": {
-     "build": 1,
+     "build": 2,
      "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base"
+      "base",
+      "hero_extra"
      ],
      "moveBattle": [
       "base"
@@ -1733,14 +1734,14 @@
       "base"
      ]
     },
-    "action_cards_played_count": 3,
+    "action_cards_played_count": 4,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Foreman Hadrik Stoll",
+      "hero": "Quartermaster Bertram Hollis",
       "coord": "-2,12",
       "is_leader": true,
       "dead": false,
@@ -1804,14 +1805,14 @@
     "faction": "The Brass Circle",
     "species": "wizard",
     "culture": 0,
-    "culture_target": 100,
+    "culture_target": 200,
     "economic_collectors": 20,
     "next_milestones": [
-     5,
-     15,
+     10,
      30,
-     50,
-     75
+     60,
+     100,
+     150
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -1827,8 +1828,8 @@
       "Surf",
       "Castle"
      ],
-     "bonus_points_live": 0,
-     "total": 2,
+     "bonus_points_live": 4,
+     "total": 6,
      "target": 26
     },
     "leader_kills": 0,
@@ -1838,14 +1839,13 @@
     "cores_reserve": 0,
     "cores_supply": 24,
     "action_cards": {
-     "build": 2,
+     "build": 1,
      "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base",
-      "hero_extra"
+      "base"
      ],
      "moveBattle": [
       "base"
@@ -1854,14 +1854,14 @@
       "base"
      ]
     },
-    "action_cards_played_count": 4,
+    "action_cards_played_count": 3,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Quartermaster Bertram Hollis",
+      "hero": "Motherboard",
       "coord": "-2,4",
       "is_leader": true,
       "dead": false,

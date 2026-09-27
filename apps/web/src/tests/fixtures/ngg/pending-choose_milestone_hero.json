@@ -328,14 +328,14 @@
     "faction": "The Covenant",
     "species": "wizard",
     "culture": 0,
-    "culture_target": 50,
+    "culture_target": 100,
     "economic_collectors": 12,
     "next_milestones": [
-     3,
-     8,
+     5,
      15,
-     25,
-     38
+     30,
+     50,
+     75
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -475,13 +475,13 @@
     "faction": "The Foundry",
     "species": "robot",
     "culture": 6,
-    "culture_target": 50,
+    "culture_target": 100,
     "economic_collectors": 12,
     "next_milestones": [
-     8,
      15,
-     25,
-     38
+     30,
+     50,
+     75
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -503,7 +503,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 24
+     "target": 25
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
@@ -729,7 +729,7 @@
   },
   {
    "move_id": "",
-   "description": "Claim Motherboard — +3 bonus tech points while alive, owned, and in play (ruling #104). Available to either species.",
+   "description": "Claim Motherboard — +4 bonus tech points while alive, owned, and in play (ruling #110). Available to either species.",
    "move": {
     "type": "choose_milestone_hero",
     "hero": "Motherboard"
@@ -1064,14 +1064,14 @@
     "faction": "The Covenant",
     "species": "wizard",
     "culture": 0,
-    "culture_target": 50,
+    "culture_target": 100,
     "economic_collectors": 12,
     "next_milestones": [
-     3,
-     8,
+     5,
      15,
-     25,
-     38
+     30,
+     50,
+     75
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -1211,13 +1211,13 @@
     "faction": "The Foundry",
     "species": "robot",
     "culture": 6,
-    "culture_target": 50,
+    "culture_target": 100,
     "economic_collectors": 12,
     "next_milestones": [
-     8,
      15,
-     25,
-     38
+     30,
+     50,
+     75
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -1239,7 +1239,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 24
+     "target": 25
     },
     "leader_kills": 0,
     "military_kills_needed": 1,

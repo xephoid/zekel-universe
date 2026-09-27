@@ -69,6 +69,39 @@ write('pending-extra_selection-shut', fx.extraSelection().s);
   console.log('battle-activations-infiltrator');
 }
 
+// A robot with Self Destruct (#111): its Spitter is up, and may blow itself up;
+// then the wizard's Mana Shield answer to the blast.
+{
+  const { startBattle, commitBattleCard, battleActivation } = await import(src + 'engine-battle.ts');
+  const s = fx.base2p();
+  const g = s.gameState;
+  const rob = g.players.find((p: { playerId: string }) => p.playerId === 'rob');
+  const wiz = g.players.find((p: { playerId: string }) => p.playerId === 'wiz');
+  rob.research.push('self-destruct');
+  wiz.research.push('mana-shield');
+  wiz.manaCurrent = wiz.manaMax;
+  const spitter = fx.placeUnit(g, 'rob', '0,2', 'spitter');
+  const spinner = fx.placeUnit(g, 'rob', '0,2', 'spinner');
+  fx.placeUnit(g, 'wiz', '0,4', 'evoker');
+  fx.placeUnit(g, 'wiz', '0,4', 'enchantress');
+  startBattle(g, rob, '0,2', '0,4', [{ kind: 'unit', id: spitter }, { kind: 'unit', id: spinner }], []);
+  for (let i = 0; g.pending?.kind === 'battle_commit' && i < 10; i++) commitBattleCard(g, g.pending.forPlayerId, null);
+  for (let i = 0; i < 12; i++) {
+    const cur = g.battle.activationQueue[g.battle.activationCursor];
+    if (cur === undefined || cur === spitter) break;
+    const owner = g.battle.units.find((u: { unitRef: string }) => u.unitRef === cur).ownerId;
+    battleActivation(g, owner, { type: 'battle_activation', unit: cur, action: { kind: 'pass' } });
+  }
+  writeFileSync(join(outDir, 'battle-activations-self_destruct.json'), JSON.stringify({
+    key: 'battle-activations', players: 2, viewer: 'rob',
+    view: game.getPlayerView(s, 'rob'), legalMoves: game.getLegalMoves(s, 'rob'),
+    watcher: 'wiz', watcherView: game.getPlayerView(s, 'wiz'), watcherLegalMoves: game.getLegalMoves(s, 'wiz'),
+  }, null, 1));
+  console.log('battle-activations-self_destruct');
+  battleActivation(g, 'rob', { type: 'battle_activation', unit: spitter, action: { kind: 'self_destruct' } });
+  write('pending-battle_defense-self_destruct', s);
+}
+
 // Each human picks their own faction: the second human's turn, one taken.
 {
   let s = game.createSession([
