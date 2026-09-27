@@ -19,7 +19,8 @@ export interface RefUnit {
 export interface RefBuilding { id: string; name: string; species: string; cost: Cost; isBase: boolean; repeatableMax: number | null; effect: string }
 /** `either`: one more resource, any one of these, on top of `cost` (an Extra action card, ruling #86). */
 export interface RefResearch { id: string; name: string; species: string; prerequisite: string; cost: Cost; either: string[]; effect: string }
-export interface RefHero { num: number; id: string; name: string; category: string; species: string | null; recommendedLeader: boolean; effect: string }
+/** `stats`: the printed battle stats (a Leader adds `leaderStatBonus`); null from an older engine. */
+export interface RefHero { num: number; id: string; name: string; category: string; species: string | null; recommendedLeader: boolean; effect: string; stats: { init: number; dmg: number; def: number } | null }
 export interface RefCard { id: string; label: string; copies: number; effect: string }
 export interface RefTreaty { id: string; name: string; cultureIncome: number; effect: string; breakingCondition: string }
 export interface RefFaction { id: string; name: string; species: 'wizard' | 'robot'; color: string }
@@ -96,6 +97,7 @@ export function readRef(reference: GameReferenceResponse | null): NggRef | null 
       num: asNum(h['num']), id: asStr(h['id']), name: asStr(h['name']), category: asStr(h['category']),
       species: typeof h['species'] === 'string' ? h['species'] : null,
       recommendedLeader: h['recommendedLeader'] === true, effect: asStr(h['effect']),
+      stats: isObj(h['stats']) ? { init: asNum(h['stats']['init']), dmg: asNum(h['stats']['dmg']), def: asNum(h['stats']['def']) } : null,
     })),
     cards: asArr(rd['battle_deck']).filter(isObj).map((c) => ({ id: asStr(c['id']), label: asStr(c['label']), copies: asNum(c['copies']), effect: asStr(c['effect']) })),
     treaties: asArr(rd['treaties']).filter(isObj).map((t) => ({

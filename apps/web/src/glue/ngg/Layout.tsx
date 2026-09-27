@@ -100,6 +100,9 @@ function HeroesSheet({ ctx, onClose }: { ctx: ScreenCtx; onClose: () => void }) 
   for (const p of v.players) for (const h of p.heroes) holder.set(h.name, { owner: p.id, leader: h.leader, dead: h.dead, reserved: h.coord === null && !h.dead });
   const unheld = heroes.filter((h) => !holder.has(h.name)).length;
   const poolKnown = unheld === v.heroPoolCount;
+  // One line of printed text each; a row opens to the whole text.
+  const [open, setOpen] = useState<string | null>(null);
+  const statsOf = (name: string) => v.players.flatMap((p) => p.heroes).find((x) => x.name === name)?.stats ?? null;
   return (
     <div className="sheet-backdrop" role="presentation" onClick={onClose}>
       <div className="sheet ngg-heroes-sheet ngg-side" role="dialog" aria-label="Heroes" onClick={(e) => e.stopPropagation()}>
@@ -114,13 +117,24 @@ function HeroesSheet({ ctx, onClose }: { ctx: ScreenCtx; onClose: () => void }) 
               ? `${held.dead ? 'Killed' : held.leader ? 'Leader' : held.reserved ? 'Reserved' : 'Held'} · ${ctx.seat(held.owner)}`
               : poolKnown ? 'In the pool' : 'Not held';
             return (
-              <li key={h.id} className={`${held ? 'taken' : 'free'}${held?.dead ? ' dead' : ''}`}>
+              <li key={h.id} className={`${held ? 'taken' : 'free'}${held?.dead ? ' dead' : ''}${open === h.id ? ' open' : ''}`}
+                role="button" tabIndex={0} aria-expanded={open === h.id}
+                onClick={() => setOpen(open === h.id ? null : h.id)}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen(open === h.id ? null : h.id); } }}>
                 <span className="ngg-avatar" style={ink ? { background: ink.fill, color: ink.on } : undefined}>
                   {h.name.split(/\s+/).map((w) => w[0]).slice(-2).join('')}
                 </span>
                 <span className="ngg-hero-body">
                   <b>{h.name}{h.recommendedLeader ? <span className="ngg-hero-star" title="Recommended Leader"> ★</span> : null}</b>
-                  <i>{[h.category, h.species ? `${h.species}s only` : null].filter(Boolean).join(' · ')}</i>
+                  {/* One line: the kind, then the battle stats — a held hero's as the
+                      engine reads them now (a Leader's +DEF included), any other its
+                      printed ones. */}
+                  <i>
+                    {[h.category, h.species ? `${h.species}s only` : null].filter(Boolean).join(' · ')}
+                    <span className="ngg-hero-stats">
+                      {held && !held.dead && statsOf(h.name) ? statsOf(h.name) : h.stats ? `Init ${h.stats.init} DMG ${h.stats.dmg} DEF ${h.stats.def}` : ''}
+                    </span>
+                  </i>
                   <span className="ngg-hero-effect">{h.effect}</span>
                 </span>
                 <span className="ngg-hero-status">

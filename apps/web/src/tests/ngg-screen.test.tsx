@@ -267,6 +267,8 @@ describe('NGnG screen', () => {
       expect(row.textContent).toContain(p.faction);
     }
     expect(rows.filter((li) => li.textContent?.includes('In the pool'))).toHaveLength(view.hero_pool_count);
+    // Every hero shows its battle stats.
+    for (const li of rows) expect(li.querySelector('.ngg-hero-stats')?.textContent, li.textContent ?? '').toMatch(/^Init \d+ DMG \d+ DEF \d+$/);
     cleanup();
   });
 });

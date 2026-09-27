@@ -549,3 +549,10 @@ button.ngg-seat:focus-visible { outline: 2px solid var(--n-brand); outline-offse
 .ngg-hero-star { color: var(--n-brand); }
 .ngg-hero-status { display: flex; align-items: center; gap: 6px; font: 600 11.5px var(--n-face); white-space: nowrap; }
 .ngg-hero-list li.free .ngg-hero-status { color: var(--n-muted); font-weight: 500; }
+
+/* Heroes list: one line of text each until opened; the battle stats always shown. */
+.ngg-hero-list li { cursor: pointer; }
+.ngg-hero-list li:focus-visible { outline: 2px solid var(--n-brand); outline-offset: 2px; }
+.ngg-hero-list li:not(.open) .ngg-hero-effect { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ngg-hero-stats { margin-left: 8px; font: 600 11px var(--n-mono); color: var(--n-text); text-transform: none; }
+.ngg-hero-statline { align-self: flex-start; }
