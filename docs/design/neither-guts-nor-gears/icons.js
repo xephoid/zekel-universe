@@ -180,8 +180,30 @@
   P['Combat Frame Production']    = [ROOF, 'M8.6 13.8h6.8v3.6H8.6Z', 'M12 13.8v-2.6M10.1 11.2h3.8'];
   P['Diplomatic Research Station']= [STATN, MAST, 'M8.7 14.4h2.4v3.2H8.7Z', 'M12.9 14.4h2.4v3.2h-2.4Z'];
   P['Defense Research Station']   = [STATN, MAST, 'M8.9 14.2h6.2v3.6H8.9Z', 'M12 14.2v3.6M8.9 16h6.2'];
+  // The third masted station, added 2026-09-26. Its siblings put two delegations or a
+  // barred wall inside the block; this one puts a card with a plus on it, because what
+  // it opens is more cards. It is a building like them, not a research.
+  P['Advance Research Station']   = [STATN, MAST, 'M9.4 13.4h5.2v6.2H9.4Z',
+                                     'M12 15.2v2.6M10.7 16.5h2.6'];
   P['Third Space']            = ['M3.4 19.8h17.2', 'M6.1 19.8v-3.1h11.8v3.1',
                                  'M8.5 16.7v-3.1h7v3.1', 'M10.9 13.6v-3.1h2.2v3.1'];
+
+  // ---------- research added 2026-09-26 ----------
+  // Haste quotes the Surf exactly and gives it a second drop. One allocation, two
+  // resources, and the extra drop is the whole difference between the two marks.
+  P['Haste'] = ['M4.5 11.5h15l-1.6 6.2a3 3 0 0 1-2.9 2.3H9a3 3 0 0 1-2.9-2.3Z',
+                'M8.7 4.4s1.82 2.03 1.82 3.22a1.82 1.82 0 0 1-3.64 0C6.88 6.43 8.7 4.4 8.7 4.4Z',
+                'M15.3 4.4s1.82 2.03 1.82 3.22a1.82 1.82 0 0 1-3.64 0C13.48 6.43 15.3 4.4 15.3 4.4Z'];
+  // Two collectors, one hex. The tile itself is drawn, because the rule is about the tile
+  // and not about the collectors — they are the same two dots the Collector mark uses.
+  P['Collector Optimizations'] = ['M7.2 4.6h9.6L21.6 12l-4.8 7.4H7.2L2.4 12Z',
+                                  'M6.5 12a2.1 2.1 0 1 0 4.2 0 2.1 2.1 0 1 0-4.2 0Z',
+                                  'M13.3 12a2.1 2.1 0 1 0 4.2 0 2.1 2.1 0 1 0-4.2 0Z'];
+  // The Core mark at nine tenths with an arrow dropping into it: the core seats itself,
+  // and it arrives with the platform rather than being bought.
+  P['Core Integration'] = ['M12 6.4 16.9 9.3v5.8L12 18l-4.9-2.9V9.3Z',
+                           'M10.1 12a1.9 1.9 0 1 0 3.8 0 1.9 1.9 0 1 0-3.8 0Z',
+                           'M12 2.2v3M10.4 3.8 12 5.4l1.6-1.6'];
 
   // A battle strategy card is drawn face down and only ever seen by its holder, so the
   // mark is the card itself with a blade on it rather than any one card's effect.
@@ -196,7 +218,9 @@
                 'Cleric save': "Cleric's save", 'Elara': "Elara's reach",
                 'Large Combat Platform': 'Large Combat', 'Immobile Combat Platform': 'Immobile Combat',
                 'Castle': 'Base', 'Home': 'Base', 'Battle strategy card': 'Battle card',
-                'Metal Platforms': 'Defense Research Station' };
+                'Metal Platforms': 'Defense Research Station',
+                'Infiltrator Platform': 'Infiltrator',
+                'Extra Build Card': 'Build', 'Extra Move/Battle Card': 'Move / Battle', 'Extra Research Card': 'Research' };
 
   // ---------- treaty types ----------
   // Five treaties, and the difference between them is what each one opens or closes. Every

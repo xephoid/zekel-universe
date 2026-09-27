@@ -31,6 +31,34 @@ export const nggGlue: GlueModule = {
 
   /** The seat's faction look for the whole page: Ink for a wizard seat, Oil
    *  for a robot seat; the table's own look for a watcher or before a faction. */
+  /** What won: the stat of the victory the engine names (the first when
+   *  several), for every seat. */
+  endStat(input) {
+    const v = readView(input.view);
+    if (!v || !v.result || typeof v.result !== 'object') return null;
+    const kinds = Array.isArray((v.result as Record<string, unknown>)['kinds']) ? ((v.result as Record<string, unknown>)['kinds'] as unknown[]).filter((k): k is string => typeof k === 'string') : [];
+    const kind = (kinds[0] ?? '').toLowerCase();
+    const values: Record<string, string> = {};
+    const of = (n: number, of: number | null) => (of ? `${n} of ${of}` : String(n));
+    if (kind.startsWith('military')) {
+      for (const p of v.players) values[p.id] = of(p.leaderKills, p.militaryKillsNeeded || null);
+      return { label: 'Leader kills', values };
+    }
+    if (kind.startsWith('tech')) {
+      for (const p of v.players) values[p.id] = of(p.tech.total, p.tech.target);
+      return { label: 'Technology', values };
+    }
+    if (kind.startsWith('econ')) {
+      for (const p of v.players) values[p.id] = p.ownedCollectors ? String(p.ownedCollectors.length) : '—';
+      return { label: 'Collectors', values };
+    }
+    if (kind.startsWith('cultur')) {
+      for (const p of v.players) values[p.id] = of(p.culture, p.cultureTarget);
+      return { label: 'Culture', values };
+    }
+    return null;
+  },
+
   themeFor(input) {
     const v = readView(input.view);
     const species = v?.players.find((p) => p.id === input.playerId)?.species ?? null;

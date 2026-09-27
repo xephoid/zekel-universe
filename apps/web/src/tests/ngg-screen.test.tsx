@@ -271,4 +271,36 @@ describe('NGnG screen', () => {
     for (const li of rows) expect(li.querySelector('.ngg-hero-stats')?.textContent, li.textContent ?? '').toMatch(/^Init \d+ DMG \d+ DEF \d+$/);
     cleanup();
   });
+  it('shows each seat its Leader kills in Seats', () => {
+    const f = FIXTURES.find((x) => x.name === 'phase-planning')!.f;
+    const r = render(<NggScreen input={inputFor(f.view, f.viewer, f.legalMoves)} yourTurn busy={false} interactive onMove={vi.fn()} onForm={vi.fn()} nameFor={(p) => p} />);
+    const players = (f.view as { players: Array<{ leader_kills: number; military_kills_needed: number }> }).players;
+    const rows = [...r.container.querySelectorAll('button.ngg-seat')];
+    players.forEach((p, i) => {
+      const kills = [...rows[i]!.querySelectorAll('.ngg-stat')].find((st) => st.textContent?.endsWith('KILLS'))!;
+      expect(kills.textContent).toBe(`${p.leader_kills}/${p.military_kills_needed}KILLS`);
+    });
+    cleanup();
+  });
+
+  it('tells the game-over window the stat of the victory that won', () => {
+    const f = FIXTURES.find((x) => x.name === 'phase-game_over')!.f;
+    for (const [kind, label] of [['Military', 'Leader kills'], ['Technological', 'Technology'], ['Cultural', 'Culture'], ['Economic', 'Collectors']] as const) {
+      const view = structuredClone(f.view) as { result: Record<string, unknown>; players: Array<{ player_id: string }> };
+      view.result = { ...view.result, kinds: [kind] };
+      const stat = nggGlue.endStat!(inputFor(view, f.viewer, []))!;
+      expect(stat.label).toBe(label);
+      expect(Object.keys(stat.values).sort()).toEqual(view.players.map((p) => p.player_id).sort());
+    }
+  });
+
+  it("a collection request shows who asks, by their faction's mark and colour", () => {
+    const f = FIXTURES.find((x) => x.name === 'pending-access_request-queue')!.f;
+    const r = render(<NggScreen input={inputFor(f.view, f.viewer, f.legalMoves)} yourTurn busy={false} interactive onMove={vi.fn()} onForm={vi.fn()} nameFor={(p) => p} />);
+    const band = r.container.querySelector('.ngg-interrupt .ngg-seat-band') as HTMLElement;
+    expect(band).not.toBeNull();
+    expect(band.querySelector('.ngg-chip')).not.toBeNull();
+    expect(band.style.borderColor).not.toBe('');
+    cleanup();
+  });
 });

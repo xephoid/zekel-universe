@@ -40,8 +40,8 @@ function Numbers({ p, need }: { p: NggPlayer; need: number | null }) {
       {p.species === 'robot'
         ? (
           <>
-            <span className="ngg-number"><i>CORES FREE</i><b>{cores.free}</b></span>
-            <span className="ngg-number"><i>CORES USED</i><b>{cores.used}</b></span>
+            <span className="ngg-number"><i>CORES FITTED</i><b>{cores.used}</b></span>
+            <span className="ngg-number"><i>CORES SPARE</i><b>{cores.free}</b></span>
             <span className="ngg-number" title="Collectors owned, against the Economic victory's count"><i>COLLECTORS</i><b>{econ ? econ.owned : '—'}{of}</b></span>
           </>
         )

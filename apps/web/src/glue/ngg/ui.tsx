@@ -68,6 +68,18 @@ export function Token({ kind, faction, name, leader, state = 'solid', size = 22,
   );
 }
 
+/** Who is asking, at a glance: their faction's mark, name and colour. */
+export function SeatBand({ faction, name, children }: { faction: string | null; name: string; children?: ReactNode }) {
+  const ink = inkOf(faction);
+  return (
+    <div className="ngg-seat-band ngr-proposer" style={{ borderColor: ink.fill }}>
+      <FactionChip faction={faction} size={40} />
+      <span className="ngr-proposer-name" style={{ color: ink.fill }}>{name}</span>
+      {children}
+    </div>
+  );
+}
+
 /** A mark that a seat holds a spy the table has not seen revealed (which hero
  *  carries it stays secret). */
 export function SpyMark({ species, count, size = 14 }: { species: string | null; count: number; size?: number }) {

@@ -937,6 +937,30 @@ and where the seat stands. The payment stage's shortcut is "Choose for me".
   own units, so the map shifting or zooming on the page does not slide every
   piece, and a slide is the right length at any zoom.
 
+**Settled 2026-09-26, after play:**
+- An area attack names no target, so the attack screen offers it without a
+  target row (it had shown an empty button).
+- Seats has a Heroes link: every hero, one line of its ability (a click opens
+  the rest), its battle stats (engine `heroes[].stats`; a held hero shows the
+  stats the engine reads now, a Leader's bonus included), and who holds it.
+- Seats shows each seat's leader kills as KILLS, against the kills a
+  Military victory needs.
+- A robot's Cores read fitted and spare everywhere, the faction board's
+  numbers included.
+- The Infiltrator Platform and the three Extra card researches use the marks
+  of the piece and the action they give.
+- An access request carries the asking seat's faction mark and colour, and
+  every out-of-turn decision sits at the right of the table so the map (and
+  the tile asked for) stays in view; on a narrow screen it centres.
+- The game-over window shows the stat of the victory the engine names
+  (leader kills, technology, collectors or culture) rather than always
+  culture. A game without that hook keeps the engine's scores.
+- A collector placed while paying is drawn dashed under its own id, so
+  committing turns it solid where it stands. Before, the dashed marks
+  vanished and every collector of the payment flew in again from the
+  supply. (Collectors still leave the map at upkeep and fly in again when
+  the next round's payment places them: that is the rule.)
+
 **Checked against engine 632231e (2026-09-25):** Cultural victory is 25
 culture per player (50 at two players to 150 at six) and the hero milestones
 are shares of it. The culture race reads both from the engine, so nothing in

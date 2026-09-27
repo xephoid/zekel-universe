@@ -458,8 +458,11 @@ export function Sheet({ title, onClose, children }: { title: string; onClose: ()
   );
 }
 
-export function EndPanel({ result, seats, myPlayerId, gameId, gameName, onPlayAgain, playAgainBusy }: {
-  result: GameOverResult; seats: SeatSummary[]; myPlayerId: string | null; gameId: string; gameName?: string; onPlayAgain: () => void; playAgainBusy: boolean;
+export function EndPanel({ result, stat = null, seats, myPlayerId, gameId, gameName, onPlayAgain, playAgainBusy }: {
+  result: GameOverResult;
+  /** the stat that decided the game, per player, when the game says which; else the engine's scores */
+  stat?: { label: string; values: Record<string, string> } | null;
+  seats: SeatSummary[]; myPlayerId: string | null; gameId: string; gameName?: string; onPlayAgain: () => void; playAgainBusy: boolean;
 }) {
   const [copied, setCopied] = useState(false);
   const nameFor = (pid: string) => {
@@ -485,7 +488,9 @@ export function EndPanel({ result, seats, myPlayerId, gameId, gameName, onPlayAg
             <span className="place">{i + 1}</span>
             <Avatar name={r.name} size={30} />
             <div className="grow"><div className="name">{r.name}{r.pid === myPlayerId ? ' (you)' : ''}</div><div className="sub">{r.winner ? 'winner' : r.pid === myPlayerId ? 'your seat' : ''}</div></div>
-            <span className="pts" style={{ color: r.winner ? 'var(--accent)' : undefined }}>{r.score}</span>
+            <span className="pts" style={{ color: r.winner ? 'var(--accent)' : undefined }}>
+              {stat ? <><small className="pts-label">{stat.label}</small>{stat.values[r.pid] ?? '—'}</> : r.score}
+            </span>
           </div>
         ))}
       </div>

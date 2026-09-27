@@ -271,6 +271,10 @@ export interface GlueModule {
   /** A theme for the whole table page (a class on the table shell), from the
    *  seat's own view: a seat's faction look covers every part of its page. */
   themeFor?(input: GlueInput): string | null;
+  /** The stat that decided a finished game, per player, for the game-over
+   *  window (e.g. Leader kills after a Military victory); null to show the
+   *  engine's scores. */
+  endStat?(input: GlueInput): { label: string; values: Record<string, string> } | null;
   /** Build a plan, or null when the view does not match this game's shape;
    *  the table then renders the generic JSON inspector. */
   plan(input: GlueInput): TablePlan | null;

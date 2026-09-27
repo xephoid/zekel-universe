@@ -29,6 +29,10 @@ export interface MapProposal {
   /** the icon name (unit/collector) or the hero's name */
   name: string;
   key: string;
+  /** the piece's own id (a collector's), so the dashed mark and the piece it
+   *  becomes are one thing to the motion root: committing turns it solid in
+   *  place instead of flying a second copy in from the supply */
+  pieceId?: string;
 }
 
 export interface MapMarks {
@@ -190,7 +194,9 @@ function TilePieces({ v, t, proposals, refs, onInspect }: {
         </span>
       )}
       {!collector && dashedCollector && (
-        <span className="ngg-tile-collector">
+        <span className="ngg-tile-collector"
+          data-flip-id={dashedCollector.pieceId ? `ngg-collector:${dashedCollector.pieceId}` : undefined}
+          data-flip-from={dashedCollector.pieceId ? `ngg-supply:${dashedCollector.owner}` : undefined}>
           <Token kind="collector" faction={factionOf(dashedCollector.owner)} name={dashedCollector.name} state="dashed" size={18} />
         </span>
       )}

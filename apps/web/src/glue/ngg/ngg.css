@@ -349,8 +349,11 @@ button.ngg-card { cursor: pointer; }
 .ngg-core-bay b { font: 700 18px var(--n-mono); }
 
 /* ---------- interrupts ---------- */
-.ngg-interrupt-layer { position: fixed; inset: 0; background: rgba(28,26,23,.34); display: grid; place-items: center; z-index: 40; padding: 16px; }
-.ngg-interrupt { width: min(560px, 100%); max-height: 88vh; overflow: auto; display: flex; flex-direction: column; gap: 10px; }
+/* An out-of-turn decision sits over the right of the table, so the map (and
+   the tile it is about) stays in view; on a narrow screen it centres. */
+.ngg-interrupt-layer { position: fixed; inset: 0; background: rgba(28,26,23,.18); display: grid; place-items: start end; z-index: 40; padding: 64px 24px 16px; }
+@media (max-width: 900px) { .ngg-interrupt-layer { place-items: center; padding: 16px; background: rgba(28,26,23,.34); } }
+.ngg-interrupt { width: min(460px, 100%); max-height: 88vh; overflow: auto; display: flex; flex-direction: column; gap: 10px; }
 .ngg-interrupt > .ngg-panel { box-shadow: 0 16px 40px rgba(28,26,23,.28); }
 
 .muted { color: var(--n-muted); }

@@ -376,7 +376,7 @@ export function TablePage() {
             <div className="sheet-backdrop" role="presentation">
               <div className="sheet" role="dialog" aria-label="Game over">
                 <button className="btn secondary small close" onClick={() => setShowEnd(false)} aria-label="Look at the final table">✕</button>
-                <EndPanel result={result} seats={table.seats} myPlayerId={myPlayerId} gameId={gameId} gameName={table.table.gameName} onPlayAgain={() => void playAgain()} playAgainBusy={playAgainBusy} />
+                <EndPanel result={result} stat={glue?.endStat?.(input) ?? null} seats={table.seats} myPlayerId={myPlayerId} gameId={gameId} gameName={table.table.gameName} onPlayAgain={() => void playAgain()} playAgainBusy={playAgainBusy} />
               </div>
             </div>
           )}

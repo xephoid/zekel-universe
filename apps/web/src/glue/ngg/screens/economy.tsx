@@ -19,7 +19,7 @@ import type { MapProposal } from '../HexMap';
 import { TableLayout } from '../Layout';
 import { economicCollectorsFor, itemByName, researchByName, heroById, type Cost } from '../ref';
 import { TERRAIN } from '../factions';
-import { Actions, BattleCardPrice, Btn, CostChips, HowTo, Icon, OptionRow, Panel, ResourceChip, Rule } from '../ui';
+import { Actions, BattleCardPrice, Btn, CostChips, HowTo, Icon, OptionRow, Panel, ResourceChip, Rule, SeatBand } from '../ui';
 import { moveType } from '../read';
 import { DiplomacyPanel } from './round';
 import './economy.css';
@@ -176,7 +176,7 @@ function collectorIcon(ctx: ScreenCtx, ownerId: string | null, coord: string): s
 
 function proposalsOf(ctx: ScreenCtx, payment: Payment): MapProposal[] {
   return payment.map((p) => ({
-    coord: p.coord, owner: ctx.me ?? '', kind: 'collector', key: `pay:${p.collectorId}`,
+    coord: p.coord, owner: ctx.me ?? '', kind: 'collector', key: `pay:${p.collectorId}`, pieceId: p.collectorId,
     name: collectorIcon(ctx, ctx.me, p.coord),
   }));
 }
@@ -491,7 +491,7 @@ function PayStage({ ctx, chosen, purchase, proposal, needsPlace, initial, onBack
         lit,
         greyRest: lit.size > 0,
         proposals: placed.map((p): MapProposal => ({
-          coord: p.coord, owner: ctx.me ?? '', kind: 'collector', key: `pay:${p.collectorId}`,
+          coord: p.coord, owner: ctx.me ?? '', kind: 'collector', key: `pay:${p.collectorId}`, pieceId: p.collectorId,
           name: collectorIcon(ctx, ctx.me, p.coord),
         })),
         tags: new Map(placed.map((p) => [p.coord, owners.has(p.collectorId) ? 'ASK' : 'PAY'])),
@@ -673,7 +673,7 @@ function AccessRequestScreen({ ctx }: { ctx: ScreenCtx }) {
     lit: new Set<string>(),
     origin: asked,
     proposals: a.placements.map((p): MapProposal => ({
-      coord: coordOf(p.tile) ?? '', owner: a.buyer, kind: 'collector', key: `acc:${p.collector}`,
+      coord: coordOf(p.tile) ?? '', owner: a.buyer, kind: 'collector', key: `acc:${p.collector}`, pieceId: p.collector,
       name: collectorIcon(ctx, a.buyer, coordOf(p.tile) ?? ''),
     })).filter((p) => p.coord),
   } : undefined;
@@ -713,6 +713,9 @@ function AccessRequestScreen({ ctx }: { ctx: ScreenCtx }) {
         marks={marks}
         interrupt={
           <Panel tone="urgent" kicker="Not your turn — your answer" title={`${ctx.seat(a.buyer)} asks to stand one collector on ${a.thisRequest.tile}`}>
+            <SeatBand faction={ctx.v.players.find((p) => p.id === a.buyer)?.faction ?? null} name={ctx.seat(a.buyer)}>
+              <span className="ngr-proposer-treaty">Asks for {a.thisRequest.tile}</span>
+            </SeatBand>
             {terms}
             {grant && <Rule>{grant.description}</Rule>}
             {refuse && <Rule>{refuse.description}</Rule>}

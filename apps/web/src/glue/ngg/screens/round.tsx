@@ -23,7 +23,7 @@ import type { MapMarks } from '../HexMap';
 import { TableLayout } from '../Layout';
 import { TREATY_INK, inkOfSeat } from '../factions';
 import { heroByName, treatyByName, type RefHero } from '../ref';
-import { Actions, Btn, CardFace, FactionChip, HowTo, Icon, OptionRow, Panel, ResourceChip, Rule, Token } from '../ui';
+import { Actions, Btn, CardFace, FactionChip, HowTo, Icon, OptionRow, Panel, ResourceChip, Rule, SeatBand, Token } from '../ui';
 import './round.css';
 
 // ---------------------------------------------------------------------------
@@ -535,11 +535,9 @@ function TreatyResponse({ ctx }: { ctx: ScreenCtx }) {
   const interrupt = (
     <Panel title={proposer && treaty ? `${ctx.seat(proposer)} offers you ${treaty}` : 'A treaty offer'} kicker="Not your turn — your answer" tone="urgent">
       {proposer && (
-        <div className="ngr-proposer" style={{ borderColor: ink.fill }}>
-          <FactionChip faction={faction} size={40} />
-          <span className="ngr-proposer-name" style={{ color: ink.fill }}>{ctx.seat(proposer)}</span>
+        <SeatBand faction={faction} name={ctx.seat(proposer)}>
           {treaty && <span className="ngr-proposer-treaty"><span style={{ color: TREATY_INK[treaty] ?? 'inherit' }}><Icon name={treaty} size={18} /></span>{treaty}</span>}
-        </div>
+        </SeatBand>
       )}
       {income !== null && <p className="ngr-state">+{income} culture to each of you, every round it stands</p>}
       {typeof c['effect'] === 'string' && <Rule>{c['effect']}</Rule>}

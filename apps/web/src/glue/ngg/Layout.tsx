@@ -172,6 +172,9 @@ function SeatsPanel({ ctx, onOpen }: { ctx: ScreenCtx; onOpen: (playerId: string
               <span className="ngg-stat"><b>{p.culture}</b><i>CULT</i></span>
               <span className="ngg-stat"><b>{p.tech.total}{p.tech.target !== null ? `/${p.tech.target}` : ''}</b><i>TECH</i></span>
               <EconStat ctx={ctx} p={p} />
+              <span className="ngg-stat" title={`Leader kills: ${p.leaderKills} of the ${p.militaryKillsNeeded} a Military victory needs`}>
+                <b>{p.leaderKills}{p.militaryKillsNeeded ? `/${p.militaryKillsNeeded}` : ''}</b><i>KILLS</i>
+              </span>
               <span className="ngg-stat"><b className={p.leaderAlive ? 'ok' : 'dead'}>{p.leaderAlive ? '✓' : '✕'}</b><i>LEAD</i></span>
               </button>
             </li>
