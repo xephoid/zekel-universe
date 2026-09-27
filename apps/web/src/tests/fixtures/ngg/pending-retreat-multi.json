@@ -19,7 +19,9 @@
      "start": 4,
      "base_owner": "p4",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Archmage Elara (p4)"
+     ],
      "collectors": []
     },
     {
@@ -67,7 +69,9 @@
      "start": 1,
      "base_owner": "p3",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Evo Angel (p3)"
+     ],
      "collectors": []
     },
     {
@@ -336,12 +340,14 @@
      "start": 2,
      "base_owner": "p1",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Warden Hesper Quill (p1)"
+     ],
      "collectors": []
     }
    ]
   },
-  "hero_pool_count": 15,
+  "hero_pool_count": 12,
   "action_stack": [
    {
     "position": 1,
@@ -415,6 +421,14 @@
     "culture_income": 2
    },
    {
+    "treaty": "Shared Resources",
+    "partners": [
+     "p2",
+     "p1"
+    ],
+    "culture_income": 2
+   },
+   {
     "treaty": "Peace",
     "partners": [
      "p2",
@@ -425,7 +439,15 @@
    {
     "treaty": "Shared Resources",
     "partners": [
-     "p2",
+     "p4",
+     "p3"
+    ],
+    "culture_income": 2
+   },
+   {
+    "treaty": "Culture Treaty",
+    "partners": [
+     "p4",
      "p1"
     ],
     "culture_income": 2
@@ -488,7 +510,7 @@
   },
   "victory_status": {
    "p1": {
-    "culture": 3,
+    "culture": 5,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
@@ -500,14 +522,14 @@
     "leader_alive": true
    },
    "p3": {
-    "culture": 4,
+    "culture": 6,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p4": {
-    "culture": 2,
-    "tech": 2,
+    "culture": 6,
+    "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -519,11 +541,10 @@
     "kind": "human",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 3,
+    "culture": 5,
     "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
-     5,
      15,
      30,
      50,
@@ -549,7 +570,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 18
+     "target": 24
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -585,6 +606,13 @@
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
+     },
+     {
+      "hero": "Warden Hesper Quill",
+      "coord": "2,12",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
      }
     ],
     "bases": [
@@ -632,7 +660,11 @@
       "core": "allocated"
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": {
+     "water": 1
+    }
    },
    {
     "player_id": "p2",
@@ -670,7 +702,7 @@
      ],
      "bonus_points_live": 0,
      "total": 3,
-     "target": 22
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -735,7 +767,8 @@
       "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
-      "Extra Build Card": "needs a Library of Enchantment"
+      "Extra Build Card": "needs a Library of Enchantment",
+      "Haste": "needs a Library of Enchantment"
      },
      "treaties": null,
      "battle_cards": null
@@ -750,20 +783,26 @@
       "collector": "surf-2",
       "type": "Surf",
       "placed_at": null
+     },
+     {
+      "collector": "surf-3",
+      "type": "Surf",
+      "placed_at": null
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": null
    },
    {
     "player_id": "p3",
     "kind": "ai",
     "faction": "The Ledger",
     "species": "robot",
-    "culture": 4,
+    "culture": 6,
     "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
-     5,
      15,
      30,
      50,
@@ -789,7 +828,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 18
+     "target": 24
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -825,6 +864,13 @@
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Evo Angel",
+      "coord": "-2,12",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 80 DMG 4 DEF 4"
      }
     ],
     "bases": [
@@ -872,18 +918,21 @@
       "core": "allocated"
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": {
+     "water": 1
+    }
    },
    {
     "player_id": "p4",
     "kind": "ai",
     "faction": "The Brass Circle",
     "species": "wizard",
-    "culture": 2,
+    "culture": 6,
     "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
-     5,
      15,
      30,
      50,
@@ -891,21 +940,27 @@
     ],
     "mana_current": 5,
     "mana_max": 5,
-    "buildings": [],
-    "building_counts": {},
+    "buildings": [
+     "Embassy"
+    ],
+    "building_counts": {
+     "embassy": 1
+    },
     "research": [],
     "tech_progress": {
      "acquired_types": [
       "surf",
-      "castle"
+      "castle",
+      "embassy"
      ],
      "acquired_type_names": [
       "Surf",
-      "Castle"
+      "Castle",
+      "Embassy"
      ],
      "bonus_points_live": 0,
-     "total": 2,
-     "target": 22
+     "total": 3,
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -942,6 +997,13 @@
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Archmage Elara",
+      "coord": "-2,4",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
      }
     ],
     "bases": [
@@ -963,10 +1025,11 @@
       "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
-      "Extra Build Card": "needs a Library of Enchantment"
+      "Extra Build Card": "needs a Library of Enchantment",
+      "Haste": "needs a Library of Enchantment"
      },
-     "treaties": "needs an Embassy or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
-     "battle_cards": "needs an Embassy"
+     "treaties": null,
+     "battle_cards": null
     },
     "collectors": [
      {
@@ -985,7 +1048,9 @@
       "placed_at": null
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": null
    }
   ],
   "your_battle_hand": [],
@@ -1068,7 +1133,9 @@
      "start": 4,
      "base_owner": "p4",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Archmage Elara (p4)"
+     ],
      "collectors": []
     },
     {
@@ -1116,7 +1183,9 @@
      "start": 1,
      "base_owner": "p3",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Evo Angel (p3)"
+     ],
      "collectors": []
     },
     {
@@ -1385,12 +1454,14 @@
      "start": 2,
      "base_owner": "p1",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Warden Hesper Quill (p1)"
+     ],
      "collectors": []
     }
    ]
   },
-  "hero_pool_count": 15,
+  "hero_pool_count": 12,
   "action_stack": [
    {
     "position": 1,
@@ -1464,6 +1535,14 @@
     "culture_income": 2
    },
    {
+    "treaty": "Shared Resources",
+    "partners": [
+     "p2",
+     "p1"
+    ],
+    "culture_income": 2
+   },
+   {
     "treaty": "Peace",
     "partners": [
      "p2",
@@ -1474,7 +1553,15 @@
    {
     "treaty": "Shared Resources",
     "partners": [
-     "p2",
+     "p4",
+     "p3"
+    ],
+    "culture_income": 2
+   },
+   {
+    "treaty": "Culture Treaty",
+    "partners": [
+     "p4",
      "p1"
     ],
     "culture_income": 2
@@ -1537,7 +1624,7 @@
   },
   "victory_status": {
    "p1": {
-    "culture": 3,
+    "culture": 5,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
@@ -1549,14 +1636,14 @@
     "leader_alive": true
    },
    "p3": {
-    "culture": 4,
+    "culture": 6,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p4": {
-    "culture": 2,
-    "tech": 2,
+    "culture": 6,
+    "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -1568,11 +1655,10 @@
     "kind": "human",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 3,
+    "culture": 5,
     "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
-     5,
      15,
      30,
      50,
@@ -1598,7 +1684,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 18
+     "target": 24
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -1634,6 +1720,13 @@
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
+     },
+     {
+      "hero": "Warden Hesper Quill",
+      "coord": "2,12",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
      }
     ],
     "bases": [
@@ -1681,7 +1774,11 @@
       "core": "allocated"
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": {
+     "water": 1
+    }
    },
    {
     "player_id": "p2",
@@ -1719,7 +1816,7 @@
      ],
      "bonus_points_live": 0,
      "total": 3,
-     "target": 22
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -1784,7 +1881,8 @@
       "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
-      "Extra Build Card": "needs a Library of Enchantment"
+      "Extra Build Card": "needs a Library of Enchantment",
+      "Haste": "needs a Library of Enchantment"
      },
      "treaties": null,
      "battle_cards": null
@@ -1799,20 +1897,26 @@
       "collector": "surf-2",
       "type": "Surf",
       "placed_at": null
+     },
+     {
+      "collector": "surf-3",
+      "type": "Surf",
+      "placed_at": null
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": null
    },
    {
     "player_id": "p3",
     "kind": "ai",
     "faction": "The Ledger",
     "species": "robot",
-    "culture": 4,
+    "culture": 6,
     "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
-     5,
      15,
      30,
      50,
@@ -1838,7 +1942,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 18
+     "target": 24
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -1874,6 +1978,13 @@
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Evo Angel",
+      "coord": "-2,12",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 80 DMG 4 DEF 4"
      }
     ],
     "bases": [
@@ -1921,18 +2032,21 @@
       "core": "allocated"
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": {
+     "water": 1
+    }
    },
    {
     "player_id": "p4",
     "kind": "ai",
     "faction": "The Brass Circle",
     "species": "wizard",
-    "culture": 2,
+    "culture": 6,
     "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
-     5,
      15,
      30,
      50,
@@ -1940,21 +2054,27 @@
     ],
     "mana_current": 5,
     "mana_max": 5,
-    "buildings": [],
-    "building_counts": {},
+    "buildings": [
+     "Embassy"
+    ],
+    "building_counts": {
+     "embassy": 1
+    },
     "research": [],
     "tech_progress": {
      "acquired_types": [
       "surf",
-      "castle"
+      "castle",
+      "embassy"
      ],
      "acquired_type_names": [
       "Surf",
-      "Castle"
+      "Castle",
+      "Embassy"
      ],
      "bonus_points_live": 0,
-     "total": 2,
-     "target": 22
+     "total": 3,
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -1991,6 +2111,13 @@
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Archmage Elara",
+      "coord": "-2,4",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
      }
     ],
     "bases": [
@@ -2012,10 +2139,11 @@
       "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
-      "Extra Build Card": "needs a Library of Enchantment"
+      "Extra Build Card": "needs a Library of Enchantment",
+      "Haste": "needs a Library of Enchantment"
      },
-     "treaties": "needs an Embassy or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
-     "battle_cards": "needs an Embassy"
+     "treaties": null,
+     "battle_cards": null
     },
     "collectors": [
      {
@@ -2034,7 +2162,9 @@
       "placed_at": null
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": null
    }
   ],
   "your_battle_hand": [],

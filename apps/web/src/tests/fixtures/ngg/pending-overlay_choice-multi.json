@@ -184,7 +184,10 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Archmage Chaimidious (p1)",
+      "Chronicler Ottoline Vey (p2)"
+     ],
      "collectors": []
     },
     {
@@ -261,9 +264,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Chronicler Ottoline Vey (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -333,9 +334,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Archmage Chaimidious (p1)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -360,22 +359,6 @@
   "resolving_action": null,
   "treaties": [
    {
-    "treaty": "Open Borders",
-    "partners": [
-     "p2",
-     "p4"
-    ],
-    "culture_income": 2
-   },
-   {
-    "treaty": "Peace",
-    "partners": [
-     "p2",
-     "p3"
-    ],
-    "culture_income": 2
-   },
-   {
     "treaty": "Shared Resources",
     "partners": [
      "p4",
@@ -390,13 +373,23 @@
      "p1"
     ],
     "culture_income": 2
+   },
+   {
+    "treaty": "Open Borders",
+    "partners": [
+     "p2",
+     "p1"
+    ],
+    "culture_income": 2
    }
   ],
   "battle": null,
-  "battle_deck_count": 17,
+  "battle_deck_count": 15,
   "battle_discard": [
    "Counter",
-   "Rally"
+   "Rally",
+   "Bonus (−1 DEF to all opposing units)",
+   "Bonus (+1 DEF to all your units)"
   ],
   "pending": {
    "kind": "overlay_choice",
@@ -412,7 +405,7 @@
      "label": "Dowser Wren Calloway",
      "detail": {
       "owner": "p3",
-      "resource": "water"
+      "resource": null
      },
      "move": {
       "type": "resolve_overlay_choice",
@@ -435,7 +428,7 @@
   },
   "victory_status": {
    "p1": {
-    "culture": 26,
+    "culture": 27,
     "tech": 5,
     "leader_kills": 0,
     "leader_alive": true
@@ -447,13 +440,13 @@
     "leader_alive": true
    },
    "p3": {
-    "culture": 37,
-    "tech": 5,
+    "culture": 31,
+    "tech": 6,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p4": {
-    "culture": 22,
+    "culture": 27,
     "tech": 5,
     "leader_kills": 0,
     "leader_alive": true
@@ -466,7 +459,7 @@
     "kind": "human",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 26,
+    "culture": 27,
     "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
@@ -500,7 +493,7 @@
      ],
      "bonus_points_live": 0,
      "total": 5,
-     "target": 18
+     "target": 24
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -532,7 +525,7 @@
     "heroes": [
      {
       "hero": "Archmage Chaimidious",
-      "coord": "2,10",
+      "coord": "0,8",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
@@ -596,7 +589,11 @@
       "core": "allocated"
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": {
+     "water": 1
+    }
    },
    {
     "player_id": "p2",
@@ -634,7 +631,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 22
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -667,7 +664,7 @@
     "heroes": [
      {
       "hero": "Chronicler Ottoline Vey",
-      "coord": "1,9",
+      "coord": "0,8",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
@@ -713,7 +710,8 @@
       "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
-      "Extra Build Card": "needs a Library of Enchantment"
+      "Extra Build Card": "needs a Library of Enchantment",
+      "Haste": "needs a Library of Enchantment"
      },
      "treaties": null,
      "battle_cards": null
@@ -740,14 +738,16 @@
       "placed_at": null
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": null
    },
    {
     "player_id": "p3",
     "kind": "ai",
     "faction": "The Ledger",
     "species": "robot",
-    "culture": 37,
+    "culture": 31,
     "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
@@ -769,6 +769,7 @@
       "water-collector",
       "wood-collector",
       "home",
+      "ore-collector",
       "diplomatic-research-station"
      ],
      "acquired_type_names": [
@@ -776,17 +777,18 @@
       "Water collector",
       "Wood collector",
       "Home",
+      "Ore collector",
       "Diplomatic Research Station"
      ],
      "bonus_points_live": 0,
-     "total": 5,
-     "target": 18
+     "total": 6,
+     "target": 24
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
     "leader_alive": true,
     "subjects": 0,
-    "cores_reserve": 7,
+    "cores_reserve": 5,
     "cores_supply": 13,
     "action_cards": {
      "build": 1,
@@ -881,16 +883,32 @@
       "type": "Wood collector",
       "placed_at": null,
       "core": "allocated"
+     },
+     {
+      "collector": "ore-collector-1",
+      "type": "Ore collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-3",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": {
+     "water": 1
+    }
    },
    {
     "player_id": "p4",
     "kind": "ai",
     "faction": "The Brass Circle",
     "species": "wizard",
-    "culture": 22,
+    "culture": 27,
     "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
@@ -924,7 +942,7 @@
      ],
      "bonus_points_live": 0,
      "total": 5,
-     "target": 22
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -996,7 +1014,8 @@
       "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
-      "Extra Build Card": "needs a Library of Enchantment"
+      "Extra Build Card": "needs a Library of Enchantment",
+      "Haste": "needs a Library of Enchantment"
      },
      "treaties": null,
      "battle_cards": null
@@ -1023,7 +1042,9 @@
       "placed_at": null
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": null
    }
   ],
   "your_battle_hand": [],
@@ -1234,7 +1255,10 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Archmage Chaimidious (p1)",
+      "Chronicler Ottoline Vey (p2)"
+     ],
      "collectors": []
     },
     {
@@ -1311,9 +1335,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Chronicler Ottoline Vey (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -1383,9 +1405,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Archmage Chaimidious (p1)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -1410,22 +1430,6 @@
   "resolving_action": null,
   "treaties": [
    {
-    "treaty": "Open Borders",
-    "partners": [
-     "p2",
-     "p4"
-    ],
-    "culture_income": 2
-   },
-   {
-    "treaty": "Peace",
-    "partners": [
-     "p2",
-     "p3"
-    ],
-    "culture_income": 2
-   },
-   {
     "treaty": "Shared Resources",
     "partners": [
      "p4",
@@ -1440,13 +1444,23 @@
      "p1"
     ],
     "culture_income": 2
+   },
+   {
+    "treaty": "Open Borders",
+    "partners": [
+     "p2",
+     "p1"
+    ],
+    "culture_income": 2
    }
   ],
   "battle": null,
-  "battle_deck_count": 17,
+  "battle_deck_count": 15,
   "battle_discard": [
    "Counter",
-   "Rally"
+   "Rally",
+   "Bonus (−1 DEF to all opposing units)",
+   "Bonus (+1 DEF to all your units)"
   ],
   "pending": {
    "kind": "overlay_choice",
@@ -1462,7 +1476,7 @@
      "label": "Dowser Wren Calloway",
      "detail": {
       "owner": "p3",
-      "resource": "water"
+      "resource": null
      }
     },
     {
@@ -1477,7 +1491,7 @@
   },
   "victory_status": {
    "p1": {
-    "culture": 26,
+    "culture": 27,
     "tech": 5,
     "leader_kills": 0,
     "leader_alive": true
@@ -1489,13 +1503,13 @@
     "leader_alive": true
    },
    "p3": {
-    "culture": 37,
-    "tech": 5,
+    "culture": 31,
+    "tech": 6,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p4": {
-    "culture": 22,
+    "culture": 27,
     "tech": 5,
     "leader_kills": 0,
     "leader_alive": true
@@ -1508,7 +1522,7 @@
     "kind": "human",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 26,
+    "culture": 27,
     "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
@@ -1542,7 +1556,7 @@
      ],
      "bonus_points_live": 0,
      "total": 5,
-     "target": 18
+     "target": 24
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -1574,7 +1588,7 @@
     "heroes": [
      {
       "hero": "Archmage Chaimidious",
-      "coord": "2,10",
+      "coord": "0,8",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
@@ -1638,7 +1652,11 @@
       "core": "allocated"
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": {
+     "water": 1
+    }
    },
    {
     "player_id": "p2",
@@ -1676,7 +1694,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 22
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -1709,7 +1727,7 @@
     "heroes": [
      {
       "hero": "Chronicler Ottoline Vey",
-      "coord": "1,9",
+      "coord": "0,8",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
@@ -1755,7 +1773,8 @@
       "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
-      "Extra Build Card": "needs a Library of Enchantment"
+      "Extra Build Card": "needs a Library of Enchantment",
+      "Haste": "needs a Library of Enchantment"
      },
      "treaties": null,
      "battle_cards": null
@@ -1782,14 +1801,16 @@
       "placed_at": null
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": null
    },
    {
     "player_id": "p3",
     "kind": "ai",
     "faction": "The Ledger",
     "species": "robot",
-    "culture": 37,
+    "culture": 31,
     "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
@@ -1811,6 +1832,7 @@
       "water-collector",
       "wood-collector",
       "home",
+      "ore-collector",
       "diplomatic-research-station"
      ],
      "acquired_type_names": [
@@ -1818,17 +1840,18 @@
       "Water collector",
       "Wood collector",
       "Home",
+      "Ore collector",
       "Diplomatic Research Station"
      ],
      "bonus_points_live": 0,
-     "total": 5,
-     "target": 18
+     "total": 6,
+     "target": 24
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
     "leader_alive": true,
     "subjects": 0,
-    "cores_reserve": 7,
+    "cores_reserve": 5,
     "cores_supply": 13,
     "action_cards": {
      "build": 1,
@@ -1923,16 +1946,32 @@
       "type": "Wood collector",
       "placed_at": null,
       "core": "allocated"
+     },
+     {
+      "collector": "ore-collector-1",
+      "type": "Ore collector",
+      "placed_at": null,
+      "core": "allocated"
+     },
+     {
+      "collector": "water-collector-3",
+      "type": "Water collector",
+      "placed_at": null,
+      "core": "allocated"
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": {
+     "water": 1
+    }
    },
    {
     "player_id": "p4",
     "kind": "ai",
     "faction": "The Brass Circle",
     "species": "wizard",
-    "culture": 22,
+    "culture": 27,
     "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
@@ -1966,7 +2005,7 @@
      ],
      "bonus_points_live": 0,
      "total": 5,
-     "target": 22
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -2038,7 +2077,8 @@
       "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
-      "Extra Build Card": "needs a Library of Enchantment"
+      "Extra Build Card": "needs a Library of Enchantment",
+      "Haste": "needs a Library of Enchantment"
      },
      "treaties": null,
      "battle_cards": null
@@ -2065,7 +2105,9 @@
       "placed_at": null
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": null
    }
   ],
   "your_battle_hand": [],

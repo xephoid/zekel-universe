@@ -961,6 +961,28 @@ and where the seat stands. The payment stage's shortcut is "Choose for me".
   supply. (Collectors still leave the map at upkeep and fly in again when
   the next round's payment places them: that is the rule.)
 
+**Checked against engine dd34645 (rulings #100-#107, 2026-09-26):**
+- Dowser Wren Calloway gives a robot a free collector of its choice (#106):
+  a new pending, `dowser_collector`, with its own screen (pick the type,
+  then Take). Before, it fell through to a quiet table with nothing to press.
+- Collector Optimizations (#102) lets two collectors share a tile: the map
+  draws every collector on a tile, side by side.
+- Haste (#101): the payment stage shows what the bank pays, and Commit
+  follows the engine's answer, so a bank-only payment commits with nothing
+  placed. A wizard's strip shows BANK while it holds anything.
+- Core Integration (#103): the Build list prints the paired Core's price
+  from the view (`paired_core_cost`); "+ Core, free" with the research.
+- The engine's name Advanced Research Station maps to the designer's
+  station mark.
+- Engine changes for these, on branch `claude/ngg-haste-bank` (with the
+  hero stats): the reach question counts a Haste Surf as two and adds the
+  bank; the view carries `bank` and `paired_core_cost`; the Build menu
+  prices the paired Core through one helper; and the view's technology
+  target (26 wizard, 24 robot) and hero bonus (+3 each) match the victory
+  check, which had said 22/18 and +1.
+- Three starting Surfs, Envoy and the Wall's DEF 3 need nothing from
+  Universe.
+
 **Checked against engine 632231e (2026-09-25):** Cultural victory is 25
 culture per player (50 at two players to 150 at six) and the hero milestones
 are shares of it. The culture race reads both from the engine, so nothing in

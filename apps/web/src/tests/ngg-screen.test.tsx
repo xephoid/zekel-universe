@@ -303,4 +303,60 @@ describe('NGnG screen', () => {
     expect(band.style.borderColor).not.toBe('');
     cleanup();
   });
+
+  it("Dowser's free collector: the robot picks its type, and only the pick is sent", () => {
+    const f = FIXTURES.find((x) => x.name === 'pending-dowser_collector')!.f;
+    const onMove = vi.fn();
+    const r = render(<NggScreen input={inputFor(f.view, f.viewer, f.legalMoves)} yourTurn busy={false} interactive onMove={onMove} onForm={vi.fn()} nameFor={(p) => p} />);
+    const names = f.legalMoves.map((m) => String(m.move['collector']));
+    expect(names.length).toBeGreaterThan(1);
+    const take = r.getByRole('button', { name: 'Choose a collector' }) as HTMLButtonElement;
+    expect(take.disabled).toBe(true);
+    fireEvent.click(r.getByText(names[1]!));
+    expect(onMove).not.toHaveBeenCalled();
+    fireEvent.click(r.getByRole('button', { name: `Take the ${names[1]}` }));
+    expect(onMove).toHaveBeenCalledTimes(1);
+    expect(onMove.mock.calls[0]![0].move).toEqual(f.legalMoves[1]!.move);
+    cleanup();
+  });
+
+  it('two collectors sharing a tile (Collector Optimizations) are both drawn', () => {
+    const { f } = FIXTURES.find((x) => (x.f.view as { players: Array<{ committed_collectors: unknown[] }> }).players.some((p) => p.committed_collectors.length >= 2))!;
+    const view = structuredClone(f.view) as { players: Array<{ committed_collectors: Array<{ collector: string; coord: string }> }> };
+    const seat = view.players.find((p) => p.committed_collectors.length >= 2)!;
+    seat.committed_collectors[1]!.coord = seat.committed_collectors[0]!.coord;
+    const r = render(<NggScreen input={inputFor(view, f.viewer, [])} yourTurn={false} busy={false} interactive onMove={vi.fn()} onForm={vi.fn()} nameFor={(p) => p} />);
+    const shared = [...r.container.querySelectorAll('.ngg-tile-collectors')].find((el) => el.querySelectorAll('[data-flip-id^="ngg-collector:"]').length === 2);
+    expect(shared).toBeTruthy();
+    cleanup();
+  });
+
+  it("the Build list prices the paired Core as the engine says: free with Core Integration", () => {
+    const f = FIXTURES.find((x) => x.name === 'action-build-robot-mid')!.f;
+    const draw = (paired: Record<string, number>) => {
+      const view = structuredClone(f.view) as { players: Array<{ player_id: string; paired_core_cost?: Record<string, number> }> };
+      view.players.find((p) => p.player_id === f.viewer)!.paired_core_cost = paired;
+      return render(<NggScreen input={inputFor(view, f.viewer, f.legalMoves)} yourTurn busy={false} interactive onMove={vi.fn()} onForm={vi.fn()} nameFor={(p) => p} />);
+    };
+    const priced = draw({ water: 1 });
+    expect(priced.queryAllByText('+ Core, free')).toHaveLength(0);
+    expect(priced.container.querySelectorAll('.ngg-eco-core').length).toBeGreaterThan(0);
+    cleanup();
+    const free = draw({});
+    expect(free.getAllByText('+ Core, free').length).toBeGreaterThan(0);
+    cleanup();
+  });
+
+  it("a Haste wizard's bank shows on the faction strip, and only when it holds something", () => {
+    const { f } = FIXTURES.find((x) => (x.f.view as { players: Array<{ player_id: string; species?: string }> }).players.some((p) => p.player_id === x.f.viewer && p.species === 'wizard'))!;
+    const draw = (bank: Record<string, number>) => {
+      const view = structuredClone(f.view) as { players: Array<{ player_id: string; bank?: Record<string, number> }> };
+      view.players.find((p) => p.player_id === f.viewer)!.bank = bank;
+      return render(<NggScreen input={inputFor(view, f.viewer, [])} yourTurn={false} busy={false} interactive onMove={vi.fn()} onForm={vi.fn()} nameFor={(p) => p} />);
+    };
+    expect(draw({}).queryByText('BANK')).toBeNull();
+    cleanup();
+    expect(draw({ ore: 1 }).getAllByText('BANK').length).toBeGreaterThan(0);
+    cleanup();
+  });
 });

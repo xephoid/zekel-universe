@@ -50,6 +50,9 @@ function Numbers({ p, need }: { p: NggPlayer; need: number | null }) {
             <span className="ngg-number"><i>MANA</i><b>{p.manaCurrent}<small>/{p.manaMax}</small></b></span>
             <span className="ngg-number" title="Surfs owned, against the Economic victory's count"><i>SURFS</i><b>{econ ? econ.owned : '—'}{of}</b></span>
             <span className="ngg-number"><i>SUBJECTS</i><b>{p.subjects}</b></span>
+            {Object.keys(p.bank).length > 0 && (
+              <span className="ngg-number" title="What Haste banked this round; it pays later purchases this round and empties at upkeep"><i>BANK</i><b><CostChips cost={p.bank} /></b></span>
+            )}
           </>
         )}
     </div>

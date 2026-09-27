@@ -45,6 +45,7 @@ const TITLES: Record<ScreenKey, string> = {
   'hero-claim': 'Claim a hero',
   'reserved-hero': 'Place a reserved hero',
   'overlay-choice': 'Choose the overlay',
+  'dowser-collector': "Dowser's free collector",
   'spy-assign': 'Assign your spy',
   'report-draw': 'Draw a battle card',
   'action-done': 'The action is done',

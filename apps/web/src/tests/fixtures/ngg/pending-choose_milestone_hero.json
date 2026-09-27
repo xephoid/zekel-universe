@@ -35,9 +35,7 @@
      "heroes": [
       "Archmage Chaimidious (p1)"
      ],
-     "collectors": [
-      "surf-2 (p1)"
-     ]
+     "collectors": []
     },
     {
      "coord": "-2,8",
@@ -59,7 +57,9 @@
      "base_owner": "p1",
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "surf-2 (p1)"
+     ]
     },
     {
      "coord": "-1,3",
@@ -81,7 +81,9 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "surf-3 (p1)"
+     ]
     },
     {
      "coord": "-1,7",
@@ -103,7 +105,9 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "surf-4 (p1)"
+     ]
     },
     {
      "coord": "-1,11",
@@ -305,7 +309,7 @@
   "victory_status": {
    "p1": {
     "culture": 0,
-    "tech": 2,
+    "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
    },
@@ -335,21 +339,27 @@
     ],
     "mana_current": 5,
     "mana_max": 5,
-    "buildings": [],
-    "building_counts": {},
+    "buildings": [
+     "Amphitheatre"
+    ],
+    "building_counts": {
+     "amphitheatre": 1
+    },
     "research": [],
     "tech_progress": {
      "acquired_types": [
       "surf",
-      "castle"
+      "castle",
+      "amphitheatre"
      ],
      "acquired_type_names": [
       "Surf",
-      "Castle"
+      "Castle",
+      "Amphitheatre"
      ],
      "bonus_points_live": 0,
-     "total": 2,
-     "target": 22
+     "total": 3,
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
@@ -406,7 +416,8 @@
       "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
-      "Extra Build Card": "needs a Library of Enchantment"
+      "Extra Build Card": "needs a Library of Enchantment",
+      "Haste": "needs a Library of Enchantment"
      },
      "treaties": "needs an Embassy or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
      "battle_cards": "needs an Embassy"
@@ -420,17 +431,17 @@
      {
       "collector": "surf-2",
       "type": "Surf",
-      "placed_at": "-2,6"
+      "placed_at": "-2,10"
      },
      {
       "collector": "surf-3",
       "type": "Surf",
-      "placed_at": null
+      "placed_at": "-1,5"
      },
      {
       "collector": "surf-4",
       "type": "Surf",
-      "placed_at": null
+      "placed_at": "-1,9"
      }
     ],
     "committed_collectors": [
@@ -441,10 +452,22 @@
      },
      {
       "collector": "surf-2",
-      "coord": "-2,6",
-      "resource": "water"
+      "coord": "-2,10",
+      "resource": "wood"
+     },
+     {
+      "collector": "surf-3",
+      "coord": "-1,5",
+      "resource": "wood"
+     },
+     {
+      "collector": "surf-4",
+      "coord": "-1,9",
+      "resource": "wood"
      }
-    ]
+    ],
+    "bank": {},
+    "paired_core_cost": null
    },
    {
     "player_id": "p2",
@@ -480,7 +503,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 18
+     "target": 24
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
@@ -574,7 +597,11 @@
       "coord": "1,5",
       "resource": "water"
      }
-    ]
+    ],
+    "bank": {},
+    "paired_core_cost": {
+     "water": 1
+    }
    }
   ],
   "your_battle_hand": [],
@@ -638,7 +665,7 @@
   },
   {
    "move_id": "",
-   "description": "Claim Envoy Sable Marrow — Unlocks treaties. Existing treaties survive Envoy's death; forming new ones still requires an unlock held by either partner.",
+   "description": "Claim Envoy Sable Marrow — Unlocks treaties. Existing treaties survive Envoy's death; forming new ones still requires an unlock held by either partner. In a battle Envoy is in, no spy (Invisible or Spy Attack) can kill a hero on Envoy's side (ruling #105).",
    "move": {
     "type": "choose_milestone_hero",
     "hero": "Envoy Sable Marrow"
@@ -654,7 +681,7 @@
   },
   {
    "move_id": "",
-   "description": "Claim Dowser Wren Calloway — Occupied space becomes Water while its overlay is active.",
+   "description": "Claim Dowser Wren Calloway — When placed, grants one free collector at once: a Surf for a wizard; for a robot, a collector of the owner's choice with a Core already in it (ruling #106). No resource overlay.",
    "move": {
     "type": "choose_milestone_hero",
     "hero": "Dowser Wren Calloway"
@@ -702,7 +729,7 @@
   },
   {
    "move_id": "",
-   "description": "Claim Motherboard — +1 bonus tech point while alive, owned, and in play. Available to either species.",
+   "description": "Claim Motherboard — +3 bonus tech points while alive, owned, and in play (ruling #104). Available to either species.",
    "move": {
     "type": "choose_milestone_hero",
     "hero": "Motherboard"
@@ -744,9 +771,7 @@
      "heroes": [
       "Archmage Chaimidious (p1)"
      ],
-     "collectors": [
-      "surf-2 (p1)"
-     ]
+     "collectors": []
     },
     {
      "coord": "-2,8",
@@ -768,7 +793,9 @@
      "base_owner": "p1",
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "surf-2 (p1)"
+     ]
     },
     {
      "coord": "-1,3",
@@ -790,7 +817,9 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "surf-3 (p1)"
+     ]
     },
     {
      "coord": "-1,7",
@@ -812,7 +841,9 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "surf-4 (p1)"
+     ]
     },
     {
      "coord": "-1,11",
@@ -1014,7 +1045,7 @@
   "victory_status": {
    "p1": {
     "culture": 0,
-    "tech": 2,
+    "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
    },
@@ -1044,21 +1075,27 @@
     ],
     "mana_current": 5,
     "mana_max": 5,
-    "buildings": [],
-    "building_counts": {},
+    "buildings": [
+     "Amphitheatre"
+    ],
+    "building_counts": {
+     "amphitheatre": 1
+    },
     "research": [],
     "tech_progress": {
      "acquired_types": [
       "surf",
-      "castle"
+      "castle",
+      "amphitheatre"
      ],
      "acquired_type_names": [
       "Surf",
-      "Castle"
+      "Castle",
+      "Amphitheatre"
      ],
      "bonus_points_live": 0,
-     "total": 2,
-     "target": 22
+     "total": 3,
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
@@ -1115,7 +1152,8 @@
       "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
-      "Extra Build Card": "needs a Library of Enchantment"
+      "Extra Build Card": "needs a Library of Enchantment",
+      "Haste": "needs a Library of Enchantment"
      },
      "treaties": "needs an Embassy or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
      "battle_cards": "needs an Embassy"
@@ -1129,17 +1167,17 @@
      {
       "collector": "surf-2",
       "type": "Surf",
-      "placed_at": "-2,6"
+      "placed_at": "-2,10"
      },
      {
       "collector": "surf-3",
       "type": "Surf",
-      "placed_at": null
+      "placed_at": "-1,5"
      },
      {
       "collector": "surf-4",
       "type": "Surf",
-      "placed_at": null
+      "placed_at": "-1,9"
      }
     ],
     "committed_collectors": [
@@ -1150,10 +1188,22 @@
      },
      {
       "collector": "surf-2",
-      "coord": "-2,6",
-      "resource": "water"
+      "coord": "-2,10",
+      "resource": "wood"
+     },
+     {
+      "collector": "surf-3",
+      "coord": "-1,5",
+      "resource": "wood"
+     },
+     {
+      "collector": "surf-4",
+      "coord": "-1,9",
+      "resource": "wood"
      }
-    ]
+    ],
+    "bank": {},
+    "paired_core_cost": null
    },
    {
     "player_id": "p2",
@@ -1189,7 +1239,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 18
+     "target": 24
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
@@ -1283,7 +1333,11 @@
       "coord": "1,5",
       "resource": "water"
      }
-    ]
+    ],
+    "bank": {},
+    "paired_core_cost": {
+     "water": 1
+    }
    }
   ],
   "your_battle_hand": [

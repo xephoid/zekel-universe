@@ -116,4 +116,5 @@ export const ICON_ALIASES: Record<string, string> = {
   "Extra Build Card": "Build",
   "Extra Move/Battle Card": "Move / Battle",
   "Extra Research Card": "Research",
+  "Advanced Research Station": "Advance Research Station",
 };

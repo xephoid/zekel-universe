@@ -22,7 +22,7 @@ import type { ScreenKey } from '../route';
 import type { MapMarks } from '../HexMap';
 import { TableLayout } from '../Layout';
 import { TREATY_INK, inkOfSeat } from '../factions';
-import { heroByName, treatyByName, type RefHero } from '../ref';
+import { heroByName, itemByName, treatyByName, type RefHero } from '../ref';
 import { Actions, Btn, CardFace, FactionChip, HowTo, Icon, OptionRow, Panel, ResourceChip, Rule, SeatBand, Token } from '../ui';
 import './round.css';
 
@@ -724,6 +724,52 @@ function ReservedHero({ ctx }: { ctx: ScreenCtx }) {
 }
 
 // ---------------------------------------------------------------------------
+// Dowser's free collector (ruling #106): a robot picks which collector type
+// Dowser Wren Calloway grants, a Core already in it. One engine move per type.
+// ---------------------------------------------------------------------------
+
+function DowserCollector({ ctx }: { ctx: ScreenCtx }) {
+  const moves = ctx.movesOf('choose_dowser_collector');
+  const [raw, setSel] = useScratch<string | null>(ctx, 'ngg:dowser-collector', null);
+  const sel = moves.find((m) => str(m.move['collector']) === raw) ?? null;
+  const decide = minePending(ctx, 'dowser_collector');
+  const owner = ctx.v.pending?.for ?? null;
+  const faction = ctx.v.players.find((p) => p.id === owner)?.faction ?? null;
+  const panel = (
+    <Panel title={decide ? 'Dowser gives you a free collector' : `${owner ? ctx.seat(owner) : 'A seat'} takes a free collector from Dowser`}>
+      {decide && <HowTo>Pick its type. It comes with a Core already in it.</HowTo>}
+      <div className="ngg-options">
+        {moves.map((m) => {
+          const name = str(m.move['collector']);
+          const unit = itemByName(ctx.ref, name);
+          const res = unit?.kind === 'unit' ? unit.unit.collectorResource : null;
+          return (
+            <OptionRow
+              key={name}
+              mark={<Token kind="collector" faction={faction} name={res ? name : 'Collector'} size={26} />}
+              title={name}
+              sub={res ? <span className="ngr-effect">Collects <ResourceChip resource={res} /></span> : undefined}
+              selected={sel === m}
+              disabled={!ctx.live}
+              onPress={() => setSel(name)}
+            />
+          );
+        })}
+      </div>
+      {decide && (
+        <Actions>
+          <Btn disabled={!ctx.live || !sel} onClick={() => { if (sel) { ctx.memory.delete('ngg:dowser-collector'); ctx.send(sel); } }}>
+            {sel ? `Take the ${str(sel.move['collector'])}` : 'Choose a collector'}
+          </Btn>
+        </Actions>
+      )}
+      <Rule>It counts toward its type's limit and toward technology like any other collector.</Rule>
+    </Panel>
+  );
+  return <TableLayout ctx={ctx} panel={panel} />;
+}
+
+// ---------------------------------------------------------------------------
 // Overlay Choice: which Economy hero's overlay is active
 // ---------------------------------------------------------------------------
 
@@ -1010,6 +1056,7 @@ export const ROUND_SCREENS: Partial<Record<ScreenKey, ComponentType<{ ctx: Scree
   'hero-claim': HeroClaim,
   'reserved-hero': ReservedHero,
   'overlay-choice': OverlayChoice,
+  'dowser-collector': DowserCollector,
   'spy-assign': SpyAssign,
   'game-over': GameOver,
   upkeep: QuietTable,

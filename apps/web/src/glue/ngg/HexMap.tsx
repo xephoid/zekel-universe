@@ -59,9 +59,10 @@ export interface MapMarks {
 function piecesOf(v: NggView, t: NggTile) {
   const heroes = t.pieces.filter((p) => p.kind === 'hero');
   const units = t.pieces.filter((p) => p.kind === 'unit');
-  const collector = t.pieces.find((p) => p.kind === 'collector') ?? null;
+  // Usually one; two when Collector Optimizations lets them share (#102).
+  const collectors = t.pieces.filter((p) => p.kind === 'collector');
   const speciesOf = (pid: string): Species | null => v.players.find((p) => p.id === pid)?.species ?? null;
-  return { heroes, units, collector, speciesOf };
+  return { heroes, units, collectors, speciesOf };
 }
 
 function collectorIcon(species: Species | null, resource: string | null): string {
@@ -139,14 +140,14 @@ function TilePieces({ v, t, proposals, refs, onInspect }: {
   /** open a piece's details; null where the hex is part of the decision */
   onInspect: ((p: InspectPiece[]) => void) | null;
 }) {
-  const { heroes, units, collector, speciesOf } = piecesOf(v, t);
+  const { heroes, units, collectors, speciesOf } = piecesOf(v, t);
   const factionOf = (pid: string) => v.players.find((p) => p.id === pid)?.faction ?? null;
   const title = (p: InspectPiece) => pieceTitle(v, refs, p);
   const crowded = heroes.length + units.length > BUDGET;
   const armies = new Map<string, NggPiece[]>();
   for (const u of units) armies.set(u.owner, [...(armies.get(u.owner) ?? []), u]);
   const baseFaction = t.baseOwner ? factionOf(t.baseOwner) : null;
-  const dashedCollector = proposals.find((p) => p.kind === 'collector');
+  const dashedCollectors = proposals.filter((p) => p.kind === 'collector');
   return (
     <div className="ngg-tile-pieces">
       <div className="ngg-tile-army">
@@ -186,18 +187,22 @@ function TilePieces({ v, t, proposals, refs, onInspect }: {
           <Token key={p.key} kind={p.kind} faction={factionOf(p.owner)} name={p.name} state="dashed" size={22} />
         ))}
       </div>
-      {collector && (
-        <span className="ngg-tile-collector" data-flip-id={`ngg-collector:${collector.id}`} data-flip-from={`ngg-supply:${collector.owner}`}>
-          <PieceBtn onInspect={onInspect} pieces={[collector]}>
-            <Token kind="collector" faction={factionOf(collector.owner)} name={collectorIcon(speciesOf(collector.owner), collector.resource)} size={18} title={title(collector)} />
-          </PieceBtn>
-        </span>
-      )}
-      {!collector && dashedCollector && (
-        <span className="ngg-tile-collector"
-          data-flip-id={dashedCollector.pieceId ? `ngg-collector:${dashedCollector.pieceId}` : undefined}
-          data-flip-from={dashedCollector.pieceId ? `ngg-supply:${dashedCollector.owner}` : undefined}>
-          <Token kind="collector" faction={factionOf(dashedCollector.owner)} name={dashedCollector.name} state="dashed" size={18} />
+      {(collectors.length > 0 || dashedCollectors.length > 0) && (
+        <span className="ngg-tile-collectors">
+          {collectors.map((c) => (
+            <span key={c.id ?? c.name} className="ngg-tile-collector" data-flip-id={`ngg-collector:${c.id}`} data-flip-from={`ngg-supply:${c.owner}`}>
+              <PieceBtn onInspect={onInspect} pieces={[c]}>
+                <Token kind="collector" faction={factionOf(c.owner)} name={collectorIcon(speciesOf(c.owner), c.resource)} size={18} title={title(c)} />
+              </PieceBtn>
+            </span>
+          ))}
+          {dashedCollectors.map((d) => (
+            <span key={d.key} className="ngg-tile-collector"
+              data-flip-id={d.pieceId ? `ngg-collector:${d.pieceId}` : undefined}
+              data-flip-from={d.pieceId ? `ngg-supply:${d.owner}` : undefined}>
+              <Token kind="collector" faction={factionOf(d.owner)} name={d.name} state="dashed" size={18} />
+            </span>
+          ))}
         </span>
       )}
     </div>

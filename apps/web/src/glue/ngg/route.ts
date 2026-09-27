@@ -26,7 +26,7 @@ export type ScreenKey =
   | 'battle-activation' | 'infiltrator' | 'battle-defense' | 'retreat' | 'rally'
   // diplomacy and heroes
   | 'treaty-response' | 'treaty-break'
-  | 'hero-claim' | 'reserved-hero' | 'overlay-choice' | 'spy-assign'
+  | 'hero-claim' | 'reserved-hero' | 'overlay-choice' | 'spy-assign' | 'dowser-collector'
   // draws
   | 'report-draw'
   // an action whose effects are over: a treaty offer, or ending the turn
@@ -74,6 +74,7 @@ const PENDING_SCREENS: Record<string, ScreenKey> = {
   rally_selection: 'rally',
   choose_milestone_hero: 'hero-claim',
   overlay_choice: 'overlay-choice',
+  dowser_collector: 'dowser-collector',
   place_reserved_hero: 'reserved-hero',
   choose_spy: 'spy-assign',
 };

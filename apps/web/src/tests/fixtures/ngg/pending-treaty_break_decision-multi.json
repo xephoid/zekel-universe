@@ -1,12 +1,12 @@
 {
  "key": "pending-treaty_break_decision",
  "players": 4,
- "viewer": "p1",
+ "viewer": "p2",
  "view": {
   "game_id": "neither-guts-nor-gears",
   "phase": "treaty_break",
   "round": 1,
-  "active_player_id": "p1",
+  "active_player_id": "p2",
   "first_player_id": "p2",
   "layout": "threeFour",
   "map": {
@@ -19,9 +19,11 @@
      "start": 4,
      "base_owner": "p4",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Archmage Elara (p4)"
+     ],
      "collectors": [
-      "surf-1 (p4)"
+      "water-collector-1 (p1)"
      ]
     },
     {
@@ -35,9 +37,7 @@
      "heroes": [
       "Quartermaster Bertram Hollis (p4)"
      ],
-     "collectors": [
-      "surf-2 (p4)"
-     ]
+     "collectors": []
     },
     {
      "coord": "-2,8",
@@ -49,7 +49,7 @@
      "units": [],
      "heroes": [],
      "collectors": [
-      "water-collector-1 (p3)"
+      "surf-2 (p4)"
      ]
     },
     {
@@ -73,9 +73,11 @@
      "start": 1,
      "base_owner": "p3",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Evo Angel (p3)"
+     ],
      "collectors": [
-      "water-collector-2 (p3)"
+      "water-collector-1 (p3)"
      ]
     },
     {
@@ -98,7 +100,9 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "surf-1 (p4)"
+     ]
     },
     {
      "coord": "-1,7",
@@ -120,7 +124,9 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "surf-3 (p4)"
+     ]
     },
     {
      "coord": "-1,11",
@@ -142,7 +148,9 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "wood-collector-1 (p3)"
+     ]
     },
     {
      "coord": "0,2",
@@ -219,7 +227,9 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "water-collector-2 (p3)"
+     ]
     },
     {
      "coord": "1,3",
@@ -349,14 +359,14 @@
      "start": 2,
      "base_owner": "p1",
      "units": [],
-     "heroes": [],
-     "collectors": [
-      "water-collector-1 (p1)"
-     ]
+     "heroes": [
+      "Warden Hesper Quill (p1)"
+     ],
+     "collectors": []
     }
    ]
   },
-  "hero_pool_count": 15,
+  "hero_pool_count": 12,
   "action_stack": [],
   "active_action": null,
   "resolving_action": null,
@@ -364,16 +374,32 @@
    {
     "treaty": "Open Borders",
     "partners": [
-     "p2",
-     "p4"
+     "p4",
+     "p1"
     ],
     "culture_income": 2
    },
    {
     "treaty": "Shared Resources",
     "partners": [
+     "p4",
+     "p2"
+    ],
+    "culture_income": 2
+   },
+   {
+    "treaty": "Peace",
+    "partners": [
+     "p4",
+     "p3"
+    ],
+    "culture_income": 2
+   },
+   {
+    "treaty": "Open Borders",
+    "partners": [
      "p2",
-     "p1"
+     "p3"
     ],
     "culture_income": 2
    },
@@ -381,7 +407,7 @@
     "treaty": "Peace",
     "partners": [
      "p2",
-     "p3"
+     "p1"
     ],
     "culture_income": 2
    }
@@ -391,21 +417,49 @@
   "battle_discard": [],
   "pending": {
    "kind": "treaty_break_decision",
-   "for": "p1",
-   "question": "p1 may break any of their breakable treaties (end of round, §5.6), or keep them",
+   "for": "p2",
+   "question": "p2 may break any of their breakable treaties (end of round, §5.6), or keep them",
    "options": [
     {
-     "option_id": "shared-resources:p2",
-     "label": "Shared Resources with The Schism",
+     "option_id": "shared-resources:p4",
+     "label": "Shared Resources with The Brass Circle",
      "detail": {
-      "partner": "p2",
+      "partner": "p4",
       "culture_income": 2,
       "break_condition": "End of round, if no unit is collecting from a partner's space."
      },
      "move": {
       "type": "break_treaty",
       "treaty_type": "Shared Resources",
-      "partner": "p2"
+      "partner": "p4"
+     }
+    },
+    {
+     "option_id": "open-borders:p3",
+     "label": "Open Borders with The Ledger",
+     "detail": {
+      "partner": "p3",
+      "culture_income": 2,
+      "break_condition": "End of round, provided allied units do not share a space."
+     },
+     "move": {
+      "type": "break_treaty",
+      "treaty_type": "Open Borders",
+      "partner": "p3"
+     }
+    },
+    {
+     "option_id": "peace:p1",
+     "label": "Peace with The Foundry",
+     "detail": {
+      "partner": "p1",
+      "culture_income": 2,
+      "break_condition": "End of round only."
+     },
+     "move": {
+      "type": "break_treaty",
+      "treaty_type": "Peace",
+      "partner": "p1"
      }
     },
     {
@@ -420,7 +474,7 @@
   },
   "victory_status": {
    "p1": {
-    "culture": 3,
+    "culture": 5,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
@@ -432,14 +486,14 @@
     "leader_alive": true
    },
    "p3": {
-    "culture": 4,
+    "culture": 6,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p4": {
-    "culture": 2,
-    "tech": 2,
+    "culture": 6,
+    "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -451,11 +505,10 @@
     "kind": "human",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 3,
+    "culture": 5,
     "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
-     5,
      15,
      30,
      50,
@@ -481,7 +534,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 18
+     "target": 24
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -517,6 +570,13 @@
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
+     },
+     {
+      "hero": "Warden Hesper Quill",
+      "coord": "2,12",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
      }
     ],
     "bases": [
@@ -542,7 +602,7 @@
      {
       "collector": "water-collector-1",
       "type": "Water collector",
-      "placed_at": "2,12",
+      "placed_at": "-2,4",
       "core": "allocated"
      },
      {
@@ -567,10 +627,14 @@
     "committed_collectors": [
      {
       "collector": "water-collector-1",
-      "coord": "2,12",
+      "coord": "-2,4",
       "resource": "water"
      }
-    ]
+    ],
+    "bank": {},
+    "paired_core_cost": {
+     "water": 1
+    }
    },
    {
     "player_id": "p2",
@@ -608,7 +672,7 @@
      ],
      "bonus_points_live": 0,
      "total": 3,
-     "target": 22
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -673,7 +737,8 @@
       "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
-      "Extra Build Card": "needs a Library of Enchantment"
+      "Extra Build Card": "needs a Library of Enchantment",
+      "Haste": "needs a Library of Enchantment"
      },
      "treaties": null,
      "battle_cards": null
@@ -688,6 +753,11 @@
       "collector": "surf-2",
       "type": "Surf",
       "placed_at": "2,8"
+     },
+     {
+      "collector": "surf-3",
+      "type": "Surf",
+      "placed_at": null
      }
     ],
     "committed_collectors": [
@@ -701,18 +771,19 @@
       "coord": "2,8",
       "resource": "wood"
      }
-    ]
+    ],
+    "bank": {},
+    "paired_core_cost": null
    },
    {
     "player_id": "p3",
     "kind": "ai",
     "faction": "The Ledger",
     "species": "robot",
-    "culture": 4,
+    "culture": 6,
     "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
-     5,
      15,
      30,
      50,
@@ -738,7 +809,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 18
+     "target": 24
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -774,6 +845,13 @@
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Evo Angel",
+      "coord": "-2,12",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 80 DMG 4 DEF 4"
      }
     ],
     "bases": [
@@ -799,19 +877,19 @@
      {
       "collector": "water-collector-1",
       "type": "Water collector",
-      "placed_at": "-2,8",
+      "placed_at": "-2,12",
       "core": "allocated"
      },
      {
       "collector": "water-collector-2",
       "type": "Water collector",
-      "placed_at": "-2,12",
+      "placed_at": "0,14",
       "core": "allocated"
      },
      {
       "collector": "wood-collector-1",
       "type": "Wood collector",
-      "placed_at": null,
+      "placed_at": "-1,13",
       "core": "allocated"
      },
      {
@@ -824,26 +902,34 @@
     "committed_collectors": [
      {
       "collector": "water-collector-1",
-      "coord": "-2,8",
+      "coord": "-2,12",
       "resource": "water"
      },
      {
+      "collector": "wood-collector-1",
+      "coord": "-1,13",
+      "resource": "wood"
+     },
+     {
       "collector": "water-collector-2",
-      "coord": "-2,12",
+      "coord": "0,14",
       "resource": "water"
      }
-    ]
+    ],
+    "bank": {},
+    "paired_core_cost": {
+     "water": 1
+    }
    },
    {
     "player_id": "p4",
     "kind": "ai",
     "faction": "The Brass Circle",
     "species": "wizard",
-    "culture": 2,
+    "culture": 6,
     "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
-     5,
      15,
      30,
      50,
@@ -851,21 +937,27 @@
     ],
     "mana_current": 5,
     "mana_max": 5,
-    "buildings": [],
-    "building_counts": {},
+    "buildings": [
+     "Embassy"
+    ],
+    "building_counts": {
+     "embassy": 1
+    },
     "research": [],
     "tech_progress": {
      "acquired_types": [
       "surf",
-      "castle"
+      "castle",
+      "embassy"
      ],
      "acquired_type_names": [
       "Surf",
-      "Castle"
+      "Castle",
+      "Embassy"
      ],
      "bonus_points_live": 0,
-     "total": 2,
-     "target": 22
+     "total": 3,
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -902,6 +994,13 @@
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Archmage Elara",
+      "coord": "-2,4",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
      }
     ],
     "bases": [
@@ -923,48 +1022,51 @@
       "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
-      "Extra Build Card": "needs a Library of Enchantment"
+      "Extra Build Card": "needs a Library of Enchantment",
+      "Haste": "needs a Library of Enchantment"
      },
-     "treaties": "needs an Embassy or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
-     "battle_cards": "needs an Embassy"
+     "treaties": null,
+     "battle_cards": null
     },
     "collectors": [
      {
       "collector": "surf-1",
       "type": "Surf",
-      "placed_at": "-2,4"
+      "placed_at": "-1,5"
      },
      {
       "collector": "surf-2",
       "type": "Surf",
-      "placed_at": "-2,6"
+      "placed_at": "-2,8"
      },
      {
       "collector": "surf-3",
       "type": "Surf",
-      "placed_at": null
+      "placed_at": "-1,9"
      }
     ],
     "committed_collectors": [
      {
       "collector": "surf-1",
-      "coord": "-2,4",
-      "resource": "water"
+      "coord": "-1,5",
+      "resource": "wood"
      },
      {
       "collector": "surf-2",
-      "coord": "-2,6",
+      "coord": "-2,8",
       "resource": "water"
+     },
+     {
+      "collector": "surf-3",
+      "coord": "-1,9",
+      "resource": "wood"
      }
-    ]
+    ],
+    "bank": {},
+    "paired_core_cost": null
    }
   ],
-  "your_battle_hand": [
-   {
-    "card": "Counter",
-    "effect": "Counter a battle strategy card that has not yet resolved."
-   }
-  ],
+  "your_battle_hand": [],
   "your_action_cards_played": [
    "build:base",
    "research:base",
@@ -977,28 +1079,46 @@
  "legalMoves": [
   {
    "move_id": "",
-   "description": "Break Shared Resources with p2.",
+   "description": "Break Shared Resources with p4.",
    "move": {
     "type": "break_treaty",
     "treaty_type": "Shared Resources",
-    "partner": "p2"
+    "partner": "p4"
    }
   },
   {
    "move_id": "",
-   "description": "Keep all treaties (shared-resources) — upkeep begins when everyone has answered.",
+   "description": "Break Open Borders with p3.",
+   "move": {
+    "type": "break_treaty",
+    "treaty_type": "Open Borders",
+    "partner": "p3"
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Break Peace with p1.",
+   "move": {
+    "type": "break_treaty",
+    "treaty_type": "Peace",
+    "partner": "p1"
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Keep all treaties (shared-resources, open-borders, peace) — upkeep begins when everyone has answered.",
    "move": {
     "type": "skip_action"
    }
   }
  ],
  "unavailable": [],
- "watcher": "p2",
+ "watcher": "p1",
  "watcherView": {
   "game_id": "neither-guts-nor-gears",
   "phase": "treaty_break",
   "round": 1,
-  "active_player_id": "p1",
+  "active_player_id": "p2",
   "first_player_id": "p2",
   "layout": "threeFour",
   "map": {
@@ -1011,9 +1131,11 @@
      "start": 4,
      "base_owner": "p4",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Archmage Elara (p4)"
+     ],
      "collectors": [
-      "surf-1 (p4)"
+      "water-collector-1 (p1)"
      ]
     },
     {
@@ -1027,9 +1149,7 @@
      "heroes": [
       "Quartermaster Bertram Hollis (p4)"
      ],
-     "collectors": [
-      "surf-2 (p4)"
-     ]
+     "collectors": []
     },
     {
      "coord": "-2,8",
@@ -1041,7 +1161,7 @@
      "units": [],
      "heroes": [],
      "collectors": [
-      "water-collector-1 (p3)"
+      "surf-2 (p4)"
      ]
     },
     {
@@ -1065,9 +1185,11 @@
      "start": 1,
      "base_owner": "p3",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Evo Angel (p3)"
+     ],
      "collectors": [
-      "water-collector-2 (p3)"
+      "water-collector-1 (p3)"
      ]
     },
     {
@@ -1090,7 +1212,9 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "surf-1 (p4)"
+     ]
     },
     {
      "coord": "-1,7",
@@ -1112,7 +1236,9 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "surf-3 (p4)"
+     ]
     },
     {
      "coord": "-1,11",
@@ -1134,7 +1260,9 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "wood-collector-1 (p3)"
+     ]
     },
     {
      "coord": "0,2",
@@ -1211,7 +1339,9 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "water-collector-2 (p3)"
+     ]
     },
     {
      "coord": "1,3",
@@ -1341,14 +1471,14 @@
      "start": 2,
      "base_owner": "p1",
      "units": [],
-     "heroes": [],
-     "collectors": [
-      "water-collector-1 (p1)"
-     ]
+     "heroes": [
+      "Warden Hesper Quill (p1)"
+     ],
+     "collectors": []
     }
    ]
   },
-  "hero_pool_count": 15,
+  "hero_pool_count": 12,
   "action_stack": [],
   "active_action": null,
   "resolving_action": null,
@@ -1356,16 +1486,32 @@
    {
     "treaty": "Open Borders",
     "partners": [
-     "p2",
-     "p4"
+     "p4",
+     "p1"
     ],
     "culture_income": 2
    },
    {
     "treaty": "Shared Resources",
     "partners": [
+     "p4",
+     "p2"
+    ],
+    "culture_income": 2
+   },
+   {
+    "treaty": "Peace",
+    "partners": [
+     "p4",
+     "p3"
+    ],
+    "culture_income": 2
+   },
+   {
+    "treaty": "Open Borders",
+    "partners": [
      "p2",
-     "p1"
+     "p3"
     ],
     "culture_income": 2
    },
@@ -1373,7 +1519,7 @@
     "treaty": "Peace",
     "partners": [
      "p2",
-     "p3"
+     "p1"
     ],
     "culture_income": 2
    }
@@ -1383,21 +1529,49 @@
   "battle_discard": [],
   "pending": {
    "kind": "treaty_break_decision",
-   "for": "p1",
-   "question": "p1 may break any of their breakable treaties (end of round, §5.6), or keep them",
+   "for": "p2",
+   "question": "p2 may break any of their breakable treaties (end of round, §5.6), or keep them",
    "options": [
     {
-     "option_id": "shared-resources:p2",
-     "label": "Shared Resources with The Schism",
+     "option_id": "shared-resources:p4",
+     "label": "Shared Resources with The Brass Circle",
      "detail": {
-      "partner": "p2",
+      "partner": "p4",
       "culture_income": 2,
       "break_condition": "End of round, if no unit is collecting from a partner's space."
      },
      "move": {
       "type": "break_treaty",
       "treaty_type": "Shared Resources",
-      "partner": "p2"
+      "partner": "p4"
+     }
+    },
+    {
+     "option_id": "open-borders:p3",
+     "label": "Open Borders with The Ledger",
+     "detail": {
+      "partner": "p3",
+      "culture_income": 2,
+      "break_condition": "End of round, provided allied units do not share a space."
+     },
+     "move": {
+      "type": "break_treaty",
+      "treaty_type": "Open Borders",
+      "partner": "p3"
+     }
+    },
+    {
+     "option_id": "peace:p1",
+     "label": "Peace with The Foundry",
+     "detail": {
+      "partner": "p1",
+      "culture_income": 2,
+      "break_condition": "End of round only."
+     },
+     "move": {
+      "type": "break_treaty",
+      "treaty_type": "Peace",
+      "partner": "p1"
      }
     },
     {
@@ -1412,7 +1586,7 @@
   },
   "victory_status": {
    "p1": {
-    "culture": 3,
+    "culture": 5,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
@@ -1424,14 +1598,14 @@
     "leader_alive": true
    },
    "p3": {
-    "culture": 4,
+    "culture": 6,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p4": {
-    "culture": 2,
-    "tech": 2,
+    "culture": 6,
+    "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -1443,11 +1617,10 @@
     "kind": "human",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 3,
+    "culture": 5,
     "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
-     5,
      15,
      30,
      50,
@@ -1473,7 +1646,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 18
+     "target": 24
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -1509,6 +1682,13 @@
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
+     },
+     {
+      "hero": "Warden Hesper Quill",
+      "coord": "2,12",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
      }
     ],
     "bases": [
@@ -1534,7 +1714,7 @@
      {
       "collector": "water-collector-1",
       "type": "Water collector",
-      "placed_at": "2,12",
+      "placed_at": "-2,4",
       "core": "allocated"
      },
      {
@@ -1559,10 +1739,14 @@
     "committed_collectors": [
      {
       "collector": "water-collector-1",
-      "coord": "2,12",
+      "coord": "-2,4",
       "resource": "water"
      }
-    ]
+    ],
+    "bank": {},
+    "paired_core_cost": {
+     "water": 1
+    }
    },
    {
     "player_id": "p2",
@@ -1600,7 +1784,7 @@
      ],
      "bonus_points_live": 0,
      "total": 3,
-     "target": 22
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -1665,7 +1849,8 @@
       "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
-      "Extra Build Card": "needs a Library of Enchantment"
+      "Extra Build Card": "needs a Library of Enchantment",
+      "Haste": "needs a Library of Enchantment"
      },
      "treaties": null,
      "battle_cards": null
@@ -1680,6 +1865,11 @@
       "collector": "surf-2",
       "type": "Surf",
       "placed_at": "2,8"
+     },
+     {
+      "collector": "surf-3",
+      "type": "Surf",
+      "placed_at": null
      }
     ],
     "committed_collectors": [
@@ -1693,18 +1883,19 @@
       "coord": "2,8",
       "resource": "wood"
      }
-    ]
+    ],
+    "bank": {},
+    "paired_core_cost": null
    },
    {
     "player_id": "p3",
     "kind": "ai",
     "faction": "The Ledger",
     "species": "robot",
-    "culture": 4,
+    "culture": 6,
     "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
-     5,
      15,
      30,
      50,
@@ -1730,7 +1921,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 18
+     "target": 24
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -1766,6 +1957,13 @@
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Evo Angel",
+      "coord": "-2,12",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 80 DMG 4 DEF 4"
      }
     ],
     "bases": [
@@ -1791,19 +1989,19 @@
      {
       "collector": "water-collector-1",
       "type": "Water collector",
-      "placed_at": "-2,8",
+      "placed_at": "-2,12",
       "core": "allocated"
      },
      {
       "collector": "water-collector-2",
       "type": "Water collector",
-      "placed_at": "-2,12",
+      "placed_at": "0,14",
       "core": "allocated"
      },
      {
       "collector": "wood-collector-1",
       "type": "Wood collector",
-      "placed_at": null,
+      "placed_at": "-1,13",
       "core": "allocated"
      },
      {
@@ -1816,26 +2014,34 @@
     "committed_collectors": [
      {
       "collector": "water-collector-1",
-      "coord": "-2,8",
+      "coord": "-2,12",
       "resource": "water"
      },
      {
+      "collector": "wood-collector-1",
+      "coord": "-1,13",
+      "resource": "wood"
+     },
+     {
       "collector": "water-collector-2",
-      "coord": "-2,12",
+      "coord": "0,14",
       "resource": "water"
      }
-    ]
+    ],
+    "bank": {},
+    "paired_core_cost": {
+     "water": 1
+    }
    },
    {
     "player_id": "p4",
     "kind": "ai",
     "faction": "The Brass Circle",
     "species": "wizard",
-    "culture": 2,
+    "culture": 6,
     "culture_target": 100,
     "economic_collectors": 20,
     "next_milestones": [
-     5,
      15,
      30,
      50,
@@ -1843,21 +2049,27 @@
     ],
     "mana_current": 5,
     "mana_max": 5,
-    "buildings": [],
-    "building_counts": {},
+    "buildings": [
+     "Embassy"
+    ],
+    "building_counts": {
+     "embassy": 1
+    },
     "research": [],
     "tech_progress": {
      "acquired_types": [
       "surf",
-      "castle"
+      "castle",
+      "embassy"
      ],
      "acquired_type_names": [
       "Surf",
-      "Castle"
+      "Castle",
+      "Embassy"
      ],
      "bonus_points_live": 0,
-     "total": 2,
-     "target": 22
+     "total": 3,
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -1894,6 +2106,13 @@
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Archmage Elara",
+      "coord": "-2,4",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
      }
     ],
     "bases": [
@@ -1915,43 +2134,56 @@
       "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
-      "Extra Build Card": "needs a Library of Enchantment"
+      "Extra Build Card": "needs a Library of Enchantment",
+      "Haste": "needs a Library of Enchantment"
      },
-     "treaties": "needs an Embassy or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
-     "battle_cards": "needs an Embassy"
+     "treaties": null,
+     "battle_cards": null
     },
     "collectors": [
      {
       "collector": "surf-1",
       "type": "Surf",
-      "placed_at": "-2,4"
+      "placed_at": "-1,5"
      },
      {
       "collector": "surf-2",
       "type": "Surf",
-      "placed_at": "-2,6"
+      "placed_at": "-2,8"
      },
      {
       "collector": "surf-3",
       "type": "Surf",
-      "placed_at": null
+      "placed_at": "-1,9"
      }
     ],
     "committed_collectors": [
      {
       "collector": "surf-1",
-      "coord": "-2,4",
-      "resource": "water"
+      "coord": "-1,5",
+      "resource": "wood"
      },
      {
       "collector": "surf-2",
-      "coord": "-2,6",
+      "coord": "-2,8",
       "resource": "water"
+     },
+     {
+      "collector": "surf-3",
+      "coord": "-1,9",
+      "resource": "wood"
      }
-    ]
+    ],
+    "bank": {},
+    "paired_core_cost": null
    }
   ],
-  "your_battle_hand": [],
+  "your_battle_hand": [
+   {
+    "card": "Counter",
+    "effect": "Counter a battle strategy card that has not yet resolved."
+   }
+  ],
   "your_action_cards_played": [
    "build:base",
    "research:base",

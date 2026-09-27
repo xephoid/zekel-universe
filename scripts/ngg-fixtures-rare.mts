@@ -78,6 +78,16 @@ write('pending-extra_selection-shut', fx.extraSelection().s);
   write('pending-choose_faction', s);
 }
 
+// Dowser Wren Calloway as a robot's Leader: the robot picks its free
+// collector (ruling #106).
+{
+  let s = game.createSession([{ player_id: 'wiz', kind: 'human' }, { player_id: 'rob', kind: 'human' }], { seed: 3, setupFirstPlayerId: 'wiz' });
+  s = game.applyMove(s, 'wiz', { type: 'assign_setup_choices', selections: { wiz: 'covenant', rob: 'ledger' } }).newState;
+  s = game.applyMove(s, 'wiz', { type: 'choose_leader', hero: 'Warden Hesper Quill' }).newState;
+  s = game.applyMove(s, 'rob', { type: 'choose_leader', hero: 'Dowser Wren Calloway' }).newState;
+  write('pending-dowser_collector', s);
+}
+
 // A claimed hero, owed a base because its owner holds two.
 {
   const s = fx.base2p();

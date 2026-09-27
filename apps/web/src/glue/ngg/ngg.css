@@ -160,7 +160,9 @@ button.ngg-hex { cursor: pointer; }
 .ngg-hex.shut .ngg-hex-face, .ngg-hex.grey .ngg-hex-face { filter: grayscale(1) brightness(1.14) contrast(.82); }
 .ngg-tile-pieces { position: absolute; inset: 0; pointer-events: none; }
 .ngg-tile-army { position: absolute; left: 8px; right: 8px; top: 18px; bottom: 22px; display: flex; flex-wrap: wrap; gap: 3px; align-items: center; justify-content: center; align-content: center; }
-.ngg-tile-collector { position: absolute; left: 50%; bottom: 3px; transform: translateX(-50%); }
+/* A tile's collectors (two when Collector Optimizations lets them share), centred at its foot. */
+.ngg-tile-collectors { position: absolute; left: 50%; bottom: 3px; transform: translateX(-50%); display: flex; gap: 2px; }
+.ngg-tile-collector { display: inline-flex; }
 .ngg-army-chip { min-width: 28px; height: 28px; padding: 0 5px; border-radius: 999px; border: 2.5px solid #1c1a17; box-shadow: 0 3px 6px rgba(0,0,0,.34); display: grid; place-items: center; font: 700 13px 'IBM Plex Mono', monospace; }
 .ngg-seatmark { position: absolute; left: -4px; top: -3px; width: 112px; height: 96px; pointer-events: none; z-index: 1; }
 .ngg-seatmark.wizard path { fill: none; stroke: #7a3b52; stroke-width: 2.6; stroke-linejoin: round; opacity: .9; }

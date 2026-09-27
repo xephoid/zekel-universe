@@ -1,13 +1,13 @@
 {
- "key": "action-research",
+ "key": "pending-dowser_collector",
  "players": 2,
- "viewer": "p2",
+ "viewer": "rob",
  "view": {
   "game_id": "neither-guts-nor-gears",
-  "phase": "action",
-  "round": 1,
-  "active_player_id": "p2",
-  "first_player_id": "p1",
+  "phase": "setup_leaders",
+  "round": 0,
+  "active_player_id": "rob",
+  "first_player_id": "wiz",
   "layout": "two",
   "map": {
    "tiles": [
@@ -41,9 +41,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Archmage Chaimidious (p1)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -52,7 +50,7 @@
      "printed_resource": "wood",
      "current_resource": "wood",
      "start": 1,
-     "base_owner": "p1",
+     "base_owner": null,
      "units": [],
      "heroes": [],
      "collectors": []
@@ -239,7 +237,7 @@
      "printed_resource": "water",
      "current_resource": "water",
      "start": 2,
-     "base_owner": "p2",
+     "base_owner": null,
      "units": [],
      "heroes": [],
      "collectors": []
@@ -252,9 +250,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Foreman Hadrik Stoll (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -282,49 +278,28 @@
    ]
   },
   "hero_pool_count": 18,
-  "action_stack": [
-   {
-    "position": 1,
-    "owner": "p1",
-    "face": "down"
-   },
-   {
-    "position": 2,
-    "owner": "p2",
-    "card_kind": "build"
-   },
-   {
-    "position": 3,
-    "owner": "p1",
-    "face": "down"
-   },
-   {
-    "position": 4,
-    "owner": "p2",
-    "card_kind": "research"
-   }
-  ],
-  "active_action": "research by p2",
-  "resolving_action": {
-   "card_kind": "research",
-   "owner": "p2",
-   "finished": false
-  },
+  "action_stack": [],
+  "active_action": null,
+  "resolving_action": null,
   "treaties": [],
   "battle": null,
-  "battle_deck_count": 19,
+  "battle_deck_count": 20,
   "battle_discard": [],
-  "pending": null,
+  "pending": {
+   "kind": "dowser_collector",
+   "for": "rob",
+   "question": "rob takes one free collector from Dowser Wren Calloway, with a Core in it — which type? (ruling #106)"
+  },
   "victory_status": {
-   "p1": {
+   "wiz": {
     "culture": 0,
-    "tech": 2,
+    "tech": 0,
     "leader_kills": 0,
     "leader_alive": true
    },
-   "p2": {
+   "rob": {
     "culture": 0,
-    "tech": 4,
+    "tech": 0,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -332,7 +307,7 @@
   "result": null,
   "players": [
    {
-    "player_id": "p1",
+    "player_id": "wiz",
     "kind": "human",
     "faction": "The Covenant",
     "species": "wizard",
@@ -352,16 +327,10 @@
     "building_counts": {},
     "research": [],
     "tech_progress": {
-     "acquired_types": [
-      "surf",
-      "castle"
-     ],
-     "acquired_type_names": [
-      "Surf",
-      "Castle"
-     ],
+     "acquired_types": [],
+     "acquired_type_names": [],
      "bonus_points_live": 0,
-     "total": 2,
+     "total": 0,
      "target": 26
     },
     "leader_kills": 0,
@@ -386,23 +355,21 @@
       "base"
      ]
     },
-    "action_cards_played_count": 3,
-    "battle_hand_count": 1,
+    "action_cards_played_count": 0,
+    "battle_hand_count": 0,
     "spy_recruitments": 0,
     "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Archmage Chaimidious",
-      "coord": "-2,8",
+      "hero": "Warden Hesper Quill",
+      "coord": "reserved",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
      }
     ],
-    "bases": [
-     "-2,10"
-    ],
+    "bases": [],
     "locked": {
      "units": {
       "Illusionist": "needs a Library of Illusion",
@@ -447,9 +414,9 @@
     "paired_core_cost": null
    },
    {
-    "player_id": "p2",
-    "kind": "ai",
-    "faction": "The Foundry",
+    "player_id": "rob",
+    "kind": "human",
+    "faction": "The Ledger",
     "species": "robot",
     "culture": 0,
     "culture_target": 50,
@@ -467,20 +434,10 @@
     "building_counts": {},
     "research": [],
     "tech_progress": {
-     "acquired_types": [
-      "core",
-      "water-collector",
-      "wood-collector",
-      "home"
-     ],
-     "acquired_type_names": [
-      "Core",
-      "Water collector",
-      "Wood collector",
-      "Home"
-     ],
+     "acquired_types": [],
+     "acquired_type_names": [],
      "bonus_points_live": 0,
-     "total": 4,
+     "total": 0,
      "target": 24
     },
     "leader_kills": 0,
@@ -488,7 +445,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 12,
+    "cores_supply": 16,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -505,23 +462,21 @@
       "base"
      ]
     },
-    "action_cards_played_count": 3,
+    "action_cards_played_count": 0,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Foreman Hadrik Stoll",
-      "coord": "2,6",
+      "hero": "Dowser Wren Calloway",
+      "coord": "reserved",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
      }
     ],
-    "bases": [
-     "2,4"
-    ],
+    "bases": [],
     "locked": {
      "units": {
       "Spinner Platform": "needs a Combat Frame Production",
@@ -531,39 +486,17 @@
       "Wall Platform": "needs a Defense Research Station"
      },
      "research": {
+      "Metal Platforms": "needs a Home on the map",
       "Extra Build Card": "needs an Advanced Research Station",
       "Extra Move/Battle Card": "needs an Advanced Research Station",
-      "Extra Research Card": "needs an Advanced Research Station"
+      "Extra Research Card": "needs an Advanced Research Station",
+      "Collector Optimizations": "needs a Home on the map",
+      "Core Integration": "needs a Home on the map"
      },
      "treaties": "needs a Diplomatic Research Station or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
      "battle_cards": "needs a Defense Research Station"
     },
-    "collectors": [
-     {
-      "collector": "water-collector-1",
-      "type": "Water collector",
-      "placed_at": null,
-      "core": "allocated"
-     },
-     {
-      "collector": "water-collector-2",
-      "type": "Water collector",
-      "placed_at": null,
-      "core": "allocated"
-     },
-     {
-      "collector": "wood-collector-1",
-      "type": "Wood collector",
-      "placed_at": null,
-      "core": "allocated"
-     },
-     {
-      "collector": "wood-collector-2",
-      "type": "Wood collector",
-      "placed_at": null,
-      "core": "allocated"
-     }
-    ],
+    "collectors": [],
     "committed_collectors": [],
     "bank": {},
     "paired_core_cost": {
@@ -572,72 +505,62 @@
    }
   ],
   "your_battle_hand": [],
-  "your_action_cards_played": [
-   "build:base",
-   "research:base",
-   "move_battle:base"
-  ],
+  "your_action_cards_played": [],
   "your_spy_assignments": [],
   "your_knowledge": [],
-  "your_reserved_heroes": []
+  "your_reserved_heroes": [
+   "Dowser Wren Calloway"
+  ]
  },
  "legalMoves": [
   {
    "move_id": "",
-   "description": "Skip this Research action.",
+   "description": "Take a free Water collector from Dowser, with a Core in it.",
    "move": {
-    "type": "skip_action"
+    "type": "choose_dowser_collector",
+    "collector": "Water collector"
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Take a free Wood collector from Dowser, with a Core in it.",
+   "move": {
+    "type": "choose_dowser_collector",
+    "collector": "Wood collector"
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Take a free Ore collector from Dowser, with a Core in it.",
+   "move": {
+    "type": "choose_dowser_collector",
+    "collector": "Ore collector"
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Take a free Oil collector from Dowser, with a Core in it.",
+   "move": {
+    "type": "choose_dowser_collector",
+    "collector": "Oil collector"
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Take a free Ether collector from Dowser, with a Core in it.",
+   "move": {
+    "type": "choose_dowser_collector",
+    "collector": "Ether collector"
    }
   }
  ],
- "unavailable": [
-  {
-   "moveType": "form_treaty",
-   "reason": "a treaty needs an unlock on one side — a Diplomatic Research Station or an active Envoy Sable Marrow; no one who could partner with you has one"
-  },
-  {
-   "moveType": "research",
-   "item": "Metal Platforms",
-   "reason": "costs 2 wood + 1 ore + 1 oil — you have no free ore collector"
-  },
-  {
-   "moveType": "research",
-   "item": "Extra Build Card",
-   "reason": "Extra Build Card requires Advanced Research Station (you have: none)"
-  },
-  {
-   "moveType": "research",
-   "item": "Extra Move/Battle Card",
-   "reason": "Extra Move/Battle Card requires Advanced Research Station (you have: none)"
-  },
-  {
-   "moveType": "research",
-   "item": "Extra Research Card",
-   "reason": "Extra Research Card requires Advanced Research Station (you have: none)"
-  },
-  {
-   "moveType": "research",
-   "item": "Collector Optimizations",
-   "reason": "costs 2 ore + 1 oil — you have no free oil collector"
-  },
-  {
-   "moveType": "research",
-   "item": "Core Integration",
-   "reason": "costs 2 water + 1 oil — you have no free oil collector"
-  },
-  {
-   "moveType": "research",
-   "item": "battle strategy card",
-   "reason": "needs a Defense Research Station first"
-  }
- ],
- "watcher": "p1",
+ "watcher": "wiz",
  "watcherView": {
   "game_id": "neither-guts-nor-gears",
-  "phase": "action",
-  "round": 1,
-  "active_player_id": "p2",
-  "first_player_id": "p1",
+  "phase": "setup_leaders",
+  "round": 0,
+  "active_player_id": "rob",
+  "first_player_id": "wiz",
   "layout": "two",
   "map": {
    "tiles": [
@@ -671,9 +594,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Archmage Chaimidious (p1)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -682,7 +603,7 @@
      "printed_resource": "wood",
      "current_resource": "wood",
      "start": 1,
-     "base_owner": "p1",
+     "base_owner": null,
      "units": [],
      "heroes": [],
      "collectors": []
@@ -869,7 +790,7 @@
      "printed_resource": "water",
      "current_resource": "water",
      "start": 2,
-     "base_owner": "p2",
+     "base_owner": null,
      "units": [],
      "heroes": [],
      "collectors": []
@@ -882,9 +803,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Foreman Hadrik Stoll (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -912,49 +831,28 @@
    ]
   },
   "hero_pool_count": 18,
-  "action_stack": [
-   {
-    "position": 1,
-    "owner": "p1",
-    "card_kind": "build"
-   },
-   {
-    "position": 2,
-    "owner": "p2",
-    "face": "down"
-   },
-   {
-    "position": 3,
-    "owner": "p1",
-    "card_kind": "research"
-   },
-   {
-    "position": 4,
-    "owner": "p2",
-    "card_kind": "research"
-   }
-  ],
-  "active_action": "research by p2",
-  "resolving_action": {
-   "card_kind": "research",
-   "owner": "p2",
-   "finished": false
-  },
+  "action_stack": [],
+  "active_action": null,
+  "resolving_action": null,
   "treaties": [],
   "battle": null,
-  "battle_deck_count": 19,
+  "battle_deck_count": 20,
   "battle_discard": [],
-  "pending": null,
+  "pending": {
+   "kind": "dowser_collector",
+   "for": "rob",
+   "question": "rob takes one free collector from Dowser Wren Calloway, with a Core in it — which type? (ruling #106)"
+  },
   "victory_status": {
-   "p1": {
+   "wiz": {
     "culture": 0,
-    "tech": 2,
+    "tech": 0,
     "leader_kills": 0,
     "leader_alive": true
    },
-   "p2": {
+   "rob": {
     "culture": 0,
-    "tech": 4,
+    "tech": 0,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -962,7 +860,7 @@
   "result": null,
   "players": [
    {
-    "player_id": "p1",
+    "player_id": "wiz",
     "kind": "human",
     "faction": "The Covenant",
     "species": "wizard",
@@ -982,16 +880,10 @@
     "building_counts": {},
     "research": [],
     "tech_progress": {
-     "acquired_types": [
-      "surf",
-      "castle"
-     ],
-     "acquired_type_names": [
-      "Surf",
-      "Castle"
-     ],
+     "acquired_types": [],
+     "acquired_type_names": [],
      "bonus_points_live": 0,
-     "total": 2,
+     "total": 0,
      "target": 26
     },
     "leader_kills": 0,
@@ -1016,23 +908,21 @@
       "base"
      ]
     },
-    "action_cards_played_count": 3,
-    "battle_hand_count": 1,
+    "action_cards_played_count": 0,
+    "battle_hand_count": 0,
     "spy_recruitments": 0,
     "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Archmage Chaimidious",
-      "coord": "-2,8",
+      "hero": "Warden Hesper Quill",
+      "coord": "reserved",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
      }
     ],
-    "bases": [
-     "-2,10"
-    ],
+    "bases": [],
     "locked": {
      "units": {
       "Illusionist": "needs a Library of Illusion",
@@ -1077,9 +967,9 @@
     "paired_core_cost": null
    },
    {
-    "player_id": "p2",
-    "kind": "ai",
-    "faction": "The Foundry",
+    "player_id": "rob",
+    "kind": "human",
+    "faction": "The Ledger",
     "species": "robot",
     "culture": 0,
     "culture_target": 50,
@@ -1097,20 +987,10 @@
     "building_counts": {},
     "research": [],
     "tech_progress": {
-     "acquired_types": [
-      "core",
-      "water-collector",
-      "wood-collector",
-      "home"
-     ],
-     "acquired_type_names": [
-      "Core",
-      "Water collector",
-      "Wood collector",
-      "Home"
-     ],
+     "acquired_types": [],
+     "acquired_type_names": [],
      "bonus_points_live": 0,
-     "total": 4,
+     "total": 0,
      "target": 24
     },
     "leader_kills": 0,
@@ -1118,7 +998,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 12,
+    "cores_supply": 16,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -1135,23 +1015,21 @@
       "base"
      ]
     },
-    "action_cards_played_count": 3,
+    "action_cards_played_count": 0,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Foreman Hadrik Stoll",
-      "coord": "2,6",
+      "hero": "Dowser Wren Calloway",
+      "coord": "reserved",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
      }
     ],
-    "bases": [
-     "2,4"
-    ],
+    "bases": [],
     "locked": {
      "units": {
       "Spinner Platform": "needs a Combat Frame Production",
@@ -1161,39 +1039,17 @@
       "Wall Platform": "needs a Defense Research Station"
      },
      "research": {
+      "Metal Platforms": "needs a Home on the map",
       "Extra Build Card": "needs an Advanced Research Station",
       "Extra Move/Battle Card": "needs an Advanced Research Station",
-      "Extra Research Card": "needs an Advanced Research Station"
+      "Extra Research Card": "needs an Advanced Research Station",
+      "Collector Optimizations": "needs a Home on the map",
+      "Core Integration": "needs a Home on the map"
      },
      "treaties": "needs a Diplomatic Research Station or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
      "battle_cards": "needs a Defense Research Station"
     },
-    "collectors": [
-     {
-      "collector": "water-collector-1",
-      "type": "Water collector",
-      "placed_at": null,
-      "core": "allocated"
-     },
-     {
-      "collector": "water-collector-2",
-      "type": "Water collector",
-      "placed_at": null,
-      "core": "allocated"
-     },
-     {
-      "collector": "wood-collector-1",
-      "type": "Wood collector",
-      "placed_at": null,
-      "core": "allocated"
-     },
-     {
-      "collector": "wood-collector-2",
-      "type": "Wood collector",
-      "placed_at": null,
-      "core": "allocated"
-     }
-    ],
+    "collectors": [],
     "committed_collectors": [],
     "bank": {},
     "paired_core_cost": {
@@ -1201,20 +1057,13 @@
     }
    }
   ],
-  "your_battle_hand": [
-   {
-    "card": "Rally",
-    "effect": "Move any number of your own eligible mobile units from adjacent locations into this battle."
-   }
-  ],
-  "your_action_cards_played": [
-   "build:base",
-   "research:base",
-   "move_battle:base"
-  ],
+  "your_battle_hand": [],
+  "your_action_cards_played": [],
   "your_spy_assignments": [],
   "your_knowledge": [],
-  "your_reserved_heroes": []
+  "your_reserved_heroes": [
+   "Warden Hesper Quill"
+  ]
  },
  "watcherLegalMoves": []
 }

@@ -56,7 +56,8 @@
      "units": [],
      "heroes": [
       "Archmage Elara (p1)",
-      "Captain Rook Malvane (p1)"
+      "Warden Hesper Quill (p1)",
+      "Kestrel Nine (p1)"
      ],
      "collectors": []
     },
@@ -254,7 +255,7 @@
       "Quartermaster Bertram Hollis (p2)",
       "Marshal Corvin Ashlock (p2)",
       "Evo Angel (p2)",
-      "Warden Hesper Quill (p2)"
+      "Captain Rook Malvane (p2)"
      ],
      "collectors": []
     },
@@ -297,7 +298,7 @@
     }
    ]
   },
-  "hero_pool_count": 11,
+  "hero_pool_count": 10,
   "action_stack": [
    {
     "position": 1,
@@ -344,7 +345,7 @@
   },
   "victory_status": {
    "p1": {
-    "culture": 12,
+    "culture": 20,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
@@ -363,11 +364,10 @@
     "kind": "human",
     "faction": "The Covenant",
     "species": "wizard",
-    "culture": 12,
+    "culture": 20,
     "culture_target": 50,
     "economic_collectors": 12,
     "next_milestones": [
-     15,
      25,
      38
     ],
@@ -395,12 +395,12 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 22
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
     "leader_alive": true,
-    "subjects": 3,
+    "subjects": 4,
     "cores_reserve": 0,
     "cores_supply": 16,
     "action_cards": {
@@ -440,7 +440,14 @@
       "stats": "Init 70 DMG 3 DEF 4"
      },
      {
-      "hero": "Captain Rook Malvane",
+      "hero": "Warden Hesper Quill",
+      "coord": "-2,10",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
+     },
+     {
+      "hero": "Kestrel Nine",
       "coord": "-2,10",
       "is_leader": false,
       "dead": false,
@@ -466,7 +473,8 @@
       "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
-      "Extra Build Card": "needs a Library of Enchantment"
+      "Extra Build Card": "needs a Library of Enchantment",
+      "Haste": "needs a Library of Enchantment"
      },
      "treaties": "needs an Embassy or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
      "battle_cards": "needs an Embassy"
@@ -493,7 +501,9 @@
       "placed_at": null
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": null
    },
    {
     "player_id": "p2",
@@ -540,7 +550,7 @@
      ],
      "bonus_points_live": 0,
      "total": 8,
-     "target": 18
+     "target": 24
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
@@ -608,7 +618,7 @@
       "stats": "Init 80 DMG 4 DEF 4"
      },
      {
-      "hero": "Warden Hesper Quill",
+      "hero": "Captain Rook Malvane",
       "coord": "2,4",
       "is_leader": false,
       "dead": false,
@@ -709,7 +719,11 @@
       "coord": "1,5",
       "resource": "water"
      }
-    ]
+    ],
+    "bank": {},
+    "paired_core_cost": {
+     "water": 1
+    }
    }
   ],
   "your_battle_hand": [
@@ -801,7 +815,8 @@
      "units": [],
      "heroes": [
       "Archmage Elara (p1)",
-      "Captain Rook Malvane (p1)"
+      "Warden Hesper Quill (p1)",
+      "Kestrel Nine (p1)"
      ],
      "collectors": []
     },
@@ -999,7 +1014,7 @@
       "Quartermaster Bertram Hollis (p2)",
       "Marshal Corvin Ashlock (p2)",
       "Evo Angel (p2)",
-      "Warden Hesper Quill (p2)"
+      "Captain Rook Malvane (p2)"
      ],
      "collectors": []
     },
@@ -1042,7 +1057,7 @@
     }
    ]
   },
-  "hero_pool_count": 11,
+  "hero_pool_count": 10,
   "action_stack": [
    {
     "position": 1,
@@ -1089,7 +1104,7 @@
   },
   "victory_status": {
    "p1": {
-    "culture": 12,
+    "culture": 20,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
@@ -1108,11 +1123,10 @@
     "kind": "human",
     "faction": "The Covenant",
     "species": "wizard",
-    "culture": 12,
+    "culture": 20,
     "culture_target": 50,
     "economic_collectors": 12,
     "next_milestones": [
-     15,
      25,
      38
     ],
@@ -1140,12 +1154,12 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 22
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
     "leader_alive": true,
-    "subjects": 3,
+    "subjects": 4,
     "cores_reserve": 0,
     "cores_supply": 16,
     "action_cards": {
@@ -1185,7 +1199,14 @@
       "stats": "Init 70 DMG 3 DEF 4"
      },
      {
-      "hero": "Captain Rook Malvane",
+      "hero": "Warden Hesper Quill",
+      "coord": "-2,10",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
+     },
+     {
+      "hero": "Kestrel Nine",
       "coord": "-2,10",
       "is_leader": false,
       "dead": false,
@@ -1211,7 +1232,8 @@
       "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
-      "Extra Build Card": "needs a Library of Enchantment"
+      "Extra Build Card": "needs a Library of Enchantment",
+      "Haste": "needs a Library of Enchantment"
      },
      "treaties": "needs an Embassy or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
      "battle_cards": "needs an Embassy"
@@ -1238,7 +1260,9 @@
       "placed_at": null
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": null
    },
    {
     "player_id": "p2",
@@ -1285,7 +1309,7 @@
      ],
      "bonus_points_live": 0,
      "total": 8,
-     "target": 18
+     "target": 24
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
@@ -1353,7 +1377,7 @@
       "stats": "Init 80 DMG 4 DEF 4"
      },
      {
-      "hero": "Warden Hesper Quill",
+      "hero": "Captain Rook Malvane",
       "coord": "2,4",
       "is_leader": false,
       "dead": false,
@@ -1454,7 +1478,11 @@
       "coord": "1,5",
       "resource": "water"
      }
-    ]
+    ],
+    "bank": {},
+    "paired_core_cost": {
+     "water": 1
+    }
    }
   ],
   "your_battle_hand": [],

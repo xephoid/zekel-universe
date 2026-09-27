@@ -160,8 +160,11 @@ function capitalize(s: string): string {
   return s ? s[0]!.toUpperCase() + s.slice(1) : s;
 }
 
-/** The Core a platform bought with its own Core (core_pairing) also costs. */
+/** What a Core bought with its platform (core_pairing) adds to the price, as
+ *  the engine says (nothing with Core Integration); the printed Core cost from
+ *  an engine that does not say. */
 function coreCost(ctx: ScreenCtx): Cost | null {
+  if (ctx.mine?.pairedCoreCost) return ctx.mine.pairedCoreCost as Cost;
   return itemByName(ctx.ref, 'Core')?.kind === 'unit' ? (itemByName(ctx.ref, 'Core') as { unit: { cost: Cost } }).unit.cost : null;
 }
 
@@ -205,7 +208,9 @@ function PurchaseRow({ ctx, p, selected, onPick }: { ctx: ScreenCtx; p: Purchase
         <span className="ngg-eco-cost">
           <span className="ngg-eco-kind">{KIND_WORDS[p.kind]}</span>
           {p.cost && !p.either?.length && <CostChips cost={p.cost} />}
-          {core && <span className="ngg-eco-core">+ Core <CostChips cost={core} /></span>}
+          {core && (Object.keys(core).length > 0
+            ? <span className="ngg-eco-core">+ Core <CostChips cost={core} /></span>
+            : <span className="ngg-eco-core">+ Core, free</span>)}
           {ways.length > 1 && <span className="ngg-eco-core">Core: yours or bought</span>}
         </span>
       }
@@ -409,6 +414,8 @@ interface Reach {
   next: Record<string, string[]>;
   produced: Record<string, number>;
   access_needed: Array<{ collectorId: string; coord: string; owner: string }>;
+  /** a Haste wizard's bank (#101), which pays before the placements */
+  bank: Record<string, number>;
   /** the engine's word on whether the placements pay for the purchase; absent from an engine that does not say */
   covers?: boolean;
   short?: Record<string, number>;
@@ -424,6 +431,7 @@ function readReach(x: unknown): Reach | null {
     next: o['next'] as Reach['next'],
     produced: (o['produced'] ?? {}) as Reach['produced'],
     access_needed: (Array.isArray(o['access_needed']) ? o['access_needed'] : []) as Reach['access_needed'],
+    bank: o['bank'] && typeof o['bank'] === 'object' ? Object.fromEntries(Object.entries(o['bank'] as Record<string, unknown>).filter(([, n]) => typeof n === 'number' && n > 0)) as Record<string, number> : {},
     ...(typeof o['covers'] === 'boolean' ? { covers: o['covers'] } : {}),
     short: (o['short'] ?? {}) as Record<string, number>,
     short_either: Array.isArray(o['short_either']) ? o['short_either'] as string[] : null,
@@ -500,6 +508,9 @@ function PayStage({ ctx, chosen, purchase, proposal, needsPlace, initial, onBack
       panel={
         <Panel title={chosen.kind === 'economic' ? 'Spend all five' : `Pay for ${chosen.label}`} kicker={KIND_WORDS[chosen.kind]}>
           {chosen.cost && <div className="ngg-eco-costline"><span>Cost</span><CostChips cost={chosen.cost} /></div>}
+          {reach && Object.keys(reach.bank).length > 0 && (
+            <div className="ngg-eco-costline" title="What Haste banked earlier this round; it pays first"><span>From your bank</span><CostChips cost={reach.bank as Cost} /></div>
+          )}
           <div className="ngg-eco-costline"><span>Produces</span>
             {reach && Object.keys(reach.produced).length > 0 ? <CostChips cost={reach.produced as Cost} /> : <span className="ngg-cost-free">nothing yet</span>}
           </div>

@@ -372,7 +372,7 @@
      ],
      "bonus_points_live": 0,
      "total": 2,
-     "target": 22
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
@@ -429,7 +429,8 @@
       "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
-      "Extra Build Card": "needs a Library of Enchantment"
+      "Extra Build Card": "needs a Library of Enchantment",
+      "Haste": "needs a Library of Enchantment"
      },
      "treaties": "needs an Embassy or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
      "battle_cards": "needs an Embassy"
@@ -449,9 +450,16 @@
       "collector": "surf-3",
       "type": "Surf",
       "placed_at": null
+     },
+     {
+      "collector": "surf-4",
+      "type": "Surf",
+      "placed_at": null
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": null
    },
    {
     "player_id": "p2",
@@ -488,7 +496,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 18
+     "target": 24
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
@@ -571,7 +579,11 @@
       "core": "allocated"
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": {
+     "water": 1
+    }
    }
   ],
   "your_battle_hand": [
@@ -1023,7 +1035,7 @@
      ],
      "bonus_points_live": 0,
      "total": 2,
-     "target": 22
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
@@ -1080,7 +1092,8 @@
       "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
-      "Extra Build Card": "needs a Library of Enchantment"
+      "Extra Build Card": "needs a Library of Enchantment",
+      "Haste": "needs a Library of Enchantment"
      },
      "treaties": "needs an Embassy or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
      "battle_cards": "needs an Embassy"
@@ -1100,9 +1113,16 @@
       "collector": "surf-3",
       "type": "Surf",
       "placed_at": null
+     },
+     {
+      "collector": "surf-4",
+      "type": "Surf",
+      "placed_at": null
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": null
    },
    {
     "player_id": "p2",
@@ -1139,7 +1159,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 18
+     "target": 24
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
@@ -1222,7 +1242,11 @@
       "core": "allocated"
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": {
+     "water": 1
+    }
    }
   ],
   "your_battle_hand": [],

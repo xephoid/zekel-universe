@@ -21,7 +21,7 @@
      "units": [],
      "heroes": [],
      "collectors": [
-      "surf-1 (p4)"
+      "water-collector-1 (p1)"
      ]
     },
     {
@@ -35,9 +35,7 @@
      "heroes": [
       "Quartermaster Bertram Hollis (p4)"
      ],
-     "collectors": [
-      "surf-2 (p4)"
-     ]
+     "collectors": []
     },
     {
      "coord": "-2,8",
@@ -49,7 +47,7 @@
      "units": [],
      "heroes": [],
      "collectors": [
-      "water-collector-1 (p3)"
+      "surf-2 (p4)"
      ]
     },
     {
@@ -74,7 +72,9 @@
      "base_owner": "p3",
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "water-collector-1 (p3)"
+     ]
     },
     {
      "coord": "-1,3",
@@ -96,7 +96,9 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "surf-1 (p4)"
+     ]
     },
     {
      "coord": "-1,7",
@@ -118,7 +120,9 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "surf-3 (p4)"
+     ]
     },
     {
      "coord": "-1,11",
@@ -342,9 +346,7 @@
      "base_owner": "p1",
      "units": [],
      "heroes": [],
-     "collectors": [
-      "water-collector-1 (p1)"
-     ]
+     "collectors": []
     }
    ]
   },
@@ -367,7 +369,32 @@
    "owner": "p3",
    "finished": false
   },
-  "treaties": [],
+  "treaties": [
+   {
+    "treaty": "Open Borders",
+    "partners": [
+     "p4",
+     "p1"
+    ],
+    "culture_income": 2
+   },
+   {
+    "treaty": "Shared Resources",
+    "partners": [
+     "p4",
+     "p2"
+    ],
+    "culture_income": 2
+   },
+   {
+    "treaty": "Peace",
+    "partners": [
+     "p4",
+     "p3"
+    ],
+    "culture_income": 2
+   }
+  ],
   "battle": null,
   "battle_deck_count": 19,
   "battle_discard": [],
@@ -400,7 +427,7 @@
    },
    "p4": {
     "culture": 0,
-    "tech": 2,
+    "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -442,7 +469,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 18
+     "target": 24
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -503,7 +530,7 @@
      {
       "collector": "water-collector-1",
       "type": "Water collector",
-      "placed_at": "2,12",
+      "placed_at": "-2,4",
       "core": "allocated"
      },
      {
@@ -528,10 +555,14 @@
     "committed_collectors": [
      {
       "collector": "water-collector-1",
-      "coord": "2,12",
+      "coord": "-2,4",
       "resource": "water"
      }
-    ]
+    ],
+    "bank": {},
+    "paired_core_cost": {
+     "water": 1
+    }
    },
    {
     "player_id": "p2",
@@ -564,7 +595,7 @@
      ],
      "bonus_points_live": 0,
      "total": 2,
-     "target": 22
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -621,7 +652,8 @@
       "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
-      "Extra Build Card": "needs a Library of Enchantment"
+      "Extra Build Card": "needs a Library of Enchantment",
+      "Haste": "needs a Library of Enchantment"
      },
      "treaties": "needs an Embassy or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
      "battle_cards": "needs an Embassy"
@@ -636,9 +668,16 @@
       "collector": "surf-2",
       "type": "Surf",
       "placed_at": null
+     },
+     {
+      "collector": "surf-3",
+      "type": "Surf",
+      "placed_at": null
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": null
    },
    {
     "player_id": "p3",
@@ -675,7 +714,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 18
+     "target": 24
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -736,7 +775,7 @@
      {
       "collector": "water-collector-1",
       "type": "Water collector",
-      "placed_at": "-2,8",
+      "placed_at": "-2,12",
       "core": "allocated"
      },
      {
@@ -761,10 +800,14 @@
     "committed_collectors": [
      {
       "collector": "water-collector-1",
-      "coord": "-2,8",
+      "coord": "-2,12",
       "resource": "water"
      }
-    ]
+    ],
+    "bank": {},
+    "paired_core_cost": {
+     "water": 1
+    }
    },
    {
     "player_id": "p4",
@@ -783,21 +826,27 @@
     ],
     "mana_current": 5,
     "mana_max": 5,
-    "buildings": [],
-    "building_counts": {},
+    "buildings": [
+     "Embassy"
+    ],
+    "building_counts": {
+     "embassy": 1
+    },
     "research": [],
     "tech_progress": {
      "acquired_types": [
       "surf",
-      "castle"
+      "castle",
+      "embassy"
      ],
      "acquired_type_names": [
       "Surf",
-      "Castle"
+      "Castle",
+      "Embassy"
      ],
      "bonus_points_live": 0,
-     "total": 2,
-     "target": 22
+     "total": 3,
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -855,40 +904,48 @@
       "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
-      "Extra Build Card": "needs a Library of Enchantment"
+      "Extra Build Card": "needs a Library of Enchantment",
+      "Haste": "needs a Library of Enchantment"
      },
-     "treaties": "needs an Embassy or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
-     "battle_cards": "needs an Embassy"
+     "treaties": null,
+     "battle_cards": null
     },
     "collectors": [
      {
       "collector": "surf-1",
       "type": "Surf",
-      "placed_at": "-2,4"
+      "placed_at": "-1,5"
      },
      {
       "collector": "surf-2",
       "type": "Surf",
-      "placed_at": "-2,6"
+      "placed_at": "-2,8"
      },
      {
       "collector": "surf-3",
       "type": "Surf",
-      "placed_at": null
+      "placed_at": "-1,9"
      }
     ],
     "committed_collectors": [
      {
       "collector": "surf-1",
-      "coord": "-2,4",
-      "resource": "water"
+      "coord": "-1,5",
+      "resource": "wood"
      },
      {
       "collector": "surf-2",
-      "coord": "-2,6",
+      "coord": "-2,8",
       "resource": "water"
+     },
+     {
+      "collector": "surf-3",
+      "coord": "-1,9",
+      "resource": "wood"
      }
-    ]
+    ],
+    "bank": {},
+    "paired_core_cost": null
    }
   ],
   "your_battle_hand": [],
@@ -917,8 +974,12 @@
     "item": "Core",
     "payment": [
      {
+      "collectorId": "wood-collector-1",
+      "coord": "-1,13"
+     },
+     {
       "collectorId": "water-collector-2",
-      "coord": "-2,12"
+      "coord": "0,14"
      }
     ]
    }
@@ -931,8 +992,12 @@
     "item": "Water collector",
     "payment": [
      {
+      "collectorId": "wood-collector-1",
+      "coord": "-1,13"
+     },
+     {
       "collectorId": "water-collector-2",
-      "coord": "-2,12"
+      "coord": "0,14"
      }
     ]
    }
@@ -945,8 +1010,12 @@
     "item": "Wood collector",
     "payment": [
      {
+      "collectorId": "wood-collector-1",
+      "coord": "-1,13"
+     },
+     {
       "collectorId": "water-collector-2",
-      "coord": "-2,12"
+      "coord": "0,14"
      }
     ]
    }
@@ -974,11 +1043,11 @@
     "payment": [
      {
       "collectorId": "wood-collector-1",
-      "coord": "-2,10"
+      "coord": "-1,13"
      },
      {
       "collectorId": "water-collector-2",
-      "coord": "-2,12"
+      "coord": "0,14"
      }
     ],
     "core_pairing": true
@@ -996,12 +1065,12 @@
       "coord": "-2,10"
      },
      {
-      "collectorId": "water-collector-2",
-      "coord": "-2,12"
+      "collectorId": "wood-collector-2",
+      "coord": "-1,13"
      },
      {
-      "collectorId": "wood-collector-2",
-      "coord": "-1,9"
+      "collectorId": "water-collector-2",
+      "coord": "0,14"
      }
     ]
    }
@@ -1098,7 +1167,7 @@
      "units": [],
      "heroes": [],
      "collectors": [
-      "surf-1 (p4)"
+      "water-collector-1 (p1)"
      ]
     },
     {
@@ -1112,9 +1181,7 @@
      "heroes": [
       "Quartermaster Bertram Hollis (p4)"
      ],
-     "collectors": [
-      "surf-2 (p4)"
-     ]
+     "collectors": []
     },
     {
      "coord": "-2,8",
@@ -1126,7 +1193,7 @@
      "units": [],
      "heroes": [],
      "collectors": [
-      "water-collector-1 (p3)"
+      "surf-2 (p4)"
      ]
     },
     {
@@ -1151,7 +1218,9 @@
      "base_owner": "p3",
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "water-collector-1 (p3)"
+     ]
     },
     {
      "coord": "-1,3",
@@ -1173,7 +1242,9 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "surf-1 (p4)"
+     ]
     },
     {
      "coord": "-1,7",
@@ -1195,7 +1266,9 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "surf-3 (p4)"
+     ]
     },
     {
      "coord": "-1,11",
@@ -1419,9 +1492,7 @@
      "base_owner": "p1",
      "units": [],
      "heroes": [],
-     "collectors": [
-      "water-collector-1 (p1)"
-     ]
+     "collectors": []
     }
    ]
   },
@@ -1444,7 +1515,32 @@
    "owner": "p3",
    "finished": false
   },
-  "treaties": [],
+  "treaties": [
+   {
+    "treaty": "Open Borders",
+    "partners": [
+     "p4",
+     "p1"
+    ],
+    "culture_income": 2
+   },
+   {
+    "treaty": "Shared Resources",
+    "partners": [
+     "p4",
+     "p2"
+    ],
+    "culture_income": 2
+   },
+   {
+    "treaty": "Peace",
+    "partners": [
+     "p4",
+     "p3"
+    ],
+    "culture_income": 2
+   }
+  ],
   "battle": null,
   "battle_deck_count": 19,
   "battle_discard": [],
@@ -1477,7 +1573,7 @@
    },
    "p4": {
     "culture": 0,
-    "tech": 2,
+    "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -1519,7 +1615,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 18
+     "target": 24
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -1580,7 +1676,7 @@
      {
       "collector": "water-collector-1",
       "type": "Water collector",
-      "placed_at": "2,12",
+      "placed_at": "-2,4",
       "core": "allocated"
      },
      {
@@ -1605,10 +1701,14 @@
     "committed_collectors": [
      {
       "collector": "water-collector-1",
-      "coord": "2,12",
+      "coord": "-2,4",
       "resource": "water"
      }
-    ]
+    ],
+    "bank": {},
+    "paired_core_cost": {
+     "water": 1
+    }
    },
    {
     "player_id": "p2",
@@ -1641,7 +1741,7 @@
      ],
      "bonus_points_live": 0,
      "total": 2,
-     "target": 22
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -1698,7 +1798,8 @@
       "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
-      "Extra Build Card": "needs a Library of Enchantment"
+      "Extra Build Card": "needs a Library of Enchantment",
+      "Haste": "needs a Library of Enchantment"
      },
      "treaties": "needs an Embassy or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
      "battle_cards": "needs an Embassy"
@@ -1713,9 +1814,16 @@
       "collector": "surf-2",
       "type": "Surf",
       "placed_at": null
+     },
+     {
+      "collector": "surf-3",
+      "type": "Surf",
+      "placed_at": null
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": null
    },
    {
     "player_id": "p3",
@@ -1752,7 +1860,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 18
+     "target": 24
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -1813,7 +1921,7 @@
      {
       "collector": "water-collector-1",
       "type": "Water collector",
-      "placed_at": "-2,8",
+      "placed_at": "-2,12",
       "core": "allocated"
      },
      {
@@ -1838,10 +1946,14 @@
     "committed_collectors": [
      {
       "collector": "water-collector-1",
-      "coord": "-2,8",
+      "coord": "-2,12",
       "resource": "water"
      }
-    ]
+    ],
+    "bank": {},
+    "paired_core_cost": {
+     "water": 1
+    }
    },
    {
     "player_id": "p4",
@@ -1860,21 +1972,27 @@
     ],
     "mana_current": 5,
     "mana_max": 5,
-    "buildings": [],
-    "building_counts": {},
+    "buildings": [
+     "Embassy"
+    ],
+    "building_counts": {
+     "embassy": 1
+    },
     "research": [],
     "tech_progress": {
      "acquired_types": [
       "surf",
-      "castle"
+      "castle",
+      "embassy"
      ],
      "acquired_type_names": [
       "Surf",
-      "Castle"
+      "Castle",
+      "Embassy"
      ],
      "bonus_points_live": 0,
-     "total": 2,
-     "target": 22
+     "total": 3,
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -1932,40 +2050,48 @@
       "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
-      "Extra Build Card": "needs a Library of Enchantment"
+      "Extra Build Card": "needs a Library of Enchantment",
+      "Haste": "needs a Library of Enchantment"
      },
-     "treaties": "needs an Embassy or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
-     "battle_cards": "needs an Embassy"
+     "treaties": null,
+     "battle_cards": null
     },
     "collectors": [
      {
       "collector": "surf-1",
       "type": "Surf",
-      "placed_at": "-2,4"
+      "placed_at": "-1,5"
      },
      {
       "collector": "surf-2",
       "type": "Surf",
-      "placed_at": "-2,6"
+      "placed_at": "-2,8"
      },
      {
       "collector": "surf-3",
       "type": "Surf",
-      "placed_at": null
+      "placed_at": "-1,9"
      }
     ],
     "committed_collectors": [
      {
       "collector": "surf-1",
-      "coord": "-2,4",
-      "resource": "water"
+      "coord": "-1,5",
+      "resource": "wood"
      },
      {
       "collector": "surf-2",
-      "coord": "-2,6",
+      "coord": "-2,8",
       "resource": "water"
+     },
+     {
+      "collector": "surf-3",
+      "coord": "-1,9",
+      "resource": "wood"
      }
-    ]
+    ],
+    "bank": {},
+    "paired_core_cost": null
    }
   ],
   "your_battle_hand": [

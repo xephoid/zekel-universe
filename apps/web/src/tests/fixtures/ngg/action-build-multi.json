@@ -452,7 +452,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 18
+     "target": 24
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -535,7 +535,11 @@
       "core": "allocated"
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": {
+     "water": 1
+    }
    },
    {
     "player_id": "p2",
@@ -568,7 +572,7 @@
      ],
      "bonus_points_live": 0,
      "total": 2,
-     "target": 22
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -625,7 +629,8 @@
       "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
-      "Extra Build Card": "needs a Library of Enchantment"
+      "Extra Build Card": "needs a Library of Enchantment",
+      "Haste": "needs a Library of Enchantment"
      },
      "treaties": "needs an Embassy or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
      "battle_cards": "needs an Embassy"
@@ -640,9 +645,16 @@
       "collector": "surf-2",
       "type": "Surf",
       "placed_at": null
+     },
+     {
+      "collector": "surf-3",
+      "type": "Surf",
+      "placed_at": null
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": null
    },
    {
     "player_id": "p3",
@@ -679,7 +691,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 18
+     "target": 24
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -762,7 +774,11 @@
       "core": "allocated"
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": {
+     "water": 1
+    }
    },
    {
     "player_id": "p4",
@@ -795,7 +811,7 @@
      ],
      "bonus_points_live": 0,
      "total": 2,
-     "target": 22
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -853,7 +869,8 @@
       "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
-      "Extra Build Card": "needs a Library of Enchantment"
+      "Extra Build Card": "needs a Library of Enchantment",
+      "Haste": "needs a Library of Enchantment"
      },
      "treaties": "needs an Embassy or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
      "battle_cards": "needs an Embassy"
@@ -868,9 +885,16 @@
       "collector": "surf-2",
       "type": "Surf",
       "placed_at": null
+     },
+     {
+      "collector": "surf-3",
+      "type": "Surf",
+      "placed_at": null
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": null
    }
   ],
   "your_battle_hand": [],
@@ -887,7 +911,7 @@
  "legalMoves": [
   {
    "move_id": "",
-   "description": "Build Surf for 2 water (available collectors: surf-1, surf-2; edit payment placements as needed).",
+   "description": "Build Surf for 2 water (available collectors: surf-1, surf-2, surf-3; edit payment placements as needed).",
    "move": {
     "type": "build",
     "item": "Surf",
@@ -905,7 +929,7 @@
   },
   {
    "move_id": "",
-   "description": "Build Subject for 1 water + 1 wood (available collectors: surf-1, surf-2; edit payment placements as needed).",
+   "description": "Build Subject for 1 water + 1 wood (available collectors: surf-1, surf-2, surf-3; edit payment placements as needed).",
    "move": {
     "type": "build",
     "item": "Subject",
@@ -916,6 +940,72 @@
      },
      {
       "collectorId": "surf-2",
+      "coord": "-1,5"
+     }
+    ]
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Build Library of Evocation for 1 water + 2 wood.",
+   "move": {
+    "type": "build",
+    "item": "Library of Evocation",
+    "payment": [
+     {
+      "collectorId": "surf-1",
+      "coord": "-2,8"
+     },
+     {
+      "collectorId": "surf-2",
+      "coord": "-2,10"
+     },
+     {
+      "collectorId": "surf-3",
+      "coord": "-1,5"
+     }
+    ]
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Build Embassy for 2 wood.",
+   "move": {
+    "type": "build",
+    "item": "Embassy",
+    "payment": [
+     {
+      "collectorId": "surf-1",
+      "coord": "-1,5"
+     },
+     {
+      "collectorId": "surf-2",
+      "coord": "-2,8"
+     },
+     {
+      "collectorId": "surf-3",
+      "coord": "-2,10"
+     }
+    ]
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Build Mana Reserve for 1 water + 2 wood.",
+   "move": {
+    "type": "build",
+    "item": "Mana Reserve",
+    "payment": [
+     {
+      "collectorId": "surf-1",
+      "coord": "-2,8"
+     },
+     {
+      "collectorId": "surf-2",
+      "coord": "-2,10"
+     },
+     {
+      "collectorId": "surf-3",
       "coord": "-1,5"
      }
     ]
@@ -937,7 +1027,7 @@
   {
    "moveType": "build",
    "item": "Evoker",
-   "reason": "costs 2 wood + 1 ore — that is 3 resources and you have 2 free collectors"
+   "reason": "costs 2 wood + 1 ore — your free collectors (surf-1, surf-2, surf-3) cannot reach enough of it from your units, bases and earlier placements"
   },
   {
    "moveType": "build",
@@ -962,51 +1052,36 @@
   {
    "moveType": "build",
    "item": "Castle",
-   "reason": "costs 3 wood + 1 ore — that is 4 resources and you have 2 free collectors"
-  },
-  {
-   "moveType": "build",
-   "item": "Library of Evocation",
-   "reason": "costs 1 water + 2 wood — that is 3 resources and you have 2 free collectors"
+   "reason": "costs 3 wood + 1 ore — that is 4 resources and you have 3 free collectors"
   },
   {
    "moveType": "build",
    "item": "Library of Illusion",
-   "reason": "costs 2 wood + 1 ore — that is 3 resources and you have 2 free collectors"
+   "reason": "costs 2 wood + 1 ore — your free collectors (surf-1, surf-2, surf-3) cannot reach enough of it from your units, bases and earlier placements"
   },
   {
    "moveType": "build",
    "item": "Library of Enchantment",
-   "reason": "costs 2 wood + 1 ore — that is 3 resources and you have 2 free collectors"
+   "reason": "costs 2 wood + 1 ore — your free collectors (surf-1, surf-2, surf-3) cannot reach enough of it from your units, bases and earlier placements"
   },
   {
    "moveType": "build",
    "item": "Dragon Hoard",
-   "reason": "costs 1 water + 2 ore + 1 ether — that is 4 resources and you have 2 free collectors"
+   "reason": "costs 1 water + 2 ore + 1 ether — that is 4 resources and you have 3 free collectors"
   },
   {
    "moveType": "build",
    "item": "Temple",
-   "reason": "costs 2 water + 2 wood — that is 4 resources and you have 2 free collectors"
-  },
-  {
-   "moveType": "build",
-   "item": "Embassy",
-   "reason": "costs 2 wood — your free collectors (surf-1, surf-2) cannot reach enough of it from your units, bases and earlier placements"
+   "reason": "costs 2 water + 2 wood — that is 4 resources and you have 3 free collectors"
   },
   {
    "moveType": "build",
    "item": "Amphitheatre",
-   "reason": "costs 1 water + 3 wood — that is 4 resources and you have 2 free collectors"
-  },
-  {
-   "moveType": "build",
-   "item": "Mana Reserve",
-   "reason": "costs 1 water + 2 wood — that is 3 resources and you have 2 free collectors"
+   "reason": "costs 1 water + 3 wood — that is 4 resources and you have 3 free collectors"
   },
   {
    "moveType": "economic_victory_spend",
-   "reason": "needs 20 free collectors on 20 different tiles — you have 2"
+   "reason": "needs 20 free collectors on 20 different tiles — you have 3"
   }
  ],
  "watcher": "p1",
@@ -1460,7 +1535,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 18
+     "target": 24
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -1543,7 +1618,11 @@
       "core": "allocated"
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": {
+     "water": 1
+    }
    },
    {
     "player_id": "p2",
@@ -1576,7 +1655,7 @@
      ],
      "bonus_points_live": 0,
      "total": 2,
-     "target": 22
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -1633,7 +1712,8 @@
       "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
-      "Extra Build Card": "needs a Library of Enchantment"
+      "Extra Build Card": "needs a Library of Enchantment",
+      "Haste": "needs a Library of Enchantment"
      },
      "treaties": "needs an Embassy or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
      "battle_cards": "needs an Embassy"
@@ -1648,9 +1728,16 @@
       "collector": "surf-2",
       "type": "Surf",
       "placed_at": null
+     },
+     {
+      "collector": "surf-3",
+      "type": "Surf",
+      "placed_at": null
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": null
    },
    {
     "player_id": "p3",
@@ -1687,7 +1774,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 18
+     "target": 24
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -1770,7 +1857,11 @@
       "core": "allocated"
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": {
+     "water": 1
+    }
    },
    {
     "player_id": "p4",
@@ -1803,7 +1894,7 @@
      ],
      "bonus_points_live": 0,
      "total": 2,
-     "target": 22
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -1861,7 +1952,8 @@
       "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
-      "Extra Build Card": "needs a Library of Enchantment"
+      "Extra Build Card": "needs a Library of Enchantment",
+      "Haste": "needs a Library of Enchantment"
      },
      "treaties": "needs an Embassy or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
      "battle_cards": "needs an Embassy"
@@ -1876,9 +1968,16 @@
       "collector": "surf-2",
       "type": "Surf",
       "placed_at": null
+     },
+     {
+      "collector": "surf-3",
+      "type": "Surf",
+      "placed_at": null
      }
     ],
-    "committed_collectors": []
+    "committed_collectors": [],
+    "bank": {},
+    "paired_core_cost": null
    }
   ],
   "your_battle_hand": [

@@ -64,6 +64,11 @@ export interface NggPlayer {
   subjects: number;
   coresReserve: number;
   coresSupply: number;
+  /** what a Haste wizard banked this round (#101); empty otherwise */
+  bank: Record<string, number>;
+  /** what a Core bought with a platform adds to its price: empty with Core
+   *  Integration (#103); null for a wizard, or from an engine that does not say */
+  pairedCoreCost: Record<string, number> | null;
   actionCards: Record<string, number>;
   /** the planned cards by kind ("build:base"); null where they are face down
    *  to this viewer (another seat's, from an engine that hides them) */
@@ -228,6 +233,8 @@ function readPlayer(p: Record<string, unknown>): NggPlayer {
     subjects: asNum(p['subjects']),
     coresReserve: asNum(p['cores_reserve']),
     coresSupply: asNum(p['cores_supply']),
+    bank: isObj(p['bank']) ? Object.fromEntries(Object.entries(p['bank']).filter(([, n]) => typeof n === 'number' && n > 0)) as Record<string, number> : {},
+    pairedCoreCost: isObj(p['paired_core_cost']) ? Object.fromEntries(Object.entries(p['paired_core_cost']).filter(([, n]) => typeof n === 'number' && n > 0)) as Record<string, number> : null,
     actionCards: isObj(p['action_cards'])
       ? Object.fromEntries(Object.entries(p['action_cards']).map(([k, v]) => [k, asNum(v)]))
       : {},

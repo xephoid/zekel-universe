@@ -241,6 +241,22 @@ describe('NGnG payment, placed by the person on tiles the engine names', () => {
     expect(isSubmissionAllowed('form', move, f.legalMoves, { template: listed.move, editableKeys: keys })).toBe(true);
   });
 
+  it("a Haste bank that covers the price opens Commit with nothing placed, and says what it pays", async () => {
+    const f = BUILD as Fixture;
+    const { item, listed } = paidItem(f);
+    const ask = vi.fn(async () => ({
+      answer: { collectors: [], next: {}, produced: {}, access_needed: [], bank: { water: 2 }, covers: true, short: {}, short_either: null },
+    }));
+    const { onForm } = drawLive(f, ask);
+    press(new RegExp(`^${esc(item)}`));
+    press(`Choose ${item}`);
+    await screen.findByText('From your bank');
+    await waitForEnabled('Commit payment');
+    press('Commit payment');
+    expect(onForm.mock.calls[0]![1]['payment']).toEqual([]);
+    expect(onForm.mock.calls[0]![0]).toBe(listed);
+  });
+
   it("takes the engine's proposal only when the person presses for it", async () => {
     const f = BUILD as Fixture;
     const { item, listed } = paidItem(f);

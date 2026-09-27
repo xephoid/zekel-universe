@@ -220,7 +220,8 @@
                 'Castle': 'Base', 'Home': 'Base', 'Battle strategy card': 'Battle card',
                 'Metal Platforms': 'Defense Research Station',
                 'Infiltrator Platform': 'Infiltrator',
-                'Extra Build Card': 'Build', 'Extra Move/Battle Card': 'Move / Battle', 'Extra Research Card': 'Research' };
+                'Extra Build Card': 'Build', 'Extra Move/Battle Card': 'Move / Battle', 'Extra Research Card': 'Research',
+                'Advanced Research Station': 'Advance Research Station' };
 
   // ---------- treaty types ----------
   // Five treaties, and the difference between them is what each one opens or closes. Every
