@@ -192,7 +192,7 @@ describe('fractured-fist glue', () => {
     expect(g.moveForSelect({ component: 'card', id: 'p:p1:supply:attack', label: 'Attack' }, inp)?.move_id).toBe('buy-attack');
     expect(g.moveForSelect({ component: 'card', id: hand(plan)[0]!.id!, label: 'Focus' }, inp)).toBeNull();
   });
-  it('puts the arcade theme on the table for a seat and a watcher, and nothing on a view that is not this game's', () => {
+  it('puts the arcade theme on the table for a seat and a watcher, and nothing on a view from another game', () => {
     expect(g.themeFor!(input(FF_VIEW, [], { playerId: 'p1' }))).toBe('ff-theme');
     expect(g.themeFor!(input(FF_VIEW, []))).toBe('ff-theme');
     expect(g.themeFor!(input({ game_id: 'something-else' }, []))).toBeNull();
