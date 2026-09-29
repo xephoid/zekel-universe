@@ -281,3 +281,14 @@
 .ff-theme .ff-screen > .ff-supply { --zekel-card-w: 92px; --zekel-card-h: 130px; }
 /* The screen fills the bench itself, under the play column. */
 .ff-theme .table-bench.slot { display: none; }
+
+/* ================= the side column and the bench (build item 3) =================
+   The side column runs the full height: the supply, the last move with pace
+   and replay, and the log. The bench is the screen's own, under the play
+   column only. At 1440 x 900 nothing scrolls. */
+.ff-theme .table-side { width: 360px; padding: 14px 14px 10px; gap: 14px; }
+.ff-theme .table-board { padding: 14px 16px 12px; gap: 12px; }
+/* A rules lesson floats over the right end of their row instead of pushing
+   the table down: it is there the first time a rule matters, then gone. */
+.ff-theme .table-play { position: relative; }
+.ff-theme .table-play > .lesson-note { position: absolute; top: 132px; right: 20px; width: 360px; margin: 0; z-index: 25; }
