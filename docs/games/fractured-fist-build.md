@@ -2,6 +2,9 @@
 
 Status 2026-09-21. Written for whoever implements the Fractured Fist table.
 
+**Next pass (2026-09-29):** the arcade theme, new card art and the restyled
+strike are in [fractured-fist-arcade-build.md](fractured-fist-arcade-build.md).
+
 **Built 2026-09-21.** Items 1 to 4 and 6 to 8 below are in `main`; item 5
 is settled by the engine, not built (see the open question). What the build
 decided, in `docs/implementation-plan.md` under "Decided in the Fractured
