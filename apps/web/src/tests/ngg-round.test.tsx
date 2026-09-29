@@ -144,11 +144,20 @@ describe('NGnG round screens', () => {
     const r = draw(f.view, f.viewer, f.legalMoves);
     expectNothingSelected(r.column);
     expect(r.column.textContent).toContain('Gain a battle strategy card.');
-    expect(r.column.textContent).toContain('★ Recommended');
+    // The same facts as the Heroes list: the star, kind and species, stats, and
+    // the ability on one line until the hero is selected.
+    expect(r.column.querySelector('.ngg-hero-star[title="Recommended Leader"]')).not.toBeNull();
+    expect(r.column.textContent).toContain('wizards only');
+    expect(r.column.textContent).toMatch(/Init \d+ DMG \d+ DEF \d+/);
+    const elara = [...r.column.querySelectorAll('.ngg-option')].find((el) => el.textContent?.includes('Archmage Elara'))!;
+    expect(elara.querySelector('.ngg-hero-effect')!.classList.contains('clamped')).toBe(true);
     const take = within(r.column).getByRole('button', { name: 'Take a hero' }) as HTMLButtonElement;
     expect(take.disabled).toBe(true);
     press(r.column, /Archmage Elara/);
     expect(r.onMove).not.toHaveBeenCalled();
+    // Selected, its whole ability shows.
+    const opened = [...r.column.querySelectorAll('.ngg-option')].find((el) => el.textContent?.includes('Archmage Elara'))!;
+    expect(opened.querySelector('.ngg-hero-effect')!.classList.contains('clamped')).toBe(false);
     press(r.column, 'Take Archmage Elara');
     expectSentListed(r.onMove, f.legalMoves, { type: 'choose_leader', hero: 'Archmage Elara' });
     cleanup();

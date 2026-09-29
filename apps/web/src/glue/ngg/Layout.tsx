@@ -10,7 +10,7 @@ import type { ScreenCtx } from './ctx';
 import { HexMap, type MapMarks } from './HexMap';
 import { TREATY_INK, inkOf, inkOfSeat } from './factions';
 import { WAITING_ON } from './route';
-import { CardBack, FactionChip, Icon, Panel, SpyMark } from './ui';
+import { CardBack, FactionChip, HeroFacts, HeroName, Icon, Panel, SpyMark } from './ui';
 import { cultureRaceOf, economicCollectorsFor } from './ref';
 import { econOf, type NggPlayer } from './read';
 import { FactionBoard, FactionStrip } from './FactionBoard';
@@ -125,17 +125,10 @@ function HeroesSheet({ ctx, onClose }: { ctx: ScreenCtx; onClose: () => void }) 
                   {h.name.split(/\s+/).map((w) => w[0]).slice(-2).join('')}
                 </span>
                 <span className="ngg-hero-body">
-                  <b>{h.name}{h.recommendedLeader ? <span className="ngg-hero-star" title="Recommended Leader"> ★</span> : null}</b>
-                  {/* One line: the kind, then the battle stats — a held hero's as the
-                      engine reads them now (a Leader's +DEF included), any other its
-                      printed ones. */}
-                  <i>
-                    {[h.category, h.species ? `${h.species}s only` : null].filter(Boolean).join(' · ')}
-                    <span className="ngg-hero-stats">
-                      {held && !held.dead && statsOf(h.name) ? statsOf(h.name) : h.stats ? `Init ${h.stats.init} DMG ${h.stats.dmg} DEF ${h.stats.def}` : ''}
-                    </span>
-                  </i>
-                  <span className="ngg-hero-effect">{h.effect}</span>
+                  <b><HeroName hero={h} name={h.name} /></b>
+                  {/* A held hero's stats as the engine reads them now (a Leader's
+                      +DEF included); any other its printed ones. */}
+                  <HeroFacts hero={h} liveStats={held && !held.dead ? statsOf(h.name) : null} open={open === h.id} />
                 </span>
                 <span className="ngg-hero-status">
                   {held && <FactionChip faction={v.players.find((p) => p.id === held.owner)?.faction ?? null} size={18} />}

@@ -23,7 +23,7 @@ import type { MapMarks } from '../HexMap';
 import { TableLayout } from '../Layout';
 import { TREATY_INK, inkOfSeat } from '../factions';
 import { heroByName, itemByName, treatyByName, type RefHero } from '../ref';
-import { Actions, Btn, CardFace, FactionChip, HowTo, Icon, OptionRow, Panel, ResourceChip, Rule, SeatBand, Token } from '../ui';
+import { Actions, Btn, CardFace, FactionChip, HeroFacts, HeroName, HowTo, Icon, OptionRow, Panel, ResourceChip, Rule, SeatBand, Token } from '../ui';
 import './round.css';
 
 // ---------------------------------------------------------------------------
@@ -63,30 +63,25 @@ function minePending(ctx: ScreenCtx, kind: string): boolean {
 const CARD_NAME: Record<string, string> = { build: 'Build', research: 'Research', move_battle: 'Move / Battle' };
 const CARD_ICON: Record<string, string> = { build: 'Build', research: 'Research', move_battle: 'Move / Battle' };
 
-/** One hero as the draft, the claim and the spy show it: printed name, the
- *  printed category and effect, and the recommended star when it is printed. */
-function HeroOption({ ctx, name, hero, stats, selected, onPress, aside, showStar }: {
+/** One hero as the draft, the claim and the spy show it: the same facts as
+ *  the Heroes list (the star, kind and species limit, battle stats, and the
+ *  ability on one line), the whole ability once the hero is selected. */
+function HeroOption({ ctx, name, hero, stats, selected, onPress, aside }: {
   ctx: ScreenCtx;
   name: string;
   hero: RefHero | null;
+  /** the engine's live stat line for a held hero */
   stats?: string | null;
   selected: boolean;
   onPress?: () => void;
   aside?: ReactNode;
-  showStar?: boolean;
 }) {
-  const sub = [stats, hero?.category ? hero.category[0]!.toUpperCase() + hero.category.slice(1) : null].filter(Boolean).join(' · ');
   return (
     <div data-flip-id={`ngg-hero-card:${name}`}>
       <OptionRow
         mark={<Token kind="hero" faction={ctx.mine?.faction ?? null} name={name} state="dashed" size={26} />}
-        title={name}
-        sub={<>
-          {(sub || (showStar && hero?.recommendedLeader)) && (
-            <span className="ngr-hero-cat">{sub}{showStar && hero?.recommendedLeader && <span className="ngr-star">{sub ? ' · ' : ''}★ Recommended</span>}</span>
-          )}
-          {hero?.effect && <span className="ngr-effect">{hero.effect}</span>}
-        </>}
+        title={<HeroName hero={hero} name={name} />}
+        sub={<span className="ngg-hero-body"><HeroFacts hero={hero} liveStats={stats ?? null} open={selected} /></span>}
         aside={aside}
         selected={selected}
         disabled={!ctx.live}
@@ -191,7 +186,7 @@ function SetupDraft({ ctx }: { ctx: ScreenCtx }) {
             const name = str(m.move['hero']);
             return (
               <HeroOption key={name} ctx={ctx} name={name} hero={heroByName(ref, name)} selected={sel === m}
-                showStar onPress={() => setSel(name)} />
+                onPress={() => setSel(name)} />
             );
           })}
         </div>

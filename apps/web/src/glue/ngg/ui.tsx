@@ -9,7 +9,7 @@
 import type { ReactNode } from 'react';
 import { ICON_ALIASES, ICON_PATHS } from './icons.gen';
 import { TERRAIN, inkOf, initials } from './factions';
-import { RESOURCES, type Cost } from './ref';
+import { RESOURCES, type Cost, type RefHero } from './ref';
 
 export function hasIcon(name: string): boolean {
   return !!(ICON_PATHS[name] ?? ICON_PATHS[ICON_ALIASES[name] ?? '']);
@@ -65,6 +65,29 @@ export function Token({ kind, faction, name, leader, state = 'solid', size = 22,
     >
       {glyph}
     </span>
+  );
+}
+
+/** A hero's name as every hero list prints it: the recommended-Leader star
+ *  after it when the card carries one. */
+export function HeroName({ hero, name }: { hero: RefHero | null; name: string }) {
+  return <>{name}{hero?.recommendedLeader ? <span className="ngg-hero-star" title="Recommended Leader"> ★</span> : null}</>;
+}
+
+/** What every hero list says about a hero (the Heroes list, the Leader draft,
+ *  a milestone claim, the spy): its kind and species limit, its battle stats,
+ *  and its printed ability on one line until opened. `liveStats` is the
+ *  engine's line for a held hero (a Leader's bonus included); otherwise the
+ *  printed stats. */
+export function HeroFacts({ hero, liveStats = null, open }: { hero: RefHero | null; liveStats?: string | null; open: boolean }) {
+  if (!hero) return liveStats ? <i className="ngg-hero-kind"><span className="ngg-hero-stats">{liveStats}</span></i> : null;
+  const kind = [hero.category ? hero.category[0]!.toUpperCase() + hero.category.slice(1) : null, hero.species ? `${hero.species}s only` : null].filter(Boolean).join(' · ');
+  const stats = liveStats ?? (hero.stats ? `Init ${hero.stats.init} DMG ${hero.stats.dmg} DEF ${hero.stats.def}` : '');
+  return (
+    <>
+      <i className="ngg-hero-kind">{kind}{stats && <span className="ngg-hero-stats">{stats}</span>}</i>
+      {hero.effect && <span className={`ngg-hero-effect${open ? '' : ' clamped'}`}>{hero.effect}</span>}
+    </>
   );
 }
 

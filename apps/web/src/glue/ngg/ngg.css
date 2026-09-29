@@ -549,7 +549,7 @@ button.ngg-seat:focus-visible { outline: 2px solid var(--n-brand); outline-offse
 .ngg-hero-list li.dead { opacity: .6; }
 .ngg-hero-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .ngg-hero-body b { font: 700 13px var(--n-face); }
-.ngg-hero-body i { font: 500 10.5px var(--n-mono); font-style: normal; letter-spacing: .03em; color: var(--n-muted); text-transform: uppercase; }
+.ngg-hero-body i, .ngg-hero-kind { font: 500 10.5px var(--n-mono); font-style: normal; letter-spacing: .03em; color: var(--n-muted); text-transform: uppercase; }
 .ngg-hero-effect { font: 400 12px/1.4 var(--n-face); color: var(--n-text); }
 .ngg-hero-star { color: var(--n-brand); }
 .ngg-hero-status { display: flex; align-items: center; gap: 6px; font: 600 11.5px var(--n-face); white-space: nowrap; }
@@ -558,6 +558,7 @@ button.ngg-seat:focus-visible { outline: 2px solid var(--n-brand); outline-offse
 /* Heroes list: one line of text each until opened; the battle stats always shown. */
 .ngg-hero-list li { cursor: pointer; }
 .ngg-hero-list li:focus-visible { outline: 2px solid var(--n-brand); outline-offset: 2px; }
-.ngg-hero-list li:not(.open) .ngg-hero-effect { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ngg-hero-stats { margin-left: 8px; font: 600 11px var(--n-mono); color: var(--n-text); text-transform: none; }
+/* Every hero list: the ability on one line until the hero is opened or selected. */
+.ngg-hero-effect.clamped { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ngg-hero-stats { margin-left: 8px; font: 600 11px var(--n-mono); color: var(--n-text); text-transform: none; white-space: nowrap; display: inline-block; }
 .ngg-hero-statline { align-self: flex-start; }

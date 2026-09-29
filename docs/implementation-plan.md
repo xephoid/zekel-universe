@@ -994,6 +994,13 @@ and where the seat stands. The payment stage's shortcut is "Choose for me".
   (#110) and the robot target of 25 all come from the engine's data and
   view; nothing in Universe held those numbers.
 
+**Settled 2026-09-29, after play:** every hero list says the same things.
+The Leader draft, a milestone claim and the spy pick show a hero as the
+Heroes list does: the recommended star, kind and species limit, battle
+stats (the engine's live line for a held hero), and the ability on one
+line; selecting a hero in a menu opens its whole ability, as a click does
+in the list.
+
 **Checked against engine 632231e (2026-09-25):** Cultural victory is 25
 culture per player (50 at two players to 150 at six) and the hero milestones
 are shares of it. The culture race reads both from the engine, so nothing in
