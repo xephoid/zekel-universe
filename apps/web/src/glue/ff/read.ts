@@ -229,7 +229,7 @@ function shelfZone(order: string[], players: Record<string, unknown>, shelfPid: 
   }));
   return {
     kind: 'card-zone', id: 'ff:supply', span: 'full',
-    data: { label: `Supply · ${phase === 'channel' ? 'pick one to buy; it goes to your discard' : 'buying opens in the Channel step'}`, mode: 'row', cards },
+    data: { label: phase === 'channel' ? 'Pick one to buy. It goes to your discard.' : 'Buying opens in the Channel step.', mode: 'list', cards },
   };
 }
 

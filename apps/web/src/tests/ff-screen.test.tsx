@@ -111,6 +111,28 @@ describe('Fractured Fist screen', () => {
     expect(inline.container.querySelector('.ff-supply')).not.toBeNull();
   });
 
+  it('draws the supply as a list: one row per stack with both counts, only a listed buy lit, the rest dim in the Channel step', () => {
+    const view = { ...FF_VIEW, phase: 'channel' };
+    const moves: LegalMove[] = [{ move_id: 'buy-attack', description: 'Buy Attack', move: { type: 'buy_card', card_id: 'attack' } }];
+    const { container, onMove } = draw({ view, moves });
+    const rows = [...container.querySelectorAll('.ff-supply .zk-card-row')];
+    expect(rows.map((r) => r.getAttribute('data-flip-id'))).toEqual(['p:p1:supply:attack', 'p:p1:supply:focus', 'p:p1:supply:momentum']);
+    for (const r of rows) expect(r.querySelectorAll('.zk-card-row-counts b')).toHaveLength(2);
+    expect(rows[0]!.querySelector('.zk-card-row-counts')!.textContent).toBe('45');
+    expect(container.querySelector('.ff-supply .zk-zone-cols')!.textContent).toBe('youthem');
+    expect(container.querySelector('.ff-supply')!.classList.contains('buying')).toBe(true);
+    expect(rows.filter((r) => r.classList.contains('zk-lit')).map((r) => r.getAttribute('data-flip-id'))).toEqual(['p:p1:supply:attack']);
+    // The counts are text: nothing about the opponent's stacks can be pressed.
+    expect(container.querySelectorAll('.zk-card-row-counts [role="button"]')).toHaveLength(0);
+    fireEvent.click(rows[1]!);
+    expect(onMove).not.toHaveBeenCalled();
+    fireEvent.click(rows[0]!);
+    expect(onMove.mock.calls[0]![0].move_id).toBe('buy-attack');
+    // Off the Channel step nothing dims.
+    cleanup();
+    expect(draw().container.querySelector('.ff-supply')!.classList.contains('buying')).toBe(false);
+  });
+
   it('a watcher sees both seats by name, can press nothing, and has no action bar', () => {
     const publicView = { ...FF_VIEW, players: { p1: { ...FF_VIEW.players.p1, hand: undefined }, p2: FF_VIEW.players.p2 } };
     const { container, onMove } = draw({ view: publicView, moves: [], playerId: null, yourTurn: false, interactive: false });

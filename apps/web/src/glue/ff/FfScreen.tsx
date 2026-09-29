@@ -188,9 +188,15 @@ export function FfScreen(props: GameScreenProps) {
   const { left, right, me } = fight;
   const refining = !!me && fight.counters.some((c) => c.label === 'Refines');
 
+  // In the Channel step the stacks you can buy are lit and the rest dim;
+  // the outline is the cue, and the opponent's counts are never pressable.
+  const buying = !!me && me.active && fight.phase === 'channel' && interactive && yourTurn;
   const supply = (
-    <section className="ff-supply" aria-label="Supply">
-      <Cards zone={fight.supply} lit={lit} onSelect={onSelect} />
+    <section className={`ff-supply${buying ? ' buying' : ''}`} aria-label="Supply">
+      <h3 className="ff-supply-title">Supply</h3>
+      {fight.supply.kind === 'card-zone' && (
+        <CardZone id={fight.supply.id} data={fight.supply.data} lit={lit} onSelect={onSelect} className="ff-supply-list" />
+      )}
     </section>
   );
 
