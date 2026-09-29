@@ -61,6 +61,7 @@ export function Card({ id, data, lit, onSelect, arriveFrom, className, style }: 
       data-flip-id={id}
       data-flip-from={arriveFrom}
       data-base-transform={handled}
+      data-color-key={data.colorKey ? slug(data.colorKey) : undefined}
       className={cx('zk-card', data.rotation ? `r${data.rotation}` : undefined, lp.className, className)}
       style={{ transform: handled, ...style }}
       title={down ? undefined : data.label}
@@ -75,6 +76,7 @@ export function Card({ id, data, lit, onSelect, arriveFrom, className, style }: 
           {data.artUrl && <img className="zk-card-art" src={data.artUrl} alt="" />}
           <div>
             {data.cost !== undefined && <span className="zk-card-cost">{data.cost}</span>}
+            {data.value !== undefined && <span className="zk-card-value">{data.value}</span>}
             <div className="zk-card-label">{data.label}</div>
             {data.subtitle && <div className="zk-card-sub">{data.subtitle}</div>}
           </div>
@@ -93,7 +95,7 @@ export function Card({ id, data, lit, onSelect, arriveFrom, className, style }: 
           </div>
         </div>
         <div className="zk-card-back">
-          <div>{data.count !== undefined && data.count > 1 ? `×${data.count}` : ''}</div>
+          <div>{data.count !== undefined && data.count > 1 ? <><span className="zk-card-back-x">×</span>{data.count}</> : ''}</div>
         </div>
       </div>
     </div>

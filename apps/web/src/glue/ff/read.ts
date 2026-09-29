@@ -25,14 +25,27 @@ import type { GlueInput, LegalMove, PlanPrompt, PlanStep, PromptAction, SelectEv
 import { asArr, asNum, asStr, isObj, shapeHas, words } from '../types';
 import { trackIdentities, type IdentityState } from '../identity';
 
+/**
+ * Card colors from the print-and-play sheet. The corner is the card's kind:
+ * a resource, one of the default seven techniques, a technique with no
+ * school, a technique with a school, a Misstep. The cost number on a
+ * school's card is the school's own color (`ink-` keys), which also marks
+ * the school on the setup page. The table publishes these as CSS variables
+ * and the theme draws each card's corner from its color key (ff.css).
+ */
 export const PALETTE: Record<string, string> = {
-  resource: '#e6a23c',
-  technique: '#3f7cc9',
-  misstep: '#8a8578',
-  'masters-circle': '#d63031',
-  uncounted: '#0984e3',
-  'titan-entertainment': '#c9a227',
-  'the-awakened': '#00b894',
+  resource: '#F2E53A',
+  starter: '#19A58B',
+  technique: '#2A74B8',
+  misstep: '#111111',
+  'masters-circle': '#8A6BB0',
+  uncounted: '#8A6BB0',
+  'titan-entertainment': '#8A6BB0',
+  'the-awakened': '#8A6BB0',
+  'ink-masters-circle': '#FFFFFF',
+  'ink-uncounted': '#111111',
+  'ink-titan-entertainment': '#FF8A1F',
+  'ink-the-awakened': '#A6E22E',
   you: '#3E7C4F',
   opponent: '#b4452f',
   round: '#E8862E',
@@ -50,11 +63,14 @@ export const EFFECT_ORDER = Object.keys(EFFECT_WORDS);
 export interface CardDef {
   id: string; name: string; type: string; cost: number; value?: number; description?: string; faction?: string;
   effects: Record<string, number>;
+  /** one of the engine's default seven (reference_data.starter_loadout) */
+  starter: boolean;
 }
 
 export function cardDefs(reference: GameReferenceResponse | null): Map<string, CardDef> {
   const rd = reference?.referenceData;
   const out = new Map<string, CardDef>();
+  const starters = new Set(starterLoadout(reference));
   if (isObj(rd) && Array.isArray(rd['cards'])) {
     for (const c of rd['cards']) {
       if (isObj(c) && typeof c['id'] === 'string') {
@@ -67,6 +83,7 @@ export function cardDefs(reference: GameReferenceResponse | null): Map<string, C
           value: typeof c['value'] === 'number' ? c['value'] : undefined,
           description: asStr(c['description']) || undefined, faction: asStr(c['faction']) || undefined,
           effects,
+          starter: starters.has(c['id']),
         });
       }
     }
@@ -90,26 +107,54 @@ export function effectChips(def: CardDef | undefined): string[] {
   return EFFECT_ORDER.filter((k) => def.effects[k]).map((k) => `+${def.effects[k]} ${EFFECT_WORDS[k]}`);
 }
 
-function colorKeyFor(def: CardDef | undefined): string | undefined {
+/** A card's color key: its school, or its kind (resource, one of the
+ *  default seven, a technique with no school, a Misstep). */
+export function colorKeyFor(def: CardDef | undefined): string | undefined {
   if (!def) return undefined;
   if (def.faction) return def.faction.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  if (def.type === 'TECHNIQUE' && def.starter) return 'starter';
   return def.type.toLowerCase();
 }
 
+/**
+ * The cards that have a scene, by engine id: the files copied from
+ * docs/design/fractured-fist-arcade/art into public/cards/fractured-fist.
+ * This says which pictures exist, nothing about the cards themselves.
+ */
+const ART = new Set([
+  'assess', 'attack', 'block', 'center', 'combination_rush', 'defensive_kata', 'deflecting_block', 'devastating_blow',
+  'distract', 'energy_channeling', 'enlightened_flow', 'flowing_counter', 'flying_kick', 'focus', 'grand_finale',
+  'impose_pressure', 'inner_harmony', 'leg_sweep', 'masters_riposte', 'mastery', 'mental_clarity', 'misstep', 'momentum',
+  'overwhelming_assault', 'perfect_form', 'quicken', 'react', 'reading_the_opponent', 'ruthless_barrage', 'showstopper',
+  'smoke_bomb', 'targeted_strike', 'thoughtful_composure', 'transcendent_strike',
+]);
+
+export function artUrlFor(cardId: string): string | undefined {
+  return ART.has(cardId) ? `/cards/fractured-fist/${cardId}.svg` : undefined;
+}
+
+/**
+ * A card's face, as the print-and-play sheet lays it out: the cost in the
+ * corner (a Misstep has none), the name, the art, and the effects as chips;
+ * a resource shows what it is worth. Every number is the reference data's.
+ */
 function cardData(cardId: string, instance: string, defs: Map<string, CardDef>, face: 'up' | 'down' = 'up'): CardData {
   const def = defs.get(cardId);
-  const badges: string[] = [];
-  if (def?.cost !== undefined && def.type !== 'MISSTEP') badges.push(`cost ${def.cost}`);
-  if (def?.value !== undefined && def.value > 0) badges.push(`${def.value} spirit`);
-  // The effects line fits on the card; the full rule text is the tooltip.
-  const chips = effectChips(def);
-  const subtitle = chips.length ? chips.join(', ') : def?.description && def.description.length <= 40 ? def.description : def ? words(def.type.toLowerCase()) : undefined;
+  const resource = def?.type === 'RESOURCE';
+  const worth = resource && def.value !== undefined && def.value > 0 ? def.value : undefined;
+  const chips = worth !== undefined ? [`Worth ${worth}`] : effectChips(def);
+  // A card with no effects says what it is in its own words ("Unplayable.
+  // Refine to remove."), when they are short enough to sit on the face.
+  const subtitle = chips.length === 0 && def?.description && def.description.length <= 40 ? def.description : undefined;
   return {
     id: instance,
     label: def?.name ?? words(cardId),
     subtitle,
     colorKey: colorKeyFor(def) ?? 'technique',
-    badges,
+    cost: def && def.type !== 'MISSTEP' ? def.cost : undefined,
+    value: worth,
+    artUrl: artUrlFor(cardId),
+    badges: chips,
     face,
   };
 }

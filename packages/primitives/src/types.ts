@@ -26,6 +26,9 @@ export interface CardData {
    * eleven cards the hand folds into stacks on this key instead.
    */
   groupKey?: string;
+  /** Universe addition: a second number, in the top corner opposite the
+   *  cost: what a resource card is worth. */
+  value?: string | number;
   /** Universe addition: art for the face. */
   artUrl?: string;
   /**

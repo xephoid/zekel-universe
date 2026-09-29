@@ -141,7 +141,7 @@ function Bench({ me, lit, onSelect, refining, menu }: { me: Fighter; lit: string
     <div className="ff-bench">
       {/* The numbered menu: every listed move, for the keyboard. */}
       <div className="ff-menu">{menu}</div>
-      <section className="ff-hand" aria-label={`Your hand: ${me.handSize}`}>
+      <section className={`ff-hand${anyLit ? ' has-lit' : ''}`} aria-label={`Your hand: ${me.handSize}`}>
         <div className="ff-bench-label">
           <span>Your hand · {me.handSize}</span>
           {hint && <span className="ff-hint">{hint}</span>}

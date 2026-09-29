@@ -80,11 +80,42 @@ describe('fractured-fist glue', () => {
   it('names cards from the reference data and takes the misstep cap from it, never from a constant', () => {
     const plan = g.plan(input(FF_VIEW, FF_MOVES, { playerId: 'p1', reference: FF_REFERENCE }))!;
     expect(hand(plan).map((c) => c.label)).toEqual(['Focus', 'Misstep', 'Quicken', 'Center', 'Focus']);
-    expect(hand(plan)[2]!.subtitle).toBe('+2 Draw');
+    expect(hand(plan)[2]!.badges).toEqual(['+2 Draw']);
     const f = fightOf(input(FF_VIEW, FF_MOVES, { playerId: 'p1', reference: FF_REFERENCE }))!;
     expect([f.left.misstepCap, f.right.misstepCap]).toEqual([10, 10]);
     // Without reference data the cap is simply absent.
     expect(fightOf(input(FF_VIEW, FF_MOVES, { playerId: 'p1' }))!.left.misstepCap).toBeNull();
+  });
+  it('draws each card face from the reference data: cost in the corner, what a resource is worth, the art by engine id, the kind as its color', () => {
+    const plan = g.plan(input(FF_VIEW, FF_MOVES, { playerId: 'p1', reference: FF_REFERENCE }))!;
+    const [focus, misstep, quicken] = hand(plan);
+    // Cost is the card's own field, not a "cost N" badge.
+    expect(quicken).toMatchObject({ cost: 2, badges: ['+2 Draw'], colorKey: 'starter', artUrl: '/cards/fractured-fist/quicken.svg' });
+    expect(quicken!.value).toBeUndefined();
+    // A resource shows what it is worth, top right and as its chip.
+    expect(focus).toMatchObject({ cost: 0, value: 1, badges: ['Worth 1'], colorKey: 'resource', artUrl: '/cards/fractured-fist/focus.svg' });
+    // A Misstep has no cost; it says what it is in its own words.
+    expect(misstep).toMatchObject({ badges: [], subtitle: 'Cannot be played.', colorKey: 'misstep' });
+    expect(misstep!.cost).toBeUndefined();
+    // A technique outside the default seven, and one with a school.
+    const f = fightOf(input(FF_VIEW, FF_MOVES, { playerId: 'p1', reference: FF_REFERENCE }))!;
+    const momentum = cards(f.supply).find((c) => c.id === 'p:p1:supply:momentum')!;
+    expect(momentum).toMatchObject({ cost: 3, value: 2, colorKey: 'resource' });
+    const withSchool = { ...FF_VIEW, players: { ...FF_VIEW.players, p1: { ...FF_VIEW.players.p1, hand: ['grand-finale'] } } };
+    const gf = hand(g.plan(input(withSchool, [], { playerId: 'p1', reference: FF_REFERENCE }))!)[0]!;
+    expect(gf).toMatchObject({ cost: 10, colorKey: 'titan-entertainment' });
+    // Only files that exist are named: this id has no scene under that name.
+    expect(gf.artUrl).toBeUndefined();
+    // Without reference data there is no number to show.
+    const bare = hand(g.plan(input(FF_VIEW, FF_MOVES, { playerId: 'p1' }))!);
+    expect(bare[2]).toMatchObject({ label: 'Quicken', badges: [] });
+    expect(bare[2]!.cost).toBeUndefined();
+  });
+  it('the loadout picker shows the art of each technique and its colored corner, the cost on it in the color of its school', () => {
+    const fields = g.setupFields(FF_REFERENCE);
+    const opts = fields[0]!.kind === 'multi' ? fields[0]!.options : [];
+    expect(opts.find((o) => o.value === 'quicken')).toMatchObject({ badge: '2', art: '/cards/fractured-fist/quicken.svg', corner: { color: '#19A58B', ink: '#111111' } });
+    expect(opts.find((o) => o.value === 'grand-finale')).toMatchObject({ badge: '10', corner: { color: '#8A6BB0', ink: '#FF8A1F' } });
   });
   it('shows only the counters the current step can change, and only on your turn', () => {
     const counters = (view: unknown, pid = 'p1') => fightOf(input(view, [], { playerId: pid, reference: FF_REFERENCE }))!.counters.map((c) => `${c.label} ${c.value}`);

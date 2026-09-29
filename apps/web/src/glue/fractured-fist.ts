@@ -12,9 +12,16 @@ import type {
   GlueModule, GlueInput, LegalMove, Moment, MomentInput, SelectEvent, SetupField, TablePlan, Zone, SetupSeat,
 } from './types';
 import { asArr, asNum, asStr, isObj, shapeHas, words } from './types';
-import { PALETTE, EFFECT_ORDER, EFFECT_WORDS, cardDefs, effectChips, fightOf, litPartsFor, moveForTap, starterLoadout, type CardDef } from './ff/read';
+import { PALETTE, EFFECT_ORDER, EFFECT_WORDS, artUrlFor, cardDefs, colorKeyFor, effectChips, fightOf, litPartsFor, moveForTap, starterLoadout, type CardDef } from './ff/read';
 import { FfScreen } from './ff/FfScreen';
 import './ff/ff.css';
+
+/** A card's colored corner and the color of the cost on it, from the palette. */
+function cornerFor(def: CardDef): { color: string; ink: string } | undefined {
+  const key = colorKeyFor(def);
+  const color = key ? PALETTE[key] : undefined;
+  return color ? { color, ink: PALETTE[`ink-${key}`] ?? '#111111' } : undefined;
+}
 
 export const fracturedFistGlue: GlueModule = {
   gameId: 'fractured-fist',
@@ -106,7 +113,8 @@ export const fracturedFistGlue: GlueModule = {
       key: f || 'none',
       label: f ? words(f) : 'No school',
       note: f ? undefined : 'open to anyone',
-      color: PALETTE[f ? f.toLowerCase().replace(/[^a-z0-9]+/g, '-') : 'misstep'],
+      // A school goes by its own color (the cost number's on the printed card).
+      color: f ? PALETTE[`ink-${f.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`] : PALETTE['technique'],
     }));
     return [{
       key: 'loadout',
@@ -124,6 +132,8 @@ export const fracturedFistGlue: GlueModule = {
         badge: String(c.cost),
         chips: effectChips(c),
         tag: starter.includes(c.id) ? 'default seven' : undefined,
+        art: artUrlFor(c.id),
+        corner: cornerFor(c),
         hint: `cost ${c.cost}${c.description ? ` · ${c.description}` : ''}${c.faction ? ` · ${words(c.faction)}` : ''}`,
       })),
       summarize: (values) => {

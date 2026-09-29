@@ -4,7 +4,7 @@
 // add up to; a preset the player may take with one press. Nothing is
 // preselected, and a pick past the limit says why instead of swapping.
 
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import type { MultiOption, SetupField } from '../glue';
 
 export type GroupedField = Extract<SetupField, { kind: 'multi' }> & { groups: NonNullable<Extract<SetupField, { kind: 'multi' }>['groups']> };
@@ -60,13 +60,14 @@ export function GroupedPicker({ field, picked, onToggle, onSet }: {
                 const full = !on && picked.length >= field.pick;
                 return (
                   <button
-                    key={o.value} type="button" className={`option-card pick-card${on ? ' on' : ''}`} aria-pressed={on}
+                    key={o.value} type="button" className={`option-card pick-card${on ? ' on' : ''}${o.art ? ' has-art' : ''}${o.corner ? ' has-corner' : ''}`} aria-pressed={on}
                     aria-label={on ? `Remove ${o.label}` : `Add ${o.label}`}
                     title={full ? 'Take one out first' : on ? `Take ${o.label} out` : `Add ${o.label}`}
-                    style={{ borderTopColor: g.color ?? undefined }}
+                    style={{ borderTopColor: g.color ?? undefined, ...(o.corner ? { '--pick-corner': o.corner.color, '--pick-ink': o.corner.ink } as CSSProperties : {}) }}
                     onClick={() => toggle(o)}
                   >
                     <span className="head"><span className="name">{o.label}</span>{o.badge && <span className="badge">{o.badge}</span>}</span>
+                    {o.art && <img className="pick-art" src={o.art} alt="" />}
                     {o.chips && o.chips.length > 0 && <span className="chips">{o.chips.map((c) => <span key={c} className="fx-chip">{c}</span>)}</span>}
                     <span className={`tag${on ? ' on' : ''}`}>{on ? `in your ${words(field.pick).toLowerCase()}` : (o.tag ?? '')}</span>
                   </button>

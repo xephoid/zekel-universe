@@ -146,6 +146,10 @@ export interface MultiOption {
   chips?: string[];
   /** a quiet tag under the chips ("in the default seven") */
   tag?: string;
+  /** a strip of the card's art */
+  art?: string;
+  /** the badge drawn as the card's colored corner, its number in `ink` */
+  corner?: { color: string; ink: string };
 }
 
 /** One of the game's own setup choices, presented as a field the player fills in. */

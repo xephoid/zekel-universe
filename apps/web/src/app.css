@@ -586,6 +586,14 @@ label.option-card { position: relative; padding-right: 40px; }
 .pick-card .chips, .pick-totals .chips { display: flex; flex-wrap: wrap; gap: 4px; }
 .fx-chip { padding: 2px 7px; border-radius: 999px; background: var(--chip); color: var(--fg); font: 600 10px var(--font-body); }
 .pick-card .tag { font: 500 10px var(--font-mono); color: var(--fg-muted); min-height: 14px; }
+/* A card with art (Fractured Fist): a strip of the scene under the name, and
+   the cost in the card's colored corner rather than a badge. */
+.pick-card.has-art .pick-art { display: block; width: 100%; aspect-ratio: 300 / 132; object-fit: cover; background: #111; border-radius: 4px; }
+.pick-card.has-corner { position: relative; overflow: hidden; }
+.pick-card.has-corner .head { padding-left: 22px; }
+.pick-card.has-corner .badge { position: absolute; left: 0; top: 0; width: 34px; height: 34px; border-radius: 0; background: var(--pick-corner); color: var(--pick-ink);
+  clip-path: polygon(0 0, 100% 0, 0 100%); place-items: start; padding: 3px 0 0 5px; box-sizing: border-box; font: 700 13px/1 var(--font-mono); }
+[data-theme='dark'] .pick-card.has-corner .badge { background: var(--pick-corner); color: var(--pick-ink); }
 .pick-card .tag.on { color: var(--you-fg); }
 .pick-slots { display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--line); padding-top: 12px; }
 .pick-slots .count { font: 600 14px var(--font-mono); color: var(--fg-muted); }

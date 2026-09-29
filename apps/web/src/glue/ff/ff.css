@@ -321,3 +321,84 @@
 .ff-theme .zk-card-row.zk-lit:hover { background: rgba(255, 210, 63, .14); }
 .ff-theme .zk-card-row.zk-lit:focus-visible { box-shadow: 0 0 0 3px var(--ff-hi) !important; }
 .ff-theme .ff-supply.buying .zk-card-row:not(.zk-lit) { opacity: .38; }
+
+/* ================= the card face (build item 5) =================
+   The print-and-play sheet's layout: the cost in a colored corner, the name
+   in italic capitals, a strip of the card's art, the effects as chips; a
+   resource shows what it is worth top right. The corner's color comes from
+   the card's color key, published by the table from the glue's palette. */
+.ff-theme :is(.zk-card, .zk-card-row) { --ff-corner: var(--zekel-c-technique, #2A74B8); --ff-ink: #111; }
+.ff-theme :is(.zk-card, .zk-card-row)[data-color-key='resource'] { --ff-corner: var(--zekel-c-resource, #F2E53A); }
+.ff-theme :is(.zk-card, .zk-card-row)[data-color-key='starter'] { --ff-corner: var(--zekel-c-starter, #19A58B); }
+.ff-theme :is(.zk-card, .zk-card-row)[data-color-key='misstep'] { --ff-corner: var(--zekel-c-misstep, #111); --ff-ink: var(--ff-text); }
+.ff-theme :is(.zk-card, .zk-card-row)[data-color-key='masters-circle'] { --ff-corner: var(--zekel-c-masters-circle); --ff-ink: var(--zekel-c-ink-masters-circle); }
+.ff-theme :is(.zk-card, .zk-card-row)[data-color-key='uncounted'] { --ff-corner: var(--zekel-c-uncounted); --ff-ink: var(--zekel-c-ink-uncounted); }
+.ff-theme :is(.zk-card, .zk-card-row)[data-color-key='titan-entertainment'] { --ff-corner: var(--zekel-c-titan-entertainment); --ff-ink: var(--zekel-c-ink-titan-entertainment); }
+.ff-theme :is(.zk-card, .zk-card-row)[data-color-key='the-awakened'] { --ff-corner: var(--zekel-c-the-awakened); --ff-ink: var(--zekel-c-ink-the-awakened); }
+
+.ff-theme .zk-card { border-radius: 5px; font-family: var(--font-body); }
+.ff-theme .zk-card-face {
+  background: #f4efe6 !important; color: #111; text-shadow: none;
+  border: 2px solid #000; border-radius: 5px; box-shadow: 3px 3px 0 #000;
+  padding: 5px 5px 6px; justify-content: flex-start; gap: 4px;
+}
+/* the corner, in the card's color, with the cost on it */
+.ff-theme .zk-card-face::before {
+  content: ''; position: absolute; left: 0; top: 0; width: 30%; aspect-ratio: 1; z-index: 1;
+  background: var(--ff-corner); clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+/* the name, then the art, then the card's own words, then the chips */
+.ff-theme .zk-card-face > div:first-of-type { display: contents; }
+.ff-theme .zk-card-label { order: 1; text-align: center; padding: 0 14%; }
+.ff-theme .zk-card-face > .zk-card-art { order: 2; }
+.ff-theme .zk-card-sub { order: 3; text-align: center; }
+.ff-theme .zk-card-face > div:last-of-type { order: 4; margin-top: auto; }
+.ff-theme .zk-card-cost {
+  position: absolute; left: 3px; top: 1px; z-index: 2; float: none; margin: 0; min-width: 0; height: auto; padding: 0;
+  background: none; border-radius: 0; color: var(--ff-ink); font: italic 800 14px/1 var(--ff-display);
+}
+.ff-theme .zk-card-value {
+  position: absolute; right: 5px; top: 2px; z-index: 2; float: none; margin: 0;
+  color: #111; font: italic 800 14px/1 var(--ff-display);
+}
+.ff-theme .zk-card-label {
+  font: italic 800 12px/1.05 var(--ff-display); letter-spacing: .01em; text-transform: uppercase; color: #111;
+  overflow-wrap: normal; word-break: normal;
+}
+.ff-theme .zk-card-art {
+  display: block; width: 100%; height: auto; aspect-ratio: 300 / 176; object-fit: cover;
+  background: #111; border: 2px solid #111; border-radius: 0; box-sizing: border-box;
+}
+.ff-theme .zk-card-sub { font-size: 9px; line-height: 1.2; color: #3a3530; opacity: 1; }
+.ff-theme .zk-card-badges { gap: 3px; }
+.ff-theme .zk-card-badge {
+  background: #fff; color: #111; border: 1.5px solid #111; border-radius: 999px;
+  padding: 0 5px; font: 600 9px/1.5 var(--font-body); white-space: nowrap;
+}
+.ff-theme .zk-card-counts { border-top-color: rgba(0, 0, 0, .2); color: #111; }
+/* the back: black, teal corners, the count in a yellow burst */
+.ff-theme .zk-card-back {
+  background: #111 !important; border: 2px solid #000; border-radius: 5px; box-shadow: 3px 3px 0 #000; color: #111;
+}
+.ff-theme .zk-card-back::before, .ff-theme .zk-card-back::after {
+  content: ''; position: absolute; width: 38%; aspect-ratio: 1; background: #19A58B;
+}
+.ff-theme .zk-card-back::before { left: 0; top: 0; clip-path: polygon(0 0, 100% 0, 0 100%); }
+.ff-theme .zk-card-back::after { right: 0; bottom: 0; clip-path: polygon(100% 0, 100% 100%, 0 100%); }
+.ff-theme .zk-card-back > div:not(:empty) {
+  width: 56%; aspect-ratio: 1; display: grid; place-items: center; z-index: 1; background: var(--ff-hi);
+  clip-path: polygon(50% 0, 61% 18%, 82% 8%, 80% 30%, 100% 36%, 86% 52%, 100% 68%, 79% 72%, 82% 94%, 61% 84%, 50% 100%, 39% 84%, 18% 94%, 21% 72%, 0 68%, 14% 52%, 0 36%, 20% 30%, 18% 8%, 39% 18%);
+  font: italic 800 20px/1 var(--ff-display); color: #111;
+}
+.ff-theme .zk-card-back-x { display: none; }
+.ff-theme .ff-pile .zk-zone-depth { display: none; }
+.ff-theme .zk-zone-pile .zk-card:not(:last-child) .zk-card-face { box-shadow: none; }
+/* the list row's corner: the same color and ink as the card's */
+.ff-theme .zk-card-row-cost { background: var(--ff-corner) !important; color: var(--ff-ink); clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+.ff-theme .zk-card-row-art { object-fit: cover; }
+
+/* lit: a thick highlight edge, lifted; in a hand with something lit, the rest step back */
+.ff-theme .zk-card.zk-lit { animation: none; }
+.ff-theme .zk-card.zk-lit .zk-card-face { border-color: var(--ff-hi); box-shadow: 0 0 0 2px #000, 4px 4px 0 #000, 0 0 16px rgba(255, 210, 63, .5); }
+.ff-theme .zk-card.zk-lit:focus-visible .zk-card-face { box-shadow: 0 0 0 4px var(--ff-hi); }
+.ff-theme .ff-hand.has-lit .zk-card:not(.zk-lit) .zk-card-face { filter: brightness(.62) saturate(.7); }
