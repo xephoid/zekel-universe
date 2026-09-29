@@ -1,0 +1,155 @@
+/* Fractured Fist's arcade theme (docs/design/fractured-fist-arcade/, the
+   build in docs/games/fractured-fist-arcade-build.md). Every rule is scoped
+   under .ff-theme, the class the glue's themeFor puts on the table shell, so
+   no other game and no other page changes. The stage is dark in both of the
+   site's light and dark settings: it is the game's own look, not a mode.
+
+   Values are the boards' (Table-Technique.dc.html, Table-Channel.dc.html). */
+
+.table-shell.ff-theme {
+  --ff-ground: #131116;
+  --ff-stage: #18151c;
+  --ff-bench-top: #0f0e12;
+  --ff-bench-foot: #0b0a0d;
+  --ff-panel: #221e27;
+  --ff-raised: #2c2732;
+  --ff-text: #f4efe6;
+  --ff-muted: #a9a2b3;
+  --ff-hi: #FFD23F;
+  --ff-hi-2: #FF5A1F;
+  --ff-damage: #ff5646;
+  --ff-defense: #4ea3ff;
+  --ff-edge: #000;
+  --ff-shadow: 4px 4px 0 #000;
+  --ff-radius: 6px;
+  --ff-display: 'Barlow Condensed', 'Arial Narrow', 'IBM Plex Sans', sans-serif;
+
+  /* Universe's own tokens, redefined for everything on the page. */
+  --bg: var(--ff-ground); --bg-raised: var(--ff-panel); --card: var(--ff-panel); --chip: var(--ff-raised);
+  --fg: var(--ff-text); --fg-muted: var(--ff-muted);
+  --accent: var(--ff-hi); --accent-tint: var(--ff-raised); --accent-tint-2: var(--ff-raised); --highlight: var(--ff-raised);
+  --border: rgba(255, 255, 255, .16); --line: rgba(255, 255, 255, .1);
+  --brand-orange: var(--ff-hi-2); --brand-orange-hover: #d9450f; --lit: var(--ff-hi);
+  --you-bg: #3a2f14; --you-fg: var(--ff-hi);
+  --danger: var(--ff-damage);
+  --card-back: #111;
+  --shadow-card: var(--ff-shadow); --shadow-sm: none;
+  --shadow-pop: 6px 6px 0 #000, 0 12px 40px rgba(0, 0, 0, .6);
+  --font-display: var(--ff-display);
+  --radius-md: var(--ff-radius);
+
+  background: var(--ff-ground);
+  color: var(--ff-text);
+}
+
+/* ---------- small labels and display type ---------- */
+.ff-theme :is(.zk-zone-label, .zk-tableau-title, .move-menu summary, .side-section h3, .zk-stat span) {
+  font-family: var(--ff-display); font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+}
+.ff-theme .zk-tableau-title { font-style: italic; font-weight: 800; font-size: 18px; letter-spacing: .02em; }
+
+/* ---------- the top bar: black, with a highlight rule under it ---------- */
+.ff-theme .table-topbar {
+  height: 50px; gap: 18px; background: #0b0a0d; border-bottom: 3px solid var(--ff-hi);
+}
+.ff-theme .table-topbar .divider { background: rgba(255, 255, 255, .2); height: 22px; }
+.ff-theme .table-topbar .wordmark { color: var(--ff-text); }
+.ff-theme .table-topbar .title {
+  font: italic 800 20px/1 var(--ff-display); letter-spacing: .02em; text-transform: uppercase;
+}
+.ff-theme .table-topbar .round-note {
+  font: 600 13px/1 var(--ff-display); letter-spacing: .08em; text-transform: uppercase; color: var(--ff-muted);
+}
+.ff-theme .turn-pill {
+  position: relative; isolation: isolate; border-radius: 0; padding: 6px 20px; background: transparent; color: var(--ff-muted);
+  font: italic 800 16px/1 var(--ff-display); letter-spacing: .02em; text-transform: uppercase;
+}
+.ff-theme .turn-pill::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; transform: skewX(-12deg);
+  background: var(--ff-raised); border: 2px solid #000;
+}
+.ff-theme .turn-pill.mine { color: #111; }
+.ff-theme .turn-pill.mine::before { background: var(--ff-hi-2); }
+.ff-theme .turn-pill .dot { display: none; }
+
+/* ---------- buttons: slanted boxes, upright words ----------
+   The box is a skewed layer behind the button, so the words stay straight
+   without an extra element inside every button on the page. */
+.ff-theme :is(.chip-btn, .btn) {
+  position: relative; isolation: isolate; z-index: 0;
+  border: 0; border-radius: 0; background: transparent; color: var(--ff-text); box-shadow: none;
+  font: 700 13px/1 var(--ff-display); letter-spacing: .08em; text-transform: uppercase;
+}
+.ff-theme :is(.chip-btn, .btn)::before {
+  content: ''; position: absolute; inset: 0; z-index: -1;
+  transform: skewX(-10deg); background: var(--ff-panel); border: 2px solid rgba(255, 255, 255, .22);
+}
+.ff-theme :is(.chip-btn, .btn):hover:not(:disabled)::before { border-color: var(--ff-hi); }
+.ff-theme :is(.chip-btn, .btn):focus-visible { outline: none; }
+.ff-theme :is(.chip-btn, .btn):focus-visible::before { border-color: var(--ff-hi); box-shadow: 0 0 0 2px var(--ff-hi); }
+.ff-theme .btn:not(.secondary) { color: #111; }
+.ff-theme .btn:not(.secondary)::before { background: var(--ff-hi); border-color: #000; box-shadow: 3px 3px 0 #000; }
+.ff-theme .btn.secondary::before { background: var(--ff-raised); border-color: #000; box-shadow: 3px 3px 0 #000; }
+.ff-theme .chip-btn.leave { color: var(--ff-muted); }
+.ff-theme .chip-btn.leave::before { background: transparent; border-color: transparent; }
+.ff-theme .chip-btn.leave:hover { color: var(--ff-damage); }
+.ff-theme .chip-btn.watching { color: #111; }
+.ff-theme .chip-btn.watching::before { background: var(--ff-hi); border-color: #000; }
+/* Pace: three touching slanted keys; the current one lit. */
+.ff-theme .pace { gap: 0; }
+.ff-theme .pace .btn.small { min-width: 34px; padding: 0 10px; }
+.ff-theme .pace .btn.small.active { color: #111; }
+.ff-theme .pace .btn.small.active::before { background: var(--ff-hi); }
+
+/* ---------- panels: flat, black-edged, a hard shadow ---------- */
+.ff-theme :is(.zone:not(.zone-tableau), .zk-tableau, .caption-card, .action-bar, .move-menu, .lesson-note, .toast, .json-inspector) {
+  background: var(--ff-panel); color: var(--ff-text);
+  border: 2px solid #000; border-radius: var(--ff-radius); box-shadow: var(--ff-shadow);
+}
+.ff-theme .zk-tableau { border-left: 6px solid var(--ff-hi); }
+.ff-theme .zk-tableau.active { box-shadow: var(--ff-shadow), 0 0 0 2px var(--ff-hi); }
+.ff-theme .zk-tableau-turn { background: var(--ff-hi); color: #111; border-radius: 0; font: 800 11px/1.4 var(--ff-display); letter-spacing: .08em; text-transform: uppercase; }
+.ff-theme .zk-meter { background: #0b0a0d; border-radius: 0; }
+.ff-theme .zk-meter > div { background: var(--ff-hi); }
+.ff-theme .toast { border-color: var(--ff-damage); }
+
+/* ---------- the play column, the side column, the bench ---------- */
+.ff-theme .table-play { background: var(--ff-stage); }
+.ff-theme .table-side { background: var(--ff-ground); border-left: 2px solid #000; }
+.ff-theme .table-bench { background: linear-gradient(var(--ff-bench-top), var(--ff-bench-foot)); border-top: 2px solid #000; }
+
+/* ---------- the action bar ---------- */
+.ff-theme .action-bar.live { background: var(--ff-panel); }
+.ff-theme .action-bar.urgent { border-color: var(--ff-damage); box-shadow: var(--ff-shadow), 0 0 0 2px var(--ff-damage); }
+.ff-theme .action-bar .step {
+  border-radius: 0; background: transparent; color: var(--ff-muted); border: 2px solid rgba(255, 255, 255, .22);
+  transform: skewX(-12deg); font: 800 13px/1 var(--ff-display); letter-spacing: .08em; text-transform: uppercase; padding: 5px 12px;
+}
+.ff-theme .action-bar .step.current { background: var(--ff-hi); color: #111; border-color: #000; }
+.ff-theme .action-bar .words .title { font: italic 800 17px/1.1 var(--ff-display); letter-spacing: .02em; text-transform: uppercase; }
+.ff-theme .action-bar .btn.small { height: 38px; padding: 0 18px; font: italic 800 16px/1 var(--ff-display); letter-spacing: .02em; }
+.ff-theme .action-bar .btn .note { font: 600 11px var(--font-body); text-transform: none; letter-spacing: 0; }
+
+/* ---------- the last move and the log ---------- */
+.ff-theme .caption-card .actor-chip { font: 800 14px var(--ff-display); letter-spacing: .06em; text-transform: uppercase; }
+.ff-theme .caption-card .avatar { border-radius: 0; border: 2px solid #000; transform: skewX(-10deg); }
+.ff-theme .side-section h3 {
+  font: italic 800 18px/1 var(--ff-display); letter-spacing: .02em; color: var(--ff-text);
+}
+.ff-theme .log li { border-bottom-color: rgba(255, 255, 255, .08); }
+.ff-theme .log li.current { color: var(--ff-hi); }
+.ff-theme .key-log .log-round { font: 800 11px var(--ff-display); letter-spacing: .1em; color: var(--ff-hi); }
+.ff-theme .key-log li.yours .log-line { color: var(--ff-text); }
+.ff-theme .key-log .log-detail { border-left-color: var(--ff-hi); }
+.ff-theme .move-menu button:hover, .ff-theme .move-menu button:focus-visible { background: var(--ff-raised); }
+
+/* ---------- sheets over the table ---------- */
+.ff-theme .sheet { background: var(--ff-panel); color: var(--ff-text); border: 2px solid #000; border-radius: var(--ff-radius); box-shadow: var(--shadow-pop); }
+.ff-theme .sheet h2 { font: italic 800 28px/1 var(--ff-display); letter-spacing: .02em; text-transform: uppercase; }
+.ff-theme .sheet-backdrop { background: rgba(8, 7, 10, .72); }
+.ff-theme .rules-text { background: var(--ff-ground); border: 2px solid #000; border-radius: var(--ff-radius); }
+.ff-theme .end-panel h2 { font: italic 800 44px/1 var(--ff-display); text-transform: uppercase; }
+.ff-theme .end-panel .result.first { background: #3a2f14; }
+
+/* ---------- the lit ring: the highlight, not the site's orange ---------- */
+.ff-theme .zk-lit { --lit: var(--ff-hi); }

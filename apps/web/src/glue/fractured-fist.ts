@@ -29,6 +29,7 @@ import type {
 } from './types';
 import { asArr, asNum, asStr, isObj, shapeHas, words } from './types';
 import { trackIdentities, type IdentityState } from './identity';
+import './ff/ff.css';
 
 const PALETTE: Record<string, string> = {
   resource: '#e6a23c',
@@ -380,6 +381,12 @@ function promptFor(view: Record<string, unknown>, me: string | null, defs: Map<s
 export const fracturedFistGlue: GlueModule = {
   gameId: 'fractured-fist',
   title: 'Fractured Fist',
+
+  /** The arcade theme (docs/design/fractured-fist-arcade): the table's own
+   *  look, for every seat and for a watcher, once the view is this game's. */
+  themeFor(input: GlueInput): string | null {
+    return shapeHas(input.view, 'players', 'phase', 'player_order') ? 'ff-theme' : null;
+  },
 
   plan(input: GlueInput): TablePlan | null {
     const { view } = input;
