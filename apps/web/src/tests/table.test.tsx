@@ -212,7 +212,11 @@ describe('the table page and player agency', () => {
       socket.receive('table_event', ev(2, 'End of round 1. Strike: p1 dealt 0, p2 dealt 1.', { kind: 'ai_move', actorSeatPosition: null, view: struck, legalMoves: LEGAL, yourTurn: true, playerId: 'p1', nextActorPosition: 0, engineMove: { type: 'end_turn' } }));
     });
     const dialog = await screen.findByRole('dialog', { name: 'Round 1 · strike' }, { timeout: 4000 });
-    expect(dialog.textContent).toContain('AI (easy) hits You');
+    // Both fighters, as they stood before the strike.
+    expect(within(dialog).getByLabelText('You: 7 of 7')).toBeTruthy();
+    expect(within(dialog).getByLabelText('AI (easy): 7 of 7')).toBeTruthy();
+    // What was in the way is on the shield; nothing is worked out yet.
+    expect(dialog.textContent).toContain('Both hits are locked in.');
     // The board underneath still shows the round before the strike.
     expect(screen.queryAllByText('End of round 1. Strike: p1 dealt 0, p2 dealt 1.')).toHaveLength(0);
     expect(submissionLog).toHaveLength(0);

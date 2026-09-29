@@ -402,3 +402,44 @@
 .ff-theme .zk-card.zk-lit .zk-card-face { border-color: var(--ff-hi); box-shadow: 0 0 0 2px #000, 4px 4px 0 #000, 0 0 16px rgba(255, 210, 63, .5); }
 .ff-theme .zk-card.zk-lit:focus-visible .zk-card-face { box-shadow: 0 0 0 4px var(--ff-hi); }
 .ff-theme .ff-hand.has-lit .zk-card:not(.zk-lit) .zk-card-face { filter: brightness(.62) saturate(.7); }
+
+/* ================= the strike moment (build item 6) =================
+   The board dims under speed lines; a slanted yellow banner; the fighters
+   in their plates; blue shields; red bursts that turn yellow when they land.
+   Same beats, same lengths as STRIKE_BEATS. */
+.ff-theme .strike-scrim {
+  background-color: rgba(8, 7, 10, .88);
+  background-image: repeating-conic-gradient(from 0deg at 50% 45%, rgba(255, 210, 63, .07) 0 4deg, transparent 4deg 12deg);
+}
+.ff-theme .strike-scrim.closing { background-color: rgba(8, 7, 10, 0); background-image: none; }
+.ff-theme .strike-banner { position: relative; isolation: isolate; background: transparent; border: 0; padding: 12px 60px; color: #111; }
+.ff-theme .strike-banner::before { content: ''; position: absolute; inset: 0; z-index: -1; transform: skewX(-12deg);
+  background: var(--ff-hi); border: 3px solid #000; box-shadow: 8px 8px 0 #000; }
+.ff-theme .strike-banner span { font: 800 22px/1 var(--ff-display); letter-spacing: .08em; text-transform: uppercase; }
+.ff-theme .strike-banner b { font: italic 800 64px/1 var(--ff-display); text-transform: uppercase; letter-spacing: .01em; }
+.ff-theme .strike-fighter { top: 70px; }
+.ff-theme .strike-badge { position: relative; isolation: isolate; width: 52px; height: 52px; border: 0; color: #111; font: italic 800 28px/1 var(--ff-display); text-transform: uppercase; }
+.ff-theme .strike-badge::before { content: ''; position: absolute; inset: 0; z-index: -1; transform: skewX(-12deg); background: var(--ff-hi-2); border: 2px solid #000; box-shadow: 4px 4px 0 #000; }
+.ff-theme .strike-fighter.right .strike-badge::before { background: #8b8398; }
+.ff-theme .strike-fighter-name { font: italic 800 30px/1 var(--ff-display); letter-spacing: .02em; text-transform: uppercase; color: var(--ff-text); }
+.ff-theme .strike-pip { width: 28px; height: 18px; border: 2px solid #000; background: #2a1c1c; transform: skewX(-20deg); }
+.ff-theme .strike-pip.full { background: linear-gradient(180deg, #FFD23F 0 55%, #FF8A1F 55%); border-color: #000; }
+.ff-theme .strike-pip.out { background: linear-gradient(180deg, #FFD23F 0 55%, #FF8A1F 55%); border-color: #000; transform: translateY(34px) rotate(24deg) skewX(-20deg); }
+.ff-theme .strike-stam { font: italic 800 20px/1 var(--ff-display); color: var(--ff-muted); }
+.ff-theme .strike-stam b { font-size: 64px; color: var(--ff-hi); }
+.ff-theme .strike-shield { width: 70px; height: 190px; top: 30px; border: 3px solid #000; box-shadow: 5px 5px 0 #000; color: #fff;
+  background: linear-gradient(180deg, #8cc4ff, #4ea3ff 55%, #2f7fe0); }
+.ff-theme .strike-shield b { font: italic 800 44px/1 var(--ff-display); color: #fff; text-shadow: 2px 2px 0 #000; }
+.ff-theme .strike-shield > span:not([class]) { writing-mode: vertical-rl; rotate: 180deg; font: 800 11px/1 var(--ff-display); letter-spacing: .12em; color: #0b2a52; }
+.ff-theme .strike-shield.flare { box-shadow: 5px 5px 0 #000, 0 0 30px rgba(78, 163, 255, .9); }
+.ff-theme .strike-block-tag { background: var(--ff-defense); color: #fff; border: 2px solid #000; box-shadow: 3px 3px 0 #000; font: 800 16px/1 var(--ff-display); letter-spacing: .06em; text-transform: uppercase; padding: 5px 12px; }
+.ff-theme .strike-stamp { background: #fff; color: var(--ff-defense); border: 3px solid var(--ff-defense); box-shadow: 4px 4px 0 #000; font: italic 800 30px/1 var(--ff-display); text-transform: uppercase; }
+.ff-theme .strike-hit { width: 84px; height: 84px; border: 0; background: var(--ff-damage); color: #fff;
+  clip-path: polygon(50% 0, 61% 18%, 82% 8%, 80% 30%, 100% 36%, 86% 52%, 100% 68%, 79% 72%, 82% 94%, 61% 84%, 50% 100%, 39% 84%, 18% 94%, 21% 72%, 0 68%, 14% 52%, 0 36%, 20% 30%, 18% 8%, 39% 18%);
+  font: italic 800 34px/1 var(--ff-display); text-shadow: 2px 2px 0 #000; }
+.ff-theme .strike-impact { background: var(--ff-hi); color: #111; padding: 18px 22px; font: italic 800 48px/1 var(--ff-display);
+  clip-path: polygon(50% 0, 61% 18%, 82% 8%, 80% 30%, 100% 36%, 86% 52%, 100% 68%, 79% 72%, 82% 94%, 61% 84%, 50% 100%, 39% 84%, 18% 94%, 21% 72%, 0 68%, 14% 52%, 0 36%, 20% 30%, 18% 8%, 39% 18%); }
+.ff-theme .strike-ko { font: italic 800 150px/1 var(--ff-display); color: var(--ff-hi); text-shadow: 6px 6px 0 #000; }
+.ff-theme .strike-caption { background: #0b0a0d; border: 2px solid #000; box-shadow: var(--ff-shadow); color: var(--ff-text); }
+.ff-theme .strike-controls { justify-content: flex-end; }
+.ff-theme .strike-controls .muted { font: 700 11px var(--ff-display); letter-spacing: .1em; text-transform: uppercase; }
