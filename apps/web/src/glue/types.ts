@@ -238,6 +238,13 @@ export interface GameScreenProps {
   interactive: boolean;
   /** send one listed move, because the person tapped it */
   onMove(move: LegalMove): void;
+  /**
+   * Send a series of taps, one per event, because the person pressed one
+   * button that stands for all of them (see glue/agency.ts): each is sent
+   * only once the engine lists the move it stands for, and the series stops
+   * the moment a tap means nothing or several things. Absent on the watch page.
+   */
+  onBatch?: (taps: SelectEvent[]) => void;
   /** send a listed template with the answers the person gave */
   onForm(template: LegalMove, move: Record<string, unknown>, editableKeys: string[]): void;
   /**

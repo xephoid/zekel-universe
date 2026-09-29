@@ -1045,3 +1045,29 @@ fields first and falls back to what the current engine sends.
   reasons and the move descriptions a screen prints use faction names and
   tile labels. Universe keeps its display swap (`ctx.say`) only as a
   fallback for older engine sentences.
+
+## 17. Fractured Fist's arcade theme (decided 2026-09-29)
+
+The design canvas is `docs/design/fractured-fist-arcade/`; what to build is
+`docs/games/fractured-fist-arcade-build.md`.
+
+- **The theme is the table's own.** The glue's `themeFor` returns
+  `ff-theme` and `glue/ff/ff.css` scopes every rule under it. The stage is
+  dark whatever the site's light or dark setting. Barlow Condensed is
+  self-hosted beside the other fonts.
+- **DECIDED: a game-drawn screen, not a new `TablePlan` field.** The owner
+  chose this over the build notes' recommended `versus` field. `FfScreen`
+  draws both fighters' plates at the top (stamina blocks and the misstep
+  meter are the track primitive), the played rows, the strike gutter, the
+  action bar and the bench; the cards are still the card and card-zone
+  primitives, so every flight is the table's FLIP. `glue/ff/read.ts` is the
+  one reading of the view that the screen and `plan()` share.
+- **A screen can hand the table a batch.** `GameScreenProps` gains
+  `onBatch`, so "Play all resources" goes through the table's own batch
+  path (one tap per event, each only once the engine lists it).
+- **The plan's side is empty.** The table draws a plan's side zones even
+  beside a screen, so the supply is portalled into the side column by the
+  screen itself, and drawn inline on the watch page, which has no slot.
+- **Still open: the watch page's look.** It does not apply `themeFor` for
+  any game today; turning it on would change the Neither Guts nor Gears
+  watch page too, so it is left for the owner.

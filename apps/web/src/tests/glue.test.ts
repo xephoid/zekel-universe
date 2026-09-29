@@ -12,6 +12,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { formForMove, isSubmissionAllowed, movesForSelect, templateForm } from '../glue';
 import { SPACES, JUNCTION_ROADS, TREATS, CASTLE_POS } from '../glue/sweetlands-board';
+import { fightOf } from '../glue/ff/read';
+import { FF_MOVES, FF_REFERENCE, FF_VIEW } from './fixtures/ff';
 
 function input(view: unknown, legalMoves: GlueInput['legalMoves'] = [], extra: Partial<GlueInput> = {}): GlueInput {
   return {
@@ -24,77 +26,23 @@ function input(view: unknown, legalMoves: GlueInput['legalMoves'] = [], extra: P
 const ids = (zones: Zone[]) => zones.map((z) => z.id);
 const cards = (z: Zone | undefined) => ((z?.data as CardZoneData | undefined)?.cards ?? []);
 
-// zekel/src/games/fractured-fist/views.ts getPlayerView for a TRACKED seat.
-const FF_VIEW = {
-  phase: 'technique',
-  round: 2,
-  active_player_id: 'p1',
-  player_order: ['p1', 'p2'],
-  players_done_this_round: [],
-  players: {
-    p1: {
-      kind: 'tracked', stamina: 6, max_stamina: 7, deck_size: 8, hand_size: 5,
-      discard_size: 2, discard: ['misstep', 'focus'], played: ['attack'],
-      damage_queued: 1, defense_queued: 0, actions: 1, channels: 1, spirit: 0,
-      refine_pending: 0, misstep_count: 3, starting_hand_size: 5,
-      focus_reloads_this_turn: 0, supply: { attack: 4, focus: 20, momentum: 19 },
-      hand: ['focus', 'misstep', 'quicken', 'center', 'focus'],
-      deck_count_by_card: { focus: 5, misstep: 1, attack: 2 },
-    },
-    p2: {
-      kind: 'tracked', stamina: 7, max_stamina: 7, deck_size: 9, hand_size: 5,
-      discard_size: 1, discard: ['block'], played: [], damage_queued: 0,
-      defense_queued: 1, actions: 1, channels: 1, spirit: 2, refine_pending: 0,
-      misstep_count: 3, starting_hand_size: 5, focus_reloads_this_turn: 0,
-      supply: { attack: 5 },
-    },
-  },
-  winners: [], scores: {}, result_summary: null,
-};
-
-const FF_MOVES = [
-  { move_id: 'play-2-quicken', description: 'Play Quicken from your hand', move: { type: 'play_card', card_id: 'quicken', hand_index: 2 } },
-  { move_id: 'buy-attack', description: 'Buy Attack', move: { type: 'buy_card', card_id: 'attack' } },
-  { move_id: 'advance-phase', description: 'Advance to Channel phase', move: { type: 'advance_phase' } },
-];
-
-const FF_REFERENCE: GameReferenceResponse = {
-  gameId: 'fractured-fist',
-  rules: 'rules',
-  referenceData: {
-    cards: [
-      { id: 'focus', name: 'Focus', type: 'RESOURCE', cost: 0, value: 1, description: '1 Spirit.' },
-      { id: 'misstep', name: 'Misstep', type: 'MISSTEP', cost: 0, description: 'Cannot be played.' },
-      { id: 'quicken', name: 'Quicken', type: 'TECHNIQUE', cost: 2, description: '+2 Draw.', effects: { draw: 2 } },
-      { id: 'center', name: 'Center', type: 'TECHNIQUE', cost: 2, description: '+2 Spirit.', effects: { spirit: 2 } },
-      { id: 'attack', name: 'Attack', type: 'TECHNIQUE', cost: 4, description: '+1 Damage.', effects: { damage: 1 } },
-      { id: 'block', name: 'Block', type: 'TECHNIQUE', cost: 3, description: '+1 Defense.', effects: { defense: 1 } },
-      { id: 'momentum', name: 'Momentum', type: 'RESOURCE', cost: 3, value: 2, description: '2 spirit.' },
-      { id: 'grand-finale', name: 'Grand Finale', type: 'TECHNIQUE', cost: 10, description: '+5 Damage.', faction: 'Titan Entertainment', effects: { damage: 5 } },
-    ],
-    starter_loadout: ['attack', 'block', 'assess', 'center', 'distract', 'quicken', 'react'],
-    max_missteps: 10,
-  },
-  moveSchema: {},
-  optionsSchema: { type: 'object', properties: { loadout: { type: 'array', description: 'Seven techniques. ASK THE PLAYER.' } } },
-};
-
 describe('fractured-fist glue', () => {
   const g = GLUES['fractured-fist']!;
   const hand = (plan: { bench: Zone[] }) => cards(plan.bench.find((z) => z.id === 'p:p1:hand'));
-  it('plans the bench (you, hand, deck, discard), the side (the opponent) and the board (their row, the gutter, your row, one shelf)', () => {
+  it('plans your row and theirs on the board and your hand, deck and discard on the bench; no tableau panels', () => {
     const plan = g.plan(input(FF_VIEW, FF_MOVES, { playerId: 'p1', reference: FF_REFERENCE }))!;
     expect(plan).not.toBeNull();
-    expect(ids(plan.bench)).toEqual(['p:p1:tableau', 'p:p1:hand', 'p:p1:deck', 'p:p1:discard']);
-    expect(ids(plan.side)).toEqual(['p:p2:tableau', 'p:p2:hand', 'p:p2:deck', 'p:p2:discard']);
-    expect(ids(plan.board)).toEqual(['p:p2:played', 'ff:strike:p1', 'ff:strike:p2', 'p:p1:played', 'ff:supply']);
-    expect(plan.board.filter((z) => z.span === 'full').map((z) => z.id)).toEqual(['p:p2:played', 'p:p1:played', 'ff:supply']);
+    expect(ids(plan.bench)).toEqual(['p:p1:hand', 'p:p1:deck', 'p:p1:discard']);
+    expect(ids(plan.board)).toEqual(['p:p2:played', 'p:p1:played']);
+    // The table draws a plan's side zones even beside a screen; the screen
+    // puts the supply in the side column itself.
+    expect(plan.side).toEqual([]);
     expect(plan.status).toBe('Round 2 · Technique step');
     expect(plan.steps).toEqual([{ id: 'technique', label: 'Technique', current: true }, { id: 'channel', label: 'Channel', current: false }]);
+    expect(g.Screen).toBeDefined();
   });
   it('draws one shelf with both players\' counts, yours marked as your own', () => {
-    const plan = g.plan(input(FF_VIEW, FF_MOVES, { playerId: 'p1', reference: FF_REFERENCE }))!;
-    const shelf = cards(plan.board.find((z) => z.id === 'ff:supply'));
+    const shelf = cards(fightOf(input(FF_VIEW, FF_MOVES, { playerId: 'p1', reference: FF_REFERENCE }))!.supply);
     expect(shelf.map((c) => c.id)).toEqual(['p:p1:supply:attack', 'p:p1:supply:focus', 'p:p1:supply:momentum']);
     expect(shelf[0]!.counts).toEqual([{ label: 'you', value: 4, own: true }, { label: 'them', value: 5, own: false }]);
     // A card only the other player still has is on the shelf too, at zero for you.
@@ -104,43 +52,49 @@ describe('fractured-fist glue', () => {
     expect(lit).toContain('p:p1:supply:attack');
     expect(lit.some((id) => id.startsWith('p:p2:supply'))).toBe(false);
   });
-  it('the gutter shows what each player queued against the other, without subtracting', () => {
-    const plan = g.plan(input(FF_VIEW, FF_MOVES, { playerId: 'p1', reference: FF_REFERENCE }))!;
-    const mine = plan.board.find((z) => z.id === 'ff:strike:p1')!;
-    expect(mine.kind).toBe('pool');
-    const data = mine.data as { label: string; items: Array<{ label: string; count: number }> };
-    expect(data.label).toBe('You hit Opponent · Opponent at 7 of 7');
-    expect(data.items).toEqual([{ label: 'damage', count: 1, colorKey: 'damage' }, { label: 'defense', count: 1, colorKey: 'defense' }]);
-    const theirs = plan.board.find((z) => z.id === 'ff:strike:p2')!.data as { label: string };
-    expect(theirs.label).toBe('Opponent hits you · You at 6 of 7');
+  it('puts you on the left and the opponent on the right, every number from the view', () => {
+    const f = fightOf(input(FF_VIEW, FF_MOVES, { playerId: 'p1', reference: FF_REFERENCE }))!;
+    expect(f.left.pid).toBe('p1');
+    expect(f.left.self).toBe(true);
+    expect(f.me).toBe(f.left);
+    expect(f.right).toMatchObject({ pid: 'p2', self: false, who: 'Opponent', stamina: 7, maxStamina: 7, handSize: 5, deckSize: 9, discardSize: 1 });
+    expect(f.left).toMatchObject({ who: 'You', active: true, stamina: 6, maxStamina: 7, missteps: 3 });
+    expect(f.right.active).toBe(false);
+    // As the second seat, you are still on the left.
+    const asP2 = fightOf(input(FF_VIEW, [], { playerId: 'p2', reference: FF_REFERENCE }))!;
+    expect([asP2.left.pid, asP2.right.pid]).toEqual(['p2', 'p1']);
+    // A watcher sees the seats in turn order, by their engine names.
+    const watch = fightOf(input(FF_VIEW, []))!;
+    expect(watch.me?.pid).toBe('p1');
+    const publicView = { ...FF_VIEW, players: { p1: { ...FF_VIEW.players.p1, hand: undefined }, p2: FF_VIEW.players.p2 } };
+    const watcher = fightOf(input(publicView, []))!;
+    expect(watcher.me).toBeNull();
+    expect([watcher.left.who, watcher.right.who]).toEqual(['P1', 'P2']);
   });
-  it('names cards from the reference data and shows the misstep cap from it, never from a constant', () => {
+  it('the gutter reads what each player queued against the other, without subtracting', () => {
+    const f = fightOf(input(FF_VIEW, FF_MOVES, { playerId: 'p1', reference: FF_REFERENCE }))!;
+    // You hit them for 1 into their 1 defense; they queued nothing into your 0.
+    expect([f.left.damageQueued, f.right.defenseQueued]).toEqual([1, 1]);
+    expect([f.right.damageQueued, f.left.defenseQueued]).toEqual([0, 0]);
+  });
+  it('names cards from the reference data and takes the misstep cap from it, never from a constant', () => {
     const plan = g.plan(input(FF_VIEW, FF_MOVES, { playerId: 'p1', reference: FF_REFERENCE }))!;
     expect(hand(plan).map((c) => c.label)).toEqual(['Focus', 'Misstep', 'Quicken', 'Center', 'Focus']);
-    expect(hand(plan)[2]!.badges).toContain('cost 2');
     expect(hand(plan)[2]!.subtitle).toBe('+2 Draw');
-    const tableau = plan.bench.find((z) => z.id === 'p:p1:tableau')!;
-    const stats = (tableau.data as { stats: Array<{ label: string; value: unknown; max?: number }> }).stats;
-    expect(stats.find((s) => s.label === 'Missteps')).toEqual({ label: 'Missteps', value: 3, max: 10 });
-    expect(stats.find((s) => s.label === 'Stamina')).toEqual({ label: 'Stamina', value: 6, max: 7 });
+    const f = fightOf(input(FF_VIEW, FF_MOVES, { playerId: 'p1', reference: FF_REFERENCE }))!;
+    expect([f.left.misstepCap, f.right.misstepCap]).toEqual([10, 10]);
     // Without reference data the cap is simply absent.
-    const bare = g.plan(input(FF_VIEW, FF_MOVES, { playerId: 'p1' }))!;
-    const bareStats = (bare.bench.find((z) => z.id === 'p:p1:tableau')!.data as { stats: Array<{ label: string; max?: number }> }).stats;
-    expect(bareStats.find((s) => s.label === 'Missteps')!.max).toBeUndefined();
+    expect(fightOf(input(FF_VIEW, FF_MOVES, { playerId: 'p1' }))!.left.misstepCap).toBeNull();
   });
-  it('shows only the counters the current step can change; stamina and missteps always', () => {
-    const labels = (view: unknown, pid: string) => {
-      const plan = g.plan(input(view, [], { playerId: 'p1', reference: FF_REFERENCE }))!;
-      const z = [...plan.bench, ...plan.side].find((x) => x.id === `p:${pid}:tableau`)!;
-      return (z.data as { stats: Array<{ label: string }> }).stats.map((s) => s.label);
-    };
-    expect(labels(FF_VIEW, 'p1')).toEqual(['Stamina', 'Actions', 'Missteps']);
-    // The opponent is not on turn: their per-turn counters cannot change.
-    expect(labels(FF_VIEW, 'p2')).toEqual(['Stamina', 'Missteps']);
+  it('shows only the counters the current step can change, and only on your turn', () => {
+    const counters = (view: unknown, pid = 'p1') => fightOf(input(view, [], { playerId: pid, reference: FF_REFERENCE }))!.counters.map((c) => `${c.label} ${c.value}`);
+    expect(counters(FF_VIEW)).toEqual(['Actions 1']);
+    // Not on turn: nothing this turn can change.
+    expect(counters(FF_VIEW, 'p2')).toEqual([]);
     const channel = { ...FF_VIEW, phase: 'channel' };
-    expect(labels(channel, 'p1')).toEqual(['Stamina', 'Spirit', 'Channels', 'Missteps']);
+    expect(counters(channel)).toEqual(['Spirit 0', 'Channels 1']);
     const refining = { ...FF_VIEW, players: { ...FF_VIEW.players, p1: { ...FF_VIEW.players.p1, refine_pending: 2 } } };
-    expect(labels(refining, 'p1')).toEqual(['Stamina', 'Refines pending', 'Actions', 'Missteps']);
+    expect(counters(refining)).toEqual(['Refines 2', 'Actions 1']);
   });
   it('gives cards stable instance ids that carry across events', () => {
     const memory = new Map<string, unknown>();

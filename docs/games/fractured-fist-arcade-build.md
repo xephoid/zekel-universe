@@ -149,7 +149,8 @@ bar, panels, buttons, action bar, log, last move, bench and the card face.
 other game's table and every other page is pixel-for-pixel unchanged.
 
 **2. Both stamina bars at the top.** `TablePlan` has no place for this. Two
-ways, and the owner has not picked one:
+ways. **The owner picked the second, a game-drawn screen, on 2026-09-29**
+(see `docs/implementation-plan.md`, section 17):
 
 - *Recommended:* an optional `versus` field on `TablePlan` (each side: name,
   stamina, max, misstep count and cap, one line of public counts), drawn as

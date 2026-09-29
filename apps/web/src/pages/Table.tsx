@@ -353,6 +353,7 @@ export function TablePage() {
                 onMove={pick}
                 onForm={(template, move, editableKeys) => void send('form', move, { template: template.move, editableKeys })}
                 onDraw={resolveReport ? () => void send('resolve_report_button', resolveReport.move) : undefined}
+                onBatch={setBatch}
                 ask={async (name, args) => {
                   const ack = await t.query(name, args);
                   return 'ok' in ack && ack.ok ? { answer: ack.answer } : { refused: ('reason' in ack && ack.reason) || ack.error };
