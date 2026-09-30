@@ -45,6 +45,12 @@ export const ZEKEL_GAMES: Record<string, { designer: string; description: string
     playTime: '90–150 min',
     tags: ['strategy', 'area control', 'hex map'],
   },
+  'adventurer-olympics': {
+    designer: 'zekel-games',
+    description: 'An exploration race for two to four players: walk a map of hex tiles that grows as you explore, recruit companions, fight monsters, delve into dungeons, and claim the most quests before the last tile is placed.',
+    playTime: '30–45 min',
+    tags: ['exploration', 'hex map', 'dice'],
+  },
   'sweetlands-imperium': {
     designer: 'zekel-games',
     description: 'Area control for two to five players on an 80-space candy kingdom: move your leader, knight and ambassador, play Intel, and hold the castle.',
@@ -83,5 +89,12 @@ export const ZEKEL_UPDATES: Array<{ id: string; gameId: string; title: string; b
     title: 'A season of Warble Way, solo',
     postedAt: '2026-09-17T10:00:00.000Z',
     body: 'Create your character on the form (name, race, ship, scores or an archetype card), take a mission, and fly. Every travel card and every die waits for your press of Draw or Roll, and the dice tumble on the table when they land.',
+  },
+  {
+    id: 'ao-2026-09-30-browser',
+    gameId: 'adventurer-olympics',
+    title: 'Adventurer Olympics plays in the browser',
+    postedAt: '2026-09-30T18:00:00.000Z',
+    body: 'Pick an adventurer and a colour and race the AI across a map you build as you go. Glowing hexes show where you can step; every card waits for your press of Draw and every test for your press of Roll. To explore, tap a glowing slot, turn the tile until its icons sit where you want them, and place it.',
   },
 ];
