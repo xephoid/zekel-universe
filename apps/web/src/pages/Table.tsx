@@ -96,6 +96,8 @@ export function TablePage() {
   const batchSentFor = useRef<number | null>(null);
   const lastTap = useRef<{ x: number; y: number } | null>(null);
   const memory = useRef(new Map<string, unknown>());
+  /** a choice the player is putting together and has not sent (GlueInput.ui) */
+  const [ui, setUi] = useState<Record<string, unknown>>({});
   const reduced = useSystemReducedMotion();
 
   const gameId = table?.table.gameId ?? '';
@@ -138,7 +140,8 @@ export function TablePage() {
       ? null
       : `p${current.actorSeatPosition + 1}`,
     memory: memory.current,
-  }), [state.view, state.previousView, legalMoves, unavailable, myPlayerId, t.reference, current]);
+    ui,
+  }), [state.view, state.previousView, legalMoves, unavailable, myPlayerId, t.reference, current, ui]);
 
   const plan = useMemo(() => (glue ? glue.plan(input) : null), [glue, input]);
   const lit = useMemo(() => (glue && yourTurn ? glue.litParts(input) : []), [glue, input, yourTurn]);
@@ -194,19 +197,24 @@ export function TablePage() {
 
   const onSelect = useCallback((sel: SelectEvent) => {
     if (!glue) return;
+    // A tap that changes what the player is putting together sends nothing.
+    const change = yourTurn ? glue.uiForSelect?.(sel, input) ?? null : null;
+    if (change) { setUi((u) => ({ ...u, ...change })); return; }
     const options = movesForSelect(glue, sel, input);
     if (options.length === 1) { pick(options[0]!); return; }
     if (options.length > 1) { setChooser(options); return; }
     // No move behind it: looking is safe, so show what it is.
     const detail = glue.detailFor?.(sel, input) ?? null;
     if (detail) setDetail(detail);
-  }, [glue, input, pick]);
+  }, [glue, input, pick, yourTurn]);
 
-  // A new event closes any chooser or form: their moves may no longer exist.
-  useEffect(() => { setChooser(null); setForm(null); setDetail(null); }, [current?.seq]);
+  // A new event closes any chooser or form, and drops a choice being put
+  // together: their moves may no longer exist.
+  useEffect(() => { setChooser(null); setForm(null); setDetail(null); setUi({}); }, [current?.seq]);
 
   // An action-bar button: one listed move, or a batch of taps.
   const onAction = useCallback((a: PromptAction) => {
+    if ('ui' in a) { setUi((u) => ({ ...u, ...a.ui })); return; }
     if ('move' in a) { pick(a.move); return; }
     // A verb with several moves behind it asks which, in the engine's own
     // words — unless they are all answers to one question the glue knows how

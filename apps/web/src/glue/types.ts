@@ -31,6 +31,13 @@ export interface GlueInput {
   actorPlayerId: string | null;
   /** scratch space the table keeps for this glue across events */
   memory: Map<string, unknown>;
+  /**
+   * A choice the player is putting together on screen and has not sent (the
+   * slot a tile is going in, the way it is turned). Set only by the player's
+   * own taps and presses, through `ui` actions and uiForSelect; cleared when
+   * a new event arrives. Changing it never sends anything.
+   */
+  ui?: Record<string, unknown>;
 }
 
 type ZoneBody =
@@ -67,7 +74,10 @@ export type PromptAction =
   | { id: string; label: string; note?: string; title?: string; primary?: boolean; batch: SelectEvent[] }
   /** A verb several listed moves stand behind: one opens directly, several ask
    *  which, in the engine's own words. Nothing is chosen for the player. */
-  | { id: string; label: string; note?: string; title?: string; primary?: boolean; moves: LegalMove[] };
+  | { id: string; label: string; note?: string; title?: string; primary?: boolean; moves: LegalMove[] }
+  /** A step in putting a choice together (turn the tile left): it changes
+   *  what the screen shows (GlueInput.ui) and sends nothing. */
+  | { id: string; label: string; note?: string; title?: string; primary?: boolean; ui: Record<string, unknown> };
 
 /** The action bar: what step it is, what you can do now, and the buttons
  *  that move the turn. Text only; every number in it comes from the view. */
@@ -293,6 +303,10 @@ export interface GlueModule {
   litParts(input: GlueInput): string[];
   /** Given a tap on a lit part, the legal move it submits, or null. */
   moveForSelect(sel: SelectEvent, input: GlueInput): LegalMove | null;
+  /** A tap that changes a choice being put together (picks a slot) rather
+   *  than sending a move: the change to GlueInput.ui, or null. Asked before
+   *  movesForSelect. */
+  uiForSelect?(sel: SelectEvent, input: GlueInput): Record<string, unknown> | null;
   /** Every legal move a tap on this part could mean. One means send it;
    *  several means the table asks which (a chooser). Defaults to moveForSelect. */
   movesForSelect?(sel: SelectEvent, input: GlueInput): LegalMove[];
