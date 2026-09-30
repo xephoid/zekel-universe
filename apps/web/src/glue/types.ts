@@ -146,6 +146,10 @@ export interface MultiOption {
   chips?: string[];
   /** a quiet tag under the chips ("in the default seven") */
   tag?: string;
+  /** a strip of the card's art */
+  art?: string;
+  /** the badge drawn as the card's colored corner, its number in `ink` */
+  corner?: { color: string; ink: string };
 }
 
 /** One of the game's own setup choices, presented as a field the player fills in. */
@@ -238,6 +242,13 @@ export interface GameScreenProps {
   interactive: boolean;
   /** send one listed move, because the person tapped it */
   onMove(move: LegalMove): void;
+  /**
+   * Send a series of taps, one per event, because the person pressed one
+   * button that stands for all of them (see glue/agency.ts): each is sent
+   * only once the engine lists the move it stands for, and the series stops
+   * the moment a tap means nothing or several things. Absent on the watch page.
+   */
+  onBatch?: (taps: SelectEvent[]) => void;
   /** send a listed template with the answers the person gave */
   onForm(template: LegalMove, move: Record<string, unknown>, editableKeys: string[]): void;
   /**

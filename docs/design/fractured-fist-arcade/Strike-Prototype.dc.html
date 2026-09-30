@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Fractured Fist strike</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,500;0,600;0,700;0,800;1,800&amp;family=Slackey&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+@keyframes ff-shake{0%,100%{translate:0 0}15%{translate:-14px 4px}30%{translate:12px -6px}45%{translate:-10px 2px}60%{translate:8px -2px}80%{translate:-4px 0}}
+</style>
+</helmet>
+<div style="width:1440px;height:900px;position:relative;overflow:hidden;background:#131116;font-family:'IBM Plex Sans',sans-serif">
+<sc-if value="{{ bare }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;background:#18151c"></div>
+</sc-if>
+<sc-if value="{{ showTable }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute;inset:0;pointer-events:none">
+<dc-import name="Table-Channel" hint-size="1440px,900px"></dc-import>
+</div>
+</sc-if>
+<div style="position:absolute;inset:0;background:rgba(8,6,10,.82);{{ scrimStyle }}">
+<svg width="1440" height="900" viewBox="0 0 1440 900" aria-hidden="true" style="position:absolute;inset:0"><polygon points="720,440 2520,440 2511,616" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 2485,791 2442,963" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 2383,1129 2307,1289" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 2217,1440 2111,1582" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 1993,1713 1862,1831" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 1720,1937 1569,2027" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 1409,2103 1243,2162" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 1071,2205 896,2231" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 720,2240 544,2231" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 369,2205 197,2162" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 31,2103 -129,2027" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 -280,1937 -422,1831" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 -553,1713 -671,1582" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 -777,1440 -867,1289" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 -943,1129 -1002,963" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 -1045,791 -1071,616" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 -1080,440 -1071,264" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 -1045,89 -1002,-83" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 -943,-249 -867,-409" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 -777,-560 -671,-702" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 -553,-833 -422,-951" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 -280,-1057 -129,-1147" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 31,-1223 197,-1282" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 369,-1325 544,-1351" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 720,-1360 896,-1351" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 1071,-1325 1243,-1282" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 1409,-1223 1569,-1147" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 1720,-1057 1862,-951" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 1993,-833 2111,-702" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 2217,-560 2307,-409" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 2383,-249 2442,-83" fill="#FFD23F" fill-opacity="0.06"/><polygon points="720,440 2485,89 2511,264" fill="#FFD23F" fill-opacity="0.06"/></svg>
+</div>
+<div role="dialog" aria-label="Round 4 strike" style="position:absolute;inset:0">
+<div style="position:absolute;left:330px;top:120px;width:780px;height:110px;background:#FFD23F;border:4px solid #000;box-shadow:8px 8px 0 #000;display:flex;align-items:center;justify-content:center;gap:24px;{{ bannerStyle }}">
+<span style="display:inline-block;transform:skewX(12deg);font:800 30px/1 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#111;font-style:italic">Round 4</span>
+<span style="display:inline-block;transform:skewX(12deg);font:800 88px/1 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#111;font-style:italic;letter-spacing:.02em">Strike!</span>
+</div>
+<div style="position:absolute;left:90px;top:300px;width:380px;display:flex;flex-direction:column;gap:14px;align-items:flex-start;{{ youPlateStyle }}"><div style="display:flex;align-items:center;gap:14px;"><span style="width:58px;height:58px;display:grid;place-items:center;background:#FF5A1F;border:3px solid #000;box-shadow:4px 4px 0 #000;transform:skewX(-10deg)"><span style="transform:skewX(10deg);font:800 32px/1 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#111;font-style:italic">Y</span></span><span style="font:800 40px/1 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#f4efe6;font-style:italic">You</span></div><div style="display:flex;gap:4px;">
+<sc-for list="{{ youSegs }}" as="g" hint-placeholder-count="7">
+<span style="width:40px;height:28px;box-sizing:border-box;border:2.5px solid #000;{{ g.style }}"></span>
+</sc-for>
+</div><div style="display:flex;align-items:baseline;gap:6px;"><span style="font:800 64px/1 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#FFD23F;font-style:italic;display:inline-block;{{ youNumStyle }}">{{ youStam }}</span><span style="font:600 20px/1 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#a9a2b3">/ 7 stamina</span></div></div><div style="position:absolute;left:970px;top:300px;width:380px;display:flex;flex-direction:column;gap:14px;align-items:flex-end;{{ oppPlateStyle }}"><div style="display:flex;align-items:center;gap:14px;flex-direction:row-reverse;"><span style="width:58px;height:58px;display:grid;place-items:center;background:#8f86a0;border:3px solid #000;box-shadow:4px 4px 0 #000;transform:skewX(-10deg)"><span style="transform:skewX(10deg);font:800 32px/1 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#111;font-style:italic">O</span></span><span style="font:800 40px/1 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#f4efe6;font-style:italic">Opponent</span></div><div style="display:flex;gap:4px;flex-direction:row-reverse;">
+<sc-for list="{{ oppSegs }}" as="g" hint-placeholder-count="7">
+<span style="width:40px;height:28px;box-sizing:border-box;border:2.5px solid #000;{{ g.style }}"></span>
+</sc-for>
+</div><div style="display:flex;align-items:baseline;gap:6px;justify-content:flex-end;"><span style="font:800 64px/1 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#FFD23F;font-style:italic;display:inline-block;{{ oppNumStyle }}">{{ oppStam }}</span><span style="font:600 20px/1 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#a9a2b3">/ 7 stamina</span></div></div>
+<div style="position:absolute;left:486px;top:318px;width:74px;height:210px;box-sizing:border-box;background:linear-gradient(180deg,#8cc6ff,#4ea3ff);border:3px solid #000;box-shadow:4px 4px 0 #000;transform-origin:50% 50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;{{ youShieldStyle }}"><span style="font:800 44px/1 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#fff;font-style:italic;text-shadow:2px 2px 0 #000">{{ youDef }}</span><span style="font:800 12px/1 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#0b2440;writing-mode:vertical-rl;transform:rotate(180deg)">Defense</span></div><div style="position:absolute;left:880px;top:318px;width:74px;height:210px;box-sizing:border-box;background:linear-gradient(180deg,#8cc6ff,#4ea3ff);border:3px solid #000;box-shadow:4px 4px 0 #000;transform-origin:50% 50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;{{ oppShieldStyle }}"><span style="font:800 44px/1 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#fff;font-style:italic;text-shadow:2px 2px 0 #000">{{ oppDef }}</span><span style="font:800 12px/1 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#0b2440;writing-mode:vertical-rl;transform:rotate(180deg)">Defense</span></div>
+<div style="position:absolute;left:676px;top:374px;width:90px;height:90px;transform-origin:50% 50%;{{ sparkStyle }}"><svg width="90" height="90" viewBox="0 0 90 90" aria-hidden="true" style="position:absolute;inset:0;overflow:visible"><polygon points="45.0,1.0 54.5,15.9 67.7,13.7 69.8,27.0 86.8,31.4 75.6,45.0 81.8,57.0 69.8,63.0 70.9,80.6 54.5,74.1 45.0,83.7 35.5,74.1 19.1,80.6 20.2,63.0 8.2,57.0 14.4,45.0 3.2,31.4 20.2,27.0 22.3,13.7 35.5,15.9" fill="#fff" stroke="#000" stroke-width="3" stroke-linejoin="round"/></svg></div>
+<div style="position:absolute;top:330px;left:0;width:84px;height:84px;{{ youTokStyle }}"><svg width="84" height="84" viewBox="0 0 84 84" aria-hidden="true" style="position:absolute;inset:0;overflow:visible"><polygon points="42.0,1.0 49.4,14.4 60.1,10.7 62.2,21.8 77.5,21.5 69.6,34.6 78.1,42.0 69.6,49.4 77.5,62.5 62.2,62.2 60.1,73.3 49.4,69.6 42.0,83.0 34.6,69.6 23.9,73.3 21.8,62.2 6.5,62.5 14.4,49.4 5.9,42.0 14.4,34.6 6.5,21.5 21.8,21.8 23.9,10.7 34.6,14.4" fill="#ff5646" stroke="#000" stroke-width="3" stroke-linejoin="round"/></svg><span style="position:absolute;inset:0;display:grid;place-items:center;font:800 38px/1 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#fff;font-style:italic;text-shadow:2px 2px 0 #000">{{ youTokNum }}</span></div><div style="position:absolute;top:452px;left:0;width:84px;height:84px;{{ oppTokStyle }}"><svg width="84" height="84" viewBox="0 0 84 84" aria-hidden="true" style="position:absolute;inset:0;overflow:visible"><polygon points="42.0,1.0 49.4,14.4 60.1,10.7 62.2,21.8 77.5,21.5 69.6,34.6 78.1,42.0 69.6,49.4 77.5,62.5 62.2,62.2 60.1,73.3 49.4,69.6 42.0,83.0 34.6,69.6 23.9,73.3 21.8,62.2 6.5,62.5 14.4,49.4 5.9,42.0 14.4,34.6 6.5,21.5 21.8,21.8 23.9,10.7 34.6,14.4" fill="#ff5646" stroke="#000" stroke-width="3" stroke-linejoin="round"/></svg><span style="position:absolute;inset:0;display:grid;place-items:center;font:800 38px/1 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#fff;font-style:italic;text-shadow:2px 2px 0 #000">{{ oppTokNum }}</span></div>
+<div style="position:absolute;left:846px;top:272px;padding:4px 12px;background:#4ea3ff;border:3px solid #000;box-shadow:3px 3px 0 #000;transform-origin:50% 100%;{{ oppBlockStyle }}"><span style="display:inline-block;transform:skewX(10deg);font:800 22px/1 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#fff;font-style:italic">Block {{ oppAbsorbed }}</span></div><div style="position:absolute;left:452px;top:272px;padding:4px 12px;background:#4ea3ff;border:3px solid #000;box-shadow:3px 3px 0 #000;transform-origin:50% 100%;{{ youBlockStyle }}"><span style="display:inline-block;transform:skewX(10deg);font:800 22px/1 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#fff;font-style:italic">Block {{ youAbsorbed }}</span></div>
+<div style="position:absolute;left:952px;top:360px;width:170px;height:170px;{{ oppHitStyle }}"><svg width="170" height="170" viewBox="0 0 170 170" aria-hidden="true" style="position:absolute;inset:0;overflow:visible"><polygon points="85.0,1.0 97.9,28.6 116.7,19.1 121.0,39.8 150.7,32.6 137.1,59.9 156.3,68.7 142.8,85.0 166.9,103.7 137.1,110.1 142.2,130.6 121.0,130.2 121.4,160.7 97.9,141.4 85.0,158.1 72.1,141.4 48.6,160.7 49.0,130.2 27.8,130.6 32.9,110.1 3.1,103.7 27.2,85.0 13.7,68.7 32.9,59.9 19.3,32.6 49.0,39.8 53.3,19.1 72.1,28.6" fill="#FFD23F" stroke="#000" stroke-width="4" stroke-linejoin="round"/></svg><span style="position:absolute;inset:0;display:grid;place-items:center;font:800 54px/1 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#111;font-style:italic">{{ oppHitText }}</span></div><div style="position:absolute;left:932px;top:400px;padding:6px 16px;background:#fff;border:4px solid #4ea3ff;box-shadow:4px 4px 0 #000;{{ oppStampStyle }}"><span style="font:800 36px/1 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#4ea3ff;font-style:italic">Blocked!</span></div><div style="position:absolute;left:330px;top:470px;width:170px;height:170px;{{ youHitStyle }}"><svg width="170" height="170" viewBox="0 0 170 170" aria-hidden="true" style="position:absolute;inset:0;overflow:visible"><polygon points="85.0,1.0 97.9,28.6 116.7,19.1 121.0,39.8 150.7,32.6 137.1,59.9 156.3,68.7 142.8,85.0 166.9,103.7 137.1,110.1 142.2,130.6 121.0,130.2 121.4,160.7 97.9,141.4 85.0,158.1 72.1,141.4 48.6,160.7 49.0,130.2 27.8,130.6 32.9,110.1 3.1,103.7 27.2,85.0 13.7,68.7 32.9,59.9 19.3,32.6 49.0,39.8 53.3,19.1 72.1,28.6" fill="#FFD23F" stroke="#000" stroke-width="4" stroke-linejoin="round"/></svg><span style="position:absolute;inset:0;display:grid;place-items:center;font:800 54px/1 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#111;font-style:italic">{{ youHitText }}</span></div><div style="position:absolute;left:310px;top:510px;padding:6px 16px;background:#fff;border:4px solid #4ea3ff;box-shadow:4px 4px 0 #000;{{ youStampStyle }}"><span style="font:800 36px/1 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#4ea3ff;font-style:italic">Blocked!</span></div>
+<div style="position:absolute;left:470px;top:560px;width:500px;height:160px;display:grid;place-items:center;{{ koStyle }}">
+<span style="font:800 150px/1 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#FFD23F;font-style:italic;letter-spacing:.02em;-webkit-text-stroke:5px #000;text-shadow:10px 10px 0 #000">K.O.</span>
+</div>
+<sc-if value="{{ showCaption }}" hint-placeholder-val="{{ true }}">
+<div aria-live="polite" style="position:absolute;left:0;right:0;bottom:92px;display:flex;justify-content:center">
+<span style="padding:8px 18px;background:#0b0a0d;border:2px solid #000;box-shadow:4px 4px 0 #000;font:500 16px/1.3 'IBM Plex Sans',sans-serif;color:#f4efe6">{{ caption }}</span>
+</div>
+</sc-if>
+<sc-if value="{{ showControls }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute;right:36px;bottom:30px;display:flex;align-items:center;gap:12px">
+<span style="font:700 13px/1 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#a9a2b3">Pace</span>
+<div style="display:flex;padding:2px;background:#0b0a0d;border:2px solid #000">
+<sc-for list="{{ paceBtns }}" as="p" hint-placeholder-count="3">
+<button type="button" aria-pressed="{{ p.pressed }}" onClick="{{ p.press }}" style="height:32px;padding:0 12px;border:none;{{ p.style }}font:800 italic 17px/1 'Barlow Condensed',sans-serif;cursor:pointer">{{ p.label }}</button>
+</sc-for>
+</div>
+<sc-if value="{{ playing }}" hint-placeholder-val="{{ true }}">
+<button type="button" onClick="{{ skip }}" style="height:40px;padding:0 16px;background:#2c2732;color:#f4efe6;border:2px solid #000;box-shadow:3px 3px 0 #000;font:800 15px/1 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#f4efe6;font-style:italic;cursor:pointer">Skip to the end</button>
+</sc-if>
+<sc-if value="{{ done }}" hint-placeholder-val="{{ false }}">
+<button type="button" onClick="{{ replay }}" style="height:40px;padding:0 16px;background:#FFD23F;color:#111;border:2px solid #000;box-shadow:3px 3px 0 #000;font:800 15px/1 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#111;font-style:italic;cursor:pointer">Replay the strike</button>
+</sc-if>
+</div>
+</sc-if>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"freeze":{"editor":null},"ko":{"editor":null},"$preview":{"width":1440,"height":900}}'>
+
+const BEATS = { locked: 800, travel: 640, absorb: 600, land: 640, fade: 420 };
+const EASE = 'cubic-bezier(0.3, 0.8, 0.4, 1)';
+const SETTLE = 'cubic-bezier(0.2, 0.9, 0.3, 1.2)';
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { beat: this.frozen() ? this.props.freeze : 0, pace: 1 }; this.timers = []; }
+  frozen() { return this.props.freeze !== undefined && this.props.freeze !== null && this.props.freeze !== ''; }
+  componentDidMount() { if (!this.frozen()) this.play(); }
+  componentWillUnmount() { this.clear(); }
+  clear() { this.timers.forEach((t) => clearTimeout(t)); this.timers = []; }
+  play() {
+    this.clear();
+    this.setState({ beat: 0 });
+    const p = this.state.pace;
+    let t = 60;
+    const at = (ms, beat) => { this.timers.push(setTimeout(() => this.setState({ beat }), ms)); };
+    at(t, 1); t += BEATS.locked / p;
+    at(t, 2); t += BEATS.travel / p;
+    at(t, 3); t += BEATS.absorb / p;
+    at(t, 4); t += BEATS.land / p;
+    at(t, 5); t += BEATS.fade / p;
+    at(t, 6);
+  }
+  skip() { this.clear(); this.setState({ beat: 5 }); this.timers.push(setTimeout(() => this.setState({ beat: 6 }), BEATS.fade / this.state.pace)); }
+  renderVals() {
+    const frozen = this.frozen();
+    const ko = !!this.props.ko;
+    const b = frozen ? Number(this.props.freeze) : this.state.beat;
+    const pace = this.state.pace;
+    const d = (ms) => Math.round(ms / pace) + 'ms';
+    const T = (prop, ms, ease) => (frozen ? 'transition:none;' : `transition:${prop} ${d(ms)} ${ease || EASE};`);
+    const on = b >= 1 && b <= 4;
+    // What the engine reported, before and after (sample numbers for the drawing).
+    const lanes = {
+      you: { hit: 2, shield: 1, through: 1, before: ko ? 1 : 6, after: ko ? 0 : 5 },   // you hit the Opponent
+      opp: { hit: 1, shield: 1, through: 0, before: 5, after: 5 },                        // the Opponent hits you
+    };
+    const absorbed = (l) => Math.max(0, Math.min(l.shield, l.hit - l.through));
+    const segs = (target) => Array.from({ length: 7 }, (_, i) => {
+      const lost = i >= target.after && i < target.before;
+      const full = i < target.after || (lost && b < 4);
+      const fall = lost && b >= 4;
+      const bg = full || fall ? 'background:#FFD23F;box-shadow:inset 0 -8px 0 rgba(255,90,31,.6);' : 'background:#2a0f0c;';
+      const tf = fall ? `transform:skewX(-12deg) translateY(90px) rotate(${i % 2 ? 28 : -22}deg);opacity:0;` : 'transform:skewX(-12deg);opacity:1;';
+      const tr = frozen ? 'transition:none;' : `transition:transform ${d(BEATS.land)} ${EASE} ${d((i - target.after) * 90)},opacity ${d(BEATS.land)} linear ${d((i - target.after) * 90 + 200)};`;
+      return { style: bg + tf + tr };
+    });
+    // Your hit travels right toward the Opponent's shield; theirs travels left toward yours.
+    const tok = (l, from, to, into) => {
+      let x = from, s = 0, rot = 0, op = 1;
+      if (b === 1) { x = from; s = 1; }
+      if (b === 2) { x = to; s = 1; rot = 360; }
+      if (b === 3) { x = to; s = l.hit ? 0.55 + 0.45 * (l.through / l.hit) : 0.4; rot = 360; }
+      if (b >= 4) { x = l.through > 0 ? into : to; s = l.through > 0 ? 1.4 : 0.1; rot = 360; op = 0; }
+      if (b === 0 || b >= 5) { s = 0; op = 0; }
+      return `transform:translateX(${x}px) scale(${s}) rotate(${rot}deg);opacity:${op};` +
+        (frozen ? 'transition:none;' : `transition:transform ${d(b === 1 ? 300 : b === 2 ? BEATS.travel : 280)} ${b === 1 ? SETTLE : EASE},opacity ${d(200)} linear;`);
+    };
+    const shieldStyle = (l) => {
+      const flare = b === 3 && absorbed(l) > 0;
+      const blocked = b === 4 && l.through === 0 && l.hit > 0;
+      const y = on ? 0 : 420;
+      return `transform:translateY(${y}px) skewX(-8deg) scale(${flare ? 1.18 : blocked ? 1.1 : 1});filter:brightness(${flare ? 1.4 : 1});` + T('transform', flare ? 180 : 360, SETTLE);
+    };
+    const blockStyle = (l) => {
+      const show = b >= 3 && b <= 4 && absorbed(l) > 0;
+      return `transform:skewX(-10deg) translateY(${show ? 0 : -60}px) scale(${show ? 1 : 0});` + T('transform', 280, SETTLE);
+    };
+    const hitStyle = (l) => {
+      const show = b === 4 && l.through > 0;
+      return `transform:scale(${show ? 1 : 0}) rotate(${show ? 0 : -40}deg);` + T('transform', 300, SETTLE);
+    };
+    const stampStyle = (l) => {
+      const show = b === 4 && l.through === 0 && l.hit > 0;
+      return `transform:rotate(-10deg) scale(${show ? 1 : 2.4});opacity:${show ? 1 : 0};` + T('transform', 220, EASE).replace(';', ',opacity ' + d(120) + ' linear;');
+    };
+    const shake = (l) => (!frozen && b === 4 && l.through > 0 ? `animation:ff-shake ${d(420)} 1;` : '');
+    const caption = {
+      0: '', 1: 'Round 4 strike. Both hits land at the same time.', 2: 'The hits travel.',
+      3: 'The Opponent blocks 1 of your 2. You block their 1.',
+      4: ko ? 'The Opponent is out. The result panel takes over.' : '1 gets through: the Opponent drops to 5. Nothing gets through to you.',
+      5: 'Both played rows sweep into the discards.', 6: 'The table is back.',
+    }[b];
+    const paceBtn = (v, t) => ({ label: t, press: () => { this.setState({ pace: v }); }, style: pace === v ? 'background:#FFD23F;color:#111;' : 'background:transparent;color:#f4efe6;', pressed: pace === v ? 'true' : 'false' });
+    return {
+      bare: frozen, showTable: !frozen && b < 6,
+      scrimStyle: `opacity:${on ? 1 : 0};` + T('opacity', b >= 5 ? BEATS.fade : 240, 'linear'),
+      bannerStyle: `transform:translateX(${on ? 0 : -1500}px) skewX(-12deg);` + T('transform', 420, SETTLE),
+      youPlateStyle: `transform:translateX(${on ? 0 : -700}px);` + T('transform', 420, SETTLE) + shake(lanes.opp),
+      oppPlateStyle: `transform:translateX(${on ? 0 : 700}px);` + T('transform', 420, SETTLE) + shake(lanes.you),
+      youSegs: segs(lanes.opp), oppSegs: segs(lanes.you),
+      youStam: b >= 4 ? lanes.opp.after : lanes.opp.before,
+      oppStam: b >= 4 ? lanes.you.after : lanes.you.before,
+      youNumStyle: `transform:scale(${b === 4 && lanes.opp.through > 0 ? 1.25 : 1});` + T('transform', 240, SETTLE),
+      oppNumStyle: `transform:scale(${b === 4 && lanes.you.through > 0 ? 1.25 : 1});color:${b >= 4 && lanes.you.through > 0 ? '#ff5646' : '#FFD23F'};` + T('transform', 240, SETTLE),
+      youDef: lanes.opp.shield, oppDef: lanes.you.shield,
+      youShieldStyle: shieldStyle(lanes.opp), oppShieldStyle: shieldStyle(lanes.you),
+      youTokStyle: tok(lanes.you, 574, 790, 1100), youTokNum: b <= 2 ? lanes.you.hit : lanes.you.through,
+      oppTokStyle: tok(lanes.opp, 790, 574, 200), oppTokNum: b <= 2 ? lanes.opp.hit : lanes.opp.through,
+      youBlockStyle: blockStyle(lanes.opp), youAbsorbed: absorbed(lanes.opp),
+      oppBlockStyle: blockStyle(lanes.you), oppAbsorbed: absorbed(lanes.you),
+      youHitStyle: hitStyle(lanes.opp), youHitText: '-' + lanes.opp.through, youStampStyle: stampStyle(lanes.opp),
+      oppHitStyle: hitStyle(lanes.you), oppHitText: '-' + lanes.you.through, oppStampStyle: stampStyle(lanes.you),
+      sparkStyle: `transform:scale(${b === 2 ? 1 : 0});` + (frozen ? 'transition:none;' : `transition:transform ${d(200)} ${SETTLE} ${b === 2 ? d(BEATS.travel * 0.45) : '0ms'};`),
+      koStyle: `transform:rotate(-8deg) scale(${ko && b === 4 ? 1 : 3});opacity:${ko && b === 4 ? 1 : 0};` + T('transform', 260, EASE),
+      caption, showCaption: b >= 1 && b <= 5,
+      showControls: !frozen, done: b === 6, playing: b < 6,
+      paceBtns: [paceBtn(0.5, '½×'), paceBtn(1, '1×'), paceBtn(2, '2×')],
+      skip: () => this.skip(), replay: () => this.play(),
+    };
+  }
+}
+
+</script>
+</body>
+</html>

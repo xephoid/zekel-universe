@@ -81,6 +81,8 @@
 }
 .zk-card-art { width: 100%; height: 44px; object-fit: cover; border-radius: var(--radius-sm); }
 .zk-card-label { font-weight: 700; overflow-wrap: anywhere; }
+/* What a card is worth, opposite its cost. */
+.zk-card-value { float: left; margin: -2px 4px 0 -2px; font-family: var(--font-mono); font-size: 10px; font-weight: 600; }
 /* What a card costs, in its own corner: a price is not one badge among many. */
 .zk-card-cost {
   float: right; margin: -2px -2px 0 4px;
@@ -356,3 +358,20 @@
 [data-motion='reduced'] .zk-die.rolling { animation-name: zk-fade; }
 [data-motion='reduced'] .zk-card-flipper { transition-property: opacity; }
 [data-motion='reduced'] .zk-lit { animation: none; box-shadow: 0 0 0 4px var(--lit, var(--highlight)); }
+
+/* A list: each card drawn flat, one row each, read down a column. */
+.zk-zone-list { display: flex; flex-direction: column; gap: 4px; }
+.zk-zone-cols { margin-left: auto; display: inline-flex; gap: 0; }
+.zk-zone-cols span { width: 34px; text-align: right; }
+.zk-card-row {
+  display: grid; grid-template-columns: 22px 34px minmax(0, 1fr) auto auto; align-items: center; gap: 8px;
+  min-height: 36px; padding: 3px 8px 3px 4px; border-radius: var(--radius-md);
+  border: 1px solid var(--line); background: var(--card); font-size: 12px;
+}
+.zk-card-row-cost { width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; font: 600 11px var(--font-mono); color: #fff; }
+.zk-card-row-art { width: 34px; height: 26px; border-radius: 4px; object-fit: cover; background: var(--chip); }
+.zk-card-row-label { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.zk-card-row-sub { font-size: 10px; color: var(--fg-muted); white-space: nowrap; }
+.zk-card-row-counts { display: inline-flex; font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.zk-card-row-counts b { width: 34px; text-align: right; font-weight: 500; opacity: .75; }
+.zk-card-row-counts b.own { font-weight: 700; opacity: 1; }

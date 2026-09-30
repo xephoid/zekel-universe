@@ -26,6 +26,9 @@ export interface CardData {
    * eleven cards the hand folds into stacks on this key instead.
    */
   groupKey?: string;
+  /** Universe addition: a second number, in the top corner opposite the
+   *  cost: what a resource card is worth. */
+  value?: string | number;
   /** Universe addition: art for the face. */
   artUrl?: string;
   /**
@@ -39,7 +42,13 @@ export interface CardData {
 /** <zekel-card-zone>: a row, a fan, or a pile of cards. */
 export interface CardZoneData {
   label?: string;
-  mode: 'row' | 'fan' | 'pile';
+  /**
+   * `list` is a Universe addition the engine ignores: each card drawn flat,
+   * as one row of cost, art, name, effects and counts, for a zone whose
+   * job is to be read down (Fractured Fist's supply). The column names come
+   * from the first card's `counts` labels.
+   */
+  mode: 'row' | 'fan' | 'pile' | 'list';
   cards?: CardData[];
   /** Hidden pile: no cards, just how many. */
   countOnly?: number;

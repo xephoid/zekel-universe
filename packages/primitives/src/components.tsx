@@ -5,7 +5,7 @@
 // data-flip-id attributes so the FlipRoot can move them between zones.
 
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from 'react';
-import { handledTransform, themeColor } from './theme.js';
+import { handledTransform, slug, themeColor } from './theme.js';
 import type {
   BagData, CardData, CardZoneData, GridData, MapData, MapNode, PoolData, SelectEvent, TableauData, TrackData,
 } from './types.js';
@@ -61,6 +61,7 @@ export function Card({ id, data, lit, onSelect, arriveFrom, className, style }: 
       data-flip-id={id}
       data-flip-from={arriveFrom}
       data-base-transform={handled}
+      data-color-key={data.colorKey ? slug(data.colorKey) : undefined}
       className={cx('zk-card', data.rotation ? `r${data.rotation}` : undefined, lp.className, className)}
       style={{ transform: handled, ...style }}
       title={down ? undefined : data.label}
@@ -75,6 +76,7 @@ export function Card({ id, data, lit, onSelect, arriveFrom, className, style }: 
           {data.artUrl && <img className="zk-card-art" src={data.artUrl} alt="" />}
           <div>
             {data.cost !== undefined && <span className="zk-card-cost">{data.cost}</span>}
+            {data.value !== undefined && <span className="zk-card-value">{data.value}</span>}
             <div className="zk-card-label">{data.label}</div>
             {data.subtitle && <div className="zk-card-sub">{data.subtitle}</div>}
           </div>
@@ -93,9 +95,45 @@ export function Card({ id, data, lit, onSelect, arriveFrom, className, style }: 
           </div>
         </div>
         <div className="zk-card-back">
-          <div>{data.count !== undefined && data.count > 1 ? `×${data.count}` : ''}</div>
+          <div>{data.count !== undefined && data.count > 1 ? <><span className="zk-card-back-x">×</span>{data.count}</> : ''}</div>
         </div>
       </div>
+    </div>
+  );
+}
+
+/**
+ * A card drawn flat, as one row of a list: cost, a crop of its art, its
+ * name, its effects and its counts. It is the same part as the card (the same
+ * id, lit and flown the same way), only laid out to be read down a column.
+ */
+export function CardRow({ id, data, lit, onSelect, arriveFrom, className, style }: PrimitiveProps<CardData>) {
+  const isLit = lit?.includes(id) ?? false;
+  const lp = litProps(isLit, () => onSelect?.({ component: 'card', id, label: data.label }));
+  return (
+    <div
+      data-flip-id={id}
+      data-flip-from={arriveFrom}
+      data-color-key={data.colorKey ? slug(data.colorKey) : undefined}
+      className={cx('zk-card-row', lp.className, className)}
+      style={style}
+      title={data.label}
+      role={lp.role}
+      tabIndex={lp.tabIndex}
+      onClick={lp.onClick}
+      onKeyDown={lp.onKeyDown}
+    >
+      <span className="zk-card-row-cost" style={{ background: themeColor(data.colorKey ?? data.label) }}>{data.cost ?? ''}</span>
+      {data.artUrl
+        ? <img className="zk-card-row-art" src={data.artUrl} alt="" />
+        : <span className="zk-card-row-art" aria-hidden="true" />}
+      <span className="zk-card-row-label">{data.label}</span>
+      <span className="zk-card-row-sub">{data.subtitle ?? (data.badges ?? []).join(' · ')}</span>
+      {data.counts && data.counts.length > 0 && (
+        <span className="zk-card-row-counts">
+          {data.counts.map((c, i) => <b key={i} className={c.own ? 'own' : undefined} aria-label={`${c.label} ${c.value}`}>{c.value}</b>)}
+        </span>
+      )}
     </div>
   );
 }
@@ -156,6 +194,7 @@ export function CardZone({ id, data, lit, onSelect, arriveFrom, className, style
   // Spread lays the whole hand out at once, and is there as soon as the fan
   // starts overlapping — for the player who would rather see all of it.
   const showSpread = data.mode === 'fan' && (cards?.length ?? 0) > FAN_FULL_UP_TO;
+  const listCols = data.mode === 'list' ? cards?.[0]?.counts?.map((c) => c.label) : undefined;
   let body: ReactNode;
   if (cards === undefined) {
     const n = data.countOnly ?? 0;
@@ -169,6 +208,14 @@ export function CardZone({ id, data, lit, onSelect, arriveFrom, className, style
     body = data.empty
       ? <div className={data.mode === 'fan' ? 'zk-zone-fan' : 'zk-zone-row'}>{emptySlots(id, data.empty)}</div>
       : <div className="zk-zone-empty">empty</div>;
+  } else if (data.mode === 'list') {
+    body = (
+      <div className="zk-zone-list">
+        {cards.map((c, i) => (
+          <CardRow key={c.id ?? `${id}:${i}`} id={c.id ?? `${id}:${i}`} data={c} lit={lit} onSelect={onSelect} arriveFrom={arriveFrom} />
+        ))}
+      </div>
+    );
   } else if (data.mode === 'pile') {
     // Bottom to top; the top card is the visible one and flies as itself.
     const under = cards.slice(Math.max(0, cards.length - 3), cards.length - 1);
@@ -240,9 +287,10 @@ export function CardZone({ id, data, lit, onSelect, arriveFrom, className, style
       onClick={lp.onClick}
       onKeyDown={lp.onKeyDown}
     >
-      {(data.label || showSpread) && (
+      {(data.label || showSpread || listCols) && (
         <div className="zk-zone-label">
           {data.label}
+          {listCols && <span className="zk-zone-cols">{listCols.map((c, i) => <span key={i}>{c}</span>)}</span>}
           {showSpread && (
             <button type="button" className="zk-spread" aria-pressed={spread} onClick={(e) => { e.stopPropagation(); setSpread(!spread); }}>
               {spread ? 'Fan' : 'Spread'}

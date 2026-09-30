@@ -66,7 +66,8 @@ export async function pickSeven(page: Page): Promise<void> {
 
 /** Tap a lit card in the bench when there is one; else pick from the menu. */
 export async function makeMove(page: Page): Promise<'tap' | 'menu' | null> {
-  const lit = page.locator('.table-bench .zk-card.zk-lit');
+  // The bench, or a game-drawn screen's own bench (Fractured Fist's hand).
+  const lit = page.locator('.table-bench .zk-card.zk-lit, .ff-bench .zk-card.zk-lit');
   if (await lit.count()) {
     await lit.first().click();
     return 'tap';

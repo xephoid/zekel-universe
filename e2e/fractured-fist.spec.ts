@@ -28,7 +28,7 @@ test('a guest plays Fractured Fist against the AI from Play now to the end scree
   await settings.getByRole('button', { name: '2×' }).click();
   await settings.getByRole('button', { name: 'Close' }).click();
   await expect(settings).toBeHidden();
-  await expect(page.locator('.table-bench .zk-card').first()).toBeVisible();
+  await expect(page.locator('.ff-bench .zk-card').first()).toBeVisible();
 
   // Take back the very first move, then carry on.
   expect(await makeMove(page)).not.toBeNull();

@@ -515,56 +515,104 @@ label.option-card { position: relative; padding-right: 40px; }
 .action-bar .btn.small { height: 34px; padding: 0 14px; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; }
 .action-bar .btn .note { font: 500 11px var(--font-body); opacity: 0.8; }
 
-/* ---- the strike moment (docs/design/Fractured Fist Strike.dc.html) ---- */
+/* ---- the strike moment (docs/design/fractured-fist-arcade, Strike-Prototype) ----
+   Layout and movement; the arcade look is the game's theme (glue/ff/ff.css).
+   Pieces move in (slide, drop, pop); only the dimming fades. Reduced motion
+   keeps the timing and turns every movement into a fade. */
 .strike-scrim {
-  position: fixed; inset: 0; z-index: 45; background: rgba(28,26,23,0.42); display: grid; place-items: center; padding: 20px;
-  animation: zk-fadein var(--motion-normal) ease-out; transition-property: opacity; opacity: 1;
+  position: fixed; inset: 0; z-index: 45; background: rgba(28,26,23,0.62); display: grid; place-items: center; padding: 20px;
+  animation: strike-dim var(--motion-normal) ease-out; transition-property: background-color; transition-timing-function: ease-out;
 }
-.strike-scrim.closing { opacity: 0; pointer-events: none; }
-.strike-panel {
-  width: min(920px, 100%); border-radius: 16px; background: var(--bg-raised); border: 1px solid var(--line); box-shadow: var(--shadow-pop);
-  padding: 22px 26px 18px; display: flex; flex-direction: column; gap: 14px; animation: strike-panel var(--motion-normal) var(--motion-settle);
+@keyframes strike-dim { from { background-color: rgba(28,26,23,0); } }
+.strike-scrim.closing { background-color: rgba(28,26,23,0); pointer-events: none; }
+.strike-panel { width: min(1180px, 100%); display: flex; flex-direction: column; align-items: stretch; gap: 16px; }
+.strike-banner {
+  align-self: center; display: flex; align-items: baseline; gap: 18px; padding: 10px 36px;
+  background: var(--card); border: 2px solid var(--fg); animation: strike-banner var(--motion-slow) var(--motion-settle);
 }
-@keyframes strike-panel { from { opacity: 0; transform: scale(0.965); } to { opacity: 1; transform: scale(1); } }
-.strike-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
-.strike-title { font: 700 22px var(--font-display); letter-spacing: -0.02em; }
-.strike-lanes { display: flex; flex-direction: column; gap: 12px; }
-.strike-lane { border-radius: 12px; background: var(--chip); border: 1px solid var(--line); padding: 12px 16px 14px; display: flex; flex-direction: column; gap: 6px; }
-.strike-lane-head { display: flex; align-items: baseline; gap: 10px; }
-.strike-lane-title { font: 700 13px var(--font-display); }
-.strike-stage { position: relative; height: 66px; }
-.strike-token {
-  position: absolute; left: 0; top: 7px; width: 64px; height: 52px; border-radius: 10px; z-index: 2;
-  background: #fae3e0; border: 2px solid #8f2018; color: #8f2018; display: grid; place-items: center; font: 700 22px var(--font-mono);
-  box-shadow: 0 3px 8px rgba(0,0,0,0.18); transition-property: transform, opacity, box-shadow; transition-timing-function: var(--motion-easing);
-}
-.strike-token.travel { transform: translateX(min(330px, 40vw)); box-shadow: var(--shadow-lift); }
-.strike-token.landed { transform: translateX(min(560px, 62vw)) scale(0.5); opacity: 0; }
-.strike-token.stopped { transform: translateX(min(330px, 40vw)) scale(0.7); opacity: 0; }
-.strike-token.reduced { transition-property: opacity; transform: none !important; }
-.strike-absorb { position: absolute; left: min(338px, 42vw); top: 0; font: 600 11px var(--font-body); color: #24507f; opacity: 0; }
-.strike-absorb.on { animation: strike-absorb ease-out forwards; }
-@keyframes strike-absorb { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(52px, -6px) scale(0.55); opacity: 0; } }
-.strike-shield {
-  position: absolute; left: min(410px, 48vw); top: 7px; width: 52px; height: 52px; border-radius: 10px 10px 22px 22px;
-  background: #e2ebf7; border: 2px solid #24507f; color: #24507f; display: grid; place-items: center; font: 700 19px var(--font-mono);
-}
-.strike-shield.flare { animation: strike-shield ease-out; }
-@keyframes strike-shield { 0% { transform: scale(1); } 35% { transform: scale(1.2) rotate(-3deg); } 100% { transform: scale(1) rotate(0); } }
-.strike-target { position: absolute; right: 0; top: 0; height: 66px; display: flex; align-items: center; gap: 12px; }
-.strike-target-name { min-width: 44px; max-width: 120px; font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.strike-banner span { font: 600 18px var(--font-display); }
+.strike-banner b { font: 800 44px/1 var(--font-display); }
+@keyframes strike-banner { from { transform: translateY(-160%); } }
+.strike-arena { position: relative; height: 300px; }
+/* a fighter slides in from their side, and out again at the fade */
+.strike-fighter { position: absolute; top: 90px; width: 27%; display: flex; align-items: center; gap: 12px; transition: transform var(--motion-normal) var(--motion-easing); }
+.strike-fighter.left { left: 0; animation: strike-in-left var(--motion-slow) var(--motion-settle); }
+.strike-fighter.right { right: 0; flex-direction: row-reverse; text-align: right; animation: strike-in-right var(--motion-slow) var(--motion-settle); }
+@keyframes strike-in-left { from { transform: translateX(-130%); } }
+@keyframes strike-in-right { from { transform: translateX(130%); } }
+.beat-5 .strike-fighter.left { transform: translateX(-130%); }
+.beat-5 .strike-fighter.right { transform: translateX(130%); }
+.strike-fighter.struck { animation: strike-shake ease-out; }
+@keyframes strike-shake { 0%, 100% { translate: 0 0; } 15% { translate: -9px 0; } 35% { translate: 8px 0; } 55% { translate: -5px 0; } 75% { translate: 3px 0; } }
+.strike-badge { width: 44px; height: 44px; flex: none; display: grid; place-items: center; border: 2px solid var(--fg); font: 700 20px var(--font-display); }
+.strike-fighter-body { display: flex; flex-direction: column; gap: 6px; min-width: 0; flex: 1; }
+.strike-fighter.right .strike-fighter-body { align-items: flex-end; }
+.strike-fighter-name { font: 700 18px var(--font-display); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
 .strike-pips { display: flex; gap: 4px; }
-.strike-pip { width: 22px; height: 26px; border-radius: 4px; border: 1px solid var(--line); box-sizing: border-box; transition-property: transform, opacity, background; transition-timing-function: var(--motion-easing); }
+.strike-fighter.right .strike-pips { flex-direction: row-reverse; }
+.strike-pip { width: 20px; height: 18px; border: 1px solid var(--line); box-sizing: border-box; transition-property: transform, opacity; transition-timing-function: var(--motion-easing); }
 .strike-pip.full { background: var(--accent); border-color: var(--accent); }
-.strike-pip.out { background: var(--accent); border-color: var(--accent); transform: translateY(18px) rotate(9deg); opacity: 0; }
-[data-motion='reduced'] .strike-pip.out { transform: none; }
-.strike-stam { width: 26px; font: 700 20px var(--font-mono); }
-.strike-stam.tick { animation: strike-tick 340ms ease-out; }
+.strike-pip.out { background: var(--accent); border-color: var(--accent); transform: translateY(26px) rotate(18deg); opacity: 0; }
+.strike-stam { flex: none; font: 600 16px var(--font-mono); }
+.strike-stam b { font-size: 40px; }
+.strike-stam.tick b { display: inline-block; animation: strike-tick 340ms ease-out; }
 @keyframes strike-tick { 0% { transform: scale(1); } 40% { transform: scale(1.4); } 100% { transform: scale(1); } }
-.strike-controls { display: flex; align-items: center; gap: 8px; padding-top: 2px; }
-[data-theme='dark'] .strike-token { background: #4a201c; border-color: #ffb3a8; color: #ffb3a8; }
-[data-theme='dark'] .strike-shield { background: #1e2f45; border-color: #a9c8ee; color: #a9c8ee; }
-[data-theme='dark'] .strike-absorb { color: #a9c8ee; }
+/* the shield in front of each fighter */
+.strike-shield { position: absolute; top: 40px; width: 64px; height: 170px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  background: #e2ebf7; border: 2px solid #24507f; color: #24507f; animation: strike-pop var(--motion-normal) var(--motion-settle); }
+.strike-shield.left { left: 30%; }
+.strike-shield.right { right: 30%; }
+.strike-shield b { font: 700 28px var(--font-mono); }
+.strike-shield > span:not([class]) { font: 600 10px var(--font-body); text-transform: uppercase; letter-spacing: .08em; }
+.strike-shield.flare { animation: strike-flare ease-out; }
+@keyframes strike-flare { 0% { transform: scale(1); } 35% { transform: scale(1.12); } 100% { transform: scale(1); } }
+.strike-block-tag { position: absolute; top: -34px; left: 50%; translate: -50% 0; white-space: nowrap; padding: 3px 10px; background: #24507f; color: #fff;
+  font: 700 13px var(--font-body); animation: strike-drop ease-out both; }
+@keyframes strike-drop { from { transform: translateY(-40px); } }
+.strike-stamp { position: absolute; top: 60px; left: 50%; translate: -50% 0; white-space: nowrap; padding: 4px 12px; background: #fff; color: #24507f; border: 2px solid #24507f;
+  font: 800 20px var(--font-display); rotate: -8deg; animation: strike-stamp var(--motion-normal) var(--motion-settle); }
+@keyframes strike-stamp { from { transform: scale(2.2); } }
+/* a hit: pops up by its owner, flies across, shrinks, is gone once it lands */
+.strike-hit { position: absolute; top: 105px; width: 70px; height: 70px; display: grid; place-items: center; z-index: 3;
+  background: #fae3e0; border: 2px solid #8f2018; color: #8f2018; font: 700 26px var(--font-mono);
+  transition-property: left, right, transform, opacity; transition-timing-function: var(--motion-easing);
+  animation: strike-pop var(--motion-normal) var(--motion-settle); }
+@keyframes strike-pop { from { transform: scale(0); } }
+.strike-hit.left.at-home { left: calc(30% + 84px); }
+.strike-hit.left.at-across { left: calc(70% - 64px - 74px); }
+.strike-hit.left.at-in { left: calc(100% - 27% - 20px); }
+.strike-hit.right.at-home { right: calc(30% + 84px); }
+.strike-hit.right.at-across { right: calc(70% - 64px - 74px); }
+.strike-hit.right.at-in { right: calc(100% - 27% - 20px); }
+.strike-hit.shrunk { transform: scale(0.78); }
+.strike-hit.gone { opacity: 0; transform: scale(1.3); }
+.strike-flash { position: absolute; left: 50%; top: 110px; width: 60px; height: 60px; margin-left: -30px; background: #fff; opacity: 0; pointer-events: none; z-index: 4;
+  clip-path: polygon(50% 0, 61% 30%, 95% 25%, 70% 50%, 95% 75%, 61% 70%, 50% 100%, 39% 70%, 5% 75%, 30% 50%, 5% 25%, 39% 30%); }
+.strike-flash.on { animation: strike-flash ease-out; }
+@keyframes strike-flash { 0%, 45% { opacity: 0; transform: scale(.3); } 60% { opacity: 1; transform: scale(1.6); } 100% { opacity: 0; transform: scale(2); } }
+.strike-impact { position: absolute; top: 20px; z-index: 5; padding: 10px 16px; background: #ffd23f; color: #111; font: 800 34px/1 var(--font-display); animation: strike-burst ease-out both; }
+.strike-impact.left { left: 14%; }
+.strike-impact.right { right: 14%; }
+@keyframes strike-burst { 0% { transform: scale(0); } 40% { transform: scale(1.25); } 100% { transform: scale(1); } }
+.strike-ko { position: absolute; left: 50%; top: 170px; translate: -50% 0; font: 800 110px/1 var(--font-display); color: var(--accent); z-index: 6; pointer-events: none;
+  animation: strike-stamp var(--motion-slow) var(--motion-settle); }
+.strike-caption { align-self: center; margin: 0; padding: 8px 16px; background: var(--card); border: 1px solid var(--line); font-size: 14px; min-height: 1.4em; }
+.strike-controls { display: flex; align-items: center; gap: 8px; }
+/* Reduced motion: the same beats, each change a fade. */
+.strike-scrim.reduced *, .strike-scrim.reduced { animation-name: strike-fade !important; }
+.strike-scrim.reduced :is(.strike-fighter, .strike-pip, .strike-hit) { transition-property: opacity !important; }
+.strike-scrim.reduced .strike-pip.out { transform: none; }
+.strike-scrim.reduced .strike-hit { left: auto; right: auto; }
+.strike-scrim.reduced .strike-hit.left { left: calc(30% + 84px) !important; }
+.strike-scrim.reduced .strike-hit.right { right: calc(30% + 84px) !important; }
+.strike-scrim.reduced .strike-hit:is(.shrunk, .gone) { transform: none; }
+.strike-scrim.reduced.beat-5 .strike-fighter { transform: none; opacity: 0; }
+@keyframes strike-fade { from { opacity: 0; } }
+/* At the fade the banner lifts away and the words go with the dimming. */
+.strike-banner, .strike-caption, .strike-controls { transition: transform var(--motion-normal) var(--motion-easing), opacity var(--motion-normal) ease-out; }
+.beat-5 .strike-banner { transform: translateY(-200%); }
+.beat-5 :is(.strike-caption, .strike-controls) { opacity: 0; }
+.strike-scrim.reduced.beat-5 .strike-banner { transform: none; opacity: 0; }
 
 /* ---- a multi pick as its own screen (docs/design/Fractured Fist Loadout.dc.html) ---- */
 .pick-tools { display: flex; gap: 8px; align-items: center; }
@@ -586,6 +634,14 @@ label.option-card { position: relative; padding-right: 40px; }
 .pick-card .chips, .pick-totals .chips { display: flex; flex-wrap: wrap; gap: 4px; }
 .fx-chip { padding: 2px 7px; border-radius: 999px; background: var(--chip); color: var(--fg); font: 600 10px var(--font-body); }
 .pick-card .tag { font: 500 10px var(--font-mono); color: var(--fg-muted); min-height: 14px; }
+/* A card with art (Fractured Fist): a strip of the scene under the name, and
+   the cost in the card's colored corner rather than a badge. */
+.pick-card.has-art .pick-art { display: block; width: 100%; aspect-ratio: 300 / 132; object-fit: cover; background: #111; border-radius: 4px; }
+.pick-card.has-corner { position: relative; overflow: hidden; }
+.pick-card.has-corner .head { padding-left: 22px; }
+.pick-card.has-corner .badge { position: absolute; left: 0; top: 0; width: 34px; height: 34px; border-radius: 0; background: var(--pick-corner); color: var(--pick-ink);
+  clip-path: polygon(0 0, 100% 0, 0 100%); place-items: start; padding: 3px 0 0 5px; box-sizing: border-box; font: 700 13px/1 var(--font-mono); }
+[data-theme='dark'] .pick-card.has-corner .badge { background: var(--pick-corner); color: var(--pick-ink); }
 .pick-card .tag.on { color: var(--you-fg); }
 .pick-slots { display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--line); padding-top: 12px; }
 .pick-slots .count { font: 600 14px var(--font-mono); color: var(--fg-muted); }

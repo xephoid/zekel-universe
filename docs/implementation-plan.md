@@ -1045,3 +1045,48 @@ fields first and falls back to what the current engine sends.
   reasons and the move descriptions a screen prints use faction names and
   tile labels. Universe keeps its display swap (`ctx.say`) only as a
   fallback for older engine sentences.
+
+## 17. Fractured Fist's arcade theme (decided 2026-09-29)
+
+The design canvas is `docs/design/fractured-fist-arcade/`; what to build is
+`docs/games/fractured-fist-arcade-build.md`.
+
+- **The theme is the table's own.** The glue's `themeFor` returns
+  `ff-theme` and `glue/ff/ff.css` scopes every rule under it. The stage is
+  dark whatever the site's light or dark setting. Barlow Condensed is
+  self-hosted beside the other fonts.
+- **DECIDED: a game-drawn screen, not a new `TablePlan` field.** The owner
+  chose this over the build notes' recommended `versus` field. `FfScreen`
+  draws both fighters' plates at the top (stamina blocks and the misstep
+  meter are the track primitive), the played rows, the strike gutter, the
+  action bar and the bench; the cards are still the card and card-zone
+  primitives, so every flight is the table's FLIP. `glue/ff/read.ts` is the
+  one reading of the view that the screen and `plan()` share.
+- **A screen can hand the table a batch.** `GameScreenProps` gains
+  `onBatch`, so "Play all resources" goes through the table's own batch
+  path (one tap per event, each only once the engine lists it).
+- **The plan's side is empty.** The table draws a plan's side zones even
+  beside a screen, so the supply is portalled into the side column by the
+  screen itself, and drawn inline on the watch page, which has no slot.
+- **The supply is a list.** `CardZoneData.mode` gains `list`, a Universe
+  addition the engine ignores: each card drawn flat as one row (`CardRow`),
+  the same part as the card, so a bought card still flies from its stack.
+- **The card face.** `CardData` gains `value` (a resource's worth, opposite
+  the cost). The glue sets `cost`, `value` and `artUrl` from the reference
+  data and the card id; the 34 scenes are served from
+  `public/cards/fractured-fist/<engine id>.svg`, and a test keeps them free
+  of script, handlers and outside links. The corner colors are the glue's
+  palette, which the table already publishes as CSS variables; the card
+  primitive only gains a `data-color-key` attribute for the theme to read.
+  The setup page's picker gains `art` and `corner` on an option.
+- **The strike is an arena.** Both fighters face each other, both hits run
+  at once, what got through is still `lane.through`; `STRIKE_BEATS`, the
+  captions, pace, skip and replay are unchanged. Only Fractured Fist has a
+  moment, so the overlay's old two-lane layout is gone rather than kept
+  beside it.
+- **A first-time rules lesson floats** over the right end of their row on
+  this table, so the 1440 x 900 table never scrolls.
+- **The watch page takes the game's theme too.** Without it the screen drew
+  there unstyled. The watch page now applies `themeFor` for any game; a
+  Neither Guts nor Gears watcher gets only the plain `ngg-theme` class,
+  whose rules paint the same colors the page already had.

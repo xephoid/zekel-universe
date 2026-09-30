@@ -59,6 +59,9 @@ export function WatchPage() {
     seq: data.seq, engineMove: null, actorPlayerId: null, memory: memory.current,
   }) : null, [data, previous, reference]);
   const plan = useMemo(() => (glue && input && data?.view ? glue.plan(input) : null), [glue, input, data?.view]);
+  // The game's own look covers the watch page too; a watcher has no seat, so
+  // a theme that follows a seat's faction falls back to the game's plain one.
+  const theme = glue?.themeFor && input && data?.view ? glue.themeFor(input) : null;
 
   if (err && !data) {
     return (<div><Nav /><div className="page"><p className="error">{err}</p><Link to="/">Back home</Link></div></div>);
@@ -73,7 +76,7 @@ export function WatchPage() {
   const watchLink = `${window.location.origin}/table/${id}/watch`;
 
   return (
-    <FlipRoot viewKey={data.seq} className="table-shell watch-shell" style={paletteVars(plan?.palette)} reducedMotion={reduced}>
+    <FlipRoot viewKey={data.seq} className={`table-shell watch-shell${theme ? ` ${theme}` : ''}`} style={paletteVars(plan?.palette)} reducedMotion={reduced}>
       <div className="table-topbar">
         <Link to="/" className="brand" aria-label="zekel home" style={{ textDecoration: 'none', display: 'inline-flex' }}><Wordmark size={24} /></Link>
         <span className="divider" />
