@@ -1186,10 +1186,9 @@ Built on branch `adventurer-olympics-table`; all eight steps have their
 checks passing.
 
 - **Engine.** Merged: the Draw step, required rotation, placement options,
-  Explore reasons, dice and headlines (zekel #114). Open: a digital seat
-  offered only the Roll button (zekel #115); each player's stats and each
-  tile's hexes in the view (zekel #116). The table reads both; the captured
-  views came from a local build with them.
+  Explore reasons, dice and headlines (zekel #114); a digital seat offered
+  only the Roll button (zekel #115); each player's stats and each tile's
+  hexes in the view (zekel #116).
 - **Decided while building.**
   - The map primitive's hex mode is shared (`MapData.hex`), with ghost and
     picked hexes and new hexes flying in from a named origin.
