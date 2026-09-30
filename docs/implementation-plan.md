@@ -1086,6 +1086,7 @@ The design canvas is `docs/design/fractured-fist-arcade/`; what to build is
   beside it.
 - **A first-time rules lesson floats** over the right end of their row on
   this table, so the 1440 x 900 table never scrolls.
-- **Still open: the watch page's look.** It does not apply `themeFor` for
-  any game today; turning it on would change the Neither Guts nor Gears
-  watch page too, so it is left for the owner.
+- **The watch page takes the game's theme too.** Without it the screen drew
+  there unstyled. The watch page now applies `themeFor` for any game; a
+  Neither Guts nor Gears watcher gets only the plain `ngg-theme` class,
+  whose rules paint the same colors the page already had.
