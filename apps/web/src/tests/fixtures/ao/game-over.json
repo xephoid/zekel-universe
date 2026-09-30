@@ -16,7 +16,16 @@
      "rotation": 0,
      "isStarting": true,
      "exploredBy": null,
-     "turned": "turned the same way as the starting tile (its N hex points where the starting tile's N hex points)"
+     "turned": "turned the same way as the starting tile (its N hex points where the starting tile's N hex points)",
+     "hexes": [
+      "0,0",
+      "1,0",
+      "1,-1",
+      "0,-1",
+      "-1,0",
+      "-1,1",
+      "0,1"
+     ]
     },
     {
      "tileId": 10,
@@ -24,7 +33,16 @@
      "rotation": 1,
      "isStarting": false,
      "exploredBy": "p1",
-     "turned": "turned so its N hex points where the starting tile's NW hex points"
+     "turned": "turned so its N hex points where the starting tile's NW hex points",
+     "hexes": [
+      "-1,-2",
+      "0,-2",
+      "0,-3",
+      "-1,-3",
+      "-2,-2",
+      "-2,-1",
+      "-1,-1"
+     ]
     },
     {
      "tileId": 6,
@@ -32,7 +50,16 @@
      "rotation": 0,
      "isStarting": false,
      "exploredBy": "p2",
-     "turned": "turned the same way as the starting tile (its N hex points where the starting tile's N hex points)"
+     "turned": "turned the same way as the starting tile (its N hex points where the starting tile's N hex points)",
+     "hexes": [
+      "2,-3",
+      "3,-3",
+      "3,-4",
+      "2,-4",
+      "1,-3",
+      "1,-2",
+      "2,-2"
+     ]
     },
     {
      "tileId": 5,
@@ -40,7 +67,16 @@
      "rotation": 0,
      "isStarting": false,
      "exploredBy": "p1",
-     "turned": "turned the same way as the starting tile (its N hex points where the starting tile's N hex points)"
+     "turned": "turned the same way as the starting tile (its N hex points where the starting tile's N hex points)",
+     "hexes": [
+      "-3,1",
+      "-2,1",
+      "-2,0",
+      "-3,0",
+      "-4,1",
+      "-4,2",
+      "-3,2"
+     ]
     },
     {
      "tileId": 8,
@@ -48,7 +84,16 @@
      "rotation": 5,
      "isStarting": false,
      "exploredBy": "p1",
-     "turned": "turned so its N hex points where the starting tile's NE hex points"
+     "turned": "turned so its N hex points where the starting tile's NE hex points",
+     "hexes": [
+      "-2,-4",
+      "-1,-4",
+      "-1,-5",
+      "-2,-5",
+      "-3,-4",
+      "-3,-3",
+      "-2,-3"
+     ]
     },
     {
      "tileId": 1,
@@ -56,7 +101,16 @@
      "rotation": 3,
      "isStarting": false,
      "exploredBy": "p1",
-     "turned": "turned so its N hex points where the starting tile's S hex points"
+     "turned": "turned so its N hex points where the starting tile's S hex points",
+     "hexes": [
+      "1,-5",
+      "2,-5",
+      "2,-6",
+      "1,-6",
+      "0,-5",
+      "0,-4",
+      "1,-4"
+     ]
     },
     {
      "tileId": 9,
@@ -64,7 +118,16 @@
      "rotation": 1,
      "isStarting": false,
      "exploredBy": "p2",
-     "turned": "turned so its N hex points where the starting tile's NW hex points"
+     "turned": "turned so its N hex points where the starting tile's NW hex points",
+     "hexes": [
+      "0,-7",
+      "1,-7",
+      "1,-8",
+      "0,-8",
+      "-1,-7",
+      "-1,-6",
+      "0,-6"
+     ]
     },
     {
      "tileId": 3,
@@ -72,7 +135,16 @@
      "rotation": 1,
      "isStarting": false,
      "exploredBy": "p1",
-     "turned": "turned so its N hex points where the starting tile's NW hex points"
+     "turned": "turned so its N hex points where the starting tile's NW hex points",
+     "hexes": [
+      "4,-6",
+      "5,-6",
+      "5,-7",
+      "4,-7",
+      "3,-6",
+      "3,-5",
+      "4,-5"
+     ]
     },
     {
      "tileId": 4,
@@ -80,7 +152,16 @@
      "rotation": 0,
      "isStarting": false,
      "exploredBy": "p2",
-     "turned": "turned the same way as the starting tile (its N hex points where the starting tile's N hex points)"
+     "turned": "turned the same way as the starting tile (its N hex points where the starting tile's N hex points)",
+     "hexes": [
+      "-4,-1",
+      "-3,-1",
+      "-3,-2",
+      "-4,-2",
+      "-5,-1",
+      "-5,0",
+      "-4,0"
+     ]
     },
     {
      "tileId": 2,
@@ -88,7 +169,16 @@
      "rotation": 1,
      "isStarting": false,
      "exploredBy": "p1",
-     "turned": "turned so its N hex points where the starting tile's NW hex points"
+     "turned": "turned so its N hex points where the starting tile's NW hex points",
+     "hexes": [
+      "5,-4",
+      "6,-4",
+      "6,-5",
+      "5,-5",
+      "4,-4",
+      "4,-3",
+      "5,-3"
+     ]
     }
    ],
    "icons": [
@@ -409,6 +499,11 @@
     "hex": "4,-4",
     "hexLabel": "the NW hex of Tile 2",
     "stepsLeft": 0,
+    "stats": {
+     "charisma": 1,
+     "strength": 3,
+     "movement": 2
+    },
     "initiative": 1,
     "companions": [
      "companion-2",
@@ -446,6 +541,11 @@
     "hex": "-2,-3",
     "hexLabel": "the NE hex of Tile 8",
     "stepsLeft": 0,
+    "stats": {
+     "charisma": 1,
+     "strength": 1,
+     "movement": 3
+    },
     "initiative": 2,
     "companions": [
      "companion-11"
@@ -916,7 +1016,16 @@
      "rotation": 0,
      "isStarting": true,
      "exploredBy": null,
-     "turned": "turned the same way as the starting tile (its N hex points where the starting tile's N hex points)"
+     "turned": "turned the same way as the starting tile (its N hex points where the starting tile's N hex points)",
+     "hexes": [
+      "0,0",
+      "1,0",
+      "1,-1",
+      "0,-1",
+      "-1,0",
+      "-1,1",
+      "0,1"
+     ]
     },
     {
      "tileId": 10,
@@ -924,7 +1033,16 @@
      "rotation": 1,
      "isStarting": false,
      "exploredBy": "p1",
-     "turned": "turned so its N hex points where the starting tile's NW hex points"
+     "turned": "turned so its N hex points where the starting tile's NW hex points",
+     "hexes": [
+      "-1,-2",
+      "0,-2",
+      "0,-3",
+      "-1,-3",
+      "-2,-2",
+      "-2,-1",
+      "-1,-1"
+     ]
     },
     {
      "tileId": 6,
@@ -932,7 +1050,16 @@
      "rotation": 0,
      "isStarting": false,
      "exploredBy": "p2",
-     "turned": "turned the same way as the starting tile (its N hex points where the starting tile's N hex points)"
+     "turned": "turned the same way as the starting tile (its N hex points where the starting tile's N hex points)",
+     "hexes": [
+      "2,-3",
+      "3,-3",
+      "3,-4",
+      "2,-4",
+      "1,-3",
+      "1,-2",
+      "2,-2"
+     ]
     },
     {
      "tileId": 5,
@@ -940,7 +1067,16 @@
      "rotation": 0,
      "isStarting": false,
      "exploredBy": "p1",
-     "turned": "turned the same way as the starting tile (its N hex points where the starting tile's N hex points)"
+     "turned": "turned the same way as the starting tile (its N hex points where the starting tile's N hex points)",
+     "hexes": [
+      "-3,1",
+      "-2,1",
+      "-2,0",
+      "-3,0",
+      "-4,1",
+      "-4,2",
+      "-3,2"
+     ]
     },
     {
      "tileId": 8,
@@ -948,7 +1084,16 @@
      "rotation": 5,
      "isStarting": false,
      "exploredBy": "p1",
-     "turned": "turned so its N hex points where the starting tile's NE hex points"
+     "turned": "turned so its N hex points where the starting tile's NE hex points",
+     "hexes": [
+      "-2,-4",
+      "-1,-4",
+      "-1,-5",
+      "-2,-5",
+      "-3,-4",
+      "-3,-3",
+      "-2,-3"
+     ]
     },
     {
      "tileId": 1,
@@ -956,7 +1101,16 @@
      "rotation": 3,
      "isStarting": false,
      "exploredBy": "p1",
-     "turned": "turned so its N hex points where the starting tile's S hex points"
+     "turned": "turned so its N hex points where the starting tile's S hex points",
+     "hexes": [
+      "1,-5",
+      "2,-5",
+      "2,-6",
+      "1,-6",
+      "0,-5",
+      "0,-4",
+      "1,-4"
+     ]
     },
     {
      "tileId": 9,
@@ -964,7 +1118,16 @@
      "rotation": 1,
      "isStarting": false,
      "exploredBy": "p2",
-     "turned": "turned so its N hex points where the starting tile's NW hex points"
+     "turned": "turned so its N hex points where the starting tile's NW hex points",
+     "hexes": [
+      "0,-7",
+      "1,-7",
+      "1,-8",
+      "0,-8",
+      "-1,-7",
+      "-1,-6",
+      "0,-6"
+     ]
     },
     {
      "tileId": 3,
@@ -972,7 +1135,16 @@
      "rotation": 1,
      "isStarting": false,
      "exploredBy": "p1",
-     "turned": "turned so its N hex points where the starting tile's NW hex points"
+     "turned": "turned so its N hex points where the starting tile's NW hex points",
+     "hexes": [
+      "4,-6",
+      "5,-6",
+      "5,-7",
+      "4,-7",
+      "3,-6",
+      "3,-5",
+      "4,-5"
+     ]
     },
     {
      "tileId": 4,
@@ -980,7 +1152,16 @@
      "rotation": 0,
      "isStarting": false,
      "exploredBy": "p2",
-     "turned": "turned the same way as the starting tile (its N hex points where the starting tile's N hex points)"
+     "turned": "turned the same way as the starting tile (its N hex points where the starting tile's N hex points)",
+     "hexes": [
+      "-4,-1",
+      "-3,-1",
+      "-3,-2",
+      "-4,-2",
+      "-5,-1",
+      "-5,0",
+      "-4,0"
+     ]
     },
     {
      "tileId": 2,
@@ -988,7 +1169,16 @@
      "rotation": 1,
      "isStarting": false,
      "exploredBy": "p1",
-     "turned": "turned so its N hex points where the starting tile's NW hex points"
+     "turned": "turned so its N hex points where the starting tile's NW hex points",
+     "hexes": [
+      "5,-4",
+      "6,-4",
+      "6,-5",
+      "5,-5",
+      "4,-4",
+      "4,-3",
+      "5,-3"
+     ]
     }
    ],
    "icons": [
@@ -1309,6 +1499,11 @@
     "hex": "4,-4",
     "hexLabel": "the NW hex of Tile 2",
     "stepsLeft": 0,
+    "stats": {
+     "charisma": 1,
+     "strength": 3,
+     "movement": 2
+    },
     "initiative": 1,
     "companions": [
      "companion-2",
@@ -1346,6 +1541,11 @@
     "hex": "-2,-3",
     "hexLabel": "the NE hex of Tile 8",
     "stepsLeft": 0,
+    "stats": {
+     "charisma": 1,
+     "strength": 1,
+     "movement": 3
+    },
     "initiative": 2,
     "companions": [
      "companion-11"

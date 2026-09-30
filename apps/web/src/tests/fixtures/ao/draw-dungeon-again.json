@@ -16,7 +16,16 @@
      "rotation": 0,
      "isStarting": true,
      "exploredBy": null,
-     "turned": "turned the same way as the starting tile (its N hex points where the starting tile's N hex points)"
+     "turned": "turned the same way as the starting tile (its N hex points where the starting tile's N hex points)",
+     "hexes": [
+      "0,0",
+      "1,0",
+      "1,-1",
+      "0,-1",
+      "-1,0",
+      "-1,1",
+      "0,1"
+     ]
     }
    ],
    "icons": [
@@ -58,6 +67,11 @@
     "hex": "1,0",
     "hexLabel": "the NE hex of Tile 1",
     "stepsLeft": 0,
+    "stats": {
+     "charisma": 1,
+     "strength": 1,
+     "movement": 2
+    },
     "initiative": 1,
     "companions": [],
     "littleMonsters": [],
@@ -82,6 +96,11 @@
     "hex": "0,0",
     "hexLabel": "the centre of Tile 1",
     "stepsLeft": 2,
+    "stats": {
+     "charisma": 1,
+     "strength": 1,
+     "movement": 2
+    },
     "initiative": 2,
     "companions": [],
     "littleMonsters": [],
@@ -536,7 +555,16 @@
      "rotation": 0,
      "isStarting": true,
      "exploredBy": null,
-     "turned": "turned the same way as the starting tile (its N hex points where the starting tile's N hex points)"
+     "turned": "turned the same way as the starting tile (its N hex points where the starting tile's N hex points)",
+     "hexes": [
+      "0,0",
+      "1,0",
+      "1,-1",
+      "0,-1",
+      "-1,0",
+      "-1,1",
+      "0,1"
+     ]
     }
    ],
    "icons": [
@@ -578,6 +606,11 @@
     "hex": "1,0",
     "hexLabel": "the NE hex of Tile 1",
     "stepsLeft": 0,
+    "stats": {
+     "charisma": 1,
+     "strength": 1,
+     "movement": 2
+    },
     "initiative": 1,
     "companions": [],
     "littleMonsters": [],
@@ -602,6 +635,11 @@
     "hex": "0,0",
     "hexLabel": "the centre of Tile 1",
     "stepsLeft": 2,
+    "stats": {
+     "charisma": 1,
+     "strength": 1,
+     "movement": 2
+    },
     "initiative": 2,
     "companions": [],
     "littleMonsters": [],
