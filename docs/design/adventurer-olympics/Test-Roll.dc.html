@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>A test, beat by beat</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#2b2233}a:hover{color:#e0762b}
+</style>
+</helmet>
+<div style="{{ rootStyle }}" data-screen-label="A test, beat by beat">
+  <div style="display:flex;flex-direction:column;gap:6px">
+    <div style="font-size:32px;font-weight:700;line-height:1.05">A test, beat by beat</div>
+    <div style="font-size:16px;color:var(--muted);max-width:980px;line-height:1.45">Every City, Little Monster and Big Monster works the same way. The player presses Draw and Roll; nothing is drawn or rolled for them. Shown here: making a friend at a City with Charisma 2.</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;flex:1;min-height:0">
+
+    <!-- 1 -->
+    <div style="background:var(--surface);border:3px solid var(--line);border-radius:18px 12px 20px 14px/14px 20px 12px 18px;box-shadow:var(--shadow);padding:14px;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:center;gap:8px"><span style="width:30px;height:30px;box-sizing:border-box;border-radius:50%;background:#ffd95e;border:2.5px solid #2b2233;color:#2b2233;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">1</span><span style="font-weight:700;font-size:19px">Step on it</span></div>
+      <div style="position:relative;height:196px;border-radius:12px;background:var(--table);border:2px solid var(--soft);overflow:hidden">
+        <sc-for list="{{ f1 }}" as="h" hint-placeholder-count="3">
+          <div style="position:absolute;left:{{ h.x }}px;top:{{ h.y }}px;width:68px;height:59px;background:#2b2233;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%)">
+            <span style="position:absolute;inset:2.5px;background:{{ h.fill }};clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);display:flex;align-items:center;justify-content:center"><span style="width:10px;height:10px;border-radius:50%;background:{{ h.dot }}"></span></span>
+          </div>
+        </sc-for>
+        <svg viewBox="0 0 260 196" width="100%" height="196" style="position:absolute;inset:0" aria-hidden="true"><path d="M74 118 Q 104 70 126 90 T 168 106" fill="none" stroke="#ff8a3d" stroke-width="3" stroke-dasharray="5 6" stroke-linecap="round"></path></svg>
+        <div style="position:absolute;left:150px;top:100px;width:52px;height:52px">
+          <div style="position:absolute;inset:-4px;border-radius:50%;border:3.5px solid #ff8a3d;background:rgba(255,138,61,.18)"></div>
+          <dc-import name="AO-Icon" icon="city" size="52" hint-size="52px,52px"></dc-import>
+        </div>
+        <div style="position:absolute;left:190px;top:56px">
+          <dc-import name="AO-Icon" icon="fighter" size="58" tint="#e8483d" hint-size="58px,58px"></dc-import>
+        </div>
+      </div>
+      <div style="font-size:15px;line-height:1.45">A glowing icon starts the moment you step on it, even mid-move. Your leftover steps are gone.</div>
+      <div style="margin-top:auto;font-size:13px;color:var(--muted);line-height:1.4">Motion: the adventurer hops hex to hex along the path, one step at a time.</div>
+    </div>
+
+    <!-- 2 -->
+    <div style="background:var(--surface);border:3px solid var(--line);border-radius:12px 20px 14px 18px/18px 14px 20px 12px;box-shadow:var(--shadow);padding:14px;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:center;gap:8px"><span style="width:30px;height:30px;box-sizing:border-box;border-radius:50%;background:#ffd95e;border:2.5px solid #2b2233;color:#2b2233;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">2</span><span style="font-weight:700;font-size:19px">Press Draw</span></div>
+      <div style="position:relative;height:196px;border-radius:12px;background:var(--table);border:2px solid var(--soft);overflow:hidden">
+        <div style="position:absolute;left:14px;top:22px;width:58px;height:80px">
+          <div style="position:absolute;inset:0;border-radius:9px;background:#5aa9e6;border:2.5px solid #2b2233;transform:rotate(-6deg)"></div>
+          <div style="position:absolute;inset:0;border-radius:9px;background:#5aa9e6;border:2.5px solid #2b2233;display:flex;align-items:center;justify-content:center"><dc-import name="AO-Icon" icon="cha" size="38" shadow="{{ false }}" hint-size="38px,38px"></dc-import></div>
+          <div style="position:absolute;top:86px;left:0;width:58px;text-align:center;font-size:15px;font-weight:700">13</div>
+        </div>
+        <svg viewBox="0 0 260 196" width="100%" height="196" style="position:absolute;inset:0" aria-hidden="true"><path d="M78 50 C 108 22, 124 30, 134 46" fill="none" stroke="#ff8a3d" stroke-width="3" stroke-dasharray="5 6" stroke-linecap="round"></path></svg>
+        <div style="position:absolute;left:124px;top:16px;width:112px;height:162px;box-sizing:border-box;border-radius:12px 8px 13px 9px/9px 13px 8px 12px;background:#fff7e6;border:3px solid #2b2233;box-shadow:var(--shadowlg);overflow:hidden;display:flex;flex-direction:column;color:#2b2233;transform:rotate(4deg)">
+          <div style="height:26px;flex:none;background:#5aa9e6;border-bottom:2.5px solid #2b2233;display:flex;align-items:center;justify-content:space-between;padding:0 4px 0 7px"><span style="font-size:11px;font-weight:600">Companion 9</span><span style="width:28px;height:28px;box-sizing:border-box;border-radius:50%;background:#ffd95e;border:2.5px solid #2b2233;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;margin-top:14px">4</span></div>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;background:#fdeef2"><dc-import name="AO-Icon" icon="fairy" size="74" hint-size="74px,74px"></dc-import></div>
+          <div style="padding:3px 4px 6px;display:flex;flex-direction:column;align-items:center;gap:3px;border-top:2px solid rgba(43,34,51,.12)"><div style="font-size:14px;font-weight:700">Fairy</div><span style="display:inline-flex;align-items:center;gap:1px;padding:0 5px 0 1px;border-radius:999px;background:#ffd6e0;border:2px solid #2b2233;font-size:12px;font-weight:700"><dc-import name="AO-Icon" icon="cha" size="14" hint-size="14px,14px"></dc-import>+3</span></div>
+        </div>
+      </div>
+      <div style="font-size:15px;line-height:1.45">The top Companion card flies from the deck, face up. The number in the yellow circle is what the roll has to reach.</div>
+      <div style="margin-top:auto;display:flex;flex-direction:column;gap:6px">
+        <div style="height:40px;border-radius:12px;border:3px solid #2b2233;background:#ff8a3d;color:#2b2233;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow)">Draw a Companion card</div>
+        <div style="font-size:13px;color:var(--muted)">The deck count ticks down as the card leaves.</div>
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <div style="background:var(--surface);border:3px solid var(--line);border-radius:20px 12px 18px 14px/12px 18px 14px 20px;box-shadow:var(--shadow);padding:14px;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:center;gap:8px"><span style="width:30px;height:30px;box-sizing:border-box;border-radius:50%;background:#ffd95e;border:2.5px solid #2b2233;color:#2b2233;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">3</span><span style="font-weight:700;font-size:19px">Press Roll</span></div>
+      <div style="height:196px;border-radius:12px;background:var(--table);border:2px solid var(--soft);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <sc-for list="{{ dice }}" as="die" hint-placeholder-count="2">
+            <div style="width:56px;height:56px;box-sizing:border-box;padding:7px;border-radius:14px;background:#ffffff;border:3.5px solid #2b2233;box-shadow:3px 4px 0 rgba(43,34,51,.2);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;transform:rotate({{ die.tilt }}deg)">
+              <sc-for list="{{ die.cells }}" as="cell" hint-placeholder-count="9"><span style="display:flex;align-items:center;justify-content:center"><span style="width:9px;height:9px;border-radius:50%;background:{{ cell.bg }}"></span></span></sc-for>
+            </div>
+          </sc-for>
+          <div style="font-size:34px;font-weight:700;color:var(--good)">= 5</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:16px;font-weight:700"><span style="padding:3px 12px;border-radius:999px;background:#d9f0c0;border:2px solid #2b2233;color:#2b2233">5 is 4 or more</span><span style="color:var(--muted);font-weight:500">the Fairy joins you!</span></div>
+      </div>
+      <div style="font-size:15px;line-height:1.45">Roll dice equal to your Charisma (Strength for monsters) and add all the pips. Equal to or higher wins.</div>
+      <div style="margin-top:auto;display:flex;flex-direction:column;gap:6px">
+        <div style="height:40px;border-radius:12px;border:3px solid #2b2233;background:#ff8a3d;color:#2b2233;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow)">Roll 2 dice</div>
+        <div style="font-size:13px;color:var(--muted)">Dice tumble in and settle. The total counts up beside them.</div>
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <div style="background:var(--surface);border:3px solid var(--line);border-radius:14px 18px 12px 20px/20px 12px 18px 14px;box-shadow:var(--shadow);padding:14px;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:center;gap:8px"><span style="width:30px;height:30px;box-sizing:border-box;border-radius:50%;background:#ffd95e;border:2.5px solid #2b2233;color:#2b2233;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">4</span><span style="font-weight:700;font-size:19px">Where things go</span></div>
+      <div style="border-radius:12px;background:#d9f0c0;border:2.5px solid #2b2233;padding:10px;display:flex;flex-direction:column;gap:6px;color:#2b2233">
+        <div style="font-size:14px;font-weight:700">It worked!</div>
+        <div style="display:flex;align-items:center;gap:8px"><dc-import name="AO-Icon" icon="fairy" size="38" hint-size="38px,38px"></dc-import><div style="font-size:14px;line-height:1.35">The Fairy flies to your Companions. Charisma 2 → 5.</div></div>
+        <div style="display:flex;align-items:center;gap:8px"><div style="width:38px;display:flex;justify-content:center"><dc-import name="AO-Icon" icon="coin" size="26" tint="#e8483d" hint-size="26px,26px"></dc-import></div><div style="font-size:14px;line-height:1.35">Your coin drops onto the City. It is done for good.</div></div>
+      </div>
+      <div style="border-radius:12px;background:var(--surface2);border:2.5px solid var(--line);padding:10px;display:flex;flex-direction:column;gap:6px">
+        <div style="font-size:14px;font-weight:700">Not enough</div>
+        <div style="font-size:14px;line-height:1.35">The card slides under the deck, to the bottom. The City stays open; stay and try again next turn, or walk away.</div>
+      </div>
+      <div style="margin-top:auto;font-size:13px;color:var(--muted);line-height:1.4">Either way the turn ends here. For AI players the same beats play as captions: "Purple draws the Goat. It needs 2. Purple rolls 1 die: 4. The Goat joins Purple!"</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1280,"height":600}}'>
+const THEMES = {
+  light:{'--bg':'#fbf3e0','--surface':'#fff7e6','--surface2':'#f3e6c8','--text':'#2b2233','--muted':'#5c4f66','--line':'#2b2233','--soft':'rgba(43,34,51,.2)','--table':'#e9dcbc','--good':'#3f8a22','--shadow':'3px 4px 0 rgba(43,34,51,.16)','--shadowlg':'5px 7px 0 rgba(43,34,51,.2)'},
+  dark:{'--bg':'#221c2a','--surface':'#2e2638','--surface2':'#3a3046','--text':'#fbf3e0','--muted':'#c9bcd6','--line':'#0f0b14','--soft':'rgba(251,243,224,.22)','--table':'#1a1520','--good':'#8fd14f','--shadow':'3px 4px 0 rgba(0,0,0,.4)','--shadowlg':'5px 7px 0 rgba(0,0,0,.45)'}
+};
+const PIPS = {1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
+class Component extends DCLogic {
+  renderVals(){
+    const th = this.props.theme || 'light';
+    const rootStyle = Object.assign({}, THEMES[th], {width:'1280px', height:'600px', boxSizing:'border-box', padding:'28px 32px', display:'flex', flexDirection:'column', gap:'18px', background:'var(--bg)', color:'var(--text)', fontFamily:"'Fredoka',sans-serif", borderRadius:'12px', overflow:'hidden'});
+    const f1 = [[40,98,'#c8e6a0',true],[91,69,'#bfe39a',true],[142,98,'#d2eaa8',false]].map((h)=> ({x:h[0], y:h[1], fill:h[2], dot:h[3] ? '#ff8a3d' : 'transparent'}));
+    const dice = [[3,-6],[2,5]].map((d)=> ({tilt:d[1], cells:[0,1,2,3,4,5,6,7,8].map((i)=> ({bg:PIPS[d[0]].indexOf(i) >= 0 ? '#2b2233' : 'transparent'}))}));
+    return {rootStyle:rootStyle, f1:f1, dice:dice};
+  }
+}
+</script>
+</body>
+</html>

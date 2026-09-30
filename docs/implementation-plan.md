@@ -1090,3 +1090,92 @@ The design canvas is `docs/design/fractured-fist-arcade/`; what to build is
   there unstyled. The watch page now applies `themeFor` for any game; a
   Neither Guts nor Gears watcher gets only the plain `ngg-theme` class,
   whose rules paint the same colors the page already had.
+
+## 18. Adventurer Olympics (decided 2026-09-30, not built)
+
+The design canvas is `docs/design/adventurer-olympics/` (start with its
+README); the rules are `docs/games/adventurer-olympics.md`. The engine game
+is `src/games/adventurer-olympics/` in the engine repository, already
+registered, with no hidden information.
+
+- **The tile pattern is the engine's.** The tile across a side sits at
+  `a + 2b` (`a`, `b` = the side's two hexes in the order N, NE, SE, S, SW,
+  NW), so across SE–S it is `(1, 2)` in flat-top axial. The canvas drew the
+  mirror; its two boards were moved to match. The client never computes a
+  slot itself: it draws the placement options the engine lists.
+- **Digital seats roll virtual dice with the Roll button; the rules doc is
+  not changed for that.** Its §12 describes the physical table, and this
+  plan's digital-seat rule (section 4, the Roll/Draw rule) already covers
+  digital play.
+- **Primitive-composed, with the game's theme.** Not a game-drawn screen.
+  `themeFor` returns `ao-theme` (Fredoka inside the house frame, the canvas
+  palette); the parts are primitives:
+
+  | Part of the table | Primitive |
+  | --- | --- |
+  | The map: 7-hex tiles, lit hexes, standees, coins on hexes | `map`, in a new hex mode |
+  | Companion, Dungeon, Little and Big decks; the tile stack | card zone, piles with counts only |
+  | Face-up quests; the rune supply; the cards drawn in a test or Dungeon chain | card zone, rows |
+  | A player's stats, companions, beaten monsters, runes | tableau (yours at the bottom, others on the bench) |
+  | Coins left, steps left | pool |
+  | Turn order 1–4 | track |
+  | Dice | `Die` |
+
+- **The map primitive gains a hex mode.** Flat-top hexes on axial
+  coordinates, hexes grouped into tiles, lit and shut hexes, a standee
+  sliding hex to hex, a coin dropping onto a hex, a tile flying in from the
+  stack and turning in place. Two games now need hexes, so it lives in the
+  primitive, taking the lessons of `glue/ngg/HexMap.tsx`. Converting an
+  engine hex key to flat-top axial is `(q + r, -q)`: a change of drawing
+  axes, not a rule.
+- **One icon module**, generated from `AO-Icon.dc.html` by a script, the way
+  `scripts/ngg-icons.mjs` generates the NGnG icons.
+- **Exploring is one client stage.** Pick a lit slot, turn the tile, press
+  Place: one `explore` move with a slot and a rotation, both always sent.
+
+### Build order
+
+Each step is done when its check passes.
+
+1. **Engine changes** (below). Check: the engine's own tests.
+2. **Icons, fixtures, `/dev/ao`.** Captured engine views for a turn, an
+   explore, a Dungeon chain and the end; a dev page that draws any of them.
+   Check: every fixture draws with no error.
+3. **The hex mode.** Check: every hex the engine lists is drawn once, at the
+   engine's position, for every fixture.
+4. **The table from the view.** Decks, supply, quests, tableaux, bench, log.
+   Check: the fixtures match the canvas's Main board.
+5. **A turn.** Step, Draw, Roll, keep or return the card, stay and try again.
+   Check: nothing is drawn or rolled until its button is pressed.
+6. **Exploring,** a forced explore and the Dungeon Map card. Check: the
+   placements offered are exactly the engine's.
+7. **The Dungeon chain and "Any rune".** Which rune, from whom, or no.
+   Check: declining draws again only when the player presses Draw.
+8. **Turn order and the end.** The 2-dice roll and roll-offs, the AI
+   slideshow, end-of-game quests and the result. Check: a full game against
+   the AI in Playwright, and the agency test covers this game.
+
+The phone pass (M6) must then include this table.
+
+### What the engine needs to change or expose
+
+1. **A Draw step the player presses.** Today, when the server owns the
+   decks, the top card goes straight into the roll step as an icon triggers
+   (`engine.ts` `openTestRoll`), each Dungeon "draw again" follows on its
+   own, and a forced explore turns its tile over at the start of the turn.
+   Each should wait on a pending that only `resolve_report` settles.
+2. **Rotation required.** An omitted rotation is read as 0 (`index.ts`);
+   it should be refused.
+3. **The hexes of each placement option,** so the client draws the preview
+   without working out the pattern.
+4. **Reasons Explore is off** in `unavailable` (on a centre hex, no steps
+   left, both slots taken, no tiles left).
+5. **A headline on each log entry** for the AI slideshow's captions, and
+   the individual dice rolled, not only the total.
+6. **Running out of the 10 coins** is not handled. It needs the designer's
+   ruling first.
+
+### Still open
+
+- The canvas has no setup screen (picking an adventurer and colour, the
+  face-up quests) and no "last tile placed" banner.
