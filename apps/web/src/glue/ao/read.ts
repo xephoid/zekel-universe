@@ -68,6 +68,8 @@ export interface Player {
   companions: string[]; little: string[]; big: string[]; artifacts: string[]; questPoints: number;
   claimedQuests: string[]; exploredTiles: number[]; dungeonsCompleted: number; tokensSpent: number;
   stats: { charisma: number; strength: number; movement: number } | null;
+  /** Coins of this colour not yet on the map, when the engine gives it. */
+  tokensLeft: number | null;
 }
 
 /** A seat's name; an AI seat the engine names only by its seat id is called by its colour. */
@@ -89,6 +91,7 @@ export function players(view: Record<string, unknown>): Player[] {
       exploredTiles: asArr(p['exploredTiles']).map((x) => asNum(x)), dungeonsCompleted: asNum(p['dungeonsCompleted']),
       tokensSpent: asNum(p['tokensSpent']),
       stats: st ? { charisma: asNum(st['charisma']), strength: asNum(st['strength']), movement: asNum(st['movement']) } : null,
+      tokensLeft: typeof p['tokensLeft'] === 'number' ? p['tokensLeft'] : null,
     };
   });
 }

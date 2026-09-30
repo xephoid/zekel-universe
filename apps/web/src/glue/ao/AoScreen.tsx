@@ -465,7 +465,7 @@ function Side({ view, all, me, nameOf }: { view: Record<string, unknown>; all: P
               <div className="line">
                 {p.stats && (Object.keys(STAT) as Array<keyof typeof STAT>).map((k) => <span key={k} title={STAT[k].name} className="stat"><Icon name={STAT[k].icon} size={18} />{p.stats![k]}</span>)}
                 <span className="sep" />
-                <span className="counts">Friends {p.companions.length} · Monsters {p.little.length + p.big.length} · Tiles {p.exploredTiles.length}</span>
+                <span className="counts">Friends {p.companions.length} · Monsters {p.little.length + p.big.length} · Tiles {p.exploredTiles.length}{p.tokensLeft !== null ? ` · Coins ${p.tokensLeft}` : ''}</span>
                 <span className="arts">{p.artifacts.map((a) => <Icon key={a} name={a} size={20} title={ICON[a]?.name} />)}</span>
               </div>
             </div>
