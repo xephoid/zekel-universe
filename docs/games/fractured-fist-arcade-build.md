@@ -1,5 +1,9 @@
 # Fractured Fist — the arcade theme: what to build
 
+**Built 2026-09-29** on the branch `ff-arcade-theme`, items 1 to 6 in order,
+one commit each. Item 2 went the game-drawn-screen way (the owner's pick);
+what the build decided is in `docs/implementation-plan.md`, section 17.
+
 Status 2026-09-29. Written for whoever implements the next Fractured Fist
 table pass. It builds on [fractured-fist-build.md](fractured-fist-build.md),
 which is done; nothing decided there is reopened here except where this file

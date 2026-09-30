@@ -1068,6 +1068,24 @@ The design canvas is `docs/design/fractured-fist-arcade/`; what to build is
 - **The plan's side is empty.** The table draws a plan's side zones even
   beside a screen, so the supply is portalled into the side column by the
   screen itself, and drawn inline on the watch page, which has no slot.
+- **The supply is a list.** `CardZoneData.mode` gains `list`, a Universe
+  addition the engine ignores: each card drawn flat as one row (`CardRow`),
+  the same part as the card, so a bought card still flies from its stack.
+- **The card face.** `CardData` gains `value` (a resource's worth, opposite
+  the cost). The glue sets `cost`, `value` and `artUrl` from the reference
+  data and the card id; the 34 scenes are served from
+  `public/cards/fractured-fist/<engine id>.svg`, and a test keeps them free
+  of script, handlers and outside links. The corner colors are the glue's
+  palette, which the table already publishes as CSS variables; the card
+  primitive only gains a `data-color-key` attribute for the theme to read.
+  The setup page's picker gains `art` and `corner` on an option.
+- **The strike is an arena.** Both fighters face each other, both hits run
+  at once, what got through is still `lane.through`; `STRIKE_BEATS`, the
+  captions, pace, skip and replay are unchanged. Only Fractured Fist has a
+  moment, so the overlay's old two-lane layout is gone rather than kept
+  beside it.
+- **A first-time rules lesson floats** over the right end of their row on
+  this table, so the 1440 x 900 table never scrolls.
 - **Still open: the watch page's look.** It does not apply `themeFor` for
   any game today; turning it on would change the Neither Guts nor Gears
   watch page too, so it is left for the owner.
