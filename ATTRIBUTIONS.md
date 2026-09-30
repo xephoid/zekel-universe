@@ -5,7 +5,7 @@ project itself is Apache 2.0 (see `LICENSE`).
 
 ## Fonts (served from `apps/web/public/fonts`, declared in `apps/web/src/fonts.css`)
 
-All six families are licensed under the SIL Open Font License 1.1, which
+All seven families are licensed under the SIL Open Font License 1.1, which
 permits bundling and self-hosting with attribution. Latin subsets only.
 
 - **Slackey** by Sideshow (the wordmark). OFL 1.1.
@@ -14,6 +14,7 @@ permits bundling and self-hosting with attribution. Latin subsets only.
 - **IM Fell English** by Igino Marini, from the Fell Types (the Neither Guts nor
   Gears wizard seat). OFL 1.1.
 - **Barlow Condensed** by Jeremy Tribby (the Fractured Fist arcade theme). OFL 1.1.
+- **Fredoka** by Milena Brandão (the Adventurer Olympics table). OFL 1.1.
 
 The files were obtained from Google Fonts in September 2026.
 

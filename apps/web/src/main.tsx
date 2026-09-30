@@ -39,7 +39,10 @@ const router = createBrowserRouter([
   // lazily inside the dev-only branch, so a production build drops the page
   // and every captured view with it.
   ...(import.meta.env.DEV
-    ? [{ path: '/dev/ngg', lazy: () => import('./pages/DevNgg').then((m) => ({ Component: m.DevNggPage })) }]
+    ? [
+        { path: '/dev/ngg', lazy: () => import('./pages/DevNgg').then((m) => ({ Component: m.DevNggPage })) },
+        { path: '/dev/ao', lazy: () => import('./pages/DevAo').then((m) => ({ Component: m.DevAoPage })) },
+      ]
     : []),
   { path: '*', element: <NotFoundPage /> },
 ]);

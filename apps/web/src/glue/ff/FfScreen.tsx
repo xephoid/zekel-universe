@@ -178,7 +178,7 @@ export function FfScreen(props: GameScreenProps) {
     if (!pressable) return;
     if ('move' in a) onMove(a.move);
     else if ('batch' in a) onBatch?.(a.batch);
-    else if (a.moves.length === 1) onMove(a.moves[0]!);
+    else if ('moves' in a && a.moves.length === 1) onMove(a.moves[0]!);
   };
   const watching = input.playerId === null;
   // The big name is the side ("You", "Opponent"); a seat's display name sits
