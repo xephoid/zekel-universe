@@ -221,7 +221,11 @@ function plan(input: GlueInput): TablePlan | null {
 
   const ending = asNum(view['endingPhase']);
   const status = `Round ${asNum(view['round'], 1)}${ending === 1 ? ' · the last tile is placed' : ending === 2 ? ' · the final round' : ''}`;
-  return { board, bench, side, points, palette: PALETTE, title: 'Adventurer Olympics', status, prompt: prompt(view, input, me) };
+  // The game draws its own screen (AoScreen), which puts turn order, the seats
+  // and the quests in the side column itself; the table draws a plan's side
+  // zones and points track even beside a screen, so the plan gives none.
+  void side; void points;
+  return { board, bench, side: [], palette: PALETTE, title: 'Adventurer Olympics', status, prompt: prompt(view, input, me) };
 }
 
 // ---- the glue -------------------------------------------------------------------

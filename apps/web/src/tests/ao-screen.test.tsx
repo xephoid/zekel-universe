@@ -111,6 +111,19 @@ describe('the Adventurer Olympics screen', () => {
     expect(container.querySelector('.ao-total')!.textContent).toBe(`= ${f.view.lastRoll.total}`);
   });
 
+  it('calls an AI seat by its colour, and a person by their seat name', () => {
+    const f = fx('move-late-multi');
+    const names = (nameFor: (p: string) => string) => {
+      const { container } = draw(f, { nameFor });
+      const out = [...container.querySelectorAll('.ao-seat .top b')].map((e) => e.textContent);
+      cleanup();
+      return out;
+    };
+    const colours = f.view.players.filter((p: any) => p.player_id !== f.viewer).map((p: any) => p.colour);
+    expect(names(() => 'AI (medium)').sort()).toEqual([...colours].sort());
+    expect(names((p) => (p === 'p2' ? 'Sam' : 'AI (easy)'))).toContain('Sam');
+  });
+
   it('a watcher sees the table and can press nothing', () => {
     const f = fx('move-late-multi');
     const { container, onMove } = draw(f, { interactive: false, yourTurn: false });

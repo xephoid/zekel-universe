@@ -127,8 +127,9 @@ describe('seats and setup', () => {
     const mine = plan.bench.find((z) => z.kind === 'tableau')!.data as TableauData;
     const me = f.view.players.find((p: any) => p.player_id === f.viewer);
     expect(mine.stats!.find((s) => s.label === 'Strength')!.value).toBe(me.stats.strength);
-    const others = plan.side.filter((z) => z.kind === 'tableau').map((z) => (z.data as TableauData).label!);
-    for (const label of others) expect(label).not.toMatch(/^p\d/);
+    // Beside the game-drawn screen the plan gives no side zones: the screen draws them.
+    expect(plan.side).toEqual([]);
+    expect(plan.points).toBeUndefined();
   });
 
   it('the setup page asks the host for an adventurer and a colour, and sends one setup move', () => {

@@ -119,6 +119,8 @@
 .ao-panel .words { flex: 1; display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
 .ao-panel .actions { display: flex; gap: 8px; align-items: center; }
 .ao-explore { width: 390px; }
+/* How a test went: nothing to press, so it never stands between a tap and the map. */
+.ao-panels > .ao-panel.result { pointer-events: none; }
 .ao-card-slot {
   width: 112px; height: 158px; flex: none; box-sizing: border-box; border-radius: 12px; border: 3px dashed var(--ao-soft);
   display: flex; align-items: center; justify-content: center; text-align: center; font-size: 14px; color: var(--ao-muted); padding: 8px;

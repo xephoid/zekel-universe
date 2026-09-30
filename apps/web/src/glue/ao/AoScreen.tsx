@@ -148,7 +148,7 @@ function TestPanel({ view, previous, all, mine, meId, onDraw }: {
     const kept = !!tester && [...tester.companions, ...tester.little, ...tester.big].includes(cardId);
     const dice = asArr(last['dice']).map((d) => asNum(d));
     return (
-      <section className="ao-panel ao-test" aria-label="The test">
+      <section className="ao-panel ao-test result" aria-label="How the test went">
         <header><Icon name={ICON[asStr(before.payload['test']) === 'recruit' ? 'city' : asStr(before.payload['test']) === 'big' ? 'big_monster' : 'little_monster']?.art ?? 'city'} size={40} /><h3>{kept ? 'Success!' : 'Not enough'}</h3></header>
         <div className="body">
           <MiniCard view={view} cardId={cardId} />
@@ -519,7 +519,8 @@ export function AoScreen(props: GameScreenProps) {
   const p = pendingOf(view);
   const mine = !!me && p?.seat === me.id && pressable;
   // Engine names an unnamed AI by its seat id; the table's seat name is better when it has one.
-  const nameOf = (pl: Player) => { const n = nameFor(pl.id); return n && n !== pl.id && n !== 'AI' ? n : pl.name; };
+  // An AI seat goes by its colour, as the canvas names it; a person by their seat name.
+  const nameOf = (pl: Player) => { const n = nameFor(pl.id); return n && n !== pl.id && !/^AI\b/.test(n) ? n : pl.name; };
   const named = all.map((pl) => ({ ...pl, name: pl.id === me?.id ? 'You' : nameOf(pl) }));
 
   const onSelect = (sel: SelectEvent) => {
