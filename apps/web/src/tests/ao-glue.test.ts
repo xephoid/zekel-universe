@@ -86,13 +86,6 @@ describe('Draw and Roll', () => {
     expect(drawn('roll-test').length).toBe(1);
   });
 
-  it('shows the dice: an AI roll from its move, the Roll button from the view', () => {
-    expect(g.diceFor!({ engineMove: { type: 'report_test_roll', total: 7, dice: [3, 4] }, summary: '', view: null })).toEqual([3, 4]);
-    const after = fx('after-roll-test');
-    expect(g.diceFor!({ engineMove: { type: 'resolve_report' }, summary: 'You pressed Roll — the server rolled 6 = 6.', view: after.view })).toEqual(after.view.lastRoll.dice);
-    // A Draw press is not a roll, whatever its summary goes on to say.
-    expect(g.diceFor!({ engineMove: { type: 'resolve_report' }, summary: 'You pressed Draw. You must fight — roll 1 die.', view: after.view })).toBeNull();
-  });
 });
 
 describe('exploring', () => {

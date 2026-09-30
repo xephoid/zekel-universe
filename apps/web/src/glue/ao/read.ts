@@ -239,7 +239,7 @@ export function mapNodes(view: Record<string, unknown>, input: GlueInput, all: P
     const pieces: NonNullable<MapNode['pieces']> = [];
     const done = icon && icon['completed'] === true;
     const by = done ? asStr(icon['completedBy']) : explored.get(key) ?? '';
-    if (by) pieces.push({ label: `coin:${key}`, colorKey: colourKey(colourOf.get(by) ?? '') });
+    if (by) pieces.push({ label: `coin:${key}`, kind: 'token', size: 0.45, artUrl: iconUrl('coin', { tint: tint(colourOf.get(by) ?? ''), wobble: false }) });
     for (const p of all.filter((pl) => pl.hex === key)) {
       pieces.push({ label: `standee:${p.id}`, artUrl: iconUrl(adventurerOf(all, p.id).toLowerCase(), { tint: tint(p.colour), wobble: false }) });
     }
@@ -283,5 +283,32 @@ export function mapNodes(view: Record<string, unknown>, input: GlueInput, all: P
     }
   }
   return nodes;
+}
+
+/** Lit parts for the current legal moves: each hex a step or a walk-away
+ *  goes to, and, while a tile waits, every hex of every slot. */
+export function litFor(input: GlueInput): string[] {
+  const lit: string[] = [];
+  for (const m of input.legalMoves) {
+    const to = targetOf(m);
+    if (to) lit.push(`ao:hex:${to}`);
+  }
+  const view = isObj(input.view) ? input.view : null;
+  const place = view && pendingOf(view)?.kind === 'explore_place' ? placementOf(view) : null;
+  if (place) for (const s of place.slots) for (const h of s.hexes) lit.push(`ao:slot:${s.slot}:${h}`);
+  return [...new Set(lit)];
+}
+
+/** Every listed move a tap on a hex could mean (a step or a walk-away to it). */
+export function movesForHex(id: string, input: GlueInput): LegalMove[] {
+  const hex = /^ao:hex:(-?\d+,-?\d+)$/.exec(id);
+  return hex ? input.legalMoves.filter((m) => targetOf(m) === hex[1]) : [];
+}
+
+/** The slot a tap on a slot's ghost hex picks, when that slot is offered. */
+export function slotForTap(id: string, view: Record<string, unknown>): string | null {
+  const m = /^ao:slot:(.+):(-?\d+,-?\d+)$/.exec(id);
+  if (!m) return null;
+  return placementOf(view)?.slots.some((s) => s.slot === m[1]) ? m[1]! : null;
 }
 

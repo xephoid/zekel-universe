@@ -25,6 +25,7 @@ import { asArr, asNum, asStr, isObj, shapeHas } from '../types';
 import { answerText } from '../forms';
 import { iconUrl } from './icons';
 import './ao.css';
+import { AoScreen } from './AoScreen';
 import {
   ADVENTURERS, COLOURS, COMPANION_ART, DECKS, DUNGEON_CARD, GAME, ICON, LAND, MONSTER_ART, PALETTE, PLAYER_COLOUR, PlacementSlot, Player, RefCard, STAT_WORD, adventurerOf, bonusText, cardFor, colourKey, composing, find, hexOf, mapNodes, nameOrColour, pendingOf, placeMove, placementOf, players, questNames, refCards, runeCard, targetOf, tint, typeOf,
 } from './read';
@@ -233,6 +234,11 @@ export const adventurerOlympicsGlue: GlueModule = {
 
   themeFor: () => 'ao-theme',
 
+  // The table is drawn by the game (plan §18, "becomes a game-drawn screen");
+  // plan() still gives the title and the status line.
+  Screen: AoScreen,
+  placesCaption: true,
+
   litParts(input: GlueInput): string[] {
     const lit: string[] = [];
     for (const m of input.legalMoves) {
@@ -327,16 +333,7 @@ export const adventurerOlympicsGlue: GlueModule = {
       : [];
   },
 
-  diceFor(event) {
-    // An AI's roll carries its dice; the Roll button's dice are in the view.
-    const m = event.engineMove;
-    if (m && Array.isArray(m['dice'])) return m['dice'].map((d) => asNum(d)).filter((n) => n >= 1 && n <= 6);
-    if (m && m['type'] === 'resolve_report' && /pressed Roll/.test(event.summary) && isObj(event.view)) {
-      const last = event.view['lastRoll'];
-      if (isObj(last) && Array.isArray(last['dice'])) return last['dice'].map((d) => asNum(d));
-    }
-    return null;
-  },
+  // The screen draws the dice in its test panel, from the view's last roll.
 
   endStat(input: GlueInput) {
     if (!isObj(input.view)) return null;
