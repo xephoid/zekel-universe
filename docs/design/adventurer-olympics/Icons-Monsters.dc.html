@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Monster cards</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#2b2233}a:hover{color:#e0762b}
+</style>
+</helmet>
+<div style="width:1280px;height:800px;box-sizing:border-box;padding:34px 40px;display:flex;flex-direction:column;gap:18px;background:#fbf3e0;color:#2b2233;font-family:'Fredoka',sans-serif;border-radius:12px;overflow:hidden;position:relative" data-screen-label="Monster cards">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><filter id="ao-wob" filterUnits="userSpaceOnUse" x="-20" y="-20" width="140" height="140"><feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="7"></feTurbulence><feDisplacementMap in="SourceGraphic" scale="{{ wobble }}"></feDisplacementMap></filter></defs></svg>
+
+  <div style="display:flex;flex-direction:column;gap:6px">
+    <div style="font-size:36px;font-weight:700;line-height:1.05">Monster cards, one creature per number</div>
+    <div style="font-size:16px;color:#5c4f66;max-width:1000px;line-height:1.45">Each deck has three numbers, four cards of each, so each number gets its own monster. The higher the number, the tougher it looks. The backs keep the map icon, so a deck still reads as Little or Big at a glance.</div>
+  </div>
+
+  <sc-for list="{{ rows }}" as="row" hint-placeholder-count="2">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:baseline;gap:12px"><span style="font-size:22px;font-weight:700">{{ row.title }}</span><span style="font-size:15px;color:#5c4f66">{{ row.sub }}</span></div>
+      <div style="display:flex;gap:26px;align-items:flex-start">
+
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;width:130px;flex:none">
+          <div style="width:130px;height:182px;box-sizing:border-box;background:{{ row.band }};border:3px solid #2b2233;border-radius:14px 9px 16px 10px/10px 16px 9px 14px;display:flex;align-items:center;justify-content:center;box-shadow:4px 5px 0 rgba(43,34,51,.16);transform:rotate(-3deg);position:relative">
+            <div style="position:absolute;inset:8px;border:2.5px dashed rgba(43,34,51,.35);border-radius:10px"></div>
+            <div style="position:relative;width:78px;height:78px">
+              <sc-for list="{{ row.back }}" as="p" hint-placeholder-count="10">
+                <svg viewBox="0 0 100 100" width="78" height="78" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><path d="{{ p.d }}" fill="{{ p.f }}" stroke="{{ p.s }}" stroke-width="{{ p.w }}" stroke-linecap="round" stroke-linejoin="round" opacity="{{ p.o }}" transform="{{ p.t }}" filter="url(#ao-wob)"></path></svg>
+              </sc-for>
+            </div>
+          </div>
+          <span style="font-size:14px;font-weight:600;color:#5c4f66">Card back</span>
+        </div>
+
+        <sc-for list="{{ row.cards }}" as="c" hint-placeholder-count="3">
+          <div style="display:flex;gap:14px;align-items:flex-start;flex:1;min-width:0">
+            <div style="width:170px;height:238px;flex:none;box-sizing:border-box;background:#fff7e6;border:3px solid #2b2233;border-radius:16px 10px 18px 12px/12px 18px 10px 16px;overflow:hidden;display:flex;flex-direction:column;transform:rotate({{ c.rot }}deg);box-shadow:4px 5px 0 rgba(43,34,51,.16)">
+              <div style="height:40px;flex:none;background:{{ row.band }};border-bottom:3px solid #2b2233;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 12px">
+                <span style="font-size:14px;font-weight:600">{{ row.kind }}</span>
+                <span style="width:38px;height:38px;box-sizing:border-box;border-radius:50%;background:#ffd95e;border:3px solid #2b2233;display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:700;margin-top:20px">{{ c.num }}</span>
+              </div>
+              <div style="flex:1;display:flex;align-items:center;justify-content:center;background:{{ c.bg }}">
+                <div style="position:relative;width:118px;height:118px;filter:drop-shadow(2px 3px 0 rgba(43,34,51,.14))">
+                  <sc-for list="{{ c.shapes }}" as="p" hint-placeholder-count="14">
+                    <svg viewBox="0 0 100 100" width="118" height="118" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><path d="{{ p.d }}" fill="{{ p.f }}" stroke="{{ p.s }}" stroke-width="{{ p.w }}" stroke-linecap="round" stroke-linejoin="round" opacity="{{ p.o }}" transform="{{ p.t }}" filter="url(#ao-wob)"></path></svg>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="padding:6px 10px 10px;display:flex;flex-direction:column;align-items:center;gap:2px;border-top:2px solid rgba(43,34,51,.12)">
+                <div style="font-size:18px;font-weight:700">{{ c.name }}</div>
+                <div style="font-size:13px;color:#5c4f66">Beat {{ c.num }} or more</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;padding-top:6px;min-width:0">
+              <div style="font-size:15px;font-weight:600">{{ c.name }} · {{ c.num }}</div>
+              <div style="font-size:14px;color:#5c4f66;line-height:1.4">{{ c.blurb }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"wobble":{"editor":"range","min":0,"max":6,"step":0.5,"default":2.5,"section":"Hand-drawn feel"},"$preview":{"width":1280,"height":800}}'>
+// ---------- hand-drawn icon kit (100×100 boxes, ink outlines, wobbled by #ao-wob) ----------
+const INK = '#2b2233';
+function C(x, y, r){ return 'M' + (x - r) + ' ' + y + 'a' + r + ' ' + r + ' 0 1 0 ' + (2 * r) + ' 0a' + r + ' ' + r + ' 0 1 0 ' + (-2 * r) + ' 0Z'; }
+function E(x, y, rx, ry){ return 'M' + (x - rx) + ' ' + y + 'a' + rx + ' ' + ry + ' 0 1 0 ' + (2 * rx) + ' 0a' + rx + ' ' + ry + ' 0 1 0 ' + (-2 * rx) + ' 0Z'; }
+// a bony or leggy line: ink first, colour on top
+function LIMB(d, col, w){ return [[d, 'none', (w || 4) + 4.5, INK], [d, 'none', w || 4, col]]; }
+
+const BACKS = {
+  little:[
+    [E(36, 86, 9, 5), '#6fb53a'], [E(64, 86, 9, 5), '#6fb53a'],
+    ['M31 34L27 15L42 29Z', '#fff1d6', 3.5], ['M69 34L73 15L58 29Z', '#fff1d6', 3.5],
+    ['M20 80C9 58 18 27 50 25C82 27 91 58 80 80C69 91 31 91 20 80Z', '#8fd14f'],
+    [C(40, 55, 7.5), '#ffffff', 3], [C(60, 55, 7.5), '#ffffff', 3],
+    [C(41.5, 56.5, 3.4), INK, 0], [C(58.5, 56.5, 3.4), INK, 0],
+    ['M30 42L45 49M70 42L55 49', 'none', 5], ['M37 75Q50 65 63 75', 'none', 4],
+    ['M45 71L47.5 78L50.5 69.8Z', '#ffffff', 2.5]
+  ],
+  big:[
+    ['M25 39C8 31 7 12 18 7C18 20 26 26 35 30Z', '#ffcf8a'], ['M75 39C92 31 93 12 82 7C82 20 74 26 65 30Z', '#ffcf8a'],
+    ['M22 50C22 26 36 17 50 17C64 17 78 26 78 50C78 62 72 67 68 69V84H32V69C28 67 22 62 22 50Z', '#f4ead0'],
+    ['M31 42L46 47C47 58 34 61 31 52Z', INK, 3], ['M69 42L54 47C53 58 66 61 69 52Z', INK, 3],
+    [C(39, 51, 3.4), '#ff4d4d', 0], [C(61, 51, 3.4), '#ff4d4d', 0],
+    ['M47 64L50 58L53 64Z', INK, 2.5], ['M33 73H67M41 84V73M50 84V73M59 84V73', 'none', 3]
+  ]
+};
+
+const MONSTERS = {
+  slime:[
+    ['M50 40C46 31 50 23 55 20C57 28 57 35 53 40Z', '#6ee0c8', 3.5],
+    ['M14 86C12 66 26 40 50 38C74 40 88 66 86 86Q77 91 71 84Q66 92 58 86Q50 92 42 86Q34 92 28 85Q20 90 14 86Z', '#6ee0c8'],
+    [C(39, 61, 8.5), '#ffffff', 3], [C(62, 59, 10), '#ffffff', 3],
+    [C(41, 63, 3.6), INK, 0], [C(63, 61, 4.3), INK, 0],
+    [C(42.5, 61.5, 1.2), '#ffffff', 0], [C(64.5, 59.5, 1.4), '#ffffff', 0],
+    ['M44 76Q51 81 58 75', 'none', 3.5],
+    [C(25, 70, 3), 'none', 2.5, '#ffffff'], [C(75, 76, 2.5), 'none', 2.5, '#ffffff'],
+    ['M23 57Q27 47 36 44', 'none', 3.5, '#ffffff']
+  ],
+  goblin:[
+    ['M24 96C26 78 36 72 50 72C64 72 74 78 76 96Z', '#8a5a2b'],
+    ['M42 76L50 86L58 76', 'none', 3, '#ffd95e'],
+    ['M30 46L4 32L27 60Z', '#a6c84a'], ['M70 46L96 32L73 60Z', '#a6c84a'],
+    ['M12 38L26 48', 'none', 2.5],
+    ['M28 50C28 30 38 24 50 24C62 24 72 30 72 50C72 66 62 76 50 76C38 76 28 66 28 50Z', '#a6c84a'],
+    ['M42 27L45 13L50 24L55 11L58 27', 'none', 3.5],
+    [E(41, 46, 6.5, 5), '#ffe45e', 3], [E(59, 46, 6.5, 5), '#ffe45e', 3],
+    [C(42, 47, 2.6), INK, 0], [C(58, 47, 2.6), INK, 0],
+    ['M33 37L46 42M67 37L54 42', 'none', 4],
+    ['M48 48Q61 60 50 62Q45 61 48 48Z', '#93b53c', 3],
+    ['M37 65Q50 74 63 65', 'none', 3.5],
+    ['M41 66.5L43.5 71L46 68.5ZM54 68.5L56.5 71L59 66.5Z', '#ffffff', 2],
+    ['M34 36Q38 29 45 27', 'none', 3, '#ffffff']
+  ],
+  skeleton:[
+    ...LIMB('M38 66L24 78L22 90', '#f4ead0'),
+    ['M79 45L87 16', 'none', 5, '#b98a5a'],
+    ['M74 42L86 46', 'none', 4.5, INK],
+    ...LIMB('M62 66L78 58L80 46', '#f4ead0'),
+    ['M50 60V88', 'none', 4.5],
+    ...LIMB('M38 67Q50 63 62 67M36 74Q50 70 64 74M38 81Q50 77 62 81', '#f4ead0', 3.5),
+    ['M40 89Q50 83 60 89L58 95H42Z', '#f4ead0', 3],
+    ['M34 40C34 24 42 18 50 18C58 18 66 24 66 40C66 48 62 52 58 53V60H42V53C38 52 34 48 34 40Z', '#f4ead0'],
+    ['M31 33Q33 14 50 13Q67 14 69 33Q58 27 50 27Q42 27 31 33Z', '#b98a5a'],
+    ['M58 16L55 23', 'none', 2.5],
+    [C(43, 40, 5.5), INK, 0], [C(57, 40, 5.5), INK, 0],
+    [C(43, 40, 2), '#8fe3ff', 0], [C(57, 40, 2), '#8fe3ff', 0],
+    ['M48 49L50 45L52 49Z', INK, 2],
+    ['M44 55H56M47 60V55M50 60V55M53 60V55', 'none', 2.5]
+  ],
+  ogre:[
+    ['M60 74L73 36Q70 22 83 17Q97 19 93 35L70 78Z', '#a0612e'],
+    [C(82, 26, 2), INK, 0], [C(88, 34, 2), INK, 0], [C(78, 38, 2), INK, 0],
+    ['M8 99C10 76 30 68 50 68C70 68 90 76 92 99Z', '#c47a3c'],
+    ['M30 80L38 99M70 80L62 99', 'none', 3],
+    [E(22, 48, 5.5, 8.5), '#9fbf7a'], [E(78, 48, 5.5, 8.5), '#9fbf7a'],
+    ['M24 48C22 26 36 16 50 16C64 16 78 26 76 48C76 60 72 72 50 74C28 72 24 60 24 48Z', '#9fbf7a'],
+    ['M46 16Q44 8 48 5M54 16Q56 9 60 7', 'none', 3],
+    ['M33 38Q50 31 67 38', 'none', 6.5, '#4a3526'],
+    [C(42, 44, 3.6), INK, 0], [C(58, 44, 3.6), INK, 0],
+    [C(43, 43, 1), '#ffffff', 0], [C(59, 43, 1), '#ffffff', 0],
+    [E(50, 53, 7.5, 5.5), '#8aad65', 3],
+    ['M33 60Q50 71 67 60', 'none', 4],
+    ['M38 63L36 53L44 61ZM62 63L64 53L56 61Z', '#fff1d6', 2.5],
+    [C(67, 57, 1.8), '#6f8f50', 0],
+    ['M30 34Q35 24 44 21', 'none', 3, '#ffffff']
+  ],
+  spider:[
+    ['M50 12V0', 'none', 1.5],
+    ...LIMB('M40 58L18 42L8 54M38 64L14 64L6 78M40 70L20 82L16 96M44 74L34 90L32 99', '#7a4fa6'),
+    ...LIMB('M60 58L82 42L92 54M62 64L86 64L94 78M60 70L80 82L84 96M56 74L66 90L68 99', '#7a4fa6'),
+    [C(50, 34, 22), '#5a3a88'],
+    ['M35 30Q50 37 65 30M37 41Q50 48 63 41', 'none', 3.5, '#ffb627'],
+    [C(50, 64, 16), '#7a4fa6'],
+    [C(44, 61, 4.2), '#ff4d6d', 2], [C(56, 61, 4.2), '#ff4d6d', 2],
+    [C(38, 55, 2.6), '#ff4d6d', 2], [C(62, 55, 2.6), '#ff4d6d', 2],
+    [C(46, 53, 2), '#ff4d6d', 1.5], [C(54, 53, 2), '#ff4d6d', 1.5],
+    [C(45, 60, 1.2), '#ffffff', 0], [C(57, 60, 1.2), '#ffffff', 0],
+    ['M45 73L47 81L50 74ZM55 73L53 81L50 74Z', '#fff1d6', 2],
+    ['M34 22Q40 15 48 13', 'none', 3, '#ffffff']
+  ],
+  dragon:[
+    ['M58 62L90 16L87 38L98 36L84 60L95 65L66 78Z', '#c0392b'],
+    ['M64 66L88 22M68 70L94 40M70 74L92 64', 'none', 2.5],
+    ['M24 99C22 80 28 66 38 57L58 58C64 70 70 84 70 99Z', '#e8483d'],
+    ['M40 99C40 84 44 72 50 66C55 76 58 88 58 99Z', '#ffd95e', 3],
+    ['M44 78H56M42 88H58', 'none', 2.5],
+    ['M24 48L14 54L26 57ZM28 59L19 67L32 67Z', '#ffe3a8', 2.5],
+    ['M31 25L22 6L39 20Z', '#ffe3a8'], ['M45 21L45 3L55 21Z', '#ffe3a8'],
+    ['M21 40C21 26 34 18 46 20L66 24C76 26 84 32 84 40C84 48 76 52 66 52L46 56C32 58 21 52 21 40Z', '#e8483d'],
+    [E(41, 34, 6.5, 5.5), '#ffe45e', 3],
+    ['M41 30V38', 'none', 3],
+    [C(76, 36, 2), INK, 0],
+    ['M55 46Q68 49 81 44', 'none', 3],
+    ['M61 47L63 52L65.5 47.5Z', '#ffffff', 2],
+    ['M86 33Q97 30 96 20Q92 25 89 25Q93 18 88 12Q87 23 84 29Z', '#ff9b3d', 3],
+    ['M28 30Q33 22 42 21', 'none', 3, '#ffffff']
+  ]
+};
+function shapesOf(list){ return list.map((p)=> ({d:p[0], f:p[1], w:p[2] === undefined ? 4 : p[2], s:p[3] || INK, o:p[4] === undefined ? 1 : p[4], t:p[5] || 'translate(0 0)'})); }
+
+class Component extends DCLogic {
+  renderVals(){
+    const card = (key, num, name, bg, rot, blurb)=> ({num:num, name:name, bg:bg, rot:rot, blurb:blurb, shapes:shapesOf(MONSTERS[key])});
+    return {
+      wobble:this.props.wobble ?? 2.5,
+      rows:[
+        {title:'Little Monsters', sub:'12 cards: four each of 2, 3 and 4', kind:'Little Monster', band:'#8fd14f', back:shapesOf(BACKS.little), cards:[
+          card('slime', 2, 'Slime', '#eaf7ee', -2, 'A wobbly, bubbly blob that mostly wants a hug. The easiest fight in the game.'),
+          card('goblin', 3, 'Goblin', '#f1f4e0', 1.5, 'Pointy ears, big nose, a sneaky grin. Small, but it fights dirty.'),
+          card('skeleton', 4, 'Skeleton', '#eeeaf3', -1, 'A rattly bone warrior in a dented helmet, still waving a rusty sword.')
+        ]},
+        {title:'Big Monsters', sub:'12 cards: four each of 5, 6 and 7', kind:'Big Monster', band:'#ff7a59', back:shapesOf(BACKS.big), cards:[
+          card('ogre', 5, 'Ogre', '#f2efe0', 2, 'Huge, slow and cross, with tusks and a spiky club over one shoulder.'),
+          card('spider', 6, 'Giant Spider', '#efe8f6', -1.5, 'Eight legs, six red eyes, fangs and a stripy back. Hangs from a thread.'),
+          card('dragon', 7, 'Dragon', '#fbe9e2', 1, 'The toughest card in the game: red scales, big wings and a puff of fire.')
+        ]}
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Artifacts as rune stones</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#2b2233}a:hover{color:#e0762b}
+</style>
+</helmet>
+<div style="width:1280px;height:700px;box-sizing:border-box;padding:36px 40px;display:flex;flex-direction:column;gap:22px;background:#fbf3e0;color:#2b2233;font-family:'Fredoka',sans-serif;border-radius:12px;overflow:hidden;position:relative" data-screen-label="Artifacts as rune stones">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><filter id="ao-wob" filterUnits="userSpaceOnUse" x="-20" y="-20" width="140" height="140"><feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="7"></feTurbulence><feDisplacementMap in="SourceGraphic" scale="{{ wobble }}"></feDisplacementMap></filter></defs></svg>
+
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="font-size:36px;font-weight:700;line-height:1.05">Artifacts as rune stones</div>
+      <div style="font-size:16px;font-weight:400;color:#5c4f66;max-width:760px;line-height:1.45">Each suit becomes a rune carved from straight strokes, so it still reads as a heart, spade, diamond or club. Each glows its own colour. The Star sits on a darker stone with sparkles, because it is the one you keep forever.</div>
+    </div>
+    <div style="flex:none;padding:8px 14px;border:3px solid #2b2233;border-radius:255px 15px 225px 15px/15px 225px 15px 255px;background:#fff7e6;font-size:15px;font-weight:600;transform:rotate(-2deg)">Option A · stones</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:20px">
+    <sc-for list="{{ stones }}" as="r" hint-placeholder-count="5">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+        <div style="position:relative;width:{{ r.ic.size }}px;height:{{ r.ic.size }}px;transform:rotate({{ r.ic.rot }}deg);filter:drop-shadow(3px 4px 0 rgba(43,34,51,.16))">
+          <sc-for list="{{ r.ic.shapes }}" as="p" hint-placeholder-count="6">
+            <svg viewBox="0 0 100 100" width="{{ r.ic.size }}" height="{{ r.ic.size }}" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><path d="{{ p.d }}" fill="{{ p.f }}" stroke="{{ p.s }}" stroke-width="{{ p.w }}" stroke-linecap="round" stroke-linejoin="round" opacity="{{ p.o }}" transform="{{ p.t }}" filter="url(#ao-wob)"></path></svg>
+          </sc-for>
+        </div>
+        <div style="font-size:20px;font-weight:600">{{ r.name }}</div>
+        <div style="font-size:14px;color:#5c4f66;text-align:center;line-height:1.35">{{ r.note }}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display:flex;gap:28px;flex:1;min-height:0">
+    <div style="flex:1.35;display:flex;flex-direction:column;gap:12px;padding:16px 18px;background:#fff7e6;border:3px solid #2b2233;border-radius:18px 8px 20px 10px/10px 20px 8px 18px">
+      <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px;font-weight:600">Option B · amulets</span><span style="font-size:14px;color:#5c4f66">Same runes, set in bronze on a cord.</span></div>
+      <div style="display:flex;gap:18px;align-items:center;justify-content:space-between">
+        <sc-for list="{{ amulets }}" as="r" hint-placeholder-count="5">
+          <div style="position:relative;width:{{ r.ic.size }}px;height:{{ r.ic.size }}px;transform:rotate({{ r.ic.rot }}deg);filter:drop-shadow(2px 3px 0 rgba(43,34,51,.16))">
+            <sc-for list="{{ r.ic.shapes }}" as="p" hint-placeholder-count="6">
+              <svg viewBox="0 0 100 100" width="{{ r.ic.size }}" height="{{ r.ic.size }}" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><path d="{{ p.d }}" fill="{{ p.f }}" stroke="{{ p.s }}" stroke-width="{{ p.w }}" stroke-linecap="round" stroke-linejoin="round" opacity="{{ p.o }}" transform="{{ p.t }}" filter="url(#ao-wob)"></path></svg>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="flex:1;display:flex;flex-direction:column;gap:12px;padding:16px 18px;background:#fff7e6;border:3px solid #2b2233;border-radius:10px 20px 8px 18px/18px 8px 20px 10px">
+      <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px;font-weight:600">At table size</span><span style="font-size:14px;color:#5c4f66">On a map hex, and in a player's row.</span></div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <sc-for list="{{ small }}" as="r" hint-placeholder-count="5">
+          <div style="position:relative;width:64px;height:56px;flex:none">
+            <div style="position:absolute;inset:0;background:#2b2233;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%)"></div>
+            <div style="position:absolute;inset:2.5px;background:#bfe39a;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%)"></div>
+            <div style="position:absolute;left:10px;top:6px;width:44px;height:44px">
+              <sc-for list="{{ r.ic.shapes }}" as="p" hint-placeholder-count="6">
+                <svg viewBox="0 0 100 100" width="44" height="44" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><path d="{{ p.d }}" fill="{{ p.f }}" stroke="{{ p.s }}" stroke-width="{{ p.w }}" stroke-linecap="round" stroke-linejoin="round" opacity="{{ p.o }}" transform="{{ p.t }}" filter="url(#ao-wob)"></path></svg>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:12px;background:#fbf3e0;border:2px solid #2b2233;align-self:flex-start">
+        <span style="width:14px;height:14px;border-radius:50%;background:#e8483d;border:2px solid #2b2233"></span>
+        <span style="font-size:15px;font-weight:600">You hold</span>
+        <sc-for list="{{ tiny }}" as="r" hint-placeholder-count="3">
+          <div style="position:relative;width:26px;height:26px">
+            <sc-for list="{{ r.ic.shapes }}" as="p" hint-placeholder-count="6">
+              <svg viewBox="0 0 100 100" width="26" height="26" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><path d="{{ p.d }}" fill="{{ p.f }}" stroke="{{ p.s }}" stroke-width="{{ p.w }}" stroke-linecap="round" stroke-linejoin="round" opacity="{{ p.o }}" transform="{{ p.t }}"></path></svg>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"wobble":{"editor":"range","min":0,"max":6,"step":0.5,"default":2.5,"section":"Hand-drawn feel"},"$preview":{"width":1280,"height":700}}'>
+// ---------- hand-drawn icon kit (100×100 boxes, ink outlines, wobbled by #ao-wob) ----------
+const INK = '#2b2233';
+function C(x, y, r){ return 'M' + (x - r) + ' ' + y + 'a' + r + ' ' + r + ' 0 1 0 ' + (2 * r) + ' 0a' + r + ' ' + r + ' 0 1 0 ' + (-2 * r) + ' 0Z'; }
+function SPARK(x, y, r){ const q = r * 0.3; return 'M' + x + ' ' + (y - r) + 'L' + (x + q) + ' ' + (y - q) + 'L' + (x + r) + ' ' + y + 'L' + (x + q) + ' ' + (y + q) + 'L' + x + ' ' + (y + r) + 'L' + (x - q) + ' ' + (y + q) + 'L' + (x - r) + ' ' + y + 'L' + (x - q) + ' ' + (y - q) + 'Z'; }
+const GLYPH = {
+  hearts:'M50 73L29 50L37 35L50 46L63 35L71 50Z',
+  spades:'M50 76V28M33 45L50 28L67 45M41 76H59',
+  diamonds:'M50 26L68 50L50 74L32 50ZM32 50L22 40M68 50L78 60',
+  clubs:'M50 77V26M50 50L33 33M50 50L67 33',
+  star:'M50 24V76M28 37L72 63M72 37L28 63'
+};
+const GLOW = {hearts:'#ff5d8f', spades:'#2ec4b6', diamonds:'#ffb627', clubs:'#6bd35a', star:'#c89bff'};
+const RUNENAME = {hearts:'Heart rune', spades:'Spade rune', diamonds:'Diamond rune', clubs:'Club rune', star:'Star rune'};
+const NOTE = {hearts:'A heart cut from six straight strokes. Pink glow.', spades:'An arrow pointing up, on a little base. Teal glow.', diamonds:'A diamond with two tails. Amber glow.', clubs:'Three branches, like a three-leaf sprig. Green glow.', star:'Three crossing strokes, on a dark stone that sparkles.'};
+function runeStone(k){
+  const star = k === 'star', g = GLYPH[k], c = GLOW[k];
+  const s = [
+    ['M20 22C30 9 70 7 83 20C93 35 91 70 81 84C67 95 33 95 19 84C7 70 8 36 20 22Z', star ? '#6b5f93' : '#aaa2c2'],
+    ['M79 31l-6 4M24 75l6-2M70 84l-3-5', 'none', 3],
+    ['M27 25Q40 15 57 15', 'none', 3.5, '#ffffff', star ? 0.45 : 0.8],
+    [g, 'none', 17, c, 0.35],
+    [g, 'none', 10, INK],
+    [g, 'none', 5, c]
+  ];
+  if (star){ s.push([SPARK(90, 9, 8), '#ffe45e', 2.5]); s.push([SPARK(8, 88, 6), '#ffe45e', 2]); s.push([SPARK(92, 66, 4.5), '#ffe45e', 2]); }
+  return s;
+}
+function runeAmulet(k){
+  const g = GLYPH[k], c = GLOW[k], t = 'translate(50 56) scale(.78) translate(-50 -50)';
+  return [
+    ['M40 14Q50 -2 60 14', 'none', 4.5, '#8a6a3a'],
+    [C(50, 56, 38), '#e0a54a'],
+    [C(50, 56, 29), k === 'star' ? '#3d3456' : '#5a4e7a', 3],
+    ['M24 36Q32 24 46 20', 'none', 3.5, '#ffffff', 0.8],
+    [g, 'none', 16, c, 0.4, t],
+    [g, 'none', 6, c, 1, t]
+  ];
+}
+function shapesOf(list){ return list.map((p)=> ({d:p[0], f:p[1], w:p[2] === undefined ? 4 : p[2], s:p[3] || INK, o:p[4] === undefined ? 1 : p[4], t:p[5] || 'translate(0 0)'})); }
+
+const ORDER = ['hearts','spades','diamonds','clubs','star'];
+const TILT = [-4, 3, -2, 4, -3];
+class Component extends DCLogic {
+  renderVals(){
+    return {
+      wobble:this.props.wobble ?? 2.5,
+      stones:ORDER.map((k, i)=> ({name:RUNENAME[k], note:NOTE[k], ic:{size:150, rot:TILT[i], shapes:shapesOf(runeStone(k))}})),
+      amulets:ORDER.map((k, i)=> ({ic:{size:92, rot:-TILT[i], shapes:shapesOf(runeAmulet(k))}})),
+      small:ORDER.map((k)=> ({ic:{shapes:shapesOf(runeStone(k))}})),
+      tiny:['diamonds','clubs','star'].map((k)=> ({ic:{shapes:shapesOf(runeStone(k))}}))
+    };
+  }
+}
+</script>
+</body>
+</html>

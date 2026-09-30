@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>End of game scoring</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#2b2233}a:hover{color:#e0762b}
+</style>
+</helmet>
+<div style="{{ rootStyle }}" data-screen-label="End of game scoring">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:20px">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="display:flex;align-items:flex-end">
+        <dc-import name="AO-Icon" icon="fighter" size="84" tint="#e8483d" rot="-4" hint-size="84px,84px"></dc-import>
+        <dc-import name="AO-Icon" icon="quest" size="56" hint-size="56px,56px"></dc-import>
+        <dc-import name="AO-Icon" icon="wizard" size="84" tint="#3d8bfd" rot="4" hint-size="84px,84px"></dc-import>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <div style="font-size:15px;font-weight:600;color:var(--muted)">Adventurer Olympics · round 10 of 10</div>
+        <div style="font-size:38px;font-weight:700;line-height:1.05">You and Blue share the victory!</div>
+        <div style="font-size:16px;color:var(--muted);line-height:1.45;max-width:640px">The last tile went down in round 9. That round finished, one more was played, and then the end-of-game quests were scored.</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;flex:none">
+      <div style="height:46px;padding:0 20px;border-radius:12px;border:3px solid #2b2233;background:#ff8a3d;color:#2b2233;font-size:17px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow)">Play again</div>
+      <div style="display:flex;gap:8px">
+        <div style="height:38px;padding:0 12px;border-radius:11px;border:2.5px solid var(--line);background:var(--surface);font-size:14px;font-weight:600;display:flex;align-items:center">See the full log</div>
+        <div style="height:38px;padding:0 12px;border-radius:11px;border:2.5px solid var(--line);background:var(--surface);font-size:14px;font-weight:600;display:flex;align-items:center">Back to the game page</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:22px;flex:1;min-height:0">
+    <div style="width:400px;flex:none;display:flex;flex-direction:column;gap:9px">
+      <div style="font-size:15px;font-weight:700;color:var(--muted)">Quest points</div>
+      <sc-for list="{{ standings }}" as="p" hint-placeholder-count="4">
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 14px 6px 6px;border-radius:16px 10px 18px 12px/12px 18px 10px 16px;background:{{ p.bg }};border:{{ p.border }};box-shadow:var(--shadow)">
+          <dc-import name="AO-Icon" icon="{{ p.icon }}" size="62" tint="{{ p.color }}" hint-size="62px,62px"></dc-import>
+          <div style="flex:1;display:flex;flex-direction:column;gap:4px">
+            <div style="display:flex;align-items:baseline;gap:6px"><span style="font-size:13px;font-weight:600;color:{{ p.sub }}">{{ p.place }}</span><span style="font-size:18px;font-weight:700;color:{{ p.fg }}">{{ p.name }}</span></div>
+            <div style="display:flex;flex-wrap:wrap;gap:4px">
+              <sc-for list="{{ p.quests }}" as="q" hint-placeholder-count="2">
+                <span style="font-size:12px;font-weight:600;padding:1px 8px;border-radius:999px;background:#fff7e6;color:#2b2233;border:1.5px solid #2b2233">{{ q }}</span>
+              </sc-for>
+              <sc-if value="{{ p.none }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;color:{{ p.sub }}">No quests this time</span></sc-if>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:2px;font-size:34px;font-weight:700;color:{{ p.fg }}"><dc-import name="AO-Icon" icon="quest" size="{{ p.medal }}" hint-size="32px,32px"></dc-import>{{ p.qp }}</div>
+        </div>
+      </sc-for>
+      <div style="margin-top:auto;font-size:14px;color:var(--muted);line-height:1.45">Players who tie for the most points share the victory. There is no tiebreak.</div>
+    </div>
+
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:15px;font-weight:700;color:var(--muted)">The 5 quests in play</div>
+      <sc-for list="{{ quests }}" as="q" hint-placeholder-count="5">
+        <div style="display:flex;align-items:center;gap:12px;padding:6px 14px 6px 6px;border-radius:14px 9px 16px 10px/10px 16px 9px 14px;background:var(--surface);border:2.5px solid var(--line);opacity:{{ q.op }}">
+          <div style="flex:none;width:52px;height:66px;box-sizing:border-box;border-radius:9px;background:{{ q.cardBg }};border:2.5px solid #2b2233;display:flex;align-items:center;justify-content:center"><dc-import name="AO-Icon" icon="quest" size="44" hint-size="44px,44px"></dc-import></div>
+          <div style="width:210px;flex:none;display:flex;flex-direction:column;gap:2px">
+            <div style="font-size:17px;font-weight:700">{{ q.name }}</div>
+            <div style="font-size:13px;color:var(--muted)">{{ q.kind }}</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:3px">
+            <sc-for list="{{ q.bars }}" as="b" hint-placeholder-count="4">
+              <div style="display:flex;align-items:center;gap:8px;height:13px">
+                <span style="width:54px;font-size:12px;font-weight:600;color:var(--muted)">{{ b.name }}</span>
+                <span style="height:10px;width:{{ b.w }}px;box-sizing:border-box;border-radius:6px;background:{{ b.color }};border:1.5px solid #2b2233"></span>
+                <span style="font-size:13px;font-weight:700">{{ b.v }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="flex:none;width:200px;display:flex;align-items:center;gap:8px;justify-content:flex-end">
+            <sc-if value="{{ q.hasWinner }}" hint-placeholder-val="{{ true }}"><dc-import name="AO-Icon" icon="{{ q.winIcon }}" size="40" tint="{{ q.dot }}" hint-size="40px,40px"></dc-import></sc-if>
+            <span style="font-size:15px;font-weight:700;text-align:right">{{ q.result }}</span>
+          </div>
+        </div>
+      </sc-for>
+      <div style="font-size:14px;color:var(--muted);line-height:1.45">Motion: the three end-of-game medals are awarded one at a time, like an AI move, each flying to its winner. A tied medal lifts, shows the tie, and slides back to the box.</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1280,"height":760}}'>
+const THEMES = {
+  light:{'--bg':'#fbf3e0','--surface':'#fff7e6','--surface2':'#f3e6c8','--text':'#2b2233','--muted':'#5c4f66','--line':'#2b2233','--youbg':'#ffe0cc','--shadow':'3px 4px 0 rgba(43,34,51,.16)'},
+  dark:{'--bg':'#221c2a','--surface':'#2e2638','--surface2':'#3a3046','--text':'#fbf3e0','--muted':'#c9bcd6','--line':'#0f0b14','--youbg':'#ffe0cc','--shadow':'3px 4px 0 rgba(0,0,0,.4)'}
+};
+const PC = {red:'#e8483d', blue:'#3d8bfd', yellow:'#ffc83d', purple:'#9b5de5'};
+const ARCH = {red:'fighter', blue:'wizard', yellow:'ranger', purple:'rogue'};
+const NAME = {red:'You', blue:'Blue', yellow:'Yellow', purple:'Purple'};
+const ARCHNAME = {fighter:'Fighter', wizard:'Wizard', ranger:'Ranger', rogue:'Rogue'};
+class Component extends DCLogic {
+  renderVals(){
+    const th = this.props.theme || 'light';
+    const rootStyle = Object.assign({}, THEMES[th], {width:'1280px', height:'760px', boxSizing:'border-box', padding:'26px 32px', display:'flex', flexDirection:'column', gap:'20px', background:'var(--bg)', color:'var(--text)', fontFamily:"'Fredoka',sans-serif", borderRadius:'12px', overflow:'hidden'});
+    const Q = [
+      {name:'Recruit 2 companions', end:false, winner:'red', when:'round 5', counts:{red:3, blue:2, yellow:1, purple:2}},
+      {name:'Explore 3 tiles', end:false, winner:'blue', when:'round 8', counts:{red:2, blue:3, yellow:2, purple:2}},
+      {name:'Complete 2 dungeons', end:false, winner:'blue', when:'round 9', counts:{red:1, blue:2, yellow:1, purple:0}},
+      {name:'Most Little Monsters', end:true, counts:{red:4, blue:1, yellow:3, purple:2}},
+      {name:'Most runes', end:true, counts:{red:2, blue:2, yellow:1, purple:0}}
+    ];
+    const order = ['red','blue','yellow','purple'];
+    const qp = {red:0, blue:0, yellow:0, purple:0}, won = {red:[], blue:[], yellow:[], purple:[]};
+    const quests = Q.map((q)=>{
+      let winner = q.winner || null, best = 0;
+      if (q.end){
+        best = Math.max.apply(null, order.map((c)=> q.counts[c]));
+        const top = order.filter((c)=> q.counts[c] === best);
+        if (top.length === 1) winner = top[0];
+      }
+      if (winner){ qp[winner] += 1; won[winner].push(q.name); }
+      const max = Math.max.apply(null, order.map((c)=> q.counts[c])) || 1;
+      return {
+        name:q.name, kind:q.end ? 'End of game · strictly the most' : 'First to do it · ' + q.when,
+        cardBg:q.end ? '#c3a6ee' : '#9fd0f5', op:winner ? 1 : 0.6,
+        bars:order.map((c)=> ({name:NAME[c], v:q.counts[c], w:Math.max(8, Math.round(q.counts[c] / max * 150)), color:PC[c]})),
+        hasWinner:!!winner, winIcon:winner ? ARCH[winner] : 'fighter', dot:winner ? PC[winner] : '#e8483d',
+        result:winner ? (NAME[winner] + ' scores 1') : ('Tied at ' + best + '. No one scores.')
+      };
+    });
+    const ranked = order.slice().sort((a, b)=> qp[b] - qp[a]);
+    let place = 0, prev = -1;
+    const standings = ranked.map((c, i)=>{
+      if (qp[c] !== prev){ place = i + 1; prev = qp[c]; }
+      const top = qp[c] === qp[ranked[0]], you = c === 'red';
+      return {place:['1st','2nd','3rd','4th'][place - 1], name:NAME[c] + ' · ' + ARCHNAME[ARCH[c]] + (you ? '' : ' (AI)'), icon:ARCH[c], color:PC[c], qp:qp[c], quests:won[c], none:won[c].length === 0,
+        bg:you ? 'var(--youbg)' : 'var(--surface)', fg:you ? '#2b2233' : 'var(--text)', sub:you ? '#5c4f66' : 'var(--muted)',
+        border:top ? '3px solid #ff8a3d' : '2.5px solid var(--line)', medal:top ? 34 : 24};
+    });
+    return {rootStyle:rootStyle, quests:quests, standings:standings};
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>A Dungeon, and drawing again</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#2b2233}a:hover{color:#e0762b}
+</style>
+</helmet>
+<div style="{{ rootStyle }}" data-screen-label="A Dungeon, and drawing again">
+  <div style="display:flex;align-items:center;gap:14px">
+    <dc-import name="AO-Icon" icon="dungeon" size="60" hint-size="60px,60px"></dc-import>
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <div style="font-size:32px;font-weight:700;line-height:1.05">A Dungeon, and drawing again</div>
+      <div style="font-size:16px;color:var(--muted);max-width:1000px;line-height:1.45">The Dungeon panel keeps every card it drew in a row, left to right, so the chain reads like a story. A card that gives nothing slides under the Dungeon deck, and the next one comes when the player presses Draw.</div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:10px;align-items:stretch;height:366px">
+
+    <div style="flex:1;min-width:0;background:var(--surface);border:3px solid var(--line);border-radius:18px 12px 20px 14px/14px 20px 12px 18px;box-shadow:var(--shadow);padding:12px;display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:15px;font-weight:700;color:var(--muted)">1 · Draw</div>
+      <div style="width:112px;height:158px;box-sizing:border-box;border-radius:12px 8px 13px 9px/9px 13px 8px 12px;background:#fff7e6;border:3px solid #2b2233;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;color:#2b2233;align-self:center">
+        <div style="height:26px;flex:none;background:#9d8fc2;border-bottom:2.5px solid #2b2233;display:flex;align-items:center;padding:0 7px"><span style="font-size:12px;font-weight:600">Dungeon</span></div>
+        <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:0;background:#efeaf6">
+          <dc-import name="AO-Icon" icon="hearts" size="36" rot="-8" hint-size="36px,36px"></dc-import>
+          <dc-import name="AO-Icon" icon="spades" size="36" hint-size="36px,36px"></dc-import>
+          <dc-import name="AO-Icon" icon="clubs" size="36" rot="8" hint-size="36px,36px"></dc-import>
+        </div>
+        <div style="padding:4px 4px 7px;text-align:center;font-size:14px;font-weight:700;border-top:2px solid rgba(43,34,51,.12)">Any rune</div>
+      </div>
+      <div style="font-size:15px;line-height:1.4">Take one suit rune from the supply or from another player. You may say no.</div>
+    </div>
+
+    <div style="flex:none;display:flex;align-items:center"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="var(--text)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+
+    <div style="flex:1.55;min-width:0;background:var(--surface);border:3px solid #ff8a3d;border-radius:12px 20px 14px 18px/18px 14px 20px 12px;box-shadow:var(--shadow);padding:12px;display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:15px;font-weight:700;color:var(--muted)">2 · Your choice</div>
+      <div style="display:flex;flex-direction:column;gap:5px">
+        <sc-for list="{{ choices }}" as="c" hint-placeholder-count="5">
+          <div style="display:flex;align-items:center;gap:8px;height:42px;padding:0 10px 0 4px;border-radius:11px;border:2px solid var(--line);background:{{ c.bg }};opacity:{{ c.op }}">
+            <dc-import name="AO-Icon" icon="{{ c.icon }}" size="36" hint-size="36px,36px"></dc-import>
+            <span style="font-size:15px;font-weight:700;color:{{ c.fg }}">{{ c.name }}</span>
+            <span style="margin-left:auto;display:flex;align-items:center;gap:5px;font-size:13px;color:{{ c.sub }}"><span style="width:10px;height:10px;border-radius:50%;background:{{ c.dot }};border:{{ c.dotBorder }}"></span>{{ c.from }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="margin-top:auto;display:flex;gap:6px">
+        <div style="flex:1;height:38px;border-radius:11px;border:3px solid #2b2233;background:#ff8a3d;color:#2b2233;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow)">Take Hearts from Blue</div>
+        <div style="flex:1;height:38px;border-radius:11px;border:2.5px solid var(--line);box-sizing:border-box;background:var(--surface);color:var(--text);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center">No thanks, draw again</div>
+      </div>
+    </div>
+
+    <div style="flex:none;display:flex;align-items:center"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="var(--text)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+
+    <div style="flex:1;min-width:0;background:var(--surface);border:3px solid var(--line);border-radius:20px 12px 18px 14px/12px 18px 14px 20px;box-shadow:var(--shadow);padding:12px;display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:15px;font-weight:700;color:var(--muted)">3 · Draw again</div>
+      <div style="position:relative;height:158px;align-self:center;width:136px">
+        <div style="position:absolute;left:0;top:18px;width:62px;height:88px;border-radius:9px;background:#9d8fc2;border:2.5px solid #2b2233;opacity:.5;transform:rotate(-8deg)"></div>
+        <div style="position:absolute;left:-4px;top:114px;font-size:12px;font-weight:600;color:var(--muted);width:70px;text-align:center">to the bottom</div>
+        <div style="position:absolute;left:26px;top:0;width:112px;height:158px;box-sizing:border-box;border-radius:12px 8px 13px 9px/9px 13px 8px 12px;background:#fff7e6;border:3px solid #2b2233;box-shadow:var(--shadowlg);overflow:hidden;display:flex;flex-direction:column;color:#2b2233">
+          <div style="height:26px;flex:none;background:#9d8fc2;border-bottom:2.5px solid #2b2233;display:flex;align-items:center;padding:0 7px"><span style="font-size:12px;font-weight:600">Dungeon</span></div>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;background:#eef6e4">
+            <dc-import name="AO-Icon" icon="little" size="44" rot="-8" hint-size="44px,44px"></dc-import>
+            <dc-import name="AO-Icon" icon="little" size="44" rot="8" hint-size="44px,44px"></dc-import>
+          </div>
+          <div style="padding:4px 4px 7px;text-align:center;font-size:13px;font-weight:700;border-top:2px solid rgba(43,34,51,.12)">2 Little Monsters</div>
+        </div>
+      </div>
+      <div style="font-size:15px;line-height:1.4">Fight two, one at a time. Lose the first and there is no second fight.</div>
+    </div>
+
+    <div style="flex:none;display:flex;align-items:center"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="var(--text)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+
+    <sc-for list="{{ fights }}" as="f" hint-placeholder-count="2">
+      <div style="flex:1;min-width:0;background:var(--surface);border:3px solid var(--line);border-radius:{{ f.radius }};box-shadow:var(--shadow);padding:12px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:15px;font-weight:700;color:var(--muted)">{{ f.label }}</div>
+        <div style="width:112px;height:158px;box-sizing:border-box;border-radius:12px 8px 13px 9px/9px 13px 8px 12px;background:#fff7e6;border:3px solid #2b2233;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;color:#2b2233;align-self:center">
+          <div style="height:26px;flex:none;background:#8fd14f;border-bottom:2.5px solid #2b2233;display:flex;align-items:center;justify-content:space-between;padding:0 4px 0 7px"><span style="font-size:11px;font-weight:600">Little Monster</span><span style="width:28px;height:28px;box-sizing:border-box;border-radius:50%;background:#ffd95e;border:2.5px solid #2b2233;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;margin-top:14px">{{ f.need }}</span></div>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;background:#eef6e4"><dc-import name="AO-Icon" icon="{{ f.art }}" size="76" hint-size="76px,76px"></dc-import></div>
+          <div style="padding:4px 4px 7px;text-align:center;font-size:14px;font-weight:700;border-top:2px solid rgba(43,34,51,.12)">{{ f.name }}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;justify-content:center">
+          <sc-for list="{{ f.dice }}" as="die" hint-placeholder-count="2">
+            <div style="width:34px;height:34px;box-sizing:border-box;padding:4px;border-radius:9px;background:#ffffff;border:2.5px solid #2b2233;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px">
+              <sc-for list="{{ die.cells }}" as="cell" hint-placeholder-count="9"><span style="display:flex;align-items:center;justify-content:center"><span style="width:6px;height:6px;border-radius:50%;background:{{ cell.bg }}"></span></span></sc-for>
+            </div>
+          </sc-for>
+          <span style="font-size:22px;font-weight:700;color:{{ f.color }}">= {{ f.total }}</span>
+        </div>
+        <div style="font-size:14px;line-height:1.35">{{ f.text }}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <div style="font-size:15px;font-weight:700;color:var(--muted)">A Dungeon card gives you nothing, and you draw again, when…</div>
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px">
+      <sc-for list="{{ nothing }}" as="n" hint-placeholder-count="4">
+        <div style="background:var(--surface2);border:2px solid var(--line);border-radius:12px 8px 13px 9px/9px 13px 8px 12px;padding:10px 12px;display:flex;flex-direction:column;gap:3px">
+          <div style="font-size:15px;font-weight:700">{{ n.t }}</div>
+          <div style="font-size:13px;line-height:1.4;color:var(--muted)">{{ n.d }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1280,"height":640}}'>
+const THEMES = {
+  light:{'--bg':'#fbf3e0','--surface':'#fff7e6','--surface2':'#f3e6c8','--text':'#2b2233','--muted':'#5c4f66','--line':'#2b2233','--soft':'rgba(43,34,51,.2)','--good':'#3f8a22','--shadow':'3px 4px 0 rgba(43,34,51,.16)','--shadowlg':'5px 7px 0 rgba(43,34,51,.2)'},
+  dark:{'--bg':'#221c2a','--surface':'#2e2638','--surface2':'#3a3046','--text':'#fbf3e0','--muted':'#c9bcd6','--line':'#0f0b14','--soft':'rgba(251,243,224,.22)','--good':'#8fd14f','--shadow':'3px 4px 0 rgba(0,0,0,.4)','--shadowlg':'5px 7px 0 rgba(0,0,0,.45)'}
+};
+const PC = {red:'#e8483d', blue:'#3d8bfd', yellow:'#ffc83d', purple:'#9b5de5'};
+const PIPS = {1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
+class Component extends DCLogic {
+  renderVals(){
+    const th = this.props.theme || 'light';
+    const rootStyle = Object.assign({}, THEMES[th], {width:'1280px', height:'640px', boxSizing:'border-box', padding:'24px 32px', display:'flex', flexDirection:'column', gap:'16px', background:'var(--bg)', color:'var(--text)', fontFamily:"'Fredoka',sans-serif", borderRadius:'12px', overflow:'hidden'});
+    const ch = (icon, name, from, dot, pick, off)=> ({icon:icon, name:name, from:from, dot:dot || 'transparent', dotBorder:dot ? '2px solid #2b2233' : '0', bg:pick ? '#fff3b0' : 'var(--surface)', fg:pick ? '#2b2233' : 'var(--text)', sub:pick ? '#5c4f66' : 'var(--muted)', op:off ? 0.45 : 1});
+    const choices = [
+      ch('hearts', 'Heart rune', 'from Blue', PC.blue, true, false),
+      ch('clubs', 'Club rune', 'from Yellow', PC.yellow, false, false),
+      ch('spades', 'Spade rune', 'free in the supply', null, false, false),
+      ch('diamonds', 'Diamond rune', 'you already have it', PC.red, false, true),
+      ch('star', 'Star rune', 'only from its own hex', null, false, true)
+    ];
+    const die = (n)=> ({cells:[0,1,2,3,4,5,6,7,8].map((i)=> ({bg:PIPS[n].indexOf(i) >= 0 ? '#2b2233' : 'transparent'}))});
+    const fights = [
+      {label:'4 · First fight', radius:'14px 18px 12px 20px/20px 12px 18px 14px', need:3, art:'goblin', name:'Goblin', dice:[die(4), die(1)], total:5, color:'var(--good)', text:'Strength 2: 4 + 1 = 5. You win! Keep the Goblin, whatever happens next.'},
+      {label:'5 · Second fight', radius:'18px 12px 20px 14px/14px 20px 12px 18px', need:4, art:'skeleton', name:'Skeleton', dice:[die(1), die(2)], total:3, color:'var(--muted)', text:'1 + 2 = 3. Not enough. The Dungeon stays open; stay and try again next turn.'}
+    ];
+    const nothing = [
+      {t:'Any rune', d:'You say no, or you already hold all four suit runes.'},
+      {t:'Map', d:'There are no tiles left.'},
+      {t:'Little or Big Monster', d:'That monster deck has run out.'},
+      {t:'2 Little Monsters', d:'The deck is empty before the first fight, or runs out after you win it. Keep what you beat.'}
+    ];
+    return {rootStyle:rootStyle, choices:choices, fights:fights, nothing:nothing};
+  }
+}
+</script>
+</body>
+</html>

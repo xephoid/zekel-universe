@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The new style on a tile and cards</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#2b2233}a:hover{color:#e0762b}
+</style>
+</helmet>
+<div style="width:1280px;height:640px;box-sizing:border-box;padding:36px 40px;display:flex;gap:32px;background:#fbf3e0;color:#2b2233;font-family:'Fredoka',sans-serif;border-radius:12px;overflow:hidden;position:relative" data-screen-label="The new style on a tile and cards">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+    <filter id="ao-wob" filterUnits="userSpaceOnUse" x="-20" y="-20" width="140" height="140"><feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="7"></feTurbulence><feDisplacementMap in="SourceGraphic" scale="{{ wobble }}"></feDisplacementMap></filter>
+    <filter id="ao-wob-tile" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="4"></feTurbulence><feDisplacementMap in="SourceGraphic" scale="{{ tileWobble }}"></feDisplacementMap></filter>
+  </defs></svg>
+
+  <!-- the tile -->
+  <div style="width:460px;flex:none;display:flex;flex-direction:column;gap:8px">
+    <div style="font-size:30px;font-weight:700;line-height:1.1">On a map tile</div>
+    <div style="font-size:15px;color:#5c4f66;line-height:1.4">Tile 3 at table size. Red finished the Heart rune (coin on it). Red's Fighter is standing on the south hex.</div>
+    <div style="position:relative;width:440px;height:440px;margin-top:4px">
+      <svg viewBox="0 0 440 440" width="440" height="440" style="position:absolute;left:0;top:0" aria-hidden="true">
+        <path d="{{ tile.shadow }}" fill="rgba(43,34,51,.14)" transform="translate(6 8)"></path>
+        <path d="{{ tile.outer }}" fill="#bfe39a" stroke="#2b2233" stroke-width="3" stroke-linejoin="round" filter="url(#ao-wob-tile)"></path>
+        <path d="{{ tile.centre }}" fill="#d5edb2" stroke="#2b2233" stroke-width="3" stroke-linejoin="round" filter="url(#ao-wob-tile)"></path>
+        <path d="{{ tile.tufts }}" fill="none" stroke="#6fa845" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+      <sc-for list="{{ tile.icons }}" as="m" hint-placeholder-count="3">
+        <div style="position:absolute;left:{{ m.x }}px;top:{{ m.y }}px;width:58px;height:58px;opacity:{{ m.op }};transform:rotate({{ m.rot }}deg);filter:drop-shadow(2px 3px 0 rgba(43,34,51,.18))">
+          <sc-for list="{{ m.shapes }}" as="p" hint-placeholder-count="8">
+            <svg viewBox="0 0 100 100" width="58" height="58" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><path d="{{ p.d }}" fill="{{ p.f }}" stroke="{{ p.s }}" stroke-width="{{ p.w }}" stroke-linecap="round" stroke-linejoin="round" opacity="{{ p.o }}" transform="{{ p.t }}" filter="url(#ao-wob)"></path></svg>
+          </sc-for>
+        </div>
+      </sc-for>
+      <div style="position:absolute;left:{{ tile.coin.x }}px;top:{{ tile.coin.y }}px;width:30px;height:30px;filter:drop-shadow(1px 2px 0 rgba(43,34,51,.25))">
+        <sc-for list="{{ coin }}" as="p" hint-placeholder-count="4">
+          <svg viewBox="0 0 100 100" width="30" height="30" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><path d="{{ p.d }}" fill="{{ p.f }}" stroke="{{ p.s }}" stroke-width="{{ p.w }}" stroke-linecap="round" stroke-linejoin="round" opacity="{{ p.o }}" transform="{{ p.t }}" filter="url(#ao-wob)"></path></svg>
+        </sc-for>
+      </div>
+      <div style="position:absolute;left:{{ tile.pawn.x }}px;top:{{ tile.pawn.y }}px;width:66px;height:66px;filter:drop-shadow(2px 3px 0 rgba(43,34,51,.18))">
+        <sc-for list="{{ pawn }}" as="p" hint-placeholder-count="9">
+          <svg viewBox="0 0 100 100" width="66" height="66" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><path d="{{ p.d }}" fill="{{ p.f }}" stroke="{{ p.s }}" stroke-width="{{ p.w }}" stroke-linecap="round" stroke-linejoin="round" opacity="{{ p.o }}" transform="{{ p.t }}" filter="url(#ao-wob)"></path></svg>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <!-- cards, palette, type -->
+  <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:18px">
+    <div style="font-size:30px;font-weight:700;line-height:1.1">On cards</div>
+    <div style="display:flex;gap:22px;align-items:flex-start;padding-top:4px">
+      <sc-for list="{{ cards }}" as="c" hint-placeholder-count="3">
+        <div style="width:160px;height:224px;box-sizing:border-box;background:#fff7e6;border:3px solid #2b2233;border-radius:16px 10px 18px 12px/12px 18px 10px 16px;overflow:hidden;display:flex;flex-direction:column;transform:rotate({{ c.rot }}deg);box-shadow:4px 5px 0 rgba(43,34,51,.16)">
+          <div style="height:40px;flex:none;background:{{ c.band }};border-bottom:3px solid #2b2233;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 12px">
+            <span style="font-size:15px;font-weight:600;color:{{ c.bandText }}">{{ c.kind }}</span>
+            <sc-if value="{{ c.hasNum }}" hint-placeholder-val="{{ true }}">
+              <span style="width:34px;height:34px;box-sizing:border-box;border-radius:50%;background:#ffd95e;border:3px solid #2b2233;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:700;margin-top:18px">{{ c.num }}</span>
+            </sc-if>
+          </div>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center">
+            <div style="position:relative;width:96px;height:96px">
+              <sc-for list="{{ c.shapes }}" as="p" hint-placeholder-count="8">
+                <svg viewBox="0 0 100 100" width="96" height="96" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><path d="{{ p.d }}" fill="{{ p.f }}" stroke="{{ p.s }}" stroke-width="{{ p.w }}" stroke-linecap="round" stroke-linejoin="round" opacity="{{ p.o }}" transform="{{ p.t }}" filter="url(#ao-wob)"></path></svg>
+              </sc-for>
+            </div>
+          </div>
+          <div style="padding:0 10px 12px;display:flex;flex-direction:column;align-items:center;gap:6px">
+            <div style="font-size:16px;font-weight:600">{{ c.name }}</div>
+            <sc-if value="{{ c.hasChip }}" hint-placeholder-val="{{ false }}">
+              <span style="display:inline-flex;align-items:center;gap:4px;padding:2px 10px 2px 4px;border-radius:999px;background:#fbf3e0;border:2px solid #2b2233;font-size:15px;font-weight:700">
+                <span style="position:relative;width:20px;height:20px">
+                  <sc-for list="{{ chaMini }}" as="p" hint-placeholder-count="8">
+                    <svg viewBox="0 0 100 100" width="20" height="20" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><path d="{{ p.d }}" fill="{{ p.f }}" stroke="{{ p.s }}" stroke-width="{{ p.w }}" stroke-linecap="round" stroke-linejoin="round" opacity="{{ p.o }}" transform="{{ p.t }}"></path></svg>
+                  </sc-for>
+                </span>+3 Charisma
+              </span>
+            </sc-if>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="display:flex;gap:18px;margin-top:auto">
+      <div style="flex:1.3;display:flex;flex-direction:column;gap:10px;padding:14px 16px;background:#fff7e6;border:3px solid #2b2233;border-radius:18px 8px 20px 10px/10px 20px 8px 18px">
+        <div style="font-size:18px;font-weight:600">Colours</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <sc-for list="{{ swatches }}" as="s" hint-placeholder-count="8">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;width:62px">
+              <span style="width:40px;height:40px;background:{{ s.hex }};border:3px solid #2b2233;border-radius:{{ s.r }}"></span>
+              <span style="font-size:12px;font-weight:500;text-align:center;line-height:1.2">{{ s.name }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:6px;padding:14px 16px;background:#fff7e6;border:3px solid #2b2233;border-radius:10px 20px 8px 18px/18px 8px 20px 10px">
+        <div style="font-size:18px;font-weight:600">Letters</div>
+        <div style="font-size:28px;font-weight:700;line-height:1.1">Fredoka · 1 2 3 4 5 6</div>
+        <div style="font-size:14px;color:#5c4f66;line-height:1.4">Round, friendly and easy for new readers. Used for everything a player reads in this game; the Zekel frame around the table keeps its own fonts.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"wobble":{"editor":"range","min":0,"max":6,"step":0.5,"default":2.5,"section":"Hand-drawn feel"},"tileWobble":{"editor":"range","min":0,"max":10,"step":0.5,"default":5,"section":"Hand-drawn feel"},"$preview":{"width":1280,"height":640}}'>
+// ---------- hand-drawn icon kit (100×100 boxes, ink outlines, wobbled by #ao-wob) ----------
+const INK = '#2b2233';
+function C(x, y, r){ return 'M' + (x - r) + ' ' + y + 'a' + r + ' ' + r + ' 0 1 0 ' + (2 * r) + ' 0a' + r + ' ' + r + ' 0 1 0 ' + (-2 * r) + ' 0Z'; }
+function E(x, y, rx, ry){ return 'M' + (x - rx) + ' ' + y + 'a' + rx + ' ' + ry + ' 0 1 0 ' + (2 * rx) + ' 0a' + rx + ' ' + ry + ' 0 1 0 ' + (-2 * rx) + ' 0Z'; }
+function SPARK(x, y, r){ const q = r * 0.3; return 'M' + x + ' ' + (y - r) + 'L' + (x + q) + ' ' + (y - q) + 'L' + (x + r) + ' ' + y + 'L' + (x + q) + ' ' + (y + q) + 'L' + x + ' ' + (y + r) + 'L' + (x - q) + ' ' + (y + q) + 'L' + (x - r) + ' ' + y + 'L' + (x - q) + ' ' + (y - q) + 'Z'; }
+const ICONS = {
+  city:[
+    ['M8 89Q50 84 92 89', 'none'],
+    ['M14 60L34 58L35 88L15 89Z', '#fff1d6'],
+    ['M9 62L24 41L39 59Z', '#ff7a59'],
+    ['M38 41L60 40L61 88L37 89Z', '#ffe3a8'],
+    ['M33 43L49 11L65 42Z', '#5aa9e6'],
+    ['M49 11V3', 'none', 3.5],
+    ['M49 3L61 6.5L49 10Z', '#ff5d7a', 3],
+    ['M62 63L84 62L85 88L62 89Z', '#fff1d6'],
+    ['M58 65L73 48L90 63Z', '#8fd14f'],
+    ['M44 89V79Q49 72 54 79V89', '#b0703b', 3.5],
+    ['M44 57Q49 50 54 57V65H44Z', '#ffd95e', 3],
+    ['M20 70H28V77H20Z', '#ffd95e', 3],
+    ['M68 71H76V78H68Z', '#ffd95e', 3],
+    ['M41 33L46 23', 'none', 3, '#ffffff']
+  ],
+  little:[
+    [E(36, 86, 9, 5), '#6fb53a'],
+    [E(64, 86, 9, 5), '#6fb53a'],
+    ['M31 34L27 15L42 29Z', '#fff1d6', 3.5],
+    ['M69 34L73 15L58 29Z', '#fff1d6', 3.5],
+    ['M20 80C9 58 18 27 50 25C82 27 91 58 80 80C69 91 31 91 20 80Z', '#8fd14f'],
+    [C(26, 65, 3), '#6fb53a', 0],
+    [C(76, 59, 2.5), '#6fb53a', 0],
+    [C(71, 73, 2), '#6fb53a', 0],
+    [C(40, 55, 7.5), '#ffffff', 3],
+    [C(60, 55, 7.5), '#ffffff', 3],
+    [C(41.5, 56.5, 3.4), INK, 0],
+    [C(58.5, 56.5, 3.4), INK, 0],
+    ['M30 42L45 49M70 42L55 49', 'none', 5],
+    ['M37 75Q50 65 63 75', 'none', 4],
+    ['M45 71L47.5 78L50.5 69.8Z', '#ffffff', 2.5],
+    ['M29 37Q35 31 43 30', 'none', 3, '#ffffff']
+  ],
+  big:[
+    ['M25 39C8 31 7 12 18 7C18 20 26 26 35 30Z', '#ffcf8a'],
+    ['M75 39C92 31 93 12 82 7C82 20 74 26 65 30Z', '#ffcf8a'],
+    ['M22 50C22 26 36 17 50 17C64 17 78 26 78 50C78 62 72 67 68 69V84H32V69C28 67 22 62 22 50Z', '#f4ead0'],
+    ['M31 42L46 47C47 58 34 61 31 52Z', INK, 3],
+    ['M69 42L54 47C53 58 66 61 69 52Z', INK, 3],
+    [C(39, 51, 3.4), '#ff4d4d', 0],
+    [C(61, 51, 3.4), '#ff4d4d', 0],
+    ['M47 64L50 58L53 64Z', INK, 2.5],
+    ['M33 73H67M41 84V73M50 84V73M59 84V73', 'none', 3],
+    ['M61 20L57 27L62 30L59 35', 'none', 2.5],
+    ['M30 33Q36 25 44 22', 'none', 3, '#ffffff']
+  ],
+  cha:[
+    [C(46, 55, 28), '#a8683c'],
+    ['M24 40Q26 18 46 24Q60 16 70 36Q60 29 47 33Q34 30 24 40Z', '#2b1a12', 3.5],
+    ['M33 50q4.5-5 9 0M50 50q4.5-5 9 0', 'none', 4],
+    ['M32 61Q46 77 60 61Z', '#ffffff', 3.5],
+    [E(28, 62, 4.5, 2.6), '#d9606f', 0],
+    [E(64, 62, 4.5, 2.6), '#d9606f', 0],
+    [SPARK(82, 18, 12), '#ffd95e', 3],
+    [SPARK(88, 44, 6), '#ffd95e', 2.5]
+  ]
+};
+const GLYPH = {hearts:'M50 73L29 50L37 35L50 46L63 35L71 50Z', clubs:'M50 77V26M50 50L33 33M50 50L67 33'};
+const GLOW = {hearts:'#ff5d8f', clubs:'#6bd35a'};
+function runeStone(k){
+  const g = GLYPH[k], c = GLOW[k];
+  return [
+    ['M20 22C30 9 70 7 83 20C93 35 91 70 81 84C67 95 33 95 19 84C7 70 8 36 20 22Z', '#aaa2c2'],
+    ['M79 31l-6 4M24 75l6-2M70 84l-3-5', 'none', 3],
+    ['M27 25Q40 15 57 15', 'none', 3.5, '#ffffff', 0.8],
+    [g, 'none', 17, c, 0.35],
+    [g, 'none', 10, INK],
+    [g, 'none', 5, c]
+  ];
+}
+// the Fighter, standing on Red's base
+function pawn(col){ return [
+  [E(50, 90, 28, 7), col],
+  ['M62 36Q74 46 67 62', 'none', 7, '#2b1a12'],
+  ['M30 89C30 62 38 50 50 50C62 50 70 62 70 89Z', '#9fb0c6'],
+  ['M31 72H69', 'none', 4, '#8a5a2b'],
+  ['M40 56V68M60 56V68', 'none', 2.5, '#ffffff'],
+  [C(50, 37, 15), '#6b3f24'],
+  ['M34 35Q34 16 50 16Q66 16 66 35Q58 29 50 29Q42 29 34 35Z', '#c9d3df'],
+  ['M50 16Q57 1 71 6Q61 10 57 19Z', '#ff5d7a', 3],
+  ['M50 29V36', 'none', 3.5],
+  [C(45, 40, 2.3), INK, 0],
+  [C(56, 40, 2.3), INK, 0],
+  ['M46 46Q50 49 54 46', 'none', 3],
+  [C(26, 69, 15), '#d99a3d'],
+  [C(26, 69, 5), '#ffd95e', 3],
+  ['M18 62Q20 57 25 56', 'none', 3, '#ffffff']
+]; }
+function coin(col){ return [
+  [C(50, 52, 36), col],
+  [C(50, 52, 25), 'none', 3, '#ffffff', 0.75],
+  ['M28 38Q34 26 46 22', 'none', 3.5, '#ffffff'],
+  [SPARK(50, 52, 10), '#ffffff', 0]
+]; }
+function shapesOf(list){ return list.map((p)=> ({d:p[0], f:p[1], w:p[2] === undefined ? 4 : p[2], s:p[3] || INK, o:p[4] === undefined ? 1 : p[4], t:p[5] || 'translate(0 0)'})); }
+
+const S = 60, R3 = Math.sqrt(3), CX = 220, CY = 222;
+const OFF = {C:[0,0], N:[0,-R3 * S], NE:[1.5 * S,-R3 * S / 2], SE:[1.5 * S,R3 * S / 2], S:[0,R3 * S], SW:[-1.5 * S,R3 * S / 2], NW:[-1.5 * S,-R3 * S / 2]};
+function hexPath(x, y, s){ const h = R3 * s / 2; return 'M' + (x - s) + ' ' + y + 'L' + (x - s / 2) + ' ' + (y - h) + 'L' + (x + s / 2) + ' ' + (y - h) + 'L' + (x + s) + ' ' + y + 'L' + (x + s / 2) + ' ' + (y + h) + 'L' + (x - s / 2) + ' ' + (y + h) + 'Z'; }
+function at(k){ return [CX + OFF[k][0], CY + OFF[k][1]]; }
+
+class Component extends DCLogic {
+  renderVals(){
+    const outerKeys = ['N','NE','SE','S','SW','NW'];
+    const outer = outerKeys.map((k)=>{ const p = at(k); return hexPath(p[0], p[1], S); }).join('');
+    const c = at('C');
+    let tufts = '';
+    [['N',-18,14],['SE',16,-20],['S',-26,-8],['NW',10,20],['C',-24,24],['NE',-22,-14],['SW',22,14]].forEach((t)=>{ const p = at(t[0]); const x = p[0] + t[1], y = p[1] + t[2]; tufts += 'M' + (x - 5) + ' ' + y + 'l2-6 2 6 2-7 2 7'; });
+    const place = (k, name, op, rot)=>{ const p = at(k); return {x:p[0] - 29, y:p[1] - 29, op:op, rot:rot, shapes:shapesOf(name === 'hearts' ? runeStone('hearts') : ICONS[name])}; };
+    const ne = at('NE'), s = at('S');
+    return {
+      wobble:this.props.wobble ?? 2.5, tileWobble:this.props.tileWobble ?? 5,
+      tile:{
+        outer:outer, centre:hexPath(c[0], c[1], S), tufts:tufts,
+        shadow:outerKeys.concat(['C']).map((k)=>{ const p = at(k); return hexPath(p[0], p[1], S); }).join(''),
+        icons:[place('NW','big',1,-3), place('NE','hearts',0.55,4), place('SW','city',1,2)],
+        coin:{x:ne[0] - 4, y:ne[1] - 2},
+        pawn:{x:s[0] - 33, y:s[1] - 52}
+      },
+      coin:shapesOf(coin('#e8483d')),
+      pawn:shapesOf(pawn('#e8483d')),
+      chaMini:shapesOf(ICONS.cha),
+      cards:[
+        {kind:'Companion', band:'#5aa9e6', bandText:'#2b2233', hasNum:true, num:4, name:'Companion 9', hasChip:true, rot:-3, shapes:shapesOf(ICONS.cha)},
+        {kind:'Little Monster', band:'#8fd14f', bandText:'#2b2233', hasNum:true, num:3, name:'Beat 3 or more', hasChip:false, rot:2, shapes:shapesOf(ICONS.little)},
+        {kind:'Artifact', band:'#6b5f93', bandText:'#ffffff', hasNum:false, num:'', name:'Club rune', hasChip:false, rot:-1.5, shapes:shapesOf(runeStone('clubs'))}
+      ],
+      swatches:[['#fbf3e0','Parchment'],['#2b2233','Ink'],['#bfe39a','Meadow'],['#5aa9e6','Sky'],['#ff7a59','Coral'],['#ffd95e','Sun'],['#9d8fc2','Stone'],['#e8483d','Red'],['#3d8bfd','Blue'],['#ffc83d','Yellow'],['#9b5de5','Purple']].map((w, i)=> ({hex:w[0], name:w[1], r:['12px 8px 14px 9px','9px 14px 8px 12px','14px 9px 12px 8px'][i % 3]}))
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,983 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adventurer Olympics table</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Slackey&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#2b2233}a:hover{color:#e0762b}
+@keyframes ao-drop{0%{transform:translateY(-34px) scale(1.3);opacity:0}60%{opacity:1}80%{transform:translateY(2px) scale(.94)}100%{transform:translateY(0) scale(1);opacity:1}}
+@keyframes ao-fly{0%{transform:translate(-260px,-220px) rotate(-12deg) scale(.7);opacity:0}35%{opacity:1}100%{transform:translate(0,0) rotate(0) scale(1);opacity:1}}
+@keyframes ao-tile{0%{transform:translate(-120px,-260px) scale(.6);opacity:0}40%{opacity:1}100%{transform:translate(0,0) scale(1);opacity:1}}
+@keyframes ao-tumble{0%{transform:translate(-40px,-30px) rotate(-220deg)}70%{transform:translate(3px,2px) rotate(8deg)}100%{transform:translate(0,0) rotate(0)}}
+@keyframes ao-pulse{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.14);opacity:.45}}
+@keyframes ao-ghost{0%,100%{opacity:.6}50%{opacity:.95}}
+@keyframes ao-rise{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes ao-caption{from{transform:translateY(-8px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes ao-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+</style>
+</helmet>
+<div style="{{ rootStyle }}" data-screen-label="Adventurer Olympics table">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><filter id="ao-hexwob" x="-8%" y="-8%" width="116%" height="116%"><feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="3"></feTurbulence><feDisplacementMap in="SourceGraphic" scale="2.2"></feDisplacementMap></filter></defs></svg>
+
+  <!-- ============ top bar (the Zekel frame) ============ -->
+  <div style="height:48px;flex:none;display:flex;align-items:center;gap:16px;padding:0 20px;background:var(--surface);border-bottom:3px solid var(--line);color:var(--text);font-family:'IBM Plex Sans',sans-serif">
+    <div style="display:inline-flex;align-items:center;gap:1px;font:400 24px 'Slackey',sans-serif;letter-spacing:-.02em;color:var(--mark)">ze<span style="display:inline-block;width:20px;height:20px;position:relative;transform:rotate(-90deg);margin:0 1px"><span style="position:absolute;left:50%;top:0;width:34%;height:34%;transform:translateX(-50%);border-radius:50%;background:#e0762b"></span><span style="position:absolute;left:0;top:28%;width:100%;height:24%;border-radius:999px;background:#e0762b"></span><span style="position:absolute;left:50%;top:40%;width:48%;height:36%;transform:translateX(-50%);border-radius:3px 3px 1px 1px;background:#e0762b"></span><span style="position:absolute;left:14%;bottom:0;width:32%;height:38%;border-radius:3px;transform:rotate(14deg);transform-origin:top center;background:#e0762b"></span><span style="position:absolute;right:14%;bottom:0;width:32%;height:38%;border-radius:3px;transform:rotate(-14deg);transform-origin:top center;background:#e0762b"></span></span>el</div>
+    <div style="width:2px;height:22px;background:var(--soft)"></div>
+    <dc-import name="AO-Icon" icon="quest" size="30" hint-size="30px,30px"></dc-import>
+    <div style="font:600 18px 'Fredoka',sans-serif">Adventurer Olympics</div>
+    <div style="font:500 14px 'Fredoka',sans-serif;color:var(--muted)">Round {{ round }}</div>
+    <div style="flex:1;display:flex;justify-content:center">
+      <div style="display:flex;align-items:center;gap:8px;padding:4px 14px;border-radius:999px;background:{{ pill.bg }};color:{{ pill.fg }};border:2.5px solid var(--line);font:600 15px 'Fredoka',sans-serif">
+        <span style="width:12px;height:12px;border-radius:50%;background:{{ pill.dot }};border:2px solid var(--line)"></span>{{ pill.text }}
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center">
+      <button type="button" style="height:32px;padding:0 12px;border-radius:8px;border:2px solid var(--line);background:var(--surface);color:var(--text);font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:var(--surface2)">Undo</button>
+      <button type="button" style="height:32px;padding:0 12px;border-radius:8px;border:2px solid var(--line);background:var(--surface);color:var(--text);font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:var(--surface2)">Rules</button>
+      <button type="button" style="height:32px;padding:0 12px;border-radius:8px;border:2px solid var(--line);background:var(--surface);color:var(--text);font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:var(--surface2)">Voice</button>
+      <button type="button" onClick="{{ toggleTheme }}" style="height:32px;padding:0 12px;border-radius:8px;border:2px solid var(--line);background:var(--surface);color:var(--text);font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:var(--surface2)">{{ themeLabel }}</button>
+      <button type="button" style="height:32px;padding:0 12px;border-radius:8px;border:2px solid var(--line);background:var(--surface);color:var(--text);font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:var(--surface2)">Leave</button>
+    </div>
+  </div>
+
+  <div style="flex:1;min-height:0;display:flex">
+
+    <!-- ============ left: decks, map, your board ============ -->
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+
+      <!-- decks and supply -->
+      <div style="height:98px;flex:none;box-sizing:border-box;display:flex;align-items:center;gap:20px;padding:0 20px;border-bottom:3px solid var(--line);background:var(--bg)">
+        <sc-for list="{{ decks }}" as="d" hint-placeholder-count="4">
+          <div style="display:flex;align-items:center;gap:10px" title="{{ d.title }}">
+            <div style="position:relative;width:48px;height:66px">
+              <div style="position:absolute;inset:0;border-radius:8px;background:{{ d.color }};border:2.5px solid var(--line);transform:rotate(-6deg) translate(-3px,2px)"></div>
+              <div style="position:absolute;inset:0;border-radius:8px;background:{{ d.color }};border:2.5px solid var(--line);transform:rotate(3deg)"></div>
+              <div style="position:absolute;inset:0;border-radius:8px;background:{{ d.color }};border:2.5px solid var(--line);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow)">
+                <dc-import name="AO-Icon" icon="{{ d.icon }}" size="34" shadow="{{ false }}" hint-size="34px,34px"></dc-import>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:0">
+              <div style="font-size:13px;font-weight:600;color:var(--muted)">{{ d.name }}</div>
+              <div style="font-size:22px;font-weight:700">{{ d.count }}</div>
+            </div>
+          </div>
+        </sc-for>
+        <div style="width:2px;height:56px;background:var(--soft)"></div>
+        <div style="display:flex;align-items:center;gap:10px" title="Map tiles still face down">
+          <div style="position:relative;width:52px;height:48px">
+            <div style="position:absolute;left:0;top:5px;width:52px;height:45px;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);background:var(--line)"></div>
+            <div style="position:absolute;left:0;top:0;width:52px;height:45px;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);background:var(--line)"></div>
+            <div style="position:absolute;left:2.5px;top:2.5px;width:47px;height:40px;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);background:#bfe39a;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#2b2233">?</div>
+          </div>
+          <div style="display:flex;flex-direction:column">
+            <div style="font-size:13px;font-weight:600;color:var(--muted)">Map tiles</div>
+            <div style="font-size:22px;font-weight:700">{{ stackCount }}</div>
+          </div>
+        </div>
+        <div style="width:2px;height:56px;background:var(--soft)"></div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div style="font-size:13px;font-weight:600;color:var(--muted)">Runes</div>
+          <div style="display:flex;gap:6px">
+            <sc-for list="{{ artChips }}" as="a" hint-placeholder-count="5">
+              <div title="{{ a.title }}" style="display:flex;flex-direction:column;align-items:center;gap:1px;width:44px">
+                <dc-import name="AO-Icon" icon="{{ a.icon }}" size="32" hint-size="32px,32px"></dc-import>
+                <span style="display:flex;align-items:center;gap:3px;font-size:11px;font-weight:600;color:var(--muted)"><span style="width:9px;height:9px;border-radius:50%;background:{{ a.dot }};border:1.5px solid var(--line)"></span>{{ a.holder }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+      <!-- the map -->
+      <div style="flex:1;min-height:0;position:relative;overflow:hidden;background:var(--table)">
+
+        <sc-for list="{{ hexes }}" as="h" hint-placeholder-count="40">
+          <button type="button" onClick="{{ h.go }}" aria-label="{{ h.label }}" style="position:absolute;left:{{ h.x }}px;top:{{ h.y }}px;width:68px;height:59px;padding:0;border:0;background:transparent;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);cursor:{{ h.cursor }};opacity:{{ h.op }};transition:left .35s cubic-bezier(.2,.8,.2,1),top .35s cubic-bezier(.2,.8,.2,1);animation:{{ h.anim }}">
+            <svg viewBox="0 0 68 59" width="68" height="59" style="position:absolute;left:0;top:0" aria-hidden="true"><polygon points="17,0.5 51,0.5 67.5,29.5 51,58.5 17,58.5 0.5,29.5" fill="{{ h.fill }}" stroke="{{ h.edge }}" stroke-width="{{ h.sw }}" stroke-linejoin="round" filter="url(#ao-hexwob)"></polygon><path d="{{ h.tuft }}" fill="none" stroke="#6fa845" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <span style="position:absolute;left:28px;top:23.5px;width:12px;height:12px;border-radius:50%;background:{{ h.dot }};border:2px solid {{ h.dotEdge }};box-sizing:border-box"></span>
+          </button>
+        </sc-for>
+
+        <sc-for list="{{ ghosts }}" as="g" hint-placeholder-count="0">
+          <button type="button" onClick="{{ g.pick }}" aria-label="{{ g.label }}" style="position:absolute;left:{{ g.x }}px;top:{{ g.y }}px;width:68px;height:59px;padding:0;border:0;background:var(--action);clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);cursor:pointer;animation:ao-ghost 1.6s ease-in-out infinite">
+            <span style="position:absolute;inset:3px;background:var(--ghost);clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);display:flex;align-items:center;justify-content:center;font:600 13px 'Fredoka',sans-serif;color:var(--youfg)">{{ g.text }}</span>
+          </button>
+        </sc-for>
+
+        <sc-for list="{{ badges }}" as="b" hint-placeholder-count="20">
+          <div title="{{ b.title }}" style="position:absolute;left:{{ b.x }}px;top:{{ b.y }}px;width:44px;height:44px;pointer-events:none;transition:left .35s cubic-bezier(.2,.8,.2,1),top .35s cubic-bezier(.2,.8,.2,1)">
+            <sc-if value="{{ b.trig }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;inset:-4px;border-radius:50%;border:3.5px solid var(--action);background:rgba(255,138,61,.18);animation:ao-pulse 1.3s ease-in-out infinite"></div>
+            </sc-if>
+            <div style="position:absolute;inset:0;opacity:{{ b.op }}">
+              <dc-import name="AO-Icon" icon="{{ b.icon }}" size="44" rot="{{ b.rot }}" hint-size="44px,44px"></dc-import>
+            </div>
+          </div>
+        </sc-for>
+
+        <sc-for list="{{ tokens }}" as="t" hint-placeholder-count="12">
+          <div style="position:absolute;left:{{ t.x }}px;top:{{ t.y }}px;width:24px;height:24px;pointer-events:none;animation:{{ t.anim }};transition:left .35s cubic-bezier(.2,.8,.2,1),top .35s cubic-bezier(.2,.8,.2,1)">
+            <dc-import name="AO-Icon" icon="coin" size="24" tint="{{ t.color }}" flat="{{ true }}" hint-size="24px,24px"></dc-import>
+          </div>
+        </sc-for>
+
+        <sc-for list="{{ standees }}" as="p" hint-placeholder-count="4">
+          <div title="{{ p.label }}" style="position:absolute;left:{{ p.x }}px;top:{{ p.y }}px;width:54px;height:54px;pointer-events:none;transition:left .34s cubic-bezier(.2,.8,.2,1),top .34s cubic-bezier(.2,.8,.2,1)">
+            <div style="width:54px;height:54px;animation:{{ p.bob }}">
+              <dc-import name="AO-Icon" icon="{{ p.icon }}" size="54" tint="{{ p.color }}" hint-size="54px,54px"></dc-import>
+            </div>
+          </div>
+        </sc-for>
+
+        <!-- AI slideshow caption -->
+        <sc-if value="{{ showCaption }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:50%;top:14px;transform:translateX(-50%);width:660px;box-sizing:border-box;display:flex;align-items:center;gap:12px;padding:10px 12px 10px 10px;border-radius:16px 10px 18px 12px/12px 18px 10px 16px;background:var(--surface);box-shadow:var(--shadowlg);border:3px solid var(--line)">
+            <div style="flex:none;display:flex;flex-direction:column;align-items:center;gap:0">
+              <dc-import name="AO-Icon" icon="{{ caption.icon }}" size="40" tint="{{ caption.color }}" hint-size="40px,40px"></dc-import>
+              <span style="font-size:12px;font-weight:700">{{ caption.who }}</span>
+            </div>
+            <div key="{{ caption.key }}" style="flex:1;font-size:16px;line-height:1.35;animation:ao-caption .3s ease both">{{ caption.text }}</div>
+            <div role="group" aria-label="Playback speed" style="flex:none;display:flex;gap:2px;padding:2px;border-radius:10px;background:var(--surface2);border:2px solid var(--line)">
+              <sc-for list="{{ paces }}" as="pc" hint-placeholder-count="3">
+                <button type="button" onClick="{{ pc.pick }}" aria-pressed="{{ pc.on }}" style="height:28px;padding:0 9px;border-radius:7px;border:0;background:{{ pc.bg }};color:var(--text);font:600 13px 'Fredoka',sans-serif;cursor:pointer">{{ pc.label }}</button>
+              </sc-for>
+            </div>
+            <button type="button" onClick="{{ replay }}" style="flex:none;height:34px;padding:0 10px;border-radius:9px;border:2px solid var(--line);background:var(--surface);color:var(--text);font:600 13px 'Fredoka',sans-serif;cursor:pointer">Replay move</button>
+          </div>
+        </sc-if>
+
+        <!-- map controls -->
+        <div style="position:absolute;left:16px;bottom:16px;display:flex;flex-direction:column;gap:6px">
+          <button type="button" aria-label="Zoom in" style="width:40px;height:40px;border-radius:10px;border:2.5px solid var(--line);background:var(--surface);color:var(--text);font:700 20px 'Fredoka',sans-serif;cursor:pointer;box-shadow:var(--shadow)">+</button>
+          <button type="button" aria-label="Zoom out" style="width:40px;height:40px;border-radius:10px;border:2.5px solid var(--line);background:var(--surface);color:var(--text);font:700 20px 'Fredoka',sans-serif;cursor:pointer;box-shadow:var(--shadow)">−</button>
+          <button type="button" style="height:40px;padding:0 8px;border-radius:10px;border:2.5px solid var(--line);background:var(--surface);color:var(--text);font:600 13px 'Fredoka',sans-serif;cursor:pointer;box-shadow:var(--shadow)">Fit</button>
+        </div>
+
+        <!-- legend -->
+        <div style="position:absolute;right:16px;top:16px;display:flex;flex-direction:column;gap:5px;padding:10px 12px;border-radius:14px 9px 16px 10px/10px 16px 9px 14px;background:var(--surface);border:2.5px solid var(--line);font-size:14px;font-weight:500;box-shadow:var(--shadow);opacity:{{ legendOp }}">
+          <sc-for list="{{ legend }}" as="l" hint-placeholder-count="6">
+            <div style="display:flex;align-items:center;gap:8px">
+              <dc-import name="AO-Icon" icon="{{ l.icon }}" size="24" hint-size="24px,24px"></dc-import>
+              <span>{{ l.name }}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- a test: draw, roll, result -->
+        <sc-if value="{{ showTest }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;right:16px;bottom:16px;width:500px;box-sizing:border-box;padding:16px;border-radius:18px 12px 20px 14px/14px 20px 12px 18px;background:var(--surface);box-shadow:var(--shadowlg);border:3px solid var(--line);display:flex;flex-direction:column;gap:12px;animation:ao-rise .25s ease both">
+            <div style="display:flex;align-items:center;gap:10px">
+              <dc-import name="AO-Icon" icon="{{ tp.icon }}" size="40" hint-size="40px,40px"></dc-import>
+              <div style="font-size:22px;font-weight:700">{{ tp.title }}</div>
+            </div>
+            <div style="display:flex;gap:14px;align-items:flex-start">
+              <div style="display:flex;gap:10px;min-height:160px">
+                <sc-if value="{{ tp.noCards }}" hint-placeholder-val="{{ true }}">
+                  <div style="width:112px;height:158px;box-sizing:border-box;border-radius:12px;border:3px dashed var(--soft);display:flex;align-items:center;justify-content:center;text-align:center;font-size:14px;color:var(--muted);padding:8px">The card lands here</div>
+                </sc-if>
+                <sc-for list="{{ tp.cards }}" as="c" hint-placeholder-count="1">
+                  <div style="width:112px;height:158px;flex:none;box-sizing:border-box;border-radius:12px 8px 13px 9px/9px 13px 8px 12px;background:#fff7e6;border:3px solid #2b2233;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;color:#2b2233;animation:{{ c.anim }}">
+                    <div style="height:26px;flex:none;background:{{ c.band }};border-bottom:2.5px solid #2b2233;display:flex;align-items:center;justify-content:space-between;padding:0 4px 0 7px">
+                      <span style="font-size:11px;font-weight:600;color:{{ c.bandText }};white-space:nowrap;overflow:hidden">{{ c.kind }}</span>
+                      <sc-if value="{{ c.hasNum }}" hint-placeholder-val="{{ true }}">
+                        <span style="flex:none;width:28px;height:28px;box-sizing:border-box;border-radius:50%;background:#ffd95e;border:2.5px solid #2b2233;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;margin-top:14px">{{ c.num }}</span>
+                      </sc-if>
+                    </div>
+                    <div style="flex:1;display:flex;align-items:center;justify-content:center;background:{{ c.bg }}">
+                      <dc-import name="AO-Icon" icon="{{ c.art }}" size="70" hint-size="70px,70px"></dc-import>
+                    </div>
+                    <div style="padding:3px 4px 6px;display:flex;flex-direction:column;align-items:center;gap:3px;border-top:2px solid rgba(43,34,51,.12)">
+                      <div style="font-size:14px;font-weight:700;line-height:1.1;text-align:center">{{ c.name }}</div>
+                      <div style="display:flex;gap:3px;flex-wrap:wrap;justify-content:center">
+                        <sc-for list="{{ c.chips }}" as="ch" hint-placeholder-count="1">
+                          <span style="display:inline-flex;align-items:center;gap:1px;padding:0 5px 0 1px;border-radius:999px;background:{{ ch.bg }};border:2px solid #2b2233;font-size:12px;font-weight:700"><dc-import name="AO-Icon" icon="{{ ch.icon }}" size="14" hint-size="14px,14px"></dc-import>+{{ ch.v }}</span>
+                        </sc-for>
+                      </div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:12px">
+                <div style="font-size:16px;line-height:1.4">{{ tp.text }}</div>
+                <sc-if value="{{ tp.hasDice }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                    <sc-for list="{{ tp.dice }}" as="die" hint-placeholder-count="2">
+                      <div style="width:42px;height:42px;box-sizing:border-box;padding:5px;border-radius:11px;background:#ffffff;border:3px solid #2b2233;box-shadow:2px 3px 0 rgba(43,34,51,.2);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px;animation:ao-tumble .55s cubic-bezier(.2,.8,.2,1) both">
+                        <sc-for list="{{ die.cells }}" as="cell" hint-placeholder-count="9">
+                          <span style="display:flex;align-items:center;justify-content:center"><span style="width:7px;height:7px;border-radius:50%;background:{{ cell.bg }}"></span></span>
+                        </sc-for>
+                      </div>
+                    </sc-for>
+                    <div style="font-size:26px;font-weight:700;margin-left:4px;color:{{ tp.totalColor }}">= {{ tp.total }}</div>
+                  </div>
+                </sc-if>
+                <button type="button" onClick="{{ tp.act }}" style="align-self:flex-start;height:44px;padding:0 18px;border-radius:12px;border:3px solid var(--line);background:var(--action);color:#2b2233;font:700 16px 'Fredoka',sans-serif;cursor:pointer;box-shadow:var(--shadow)" style-hover="background:var(--actionh)">{{ tp.btn }}</button>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- exploring -->
+        <sc-if value="{{ showEx }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;right:16px;bottom:16px;width:390px;box-sizing:border-box;padding:16px;border-radius:18px 12px 20px 14px/14px 20px 12px 18px;background:var(--surface);box-shadow:var(--shadowlg);border:3px solid var(--line);display:flex;flex-direction:column;gap:12px;animation:ao-rise .25s ease both">
+            <div style="display:flex;gap:14px;align-items:center">
+              <div style="position:relative;width:104px;height:104px;flex:none;animation:ao-tile .45s cubic-bezier(.2,.8,.2,1) both">
+                <sc-for list="{{ ex.mini }}" as="m" hint-placeholder-count="7">
+                  <div style="position:absolute;left:{{ m.x }}px;top:{{ m.y }}px;width:38px;height:33px;background:#2b2233;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%)">
+                    <span style="position:absolute;inset:1.5px;background:{{ m.fill }};clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);display:flex;align-items:center;justify-content:center">
+                      <sc-if value="{{ m.has }}" hint-placeholder-val="{{ false }}"><dc-import name="AO-Icon" icon="{{ m.icon }}" size="24" hint-size="24px,24px"></dc-import></sc-if>
+                    </span>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <div style="font-size:22px;font-weight:700">Exploring · tile {{ ex.n }}</div>
+                <div style="font-size:16px;line-height:1.4">{{ ex.text }}</div>
+              </div>
+            </div>
+            <sc-if value="{{ ex.turning }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;gap:8px;align-items:center">
+                <button type="button" onClick="{{ ex.left }}" style="height:44px;padding:0 12px;border-radius:12px;border:2.5px solid var(--line);background:var(--surface);color:var(--text);font:600 15px 'Fredoka',sans-serif;cursor:pointer;display:flex;align-items:center;gap:6px" style-hover="background:var(--surface2)"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 4v5h5M4.6 9A8 8 0 1 1 5 15.5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>Turn left</button>
+                <button type="button" onClick="{{ ex.right }}" style="height:44px;padding:0 12px;border-radius:12px;border:2.5px solid var(--line);background:var(--surface);color:var(--text);font:600 15px 'Fredoka',sans-serif;cursor:pointer;display:flex;align-items:center;gap:6px" style-hover="background:var(--surface2)">Turn right<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M20 4v5h-5M19.4 9A8 8 0 1 0 19 15.5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+                <button type="button" onClick="{{ ex.place }}" style="margin-left:auto;height:44px;padding:0 18px;border-radius:12px;border:3px solid var(--line);background:var(--action);color:#2b2233;font:700 16px 'Fredoka',sans-serif;cursor:pointer;box-shadow:var(--shadow)" style-hover="background:var(--actionh)">Place tile</button>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <!-- roll for turn order -->
+        <sc-if value="{{ showOrder }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:440px;box-sizing:border-box;padding:20px;border-radius:18px 12px 20px 14px/14px 20px 12px 18px;background:var(--surface);box-shadow:var(--shadowlg);border:3px solid var(--line);display:flex;flex-direction:column;gap:12px;animation:ao-rise .25s ease both">
+            <div style="font-size:26px;font-weight:700">Round {{ round }} · who goes first?</div>
+            <div style="font-size:16px;line-height:1.4;color:var(--muted)">Everyone rolls 2 dice. Highest total goes first. Ties roll again.</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <sc-for list="{{ orderRows }}" as="o" hint-placeholder-count="4">
+                <div style="display:flex;align-items:center;gap:10px;height:46px;padding:0 10px 0 4px;border-radius:12px;background:{{ o.bg }};border:2px solid var(--line)">
+                  <dc-import name="AO-Icon" icon="{{ o.icon }}" size="40" tint="{{ o.color }}" hint-size="40px,40px"></dc-import>
+                  <span style="flex:1;font-size:17px;font-weight:{{ o.weight }}">{{ o.name }}</span>
+                  <span style="font-size:13px;color:var(--muted)">{{ o.place }}</span>
+                  <span style="font-size:22px;font-weight:700;min-width:28px;text-align:right">{{ o.total }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <button type="button" onClick="{{ orderAct }}" style="height:46px;padding:0 16px;border-radius:12px;border:3px solid var(--line);background:var(--action);color:#2b2233;font:700 17px 'Fredoka',sans-serif;cursor:pointer;box-shadow:var(--shadow)" style-hover="background:var(--actionh)">{{ orderBtn }}</button>
+          </div>
+        </sc-if>
+      </div>
+
+      <!-- ============ your board ============ -->
+      <div style="height:196px;flex:none;box-sizing:border-box;display:flex;gap:18px;padding:12px 20px;border-top:3px solid var(--line);background:var(--surface)">
+        <div style="display:flex;flex-direction:column;gap:6px;width:214px;flex:none">
+          <div style="display:flex;align-items:center;gap:6px">
+            <dc-import name="AO-Icon" icon="fighter" size="42" tint="{{ me.color }}" hint-size="42px,42px"></dc-import>
+            <div style="display:flex;flex-direction:column">
+              <div style="font-size:19px;font-weight:700;line-height:1.1">You · Fighter</div>
+              <div style="font-size:12px;color:var(--muted)">Red</div>
+            </div>
+            <div title="Quest points" style="margin-left:auto;display:flex;align-items:center;gap:2px;padding:2px 9px 2px 3px;border-radius:999px;background:var(--youbg);color:var(--youfg);border:2px solid var(--line);font-size:17px;font-weight:700"><dc-import name="AO-Icon" icon="quest" size="22" hint-size="22px,22px"></dc-import>{{ me.qp }}</div>
+          </div>
+          <sc-for list="{{ me.stats }}" as="st" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:7px;height:34px;padding:0 10px 0 5px;border-radius:10px;background:{{ st.bg }};border:2px solid var(--line);color:#2b2233">
+              <dc-import name="AO-Icon" icon="{{ st.icon }}" size="26" hint-size="26px,26px"></dc-import>
+              <span style="font-size:15px;font-weight:600;flex:1">{{ st.name }}</span>
+              <span style="font-size:11px;color:#5c4f66">{{ st.note }}</span>
+              <span style="font-size:21px;font-weight:700;min-width:16px;text-align:right">{{ st.v }}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="flex:1;min-width:0;display:flex;gap:16px">
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <div style="font-size:13px;font-weight:600;color:var(--muted)">Companions {{ me.compCount }}</div>
+            <div style="display:flex;gap:6px">
+              <sc-for list="{{ me.comps }}" as="c" hint-placeholder-count="2">
+                <div title="{{ c.title }}" style="width:66px;height:96px;box-sizing:border-box;border-radius:9px 6px 10px 7px/7px 10px 6px 9px;background:#fff7e6;border:2.5px solid #2b2233;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;align-items:center;color:#2b2233;transform:rotate({{ c.tilt }}deg);animation:{{ c.anim }}">
+                  <div style="height:12px;width:100%;flex:none;background:#5aa9e6;border-bottom:2px solid #2b2233"></div>
+                  <dc-import name="AO-Icon" icon="{{ c.art }}" size="46" hint-size="46px,46px"></dc-import>
+                  <div style="font-size:10px;font-weight:700;line-height:1;white-space:nowrap">{{ c.name }}</div>
+                  <div style="display:flex;gap:2px;margin-top:2px">
+                    <sc-for list="{{ c.chips }}" as="ch" hint-placeholder-count="1">
+                      <span style="display:inline-flex;align-items:center;padding:0 3px 0 0;border-radius:999px;background:{{ ch.bg }};border:1.5px solid #2b2233;font-size:10px;font-weight:700"><dc-import name="AO-Icon" icon="{{ ch.icon }}" size="11" hint-size="11px,11px"></dc-import>+{{ ch.v }}</span>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <div style="font-size:13px;font-weight:600;color:var(--muted)">Monsters beaten</div>
+            <div style="display:flex;gap:10px">
+              <sc-for list="{{ me.monsters }}" as="mo" hint-placeholder-count="2">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+                  <div style="position:relative;width:66px;height:80px">
+                    <sc-if value="{{ mo.stack }}" hint-placeholder-val="{{ true }}">
+                      <div style="position:absolute;inset:0;border-radius:9px;background:#fff7e6;border:2.5px solid #2b2233;transform:rotate(-6deg)"></div>
+                    </sc-if>
+                    <div style="position:absolute;inset:0;border-radius:9px 6px 10px 7px/7px 10px 6px 9px;background:{{ mo.face }};border:{{ mo.border }};box-shadow:{{ mo.shadow }};display:flex;align-items:center;justify-content:center;overflow:hidden">
+                      <sc-if value="{{ mo.has }}" hint-placeholder-val="{{ true }}"><dc-import name="AO-Icon" icon="{{ mo.art }}" size="50" hint-size="50px,50px"></dc-import></sc-if>
+                      <sc-if value="{{ mo.none }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;color:var(--muted);text-align:center">None yet</span></sc-if>
+                    </div>
+                  </div>
+                  <div style="font-size:13px;font-weight:600">{{ mo.name }} <b style="font-size:15px">{{ mo.n }}</b></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <div style="font-size:13px;font-weight:600;color:var(--muted)">Runes {{ me.artCount }}</div>
+            <div style="display:flex;gap:6px">
+              <sc-for list="{{ me.arts }}" as="a" hint-placeholder-count="1">
+                <div title="{{ a.name }}" style="width:66px;height:80px;box-sizing:border-box;border-radius:9px 6px 10px 7px/7px 10px 6px 9px;background:#fff7e6;border:2.5px solid #2b2233;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#2b2233;animation:{{ a.anim }}">
+                  <dc-import name="AO-Icon" icon="{{ a.icon }}" size="46" hint-size="46px,46px"></dc-import>
+                  <span style="font-size:11px;font-weight:700">{{ a.name }}</span>
+                </div>
+              </sc-for>
+              <sc-if value="{{ me.noArts }}" hint-placeholder-val="{{ false }}">
+                <div style="width:66px;height:80px;box-sizing:border-box;border-radius:9px;border:2.5px dashed var(--soft);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);text-align:center">None yet</div>
+              </sc-if>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-left:auto">
+            <div style="font-size:13px;font-weight:600;color:var(--muted)">Coins left {{ me.tokensLeft }} of 10</div>
+            <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;width:118px">
+              <sc-for list="{{ me.tokenDots }}" as="td" hint-placeholder-count="10">
+                <div style="width:20px;height:20px;position:relative">
+                  <sc-if value="{{ td.on }}" hint-placeholder-val="{{ true }}"><dc-import name="AO-Icon" icon="coin" size="20" tint="{{ me.color }}" hint-size="20px,20px"></dc-import></sc-if>
+                  <sc-if value="{{ td.off }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;inset:2px;border-radius:50%;border:2px dashed var(--soft)"></span></sc-if>
+                </div>
+              </sc-for>
+            </div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.5">Tiles explored <b style="color:var(--text);font-size:15px">{{ me.tiles }}</b><br>Dungeons done <b style="color:var(--text);font-size:15px">{{ me.dungeons }}</b></div>
+          </div>
+        </div>
+
+        <div style="width:236px;flex:none;display:flex;flex-direction:column;gap:8px;padding-left:16px;border-left:2px dashed var(--soft)">
+          <div style="display:flex;align-items:center;gap:8px">
+            <dc-import name="AO-Icon" icon="mov" size="26" hint-size="26px,26px"></dc-import>
+            <span style="font-size:16px;font-weight:600">Steps</span>
+            <div style="display:flex;gap:4px">
+              <sc-for list="{{ stepPips }}" as="sp" hint-placeholder-count="3">
+                <span style="width:18px;height:18px;border-radius:50%;box-sizing:border-box;background:{{ sp.bg }};border:2.5px solid var(--line);transition:background .2s"></span>
+              </sc-for>
+            </div>
+            <span style="margin-left:auto;font-size:15px;font-weight:600;color:var(--muted)">{{ stepsText }}</span>
+          </div>
+          <div style="font-size:14px;line-height:1.35;color:var(--muted);min-height:38px">{{ hint }}</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:auto">
+            <sc-if value="{{ canRetry }}" hint-placeholder-val="{{ false }}">
+              <button type="button" onClick="{{ retry }}" style="height:38px;border-radius:11px;border:2.5px solid var(--line);background:var(--surface);color:var(--text);font:600 15px 'Fredoka',sans-serif;cursor:pointer" style-hover="background:var(--surface2)">Stay and try again</button>
+            </sc-if>
+            <button type="button" onClick="{{ explore }}" disabled="{{ exploreOff }}" style="height:38px;border-radius:11px;border:2.5px solid {{ exploreBorder }};background:{{ exploreBg }};color:{{ exploreFg }};font:600 15px 'Fredoka',sans-serif;cursor:{{ exploreCursor }}">Explore · turn over a tile</button>
+            <button type="button" onClick="{{ endTurn }}" disabled="{{ endOff }}" style="height:40px;border-radius:11px;border:3px solid {{ endBorder }};background:{{ endBg }};color:{{ endFg }};font:700 16px 'Fredoka',sans-serif;cursor:{{ endCursor }};box-shadow:{{ endShadow }}">End turn</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ the bench ============ -->
+    <div style="width:420px;flex:none;box-sizing:border-box;display:flex;flex-direction:column;border-left:3px solid var(--line);background:var(--bg);min-height:0">
+      <div style="padding:12px 16px 8px;display:flex;flex-direction:column;gap:7px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:14px;font-weight:700;color:var(--muted)">Turn order</div>
+          <button type="button" style="height:28px;padding:0 10px;border-radius:8px;border:2px solid var(--line);background:var(--surface);color:var(--text);font:600 13px 'Fredoka',sans-serif;cursor:pointer">Hide column</button>
+        </div>
+        <div style="display:flex;gap:6px">
+          <sc-for list="{{ orderStrip }}" as="o" hint-placeholder-count="4">
+            <div style="flex:1;display:flex;align-items:center;gap:5px;height:36px;padding:0 6px;border-radius:10px;background:{{ o.bg }};border:2.5px solid {{ o.border }}">
+              <span style="width:22px;height:22px;box-sizing:border-box;border-radius:50%;background:{{ o.color }};border:2px solid #2b2233;color:#2b2233;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ o.place }}</span>
+              <span style="font-size:14px;font-weight:600;flex:1">{{ o.name }}</span>
+              <span style="font-size:12px;color:var(--muted)">{{ o.roll }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="padding:0 16px;display:flex;flex-direction:column;gap:7px">
+        <sc-for list="{{ seats }}" as="s" hint-placeholder-count="3">
+          <div style="border-radius:14px 9px 16px 10px/10px 16px 9px 14px;background:var(--surface);border:{{ s.border }};box-shadow:{{ s.shadow }};padding:6px 10px 6px 4px;display:flex;gap:6px;align-items:center;transition:box-shadow .25s">
+            <dc-import name="AO-Icon" icon="{{ s.icon }}" size="50" tint="{{ s.color }}" hint-size="50px,50px"></dc-import>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-weight:700;font-size:16px">{{ s.name }}</span>
+                <span style="font-size:11px;padding:0 6px;border-radius:6px;background:var(--aibg);color:var(--aifg);font-weight:600;border:1.5px solid var(--line)">AI</span>
+                <span style="font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden">{{ s.status }}</span>
+                <span title="Quest points" style="margin-left:auto;display:flex;align-items:center;gap:1px;font-size:16px;font-weight:700"><dc-import name="AO-Icon" icon="quest" size="20" hint-size="20px,20px"></dc-import>{{ s.qp }}</span>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;align-items:center;gap:2px 8px;font-size:14px;font-weight:600">
+                <sc-for list="{{ s.stats }}" as="st" hint-placeholder-count="3">
+                  <span title="{{ st.name }}" style="display:inline-flex;align-items:center;gap:2px"><dc-import name="AO-Icon" icon="{{ st.icon }}" size="18" hint-size="18px,18px"></dc-import>{{ st.v }}</span>
+                </sc-for>
+                <span style="width:2px;height:14px;background:var(--soft)"></span>
+                <span style="font-size:12px;font-weight:500;color:var(--muted);white-space:nowrap">{{ s.counts }}</span>
+                <span style="flex:none;margin-left:auto;display:flex;gap:1px">
+                  <sc-for list="{{ s.arts }}" as="a" hint-placeholder-count="1">
+                    <dc-import name="AO-Icon" icon="{{ a }}" size="20" hint-size="20px,20px"></dc-import>
+                  </sc-for>
+                </span>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="padding:12px 16px 0;display:flex;flex-direction:column;gap:5px">
+        <div style="font-size:14px;font-weight:700;color:var(--muted)">Quests in play · 5</div>
+        <sc-for list="{{ quests }}" as="q" hint-placeholder-count="5">
+          <div style="display:flex;align-items:center;gap:8px;padding:3px 8px 3px 4px;border-radius:11px;background:var(--surface);border:2px solid var(--line)">
+            <dc-import name="AO-Icon" icon="quest" size="30" hint-size="30px,30px"></dc-import>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+              <div style="font-size:14px;font-weight:600;line-height:1.2">{{ q.name }}</div>
+              <div style="font-size:11px;color:var(--muted)">{{ q.kind }}</div>
+            </div>
+            <div style="flex:none;display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;padding:2px 9px;border-radius:999px;background:{{ q.tagBg }};color:{{ q.tagFg }};border:1.5px solid var(--line)">
+              <sc-if value="{{ q.hasDot }}" hint-placeholder-val="{{ false }}"><span style="width:10px;height:10px;border-radius:50%;background:{{ q.dot }};border:1.5px solid #2b2233"></span></sc-if>{{ q.status }}
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="padding:10px 16px 14px;display:flex;flex-direction:column;gap:5px;flex:1;min-height:0">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:14px;font-weight:700;color:var(--muted)">Table log</div>
+          <div style="display:flex;gap:6px">
+            <button type="button" style="height:26px;padding:0 8px;border-radius:7px;border:2px solid var(--line);background:var(--surface);color:var(--text);font:600 12px 'Fredoka',sans-serif;cursor:pointer">Rules</button>
+            <button type="button" style="height:26px;padding:0 8px;border-radius:7px;border:2px solid var(--line);background:var(--surface);color:var(--text);font:600 12px 'Fredoka',sans-serif;cursor:pointer">Chat</button>
+          </div>
+        </div>
+        <div style="flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:4px">
+          <sc-for list="{{ log }}" as="l" hint-placeholder-count="4">
+            <div style="display:flex;gap:8px;font-size:13px;line-height:1.35;animation:{{ l.anim }}">
+              <span style="flex:none;margin-top:3px;width:10px;height:10px;border-radius:50%;background:{{ l.color }};border:1.5px solid var(--line)"></span>
+              <span style="color:{{ l.fg }}">{{ l.text }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1440,"height":900}}'>
+// ---------- geometry: flat-top hexes, 7-hex tiles ----------
+const S = 34, R3 = Math.sqrt(3);
+const MAPW = 1020, MAPH = 558;
+const DIRS = [[0,-1],[1,-1],[1,0],[0,1],[-1,1],[-1,0]]; // N NE SE S SW NW
+const DN = ['N','NE','SE','S','SW','NW'];
+function slotOff(i){ const a = DIRS[i % 6], b = DIRS[(i + 1) % 6]; return [a[0] + 2 * b[0], a[1] + 2 * b[1]]; } // side between outer hex i and i+1; the tile across it sits at a + 2b, as the engine does (SE–S → (1,2))
+function K(q, r){ return q + ',' + r; }
+function px(q, r){ return [1.5 * S * q, R3 * S * (r + q / 2)]; }
+
+// ---------- game facts (RULES.md §10–11) and the art that goes with them ----------
+const TILES = {
+  1:{SW:'city',NE:'dungeon'}, 2:{NW:'clubs',N:'dungeon',S:'little'}, 3:{NW:'big',NE:'hearts',SW:'city'},
+  4:{SW:'little',NE:'big'}, 5:{SW:'little'}, 6:{N:'little',S:'big',SW:'star'},
+  7:{NW:'dungeon',S:'diamonds',NE:'little',SE:'little'}, 8:{NW:'little',N:'spades',NE:'dungeon'},
+  9:{N:'little',S:'city'}, 10:{SW:'little',NE:'little',SE:'dungeon'}
+};
+const COMP = {1:[2,{S:1}],2:[2,{S:1}],3:[2,{C:1}],4:[2,{S:1,C:1}],5:[6,{C:3,M:3}],6:[4,{M:3}],7:[2,{S:1,M:1}],8:[6,{M:4}],9:[4,{C:3}],10:[2,{M:1}],11:[2,{M:1}],12:[2,{C:1}],13:[4,{S:3}],14:[4,{S:2,M:2}],15:[6,{S:4}],16:[6,{C:4}]};
+const COMPART = {1:['cat','Cat'],2:['imp','Imp'],3:['pseudodragon','Pseudodragon'],4:['squire','Squire'],5:['unicorn','Unicorn'],6:['horse','Horse'],7:['goat','Goat'],8:['pegasus','Pegasus'],9:['fairy','Fairy'],10:['broom','Magic Broom'],11:['owl','Owl'],12:['parrot','Parrot'],13:['orc','Orc'],14:['wolf','Wolf'],15:['golem','Stone Golem'],16:['bard','Bard']};
+const MON = {2:['slime','Slime'],3:['goblin','Goblin'],4:['skeleton','Skeleton'],5:['ogre','Ogre'],6:['spider','Giant Spider'],7:['dragon','Dragon']};
+const SUITS = ['hearts','spades','diamonds','clubs'];
+const ARTS = ['hearts','spades','diamonds','clubs','star'];
+const NAMES = {city:'City',dungeon:'Dungeon',little:'Little Monster',big:'Big Monster',hearts:'Heart rune',spades:'Spade rune',diamonds:'Diamond rune',clubs:'Club rune',star:'Star rune'};
+function cat(icon){ return icon === 'star' ? 'star' : (SUITS.indexOf(icon) >= 0 ? 'art' : icon); }
+const PIPS = {1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
+const STATBG = {C:'#ffd6e0', S:'#ffe0b8', M:'#d6ecff'};
+const STATICON = {C:'cha', S:'str', M:'mov'};
+const ARTBG = {C:'#fdeef2', S:'#fdf0e2', M:'#eaf4fd'};
+const BAND = {comp:'#5aa9e6', little:'#8fd14f', big:'#ff7a59', dungeon:'#9d8fc2', art:'#6b5f93'};
+
+const THEMES = {
+  light:{'--mark':'#1f4d3a','--bg':'#fbf3e0','--surface':'#fff7e6','--surface2':'#f3e6c8','--text':'#2b2233','--muted':'#5c4f66','--line':'#2b2233','--soft':'rgba(43,34,51,.2)','--action':'#ff8a3d','--actionh':'#f47a2a','--youbg':'#ffe0cc','--youfg':'#7a2e12','--aibg':'#e3ecff','--aifg':'#1f3f8a','--hlbg':'#fff3b0','--shadow':'3px 4px 0 rgba(43,34,51,.16)','--shadowlg':'5px 7px 0 rgba(43,34,51,.2)','--table':'#e9dcbc','--ghost':'#ffe0cc'},
+  dark:{'--mark':'#fbf3e0','--bg':'#221c2a','--surface':'#2e2638','--surface2':'#3a3046','--text':'#fbf3e0','--muted':'#c9bcd6','--line':'#0f0b14','--soft':'rgba(251,243,224,.22)','--action':'#ff8a3d','--actionh':'#f47a2a','--youbg':'#5a2c10','--youfg':'#ffe0cc','--aibg':'#2a3a66','--aifg':'#dbe6ff','--hlbg':'#fff3b0','--shadow':'3px 4px 0 rgba(0,0,0,.4)','--shadowlg':'5px 7px 0 rgba(0,0,0,.45)','--table':'#1a1520','--ghost':'#5a2c10'}
+};
+const PC = {red:'#e8483d', blue:'#3d8bfd', yellow:'#ffc83d', purple:'#9b5de5'};
+const ARCH = {red:'fighter', blue:'wizard', yellow:'ranger', purple:'rogue'};
+const ARCHNAME = {fighter:'Fighter', wizard:'Wizard', ranger:'Ranger', rogue:'Rogue'};
+const LAND = ['#c8e6a0','#bfe39a','#d2eaa8','#c3e0a4','#cfe6b0','#d8e8a0','#c6e3ac','#bddf9c','#d0e4a4','#c9e8b0'];
+const SEATNAME = {red:'You',blue:'Blue',yellow:'Yellow',purple:'Purple'};
+const PACES = [['Slower',0.6],['Normal',1],['Faster',1.8]];
+
+function baseStats(seat){ const s = {C:1,S:1,M:2}; seat.comps.forEach((id)=>{ const b = COMP[id][1]; Object.keys(b).forEach((k)=>{ s[k] += b[k]; }); }); return s; }
+
+function initialState(){
+  return {
+    theme:null, round:7, pace:1,
+    tiles:[
+      {n:5,c:[0,0],k:0,by:null}, {n:3,c:[2,-3],k:0,by:'blue'}, {n:7,c:[1,2],k:0,by:'red'},
+      {n:1,c:[-3,1],k:0,by:'yellow'}, {n:9,c:[3,-1],k:0,by:'purple'}, {n:2,c:[-1,-2],k:1,by:'blue'}
+    ],
+    stack:[8,6,4,10],
+    tokens:[
+      {h:'2,-3',p:'blue'},{h:'1,2',p:'red'},{h:'-3,1',p:'yellow'},{h:'3,-1',p:'purple'},{h:'-1,-2',p:'blue'},
+      {h:'-1,1',p:'red'},{h:'1,-2',p:'blue'},{h:'2,1',p:'red'},{h:'-2,0',p:'yellow'},{h:'3,-2',p:'purple'},
+      {h:'3,-4',p:'blue'},{h:'-1,-3',p:'yellow'},{h:'1,3',p:'red'},{h:'0,2',p:'red'},{h:'-4,2',p:'red'}
+    ],
+    seats:{
+      red:{comps:[3,10],little:[2,3],big:[],arts:['diamonds'],tiles:1,dungeons:1,used:6,qp:1},
+      blue:{comps:[1],little:[],big:[],arts:['hearts'],tiles:2,dungeons:0,used:4,qp:0},
+      yellow:{comps:[],little:[3],big:[],arts:['clubs'],tiles:1,dungeons:1,used:3,qp:0},
+      purple:{comps:[],little:[2],big:[],arts:[],tiles:1,dungeons:0,used:2,qp:0}
+    },
+    claimed:{explore:null,dungeons:null,recruit:'red'},
+    pos:{red:[1,1],blue:[2,-2],yellow:[-3,0],purple:[3,0]},
+    order:['yellow','red','purple','blue'], rolls:{yellow:9,red:8,purple:6,blue:4},
+    active:'red', phase:'move', steps:3, startHex:'1,1', moved:false,
+    test:null, ex:null, ai:null, ord:null,
+    decks:{comp:13,dun:24,little:8,big:12},
+    q:{comp:[9,12,6],little:[3,2,4],big:[6,5],dun:['little','comp']},
+    log:[
+      {p:'red',t:'Your turn. Movement 3: take up to 3 steps.'},
+      {p:'yellow',t:'Yellow walked 2 hexes and stopped.'},
+      {p:null,t:'Round 7. Turn order: Yellow 9, You 8, Purple 6, Blue 4.'},
+      {p:'purple',t:'Purple failed at the City: rolled 3, needed 4. Purple stayed on it.'}
+    ],
+    freshTok:-1, freshLog:false, capKey:0
+  };
+}
+
+class Component extends DCLogic {
+  constructor(props){ super(props); this.state = initialState(); }
+  componentWillUnmount(){ clearTimeout(this.aiT); }
+  theme(){ return this.state.theme || this.props.theme || 'light'; }
+
+  // ---------- map helpers ----------
+  mapOf(tiles){
+    const m = {};
+    tiles.forEach((t, ti)=>{
+      m[K(t.c[0], t.c[1])] = {q:t.c[0], r:t.c[1], ti:ti, dir:-1, icon:null};
+      const ic = TILES[t.n];
+      for (let d = 0; d < 6; d++){
+        const pd = (d - t.k + 6) % 6;
+        const q = t.c[0] + DIRS[d][0], r = t.c[1] + DIRS[d][1];
+        m[K(q, r)] = {q:q, r:r, ti:ti, dir:d, icon:ic[DN[pd]] || null};
+      }
+    });
+    return m;
+  }
+  doneMap(tokens, map){ const d = {}; tokens.forEach((t)=>{ if (map[t.h] && map[t.h].icon) d[t.h] = t.p; }); return d; }
+  occupied(except){ const o = {}; const p = this.state.pos; Object.keys(p).forEach((c)=>{ if (c !== except) o[K(p[c][0], p[c][1])] = c; }); return o; }
+  emptySlotsAt(hk, tiles, map){
+    const h = map[hk]; if (!h || h.dir < 0) return [];
+    const t = tiles[h.ti], out = [];
+    [h.dir, (h.dir + 5) % 6].forEach((i)=>{
+      const o = slotOff(i), c = [t.c[0] + o[0], t.c[1] + o[1]];
+      if (!tiles.some((x)=> x.c[0] === c[0] && x.c[1] === c[1])) out.push(c);
+    });
+    return out;
+  }
+  stats(color){ return baseStats(this.state.seats[color]); }
+  addLog(list, p, t){ return [{p:p, t:t}].concat(list).slice(0, 14); }
+
+  // ---------- your moves ----------
+  step(hk){
+    const s = this.state; if (s.phase !== 'move' || s.active !== 'red' || s.steps <= 0) return;
+    const map = this.mapOf(s.tiles), h = map[hk], done = this.doneMap(s.tokens, map);
+    const pos = Object.assign({}, s.pos, {red:[h.q, h.r]});
+    if (h.icon && !done[hk]) this.setState({pos:pos, steps:0, moved:true, phase:'test', test:this.newTest(h.icon, hk)});
+    else this.setState({pos:pos, steps:s.steps - 1, moved:true});
+  }
+  newTest(icon, hk){
+    const c = cat(icon);
+    if (c === 'art' || c === 'star') return {kind:'art', icon:icon, hk:hk, stage:'take'};
+    return {kind:c, icon:icon, hk:hk, stage:'start', dcard:null, card:null, dice:null};
+  }
+  retry(){
+    const s = this.state, map = this.mapOf(s.tiles), h = map[s.startHex];
+    if (!h || !h.icon) return;
+    this.setState({phase:'test', steps:0, moved:true, test:this.newTest(h.icon, s.startHex)});
+  }
+  sub(t){ return t.kind === 'dungeon' ? t.dcard : t.kind; }
+  cardLabel(card){ return card.type === 'comp' ? ('the ' + COMPART[card.id][1] + ' (Companion ' + card.id + ')') : ('the ' + MON[card.need][1] + ' (' + (card.type === 'little' ? 'Little' : 'Big') + ' Monster ' + card.need + ')'); }
+  testAct(){
+    const s = this.state, t = Object.assign({}, s.test), q = Object.assign({}, s.q);
+    let log = s.log;
+    if (t.kind === 'art'){ this.finishTest(true); return; }
+    if (t.stage === 'start' && t.kind === 'dungeon'){
+      t.dcard = q.dun[0]; q.dun = q.dun.slice(1).concat([t.dcard]); t.stage = 'dcard';
+      log = this.addLog(log, 'red', 'You drew a Dungeon card: ' + (t.dcard === 'comp' ? 'Companion.' : 'Little Monster.'));
+    } else if (t.stage === 'start' || t.stage === 'dcard'){
+      const sb = this.sub(t);
+      if (sb === 'comp' || sb === 'city'){ t.card = {type:'comp', id:q.comp[0]}; q.comp = q.comp.slice(1).concat([q.comp[0]]); }
+      else { t.card = {type:sb, need:q[sb][0]}; q[sb] = q[sb].slice(1).concat([q[sb][0]]); }
+      t.stage = 'card';
+      log = this.addLog(log, 'red', 'You drew ' + this.cardLabel(t.card) + '.');
+    } else if (t.stage === 'card'){
+      const st = this.stats('red'), recruit = t.card.type === 'comp';
+      const n = recruit ? st.C : st.S, dice = [];
+      for (let i = 0; i < n; i++) dice.push(1 + Math.floor(Math.random() * 6));
+      const total = dice.reduce((a, b)=> a + b, 0), need = recruit ? COMP[t.card.id][0] : t.card.need;
+      t.dice = dice; t.total = total; t.ok = total >= need; t.stage = 'rolled';
+      log = this.addLog(log, 'red', 'You rolled ' + dice.join(' + ') + ' = ' + total + ' against ' + need + '. ' + (t.ok ? 'Success!' : 'Not enough.'));
+    } else if (t.stage === 'rolled'){ this.finishTest(t.ok); return; }
+    this.setState({test:t, q:q, log:log, freshLog:true});
+  }
+  finishTest(ok){
+    const s = this.state, t = s.test, seats = JSON.parse(JSON.stringify(s.seats)), me = seats.red;
+    let tokens = s.tokens, log = s.log, decks = Object.assign({}, s.decks), freshTok = -1;
+    const name = NAMES[t.icon];
+    if (ok){
+      tokens = tokens.concat([{h:t.hk, p:'red'}]); me.used += 1; freshTok = tokens.length - 1;
+      if (t.kind === 'art'){
+        Object.keys(seats).forEach((c)=>{ seats[c].arts = seats[c].arts.filter((a)=> a !== t.icon); });
+        me.arts.push(t.icon); log = this.addLog(log, 'red', 'You took the ' + name + ' and put a coin on its hex.');
+      } else {
+        if (t.card.type === 'comp'){ me.comps.push(t.card.id); decks.comp -= 1; log = this.addLog(log, 'red', 'The ' + COMPART[t.card.id][1] + ' joins you!'); }
+        else { me[t.card.type].push(t.card.need); decks[t.card.type] -= 1; log = this.addLog(log, 'red', 'You beat the ' + MON[t.card.need][1] + '.'); }
+        if (t.kind === 'dungeon') me.dungeons += 1;
+        log = this.addLog(log, 'red', 'The ' + name + ' is done. Coin placed.');
+      }
+    } else {
+      log = this.addLog(log, 'red', 'The card went to the bottom of its deck. The ' + name + ' stays open.');
+    }
+    const claimed = this.checkClaims(seats, s.claimed);
+    this.setState({seats:seats, tokens:tokens, decks:decks, log:claimed.log ? this.addLog(log, 'red', claimed.log) : log, claimed:claimed.c, phase:'done', test:null, freshTok:freshTok, freshLog:true});
+  }
+  checkClaims(seats, claimed){
+    const c = Object.assign({}, claimed); let msg = null;
+    const rules = [['explore','tiles',3,'Explore 3 tiles'],['dungeons','dungeons',2,'Complete 2 dungeons'],['recruit',null,2,'Recruit 2 companions']];
+    rules.forEach((r)=>{
+      if (c[r[0]]) return;
+      Object.keys(seats).forEach((p)=>{
+        const v = r[1] ? seats[p][r[1]] : seats[p].comps.length;
+        if (!c[r[0]] && v >= r[2]){ c[r[0]] = p; seats[p].qp += 1; msg = SEATNAME[p] + ' claimed the quest ' + r[3] + '!'; }
+      });
+    });
+    return {c:c, log:msg};
+  }
+
+  // ---------- exploring ----------
+  explore(){
+    const s = this.state; if (!this.canExplore()) return;
+    const n = s.stack[0];
+    const slots = this.emptySlotsAt(K(s.pos.red[0], s.pos.red[1]), s.tiles, this.mapOf(s.tiles));
+    this.setState({phase:'explore', stack:s.stack.slice(1), ex:{n:n, slots:slots, pick:null, k:0}, log:this.addLog(s.log, 'red', 'You turned over tile ' + n + '.'), freshLog:true});
+  }
+  canExplore(){
+    const s = this.state;
+    if (s.phase !== 'move' || s.active !== 'red' || s.steps <= 0 || !s.stack.length) return false;
+    return this.emptySlotsAt(K(s.pos.red[0], s.pos.red[1]), s.tiles, this.mapOf(s.tiles)).length > 0;
+  }
+  pickSlot(c){ this.setState({ex:Object.assign({}, this.state.ex, {pick:c})}); }
+  turnTile(d){ const ex = Object.assign({}, this.state.ex); ex.k = (ex.k + d + 6) % 6; this.setState({ex:ex}); }
+  placeTile(){
+    const s = this.state, ex = s.ex; if (!ex.pick) return;
+    const tiles = s.tiles.concat([{n:ex.n, c:ex.pick, k:ex.k, by:'red'}]);
+    const seats = JSON.parse(JSON.stringify(s.seats)); seats.red.tiles += 1; seats.red.used += 1;
+    const tokens = s.tokens.concat([{h:K(ex.pick[0], ex.pick[1]), p:'red'}]);
+    let log = this.addLog(s.log, 'red', 'You placed tile ' + ex.n + ' and put a coin on its centre. Your turn is over.');
+    const claimed = this.checkClaims(seats, s.claimed); if (claimed.log) log = this.addLog(log, 'red', claimed.log);
+    if (!s.stack.length) log = this.addLog(log, null, 'That was the last tile. Finish this round, then play one more.');
+    this.setState({tiles:tiles, seats:seats, tokens:tokens, claimed:claimed.c, ex:null, phase:'done', steps:0, log:log, freshTok:tokens.length - 1, freshLog:true});
+  }
+
+  // ---------- AI turns: a slideshow, never skipped ----------
+  endTurn(){
+    const s = this.state; if (s.active !== 'red' || s.phase === 'test' || s.phase === 'explore') return;
+    const idx = s.order.indexOf('red');
+    this.runAI(this.aiScript(s.order.slice(idx + 1)), 'order');
+  }
+  aiScript(who){
+    const lines = [];
+    who.forEach((c)=>{
+      if (c === 'purple' && this.state.round === 7){
+        lines.push({who:c, text:'Purple starts on the City they failed last turn, and stays to try again.'});
+        lines.push({who:c, text:'Purple draws the Goat (Companion 7). It needs 2. Purple rolls 1 die: 4. The Goat joins Purple!', fx:(st)=>{ const seats = JSON.parse(JSON.stringify(st.seats)); seats.purple.comps.push(7); seats.purple.used += 1; const tokens = st.tokens.concat([{h:'3,0', p:'purple'}]); return {seats:seats, tokens:tokens, freshTok:tokens.length - 1, decks:Object.assign({}, st.decks, {comp:st.decks.comp - 1})}; }});
+      } else if (c === 'blue' && this.state.round === 7){
+        lines.push({who:c, text:'Blue steps onto the finished City. It is plain ground now.', fx:(st)=> this.moveFx(st, 'blue', [1,-2])});
+        lines.push({who:c, text:'Blue steps onto the Skull. A Big Monster fight!', fx:(st)=> this.moveFx(st, 'blue', [1,-3])});
+        lines.push({who:c, text:'Blue draws the Dragon (Big Monster 7) and rolls 2 dice: 4 + 2 = 6. Not enough. The Dragon goes to the bottom of the deck.'});
+      } else {
+        lines.push({who:c, text:SEATNAME[c] + ' looks at the map, stays put, and ends the turn.'});
+      }
+    });
+    return lines;
+  }
+  moveFx(st, c, to){ const pos = Object.assign({}, st.pos); pos[c] = to; return {pos:pos}; }
+  runAI(lines, then){
+    clearTimeout(this.aiT);
+    if (!lines.length){ this.afterAI(then); return; }
+    this.setState({phase:'ai', active:lines[0].who, ai:{lines:lines, i:0, then:then}, capKey:this.state.capKey + 1});
+    this.applyLine(0, lines);
+  }
+  applyLine(i, lines){
+    const L = lines[i];
+    const patch = L.fx ? L.fx(this.state) : {};
+    patch.log = this.addLog(this.state.log, L.who, L.text); patch.freshLog = true;
+    this.setState(patch);
+    this.aiT = setTimeout(()=> this.nextLine(), 2200 / this.state.pace);
+  }
+  nextLine(){
+    const ai = this.state.ai; if (!ai) return;
+    const i = ai.i + 1;
+    if (i >= ai.lines.length){ this.afterAI(ai.then); return; }
+    this.setState({ai:Object.assign({}, ai, {i:i}), active:ai.lines[i].who, capKey:this.state.capKey + 1});
+    this.applyLine(i, ai.lines);
+  }
+  replay(){ if (!this.state.ai) return; clearTimeout(this.aiT); this.setState({capKey:this.state.capKey + 1}); this.aiT = setTimeout(()=> this.nextLine(), 2200 / this.state.pace); }
+  afterAI(then){
+    const s = this.state;
+    if (then === 'order') this.setState({phase:'order', ai:null, active:null, round:s.round + 1, ord:{rolled:false}, log:this.addLog(s.log, null, 'Round ' + s.round + ' is over.')});
+    else this.startYourTurn();
+  }
+  rollOrder(){
+    const s = this.state, rolls = {}, used = {};
+    ['red','blue','yellow','purple'].forEach((c)=>{
+      let v; do { v = 2 + Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6); } while (used[v]);
+      used[v] = 1; rolls[c] = v;
+    });
+    const order = Object.keys(rolls).sort((a, b)=> rolls[b] - rolls[a]);
+    this.setState({rolls:rolls, order:order, ord:{rolled:true}, log:this.addLog(s.log, null, 'Round ' + s.round + '. Turn order: ' + order.map((c)=> SEATNAME[c] + ' ' + rolls[c]).join(', ') + '.'), freshLog:true});
+  }
+  startRound(){ const s = this.state; this.setState({ord:null}); this.runAI(this.aiScript(s.order.slice(0, s.order.indexOf('red'))), 'you'); }
+  startYourTurn(){
+    const s = this.state, M = this.stats('red').M;
+    this.setState({phase:'move', active:'red', ai:null, steps:M, moved:false, startHex:K(s.pos.red[0], s.pos.red[1]), log:this.addLog(s.log, 'red', 'Your turn. Movement ' + M + ': take up to ' + M + ' steps.'), freshLog:true});
+  }
+  setPace(p){ this.setState({pace:p}); }
+  toggleTheme(){ this.setState({theme:this.theme() === 'light' ? 'dark' : 'light'}); }
+
+  // ---------- view ----------
+  chipsOf(b){ return Object.keys(b).map((k)=> ({icon:STATICON[k], v:b[k], bg:STATBG[k]})); }
+  cardView(card, fresh){
+    const anim = fresh ? 'ao-fly .42s cubic-bezier(.2,.8,.2,1) both' : 'none';
+    if (card.type === 'comp'){
+      const c = COMP[card.id], a = COMPART[card.id], k = Object.keys(c[1])[0];
+      return {kind:'Companion ' + card.id, band:BAND.comp, bandText:'#2b2233', hasNum:true, num:c[0], bg:ARTBG[k], art:a[0], name:a[1], chips:this.chipsOf(c[1]), anim:anim};
+    }
+    if (card.type === 'dcard'){
+      const lm = card.v === 'little';
+      return {kind:'Dungeon', band:BAND.dungeon, bandText:'#2b2233', hasNum:false, num:'', bg:'#efeaf6', art:lm ? 'little' : 'cha', name:lm ? 'Little Monster' : 'Companion', chips:[], anim:anim};
+    }
+    if (card.type === 'art'){
+      return {kind:'Rune', band:BAND.art, bandText:'#ffffff', hasNum:false, num:'', bg:'#efeaf6', art:card.icon, name:NAMES[card.icon], chips:[], anim:anim};
+    }
+    const m = MON[card.need];
+    return {kind:card.type === 'little' ? 'Little Monster' : 'Big Monster', band:BAND[card.type], bandText:'#2b2233', hasNum:true, num:card.need, bg:card.type === 'little' ? '#eef6e4' : '#fbe9e2', art:m[0], name:m[1], chips:[], anim:anim};
+  }
+  testView(){
+    const s = this.state, t = s.test; if (!t) return null;
+    const st = this.stats('red');
+    const v = {icon:t.icon, cards:[], dice:[], hasDice:false, total:0, totalColor:'var(--text)', act:()=> this.testAct()};
+    if (t.kind === 'art'){
+      const holder = Object.keys(s.seats).filter((c)=> s.seats[c].arts.indexOf(t.icon) >= 0)[0];
+      v.title = NAMES[t.icon];
+      v.cards = [this.cardView({type:'art', icon:t.icon}, true)];
+      v.text = 'No roll! You take the ' + NAMES[t.icon] + (holder ? (' from ' + SEATNAME[holder] + '.') : ' from the supply.') + ' Your coin goes on this hex, and it can never be used again.';
+      v.btn = 'Take it';
+    } else {
+      const titles = {city:'City · make a friend', little:'Little Monster · fight!', big:'Big Monster · fight!', dungeon:'Dungeon'};
+      v.title = titles[t.kind];
+      if (t.dcard) v.cards.push(this.cardView({type:'dcard', v:t.dcard}, t.stage === 'dcard'));
+      if (t.card) v.cards.push(this.cardView(t.card, t.stage === 'card'));
+      const sb = this.sub(t) || t.kind, recruit = sb === 'city' || sb === 'comp';
+      const n = recruit ? st.C : st.S, statName = recruit ? 'Charisma' : 'Strength';
+      const dice = n === 1 ? '1 die' : n + ' dice';
+      if (t.stage === 'start'){
+        if (t.kind === 'dungeon'){ v.text = 'Draw the top Dungeon card and do what it says.'; v.btn = 'Draw a Dungeon card'; }
+        else if (recruit){ v.text = 'Draw the top Companion card, then roll dice equal to your Charisma (' + st.C + ').'; v.btn = 'Draw a Companion card'; }
+        else { v.text = 'Draw the top ' + NAMES[sb] + ' card, then roll dice equal to your Strength (' + st.S + ').'; v.btn = 'Draw a ' + NAMES[sb] + ' card'; }
+      } else if (t.stage === 'dcard'){
+        v.text = t.dcard === 'comp' ? 'Companion: make a friend. If you fail, the Dungeon fails too.' : 'Little Monster: fight one. Beat it and the Dungeon is done.';
+        v.btn = t.dcard === 'comp' ? 'Draw a Companion card' : 'Draw a Little Monster card';
+      } else if (t.stage === 'card'){
+        const need = t.card.type === 'comp' ? COMP[t.card.id][0] : t.card.need;
+        v.text = 'Roll ' + dice + ' (your ' + statName + '). You need ' + need + ' or more.';
+        v.btn = 'Roll ' + dice;
+      } else {
+        v.hasDice = true; v.total = t.total; v.totalColor = t.ok ? '#3f8a22' : 'var(--muted)';
+        v.dice = t.dice.map((x)=> ({cells:[0,1,2,3,4,5,6,7,8].map((i)=> ({bg:PIPS[x].indexOf(i) >= 0 ? '#2b2233' : 'transparent'}))}));
+        if (t.ok){ v.text = t.card.type === 'comp' ? 'They join you! Their bonus adds to your stats for the rest of the game.' : 'You win! Keep the card; it counts toward quests.'; v.btn = 'Keep it'; }
+        else { v.text = 'Not enough. The card goes to the bottom of its deck. You can stay here and try again next turn.'; v.btn = 'Put it under its deck'; }
+      }
+    }
+    v.noCards = v.cards.length === 0;
+    return v;
+  }
+
+  renderVals(){
+    const s = this.state, th = this.theme(), T = THEMES[th];
+    const rootStyle = Object.assign({}, T, {width:'1440px', height:'900px', display:'flex', flexDirection:'column', background:'var(--bg)', fontFamily:"'Fredoka',sans-serif", overflow:'hidden', borderRadius:'12px', boxSizing:'border-box', position:'relative', color:'var(--text)'});
+
+    const ex = s.ex, pendTiles = ex && ex.pick ? s.tiles.concat([{n:ex.n, c:ex.pick, k:ex.k, by:'red', pending:true}]) : s.tiles;
+    const map = this.mapOf(pendTiles), done = this.doneMap(s.tokens, map), occ = this.occupied('red');
+    const pendIdx = ex && ex.pick ? pendTiles.length - 1 : -1;
+
+    let minx = 1e9, maxx = -1e9, miny = 1e9, maxy = -1e9;
+    Object.keys(map).forEach((k)=>{ const p = px(map[k].q, map[k].r); minx = Math.min(minx, p[0]); maxx = Math.max(maxx, p[0]); miny = Math.min(miny, p[1]); maxy = Math.max(maxy, p[1]); });
+    const ox = MAPW / 2 - (minx + maxx) / 2, oy = MAPH / 2 - (miny + maxy) / 2;
+    const at = (q, r)=>{ const p = px(q, r); return [ox + p[0], oy + p[1]]; };
+
+    const yours = s.active === 'red' && s.phase === 'move';
+    const here = K(s.pos.red[0], s.pos.red[1]);
+    const legal = {};
+    if (yours && s.steps > 0) DIRS.forEach((d)=>{ const k = K(s.pos.red[0] + d[0], s.pos.red[1] + d[1]); if (map[k] && !occ[k]) legal[k] = 1; });
+
+    const hexes = Object.keys(map).map((k)=>{
+      const h = map[k], p = at(h.q, h.r), isL = !!legal[k], pend = h.ti === pendIdx;
+      const trig = isL && h.icon && !done[k];
+      const tuft = !h.icon && ((h.q * 7 + h.r * 3) % 4 === 0) ? 'M44 42l2-5 2 5 2-6 2 6' : '';
+      return {
+        x:+(p[0] - S).toFixed(1), y:+(p[1] - R3 * S / 2).toFixed(1),
+        fill:isL ? '#fff3b0' : LAND[pendTiles[h.ti].n - 1], edge:pend ? '#ff8a3d' : '#2b2233', sw:pend ? 5 : 3, tuft:tuft,
+        dot:isL && !trig ? '#ff8a3d' : 'transparent', dotEdge:isL && !trig ? '#2b2233' : 'transparent', cursor:isL ? 'pointer' : 'default', op:pend ? 0.94 : 1,
+        anim:pend ? 'ao-tile .45s cubic-bezier(.2,.8,.2,1) both' : 'none',
+        label:(h.icon ? NAMES[h.icon] + (done[k] ? ', done' : '') : 'Empty hex') + (isL ? (trig ? '. Step here to trigger it.' : '. Step here.') : ''),
+        go:()=>{ if (isL) this.step(k); }
+      };
+    });
+
+    const badges = [];
+    Object.keys(map).forEach((k)=>{
+      const h = map[k]; if (!h.icon) return;
+      const p = at(h.q, h.r);
+      badges.push({x:+(p[0] - 22).toFixed(1), y:+(p[1] - 24).toFixed(1), icon:h.icon, op:done[k] ? 0.45 : 1, rot:((h.q * 5 + h.r * 3) % 7) - 3,
+        trig:!!legal[k] && !done[k], title:NAMES[h.icon] + (done[k] ? ' · done by ' + SEATNAME[done[k]] : '')});
+    });
+
+    const tokens = s.tokens.map((t, i)=>{
+      const h = map[t.h], p = at(h.q, h.r), centre = h.dir < 0;
+      return {x:+(p[0] + (centre ? -12 : 4)).toFixed(1), y:+(p[1] + (centre ? -12 : 2)).toFixed(1), color:PC[t.p], anim:i === s.freshTok ? 'ao-drop .5s cubic-bezier(.2,.8,.2,1) both' : 'none'};
+    });
+
+    const standees = ['red','blue','yellow','purple'].map((c)=>{
+      const p = at(s.pos[c][0], s.pos[c][1]);
+      return {x:+(p[0] - 27).toFixed(1), y:+(p[1] - 44).toFixed(1), icon:ARCH[c], color:PC[c], label:SEATNAME[c] + ' · ' + ARCHNAME[ARCH[c]], bob:s.active === c ? 'ao-bob 1.2s ease-in-out infinite' : 'none'};
+    });
+
+    const ghosts = [];
+    if (ex && !ex.pick){
+      ex.slots.forEach((c)=>{
+        [[0,0]].concat(DIRS).forEach((d, j)=>{
+          const p = at(c[0] + d[0], c[1] + d[1]);
+          ghosts.push({x:+(p[0] - S).toFixed(1), y:+(p[1] - R3 * S / 2).toFixed(1), text:j === 0 ? 'Here!' : '', label:'Place the tile in this slot', pick:()=> this.pickSlot(c)});
+        });
+      });
+    }
+
+    let exV = null;
+    if (ex){
+      const ms = 19;
+      const mini = [[0,0]].concat(DIRS).map((d, j)=>{
+        const pd = j === 0 ? -1 : (j - 1 - ex.k + 6) % 6, icon = pd < 0 ? null : TILES[ex.n][DN[pd]];
+        const p = px(d[0], d[1]).map((v)=> v * ms / S);
+        return {x:+(52 + p[0] - 19).toFixed(1), y:+(52 + p[1] - 16.5).toFixed(1), fill:LAND[ex.n - 1], has:!!icon, icon:icon || 'city'};
+      });
+      exV = {n:ex.n, mini:mini, turning:!!ex.pick,
+        text:ex.pick ? 'Turn it any of 6 ways, then place it. Your coin goes on its centre.' : (ex.slots.length > 1 ? 'Pick one of the two glowing slots next to you.' : 'Pick the glowing slot next to you.'),
+        left:()=> this.turnTile(-1), right:()=> this.turnTile(1), place:()=> this.placeTile()};
+    }
+
+    const ai = s.ai, line = ai ? ai.lines[ai.i] : null;
+    const caption = line ? {who:SEATNAME[line.who], icon:ARCH[line.who], color:PC[line.who], text:line.text, key:s.capKey} : {who:'', icon:'fighter', color:'#e8483d', text:'', key:0};
+    const paces = PACES.map((p)=> ({label:p[0], on:s.pace === p[1], bg:s.pace === p[1] ? 'var(--surface)' : 'transparent', pick:()=> this.setPace(p[1])}));
+
+    const decks = [
+      {name:'Companions', count:s.decks.comp, color:BAND.comp, icon:'cha', title:'Companion deck'},
+      {name:'Dungeon', count:s.decks.dun, color:BAND.dungeon, icon:'dungeon', title:'Dungeon deck'},
+      {name:'Little', count:s.decks.little, color:BAND.little, icon:'little', title:'Little Monster deck'},
+      {name:'Big', count:s.decks.big, color:BAND.big, icon:'big', title:'Big Monster deck'}
+    ];
+    const holderOf = (a)=> Object.keys(s.seats).filter((c)=> s.seats[c].arts.indexOf(a) >= 0)[0];
+    const artChips = ARTS.map((a)=>{ const h = holderOf(a); return {icon:a, dot:h ? PC[h] : 'transparent', holder:h ? SEATNAME[h] : 'Free', title:NAMES[a] + (h ? ' · held by ' + SEATNAME[h] : ' · in the supply')}; });
+
+    const me = s.seats.red, st = baseStats(me);
+    const bonus = (k)=>{ const v = st[k] - {C:1,S:1,M:2}[k]; return v ? ('+' + v + ' from friends') : 'to start'; };
+    const lastOf = (arr)=> arr.length ? arr[arr.length - 1] : 0;
+    const meV = {
+      color:PC.red, qp:me.qp,
+      stats:[{name:'Charisma', icon:'cha', v:st.C, note:bonus('C'), bg:STATBG.C}, {name:'Strength', icon:'str', v:st.S, note:bonus('S'), bg:STATBG.S}, {name:'Movement', icon:'mov', v:st.M, note:bonus('M'), bg:STATBG.M}],
+      compCount:me.comps.length,
+      comps:me.comps.map((id, i)=> ({art:COMPART[id][0], name:COMPART[id][1], tilt:[-3,2,-1.5,2.5][i % 4], anim:'none', title:COMPART[id][1] + ' (Companion ' + id + ')', chips:this.chipsOf(COMP[id][1])})),
+      monsters:[['little','Little'],['big','Big']].map((m)=>{ const arr = me[m[0]], has = arr.length > 0; return {name:m[1], n:arr.length, stack:arr.length > 1, has:has, none:!has, art:has ? MON[lastOf(arr)][0] : 'little',
+        face:has ? '#fff7e6' : 'transparent', border:has ? '2.5px solid #2b2233' : '2.5px dashed var(--soft)', shadow:has ? 'var(--shadow)' : 'none'}; }),
+      artCount:me.arts.length, noArts:me.arts.length === 0,
+      arts:me.arts.map((a)=> ({icon:a, name:NAMES[a].replace(' rune', ''), anim:'none'})),
+      tokensLeft:10 - me.used,
+      tokenDots:[0,1,2,3,4,5,6,7,8,9].map((i)=> ({on:i < 10 - me.used, off:i >= 10 - me.used})),
+      tiles:me.tiles, dungeons:me.dungeons
+    };
+
+    const M = st.M;
+    const stepPips = []; for (let i = 0; i < M; i++) stepPips.push({bg:i < s.steps && s.active === 'red' && s.phase === 'move' ? 'var(--action)' : 'transparent'});
+    const canEx = this.canExplore();
+    const mh = map[here], onOpen = mh && mh.icon && !done[here];
+    const canRetry = yours && !s.moved && s.startHex === here && !!onOpen;
+    let hint;
+    if (s.phase === 'move' && s.active === 'red'){
+      hint = s.steps > 0 ? 'Tap a yellow hex to step. A glowing icon starts the moment you step on it, and ends your turn.' : 'No steps left. End your turn.';
+      if (canEx) hint = 'You are next to an empty slot. Explore now, or keep walking. Exploring ends your turn.';
+    } else if (s.phase === 'test') hint = 'Finish the icon. Your turn ends after it.';
+    else if (s.phase === 'explore') hint = 'Place the tile. You don’t step onto it this turn.';
+    else if (s.phase === 'done') hint = 'Your turn is over. Press End turn.';
+    else if (s.phase === 'ai') hint = 'Watching the others. Change the speed or replay a move at the top of the map.';
+    else hint = 'New round! Roll for turn order.';
+
+    let pill;
+    if (s.phase === 'ai' && s.active) pill = {bg:'var(--aibg)', fg:'var(--aifg)', dot:PC[s.active], text:SEATNAME[s.active] + ' is taking a turn'};
+    else if (s.phase === 'order') pill = {bg:'var(--surface2)', fg:'var(--text)', dot:'var(--muted)', text:'Roll for turn order'};
+    else if (s.phase === 'done') pill = {bg:'var(--youbg)', fg:'var(--youfg)', dot:PC.red, text:'Your turn · done'};
+    else pill = {bg:'var(--youbg)', fg:'var(--youfg)', dot:PC.red, text:'Your turn · ' + s.steps + (s.steps === 1 ? ' step' : ' steps') + ' left'};
+
+    const orderStrip = s.order.map((c, i)=> ({place:i + 1, name:SEATNAME[c], roll:s.rolls[c] || '', color:PC[c], bg:s.active === c ? 'var(--surface)' : 'transparent', border:s.active === c ? 'var(--action)' : 'var(--soft)'}));
+    const seats = s.order.filter((c)=> c !== 'red').map((c)=>{
+      const x = s.seats[c], xs = baseStats(x), hk = K(s.pos[c][0], s.pos[c][1]), onIcon = map[hk];
+      const status = s.active === c ? 'playing' : (onIcon && onIcon.icon && !done[hk] ? 'on the ' + NAMES[onIcon.icon] : ARCHNAME[ARCH[c]]);
+      return {name:SEATNAME[c], icon:ARCH[c], color:PC[c], qp:x.qp, status:status,
+        border:s.active === c ? '3px solid var(--action)' : '2.5px solid var(--line)', shadow:s.active === c ? 'var(--shadowlg)' : 'var(--shadow)',
+        stats:[{name:'Charisma', icon:'cha', v:xs.C}, {name:'Strength', icon:'str', v:xs.S}, {name:'Movement', icon:'mov', v:xs.M}],
+        counts:'Friends ' + x.comps.length + ' · Monsters ' + (x.little.length + x.big.length) + ' · Tiles ' + x.tiles + ' · Coins ' + (10 - x.used),
+        arts:x.arts};
+    });
+
+    const all = ['red','blue','yellow','purple'];
+    const lead = (fn)=>{ let best = -1, who = []; all.forEach((c)=>{ const v = fn(s.seats[c]); if (v > best){ best = v; who = [c]; } else if (v === best) who.push(c); }); return {best:best, who:who}; };
+    const quests = [];
+    [['explore','Explore 3 tiles',(x)=> x.tiles,3],['dungeons','Complete 2 dungeons',(x)=> x.dungeons,2],['recruit','Recruit 2 companions',(x)=> x.comps.length,2]].forEach((qd)=>{
+      const cl = s.claimed[qd[0]];
+      if (cl) quests.push({name:qd[1], kind:'First to do it · claimed', status:SEATNAME[cl], hasDot:true, dot:PC[cl], tagBg:cl === 'red' ? 'var(--youbg)' : 'var(--surface2)', tagFg:cl === 'red' ? 'var(--youfg)' : 'var(--text)'});
+      else { const L = lead(qd[2]); quests.push({name:qd[1], kind:'First to do it · closest: ' + L.who.map((c)=> SEATNAME[c]).join(', '), status:L.best + ' of ' + qd[3], hasDot:false, dot:'', tagBg:'var(--surface2)', tagFg:'var(--text)'}); }
+    });
+    [['Most Little Monsters',(x)=> x.little.length],['Most runes',(x)=> x.arts.length]].forEach((qd)=>{
+      const L = lead(qd[1]), tie = L.who.length > 1;
+      quests.push({name:qd[0], kind:'End of game · a tie scores nothing', status:tie ? ('Tied at ' + L.best) : (SEATNAME[L.who[0]] + (L.who[0] === 'red' ? ' lead, ' : ' leads, ') + L.best), hasDot:!tie, dot:tie ? '' : PC[L.who[0]], tagBg:'var(--surface2)', tagFg:'var(--text)'});
+    });
+
+    const log = s.log.slice(0, 8).map((l, i)=> ({text:l.t, color:l.p ? PC[l.p] : 'var(--muted)', fg:i === 0 ? 'var(--text)' : 'var(--muted)', anim:i === 0 && s.freshLog ? 'ao-rise .3s ease both' : 'none'}));
+    const legend = [['city','City'],['dungeon','Dungeon'],['little','Little Monster'],['big','Big Monster'],['spades','Rune'],['star','Star rune']].map((l)=> ({icon:l[0], name:l[1]}));
+    const orderRows = s.order.map((c, i)=> ({place:s.ord && s.ord.rolled ? ['1st','2nd','3rd','4th'][i] : '', name:SEATNAME[c] + ' · ' + ARCHNAME[ARCH[c]], icon:ARCH[c], color:PC[c], total:s.ord && s.ord.rolled ? s.rolls[c] : '?', bg:c === 'red' ? 'var(--youbg)' : 'var(--surface2)', weight:c === 'red' ? 700 : 500}));
+
+    const endOk = s.active === 'red' && (s.phase === 'move' || s.phase === 'done');
+    const tp = this.testView();
+
+    return {
+      rootStyle:rootStyle, round:s.round, pill:pill, themeLabel:th === 'light' ? 'Dark' : 'Light', toggleTheme:()=> this.toggleTheme(),
+      decks:decks, stackCount:s.stack.length, artChips:artChips,
+      hexes:hexes, ghosts:ghosts, badges:badges, tokens:tokens, standees:standees,
+      showCaption:!!line, caption:caption, paces:paces, replay:()=> this.replay(),
+      legend:legend, legendOp:s.phase === 'test' || s.phase === 'explore' ? 0 : 1,
+      showTest:!!tp, tp:tp || {cards:[], dice:[], noCards:true, icon:'city'},
+      showEx:!!exV, ex:exV || {mini:[]},
+      showOrder:s.phase === 'order', orderRows:orderRows, orderBtn:s.ord && s.ord.rolled ? 'Start round ' + s.round : 'Roll 2 dice',
+      orderAct:()=>{ if (s.ord && s.ord.rolled) this.startRound(); else this.rollOrder(); },
+      me:meV, stepPips:stepPips, stepsText:s.active === 'red' && s.phase === 'move' ? s.steps + ' of ' + M : '0 of ' + M, hint:hint,
+      canRetry:canRetry, retry:()=> this.retry(),
+      explore:()=> this.explore(), exploreOff:!canEx,
+      exploreBg:canEx ? 'var(--youbg)' : 'var(--surface2)', exploreFg:canEx ? 'var(--youfg)' : 'var(--muted)', exploreBorder:canEx ? 'var(--action)' : 'var(--soft)', exploreCursor:canEx ? 'pointer' : 'not-allowed',
+      endTurn:()=> this.endTurn(), endOff:!endOk, endBg:endOk ? 'var(--action)' : 'var(--surface2)', endFg:endOk ? '#2b2233' : 'var(--muted)', endBorder:endOk ? 'var(--line)' : 'var(--soft)', endCursor:endOk ? 'pointer' : 'not-allowed', endShadow:endOk ? 'var(--shadow)' : 'none',
+      orderStrip:orderStrip, seats:seats, quests:quests, log:log
+    };
+  }
+}
+</script>
+</body>
+</html>

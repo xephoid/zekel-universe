@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Map icons, stats and pieces</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#2b2233}a:hover{color:#e0762b}
+</style>
+</helmet>
+<div style="width:1280px;height:760px;box-sizing:border-box;padding:36px 40px;display:flex;flex-direction:column;gap:20px;background:#fbf3e0;color:#2b2233;font-family:'Fredoka',sans-serif;border-radius:12px;overflow:hidden;position:relative" data-screen-label="Map icons, stats and pieces">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><filter id="ao-wob" filterUnits="userSpaceOnUse" x="-20" y="-20" width="140" height="140"><feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="7"></feTurbulence><feDisplacementMap in="SourceGraphic" scale="{{ wobble }}"></feDisplacementMap></filter></defs></svg>
+
+  <div style="display:flex;flex-direction:column;gap:6px">
+    <div style="font-size:36px;font-weight:700;line-height:1.05">Map icons, stats and pieces</div>
+    <div style="font-size:16px;color:#5c4f66;max-width:900px;line-height:1.45">Thick wobbly ink lines, bright flat fills, a white shine on each shape and a hard little shadow, like a sticker. Each icon keeps the shape the rules describe: square buildings, round buildings, an angry face, a skull.</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px">
+    <sc-for list="{{ mapIcons }}" as="m" hint-placeholder-count="4">
+      <div style="display:flex;flex-direction:column;gap:10px;padding:14px 16px;background:#fff7e6;border:3px solid #2b2233;border-radius:{{ m.radius }}">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="position:relative;width:130px;height:130px;transform:rotate({{ m.ic.rot }}deg);filter:drop-shadow(3px 4px 0 rgba(43,34,51,.16))">
+            <sc-for list="{{ m.ic.shapes }}" as="p" hint-placeholder-count="8">
+              <svg viewBox="0 0 100 100" width="130" height="130" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><path d="{{ p.d }}" fill="{{ p.f }}" stroke="{{ p.s }}" stroke-width="{{ p.w }}" stroke-linecap="round" stroke-linejoin="round" opacity="{{ p.o }}" transform="{{ p.t }}" filter="url(#ao-wob)"></path></svg>
+            </sc-for>
+          </div>
+          <div style="position:relative;width:64px;height:56px;flex:none;align-self:flex-end">
+            <div style="position:absolute;inset:0;background:#2b2233;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%)"></div>
+            <div style="position:absolute;inset:2.5px;background:#bfe39a;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%)"></div>
+            <div style="position:absolute;left:11px;top:7px;width:42px;height:42px">
+              <sc-for list="{{ m.ic.shapes }}" as="p" hint-placeholder-count="8">
+                <svg viewBox="0 0 100 100" width="42" height="42" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><path d="{{ p.d }}" fill="{{ p.f }}" stroke="{{ p.s }}" stroke-width="{{ p.w }}" stroke-linecap="round" stroke-linejoin="round" opacity="{{ p.o }}" transform="{{ p.t }}" filter="url(#ao-wob)"></path></svg>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:22px;font-weight:600">{{ m.name }}</div>
+        <div style="font-size:14px;color:#5c4f66;line-height:1.4">{{ m.note }}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display:flex;gap:18px;flex:1;min-height:0">
+    <div style="flex:1.1;display:flex;flex-direction:column;gap:10px;padding:14px 16px;background:#fff7e6;border:3px solid #2b2233;border-radius:10px 20px 8px 18px/18px 8px 20px 10px">
+      <div style="font-size:18px;font-weight:600">Stats</div>
+      <div style="display:flex;gap:14px;justify-content:space-around">
+        <sc-for list="{{ stats }}" as="m" hint-placeholder-count="3">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+            <div style="position:relative;width:92px;height:92px;transform:rotate({{ m.ic.rot }}deg);filter:drop-shadow(2px 3px 0 rgba(43,34,51,.16))">
+              <sc-for list="{{ m.ic.shapes }}" as="p" hint-placeholder-count="7">
+                <svg viewBox="0 0 100 100" width="92" height="92" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><path d="{{ p.d }}" fill="{{ p.f }}" stroke="{{ p.s }}" stroke-width="{{ p.w }}" stroke-linecap="round" stroke-linejoin="round" opacity="{{ p.o }}" transform="{{ p.t }}" filter="url(#ao-wob)"></path></svg>
+              </sc-for>
+            </div>
+            <div style="font-size:17px;font-weight:600">{{ m.name }}</div>
+            <div style="display:flex;align-items:center;gap:6px;padding:3px 10px 3px 4px;border-radius:999px;background:#fbf3e0;border:2px solid #2b2233">
+              <div style="position:relative;width:24px;height:24px">
+                <sc-for list="{{ m.ic.shapes }}" as="p" hint-placeholder-count="7">
+                  <svg viewBox="0 0 100 100" width="24" height="24" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><path d="{{ p.d }}" fill="{{ p.f }}" stroke="{{ p.s }}" stroke-width="{{ p.w }}" stroke-linecap="round" stroke-linejoin="round" opacity="{{ p.o }}" transform="{{ p.t }}"></path></svg>
+                </sc-for>
+              </div>
+              <span style="font-size:17px;font-weight:700">{{ m.v }}</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="font-size:13px;color:#5c4f66;line-height:1.4">Charisma is a friendly face, Strength a chunky sword, Movement a winged boot. The chip is the size they appear on a player's board.</div>
+    </div>
+
+    <div style="width:230px;flex:none;display:flex;flex-direction:column;gap:8px;padding:14px 16px;background:#fff7e6;border:3px solid #2b2233;border-radius:18px 8px 20px 10px/10px 20px 8px 18px;align-items:center">
+      <div style="font-size:18px;font-weight:600;align-self:flex-start">Quest card back</div>
+      <div style="position:relative;width:100px;height:100px;transform:rotate(3deg);filter:drop-shadow(2px 3px 0 rgba(43,34,51,.16))">
+        <sc-for list="{{ quest.shapes }}" as="p" hint-placeholder-count="7">
+          <svg viewBox="0 0 100 100" width="100" height="100" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><path d="{{ p.d }}" fill="{{ p.f }}" stroke="{{ p.s }}" stroke-width="{{ p.w }}" stroke-linecap="round" stroke-linejoin="round" opacity="{{ p.o }}" transform="{{ p.t }}" filter="url(#ao-wob)"></path></svg>
+        </sc-for>
+      </div>
+      <div style="font-size:13px;color:#5c4f66;line-height:1.4">A medal with the games' flame. It no longer looks like the Star artifact, which RULES.md flagged.</div>
+    </div>
+
+    <div style="flex:1;display:flex;flex-direction:column;gap:10px;padding:14px 16px;background:#fff7e6;border:3px solid #2b2233;border-radius:12px 22px 10px 20px/20px 10px 22px 12px">
+      <div style="font-size:18px;font-weight:600">Adventurers, tokens and dice</div>
+      <div style="display:flex;align-items:flex-end;gap:6px">
+        <sc-for list="{{ pawns }}" as="m" hint-placeholder-count="4">
+          <div title="{{ m.who }}" style="display:flex;flex-direction:column;align-items:center;gap:2px">
+            <div style="position:relative;width:76px;height:76px;transform:rotate({{ m.rot }}deg);filter:drop-shadow(2px 3px 0 rgba(43,34,51,.16))">
+              <sc-for list="{{ m.shapes }}" as="p" hint-placeholder-count="12">
+                <svg viewBox="0 0 100 100" width="76" height="76" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><path d="{{ p.d }}" fill="{{ p.f }}" stroke="{{ p.s }}" stroke-width="{{ p.w }}" stroke-linecap="round" stroke-linejoin="round" opacity="{{ p.o }}" transform="{{ p.t }}" filter="url(#ao-wob)"></path></svg>
+              </sc-for>
+            </div>
+            <span style="font-size:14px;font-weight:600">{{ m.name }}</span>
+          </div>
+        </sc-for>
+        <div style="position:relative;width:64px;height:64px;margin-left:auto;filter:drop-shadow(2px 3px 0 rgba(43,34,51,.16))">
+          <sc-for list="{{ die.shapes }}" as="p" hint-placeholder-count="3">
+            <svg viewBox="0 0 100 100" width="64" height="64" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><path d="{{ p.d }}" fill="{{ p.f }}" stroke="{{ p.s }}" stroke-width="{{ p.w }}" stroke-linecap="round" stroke-linejoin="round" opacity="{{ p.o }}" transform="{{ p.t }}" filter="url(#ao-wob)"></path></svg>
+          </sc-for>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <sc-for list="{{ coins }}" as="m" hint-placeholder-count="4">
+          <div style="position:relative;width:38px;height:38px;filter:drop-shadow(1px 2px 0 rgba(43,34,51,.2))">
+            <sc-for list="{{ m.shapes }}" as="p" hint-placeholder-count="4">
+              <svg viewBox="0 0 100 100" width="38" height="38" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><path d="{{ p.d }}" fill="{{ p.f }}" stroke="{{ p.s }}" stroke-width="{{ p.w }}" stroke-linecap="round" stroke-linejoin="round" opacity="{{ p.o }}" transform="{{ p.t }}" filter="url(#ao-wob)"></path></svg>
+            </sc-for>
+          </div>
+        </sc-for>
+        <div style="font-size:13px;color:#5c4f66;line-height:1.35;margin-left:6px">Any adventurer can take any colour: the colour is the base they stand on, and matches the coins.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"wobble":{"editor":"range","min":0,"max":6,"step":0.5,"default":2.5,"section":"Hand-drawn feel"},"$preview":{"width":1280,"height":760}}'>
+// ---------- hand-drawn icon kit (100×100 boxes, ink outlines, wobbled by #ao-wob) ----------
+const INK = '#2b2233';
+function C(x, y, r){ return 'M' + (x - r) + ' ' + y + 'a' + r + ' ' + r + ' 0 1 0 ' + (2 * r) + ' 0a' + r + ' ' + r + ' 0 1 0 ' + (-2 * r) + ' 0Z'; }
+function E(x, y, rx, ry){ return 'M' + (x - rx) + ' ' + y + 'a' + rx + ' ' + ry + ' 0 1 0 ' + (2 * rx) + ' 0a' + rx + ' ' + ry + ' 0 1 0 ' + (-2 * rx) + ' 0Z'; }
+function SPARK(x, y, r){ const q = r * 0.3; return 'M' + x + ' ' + (y - r) + 'L' + (x + q) + ' ' + (y - q) + 'L' + (x + r) + ' ' + y + 'L' + (x + q) + ' ' + (y + q) + 'L' + x + ' ' + (y + r) + 'L' + (x - q) + ' ' + (y + q) + 'L' + (x - r) + ' ' + y + 'L' + (x - q) + ' ' + (y - q) + 'Z'; }
+const ICONS = {
+  city:[
+    ['M8 89Q50 84 92 89', 'none'],
+    ['M14 60L34 58L35 88L15 89Z', '#fff1d6'],
+    ['M9 62L24 41L39 59Z', '#ff7a59'],
+    ['M38 41L60 40L61 88L37 89Z', '#ffe3a8'],
+    ['M33 43L49 11L65 42Z', '#5aa9e6'],
+    ['M49 11V3', 'none', 3.5],
+    ['M49 3L61 6.5L49 10Z', '#ff5d7a', 3],
+    ['M62 63L84 62L85 88L62 89Z', '#fff1d6'],
+    ['M58 65L73 48L90 63Z', '#8fd14f'],
+    ['M44 89V79Q49 72 54 79V89', '#b0703b', 3.5],
+    ['M44 57Q49 50 54 57V65H44Z', '#ffd95e', 3],
+    ['M20 70H28V77H20Z', '#ffd95e', 3],
+    ['M68 71H76V78H68Z', '#ffd95e', 3],
+    ['M41 33L46 23', 'none', 3, '#ffffff']
+  ],
+  dungeon:[
+    ['M11 87C11 44 29 21 50 21C71 21 89 44 89 87Z', '#9d8fc2'],
+    ['M24 48q6-4 13-1M62 36q6-2 12 2M71 63q5-3 11 0M17 70q5-2 10 1M40 31q5-2 9 0', 'none', 3],
+    ['M35 87V65C35 49 65 49 65 65V87Z', INK],
+    ['M38 60L42 67L46 58ZM46 58L50 67L54 57ZM54 57L58 67L62 60Z', '#ffffff', 2],
+    [E(44, 72, 2.6, 3.2), '#ffe45e', 0],
+    [E(56, 72, 2.6, 3.2), '#ffe45e', 0],
+    ['M50 21V11', 'none', 4],
+    ['M50 12C44 9 46 4 50 0C54 4 56 9 50 12Z', '#ff9b3d', 3],
+    ['M7 89l4-8 3 8M85 89l4-9 4 9', 'none', 3.5, '#4f9a2f'],
+    ['M23 40Q29 30 39 26', 'none', 3, '#ffffff']
+  ],
+  little:[
+    [E(36, 86, 9, 5), '#6fb53a'],
+    [E(64, 86, 9, 5), '#6fb53a'],
+    ['M31 34L27 15L42 29Z', '#fff1d6', 3.5],
+    ['M69 34L73 15L58 29Z', '#fff1d6', 3.5],
+    ['M20 80C9 58 18 27 50 25C82 27 91 58 80 80C69 91 31 91 20 80Z', '#8fd14f'],
+    [C(26, 65, 3), '#6fb53a', 0],
+    [C(76, 59, 2.5), '#6fb53a', 0],
+    [C(71, 73, 2), '#6fb53a', 0],
+    [C(40, 55, 7.5), '#ffffff', 3],
+    [C(60, 55, 7.5), '#ffffff', 3],
+    [C(41.5, 56.5, 3.4), INK, 0],
+    [C(58.5, 56.5, 3.4), INK, 0],
+    ['M30 42L45 49M70 42L55 49', 'none', 5],
+    ['M37 75Q50 65 63 75', 'none', 4],
+    ['M45 71L47.5 78L50.5 69.8Z', '#ffffff', 2.5],
+    ['M29 37Q35 31 43 30', 'none', 3, '#ffffff']
+  ],
+  big:[
+    ['M25 39C8 31 7 12 18 7C18 20 26 26 35 30Z', '#ffcf8a'],
+    ['M75 39C92 31 93 12 82 7C82 20 74 26 65 30Z', '#ffcf8a'],
+    ['M22 50C22 26 36 17 50 17C64 17 78 26 78 50C78 62 72 67 68 69V84H32V69C28 67 22 62 22 50Z', '#f4ead0'],
+    ['M31 42L46 47C47 58 34 61 31 52Z', INK, 3],
+    ['M69 42L54 47C53 58 66 61 69 52Z', INK, 3],
+    [C(39, 51, 3.4), '#ff4d4d', 0],
+    [C(61, 51, 3.4), '#ff4d4d', 0],
+    ['M47 64L50 58L53 64Z', INK, 2.5],
+    ['M33 73H67M41 84V73M50 84V73M59 84V73', 'none', 3],
+    ['M61 20L57 27L62 30L59 35', 'none', 2.5],
+    ['M30 33Q36 25 44 22', 'none', 3, '#ffffff']
+  ],
+  cha:[
+    [C(46, 55, 28), '#a8683c'],
+    ['M24 40Q26 18 46 24Q60 16 70 36Q60 29 47 33Q34 30 24 40Z', '#2b1a12', 3.5],
+    ['M33 50q4.5-5 9 0M50 50q4.5-5 9 0', 'none', 4],
+    ['M32 61Q46 77 60 61Z', '#ffffff', 3.5],
+    [E(28, 62, 4.5, 2.6), '#d9606f', 0],
+    [E(64, 62, 4.5, 2.6), '#d9606f', 0],
+    [SPARK(82, 18, 12), '#ffd95e', 3],
+    [SPARK(88, 44, 6), '#ffd95e', 2.5]
+  ],
+  str:[
+    ['M43 62V18L50 6L57 18V62Z', '#e3ebf5', 4, INK, 1, 'rotate(38 50 50)'],
+    ['M50 17V57', 'none', 2.5, '#9fb0c6', 1, 'rotate(38 50 50)'],
+    ['M27 61Q50 55 73 61L71 70Q50 65 29 70Z', '#ffb627', 4, INK, 1, 'rotate(38 50 50)'],
+    ['M45 69H55V85H45Z', '#a0612e', 4, INK, 1, 'rotate(38 50 50)'],
+    ['M45 75H55M45 80H55', 'none', 2.5, INK, 1, 'rotate(38 50 50)'],
+    [C(50, 90, 6), '#ffb627', 4, INK, 1, 'rotate(38 50 50)'],
+    [SPARK(24, 22, 9), '#ffffff', 2.5]
+  ],
+  mov:[
+    ['M32 18H54V56L76 62C85 64 88 70 88 78H32Z', '#c47a3c'],
+    ['M29 13H57V24H29Z', '#ffb627'],
+    ['M28 78H90Q90 88 84 88H30Q27 88 28 78Z', '#5a3a22'],
+    ['M32 34C16 24 6 32 8 40C14 38 19 40 21 44C12 46 12 54 17 57C23 53 28 55 32 56Z', '#ffffff'],
+    ['M14 40Q22 42 30 44M18 51Q24 51 31 52', 'none', 2.5],
+    ['M3 67H17M7 75H21', 'none', 3.5, '#5aa9e6'],
+    ['M39 29V48', 'none', 3, '#ffffff']
+  ],
+  quest:[
+    ['M30 5H44L57 38H44Z', '#5aa9e6'],
+    ['M70 5H56L43 38H56Z', '#ff5d7a'],
+    [C(50, 63, 26), '#ffd95e'],
+    [C(50, 63, 17), '#ffc53d', 3],
+    ['M50 76C42 72 43 62 50 53C57 62 58 72 50 76Z', '#ff7a3d', 3],
+    ['M50 76C47 74 47 69 50 65C53 69 53 74 50 76Z', '#ffe45e', 0],
+    ['M31 53Q35 45 43 41', 'none', 3, '#ffffff']
+  ],
+  die:[
+    ['M26 16H74Q84 16 84 26V74Q84 84 74 84H26Q16 84 16 74V26Q16 16 26 16Z', '#ffffff', 4, INK, 1, 'rotate(-8 50 50)'],
+    [C(33, 33, 6) + C(67, 33, 6) + C(50, 50, 6) + C(33, 67, 6) + C(67, 67, 6), INK, 0, INK, 1, 'rotate(-8 50 50)'],
+    ['M22 30Q22 22 30 21', 'none', 3, '#d8d2e6', 1, 'rotate(-8 50 50)']
+  ]
+};
+// adventurers: the archetype is the figure, the player's colour is the base they stand on
+const EYES = (y)=> [[C(45, y, 2.3), INK, 0], [C(56, y, 2.3), INK, 0]];
+const ARCH = {
+  fighter:{name:'Fighter', who:'She wears a plumed helmet and carries a round shield.', parts:[
+    ['M62 36Q74 46 67 62', 'none', 7, '#2b1a12'],
+    ['M30 89C30 62 38 50 50 50C62 50 70 62 70 89Z', '#9fb0c6'],
+    ['M31 72H69', 'none', 4, '#8a5a2b'],
+    ['M40 56V68M60 56V68', 'none', 2.5, '#ffffff'],
+    [C(50, 37, 15), '#6b3f24'],
+    ['M34 35Q34 16 50 16Q66 16 66 35Q58 29 50 29Q42 29 34 35Z', '#c9d3df'],
+    ['M50 16Q57 1 71 6Q61 10 57 19Z', '#ff5d7a', 3],
+    ['M50 29V36', 'none', 3.5],
+    ...EYES(40),
+    ['M46 46Q50 49 54 46', 'none', 3],
+    [C(26, 69, 15), '#d99a3d'],
+    [C(26, 69, 5), '#ffd95e', 3],
+    ['M18 62Q20 57 25 56', 'none', 3, '#ffffff']
+  ]},
+  ranger:{name:'Ranger', who:'He wears a green hood and carries a longbow.', parts:[
+    ['M72 28Q92 58 70 88', 'none', 4.5, '#8a5a2b'],
+    ['M72 28L70 88', 'none', 1.5],
+    ['M30 89C30 62 38 50 50 50C62 50 70 62 70 89Z', '#6fa845'],
+    ['M31 73H69', 'none', 4, '#8a5a2b'],
+    [C(50, 38, 15), '#f3cfae'],
+    ['M31 44Q28 12 50 10Q72 12 69 44Q66 30 50 28Q34 30 31 44Z', '#4f8a2f'],
+    ['M34 52Q50 61 66 52', 'none', 4, '#4f8a2f'],
+    ...EYES(39),
+    ['M44 46Q50 42 56 46', 'none', 3.5, '#8a5a2b'],
+    ['M38 20Q44 14 50 13', 'none', 3, '#ffffff']
+  ]},
+  wizard:{name:'Wizard', who:'He has a long white beard, a starry hat and a glowing staff.', parts:[
+    ['M77 22V89', 'none', 4.5, '#8a5a2b'],
+    [C(77, 18, 7), '#8fe3ff', 3],
+    ['M28 89C30 60 38 50 50 50C62 50 70 60 72 89Z', '#3d6fd0'],
+    [SPARK(38, 76, 4), '#ffd95e', 2],
+    [SPARK(60, 68, 3), '#ffd95e', 2],
+    [C(50, 39, 14), '#c68652'],
+    ['M37 42Q39 68 50 72Q61 68 63 42Q57 49 50 49Q43 49 37 42Z', '#f4f1ea'],
+    ['M36 31L53 3Q57 0 58 6L65 31Z', '#9b5de5'],
+    [E(50, 32, 22, 5), '#7a4fa6'],
+    [SPARK(54, 19, 4.5), '#ffd95e', 2],
+    ...EYES(39),
+    ['M41 35h6M53 35h6', 'none', 3, '#ffffff']
+  ]},
+  rogue:{name:'Rogue', who:'She wears a mask and a red scarf, and keeps a dagger handy.', parts:[
+    ['M60 28Q78 32 73 54', 'none', 7, '#1a1016'],
+    ['M26 89C28 58 38 48 50 48C62 48 72 58 74 89Z', '#4a4058'],
+    ['M38 52Q50 60 62 52L60 59Q50 65 40 59Z', '#d8433a', 3],
+    [C(50, 36, 15), '#8d5a3b'],
+    ['M35 34Q36 18 50 18Q64 18 65 32Q56 26 44 28Q38 30 35 34Z', '#1a1016'],
+    ['M35 36Q50 32 65 36L64 43Q50 40 36 43Z', INK, 2],
+    [C(44, 39, 2.2), '#ffffff', 0],
+    [C(56, 39, 2.2), '#ffffff', 0],
+    ['M46 47Q51 49 55 46', 'none', 3],
+    ['M77 62L87 45L89 47L81 64Z', '#e3ebf5', 3],
+    ['M74 59L83 66', 'none', 4.5, '#8a5a2b']
+  ]}
+};
+function pawn(arch, col){ return [[E(50, 90, 28, 7), col]].concat(ARCH[arch].parts); }
+function coin(col){ return [
+  [C(50, 52, 36), col],
+  [C(50, 52, 25), 'none', 3, '#ffffff', 0.75],
+  ['M28 38Q34 26 46 22', 'none', 3.5, '#ffffff'],
+  [SPARK(50, 52, 10), '#ffffff', 0]
+]; }
+function shapesOf(list){ return list.map((p)=> ({d:p[0], f:p[1], w:p[2] === undefined ? 4 : p[2], s:p[3] || INK, o:p[4] === undefined ? 1 : p[4], t:p[5] || 'translate(0 0)'})); }
+
+const PLAYERS = [['#e8483d','#a3281f'],['#3d8bfd','#1f5bb5'],['#ffc83d','#c48a0a'],['#9b5de5','#6a3aa8']];
+const RADII = ['18px 8px 20px 10px/10px 20px 8px 18px','10px 20px 8px 18px/18px 8px 20px 10px','20px 10px 18px 8px/8px 18px 10px 20px','8px 18px 10px 20px/20px 10px 18px 8px'];
+class Component extends DCLogic {
+  renderVals(){
+    const map = [
+      ['city','City','Square houses and a tall tower with a flag. Lit windows say "friends live here".',-3],
+      ['dungeon','Dungeon','A round stone mound with a toothy doorway, glowing eyes inside and a torch on top.',2],
+      ['little','Little Monster','A grumpy green blob with stubby horns and one tooth. Cross, not scary.',-2],
+      ['big','Big Monster','A horned skull with red eyes. The spookiest thing on the map, still cartoon.',3]
+    ];
+    return {
+      wobble:this.props.wobble ?? 2.5,
+      mapIcons:map.map((m, i)=> ({name:m[1], note:m[2], radius:RADII[i], ic:{rot:m[3], shapes:shapesOf(ICONS[m[0]])}})),
+      stats:[['cha','Charisma',2,-3],['str','Strength',1,2],['mov','Movement',3,-2]].map((s)=> ({name:s[1], v:s[2], ic:{rot:s[3], shapes:shapesOf(ICONS[s[0]])}})),
+      quest:{shapes:shapesOf(ICONS.quest)},
+      pawns:['fighter','ranger','wizard','rogue'].map((a, i)=> ({name:ARCH[a].name, who:ARCH[a].who, rot:[-3,2,-1,3][i], shapes:shapesOf(pawn(a, PLAYERS[i][0]))})),
+      coins:PLAYERS.map((p)=> ({shapes:shapesOf(coin(p[0]))})),
+      die:{shapes:shapesOf(ICONS.die)}
+    };
+  }
+}
+</script>
+</body>
+</html>

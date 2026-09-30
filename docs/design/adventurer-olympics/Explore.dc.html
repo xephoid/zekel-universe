@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Exploring a tile</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#2b2233}a:hover{color:#e0762b}
+</style>
+</helmet>
+<div style="{{ rootStyle }}" data-screen-label="Exploring a tile">
+  <div style="display:flex;flex-direction:column;gap:6px">
+    <div style="font-size:32px;font-weight:700;line-height:1.05">Exploring: pick a slot, turn the tile</div>
+    <div style="font-size:16px;color:var(--muted);max-width:1000px;line-height:1.45">Tiles always sit in a fixed pattern, so the player never drags a tile freely. They pick one of the glowing slots, then turn the tile through its six ways. Both are the player's choices; the server only checks them.</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px">
+    <sc-for list="{{ frames }}" as="fr" hint-placeholder-count="4">
+      <div style="background:var(--surface);border:3px solid var(--line);border-radius:{{ fr.radius }};box-shadow:var(--shadow);padding:14px;display:flex;flex-direction:column;gap:10px;height:336px;box-sizing:border-box">
+        <div style="display:flex;align-items:center;gap:8px"><span style="width:30px;height:30px;box-sizing:border-box;border-radius:50%;background:#ffd95e;border:2.5px solid #2b2233;color:#2b2233;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ fr.n }}</span><span style="font-weight:700;font-size:18px">{{ fr.title }}</span></div>
+        <div style="position:relative;height:176px;border-radius:12px;background:var(--table);border:2px solid var(--soft);overflow:hidden">
+          <sc-for list="{{ fr.hexes }}" as="h" hint-placeholder-count="7">
+            <div style="position:absolute;left:{{ h.x }}px;top:{{ h.y }}px;width:{{ h.w }}px;height:{{ h.h }}px;background:{{ h.edge }};opacity:{{ h.op }};clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%)">
+              <span style="position:absolute;inset:{{ h.inset }}px;background:{{ h.fill }};clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);display:flex;align-items:center;justify-content:center;font:600 11px 'Fredoka',sans-serif;color:#7a2e12">{{ h.text }}</span>
+            </div>
+          </sc-for>
+          <sc-for list="{{ fr.badges }}" as="b" hint-placeholder-count="3">
+            <div style="position:absolute;left:{{ b.x }}px;top:{{ b.y }}px;opacity:{{ b.op }}"><dc-import name="AO-Icon" icon="{{ b.icon }}" size="28" hint-size="28px,28px"></dc-import></div>
+          </sc-for>
+          <sc-for list="{{ fr.tokens }}" as="t" hint-placeholder-count="1">
+            <div style="position:absolute;left:{{ t.x }}px;top:{{ t.y }}px;transform:translateY({{ t.lift }}px);filter:{{ t.shadow }}"><dc-import name="AO-Icon" icon="coin" size="20" tint="#e8483d" hint-size="20px,20px"></dc-import></div>
+          </sc-for>
+          <sc-for list="{{ fr.standees }}" as="p" hint-placeholder-count="1">
+            <div style="position:absolute;left:{{ p.x }}px;top:{{ p.y }}px"><dc-import name="AO-Icon" icon="fighter" size="42" tint="#e8483d" hint-size="42px,42px"></dc-import></div>
+          </sc-for>
+          <sc-if value="{{ fr.stack }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;left:14px;top:14px;display:flex;flex-direction:column;align-items:center;gap:4px">
+              <div style="position:relative;width:46px;height:44px">
+                <div style="position:absolute;left:0;top:5px;width:46px;height:40px;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);background:#2b2233"></div>
+                <div style="position:absolute;left:0;top:0;width:46px;height:40px;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);background:#2b2233"></div>
+                <div style="position:absolute;left:2.5px;top:2.5px;width:41px;height:35px;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);background:#bfe39a;display:flex;align-items:center;justify-content:center;font-weight:700;color:#2b2233">?</div>
+              </div>
+              <div style="font-size:13px;font-weight:600;color:var(--muted)">3 left</div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ fr.arc }}" hint-placeholder-val="{{ false }}">
+            <svg viewBox="0 0 260 176" width="100%" height="176" style="position:absolute;inset:0" aria-hidden="true"><path d="M64 40 C 100 18, 122 38, 130 62" fill="none" stroke="#ff8a3d" stroke-width="3" stroke-dasharray="5 6" stroke-linecap="round"></path></svg>
+          </sc-if>
+          <sc-if value="{{ fr.turn }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;left:0;right:0;bottom:8px;display:flex;justify-content:center;gap:5px">
+              <sc-for list="{{ fr.dots }}" as="d" hint-placeholder-count="6"><span style="width:10px;height:10px;box-sizing:border-box;border-radius:50%;background:{{ d.bg }};border:2px solid #2b2233"></span></sc-for>
+            </div>
+          </sc-if>
+        </div>
+        <div style="font-size:15px;line-height:1.4">{{ fr.text }}</div>
+        <sc-if value="{{ fr.hasBtns }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:auto;display:flex;gap:6px">
+            <sc-for list="{{ fr.btns }}" as="bt" hint-placeholder-count="2">
+              <div style="flex:{{ bt.flex }};height:38px;padding:0 8px;border-radius:11px;border:{{ bt.border }};background:{{ bt.bg }};color:{{ bt.fg }};font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;white-space:nowrap;box-shadow:{{ bt.shadow }}">{{ bt.t }}</div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;flex:1;min-height:0">
+    <div style="background:var(--surface);border:3px solid var(--line);border-radius:18px 12px 20px 14px/14px 20px 12px 18px;box-shadow:var(--shadow);padding:14px;display:flex;gap:16px;align-items:center">
+      <div style="position:relative;width:180px;height:92px;flex:none;border-radius:10px;background:var(--table);border:2px solid var(--soft);overflow:hidden">
+        <sc-for list="{{ anyMap.hexes }}" as="h" hint-placeholder-count="20">
+          <div style="position:absolute;left:{{ h.x }}px;top:{{ h.y }}px;width:{{ h.w }}px;height:{{ h.h }}px;background:{{ h.edge }};opacity:{{ h.op }};clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%)"><span style="position:absolute;inset:{{ h.inset }}px;background:{{ h.fill }};clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%)"></span></div>
+        </sc-for>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="font-weight:700;font-size:18px">Dungeon Map card, and forced explore</div>
+        <div style="font-size:15px;line-height:1.45">Same steps, but every empty slot touching the map glows, not only the ones next to you. A forced explore happens at the start of a turn when every icon on the map is done; then the turn carries on.</div>
+      </div>
+    </div>
+    <div style="background:var(--surface);border:3px solid var(--line);border-radius:12px 20px 14px 18px/18px 14px 20px 12px;box-shadow:var(--shadow);padding:14px;display:flex;flex-direction:column;gap:6px;justify-content:center">
+      <div style="font-weight:700;font-size:18px">When Explore is greyed out, say why</div>
+      <div style="font-size:15px;line-height:1.45">"You're on a centre hex; centre hexes touch no slot." · "No steps left." · "Both slots next to you are taken." · "No tiles left." The button stays put so players learn where it lives.</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.4">The last tile placed starts the end: finish the round, play one more, then score.</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1280,"height":640}}'>
+const THEMES = {
+  light:{'--bg':'#fbf3e0','--surface':'#fff7e6','--surface2':'#f3e6c8','--text':'#2b2233','--muted':'#5c4f66','--line':'#2b2233','--soft':'rgba(43,34,51,.2)','--table':'#e9dcbc','--shadow':'3px 4px 0 rgba(43,34,51,.16)'},
+  dark:{'--bg':'#221c2a','--surface':'#2e2638','--surface2':'#3a3046','--text':'#fbf3e0','--muted':'#c9bcd6','--line':'#0f0b14','--soft':'rgba(251,243,224,.22)','--table':'#1a1520','--shadow':'3px 4px 0 rgba(0,0,0,.4)'}
+};
+const LAND = ['#c8e6a0','#d2eaa8','#cfe6b0'];
+const DIRS = [[0,-1],[1,-1],[1,0],[0,1],[-1,1],[-1,0]], DN = ['N','NE','SE','S','SW','NW'];
+const TILES = {9:{N:'little',S:'city'}, 8:{NW:'little',N:'spades',NE:'dungeon'}, 5:{SW:'little'}};
+const R3 = Math.sqrt(3);
+function slotOff(i){ const a = DIRS[i % 6], b = DIRS[(i + 1) % 6]; return [a[0] + 2 * b[0], a[1] + 2 * b[1]]; }
+const RADII = ['18px 12px 20px 14px/14px 20px 12px 18px','12px 20px 14px 18px/18px 14px 20px 12px','20px 12px 18px 14px/12px 18px 14px 20px','14px 18px 12px 20px/20px 12px 18px 14px'];
+
+class Component extends DCLogic {
+  scene(opts){
+    const S = opts.S, W = opts.W, H = opts.H, cells = [];
+    opts.tiles.forEach((t, ti)=>{
+      [[0,0]].concat(DIRS).forEach((d, j)=>{
+        const pd = j === 0 ? -1 : (j - 1 - t.k + 6) % 6;
+        const icon = pd < 0 ? null : (TILES[t.n] || {})[DN[pd]] || null;
+        cells.push({q:t.c[0] + d[0], r:t.c[1] + d[1], centre:j === 0, icon:icon, fill:LAND[ti % LAND.length], ghost:false, op:t.op || 1, edge:t.edge || '#2b2233'});
+      });
+    });
+    (opts.ghosts || []).forEach((c)=>{ [[0,0]].concat(DIRS).forEach((d, j)=>{ cells.push({q:c[0] + d[0], r:c[1] + d[1], centre:j === 0, icon:null, ghost:true, op:1}); }); });
+    const P = (q, r)=> [1.5 * S * q, R3 * S * (r + q / 2)];
+    let a = 1e9, b = -1e9, c = 1e9, e = -1e9;
+    cells.forEach((h)=>{ const p = P(h.q, h.r); a = Math.min(a, p[0]); b = Math.max(b, p[0]); c = Math.min(c, p[1]); e = Math.max(e, p[1]); });
+    const ox = W / 2 - (a + b) / 2 + (opts.dx || 0), oy = H / 2 - (c + e) / 2 + (opts.dy || 0);
+    const at = (q, r)=>{ const p = P(q, r); return [ox + p[0], oy + p[1]]; };
+    const ins = S > 10 ? 2 : 1;
+    const hexes = cells.map((h)=>{ const p = at(h.q, h.r); return {x:+(p[0] - S).toFixed(1), y:+(p[1] - R3 * S / 2).toFixed(1), w:2 * S, h:+(R3 * S).toFixed(1), inset:ins, edge:h.ghost ? '#ff8a3d' : h.edge, fill:h.ghost ? '#ffe0cc' : h.fill, op:h.ghost ? 0.8 : h.op, text:h.ghost && h.centre && opts.label ? 'Here!' : ''}; });
+    const badges = cells.filter((h)=> h.icon).map((h)=>{ const p = at(h.q, h.r); return {x:+(p[0] - 14).toFixed(1), y:+(p[1] - 15).toFixed(1), icon:h.icon, op:h.op}; });
+    const tokens = (opts.tokens || []).map((t)=>{ const p = at(t.at[0], t.at[1]); return {x:+(p[0] - 10).toFixed(1), y:+(p[1] - 10).toFixed(1), lift:t.lift || 0, shadow:t.lift ? 'drop-shadow(0 14px 6px rgba(43,34,51,.22))' : 'none'}; });
+    const standees = (opts.you ? [opts.you] : []).map((y)=>{ const p = at(y[0], y[1]); return {x:+(p[0] - 21).toFixed(1), y:+(p[1] - 34).toFixed(1)}; });
+    return {hexes:hexes, badges:badges, tokens:tokens, standees:standees};
+  }
+  renderVals(){
+    const th = this.props.theme || 'light';
+    const rootStyle = Object.assign({}, THEMES[th], {width:'1280px', height:'640px', boxSizing:'border-box', padding:'28px 32px', display:'flex', flexDirection:'column', gap:'18px', background:'var(--bg)', color:'var(--text)', fontFamily:"'Fredoka',sans-serif", borderRadius:'12px', overflow:'hidden'});
+    const home = {n:9, c:[0,0], k:0}, s0 = slotOff(0), s1 = slotOff(1), base = {S:16, W:258, H:172};
+    const act = {bg:'#ff8a3d', fg:'#2b2233', border:'3px solid #2b2233', shadow:'3px 4px 0 rgba(43,34,51,.16)'}, sec = {bg:'var(--surface)', fg:'var(--text)', border:'2.5px solid var(--line)', shadow:'none'};
+    const btn = (t, k, flex)=> Object.assign({t:t, flex:flex || 1}, k);
+    const blank = {stack:false, arc:false, turn:false, dots:[], hasBtns:false, btns:[]};
+    const f1 = Object.assign(this.scene(Object.assign({}, base, {tiles:[home], ghosts:[s0, s1], you:[1,-1], label:true})), blank, {n:1, radius:RADII[0], title:'Stand next to a slot', text:'You need one step left and an empty slot touching your hex. From an outer hex, up to two slots glow.', hasBtns:true, btns:[btn('Explore · turn over a tile', act)]});
+    const f2 = Object.assign(this.scene(Object.assign({}, base, {tiles:[{n:8, c:[0,0], k:0}], dx:40, dy:14})), blank, {n:2, radius:RADII[1], title:'The top tile flips over', text:'Pressing Explore takes the top tile from the stack, face up. The slots keep glowing on the map.', stack:true, arc:true});
+    const f3 = Object.assign(this.scene(Object.assign({}, base, {tiles:[home, {n:8, c:s0, k:1, op:0.92, edge:'#ff8a3d'}], you:[1,-1]})), blank, {n:3, radius:RADII[2], title:'Pick a slot, turn it', text:'Tap a glowing slot and the tile drops in. Turn it through all six ways; the icons turn with it.', hasBtns:true, btns:[btn('Turn left', sec), btn('Turn right', sec), btn('Place', act)], turn:true,
+      dots:[0,1,2,3,4,5].map((i)=> ({bg:i === 1 ? '#ff8a3d' : 'transparent'}))});
+    const f4 = Object.assign(this.scene(Object.assign({}, base, {tiles:[home, {n:8, c:s0, k:1}], you:[1,-1], tokens:[{at:s0, lift:-18}]})), blank, {n:4, radius:RADII[3], title:'Place it, coin drops', text:'Your coin drops onto the new centre hex. Your steps are spent; you don’t walk onto the tile this turn.'});
+    const mapTiles = [{n:5, c:[0,0], k:0}, {n:9, c:slotOff(2), k:0}, {n:8, c:slotOff(5), k:2}], empties = [];
+    mapTiles.forEach((t)=>{ for (let i = 0; i < 6; i++){ const o = slotOff(i), c = [t.c[0] + o[0], t.c[1] + o[1]]; if (!mapTiles.some((x)=> x.c[0] === c[0] && x.c[1] === c[1]) && !empties.some((x)=> x[0] === c[0] && x[1] === c[1])) empties.push(c); } });
+    const anyMap = this.scene({S:5, W:176, H:88, tiles:mapTiles, ghosts:empties});
+    return {rootStyle:rootStyle, frames:[f1, f2, f3, f4], anyMap:anyMap};
+  }
+}
+</script>
+</body>
+</html>

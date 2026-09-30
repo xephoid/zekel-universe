@@ -1,0 +1,127 @@
+{
+    "v": 3,
+    "createdOnFiles": {
+        "v": 1,
+        "at": "2026-09-29T18:57:59Z"
+    },
+    "title": "Adventurer Olympics",
+    "launch": {
+        "view": "canvas"
+    },
+    "pages": [
+        {
+            "id": "table",
+            "name": "Table"
+        },
+        {
+            "id": "icons",
+            "name": "Icons"
+        }
+    ],
+    "boards": {
+        "Main.dc.html": {
+            "x": 0,
+            "y": 0,
+            "w": 1440,
+            "h": 900,
+            "title": "Adventurer Olympics \u00b7 the table",
+            "is_interactive": true,
+            "page": "table"
+        },
+        "Test-Roll.dc.html": {
+            "x": 1520,
+            "y": 0,
+            "w": 1280,
+            "h": 600,
+            "title": "A test, beat by beat",
+            "page": "table"
+        },
+        "Explore.dc.html": {
+            "x": 0,
+            "y": 1020,
+            "w": 1280,
+            "h": 640,
+            "title": "Exploring: pick a slot, turn the tile",
+            "page": "table"
+        },
+        "Dungeon.dc.html": {
+            "x": 1360,
+            "y": 1020,
+            "w": 1280,
+            "h": 640,
+            "title": "A Dungeon, and drawing again",
+            "page": "table"
+        },
+        "End-Scoring.dc.html": {
+            "x": 0,
+            "y": 1780,
+            "w": 1280,
+            "h": 760,
+            "title": "End of game: the quests are scored",
+            "page": "table"
+        },
+        "Icons-Runes.dc.html": {
+            "x": 0,
+            "y": 0,
+            "w": 1280,
+            "h": 700,
+            "title": "Artifacts as rune stones",
+            "page": "icons"
+        },
+        "Icons-Map.dc.html": {
+            "x": 1360,
+            "y": 0,
+            "w": 1280,
+            "h": 760,
+            "title": "Map icons, stats and pieces",
+            "page": "icons"
+        },
+        "Icons-Context.dc.html": {
+            "x": 0,
+            "y": 880,
+            "w": 1280,
+            "h": 640,
+            "title": "The new style on a tile and cards",
+            "page": "icons"
+        },
+        "Icons-Monsters.dc.html": {
+            "x": 1360,
+            "y": 880,
+            "w": 1280,
+            "h": 800,
+            "title": "Monster cards, one creature per number",
+            "page": "icons"
+        },
+        "Icons-Companions.dc.html": {
+            "x": 0,
+            "y": 1800,
+            "w": 1280,
+            "h": 780,
+            "title": "The 16 companions",
+            "page": "icons"
+        },
+        "AO-Icon.dc.html": {
+            "x": 1360,
+            "y": 1800,
+            "w": 100,
+            "h": 100,
+            "title": "Icon component (every drawing, by name)",
+            "page": "icons"
+        }
+    },
+    "order": [
+        "Main.dc.html",
+        "Test-Roll.dc.html",
+        "Explore.dc.html",
+        "Dungeon.dc.html",
+        "End-Scoring.dc.html",
+        "Icons-Runes.dc.html",
+        "Icons-Map.dc.html",
+        "Icons-Context.dc.html",
+        "Icons-Monsters.dc.html",
+        "Icons-Companions.dc.html",
+        "AO-Icon.dc.html"
+    ],
+    "notes": {},
+    "designSystems": []
+}
