@@ -58,6 +58,10 @@
 .ao-theme .ao-map .zk-map { border: none; border-radius: 0; box-shadow: none; background: var(--ao-table); }
 .ao-caption { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); width: min(660px, calc(100% - 300px)); z-index: 4; }
 .ao-theme .ao-caption .caption-card { position: static; width: auto; margin: 0; box-shadow: var(--ao-shadow-lg); }
+/* The caption sits over the map's top, as on the canvas: only its own buttons
+   take a tap, so a glowing hex under it can still be pressed. */
+.ao-caption, .ao-caption .caption-card { pointer-events: none; }
+.ao-caption button { pointer-events: auto; }
 .ao-legend {
   position: absolute; right: 16px; top: 16px; display: flex; flex-direction: column; gap: 5px; padding: 10px 12px;
   border-radius: 14px 9px 16px 10px / 10px 16px 9px 14px; background: var(--ao-surface); border: 2.5px solid var(--ao-line);

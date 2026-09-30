@@ -1232,4 +1232,16 @@ the same call Fractured Fist's arcade theme made (§17).
   on screen and sent with Place.
 - **Coins left** needs the engine to publish the number of coins each colour
   has (a component count); asked for in the engine.
+- **Built (2026-09-30).** `AoScreen` matches `Main.dc.html`'s layout: the deck
+  strip, the map at the canvas's hex size with legend and zoom, the panels
+  over the map (a test, exploring, "Any rune", turn order, setup), your
+  board, and turn order, seats and quests in the side column. Shared
+  additions: the map's `hex.maxRadius` and `hex.zoom`, a `has-art` mark on
+  hexes, token pieces, and `GlueModule.placesCaption`. Checks:
+  `ao-screen.test.tsx` and `ao-glue.test.ts` (196), the web suite, and the
+  full-game browser spec against a live engine.
+- **Still different from the canvas.** The seat rows carry no AI badge; the
+  instant quests show "Open" rather than progress ("2 of 3 · closest:
+  Blue"), which needs the engine to publish each quest's target; hex edges
+  are straight, with no grass tufts; the top bar is the site's own.
 
