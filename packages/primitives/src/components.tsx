@@ -569,10 +569,12 @@ function HexMap({ id, data, lit, onSelect, className, style }: PrimitiveProps<Ma
   const maxY = Math.max(0, ...centres.map((c) => c.y)) + R3 / 2 + pad;
   const spanX = maxX - minX, spanY = maxY - minY;
   const fill = data.fill;
-  // The hex radius in pixels: as large as the board allows, the whole map in view.
-  const s = size.w > 0 ? (fill ? Math.min(size.w / spanX, size.h / spanY) : size.w / spanX) : 0;
-  const ox = (size.w - spanX * s) / 2 - minX * s;
-  const oy = (fill ? (size.h - spanY * s) / 2 : 0) - minY * s;
+  // The hex radius in pixels: as large as the board allows, the whole map in
+  // view, never past maxRadius; zoom enlarges it and the board then scrolls.
+  const fit = size.w > 0 ? (fill ? Math.min(size.w / spanX, size.h / spanY) : size.w / spanX) : 0;
+  const s = Math.min(fit, data.hex?.maxRadius ?? Infinity) * (data.hex?.zoom ?? 1);
+  const ox = Math.max(0, (size.w - spanX * s) / 2) - minX * s;
+  const oy = (fill ? Math.max(0, (size.h - spanY * s) / 2) : 0) - minY * s;
   const at = (i: number) => ({ x: ox + centres[i]!.x * s, y: oy + centres[i]!.y * s });
   return (
     <div data-flip-id={id} className={cx(className, fill && 'zk-map-filling')} style={style}>
@@ -582,6 +584,8 @@ function HexMap({ id, data, lit, onSelect, className, style }: PrimitiveProps<Ma
         className="zk-map zk-hexmap"
         style={fill ? { flex: '1 1 auto', minHeight: fill.minHeight } : { paddingTop: `${(spanY / spanX) * 100}%` }}
       >
+        {/* Holds the board's full size when zoomed past the room, so it scrolls. */}
+        {s > 0 && <div className="zk-hexmap-extent" style={{ width: Math.max(size.w, spanX * s), height: Math.max(size.h, spanY * s) }} />}
         {s > 0 && nodes.map((n, i) => {
           const c = at(i);
           const isLit = lit?.includes(n.id) ?? false;
@@ -594,7 +598,7 @@ function HexMap({ id, data, lit, onSelect, className, style }: PrimitiveProps<Ma
               key={n.id}
               data-flip-id={`${id}:hex:${n.id}`}
               data-flip-from={n.arriveFrom}
-              className={cx('zk-hex', n.ghost && 'ghost', n.selected && 'selected', n.dim && 'dim', lp.className)}
+              className={cx('zk-hex', n.ghost && 'ghost', n.selected && 'selected', n.dim && 'dim', n.artUrl && 'has-art', lp.className)}
               style={{ left: c.x - s, top: c.y - (R3 / 2) * s, width: 2 * s, height: R3 * s, ['--hex-fill' as string]: themeColor(n.colorKey ?? n.label) }}
               role={lp.role} tabIndex={lp.tabIndex} onClick={lp.onClick} onKeyDown={lp.onKeyDown}
               aria-label={n.describedAs ?? n.label}
@@ -612,7 +616,7 @@ function HexMap({ id, data, lit, onSelect, className, style }: PrimitiveProps<Ma
             <div key={`over:${n.id}`} className={cx('zk-hex-over', n.ghost && 'ghost', n.dim && 'dim')} style={{ left: c.x, top: c.y, ['--hex-r' as string]: `${s}px` }}>
               {n.artUrl && <img className="zk-hex-art" src={n.artUrl} alt="" />}
               {pieces.map((p, k) => (p.artUrl
-                ? <img key={p.label} className="zk-hex-piece art" data-flip-id={`${id}:piece:${p.label}`} src={p.artUrl} alt={p.label}
+                ? <img key={p.label} className={cx('zk-hex-piece', 'art', p.kind === 'token' && 'token')} data-flip-id={`${id}:piece:${p.label}`} src={p.artUrl} alt={p.label}
                     style={{ width: s * 1.5 * (p.size ?? 1), height: s * 1.5 * (p.size ?? 1), ['--k' as string]: k }} />
                 : <span key={p.label} className="zk-hex-piece" data-flip-id={`${id}:piece:${p.label}`} title={p.label}
                     style={{ width: s * 0.5 * (p.size ?? 1), height: s * 0.5 * (p.size ?? 1), background: themeColor(p.colorKey ?? p.label), ['--k' as string]: k }}>

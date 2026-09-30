@@ -86,13 +86,6 @@ describe('Draw and Roll', () => {
     expect(drawn('roll-test').length).toBe(1);
   });
 
-  it('shows the dice: an AI roll from its move, the Roll button from the view', () => {
-    expect(g.diceFor!({ engineMove: { type: 'report_test_roll', total: 7, dice: [3, 4] }, summary: '', view: null })).toEqual([3, 4]);
-    const after = fx('after-roll-test');
-    expect(g.diceFor!({ engineMove: { type: 'resolve_report' }, summary: 'You pressed Roll — the server rolled 6 = 6.', view: after.view })).toEqual(after.view.lastRoll.dice);
-    // A Draw press is not a roll, whatever its summary goes on to say.
-    expect(g.diceFor!({ engineMove: { type: 'resolve_report' }, summary: 'You pressed Draw. You must fight — roll 1 die.', view: after.view })).toBeNull();
-  });
 });
 
 describe('exploring', () => {
@@ -134,8 +127,9 @@ describe('seats and setup', () => {
     const mine = plan.bench.find((z) => z.kind === 'tableau')!.data as TableauData;
     const me = f.view.players.find((p: any) => p.player_id === f.viewer);
     expect(mine.stats!.find((s) => s.label === 'Strength')!.value).toBe(me.stats.strength);
-    const others = plan.side.filter((z) => z.kind === 'tableau').map((z) => (z.data as TableauData).label!);
-    for (const label of others) expect(label).not.toMatch(/^p\d/);
+    // Beside the game-drawn screen the plan gives no side zones: the screen draws them.
+    expect(plan.side).toEqual([]);
+    expect(plan.points).toBeUndefined();
   });
 
   it('the setup page asks the host for an adventurer and a colour, and sends one setup move', () => {

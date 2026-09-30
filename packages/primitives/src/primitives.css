@@ -362,7 +362,8 @@
 /* A hex board (MapData.hex). Each hex is its own clip, so a tap lands on the
    hex it seems to; its edge is the hex behind its face. Art and pieces ride a
    layer above, unclipped and not tappable, so a standee can stand tall. */
-.zk-hexmap { background: var(--hex-table, var(--bg-raised)); }
+.zk-hexmap { background: var(--hex-table, var(--bg-raised)); overflow: auto; }
+.zk-hexmap-extent { position: absolute; left: 0; top: 0; pointer-events: none; }
 .zk-hex {
   position: absolute; clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
   background: var(--hex-edge, rgba(0,0,0,0.7));
@@ -388,6 +389,7 @@
 }
 .zk-hex-piece { position: absolute; left: 0; top: 0; }
 .zk-hex-piece.art { transform: translate(calc(-50% + var(--k) * 30%), -78%); filter: drop-shadow(1px 2px 0 rgba(0,0,0,0.2)); }
+.zk-hex-piece.art.token { transform: translate(calc(var(--hex-r) * 0.18 + var(--k) * 35%), calc(var(--hex-r) * 0.05)); }
 .zk-hex-piece:not(.art) {
   border-radius: 50%; border: 2px solid rgba(0,0,0,0.65); box-shadow: var(--shadow-sm);
   transform: translate(calc(var(--hex-r) * 0.25 + var(--k) * 40%), calc(var(--hex-r) * 0.12));

@@ -1213,3 +1213,35 @@ checks passing.
   - Running out of the 10 coins still needs the designer's ruling.
   - Motion is the primitives' own (standees slide, coins drop, tiles fly from
     the stack); the canvas's per-beat captions for a test are not built.
+
+### Adventurer Olympics becomes a game-drawn screen (decided 2026-09-30)
+
+The table built from the generic layout had the canvas's colours but not its
+layout, and the owner asked for it to match the design as closely as
+possible. That reverses "primitive-composed, not a game-drawn screen" above,
+the same call Fractured Fist's arcade theme made (§17).
+
+- **`AoScreen` draws the table** (`glue/ao/`): the deck strip, the map with its
+  legend and zoom, the test panel over the map, the seat's own board in the
+  bench slot, and turn order, seats and quests in the side slot. The drawings
+  stay the primitives' (the hex map, cards, dice), so every flight is still
+  the table's FLIP.
+- **`plan()` stays** for the title, the status line and the watch page.
+- **Nothing about agency changes:** a tap sends a listed move through
+  `onMove`, Draw and Roll are `onDraw`, and exploring is still put together
+  on screen and sent with Place.
+- **Coins left** needs the engine to publish the number of coins each colour
+  has (a component count); asked for in the engine.
+- **Built (2026-09-30).** `AoScreen` matches `Main.dc.html`'s layout: the deck
+  strip, the map at the canvas's hex size with legend and zoom, the panels
+  over the map (a test, exploring, "Any rune", turn order, setup), your
+  board, and turn order, seats and quests in the side column. Shared
+  additions: the map's `hex.maxRadius` and `hex.zoom`, a `has-art` mark on
+  hexes, token pieces, and `GlueModule.placesCaption`. Checks:
+  `ao-screen.test.tsx` and `ao-glue.test.ts` (196), the web suite, and the
+  full-game browser spec against a live engine.
+- **Still different from the canvas.** The seat rows carry no AI badge; the
+  instant quests show "Open" rather than progress ("2 of 3 · closest:
+  Blue"), which needs the engine to publish each quest's target; hex edges
+  are straight, with no grass tufts; the top bar is the site's own.
+

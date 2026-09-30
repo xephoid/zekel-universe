@@ -297,7 +297,7 @@ export function TablePage() {
 
   // A game-drawn screen keeps the last move and the playback speed in the side
   // column, just above the log; any other table shows them over the board.
-  const captionInSide = !!glue?.Screen && sideOpen;
+  const captionInSide = !!glue?.Screen && sideOpen && !glue.placesCaption;
   const captionCard = (
     <div className={`caption-card${state.done ? '' : ' pending'}`} aria-live="polite">
       {current?.actorSeatPosition !== null && current?.actorSeatPosition !== undefined && table ? (
@@ -347,7 +347,7 @@ export function TablePage() {
       <div className="table-main">
         <div className="table-play">
         <div className="table-board">
-          {result === null && !captionInSide && captionCard}
+          {result === null && !captionInSide && !glue?.placesCaption && captionCard}
           {dice && dice.length > 0 && (
             <div className="dice-row">{dice.map((d, i) => <Die key={i} value={d} rollKey={current?.seq} />)}</div>
           )}
@@ -366,6 +366,7 @@ export function TablePage() {
                   const ack = await t.query(name, args);
                   return 'ok' in ack && ack.ok ? { answer: ack.answer } : { refused: ('reason' in ack && ack.reason) || ack.error };
                 }}
+                caption={glue.placesCaption && result === null ? captionCard : undefined}
                 menu={yourTurn ? <MoveMenuList menu={current?.moveMenu ?? null} legalMoves={legalMoves} onPick={pick} disabled={busy} open={false} /> : null}
                 benchSlot={benchSlot}
                 sideSlot={sideOpen ? sideSlot : null}
