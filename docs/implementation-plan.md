@@ -1179,3 +1179,38 @@ The phone pass (M6) must then include this table.
 
 - The canvas has no setup screen (picking an adventurer and colour, the
   face-up quests) and no "last tile placed" banner.
+
+### Where Adventurer Olympics stands (2026-09-30)
+
+Built on branch `adventurer-olympics-table`; all eight steps have their
+checks passing.
+
+- **Engine.** Merged: the Draw step, required rotation, placement options,
+  Explore reasons, dice and headlines (zekel #114). Open: a digital seat
+  offered only the Roll button (zekel #115); each player's stats and each
+  tile's hexes in the view (zekel #116). The table reads both; the captured
+  views came from a local build with them.
+- **Decided while building.**
+  - The map primitive's hex mode is shared (`MapData.hex`), with ghost and
+    picked hexes and new hexes flying in from a named origin.
+  - A choice the player puts together before sending (the slot and turn of a
+    tile) lives in `GlueInput.ui`, changed only by `ui` action-bar buttons
+    and `uiForSelect`; neither sends anything, and a new event clears it.
+  - Draw and Roll stay the table's own button; in this theme it sticks to the
+    foot of the board so it is never below the fold.
+  - An AI seat the engine names only by its seat id is called by its colour.
+  - Setup is the setup page (adventurer and colour) against the AI, and a
+    form at the table when a friend is seated.
+- **Checks.** `ao-glue.test.ts` on all 43 captured views (187 tests);
+  `hexmap.test.tsx`; the web suite (576); `e2e/adventurer-olympics.spec.ts`,
+  a full game against the AI in a browser.
+- **Still open.**
+  - The game is not on the storefront (`apps/server/src/storefront.ts`): a
+    publishing decision.
+  - The engine's first-encounter lesson "Real cards and dice: what the
+    players report" appears at a digital table, where it does not apply.
+  - Some engine summaries name the same seat two ways ("Ranger pressed
+    Draw. Player 1 must recruit…").
+  - Running out of the 10 coins still needs the designer's ruling.
+  - Motion is the primitives' own (standees slide, coins drop, tiles fly from
+    the stack); the canvas's per-beat captions for a test are not built.
