@@ -161,9 +161,35 @@ export interface MapNode {
   /** Relative blob size, 1 = default. */
   size?: number;
   badges?: string[];
-  pieces?: { label: string; colorKey?: string; count?: number }[];
+  /**
+   * What stands on the node. Universe additions: `artUrl` draws a piece as a
+   * picture (a standee) instead of a coloured dot, and `size` scales it
+   * (1 = default). A piece keeps its label from node to node, so moving it
+   * slides it rather than making a new one.
+   */
+  pieces?: { label: string; colorKey?: string; count?: number; artUrl?: string; size?: number }[];
   /** Universe addition: art drawn inside the node (a treat, a landmark). */
   artUrl?: string;
+  /**
+   * Universe addition, hex boards only (MapData.hex): the node's hex, in
+   * axial coordinates for flat-topped hexes (q to the right, r down; the six
+   * neighbours are q±1, r±1 and the two diagonals q+1,r-1 and q-1,r+1). The
+   * node is drawn on that hex instead of at x/y.
+   */
+  hex?: { q: number; r: number };
+  /**
+   * Universe addition: a node that is not on the table yet, only a place a
+   * piece could go (a slot a tile could fill). Drawn dashed and see-through.
+   */
+  ghost?: boolean;
+  /** Universe addition: the node the player has picked in a choice not yet
+   *  sent (the slot a tile is being turned in). Drawn outlined. */
+  selected?: boolean;
+  /**
+   * Universe addition: the flip id of the element a new node flies in from
+   * (a tile from the stack), so it does not appear in place.
+   */
+  arriveFrom?: string;
   /** Universe addition: node ids this node connects to by a road. */
   roadsTo?: string[];
   /** Universe addition: the area of the board this region belongs to. */
@@ -218,6 +244,12 @@ export interface MapData {
    * rather than being crushed.
    */
   fill?: { minHeight: number };
+  /**
+   * Universe addition: a board of flat-topped hexes. Every node carries a
+   * `hex` coordinate and is drawn on it; the board scales to hold them all
+   * and keeps them centred. `x`, `y`, `aspect`, roads and areas are not used.
+   */
+  hex?: { orientation: 'flat' };
 }
 
 /** One select event, common to every primitive. */

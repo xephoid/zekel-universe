@@ -359,6 +359,43 @@
 [data-motion='reduced'] .zk-card-flipper { transition-property: opacity; }
 [data-motion='reduced'] .zk-lit { animation: none; box-shadow: 0 0 0 4px var(--lit, var(--highlight)); }
 
+/* A hex board (MapData.hex). Each hex is its own clip, so a tap lands on the
+   hex it seems to; its edge is the hex behind its face. Art and pieces ride a
+   layer above, unclipped and not tappable, so a standee can stand tall. */
+.zk-hexmap { background: var(--hex-table, var(--bg-raised)); }
+.zk-hex {
+  position: absolute; clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+  background: var(--hex-edge, rgba(0,0,0,0.7));
+}
+.zk-hex-face {
+  position: absolute; inset: 2.5px; clip-path: inherit; background: var(--hex-fill);
+}
+.zk-hex.zk-lit { animation: none; background: var(--lit, var(--highlight)); }
+.zk-hex.zk-lit .zk-hex-face { inset: 4px; animation: zk-hex-glow 1400ms ease-in-out infinite; }
+.zk-hex.zk-lit:focus-visible { box-shadow: none; background: var(--accent); }
+.zk-hex.ghost { background: var(--lit, var(--highlight)); opacity: 0.75; }
+.zk-hex.ghost .zk-hex-face { background: color-mix(in srgb, var(--hex-fill) 55%, transparent); }
+.zk-hex.selected { background: var(--accent); opacity: 1; }
+.zk-hex.selected .zk-hex-face { inset: 4px; }
+.zk-hex.dim .zk-hex-face { filter: saturate(0.6) brightness(0.95); }
+@keyframes zk-hex-glow { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.18); } }
+.zk-hex-over { position: absolute; width: 0; height: 0; pointer-events: none; }
+.zk-hex-over.ghost { opacity: 0.8; }
+.zk-hex-over.dim .zk-hex-art { opacity: 0.45; }
+.zk-hex-art {
+  position: absolute; width: calc(var(--hex-r) * 1.25); height: calc(var(--hex-r) * 1.25);
+  left: calc(var(--hex-r) * -0.625); top: calc(var(--hex-r) * -0.625);
+}
+.zk-hex-piece { position: absolute; left: 0; top: 0; }
+.zk-hex-piece.art { transform: translate(calc(-50% + var(--k) * 30%), -78%); filter: drop-shadow(1px 2px 0 rgba(0,0,0,0.2)); }
+.zk-hex-piece:not(.art) {
+  border-radius: 50%; border: 2px solid rgba(0,0,0,0.65); box-shadow: var(--shadow-sm);
+  transform: translate(calc(var(--hex-r) * 0.25 + var(--k) * 40%), calc(var(--hex-r) * 0.12));
+  color: #fff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+}
+@media (prefers-reduced-motion: reduce) { [data-motion] .zk-hex.zk-lit .zk-hex-face { animation: none; } }
+[data-motion='reduced'] .zk-hex.zk-lit .zk-hex-face { animation: none; }
+
 /* A list: each card drawn flat, one row each, read down a column. */
 .zk-zone-list { display: flex; flex-direction: column; gap: 4px; }
 .zk-zone-cols { margin-left: auto; display: inline-flex; gap: 0; }

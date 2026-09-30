@@ -530,7 +530,113 @@ export function Grid({ id, data, lit, onSelect, className, style }: PrimitivePro
 
 // ---- Map --------------------------------------------------------------------------
 
-export function Map({ id, data, lit, onSelect, className, style }: PrimitiveProps<MapData>) {
+export function Map(props: PrimitiveProps<MapData>) {
+  return props.data.hex ? <HexMap {...props} /> : <PlainMap {...props} />;
+}
+
+const R3 = Math.sqrt(3);
+
+/** A flat-topped hex's centre, in hex radii, from its axial coordinate. */
+function hexCentre(h: { q: number; r: number }): { x: number; y: number } {
+  return { x: 1.5 * h.q, y: R3 * (h.r + h.q / 2) };
+}
+
+/**
+ * A board of flat-topped hexes (MapData.hex). Two layers share one frame:
+ * the hexes themselves, clipped to their shape so a tap lands on the hex it
+ * looks like it lands on, and above them the art and pieces, not clipped, so
+ * a standee may stand taller than its hex. Pieces keep their flip ids from
+ * hex to hex, so a move slides them; a new hex flies in from its arriveFrom.
+ */
+function HexMap({ id, data, lit, onSelect, className, style }: PrimitiveProps<MapData>) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [size, setSize] = useState({ w: 0, h: 0 });
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const measure = () => setSize({ w: el.clientWidth, h: el.clientHeight });
+    measure();
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null;
+    ro?.observe(el);
+    return () => ro?.disconnect();
+  }, []);
+  const nodes = data.nodes.filter((n) => n.hex);
+  const centres = nodes.map((n) => hexCentre(n.hex!));
+  const pad = 0.35;
+  const minX = Math.min(0, ...centres.map((c) => c.x)) - 1 - pad;
+  const maxX = Math.max(0, ...centres.map((c) => c.x)) + 1 + pad;
+  const minY = Math.min(0, ...centres.map((c) => c.y)) - R3 / 2 - pad;
+  const maxY = Math.max(0, ...centres.map((c) => c.y)) + R3 / 2 + pad;
+  const spanX = maxX - minX, spanY = maxY - minY;
+  const fill = data.fill;
+  // The hex radius in pixels: as large as the board allows, the whole map in view.
+  const s = size.w > 0 ? (fill ? Math.min(size.w / spanX, size.h / spanY) : size.w / spanX) : 0;
+  const ox = (size.w - spanX * s) / 2 - minX * s;
+  const oy = (fill ? (size.h - spanY * s) / 2 : 0) - minY * s;
+  const at = (i: number) => ({ x: ox + centres[i]!.x * s, y: oy + centres[i]!.y * s });
+  return (
+    <div data-flip-id={id} className={cx(className, fill && 'zk-map-filling')} style={style}>
+      {data.label && <div className="zk-zone-label">{data.label}</div>}
+      <div
+        ref={ref}
+        className="zk-map zk-hexmap"
+        style={fill ? { flex: '1 1 auto', minHeight: fill.minHeight } : { paddingTop: `${(spanY / spanX) * 100}%` }}
+      >
+        {s > 0 && nodes.map((n, i) => {
+          const c = at(i);
+          const isLit = lit?.includes(n.id) ?? false;
+          const fire = () => onSelect?.({ component: 'map', id: n.id, label: n.label });
+          const lp: LitProps = isLit || data.inspectable
+            ? { ...litProps(true, fire), className: isLit ? 'zk-lit' : 'zk-look' }
+            : {};
+          return (
+            <div
+              key={n.id}
+              data-flip-id={`${id}:hex:${n.id}`}
+              data-flip-from={n.arriveFrom}
+              className={cx('zk-hex', n.ghost && 'ghost', n.selected && 'selected', n.dim && 'dim', lp.className)}
+              style={{ left: c.x - s, top: c.y - (R3 / 2) * s, width: 2 * s, height: R3 * s, ['--hex-fill' as string]: themeColor(n.colorKey ?? n.label) }}
+              role={lp.role} tabIndex={lp.tabIndex} onClick={lp.onClick} onKeyDown={lp.onKeyDown}
+              aria-label={n.describedAs ?? n.label}
+              title={n.describedAs ?? n.label}
+            >
+              <span className="zk-hex-face" />
+            </div>
+          );
+        })}
+        {s > 0 && nodes.map((n, i) => {
+          const c = at(i);
+          const pieces = n.pieces ?? [];
+          if (!n.artUrl && pieces.length === 0) return null;
+          return (
+            <div key={`over:${n.id}`} className={cx('zk-hex-over', n.ghost && 'ghost', n.dim && 'dim')} style={{ left: c.x, top: c.y, ['--hex-r' as string]: `${s}px` }}>
+              {n.artUrl && <img className="zk-hex-art" src={n.artUrl} alt="" />}
+              {pieces.map((p, k) => (p.artUrl
+                ? <img key={p.label} className="zk-hex-piece art" data-flip-id={`${id}:piece:${p.label}`} src={p.artUrl} alt={p.label}
+                    style={{ width: s * 1.5 * (p.size ?? 1), height: s * 1.5 * (p.size ?? 1), ['--k' as string]: k }} />
+                : <span key={p.label} className="zk-hex-piece" data-flip-id={`${id}:piece:${p.label}`} title={p.label}
+                    style={{ width: s * 0.5 * (p.size ?? 1), height: s * 0.5 * (p.size ?? 1), background: themeColor(p.colorKey ?? p.label), ['--k' as string]: k }}>
+                    {p.count && p.count > 1 ? p.count : ''}
+                  </span>))}
+            </div>
+          );
+        })}
+      </div>
+      {data.legend && data.legend.length > 0 && (
+        <div className="zk-map-legend" aria-label="What the colours mean">
+          {data.legend.map((k) => (
+            <span key={k.colorKey} className="zk-map-key">
+              <span className="zk-map-key-dot" style={{ background: themeColor(k.colorKey) }} />
+              {k.label}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PlainMap({ id, data, lit, onSelect, className, style }: PrimitiveProps<MapData>) {
   const aspect = data.aspect ?? 62;
   const ref = useRef<HTMLDivElement | null>(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
