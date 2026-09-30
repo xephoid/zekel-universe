@@ -83,6 +83,26 @@ describe('a hex board', () => {
     expect(container.querySelectorAll('[data-flip-id="m:piece:standee:p1"]')).toHaveLength(1);
   });
 
+  it('maxRadius caps the hex size, zoom enlarges it, and hexes with art are marked', () => {
+    const capped = board();
+    capped.hex = { orientation: 'flat', maxRadius: 20 };
+    capped.nodes[0] = { ...capped.nodes[0]!, artUrl: 'data:,a' };
+    const { rerender } = render(<MapPart id="m" data={capped} />);
+    expect(parseFloat(hexOf('Centre').style.width)).toBeCloseTo(40);
+    expect(hexOf('Centre').className).toMatch(/has-art/);
+    expect(hexOf('North').className).not.toMatch(/has-art/);
+    rerender(<MapPart id="m" data={{ ...capped, hex: { orientation: 'flat', maxRadius: 20, zoom: 1.5 } }} />);
+    expect(parseFloat(hexOf('Centre').style.width)).toBeCloseTo(60);
+  });
+
+  it('a token piece lies on the hex; a figure stands on it', () => {
+    const data = board();
+    data.nodes[0] = { ...data.nodes[0]!, pieces: [{ label: 'coin:c', artUrl: 'data:,c', kind: 'token' }, { label: 'fig', artUrl: 'data:,f' }] };
+    const { container } = render(<MapPart id="m" data={data} />);
+    expect(container.querySelector('[data-flip-id="m:piece:coin:c"]')!.className).toMatch(/token/);
+    expect(container.querySelector('[data-flip-id="m:piece:fig"]')!.className).not.toMatch(/token/);
+  });
+
   it('a board without hex coordinates is still the plain map', () => {
     const { container } = render(<MapPart id="m" data={{ nodes: [{ id: 'a', label: 'A', x: 50, y: 50 }] }} />);
     expect(container.querySelector('.zk-hexmap')).toBeNull();

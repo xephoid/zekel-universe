@@ -164,10 +164,11 @@ export interface MapNode {
   /**
    * What stands on the node. Universe additions: `artUrl` draws a piece as a
    * picture (a standee) instead of a coloured dot, and `size` scales it
-   * (1 = default). A piece keeps its label from node to node, so moving it
+   * (1 = default); `kind: 'token'` lays a picture flat on the node (a coin)
+   * where a figure would stand on it. A piece keeps its label from node to node, so moving it
    * slides it rather than making a new one.
    */
-  pieces?: { label: string; colorKey?: string; count?: number; artUrl?: string; size?: number }[];
+  pieces?: { label: string; colorKey?: string; count?: number; artUrl?: string; size?: number; kind?: 'figure' | 'token' }[];
   /** Universe addition: art drawn inside the node (a treat, a landmark). */
   artUrl?: string;
   /**
@@ -249,7 +250,15 @@ export interface MapData {
    * `hex` coordinate and is drawn on it; the board scales to hold them all
    * and keeps them centred. `x`, `y`, `aspect`, roads and areas are not used.
    */
-  hex?: { orientation: 'flat' };
+  hex?: {
+    orientation: 'flat';
+    /** The largest a hex may be drawn, as its radius in pixels: a small map
+     *  stays at the board's own scale instead of growing to fill the room. */
+    maxRadius?: number;
+    /** Drawn this many times the fitted size (1 = fit); past the room the
+     *  board scrolls. */
+    zoom?: number;
+  };
 }
 
 /** One select event, common to every primitive. */

@@ -275,6 +275,9 @@ export interface GameScreenProps {
   ask?: (name: string, args: Record<string, unknown>) => Promise<{ answer: unknown } | { refused: string }>;
   /** the numbered move menu, for the screen to place where it fits; absent when there is none */
   menu?: ReactNode;
+  /** the last move's caption card (who, what, pace, replay), for a screen
+   *  that places it itself (GlueModule.placesCaption); absent otherwise */
+  caption?: ReactNode;
   /** the bench along the bottom of the table, for the screen to fill (a portal target) */
   benchSlot?: HTMLElement | null;
   /** the top of the side column, above the log, for the screen's standings (a portal target) */
@@ -289,6 +292,10 @@ export interface GlueModule {
   /** A game whose table is more than the bench layout can hold draws its own
    *  screen. When present the table renders it instead of the plan's zones. */
   Screen?: ComponentType<GameScreenProps>;
+  /** The screen draws the caption card where its design puts it (over the
+   *  map), instead of the table putting it above the board or in the side
+   *  column. */
+  placesCaption?: boolean;
   /** A theme for the whole table page (a class on the table shell), from the
    *  seat's own view: a seat's faction look covers every part of its page. */
   themeFor?(input: GlueInput): string | null;
