@@ -76,7 +76,6 @@
 .ao-theme .btn:not(.secondary) { background: var(--ao-action); color: #2b2233; border: 3px solid #2b2233; box-shadow: var(--ao-shadow); font-weight: 700; }
 .ao-theme .btn:not(.secondary):hover { background: var(--ao-action-h); }
 .ao-theme .btn.secondary { border: 2.5px solid var(--ao-line); background: var(--ao-surface); color: var(--ao-text); font-weight: 600; }
-.ao-theme .roll-button { font-size: 18px; border-radius: 14px; }
 
 /* The top bar: parchment, an ink rule under it. */
 .ao-theme .table-topbar { background: var(--ao-surface); border-bottom: 3px solid var(--ao-line); }
@@ -87,3 +86,7 @@
 .ao-theme .table-board .zone-row { --zekel-card-w: 46px; --zekel-card-h: 64px; gap: 10px; }
 .ao-theme .table-board .zone-row [data-flip-id='ao:drawn'] { --zekel-card-w: 64px; --zekel-card-h: 88px; }
 .ao-theme .table-board .zone-row .zk-zone { padding: 6px 8px; }
+
+/* Draw and Roll stay in view at the foot of the board, over the map if the
+   board scrolls: the one thing to press must never be below the fold. */
+.ao-theme .table-board .roll-button { position: sticky; bottom: 0; align-self: center; z-index: 6; box-shadow: var(--ao-shadow-lg); }

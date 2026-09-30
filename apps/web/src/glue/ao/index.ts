@@ -401,7 +401,7 @@ function plan(input: GlueInput): TablePlan | null {
   const quests = questNames(view);
 
   const board: Zone[] = [
-    { kind: 'map', id: 'ao:map', data: { hex: { orientation: 'flat' }, fill: { minHeight: 320 }, nodes: mapNodes(view, input, all) } },
+    { kind: 'map', id: 'ao:map', data: { hex: { orientation: 'flat' }, fill: { minHeight: 240 }, nodes: mapNodes(view, input, all) } },
   ];
   for (const d of DECKS) {
     board.push({ kind: 'card-zone', id: `ao:deck:${d.key}`, span: 'row', data: { label: d.label, mode: 'pile', size: 'small', countOnly: asNum(decks[d.key]) } });
