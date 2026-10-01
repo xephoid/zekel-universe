@@ -5,6 +5,11 @@ published; 7 pages, including the table photo on page 6 and the companion-card
 photo on page 7) plus the designer's rulings of 2026-09-27. Where this doc and
 the draft rulebook disagree, this doc wins.
 
+Rules change 2026-09-30 (designer): "Complete 2 dungeons" and "Recruit 2
+companions" became end-of-game quests, "Most dungeons" and "Most companions".
+Explore 3 tiles is still claimed the moment someone gets there. The engine
+follows this from xephoid/zekel#120.
+
 All names and symbols on cards and tiles are placeholders for now.
 
 - **Players:** 2–4
@@ -310,14 +315,12 @@ Only the quests turned face up at setup (players + 1 of them) are in play.
 
 ### Claimed the moment someone achieves it
 
-The **first** player to achieve one of these takes the card and scores 1 point.
+The **first** player to achieve this takes the card and scores 1 point.
 Nobody else can claim it after that.
 
 | Quest | What counts |
 |---|---|
 | **Explore 3 tiles** | Tiles with your token on the centre hex. Every way of placing a tile counts: exploring, a Dungeon Map card, and a forced explore. The starting tile never counts. |
-| **Complete 2 dungeons** | Dungeon hexes with your token on them. |
-| **Recruit 2 companions** | Companions you hold, from Cities or from Dungeons. |
 
 ### Scored at the end of the game
 
@@ -327,6 +330,8 @@ the point.**
 
 | Quest | What counts |
 |---|---|
+| **Most dungeons** | Dungeon hexes with your token on them. |
+| **Most companions** | Companions you hold at the end, from Cities or from Dungeons. |
 | **Most Little Monsters** | Little Monster cards you defeated, from icons and from Dungeons. |
 | **Most Big Monsters** | Big Monster cards you defeated, from icons and from Dungeons. |
 | **Most artifacts** | Artifact cards you hold at the end, the Star included. |
@@ -353,8 +358,8 @@ accepted this: it only happens if nobody chooses to explore.
 ### Quest cards (6)
 
 1. Explore 3 tiles
-2. Complete 2 dungeons
-3. Recruit 2 companions
+2. Most dungeons — end of game
+3. Most companions — end of game
 4. Most Little Monsters — end of game
 5. Most Big Monsters — end of game
 6. Most artifacts — end of game
