@@ -19,7 +19,9 @@
      "start": 4,
      "base_owner": "p4",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Archmage Elara (p4)"
+     ],
      "collectors": []
     },
     {
@@ -30,9 +32,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Motherboard (p4)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -44,7 +44,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [
-      "Quartermaster Bertram Hollis (p3)"
+      "Quartermaster Bertram Hollis (p4)"
      ],
      "collectors": []
     },
@@ -56,7 +56,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Foreman Hadrik Stoll (p3)"
+     ],
      "collectors": []
     },
     {
@@ -67,7 +69,9 @@
      "start": 1,
      "base_owner": "p3",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Evo Angel (p3)"
+     ],
      "collectors": []
     },
     {
@@ -254,7 +258,10 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Archmage Chaimidious (p1)",
+      "Chronicler Ottoline Vey (p2)"
+     ],
      "collectors": []
     },
     {
@@ -287,7 +294,9 @@
      "start": 3,
      "base_owner": "p2",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Marshal Corvin Ashlock (p2)"
+     ],
      "collectors": []
     },
     {
@@ -309,10 +318,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Archmage Chaimidious (p1)",
-      "Foreman Hadrik Stoll (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -339,7 +345,7 @@
     }
    ]
   },
-  "hero_pool_count": 16,
+  "hero_pool_count": 13,
   "action_stack": [
    {
     "position": 1,
@@ -405,20 +411,28 @@
   },
   "treaties": [
    {
-    "treaty": "Open Borders",
+    "treaty": "Shared Resources",
     "partners": [
-     "p3",
-     "p2"
+     "p4",
+     "p1"
     ],
-    "culture_income": 2
+    "culture_income": 4
    },
    {
-    "treaty": "Shared Resources",
+    "treaty": "Culture Treaty",
     "partners": [
      "p2",
      "p1"
     ],
-    "culture_income": 2
+    "culture_income": 1
+   },
+   {
+    "treaty": "Open Borders",
+    "partners": [
+     "p2",
+     "p3"
+    ],
+    "culture_income": 5
    },
    {
     "treaty": "Peace",
@@ -426,11 +440,19 @@
      "p2",
      "p4"
     ],
+    "culture_income": 3
+   },
+   {
+    "treaty": "Shared Tactics",
+    "partners": [
+     "p4",
+     "p3"
+    ],
     "culture_income": 2
    }
   ],
   "battle": {
-   "coord": "2,8",
+   "coord": "1,9",
    "origin": "2,10",
    "phase": "commit",
    "pass": 1,
@@ -446,8 +468,8 @@
      "activated": false
     },
     {
-     "unit": "Foreman Hadrik Stoll",
-     "ref": "foreman",
+     "unit": "Chronicler Ottoline Vey",
+     "ref": "chronicler",
      "owner": "p2",
      "side": "defenders",
      "init": 30,
@@ -495,26 +517,26 @@
   },
   "victory_status": {
    "p1": {
-    "culture": 3,
+    "culture": 6,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p2": {
-    "culture": 6,
+    "culture": 15,
     "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p3": {
-    "culture": 4,
+    "culture": 9,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p4": {
-    "culture": 2,
-    "tech": 6,
+    "culture": 12,
+    "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -526,15 +548,15 @@
     "kind": "human",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 3,
-    "culture_target": 200,
-    "economic_collectors": 20,
+    "culture": 6,
+    "culture_target": 140,
+    "economic_collectors": 15,
     "next_milestones": [
-     10,
-     30,
-     60,
-     100,
-     150
+     7,
+     21,
+     42,
+     70,
+     105
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -563,7 +585,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 1,
-    "cores_supply": 19,
+    "cores_supply": 14,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -588,7 +610,7 @@
     "heroes": [
      {
       "hero": "Archmage Chaimidious",
-      "coord": "2,8",
+      "coord": "1,9",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
@@ -643,6 +665,20 @@
     "bank": {},
     "paired_core_cost": {
      "water": 1
+    },
+    "unit_limits": {
+     "Core": 19,
+     "Water collector": 10,
+     "Wood collector": 8,
+     "Ore collector": 7,
+     "Oil collector": 4,
+     "Ether collector": 2,
+     "Spinner Platform": 5,
+     "Spitter Platform": 5,
+     "Infiltrator Platform": 5,
+     "Immobile Combat Platform": 5,
+     "Large Combat Platform": 5,
+     "Wall Platform": 5
     }
    },
    {
@@ -650,15 +686,14 @@
     "kind": "ai",
     "faction": "The Schism",
     "species": "wizard",
-    "culture": 6,
-    "culture_target": 200,
-    "economic_collectors": 20,
+    "culture": 15,
+    "culture_target": 140,
+    "economic_collectors": 15,
     "next_milestones": [
-     10,
-     30,
-     60,
-     100,
-     150
+     21,
+     42,
+     70,
+     105
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -689,10 +724,10 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 24,
+    "cores_supply": 19,
     "action_cards": {
      "build": 1,
-     "moveBattle": 1,
+     "moveBattle": 2,
      "research": 1
     },
     "action_card_slots": {
@@ -700,24 +735,32 @@
       "base"
      ],
      "moveBattle": [
-      "base"
+      "base",
+      "hero_extra"
      ],
      "research": [
       "base"
      ]
     },
-    "action_cards_played_count": 3,
+    "action_cards_played_count": 4,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Foreman Hadrik Stoll",
-      "coord": "2,8",
+      "hero": "Chronicler Ottoline Vey",
+      "coord": "1,9",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Marshal Corvin Ashlock",
+      "coord": "2,4",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
      }
     ],
     "bases": [
@@ -764,22 +807,30 @@
     ],
     "committed_collectors": [],
     "bank": {},
-    "paired_core_cost": null
+    "paired_core_cost": null,
+    "unit_limits": {
+     "Surf": 15,
+     "Subject": 10,
+     "Evoker": 5,
+     "Illusionist": 5,
+     "Dragon": 5,
+     "Enchantress": 5,
+     "Cleric": 5
+    }
    },
    {
     "player_id": "p3",
     "kind": "ai",
     "faction": "The Ledger",
     "species": "robot",
-    "culture": 4,
-    "culture_target": 200,
-    "economic_collectors": 20,
+    "culture": 9,
+    "culture_target": 140,
+    "economic_collectors": 15,
     "next_milestones": [
-     10,
-     30,
-     60,
-     100,
-     150
+     21,
+     42,
+     70,
+     105
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -808,16 +859,15 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 2,
-    "cores_supply": 18,
+    "cores_supply": 13,
     "action_cards": {
-     "build": 2,
+     "build": 1,
      "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base",
-      "hero_extra"
+      "base"
      ],
      "moveBattle": [
       "base"
@@ -826,18 +876,25 @@
       "base"
      ]
     },
-    "action_cards_played_count": 4,
+    "action_cards_played_count": 3,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Quartermaster Bertram Hollis",
-      "coord": "-2,8",
+      "hero": "Foreman Hadrik Stoll",
+      "coord": "-2,10",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Evo Angel",
+      "coord": "-2,12",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 80 DMG 4 DEF 4"
      }
     ],
     "bases": [
@@ -889,6 +946,20 @@
     "bank": {},
     "paired_core_cost": {
      "water": 1
+    },
+    "unit_limits": {
+     "Core": 19,
+     "Water collector": 10,
+     "Wood collector": 8,
+     "Ore collector": 7,
+     "Oil collector": 4,
+     "Ether collector": 2,
+     "Spinner Platform": 5,
+     "Spitter Platform": 5,
+     "Infiltrator Platform": 5,
+     "Immobile Combat Platform": 5,
+     "Large Combat Platform": 5,
+     "Wall Platform": 5
     }
    },
    {
@@ -896,32 +967,37 @@
     "kind": "ai",
     "faction": "The Brass Circle",
     "species": "wizard",
-    "culture": 2,
-    "culture_target": 200,
-    "economic_collectors": 20,
+    "culture": 12,
+    "culture_target": 140,
+    "economic_collectors": 15,
     "next_milestones": [
-     10,
-     30,
-     60,
-     100,
-     150
+     21,
+     42,
+     70,
+     105
     ],
     "mana_current": 5,
     "mana_max": 5,
-    "buildings": [],
-    "building_counts": {},
+    "buildings": [
+     "Embassy"
+    ],
+    "building_counts": {
+     "embassy": 1
+    },
     "research": [],
     "tech_progress": {
      "acquired_types": [
       "surf",
-      "castle"
+      "castle",
+      "embassy"
      ],
      "acquired_type_names": [
       "Surf",
-      "Castle"
+      "Castle",
+      "Embassy"
      ],
-     "bonus_points_live": 4,
-     "total": 6,
+     "bonus_points_live": 0,
+     "total": 3,
      "target": 26
     },
     "leader_kills": 0,
@@ -929,15 +1005,16 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 24,
+    "cores_supply": 19,
     "action_cards": {
-     "build": 1,
+     "build": 2,
      "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base"
+      "base",
+      "hero_extra"
      ],
      "moveBattle": [
       "base"
@@ -946,18 +1023,25 @@
       "base"
      ]
     },
-    "action_cards_played_count": 3,
+    "action_cards_played_count": 4,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Motherboard",
-      "coord": "-2,6",
+      "hero": "Quartermaster Bertram Hollis",
+      "coord": "-2,8",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Archmage Elara",
+      "coord": "-2,4",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
      }
     ],
     "bases": [
@@ -982,8 +1066,8 @@
       "Extra Build Card": "needs a Library of Enchantment",
       "Haste": "needs a Library of Enchantment"
      },
-     "treaties": "needs an Embassy or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
-     "battle_cards": "needs an Embassy"
+     "treaties": null,
+     "battle_cards": null
     },
     "collectors": [
      {
@@ -1000,16 +1084,20 @@
       "collector": "surf-3",
       "type": "Surf",
       "placed_at": null
-     },
-     {
-      "collector": "surf-4",
-      "type": "Surf",
-      "placed_at": null
      }
     ],
     "committed_collectors": [],
     "bank": {},
-    "paired_core_cost": null
+    "paired_core_cost": null,
+    "unit_limits": {
+     "Surf": 15,
+     "Subject": 10,
+     "Evoker": 5,
+     "Illusionist": 5,
+     "Dragon": 5,
+     "Enchantress": 5,
+     "Cleric": 5
+    }
    }
   ],
   "your_battle_hand": [
@@ -1064,7 +1152,9 @@
      "start": 4,
      "base_owner": "p4",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Archmage Elara (p4)"
+     ],
      "collectors": []
     },
     {
@@ -1075,9 +1165,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Motherboard (p4)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -1089,7 +1177,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [
-      "Quartermaster Bertram Hollis (p3)"
+      "Quartermaster Bertram Hollis (p4)"
      ],
      "collectors": []
     },
@@ -1101,7 +1189,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Foreman Hadrik Stoll (p3)"
+     ],
      "collectors": []
     },
     {
@@ -1112,7 +1202,9 @@
      "start": 1,
      "base_owner": "p3",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Evo Angel (p3)"
+     ],
      "collectors": []
     },
     {
@@ -1299,7 +1391,10 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Archmage Chaimidious (p1)",
+      "Chronicler Ottoline Vey (p2)"
+     ],
      "collectors": []
     },
     {
@@ -1332,7 +1427,9 @@
      "start": 3,
      "base_owner": "p2",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Marshal Corvin Ashlock (p2)"
+     ],
      "collectors": []
     },
     {
@@ -1354,10 +1451,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Archmage Chaimidious (p1)",
-      "Foreman Hadrik Stoll (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -1384,7 +1478,7 @@
     }
    ]
   },
-  "hero_pool_count": 16,
+  "hero_pool_count": 13,
   "action_stack": [
    {
     "position": 1,
@@ -1450,20 +1544,28 @@
   },
   "treaties": [
    {
-    "treaty": "Open Borders",
+    "treaty": "Shared Resources",
     "partners": [
-     "p3",
-     "p2"
+     "p4",
+     "p1"
     ],
-    "culture_income": 2
+    "culture_income": 4
    },
    {
-    "treaty": "Shared Resources",
+    "treaty": "Culture Treaty",
     "partners": [
      "p2",
      "p1"
     ],
-    "culture_income": 2
+    "culture_income": 1
+   },
+   {
+    "treaty": "Open Borders",
+    "partners": [
+     "p2",
+     "p3"
+    ],
+    "culture_income": 5
    },
    {
     "treaty": "Peace",
@@ -1471,11 +1573,19 @@
      "p2",
      "p4"
     ],
+    "culture_income": 3
+   },
+   {
+    "treaty": "Shared Tactics",
+    "partners": [
+     "p4",
+     "p3"
+    ],
     "culture_income": 2
    }
   ],
   "battle": {
-   "coord": "2,8",
+   "coord": "1,9",
    "origin": "2,10",
    "phase": "commit",
    "pass": 1,
@@ -1491,8 +1601,8 @@
      "activated": false
     },
     {
-     "unit": "Foreman Hadrik Stoll",
-     "ref": "foreman",
+     "unit": "Chronicler Ottoline Vey",
+     "ref": "chronicler",
      "owner": "p2",
      "side": "defenders",
      "init": 30,
@@ -1515,26 +1625,26 @@
   },
   "victory_status": {
    "p1": {
-    "culture": 3,
+    "culture": 6,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p2": {
-    "culture": 6,
+    "culture": 15,
     "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p3": {
-    "culture": 4,
+    "culture": 9,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p4": {
-    "culture": 2,
-    "tech": 6,
+    "culture": 12,
+    "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -1546,15 +1656,15 @@
     "kind": "human",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 3,
-    "culture_target": 200,
-    "economic_collectors": 20,
+    "culture": 6,
+    "culture_target": 140,
+    "economic_collectors": 15,
     "next_milestones": [
-     10,
-     30,
-     60,
-     100,
-     150
+     7,
+     21,
+     42,
+     70,
+     105
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -1583,7 +1693,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 1,
-    "cores_supply": 19,
+    "cores_supply": 14,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -1608,7 +1718,7 @@
     "heroes": [
      {
       "hero": "Archmage Chaimidious",
-      "coord": "2,8",
+      "coord": "1,9",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
@@ -1663,6 +1773,20 @@
     "bank": {},
     "paired_core_cost": {
      "water": 1
+    },
+    "unit_limits": {
+     "Core": 19,
+     "Water collector": 10,
+     "Wood collector": 8,
+     "Ore collector": 7,
+     "Oil collector": 4,
+     "Ether collector": 2,
+     "Spinner Platform": 5,
+     "Spitter Platform": 5,
+     "Infiltrator Platform": 5,
+     "Immobile Combat Platform": 5,
+     "Large Combat Platform": 5,
+     "Wall Platform": 5
     }
    },
    {
@@ -1670,15 +1794,14 @@
     "kind": "ai",
     "faction": "The Schism",
     "species": "wizard",
-    "culture": 6,
-    "culture_target": 200,
-    "economic_collectors": 20,
+    "culture": 15,
+    "culture_target": 140,
+    "economic_collectors": 15,
     "next_milestones": [
-     10,
-     30,
-     60,
-     100,
-     150
+     21,
+     42,
+     70,
+     105
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -1709,10 +1832,10 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 24,
+    "cores_supply": 19,
     "action_cards": {
      "build": 1,
-     "moveBattle": 1,
+     "moveBattle": 2,
      "research": 1
     },
     "action_card_slots": {
@@ -1720,24 +1843,32 @@
       "base"
      ],
      "moveBattle": [
-      "base"
+      "base",
+      "hero_extra"
      ],
      "research": [
       "base"
      ]
     },
-    "action_cards_played_count": 3,
+    "action_cards_played_count": 4,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Foreman Hadrik Stoll",
-      "coord": "2,8",
+      "hero": "Chronicler Ottoline Vey",
+      "coord": "1,9",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Marshal Corvin Ashlock",
+      "coord": "2,4",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
      }
     ],
     "bases": [
@@ -1784,22 +1915,30 @@
     ],
     "committed_collectors": [],
     "bank": {},
-    "paired_core_cost": null
+    "paired_core_cost": null,
+    "unit_limits": {
+     "Surf": 15,
+     "Subject": 10,
+     "Evoker": 5,
+     "Illusionist": 5,
+     "Dragon": 5,
+     "Enchantress": 5,
+     "Cleric": 5
+    }
    },
    {
     "player_id": "p3",
     "kind": "ai",
     "faction": "The Ledger",
     "species": "robot",
-    "culture": 4,
-    "culture_target": 200,
-    "economic_collectors": 20,
+    "culture": 9,
+    "culture_target": 140,
+    "economic_collectors": 15,
     "next_milestones": [
-     10,
-     30,
-     60,
-     100,
-     150
+     21,
+     42,
+     70,
+     105
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -1828,16 +1967,15 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 2,
-    "cores_supply": 18,
+    "cores_supply": 13,
     "action_cards": {
-     "build": 2,
+     "build": 1,
      "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base",
-      "hero_extra"
+      "base"
      ],
      "moveBattle": [
       "base"
@@ -1846,18 +1984,25 @@
       "base"
      ]
     },
-    "action_cards_played_count": 4,
+    "action_cards_played_count": 3,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Quartermaster Bertram Hollis",
-      "coord": "-2,8",
+      "hero": "Foreman Hadrik Stoll",
+      "coord": "-2,10",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Evo Angel",
+      "coord": "-2,12",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 80 DMG 4 DEF 4"
      }
     ],
     "bases": [
@@ -1909,6 +2054,20 @@
     "bank": {},
     "paired_core_cost": {
      "water": 1
+    },
+    "unit_limits": {
+     "Core": 19,
+     "Water collector": 10,
+     "Wood collector": 8,
+     "Ore collector": 7,
+     "Oil collector": 4,
+     "Ether collector": 2,
+     "Spinner Platform": 5,
+     "Spitter Platform": 5,
+     "Infiltrator Platform": 5,
+     "Immobile Combat Platform": 5,
+     "Large Combat Platform": 5,
+     "Wall Platform": 5
     }
    },
    {
@@ -1916,32 +2075,37 @@
     "kind": "ai",
     "faction": "The Brass Circle",
     "species": "wizard",
-    "culture": 2,
-    "culture_target": 200,
-    "economic_collectors": 20,
+    "culture": 12,
+    "culture_target": 140,
+    "economic_collectors": 15,
     "next_milestones": [
-     10,
-     30,
-     60,
-     100,
-     150
+     21,
+     42,
+     70,
+     105
     ],
     "mana_current": 5,
     "mana_max": 5,
-    "buildings": [],
-    "building_counts": {},
+    "buildings": [
+     "Embassy"
+    ],
+    "building_counts": {
+     "embassy": 1
+    },
     "research": [],
     "tech_progress": {
      "acquired_types": [
       "surf",
-      "castle"
+      "castle",
+      "embassy"
      ],
      "acquired_type_names": [
       "Surf",
-      "Castle"
+      "Castle",
+      "Embassy"
      ],
-     "bonus_points_live": 4,
-     "total": 6,
+     "bonus_points_live": 0,
+     "total": 3,
      "target": 26
     },
     "leader_kills": 0,
@@ -1949,15 +2113,16 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 24,
+    "cores_supply": 19,
     "action_cards": {
-     "build": 1,
+     "build": 2,
      "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base"
+      "base",
+      "hero_extra"
      ],
      "moveBattle": [
       "base"
@@ -1966,18 +2131,25 @@
       "base"
      ]
     },
-    "action_cards_played_count": 3,
+    "action_cards_played_count": 4,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Motherboard",
-      "coord": "-2,6",
+      "hero": "Quartermaster Bertram Hollis",
+      "coord": "-2,8",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Archmage Elara",
+      "coord": "-2,4",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
      }
     ],
     "bases": [
@@ -2002,8 +2174,8 @@
       "Extra Build Card": "needs a Library of Enchantment",
       "Haste": "needs a Library of Enchantment"
      },
-     "treaties": "needs an Embassy or Envoy Sable Marrow placed; a partner who has one can still form treaties with you",
-     "battle_cards": "needs an Embassy"
+     "treaties": null,
+     "battle_cards": null
     },
     "collectors": [
      {
@@ -2020,23 +2192,28 @@
       "collector": "surf-3",
       "type": "Surf",
       "placed_at": null
-     },
-     {
-      "collector": "surf-4",
-      "type": "Surf",
-      "placed_at": null
      }
     ],
     "committed_collectors": [],
     "bank": {},
-    "paired_core_cost": null
+    "paired_core_cost": null,
+    "unit_limits": {
+     "Surf": 15,
+     "Subject": 10,
+     "Evoker": 5,
+     "Illusionist": 5,
+     "Dragon": 5,
+     "Enchantress": 5,
+     "Cleric": 5
+    }
    }
   ],
   "your_battle_hand": [],
   "your_action_cards_played": [
    "build:base",
    "research:base",
-   "move_battle:base"
+   "move_battle:base",
+   "move_battle:hero_extra"
   ],
   "your_spy_assignments": [],
   "your_knowledge": [],

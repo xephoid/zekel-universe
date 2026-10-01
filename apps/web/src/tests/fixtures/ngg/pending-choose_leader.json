@@ -312,14 +312,14 @@
     "faction": "The Covenant",
     "species": "wizard",
     "culture": 0,
-    "culture_target": 100,
+    "culture_target": 70,
     "economic_collectors": 12,
     "next_milestones": [
-     5,
-     15,
-     30,
-     50,
-     75
+     4,
+     11,
+     21,
+     35,
+     53
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -403,7 +403,16 @@
     ],
     "committed_collectors": [],
     "bank": {},
-    "paired_core_cost": null
+    "paired_core_cost": null,
+    "unit_limits": {
+     "Surf": 12,
+     "Subject": 10,
+     "Evoker": 5,
+     "Illusionist": 5,
+     "Dragon": 5,
+     "Enchantress": 5,
+     "Cleric": 5
+    }
    },
    {
     "player_id": "p2",
@@ -411,14 +420,14 @@
     "faction": "The Foundry",
     "species": "robot",
     "culture": 0,
-    "culture_target": 100,
+    "culture_target": 70,
     "economic_collectors": 12,
     "next_milestones": [
-     5,
-     15,
-     30,
-     50,
-     75
+     4,
+     11,
+     21,
+     35,
+     53
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -461,7 +470,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Foreman Hadrik Stoll",
+      "hero": "Chronicler Ottoline Vey",
       "coord": "reserved",
       "is_leader": true,
       "dead": false,
@@ -494,6 +503,20 @@
     "bank": {},
     "paired_core_cost": {
      "water": 1
+    },
+    "unit_limits": {
+     "Core": 16,
+     "Water collector": 7,
+     "Wood collector": 6,
+     "Ore collector": 7,
+     "Oil collector": 4,
+     "Ether collector": 2,
+     "Spinner Platform": 5,
+     "Spitter Platform": 5,
+     "Infiltrator Platform": 5,
+     "Immobile Combat Platform": 5,
+     "Large Combat Platform": 5,
+     "Wall Platform": 5
     }
    }
   ],
@@ -554,10 +577,10 @@
   },
   {
    "move_id": "",
-   "description": "Choose Chronicler Ottoline Vey as Leader (recommended) — +2 culture per round during the income step. No income while reserved.",
+   "description": "Choose Foreman Hadrik Stoll as Leader — May make two unit or building purchases per Build action, each paid with separate collectors. A collector bought in the first purchase may help pay the second.",
    "move": {
     "type": "choose_leader",
-    "hero": "Chronicler Ottoline Vey"
+    "hero": "Foreman Hadrik Stoll"
    }
   },
   {
@@ -578,7 +601,7 @@
   },
   {
    "move_id": "",
-   "description": "Choose Dowser Wren Calloway as Leader — When placed, grants one free collector at once: a Surf for a wizard; for a robot, a collector of the owner's choice with a Core already in it (ruling #106). No resource overlay.",
+   "description": "Choose Dowser Wren Calloway as Leader — When placed, grants four free collectors at once: Surfs for a wizard; for a robot, four collectors, the owner choosing the type of each, each with a Core already in it (rulings #106, #117). The grant stops at the supply limits. No resource overlay.",
    "move": {
     "type": "choose_leader",
     "hero": "Dowser Wren Calloway"
@@ -626,7 +649,7 @@
   },
   {
    "move_id": "",
-   "description": "Choose Motherboard as Leader (recommended) — +4 bonus tech points while alive, owned, and in play (ruling #110). Available to either species.",
+   "description": "Choose Motherboard as Leader (recommended) — +5 bonus tech points while alive, owned, and in play (ruling #113). Available to either species.",
    "move": {
     "type": "choose_leader",
     "hero": "Motherboard"
@@ -634,7 +657,7 @@
   },
   {
    "move_id": "",
-   "description": "Choose Technomancer Greymore as Leader (recommended) — +4 bonus tech points while alive, owned, and in play (ruling #110).",
+   "description": "Choose Technomancer Greymore as Leader (recommended) — +5 bonus tech points while alive, owned, and in play (ruling #113).",
    "move": {
     "type": "choose_leader",
     "hero": "Technomancer Greymore"
@@ -953,14 +976,14 @@
     "faction": "The Covenant",
     "species": "wizard",
     "culture": 0,
-    "culture_target": 100,
+    "culture_target": 70,
     "economic_collectors": 12,
     "next_milestones": [
-     5,
-     15,
-     30,
-     50,
-     75
+     4,
+     11,
+     21,
+     35,
+     53
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -1044,7 +1067,16 @@
     ],
     "committed_collectors": [],
     "bank": {},
-    "paired_core_cost": null
+    "paired_core_cost": null,
+    "unit_limits": {
+     "Surf": 12,
+     "Subject": 10,
+     "Evoker": 5,
+     "Illusionist": 5,
+     "Dragon": 5,
+     "Enchantress": 5,
+     "Cleric": 5
+    }
    },
    {
     "player_id": "p2",
@@ -1052,14 +1084,14 @@
     "faction": "The Foundry",
     "species": "robot",
     "culture": 0,
-    "culture_target": 100,
+    "culture_target": 70,
     "economic_collectors": 12,
     "next_milestones": [
-     5,
-     15,
-     30,
-     50,
-     75
+     4,
+     11,
+     21,
+     35,
+     53
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -1102,7 +1134,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Foreman Hadrik Stoll",
+      "hero": "Chronicler Ottoline Vey",
       "coord": "reserved",
       "is_leader": true,
       "dead": false,
@@ -1135,6 +1167,20 @@
     "bank": {},
     "paired_core_cost": {
      "water": 1
+    },
+    "unit_limits": {
+     "Core": 16,
+     "Water collector": 7,
+     "Wood collector": 6,
+     "Ore collector": 7,
+     "Oil collector": 4,
+     "Ether collector": 2,
+     "Spinner Platform": 5,
+     "Spitter Platform": 5,
+     "Infiltrator Platform": 5,
+     "Immobile Combat Platform": 5,
+     "Large Combat Platform": 5,
+     "Wall Platform": 5
     }
    }
   ],
@@ -1143,7 +1189,7 @@
   "your_spy_assignments": [],
   "your_knowledge": [],
   "your_reserved_heroes": [
-   "Foreman Hadrik Stoll"
+   "Chronicler Ottoline Vey"
   ]
  },
  "watcherLegalMoves": []

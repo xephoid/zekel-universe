@@ -241,7 +241,9 @@
      "start": 2,
      "base_owner": "p2",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Foreman Hadrik Stoll (p2)"
+     ],
      "collectors": []
     },
     {
@@ -253,7 +255,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [
-      "Foreman Hadrik Stoll (p2)"
+      "Chronicler Ottoline Vey (p2)"
      ],
      "collectors": []
     },
@@ -281,7 +283,7 @@
     }
    ]
   },
-  "hero_pool_count": 18,
+  "hero_pool_count": 17,
   "action_stack": [
    {
     "position": 1,
@@ -333,7 +335,7 @@
     "leader_alive": true
    },
    "p2": {
-    "culture": 2,
+    "culture": 6,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
@@ -347,14 +349,14 @@
     "faction": "The Covenant",
     "species": "wizard",
     "culture": 0,
-    "culture_target": 100,
+    "culture_target": 70,
     "economic_collectors": 12,
     "next_milestones": [
-     5,
-     15,
-     30,
-     50,
-     75
+     4,
+     11,
+     21,
+     35,
+     53
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -459,22 +461,30 @@
     ],
     "committed_collectors": [],
     "bank": {},
-    "paired_core_cost": null
+    "paired_core_cost": null,
+    "unit_limits": {
+     "Surf": 12,
+     "Subject": 10,
+     "Evoker": 5,
+     "Illusionist": 5,
+     "Dragon": 5,
+     "Enchantress": 5,
+     "Cleric": 5
+    }
    },
    {
     "player_id": "p2",
     "kind": "ai",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 2,
-    "culture_target": 100,
+    "culture": 6,
+    "culture_target": 70,
     "economic_collectors": 12,
     "next_milestones": [
-     5,
-     15,
-     30,
-     50,
-     75
+     11,
+     21,
+     35,
+     53
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -502,8 +512,8 @@
     "military_kills_needed": 1,
     "leader_alive": true,
     "subjects": 0,
-    "cores_reserve": 2,
-    "cores_supply": 10,
+    "cores_reserve": 1,
+    "cores_supply": 11,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -527,11 +537,18 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Foreman Hadrik Stoll",
+      "hero": "Chronicler Ottoline Vey",
       "coord": "2,6",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Foreman Hadrik Stoll",
+      "coord": "2,4",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
@@ -583,6 +600,20 @@
     "bank": {},
     "paired_core_cost": {
      "water": 1
+    },
+    "unit_limits": {
+     "Core": 16,
+     "Water collector": 7,
+     "Wood collector": 6,
+     "Ore collector": 7,
+     "Oil collector": 4,
+     "Ether collector": 2,
+     "Spinner Platform": 5,
+     "Spitter Platform": 5,
+     "Infiltrator Platform": 5,
+     "Immobile Combat Platform": 5,
+     "Large Combat Platform": 5,
+     "Wall Platform": 5
     }
    }
   ],
@@ -904,7 +935,9 @@
      "start": 2,
      "base_owner": "p2",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Foreman Hadrik Stoll (p2)"
+     ],
      "collectors": []
     },
     {
@@ -916,7 +949,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [
-      "Foreman Hadrik Stoll (p2)"
+      "Chronicler Ottoline Vey (p2)"
      ],
      "collectors": []
     },
@@ -944,7 +977,7 @@
     }
    ]
   },
-  "hero_pool_count": 18,
+  "hero_pool_count": 17,
   "action_stack": [
    {
     "position": 1,
@@ -996,7 +1029,7 @@
     "leader_alive": true
    },
    "p2": {
-    "culture": 2,
+    "culture": 6,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
@@ -1010,14 +1043,14 @@
     "faction": "The Covenant",
     "species": "wizard",
     "culture": 0,
-    "culture_target": 100,
+    "culture_target": 70,
     "economic_collectors": 12,
     "next_milestones": [
-     5,
-     15,
-     30,
-     50,
-     75
+     4,
+     11,
+     21,
+     35,
+     53
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -1122,22 +1155,30 @@
     ],
     "committed_collectors": [],
     "bank": {},
-    "paired_core_cost": null
+    "paired_core_cost": null,
+    "unit_limits": {
+     "Surf": 12,
+     "Subject": 10,
+     "Evoker": 5,
+     "Illusionist": 5,
+     "Dragon": 5,
+     "Enchantress": 5,
+     "Cleric": 5
+    }
    },
    {
     "player_id": "p2",
     "kind": "ai",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 2,
-    "culture_target": 100,
+    "culture": 6,
+    "culture_target": 70,
     "economic_collectors": 12,
     "next_milestones": [
-     5,
-     15,
-     30,
-     50,
-     75
+     11,
+     21,
+     35,
+     53
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -1165,8 +1206,8 @@
     "military_kills_needed": 1,
     "leader_alive": true,
     "subjects": 0,
-    "cores_reserve": 2,
-    "cores_supply": 10,
+    "cores_reserve": 1,
+    "cores_supply": 11,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -1190,11 +1231,18 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Foreman Hadrik Stoll",
+      "hero": "Chronicler Ottoline Vey",
       "coord": "2,6",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
+     },
+     {
+      "hero": "Foreman Hadrik Stoll",
+      "coord": "2,4",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
@@ -1246,6 +1294,20 @@
     "bank": {},
     "paired_core_cost": {
      "water": 1
+    },
+    "unit_limits": {
+     "Core": 16,
+     "Water collector": 7,
+     "Wood collector": 6,
+     "Ore collector": 7,
+     "Oil collector": 4,
+     "Ether collector": 2,
+     "Spinner Platform": 5,
+     "Spitter Platform": 5,
+     "Infiltrator Platform": 5,
+     "Immobile Combat Platform": 5,
+     "Large Combat Platform": 5,
+     "Wall Platform": 5
     }
    }
   ],

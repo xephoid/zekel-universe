@@ -314,6 +314,8 @@ describe('NGnG screen', () => {
     expect(take.disabled).toBe(true);
     fireEvent.click(r.getByText(names[1]!));
     expect(onMove).not.toHaveBeenCalled();
+    // Four free collectors (#117): the engine says how many picks are left.
+    expect(r.container.textContent).toContain(`${(f.view as { pending: { context: { remaining: number } } }).pending.context.remaining} left to pick`);
     fireEvent.click(r.getByRole('button', { name: `Take the ${names[1]}` }));
     expect(onMove).toHaveBeenCalledTimes(1);
     expect(onMove.mock.calls[0]![0].move).toEqual(f.legalMoves[1]!.move);
@@ -368,6 +370,18 @@ describe('NGnG screen', () => {
     const r = render(<NggScreen input={inputFor(f.view, f.viewer, f.legalMoves)} yourTurn busy={false} interactive onMove={vi.fn()} onForm={vi.fn()} nameFor={(p) => p} />);
     expect(r.container.textContent).toMatch(/Self Destruct · .* blows itself up, hitting every side/);
     expect(r.container.textContent).toMatch(/'s blast hits /);
+    cleanup();
+  });
+
+  it("the faction board gives each unit the engine's limit on this map, not the printed one", () => {
+    const f = FIXTURES.find((x) => x.name === 'action-build-robot-mid')!.f;
+    const view = f.view as { players: Array<{ player_id: string; unit_limits: Record<string, number> }> };
+    const limits = view.players.find((p) => p.player_id === f.viewer)!.unit_limits;
+    expect(limits['Water collector']).not.toBe(3);
+    const r = render(<NggScreen input={inputFor(f.view, f.viewer, [])} yourTurn={false} busy={false} interactive onMove={vi.fn()} onForm={vi.fn()} nameFor={(p) => p} />);
+    fireEvent.click(r.getByRole('button', { name: 'Open board' }));
+    expect(r.container.textContent).toContain(`up to ${limits['Water collector']}`);
+    expect(r.container.textContent).toContain(`up to ${limits['Core']}`);
     cleanup();
   });
 

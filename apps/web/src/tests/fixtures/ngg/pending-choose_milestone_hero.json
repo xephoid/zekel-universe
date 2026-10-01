@@ -5,9 +5,9 @@
  "view": {
   "game_id": "neither-guts-nor-gears",
   "phase": "claims",
-  "round": 2,
+  "round": 1,
   "active_player_id": "p2",
-  "first_player_id": "p2",
+  "first_player_id": "p1",
   "layout": "two",
   "map": {
    "tiles": [
@@ -21,12 +21,25 @@
      "units": [],
      "heroes": [],
      "collectors": [
-      "surf-1 (p1)"
+      "surf-2 (p1)"
      ]
     },
     {
      "coord": "-2,6",
      "label": "C4",
+     "printed_resource": "water",
+     "current_resource": "water",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": [
+      "surf-1 (p1)"
+     ]
+    },
+    {
+     "coord": "-2,8",
+     "label": "C5",
      "printed_resource": "water",
      "current_resource": "water",
      "start": null,
@@ -38,17 +51,6 @@
      "collectors": []
     },
     {
-     "coord": "-2,8",
-     "label": "C5",
-     "printed_resource": "water",
-     "current_resource": "water",
-     "start": null,
-     "base_owner": null,
-     "units": [],
-     "heroes": [],
-     "collectors": []
-    },
-    {
      "coord": "-2,10",
      "label": "C6",
      "printed_resource": "wood",
@@ -57,9 +59,7 @@
      "base_owner": "p1",
      "units": [],
      "heroes": [],
-     "collectors": [
-      "surf-2 (p1)"
-     ]
+     "collectors": []
     },
     {
      "coord": "-1,3",
@@ -81,9 +81,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "surf-3 (p1)"
-     ]
+     "collectors": []
     },
     {
      "coord": "-1,7",
@@ -105,9 +103,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "surf-4 (p1)"
-     ]
+     "collectors": []
     },
     {
      "coord": "-1,11",
@@ -208,9 +204,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "water-collector-2 (p2)"
-     ]
+     "collectors": []
     },
     {
      "coord": "1,7",
@@ -253,9 +247,7 @@
      "start": 2,
      "base_owner": "p2",
      "units": [],
-     "heroes": [
-      "Foreman Hadrik Stoll (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -266,7 +258,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Chronicler Ottoline Vey (p2)"
+     ],
      "collectors": []
     },
     {
@@ -309,7 +303,7 @@
   "victory_status": {
    "p1": {
     "culture": 0,
-    "tech": 3,
+    "tech": 2,
     "leader_kills": 0,
     "leader_alive": true
    },
@@ -328,37 +322,31 @@
     "faction": "The Covenant",
     "species": "wizard",
     "culture": 0,
-    "culture_target": 100,
+    "culture_target": 70,
     "economic_collectors": 12,
     "next_milestones": [
-     5,
-     15,
-     30,
-     50,
-     75
+     4,
+     11,
+     21,
+     35,
+     53
     ],
     "mana_current": 5,
     "mana_max": 5,
-    "buildings": [
-     "Amphitheatre"
-    ],
-    "building_counts": {
-     "amphitheatre": 1
-    },
+    "buildings": [],
+    "building_counts": {},
     "research": [],
     "tech_progress": {
      "acquired_types": [
       "surf",
-      "castle",
-      "amphitheatre"
+      "castle"
      ],
      "acquired_type_names": [
       "Surf",
-      "Castle",
-      "Amphitheatre"
+      "Castle"
      ],
      "bonus_points_live": 0,
-     "total": 3,
+     "total": 2,
      "target": 26
     },
     "leader_kills": 0,
@@ -391,7 +379,7 @@
     "heroes": [
      {
       "hero": "Archmage Chaimidious",
-      "coord": "-2,6",
+      "coord": "-2,8",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
@@ -426,48 +414,47 @@
      {
       "collector": "surf-1",
       "type": "Surf",
-      "placed_at": "-2,4"
+      "placed_at": "-2,6"
      },
      {
       "collector": "surf-2",
       "type": "Surf",
-      "placed_at": "-2,10"
+      "placed_at": "-2,4"
      },
      {
       "collector": "surf-3",
       "type": "Surf",
-      "placed_at": "-1,5"
+      "placed_at": null
      },
      {
       "collector": "surf-4",
       "type": "Surf",
-      "placed_at": "-1,9"
+      "placed_at": null
      }
     ],
     "committed_collectors": [
      {
       "collector": "surf-1",
-      "coord": "-2,4",
+      "coord": "-2,6",
       "resource": "water"
      },
      {
       "collector": "surf-2",
-      "coord": "-2,10",
-      "resource": "wood"
-     },
-     {
-      "collector": "surf-3",
-      "coord": "-1,5",
-      "resource": "wood"
-     },
-     {
-      "collector": "surf-4",
-      "coord": "-1,9",
-      "resource": "wood"
+      "coord": "-2,4",
+      "resource": "water"
      }
     ],
     "bank": {},
-    "paired_core_cost": null
+    "paired_core_cost": null,
+    "unit_limits": {
+     "Surf": 12,
+     "Subject": 10,
+     "Evoker": 5,
+     "Illusionist": 5,
+     "Dragon": 5,
+     "Enchantress": 5,
+     "Cleric": 5
+    }
    },
    {
     "player_id": "p2",
@@ -475,13 +462,13 @@
     "faction": "The Foundry",
     "species": "robot",
     "culture": 6,
-    "culture_target": 100,
+    "culture_target": 70,
     "economic_collectors": 12,
     "next_milestones": [
-     15,
-     30,
-     50,
-     75
+     11,
+     21,
+     35,
+     53
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -509,8 +496,8 @@
     "military_kills_needed": 1,
     "leader_alive": true,
     "subjects": 0,
-    "cores_reserve": 4,
-    "cores_supply": 8,
+    "cores_reserve": 1,
+    "cores_supply": 11,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -534,8 +521,8 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Foreman Hadrik Stoll",
-      "coord": "2,4",
+      "hero": "Chronicler Ottoline Vey",
+      "coord": "2,6",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
@@ -570,7 +557,7 @@
      {
       "collector": "water-collector-2",
       "type": "Water collector",
-      "placed_at": "1,5",
+      "placed_at": null,
       "core": "allocated"
      },
      {
@@ -591,16 +578,25 @@
       "collector": "water-collector-1",
       "coord": "1,3",
       "resource": "water"
-     },
-     {
-      "collector": "water-collector-2",
-      "coord": "1,5",
-      "resource": "water"
      }
     ],
     "bank": {},
     "paired_core_cost": {
      "water": 1
+    },
+    "unit_limits": {
+     "Core": 16,
+     "Water collector": 7,
+     "Wood collector": 6,
+     "Ore collector": 7,
+     "Oil collector": 4,
+     "Ether collector": 2,
+     "Spinner Platform": 5,
+     "Spitter Platform": 5,
+     "Infiltrator Platform": 5,
+     "Immobile Combat Platform": 5,
+     "Large Combat Platform": 5,
+     "Wall Platform": 5
     }
    }
   ],
@@ -657,10 +653,10 @@
   },
   {
    "move_id": "",
-   "description": "Claim Chronicler Ottoline Vey — +2 culture per round during the income step. No income while reserved.",
+   "description": "Claim Foreman Hadrik Stoll — May make two unit or building purchases per Build action, each paid with separate collectors. A collector bought in the first purchase may help pay the second.",
    "move": {
     "type": "choose_milestone_hero",
-    "hero": "Chronicler Ottoline Vey"
+    "hero": "Foreman Hadrik Stoll"
    }
   },
   {
@@ -681,7 +677,7 @@
   },
   {
    "move_id": "",
-   "description": "Claim Dowser Wren Calloway — When placed, grants one free collector at once: a Surf for a wizard; for a robot, a collector of the owner's choice with a Core already in it (ruling #106). No resource overlay.",
+   "description": "Claim Dowser Wren Calloway — When placed, grants four free collectors at once: Surfs for a wizard; for a robot, four collectors, the owner choosing the type of each, each with a Core already in it (rulings #106, #117). The grant stops at the supply limits. No resource overlay.",
    "move": {
     "type": "choose_milestone_hero",
     "hero": "Dowser Wren Calloway"
@@ -729,7 +725,7 @@
   },
   {
    "move_id": "",
-   "description": "Claim Motherboard — +4 bonus tech points while alive, owned, and in play (ruling #110). Available to either species.",
+   "description": "Claim Motherboard — +5 bonus tech points while alive, owned, and in play (ruling #113). Available to either species.",
    "move": {
     "type": "choose_milestone_hero",
     "hero": "Motherboard"
@@ -741,9 +737,9 @@
  "watcherView": {
   "game_id": "neither-guts-nor-gears",
   "phase": "claims",
-  "round": 2,
+  "round": 1,
   "active_player_id": "p2",
-  "first_player_id": "p2",
+  "first_player_id": "p1",
   "layout": "two",
   "map": {
    "tiles": [
@@ -757,12 +753,25 @@
      "units": [],
      "heroes": [],
      "collectors": [
-      "surf-1 (p1)"
+      "surf-2 (p1)"
      ]
     },
     {
      "coord": "-2,6",
      "label": "C4",
+     "printed_resource": "water",
+     "current_resource": "water",
+     "start": null,
+     "base_owner": null,
+     "units": [],
+     "heroes": [],
+     "collectors": [
+      "surf-1 (p1)"
+     ]
+    },
+    {
+     "coord": "-2,8",
+     "label": "C5",
      "printed_resource": "water",
      "current_resource": "water",
      "start": null,
@@ -774,17 +783,6 @@
      "collectors": []
     },
     {
-     "coord": "-2,8",
-     "label": "C5",
-     "printed_resource": "water",
-     "current_resource": "water",
-     "start": null,
-     "base_owner": null,
-     "units": [],
-     "heroes": [],
-     "collectors": []
-    },
-    {
      "coord": "-2,10",
      "label": "C6",
      "printed_resource": "wood",
@@ -793,9 +791,7 @@
      "base_owner": "p1",
      "units": [],
      "heroes": [],
-     "collectors": [
-      "surf-2 (p1)"
-     ]
+     "collectors": []
     },
     {
      "coord": "-1,3",
@@ -817,9 +813,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "surf-3 (p1)"
-     ]
+     "collectors": []
     },
     {
      "coord": "-1,7",
@@ -841,9 +835,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "surf-4 (p1)"
-     ]
+     "collectors": []
     },
     {
      "coord": "-1,11",
@@ -944,9 +936,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "water-collector-2 (p2)"
-     ]
+     "collectors": []
     },
     {
      "coord": "1,7",
@@ -989,9 +979,7 @@
      "start": 2,
      "base_owner": "p2",
      "units": [],
-     "heroes": [
-      "Foreman Hadrik Stoll (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -1002,7 +990,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Chronicler Ottoline Vey (p2)"
+     ],
      "collectors": []
     },
     {
@@ -1045,7 +1035,7 @@
   "victory_status": {
    "p1": {
     "culture": 0,
-    "tech": 3,
+    "tech": 2,
     "leader_kills": 0,
     "leader_alive": true
    },
@@ -1064,37 +1054,31 @@
     "faction": "The Covenant",
     "species": "wizard",
     "culture": 0,
-    "culture_target": 100,
+    "culture_target": 70,
     "economic_collectors": 12,
     "next_milestones": [
-     5,
-     15,
-     30,
-     50,
-     75
+     4,
+     11,
+     21,
+     35,
+     53
     ],
     "mana_current": 5,
     "mana_max": 5,
-    "buildings": [
-     "Amphitheatre"
-    ],
-    "building_counts": {
-     "amphitheatre": 1
-    },
+    "buildings": [],
+    "building_counts": {},
     "research": [],
     "tech_progress": {
      "acquired_types": [
       "surf",
-      "castle",
-      "amphitheatre"
+      "castle"
      ],
      "acquired_type_names": [
       "Surf",
-      "Castle",
-      "Amphitheatre"
+      "Castle"
      ],
      "bonus_points_live": 0,
-     "total": 3,
+     "total": 2,
      "target": 26
     },
     "leader_kills": 0,
@@ -1127,7 +1111,7 @@
     "heroes": [
      {
       "hero": "Archmage Chaimidious",
-      "coord": "-2,6",
+      "coord": "-2,8",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
@@ -1162,48 +1146,47 @@
      {
       "collector": "surf-1",
       "type": "Surf",
-      "placed_at": "-2,4"
+      "placed_at": "-2,6"
      },
      {
       "collector": "surf-2",
       "type": "Surf",
-      "placed_at": "-2,10"
+      "placed_at": "-2,4"
      },
      {
       "collector": "surf-3",
       "type": "Surf",
-      "placed_at": "-1,5"
+      "placed_at": null
      },
      {
       "collector": "surf-4",
       "type": "Surf",
-      "placed_at": "-1,9"
+      "placed_at": null
      }
     ],
     "committed_collectors": [
      {
       "collector": "surf-1",
-      "coord": "-2,4",
+      "coord": "-2,6",
       "resource": "water"
      },
      {
       "collector": "surf-2",
-      "coord": "-2,10",
-      "resource": "wood"
-     },
-     {
-      "collector": "surf-3",
-      "coord": "-1,5",
-      "resource": "wood"
-     },
-     {
-      "collector": "surf-4",
-      "coord": "-1,9",
-      "resource": "wood"
+      "coord": "-2,4",
+      "resource": "water"
      }
     ],
     "bank": {},
-    "paired_core_cost": null
+    "paired_core_cost": null,
+    "unit_limits": {
+     "Surf": 12,
+     "Subject": 10,
+     "Evoker": 5,
+     "Illusionist": 5,
+     "Dragon": 5,
+     "Enchantress": 5,
+     "Cleric": 5
+    }
    },
    {
     "player_id": "p2",
@@ -1211,13 +1194,13 @@
     "faction": "The Foundry",
     "species": "robot",
     "culture": 6,
-    "culture_target": 100,
+    "culture_target": 70,
     "economic_collectors": 12,
     "next_milestones": [
-     15,
-     30,
-     50,
-     75
+     11,
+     21,
+     35,
+     53
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -1245,8 +1228,8 @@
     "military_kills_needed": 1,
     "leader_alive": true,
     "subjects": 0,
-    "cores_reserve": 4,
-    "cores_supply": 8,
+    "cores_reserve": 1,
+    "cores_supply": 11,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -1270,8 +1253,8 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Foreman Hadrik Stoll",
-      "coord": "2,4",
+      "hero": "Chronicler Ottoline Vey",
+      "coord": "2,6",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
@@ -1306,7 +1289,7 @@
      {
       "collector": "water-collector-2",
       "type": "Water collector",
-      "placed_at": "1,5",
+      "placed_at": null,
       "core": "allocated"
      },
      {
@@ -1327,16 +1310,25 @@
       "collector": "water-collector-1",
       "coord": "1,3",
       "resource": "water"
-     },
-     {
-      "collector": "water-collector-2",
-      "coord": "1,5",
-      "resource": "water"
      }
     ],
     "bank": {},
     "paired_core_cost": {
      "water": 1
+    },
+    "unit_limits": {
+     "Core": 16,
+     "Water collector": 7,
+     "Wood collector": 6,
+     "Ore collector": 7,
+     "Oil collector": 4,
+     "Ether collector": 2,
+     "Spinner Platform": 5,
+     "Spitter Platform": 5,
+     "Infiltrator Platform": 5,
+     "Immobile Combat Platform": 5,
+     "Large Combat Platform": 5,
+     "Wall Platform": 5
     }
    }
   ],

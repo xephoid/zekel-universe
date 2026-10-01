@@ -20,7 +20,7 @@
      "base_owner": "p4",
      "units": [],
      "heroes": [
-      "Motherboard (p4)"
+      "Quartermaster Bertram Hollis (p4)"
      ],
      "collectors": []
     },
@@ -66,7 +66,7 @@
      "base_owner": "p3",
      "units": [],
      "heroes": [
-      "Quartermaster Bertram Hollis (p3)"
+      "Foreman Hadrik Stoll (p3)"
      ],
      "collectors": []
     },
@@ -288,7 +288,7 @@
      "base_owner": "p2",
      "units": [],
      "heroes": [
-      "Foreman Hadrik Stoll (p2)"
+      "Chronicler Ottoline Vey (p2)"
      ],
      "collectors": []
     },
@@ -370,7 +370,7 @@
    },
    "p4": {
     "culture": 0,
-    "tech": 6,
+    "tech": 2,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -383,14 +383,14 @@
     "faction": "The Foundry",
     "species": "robot",
     "culture": 0,
-    "culture_target": 200,
-    "economic_collectors": 20,
+    "culture_target": 140,
+    "economic_collectors": 15,
     "next_milestones": [
-     10,
-     30,
-     60,
-     100,
-     150
+     7,
+     21,
+     42,
+     70,
+     105
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -419,7 +419,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 20,
+    "cores_supply": 15,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -499,6 +499,20 @@
     "bank": {},
     "paired_core_cost": {
      "water": 1
+    },
+    "unit_limits": {
+     "Core": 19,
+     "Water collector": 10,
+     "Wood collector": 8,
+     "Ore collector": 7,
+     "Oil collector": 4,
+     "Ether collector": 2,
+     "Spinner Platform": 5,
+     "Spitter Platform": 5,
+     "Infiltrator Platform": 5,
+     "Immobile Combat Platform": 5,
+     "Large Combat Platform": 5,
+     "Wall Platform": 5
     }
    },
    {
@@ -507,14 +521,14 @@
     "faction": "The Schism",
     "species": "wizard",
     "culture": 0,
-    "culture_target": 200,
-    "economic_collectors": 20,
+    "culture_target": 140,
+    "economic_collectors": 15,
     "next_milestones": [
-     10,
-     30,
-     60,
-     100,
-     150
+     7,
+     21,
+     42,
+     70,
+     105
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -539,7 +553,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 24,
+    "cores_supply": 19,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -563,7 +577,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Foreman Hadrik Stoll",
+      "hero": "Chronicler Ottoline Vey",
       "coord": "2,4",
       "is_leader": true,
       "dead": false,
@@ -614,7 +628,16 @@
     ],
     "committed_collectors": [],
     "bank": {},
-    "paired_core_cost": null
+    "paired_core_cost": null,
+    "unit_limits": {
+     "Surf": 15,
+     "Subject": 10,
+     "Evoker": 5,
+     "Illusionist": 5,
+     "Dragon": 5,
+     "Enchantress": 5,
+     "Cleric": 5
+    }
    },
    {
     "player_id": "p3",
@@ -622,14 +645,14 @@
     "faction": "The Ledger",
     "species": "robot",
     "culture": 0,
-    "culture_target": 200,
-    "economic_collectors": 20,
+    "culture_target": 140,
+    "economic_collectors": 15,
     "next_milestones": [
-     10,
-     30,
-     60,
-     100,
-     150
+     7,
+     21,
+     42,
+     70,
+     105
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -658,16 +681,15 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 20,
+    "cores_supply": 15,
     "action_cards": {
-     "build": 2,
+     "build": 1,
      "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base",
-      "hero_extra"
+      "base"
      ],
      "moveBattle": [
       "base"
@@ -683,7 +705,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Quartermaster Bertram Hollis",
+      "hero": "Foreman Hadrik Stoll",
       "coord": "-2,12",
       "is_leader": true,
       "dead": false,
@@ -739,6 +761,20 @@
     "bank": {},
     "paired_core_cost": {
      "water": 1
+    },
+    "unit_limits": {
+     "Core": 19,
+     "Water collector": 10,
+     "Wood collector": 8,
+     "Ore collector": 7,
+     "Oil collector": 4,
+     "Ether collector": 2,
+     "Spinner Platform": 5,
+     "Spitter Platform": 5,
+     "Infiltrator Platform": 5,
+     "Immobile Combat Platform": 5,
+     "Large Combat Platform": 5,
+     "Wall Platform": 5
     }
    },
    {
@@ -747,14 +783,14 @@
     "faction": "The Brass Circle",
     "species": "wizard",
     "culture": 0,
-    "culture_target": 200,
-    "economic_collectors": 20,
+    "culture_target": 140,
+    "economic_collectors": 15,
     "next_milestones": [
-     10,
-     30,
-     60,
-     100,
-     150
+     7,
+     21,
+     42,
+     70,
+     105
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -770,8 +806,8 @@
       "Surf",
       "Castle"
      ],
-     "bonus_points_live": 4,
-     "total": 6,
+     "bonus_points_live": 0,
+     "total": 2,
      "target": 26
     },
     "leader_kills": 0,
@@ -779,15 +815,16 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 24,
+    "cores_supply": 19,
     "action_cards": {
-     "build": 1,
+     "build": 2,
      "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base"
+      "base",
+      "hero_extra"
      ],
      "moveBattle": [
       "base"
@@ -803,7 +840,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Motherboard",
+      "hero": "Quartermaster Bertram Hollis",
       "coord": "-2,4",
       "is_leader": true,
       "dead": false,
@@ -854,7 +891,16 @@
     ],
     "committed_collectors": [],
     "bank": {},
-    "paired_core_cost": null
+    "paired_core_cost": null,
+    "unit_limits": {
+     "Surf": 15,
+     "Subject": 10,
+     "Evoker": 5,
+     "Illusionist": 5,
+     "Dragon": 5,
+     "Enchantress": 5,
+     "Cleric": 5
+    }
    }
   ],
   "your_battle_hand": [],
@@ -920,7 +966,7 @@
      "base_owner": "p4",
      "units": [],
      "heroes": [
-      "Motherboard (p4)"
+      "Quartermaster Bertram Hollis (p4)"
      ],
      "collectors": []
     },
@@ -966,7 +1012,7 @@
      "base_owner": "p3",
      "units": [],
      "heroes": [
-      "Quartermaster Bertram Hollis (p3)"
+      "Foreman Hadrik Stoll (p3)"
      ],
      "collectors": []
     },
@@ -1188,7 +1234,7 @@
      "base_owner": "p2",
      "units": [],
      "heroes": [
-      "Foreman Hadrik Stoll (p2)"
+      "Chronicler Ottoline Vey (p2)"
      ],
      "collectors": []
     },
@@ -1270,7 +1316,7 @@
    },
    "p4": {
     "culture": 0,
-    "tech": 6,
+    "tech": 2,
     "leader_kills": 0,
     "leader_alive": true
    }
@@ -1283,14 +1329,14 @@
     "faction": "The Foundry",
     "species": "robot",
     "culture": 0,
-    "culture_target": 200,
-    "economic_collectors": 20,
+    "culture_target": 140,
+    "economic_collectors": 15,
     "next_milestones": [
-     10,
-     30,
-     60,
-     100,
-     150
+     7,
+     21,
+     42,
+     70,
+     105
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -1319,7 +1365,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 20,
+    "cores_supply": 15,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -1399,6 +1445,20 @@
     "bank": {},
     "paired_core_cost": {
      "water": 1
+    },
+    "unit_limits": {
+     "Core": 19,
+     "Water collector": 10,
+     "Wood collector": 8,
+     "Ore collector": 7,
+     "Oil collector": 4,
+     "Ether collector": 2,
+     "Spinner Platform": 5,
+     "Spitter Platform": 5,
+     "Infiltrator Platform": 5,
+     "Immobile Combat Platform": 5,
+     "Large Combat Platform": 5,
+     "Wall Platform": 5
     }
    },
    {
@@ -1407,14 +1467,14 @@
     "faction": "The Schism",
     "species": "wizard",
     "culture": 0,
-    "culture_target": 200,
-    "economic_collectors": 20,
+    "culture_target": 140,
+    "economic_collectors": 15,
     "next_milestones": [
-     10,
-     30,
-     60,
-     100,
-     150
+     7,
+     21,
+     42,
+     70,
+     105
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -1439,7 +1499,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 24,
+    "cores_supply": 19,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -1463,7 +1523,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Foreman Hadrik Stoll",
+      "hero": "Chronicler Ottoline Vey",
       "coord": "2,4",
       "is_leader": true,
       "dead": false,
@@ -1514,7 +1574,16 @@
     ],
     "committed_collectors": [],
     "bank": {},
-    "paired_core_cost": null
+    "paired_core_cost": null,
+    "unit_limits": {
+     "Surf": 15,
+     "Subject": 10,
+     "Evoker": 5,
+     "Illusionist": 5,
+     "Dragon": 5,
+     "Enchantress": 5,
+     "Cleric": 5
+    }
    },
    {
     "player_id": "p3",
@@ -1522,14 +1591,14 @@
     "faction": "The Ledger",
     "species": "robot",
     "culture": 0,
-    "culture_target": 200,
-    "economic_collectors": 20,
+    "culture_target": 140,
+    "economic_collectors": 15,
     "next_milestones": [
-     10,
-     30,
-     60,
-     100,
-     150
+     7,
+     21,
+     42,
+     70,
+     105
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -1558,16 +1627,15 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 20,
+    "cores_supply": 15,
     "action_cards": {
-     "build": 2,
+     "build": 1,
      "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base",
-      "hero_extra"
+      "base"
      ],
      "moveBattle": [
       "base"
@@ -1583,7 +1651,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Quartermaster Bertram Hollis",
+      "hero": "Foreman Hadrik Stoll",
       "coord": "-2,12",
       "is_leader": true,
       "dead": false,
@@ -1639,6 +1707,20 @@
     "bank": {},
     "paired_core_cost": {
      "water": 1
+    },
+    "unit_limits": {
+     "Core": 19,
+     "Water collector": 10,
+     "Wood collector": 8,
+     "Ore collector": 7,
+     "Oil collector": 4,
+     "Ether collector": 2,
+     "Spinner Platform": 5,
+     "Spitter Platform": 5,
+     "Infiltrator Platform": 5,
+     "Immobile Combat Platform": 5,
+     "Large Combat Platform": 5,
+     "Wall Platform": 5
     }
    },
    {
@@ -1647,14 +1729,14 @@
     "faction": "The Brass Circle",
     "species": "wizard",
     "culture": 0,
-    "culture_target": 200,
-    "economic_collectors": 20,
+    "culture_target": 140,
+    "economic_collectors": 15,
     "next_milestones": [
-     10,
-     30,
-     60,
-     100,
-     150
+     7,
+     21,
+     42,
+     70,
+     105
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -1670,8 +1752,8 @@
       "Surf",
       "Castle"
      ],
-     "bonus_points_live": 4,
-     "total": 6,
+     "bonus_points_live": 0,
+     "total": 2,
      "target": 26
     },
     "leader_kills": 0,
@@ -1679,15 +1761,16 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 24,
+    "cores_supply": 19,
     "action_cards": {
-     "build": 1,
+     "build": 2,
      "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base"
+      "base",
+      "hero_extra"
      ],
      "moveBattle": [
       "base"
@@ -1703,7 +1786,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Motherboard",
+      "hero": "Quartermaster Bertram Hollis",
       "coord": "-2,4",
       "is_leader": true,
       "dead": false,
@@ -1754,7 +1837,16 @@
     ],
     "committed_collectors": [],
     "bank": {},
-    "paired_core_cost": null
+    "paired_core_cost": null,
+    "unit_limits": {
+     "Surf": 15,
+     "Subject": 10,
+     "Evoker": 5,
+     "Illusionist": 5,
+     "Dragon": 5,
+     "Enchantress": 5,
+     "Cleric": 5
+    }
    }
   ],
   "your_battle_hand": [

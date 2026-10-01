@@ -69,6 +69,10 @@ export interface NggPlayer {
   /** what a Core bought with a platform adds to its price: empty with Core
    *  Integration (#103); null for a wizard, or from an engine that does not say */
   pairedCoreCost: Record<string, number> | null;
+  /** each unit type's limit for this seat on this map, by unit name, as the
+   *  engine enforces it (collectors and Cores follow the map); null from an
+   *  engine that does not say */
+  unitLimits: Record<string, number> | null;
   actionCards: Record<string, number>;
   /** the planned cards by kind ("build:base"); null where they are face down
    *  to this viewer (another seat's, from an engine that hides them) */
@@ -234,6 +238,7 @@ function readPlayer(p: Record<string, unknown>): NggPlayer {
     coresReserve: asNum(p['cores_reserve']),
     coresSupply: asNum(p['cores_supply']),
     bank: isObj(p['bank']) ? Object.fromEntries(Object.entries(p['bank']).filter(([, n]) => typeof n === 'number' && n > 0)) as Record<string, number> : {},
+    unitLimits: isObj(p['unit_limits']) ? Object.fromEntries(Object.entries(p['unit_limits']).filter(([, n]) => typeof n === 'number')) as Record<string, number> : null,
     pairedCoreCost: isObj(p['paired_core_cost']) ? Object.fromEntries(Object.entries(p['paired_core_cost']).filter(([, n]) => typeof n === 'number' && n > 0)) as Record<string, number> : null,
     actionCards: isObj(p['action_cards'])
       ? Object.fromEntries(Object.entries(p['action_cards']).map(([k, v]) => [k, asNum(v)]))

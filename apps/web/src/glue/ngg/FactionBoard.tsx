@@ -68,17 +68,23 @@ function ownedCount(p: NggPlayer, u: RefUnit): number | null {
   return p.units.filter((x) => x.type === u.name).length;
 }
 
+/** A unit type's limit for this seat: the engine's, which follows the map for
+ *  collectors and Cores; the printed maximum from an engine that does not say. */
+function limitOf(p: NggPlayer, u: RefUnit): number {
+  return p.unitLimits?.[u.name] ?? u.maxPerPlayer;
+}
+
 function ownedNote(p: NggPlayer, u: RefUnit): string {
   if (u.collector) {
-    if (!p.ownedCollectors) return `${p.collectors.filter((c) => c.id && collectorType(p, c.resource) === u.name).length} on the map · up to ${u.maxPerPlayer}`;
+    if (!p.ownedCollectors) return `${p.collectors.filter((c) => c.id && collectorType(p, c.resource) === u.name).length} on the map · up to ${limitOf(p, u)}`;
     const mine = p.ownedCollectors.filter((c) => c.type === u.name);
     const placed = mine.filter((c) => c.placedAt).length;
     const unpowered = mine.filter((c) => c.core === 'CORELESS').length;
-    return [`${placed} on the map`, unpowered ? `${unpowered} without a Core` : null, `up to ${u.maxPerPlayer}`].filter(Boolean).join(' · ');
+    return [`${placed} on the map`, unpowered ? `${unpowered} without a Core` : null, `up to ${limitOf(p, u)}`].filter(Boolean).join(' · ');
   }
-  if (u.id === 'subject') return 'on the faction board';
-  if (u.id === 'core') { const c = coresOf(p); return `${c.used} fitted · ${c.free} spare`; }
-  return `on the map · up to ${u.maxPerPlayer}`;
+  if (u.id === 'subject') return `on the faction board · up to ${limitOf(p, u)}`;
+  if (u.id === 'core') { const c = coresOf(p); return `${c.used} fitted · ${c.free} spare · up to ${limitOf(p, u)}`; }
+  return `on the map · up to ${limitOf(p, u)}`;
 }
 
 /** A placed collector's type: a wizard's is a Surf, a robot's names its resource. */

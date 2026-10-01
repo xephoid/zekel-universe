@@ -1001,6 +1001,18 @@ stats (the engine's live line for a held hero), and the ability on one
 line; selecting a hero in a menu opens its whole ability, as a click does
 in the list.
 
+**Checked against engine 6307cd9 (rulings #112-#119, 2026-10-01):**
+- The faction board's "up to N" reads each unit's limit from the view
+  (`unit_limits`, engine branch `claude/ngg-view-limits`): robot collectors
+  follow the map (#116), Surfs the spend (#115), the Core supply 15 plus the
+  spend's extra, Subjects 10 (#118). It had printed the catalogue's fixed
+  maximum (3 water collectors, 15 Cores), which the engine no longer enforces.
+- Dowser now gives four free collectors (#117); a robot picks each in turn
+  and the screen says how many are left (the pending's `remaining`).
+- Treaty income per type (#112), bonus heroes +5 (#113), the Chronicler's +5
+  (#114), the 3-4 player spend of 15 (#115) and culture 35 per player (#119)
+  come from the engine's data and view; nothing in Universe held them.
+
 **Checked against engine 632231e (2026-09-25):** Cultural victory is 25
 culture per player (50 at two players to 150 at six) and the hero milestones
 are shares of it. The culture race reads both from the engine, so nothing in

@@ -288,7 +288,10 @@
   "pending": {
    "kind": "dowser_collector",
    "for": "rob",
-   "question": "rob takes one free collector from Dowser Wren Calloway, with a Core in it — which type? (ruling #106)"
+   "context": {
+    "remaining": 4
+   },
+   "question": "rob takes a free collector from Dowser Wren Calloway, with a Core in it — which type? (4 left to pick; rulings #106, #117)"
   },
   "victory_status": {
    "wiz": {
@@ -312,14 +315,14 @@
     "faction": "The Covenant",
     "species": "wizard",
     "culture": 0,
-    "culture_target": 100,
+    "culture_target": 70,
     "economic_collectors": 12,
     "next_milestones": [
-     5,
-     15,
-     30,
-     50,
-     75
+     4,
+     11,
+     21,
+     35,
+     53
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -411,7 +414,16 @@
     ],
     "committed_collectors": [],
     "bank": {},
-    "paired_core_cost": null
+    "paired_core_cost": null,
+    "unit_limits": {
+     "Surf": 12,
+     "Subject": 10,
+     "Evoker": 5,
+     "Illusionist": 5,
+     "Dragon": 5,
+     "Enchantress": 5,
+     "Cleric": 5
+    }
    },
    {
     "player_id": "rob",
@@ -419,14 +431,14 @@
     "faction": "The Ledger",
     "species": "robot",
     "culture": 0,
-    "culture_target": 100,
+    "culture_target": 70,
     "economic_collectors": 12,
     "next_milestones": [
-     5,
-     15,
-     30,
-     50,
-     75
+     4,
+     11,
+     21,
+     35,
+     53
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -502,6 +514,20 @@
     "bank": {},
     "paired_core_cost": {
      "water": 1
+    },
+    "unit_limits": {
+     "Core": 16,
+     "Water collector": 7,
+     "Wood collector": 6,
+     "Ore collector": 7,
+     "Oil collector": 4,
+     "Ether collector": 2,
+     "Spinner Platform": 5,
+     "Spitter Platform": 5,
+     "Infiltrator Platform": 5,
+     "Immobile Combat Platform": 5,
+     "Large Combat Platform": 5,
+     "Wall Platform": 5
     }
    }
   ],
@@ -842,7 +868,10 @@
   "pending": {
    "kind": "dowser_collector",
    "for": "rob",
-   "question": "rob takes one free collector from Dowser Wren Calloway, with a Core in it — which type? (ruling #106)"
+   "context": {
+    "remaining": 4
+   },
+   "question": "rob takes a free collector from Dowser Wren Calloway, with a Core in it — which type? (4 left to pick; rulings #106, #117)"
   },
   "victory_status": {
    "wiz": {
@@ -866,14 +895,14 @@
     "faction": "The Covenant",
     "species": "wizard",
     "culture": 0,
-    "culture_target": 100,
+    "culture_target": 70,
     "economic_collectors": 12,
     "next_milestones": [
-     5,
-     15,
-     30,
-     50,
-     75
+     4,
+     11,
+     21,
+     35,
+     53
     ],
     "mana_current": 5,
     "mana_max": 5,
@@ -965,7 +994,16 @@
     ],
     "committed_collectors": [],
     "bank": {},
-    "paired_core_cost": null
+    "paired_core_cost": null,
+    "unit_limits": {
+     "Surf": 12,
+     "Subject": 10,
+     "Evoker": 5,
+     "Illusionist": 5,
+     "Dragon": 5,
+     "Enchantress": 5,
+     "Cleric": 5
+    }
    },
    {
     "player_id": "rob",
@@ -973,14 +1011,14 @@
     "faction": "The Ledger",
     "species": "robot",
     "culture": 0,
-    "culture_target": 100,
+    "culture_target": 70,
     "economic_collectors": 12,
     "next_milestones": [
-     5,
-     15,
-     30,
-     50,
-     75
+     4,
+     11,
+     21,
+     35,
+     53
     ],
     "mana_current": 0,
     "mana_max": 0,
@@ -1056,6 +1094,20 @@
     "bank": {},
     "paired_core_cost": {
      "water": 1
+    },
+    "unit_limits": {
+     "Core": 16,
+     "Water collector": 7,
+     "Wood collector": 6,
+     "Ore collector": 7,
+     "Oil collector": 4,
+     "Ether collector": 2,
+     "Spinner Platform": 5,
+     "Spitter Platform": 5,
+     "Infiltrator Platform": 5,
+     "Immobile Combat Platform": 5,
+     "Large Combat Platform": 5,
+     "Wall Platform": 5
     }
    }
   ],
