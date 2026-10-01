@@ -150,11 +150,27 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     secure: opts.secureCookies,
   };
 
+  // Is this an API request? The router matches the decoded path, so
+  // `/%61pi/me` reaches `/api/me`; the raw `req.url` cannot answer this.
+  // Ask the matched route first, then the decoded path (for answers with
+  // no route, such as a 404). A path that will not decode counts as API,
+  // so it gets no-store rather than being treated as a page.
+  function isApiRequest(req: FastifyRequest): boolean {
+    const route = req.routeOptions.url;
+    if (route !== undefined && route.startsWith('/api/')) return true;
+    const raw = req.url.split('?', 1)[0]!;
+    let decoded: string;
+    try { decoded = decodeURIComponent(raw); } catch { return true; }
+    return decoded === '/api' || decoded.startsWith('/api/');
+  }
+
   // Every state-changing request must come from the app's own origin. The
-  // cookies are SameSite=Lax already; this closes the remaining gap.
+  // cookies are SameSite=Lax already; this closes the remaining gap. It
+  // covers every path, not just /api/: static files are GET only, and the
+  // socket's own requests never reach Fastify (sockets.ts checks those).
+  // Checking the path here once let `/%61pi/...` skip the check (SEC-05-F10).
   app.addHook('onRequest', async (req, reply) => {
     if (req.method === 'GET' || req.method === 'HEAD' || req.method === 'OPTIONS') return;
-    if (!req.url.startsWith('/api/')) return;
     if (!originAllowed(req.headers.origin, opts.allowedOrigins)) {
       return reply.code(403).send({ error: 'origin_not_allowed' });
     }
@@ -168,7 +184,7 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     reply.header('X-Frame-Options', 'DENY');
     reply.header('Referrer-Policy', 'same-origin');
     reply.header('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
-    if (req.url.startsWith('/api/')) {
+    if (isApiRequest(req)) {
       reply.header('Cache-Control', 'no-store');
     } else {
       reply.header('Content-Security-Policy',
@@ -1058,7 +1074,7 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     void app.register(fastifyStatic, { root: webDist });
     // Client-side routing: any GET that is not /api/* gets index.html back.
     app.setNotFoundHandler((req: FastifyRequest, reply: FastifyReply) => {
-      if (req.method === 'GET' && !req.url.startsWith('/api')) {
+      if (req.method === 'GET' && !isApiRequest(req)) {
         return reply.sendFile('index.html');
       }
       return reply.status(404).send({ error: 'not_found' });

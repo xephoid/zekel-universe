@@ -158,6 +158,78 @@ describe('hardening', () => {
     expect(String(page.headers['content-security-policy'])).toContain("script-src 'self'");
   });
 
+  // SEC-05-F10: the router matches the decoded path, so `/%61pi/me` is
+  // `/api/me`. The origin check and the no-store header must not care how
+  // the path is spelled.
+  it('refuses foreign-origin writes and keeps no-store however the API path is spelled', async () => {
+    const EVIL = 'http://evil.example';
+    const spellings = (rest: string) => [
+      `/%61pi/${rest}`, `/%61%70%69/${rest}`, `/a%70i/${rest}`, `/ap%69/${rest}`, `/%61%70i/${rest}`,
+    ];
+    const guestCount = async () => (await db.selectFrom('guests').select('id').execute()).length;
+
+    // POST: no guest is created, with a JSON body or none at all.
+    const before = await guestCount();
+    for (const url of spellings('guests')) {
+      const json = await app.fastify.inject({ method: 'POST', url, headers: { origin: EVIL } });
+      const text = await app.fastify.inject({ method: 'POST', url, headers: { origin: EVIL, 'content-type': 'text/plain' }, payload: 'x' });
+      for (const res of [json, text]) {
+        expect(res.statusCode, url).toBe(403);
+        expect(res.json()).toMatchObject({ error: 'origin_not_allowed' });
+      }
+    }
+    expect(await guestCount()).toBe(before);
+
+    // PATCH with a victim's cookie: the name does not change.
+    const victim = await guest();
+    const nameOf = async () => (await db.selectFrom('guests').select('display_name')
+      .where('token_hash', '=', (await import('./identity.js')).hashToken(victim.split('=')[1]!)).executeTakeFirstOrThrow()).display_name;
+    const name = await nameOf();
+    for (const url of [...spellings('me'), '/%61pi/%6De', '/api/%6de']) {
+      const res = await app.fastify.inject({ method: 'PATCH', url, headers: { origin: EVIL, cookie: victim }, payload: { displayName: 'MARKER-F10' } });
+      expect(res.statusCode, url).toBe(403);
+    }
+    expect(await nameOf()).toBe(name);
+
+    // DELETE with the host's cookie: the table and its rows stay.
+    const created = await app.fastify.inject({
+      method: 'POST', url: '/api/tables', headers: { origin: ORIGIN, cookie: victim },
+      payload: { gameId: 'fractured-fist', mode: 'live', seats: [{ kind: 'human' }, { kind: 'ai' }], hostPosition: 0 },
+    });
+    const { tableId } = created.json<CreateTableResponse>();
+    const seats = async () => (await db.selectFrom('seats').select('id').where('table_id', '=', tableId).execute()).length;
+    const seatCount = await seats();
+    for (const url of spellings(`tables/${tableId}`)) {
+      const res = await app.fastify.inject({ method: 'DELETE', url, headers: { origin: EVIL, cookie: victim } });
+      expect(res.statusCode, url).toBe(403);
+    }
+    expect((await app.fastify.inject({ method: 'GET', url: `/api/tables/${tableId}`, headers: { cookie: victim } })).statusCode).toBe(200);
+    expect(await seats()).toBe(seatCount);
+
+    // A write to a path that is not the API is refused from a foreign origin too.
+    expect((await app.fastify.inject({ method: 'POST', url: '/anything', headers: { origin: EVIL } })).statusCode).toBe(403);
+
+    // Every API answer carries no-store and no page policy, however it is spelled.
+    for (const url of ['/%61pi/games', '/a%70i/me', '/%61pi/nope']) {
+      const res = await app.fastify.inject({ method: 'GET', url, headers: { cookie: victim } });
+      expect(res.headers['cache-control'], url).toBe('no-store');
+      expect(res.headers['content-security-policy'], url).toBeUndefined();
+    }
+    const refused = await app.fastify.inject({ method: 'POST', url: '/%61pi/guests', headers: { origin: EVIL } });
+    expect(refused.headers['cache-control']).toBe('no-store');
+
+    // The app's own origin still works, on the plain and the encoded path.
+    const renamed = await app.fastify.inject({ method: 'PATCH', url: '/api/me', headers: { origin: ORIGIN, cookie: victim }, payload: { displayName: 'Plain' } });
+    expect(renamed.statusCode).toBe(200);
+    expect(await nameOf()).toBe('Plain');
+    const encoded = await app.fastify.inject({ method: 'PATCH', url: '/%61pi/me', headers: { origin: ORIGIN, cookie: victim }, payload: { displayName: 'Encoded' } });
+    expect(encoded.statusCode).toBe(200);
+    expect(encoded.headers['cache-control']).toBe('no-store');
+    expect(await nameOf()).toBe('Encoded');
+    expect((await app.fastify.inject({ method: 'DELETE', url: `/api/tables/${tableId}`, headers: { origin: ORIGIN, cookie: victim } })).statusCode).toBe(200);
+    expect(await seats()).toBe(0);
+  });
+
   it('refuses malformed and oversized input without side effects', async () => {
     const cookie = await guest();
     const before = engine.sessions.size;
