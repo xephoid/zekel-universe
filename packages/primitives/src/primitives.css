@@ -28,6 +28,8 @@
 }
 
 .zk-lift { box-shadow: var(--shadow-lift) !important; }
+/* A picture lifts by its own outline (a standee, a coin), not by its square box. */
+.zk-hex-piece.art.zk-lift { box-shadow: none !important; filter: drop-shadow(2px 7px 4px rgba(0, 0, 0, 0.28)); }
 /* the layer the ghosts fly in: over the table, under the sheets */
 .zk-flights { position: fixed; inset: 0; z-index: 40; pointer-events: none; overflow: visible; }
 .zk-flights .zk-ghost { pointer-events: none; }

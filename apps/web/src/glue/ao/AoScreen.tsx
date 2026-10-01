@@ -32,6 +32,8 @@ const LEGEND = [['city', 'City'], ['dungeon', 'Dungeon'], ['little', 'Little Mon
 const RUNES = ['hearts', 'spades', 'diamonds', 'clubs', 'star'] as const;
 const DECK_COLOUR: Record<string, string> = { companion: '#5aa9e6', dungeon: '#9d8fc2', little: '#8fd14f', big: '#ff7a59' };
 const ZOOMS = [1, 1.35, 1.8, 2.4];
+/** How long "how the test went" stays up after the roll lands. */
+export const RESULT_MS = 2500;
 
 function Icon({ name, size, tint: colour, title }: { name: string; size: number; tint?: string; title?: string }) {
   const src = iconUrl(name, { tint: colour, wobble: size >= 26 });
@@ -132,8 +134,9 @@ function Dice({ dice, total, good }: { dice: number[]; total: number; good: bool
 
 const DECK_OF: Record<string, string> = { recruit: 'companion', little: 'little', big: 'big' };
 
-function TestPanel({ view, previous, all, mine, meId, onDraw }: {
+function TestPanel({ view, previous, all, mine, meId, onDraw, showResult }: {
   view: Record<string, unknown>; previous: unknown; all: Player[]; mine: boolean; meId: string | null; onDraw?: () => void;
+  showResult: boolean;
 }): ReactNode {
   const p = pendingOf(view);
   const who = (id: string) => all.find((x) => x.id === id);
@@ -142,7 +145,7 @@ function TestPanel({ view, previous, all, mine, meId, onDraw }: {
   // Just after a roll: the card that was tested, the dice, and how it went.
   const before = isObj(previous) ? pendingOf(previous) : null;
   const last = isObj(view['lastRoll']) ? view['lastRoll'] : null;
-  if ((!p || (p.kind !== 'draw' && p.kind !== 'roll')) && before?.kind === 'roll' && before.payload['rollKind'] === 'test' && last) {
+  if (showResult && (!p || (p.kind !== 'draw' && p.kind !== 'roll')) && before?.kind === 'roll' && before.payload['rollKind'] === 'test' && last) {
     const cardId = asStr(before.payload['cardId']);
     const tester = who(before.seat);
     const kept = !!tester && [...tester.companions, ...tester.little, ...tester.big].includes(cardId);
@@ -549,6 +552,13 @@ export function AoScreen(props: GameScreenProps) {
   const [zoom, setZoom] = useState(0);
   // A new event drops a choice being put together: its moves may be gone.
   useEffect(() => { setPick(null); }, [input.seq]);
+  // How a test went shows for a beat after the roll, then closes by itself.
+  const [showResult, setShowResult] = useState(true);
+  useEffect(() => {
+    setShowResult(true);
+    const t = setTimeout(() => setShowResult(false), RESULT_MS);
+    return () => clearTimeout(t);
+  }, [input.seq]);
   const view = isObj(input.view) ? input.view : null;
   const all = useMemo(() => (view ? players(view) : []), [view]);
   const pressable = interactive && yourTurn && !busy;
@@ -575,7 +585,7 @@ export function AoScreen(props: GameScreenProps) {
   const side = <Side view={view} all={named} me={me?.id ?? null} nameOf={nameOf} caption={caption} isAI={isAI} />;
   const panel = (
     <>
-      <TestPanel view={view} previous={input.previous} all={named} mine={mine} meId={me?.id ?? null} onDraw={onDraw} />
+      <TestPanel view={view} previous={input.previous} all={named} mine={mine} meId={me?.id ?? null} onDraw={onDraw} showResult={showResult} />
       <ExplorePanel view={view} input={input} pick={pick} setPick={setPick} onMove={onMove} onDraw={onDraw} mine={mine} />
       <RunePanel view={view} input={input} all={named} mine={mine} onMove={onMove} />
     </>

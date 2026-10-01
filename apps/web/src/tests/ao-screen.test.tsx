@@ -6,14 +6,14 @@
 // press nothing.
 
 import { describe, expect, it, afterEach, beforeAll, afterAll, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { LegalMove } from '@universe/shared';
 import type { GameScreenProps, GlueInput } from '../glue';
 import { isSubmissionAllowed } from '../glue';
-import { AoScreen } from '../glue/ao/AoScreen';
+import { AoScreen, RESULT_MS } from '../glue/ao/AoScreen';
 
 afterEach(cleanup);
 const widthDesc = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'clientWidth');
@@ -122,6 +122,22 @@ describe('the Adventurer Olympics screen', () => {
     const colours = f.view.players.filter((p: any) => p.player_id !== f.viewer).map((p: any) => p.colour);
     expect(names(() => 'AI (medium)').sort()).toEqual([...colours].sort());
     expect(names((p) => (p === 'p2' ? 'Sam' : 'AI (easy)'))).toContain('Sam');
+  });
+
+  it('how a test went closes by itself after a beat', () => {
+    vi.useFakeTimers();
+    try {
+      const f = fx('after-roll-test');
+      const me = f.view.players.find((p: any) => p.player_id === f.viewer);
+      const cardId = [...me.companions, ...me.littleMonsters, ...me.bigMonsters][0] ?? 'little-1';
+      const previous = { ...f.view, pending: { kind: 'roll', seat: f.viewer, payload: { rollKind: 'test', test: 'recruit', cardId } } };
+      const { container } = draw(f, {}, { previous });
+      expect(container.querySelector('.ao-panel.result')).not.toBeNull();
+      act(() => { vi.advanceTimersByTime(RESULT_MS + 50); });
+      expect(container.querySelector('.ao-panel.result')).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('a watcher sees the table and can press nothing', () => {
