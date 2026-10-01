@@ -21,7 +21,7 @@
      "units": [],
      "heroes": [
       "Archmage Elara (p4)",
-      "Warden Hesper Quill (p4)"
+      "Kestrel Nine (p4)"
      ],
      "collectors": []
     },
@@ -33,7 +33,10 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Foreman Hadrik Stoll (p3)",
+      "Quartermaster Bertram Hollis (p4)"
+     ],
      "collectors": []
     },
     {
@@ -44,9 +47,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Quartermaster Bertram Hollis (p4)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -57,9 +58,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Foreman Hadrik Stoll (p3)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -71,7 +70,8 @@
      "base_owner": "p3",
      "units": [],
      "heroes": [
-      "Evo Angel (p3)"
+      "Evo Angel (p3)",
+      "Captain Rook Malvane (p3)"
      ],
      "collectors": []
     },
@@ -182,7 +182,10 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Archmage Chaimidious (p1)",
+      "Chronicler Ottoline Vey (p2)"
+     ],
      "collectors": []
     },
     {
@@ -259,9 +262,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Chronicler Ottoline Vey (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -296,7 +297,7 @@
      "units": [],
      "heroes": [
       "Marshal Corvin Ashlock (p2)",
-      "Kestrel Nine (p2)"
+      "Envoy Sable Marrow (p2)"
      ],
      "collectors": []
     },
@@ -330,9 +331,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Archmage Chaimidious (p1)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -344,13 +343,13 @@
      "base_owner": "p1",
      "units": [],
      "heroes": [
-      "Captain Rook Malvane (p1)"
+      "Warden Hesper Quill (p1)"
      ],
      "collectors": []
     }
    ]
   },
-  "hero_pool_count": 10,
+  "hero_pool_count": 9,
   "action_stack": [
    {
     "position": 1,
@@ -406,10 +405,18 @@
   },
   "treaties": [
    {
+    "treaty": "Open Borders",
+    "partners": [
+     "p2",
+     "p1"
+    ],
+    "culture_income": 5
+   },
+   {
     "treaty": "Shared Resources",
     "partners": [
-     "p4",
-     "p1"
+     "p2",
+     "p3"
     ],
     "culture_income": 4
    },
@@ -417,62 +424,52 @@
     "treaty": "Culture Treaty",
     "partners": [
      "p2",
-     "p1"
+     "p4"
     ],
     "culture_income": 1
    },
    {
     "treaty": "Open Borders",
     "partners": [
-     "p2",
+     "p4",
      "p3"
     ],
     "culture_income": 5
    },
    {
-    "treaty": "Peace",
-    "partners": [
-     "p2",
-     "p4"
-    ],
-    "culture_income": 3
-   },
-   {
-    "treaty": "Culture Treaty",
+    "treaty": "Shared Resources",
     "partners": [
      "p4",
-     "p3"
+     "p1"
     ],
-    "culture_income": 1
+    "culture_income": 4
    }
   ],
   "battle": null,
   "battle_deck_count": 19,
-  "battle_discard": [
-   "Counter"
-  ],
+  "battle_discard": [],
   "pending": null,
   "victory_status": {
    "p1": {
-    "culture": 13,
-    "tech": 4,
-    "leader_kills": 0,
-    "leader_alive": true
-   },
-   "p2": {
-    "culture": 29,
-    "tech": 3,
-    "leader_kills": 0,
-    "leader_alive": true
-   },
-   "p3": {
     "culture": 20,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
+   "p2": {
+    "culture": 32,
+    "tech": 3,
+    "leader_kills": 0,
+    "leader_alive": true
+   },
+   "p3": {
+    "culture": 23,
+    "tech": 4,
+    "leader_kills": 0,
+    "leader_alive": true
+   },
    "p4": {
-    "culture": 22,
+    "culture": 23,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
@@ -485,9 +482,9 @@
     "kind": "human",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 13,
+    "culture": 20,
     "culture_target": 140,
-    "economic_collectors": 15,
+    "economic_collectors": 20,
     "next_milestones": [
      21,
      42,
@@ -521,7 +518,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 2,
-    "cores_supply": 13,
+    "cores_supply": 18,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -539,20 +536,20 @@
      ]
     },
     "action_cards_played_count": 3,
-    "battle_hand_count": 0,
+    "battle_hand_count": 1,
     "spy_recruitments": 0,
     "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
       "hero": "Archmage Chaimidious",
-      "coord": "2,10",
+      "coord": "0,8",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
      },
      {
-      "hero": "Captain Rook Malvane",
+      "hero": "Warden Hesper Quill",
       "coord": "2,12",
       "is_leader": false,
       "dead": false,
@@ -610,7 +607,7 @@
      "water": 1
     },
     "unit_limits": {
-     "Core": 19,
+     "Core": 24,
      "Water collector": 10,
      "Wood collector": 8,
      "Ore collector": 7,
@@ -629,9 +626,9 @@
     "kind": "ai",
     "faction": "The Schism",
     "species": "wizard",
-    "culture": 29,
+    "culture": 32,
     "culture_target": 140,
-    "economic_collectors": 15,
+    "economic_collectors": 20,
     "next_milestones": [
      42,
      70,
@@ -659,14 +656,14 @@
      ],
      "bonus_points_live": 0,
      "total": 3,
-     "target": 26
+     "target": 25
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 19,
+    "cores_supply": 24,
     "action_cards": {
      "build": 1,
      "moveBattle": 2,
@@ -692,7 +689,7 @@
     "heroes": [
      {
       "hero": "Chronicler Ottoline Vey",
-      "coord": "1,9",
+      "coord": "0,8",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
@@ -705,11 +702,11 @@
       "stats": "Init 70 DMG 3 DEF 4"
      },
      {
-      "hero": "Kestrel Nine",
+      "hero": "Envoy Sable Marrow",
       "coord": "2,4",
       "is_leader": false,
       "dead": false,
-      "stats": "Init 70 DMG 3 DEF 4"
+      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
@@ -728,7 +725,6 @@
       "Mana Shield": "needs a Library of Evocation",
       "Invisible": "needs a Library of Illusion",
       "Dehance": "needs a Library of Enchantment",
-      "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
       "Extra Build Card": "needs a Library of Enchantment",
@@ -763,7 +759,7 @@
     "bank": {},
     "paired_core_cost": null,
     "unit_limits": {
-     "Surf": 15,
+     "Surf": 20,
      "Subject": 10,
      "Evoker": 5,
      "Illusionist": 5,
@@ -777,11 +773,10 @@
     "kind": "ai",
     "faction": "The Ledger",
     "species": "robot",
-    "culture": 20,
+    "culture": 23,
     "culture_target": 140,
-    "economic_collectors": 15,
+    "economic_collectors": 20,
     "next_milestones": [
-     21,
      42,
      70,
      105
@@ -813,7 +808,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 4,
-    "cores_supply": 11,
+    "cores_supply": 16,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -838,7 +833,7 @@
     "heroes": [
      {
       "hero": "Foreman Hadrik Stoll",
-      "coord": "-2,10",
+      "coord": "-2,6",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
@@ -849,6 +844,13 @@
       "is_leader": false,
       "dead": false,
       "stats": "Init 80 DMG 4 DEF 4"
+     },
+     {
+      "hero": "Captain Rook Malvane",
+      "coord": "-2,12",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
      }
     ],
     "bases": [
@@ -902,7 +904,7 @@
      "water": 1
     },
     "unit_limits": {
-     "Core": 19,
+     "Core": 24,
      "Water collector": 10,
      "Wood collector": 8,
      "Ore collector": 7,
@@ -921,9 +923,9 @@
     "kind": "ai",
     "faction": "The Brass Circle",
     "species": "wizard",
-    "culture": 22,
+    "culture": 23,
     "culture_target": 140,
-    "economic_collectors": 15,
+    "economic_collectors": 20,
     "next_milestones": [
      42,
      70,
@@ -953,14 +955,14 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 26
+     "target": 25
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
     "leader_alive": true,
     "subjects": 1,
     "cores_reserve": 0,
-    "cores_supply": 19,
+    "cores_supply": 24,
     "action_cards": {
      "build": 2,
      "moveBattle": 1,
@@ -986,7 +988,7 @@
     "heroes": [
      {
       "hero": "Quartermaster Bertram Hollis",
-      "coord": "-2,8",
+      "coord": "-2,6",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
@@ -999,7 +1001,7 @@
       "stats": "Init 70 DMG 3 DEF 4"
      },
      {
-      "hero": "Warden Hesper Quill",
+      "hero": "Kestrel Nine",
       "coord": "-2,4",
       "is_leader": false,
       "dead": false,
@@ -1022,7 +1024,6 @@
       "Mana Shield": "needs a Library of Evocation",
       "Invisible": "needs a Library of Illusion",
       "Dehance": "needs a Library of Enchantment",
-      "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
       "Extra Build Card": "needs a Library of Enchantment",
@@ -1057,7 +1058,7 @@
     "bank": {},
     "paired_core_cost": null,
     "unit_limits": {
-     "Surf": 15,
+     "Surf": 20,
      "Subject": 10,
      "Evoker": 5,
      "Illusionist": 5,
@@ -1081,11 +1082,11 @@
  "legalMoves": [
   {
    "move_id": "",
-   "description": "Break Culture Treaty with p3.",
+   "description": "Break Culture Treaty with p2.",
    "move": {
     "type": "break_treaty",
     "treaty_type": "Culture Treaty",
-    "partner": "p3"
+    "partner": "p2"
    }
   },
   {
@@ -1109,7 +1110,7 @@
      },
      {
       "collectorId": "surf-4",
-      "coord": "1,9"
+      "coord": "0,10"
      }
     ]
    }
@@ -1131,11 +1132,11 @@
      },
      {
       "collectorId": "surf-3",
-      "coord": "1,9"
+      "coord": "0,6"
      },
      {
       "collectorId": "surf-4",
-      "coord": "0,8"
+      "coord": "0,4"
      }
     ]
    }
@@ -1155,13 +1156,13 @@
   },
   {
    "moveType": "break_treaty",
-   "item": "Shared Resources with p1",
-   "reason": "Shared Resources breaks only at end of round (after the culture phase, §5.6)"
+   "item": "Open Borders with p3",
+   "reason": "Open Borders breaks only at end of round (after the culture phase, §5.6)"
   },
   {
    "moveType": "break_treaty",
-   "item": "Peace with p2",
-   "reason": "Peace breaks only at end of round (after the culture phase, §5.6)"
+   "item": "Shared Resources with p1",
+   "reason": "Shared Resources breaks only at end of round (after the culture phase, §5.6)"
   },
   {
    "moveType": "research",
@@ -1187,11 +1188,6 @@
    "moveType": "research",
    "item": "Dehance",
    "reason": "Dehance requires Library of Enchantment (you have: Embassy)"
-  },
-  {
-   "moveType": "research",
-   "item": "Detection",
-   "reason": "Detection requires Library of Enchantment (you have: Embassy)"
   },
   {
    "moveType": "research",
@@ -1234,7 +1230,7 @@
      "units": [],
      "heroes": [
       "Archmage Elara (p4)",
-      "Warden Hesper Quill (p4)"
+      "Kestrel Nine (p4)"
      ],
      "collectors": []
     },
@@ -1246,7 +1242,10 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Foreman Hadrik Stoll (p3)",
+      "Quartermaster Bertram Hollis (p4)"
+     ],
      "collectors": []
     },
     {
@@ -1257,9 +1256,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Quartermaster Bertram Hollis (p4)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -1270,9 +1267,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Foreman Hadrik Stoll (p3)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -1284,7 +1279,8 @@
      "base_owner": "p3",
      "units": [],
      "heroes": [
-      "Evo Angel (p3)"
+      "Evo Angel (p3)",
+      "Captain Rook Malvane (p3)"
      ],
      "collectors": []
     },
@@ -1395,7 +1391,10 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Archmage Chaimidious (p1)",
+      "Chronicler Ottoline Vey (p2)"
+     ],
      "collectors": []
     },
     {
@@ -1472,9 +1471,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Chronicler Ottoline Vey (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -1509,7 +1506,7 @@
      "units": [],
      "heroes": [
       "Marshal Corvin Ashlock (p2)",
-      "Kestrel Nine (p2)"
+      "Envoy Sable Marrow (p2)"
      ],
      "collectors": []
     },
@@ -1543,9 +1540,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Archmage Chaimidious (p1)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -1557,13 +1552,13 @@
      "base_owner": "p1",
      "units": [],
      "heroes": [
-      "Captain Rook Malvane (p1)"
+      "Warden Hesper Quill (p1)"
      ],
      "collectors": []
     }
    ]
   },
-  "hero_pool_count": 10,
+  "hero_pool_count": 9,
   "action_stack": [
    {
     "position": 1,
@@ -1619,10 +1614,18 @@
   },
   "treaties": [
    {
+    "treaty": "Open Borders",
+    "partners": [
+     "p2",
+     "p1"
+    ],
+    "culture_income": 5
+   },
+   {
     "treaty": "Shared Resources",
     "partners": [
-     "p4",
-     "p1"
+     "p2",
+     "p3"
     ],
     "culture_income": 4
    },
@@ -1630,62 +1633,52 @@
     "treaty": "Culture Treaty",
     "partners": [
      "p2",
-     "p1"
+     "p4"
     ],
     "culture_income": 1
    },
    {
     "treaty": "Open Borders",
     "partners": [
-     "p2",
+     "p4",
      "p3"
     ],
     "culture_income": 5
    },
    {
-    "treaty": "Peace",
-    "partners": [
-     "p2",
-     "p4"
-    ],
-    "culture_income": 3
-   },
-   {
-    "treaty": "Culture Treaty",
+    "treaty": "Shared Resources",
     "partners": [
      "p4",
-     "p3"
+     "p1"
     ],
-    "culture_income": 1
+    "culture_income": 4
    }
   ],
   "battle": null,
   "battle_deck_count": 19,
-  "battle_discard": [
-   "Counter"
-  ],
+  "battle_discard": [],
   "pending": null,
   "victory_status": {
    "p1": {
-    "culture": 13,
-    "tech": 4,
-    "leader_kills": 0,
-    "leader_alive": true
-   },
-   "p2": {
-    "culture": 29,
-    "tech": 3,
-    "leader_kills": 0,
-    "leader_alive": true
-   },
-   "p3": {
     "culture": 20,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
+   "p2": {
+    "culture": 32,
+    "tech": 3,
+    "leader_kills": 0,
+    "leader_alive": true
+   },
+   "p3": {
+    "culture": 23,
+    "tech": 4,
+    "leader_kills": 0,
+    "leader_alive": true
+   },
    "p4": {
-    "culture": 22,
+    "culture": 23,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
@@ -1698,9 +1691,9 @@
     "kind": "human",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 13,
+    "culture": 20,
     "culture_target": 140,
-    "economic_collectors": 15,
+    "economic_collectors": 20,
     "next_milestones": [
      21,
      42,
@@ -1734,7 +1727,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 2,
-    "cores_supply": 13,
+    "cores_supply": 18,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -1752,20 +1745,20 @@
      ]
     },
     "action_cards_played_count": 3,
-    "battle_hand_count": 0,
+    "battle_hand_count": 1,
     "spy_recruitments": 0,
     "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
       "hero": "Archmage Chaimidious",
-      "coord": "2,10",
+      "coord": "0,8",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
      },
      {
-      "hero": "Captain Rook Malvane",
+      "hero": "Warden Hesper Quill",
       "coord": "2,12",
       "is_leader": false,
       "dead": false,
@@ -1823,7 +1816,7 @@
      "water": 1
     },
     "unit_limits": {
-     "Core": 19,
+     "Core": 24,
      "Water collector": 10,
      "Wood collector": 8,
      "Ore collector": 7,
@@ -1842,9 +1835,9 @@
     "kind": "ai",
     "faction": "The Schism",
     "species": "wizard",
-    "culture": 29,
+    "culture": 32,
     "culture_target": 140,
-    "economic_collectors": 15,
+    "economic_collectors": 20,
     "next_milestones": [
      42,
      70,
@@ -1872,14 +1865,14 @@
      ],
      "bonus_points_live": 0,
      "total": 3,
-     "target": 26
+     "target": 25
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 19,
+    "cores_supply": 24,
     "action_cards": {
      "build": 1,
      "moveBattle": 2,
@@ -1905,7 +1898,7 @@
     "heroes": [
      {
       "hero": "Chronicler Ottoline Vey",
-      "coord": "1,9",
+      "coord": "0,8",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
@@ -1918,11 +1911,11 @@
       "stats": "Init 70 DMG 3 DEF 4"
      },
      {
-      "hero": "Kestrel Nine",
+      "hero": "Envoy Sable Marrow",
       "coord": "2,4",
       "is_leader": false,
       "dead": false,
-      "stats": "Init 70 DMG 3 DEF 4"
+      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
@@ -1941,7 +1934,6 @@
       "Mana Shield": "needs a Library of Evocation",
       "Invisible": "needs a Library of Illusion",
       "Dehance": "needs a Library of Enchantment",
-      "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
       "Extra Build Card": "needs a Library of Enchantment",
@@ -1976,7 +1968,7 @@
     "bank": {},
     "paired_core_cost": null,
     "unit_limits": {
-     "Surf": 15,
+     "Surf": 20,
      "Subject": 10,
      "Evoker": 5,
      "Illusionist": 5,
@@ -1990,11 +1982,10 @@
     "kind": "ai",
     "faction": "The Ledger",
     "species": "robot",
-    "culture": 20,
+    "culture": 23,
     "culture_target": 140,
-    "economic_collectors": 15,
+    "economic_collectors": 20,
     "next_milestones": [
-     21,
      42,
      70,
      105
@@ -2026,7 +2017,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 4,
-    "cores_supply": 11,
+    "cores_supply": 16,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -2051,7 +2042,7 @@
     "heroes": [
      {
       "hero": "Foreman Hadrik Stoll",
-      "coord": "-2,10",
+      "coord": "-2,6",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
@@ -2062,6 +2053,13 @@
       "is_leader": false,
       "dead": false,
       "stats": "Init 80 DMG 4 DEF 4"
+     },
+     {
+      "hero": "Captain Rook Malvane",
+      "coord": "-2,12",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 70 DMG 3 DEF 4"
      }
     ],
     "bases": [
@@ -2115,7 +2113,7 @@
      "water": 1
     },
     "unit_limits": {
-     "Core": 19,
+     "Core": 24,
      "Water collector": 10,
      "Wood collector": 8,
      "Ore collector": 7,
@@ -2134,9 +2132,9 @@
     "kind": "ai",
     "faction": "The Brass Circle",
     "species": "wizard",
-    "culture": 22,
+    "culture": 23,
     "culture_target": 140,
-    "economic_collectors": 15,
+    "economic_collectors": 20,
     "next_milestones": [
      42,
      70,
@@ -2166,14 +2164,14 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 26
+     "target": 25
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
     "leader_alive": true,
     "subjects": 1,
     "cores_reserve": 0,
-    "cores_supply": 19,
+    "cores_supply": 24,
     "action_cards": {
      "build": 2,
      "moveBattle": 1,
@@ -2199,7 +2197,7 @@
     "heroes": [
      {
       "hero": "Quartermaster Bertram Hollis",
-      "coord": "-2,8",
+      "coord": "-2,6",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
@@ -2212,7 +2210,7 @@
       "stats": "Init 70 DMG 3 DEF 4"
      },
      {
-      "hero": "Warden Hesper Quill",
+      "hero": "Kestrel Nine",
       "coord": "-2,4",
       "is_leader": false,
       "dead": false,
@@ -2235,7 +2233,6 @@
       "Mana Shield": "needs a Library of Evocation",
       "Invisible": "needs a Library of Illusion",
       "Dehance": "needs a Library of Enchantment",
-      "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
       "Extra Build Card": "needs a Library of Enchantment",
@@ -2270,7 +2267,7 @@
     "bank": {},
     "paired_core_cost": null,
     "unit_limits": {
-     "Surf": 15,
+     "Surf": 20,
      "Subject": 10,
      "Evoker": 5,
      "Illusionist": 5,
@@ -2280,7 +2277,12 @@
     }
    }
   ],
-  "your_battle_hand": [],
+  "your_battle_hand": [
+   {
+    "card": "Counter",
+    "effect": "Counter a battle strategy card that has not yet resolved."
+   }
+  ],
   "your_action_cards_played": [
    "build:base",
    "research:base",

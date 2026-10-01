@@ -1027,6 +1027,21 @@ in the list.
   on the map and in the Heroes list alike; no two heroes share a pair (Envoy
   Sable Marrow is SM; Dr. Elayn Smyth stays ES).
 
+**Checked against engine fd8fa28 (rulings #120-#121, 2026-10-01):** the
+3-4 player Economic spend is 20 again (data). Detection is gone from both
+species (#121): the battle screen's Detection panel and its routing are
+removed; nothing else in Universe held it.
+
+**Tech tree (2026-10-01).** Each faction board's header has a Tech tree link,
+opening that seat's species tree as the canvas boards draw it (`Wizard Tech
+Tree`, `Robot Tech Tree`): the base at the root, a trunk down the buildings,
+and beside each building the units, research and abilities it opens, with
+counts and the tech target at the top. It is built from the catalogue (a
+unit's required building, a research's prerequisite, what unlocks treaties
+and battle cards; a building that opens nothing else shows its own effect),
+never from the boards' text, and ticks what the seat already has. An
+opponent's board opens their tree.
+
 **Checked against engine 632231e (2026-09-25):** Cultural victory is 25
 culture per player (50 at two players to 150 at six) and the hero milestones
 are shares of it. The culture race reads both from the engine, so nothing in

@@ -97,10 +97,9 @@ const PHASE_SCREENS: Record<string, ScreenKey> = {
   game_over: 'game-over',
 };
 
-/** A move that is a hero carrying a spy acting on it. */
+/** A move that is a hero carrying a spy acting on it (Detection is gone, #121). */
 function isSpyMove(m: LegalMove): boolean {
   const t = moveType(m.move);
-  if (t === 'use_detection') return true;
   const action = m.move['action'];
   return t === 'battle_activation' && typeof action === 'object' && action !== null
     && ((action as Record<string, unknown>)['kind'] === 'spy_attack' || (action as Record<string, unknown>)['kind'] === 'invisible');
@@ -134,7 +133,7 @@ export function route(v: NggView, me: string | null, legalMoves: LegalMove[] = [
       commit: 'battle-commit', cards: 'battle-cards', activations: 'battle-activation', retreat: 'retreat',
     };
     let screen = byPhase[b.phase] ?? 'battle-cards';
-    const acting = legalMoves.some((m) => moveType(m.move) === 'battle_activation' || moveType(m.move) === 'use_detection');
+    const acting = legalMoves.some((m) => moveType(m.move) === 'battle_activation');
     if (screen === 'battle-activation' && acting && legalMoves.some(isSpyMove)) screen = 'infiltrator';
     return { screen, perspective: acting ? 'decide' : 'watch', owner: v.activePlayerId, interrupt: false };
   }

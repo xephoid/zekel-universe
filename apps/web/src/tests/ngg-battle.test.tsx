@@ -182,17 +182,10 @@ describe('NGnG battle screens', () => {
     expect(sentListed(p.onMove, p.legalMoves)).toEqual({ type: 'battle_activation', unit: 'kestrel', action: { kind: 'pass' } });
   });
 
-  it("Robot Infiltrator: the look is its own control, and sends the engine's listed move", () => {
+  it('Detection is gone (#121): no seat is offered a look, and no screen draws one', () => {
     const r = decider('battle-activations-infiltrator');
-    const look = r.legalMoves.find((m) => m.move['type'] === 'use_detection')!;
-    expect(look).toBeTruthy();
-    const buttons = [...r.container.querySelectorAll('button')].filter((b) => !b.disabled && /Detection|Look/i.test(b.textContent ?? ''));
-    expect(buttons.length).toBeGreaterThan(0);
-    fireEvent.click(buttons[buttons.length - 1]!);
-    // One press may pick the seat, a second confirms; either way only the listed look goes out.
-    const confirm = [...r.container.querySelectorAll('button')].filter((b) => !b.disabled && /^(Look|Inspect|Use Detection)/i.test(b.textContent ?? ''));
-    if (r.onMove.mock.calls.length === 0 && confirm.length) fireEvent.click(confirm[0]!);
-    expect(sentListed(r.onMove, r.legalMoves)).toEqual(look.move);
+    expect(r.legalMoves.some((m) => m.move['type'] === 'use_detection')).toBe(false);
+    expect(r.container.textContent).not.toMatch(/Detection/);
   });
 
   it('Battle Defense: drawn as an interrupt; shut defenses carry reasons; a shield is sent on confirm', () => {

@@ -364,20 +364,20 @@
   "resolving_action": null,
   "treaties": [
    {
-    "treaty": "Shared Resources",
+    "treaty": "Open Borders",
     "partners": [
      "p4",
      "p1"
     ],
-    "culture_income": 4
+    "culture_income": 5
    },
    {
-    "treaty": "Open Borders",
+    "treaty": "Shared Resources",
     "partners": [
      "p4",
      "p2"
     ],
-    "culture_income": 5
+    "culture_income": 4
    },
    {
     "treaty": "Peace",
@@ -388,20 +388,20 @@
     "culture_income": 3
    },
    {
-    "treaty": "Shared Resources",
+    "treaty": "Open Borders",
     "partners": [
      "p2",
      "p3"
     ],
-    "culture_income": 4
+    "culture_income": 5
    },
    {
-    "treaty": "Culture Treaty",
+    "treaty": "Peace",
     "partners": [
      "p2",
      "p1"
     ],
-    "culture_income": 1
+    "culture_income": 3
    }
   ],
   "battle": null,
@@ -414,19 +414,19 @@
   },
   "victory_status": {
    "p1": {
-    "culture": 6,
+    "culture": 9,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p2": {
-    "culture": 15,
+    "culture": 17,
     "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p3": {
-    "culture": 9,
+    "culture": 10,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
@@ -445,11 +445,10 @@
     "kind": "human",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 6,
+    "culture": 9,
     "culture_target": 140,
-    "economic_collectors": 15,
+    "economic_collectors": 20,
     "next_milestones": [
-     7,
      21,
      42,
      70,
@@ -482,7 +481,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 1,
-    "cores_supply": 14,
+    "cores_supply": 19,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -570,7 +569,7 @@
      "water": 1
     },
     "unit_limits": {
-     "Core": 19,
+     "Core": 24,
      "Water collector": 10,
      "Wood collector": 8,
      "Ore collector": 7,
@@ -589,9 +588,9 @@
     "kind": "ai",
     "faction": "The Schism",
     "species": "wizard",
-    "culture": 15,
+    "culture": 17,
     "culture_target": 140,
-    "economic_collectors": 15,
+    "economic_collectors": 20,
     "next_milestones": [
      21,
      42,
@@ -620,14 +619,14 @@
      ],
      "bonus_points_live": 0,
      "total": 3,
-     "target": 26
+     "target": 25
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 19,
+    "cores_supply": 24,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -674,7 +673,6 @@
       "Mana Shield": "needs a Library of Evocation",
       "Invisible": "needs a Library of Illusion",
       "Dehance": "needs a Library of Enchantment",
-      "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
       "Extra Build Card": "needs a Library of Enchantment",
@@ -715,7 +713,7 @@
     "bank": {},
     "paired_core_cost": null,
     "unit_limits": {
-     "Surf": 15,
+     "Surf": 20,
      "Subject": 10,
      "Evoker": 5,
      "Illusionist": 5,
@@ -729,9 +727,9 @@
     "kind": "ai",
     "faction": "The Ledger",
     "species": "robot",
-    "culture": 9,
+    "culture": 10,
     "culture_target": 140,
-    "economic_collectors": 15,
+    "economic_collectors": 20,
     "next_milestones": [
      21,
      42,
@@ -765,7 +763,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 2,
-    "cores_supply": 13,
+    "cores_supply": 18,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -863,7 +861,7 @@
      "water": 1
     },
     "unit_limits": {
-     "Core": 19,
+     "Core": 24,
      "Water collector": 10,
      "Wood collector": 8,
      "Ore collector": 7,
@@ -884,7 +882,7 @@
     "species": "wizard",
     "culture": 12,
     "culture_target": 140,
-    "economic_collectors": 15,
+    "economic_collectors": 20,
     "next_milestones": [
      21,
      42,
@@ -913,14 +911,14 @@
      ],
      "bonus_points_live": 0,
      "total": 3,
-     "target": 26
+     "target": 25
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 19,
+    "cores_supply": 24,
     "action_cards": {
      "build": 2,
      "moveBattle": 1,
@@ -968,7 +966,6 @@
       "Mana Shield": "needs a Library of Evocation",
       "Invisible": "needs a Library of Illusion",
       "Dehance": "needs a Library of Enchantment",
-      "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
       "Extra Build Card": "needs a Library of Enchantment",
@@ -1014,7 +1011,7 @@
     "bank": {},
     "paired_core_cost": null,
     "unit_limits": {
-     "Surf": 15,
+     "Surf": 20,
      "Subject": 10,
      "Evoker": 5,
      "Illusionist": 5,
@@ -1512,20 +1509,20 @@
   "resolving_action": null,
   "treaties": [
    {
-    "treaty": "Shared Resources",
+    "treaty": "Open Borders",
     "partners": [
      "p4",
      "p1"
     ],
-    "culture_income": 4
+    "culture_income": 5
    },
    {
-    "treaty": "Open Borders",
+    "treaty": "Shared Resources",
     "partners": [
      "p4",
      "p2"
     ],
-    "culture_income": 5
+    "culture_income": 4
    },
    {
     "treaty": "Peace",
@@ -1536,20 +1533,20 @@
     "culture_income": 3
    },
    {
-    "treaty": "Shared Resources",
+    "treaty": "Open Borders",
     "partners": [
      "p2",
      "p3"
     ],
-    "culture_income": 4
+    "culture_income": 5
    },
    {
-    "treaty": "Culture Treaty",
+    "treaty": "Peace",
     "partners": [
      "p2",
      "p1"
     ],
-    "culture_income": 1
+    "culture_income": 3
    }
   ],
   "battle": null,
@@ -1562,19 +1559,19 @@
   },
   "victory_status": {
    "p1": {
-    "culture": 6,
+    "culture": 9,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p2": {
-    "culture": 15,
+    "culture": 17,
     "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p3": {
-    "culture": 9,
+    "culture": 10,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
@@ -1593,11 +1590,10 @@
     "kind": "human",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 6,
+    "culture": 9,
     "culture_target": 140,
-    "economic_collectors": 15,
+    "economic_collectors": 20,
     "next_milestones": [
-     7,
      21,
      42,
      70,
@@ -1630,7 +1626,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 1,
-    "cores_supply": 14,
+    "cores_supply": 19,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -1718,7 +1714,7 @@
      "water": 1
     },
     "unit_limits": {
-     "Core": 19,
+     "Core": 24,
      "Water collector": 10,
      "Wood collector": 8,
      "Ore collector": 7,
@@ -1737,9 +1733,9 @@
     "kind": "ai",
     "faction": "The Schism",
     "species": "wizard",
-    "culture": 15,
+    "culture": 17,
     "culture_target": 140,
-    "economic_collectors": 15,
+    "economic_collectors": 20,
     "next_milestones": [
      21,
      42,
@@ -1768,14 +1764,14 @@
      ],
      "bonus_points_live": 0,
      "total": 3,
-     "target": 26
+     "target": 25
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 19,
+    "cores_supply": 24,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -1822,7 +1818,6 @@
       "Mana Shield": "needs a Library of Evocation",
       "Invisible": "needs a Library of Illusion",
       "Dehance": "needs a Library of Enchantment",
-      "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
       "Extra Build Card": "needs a Library of Enchantment",
@@ -1863,7 +1858,7 @@
     "bank": {},
     "paired_core_cost": null,
     "unit_limits": {
-     "Surf": 15,
+     "Surf": 20,
      "Subject": 10,
      "Evoker": 5,
      "Illusionist": 5,
@@ -1877,9 +1872,9 @@
     "kind": "ai",
     "faction": "The Ledger",
     "species": "robot",
-    "culture": 9,
+    "culture": 10,
     "culture_target": 140,
-    "economic_collectors": 15,
+    "economic_collectors": 20,
     "next_milestones": [
      21,
      42,
@@ -1913,7 +1908,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 2,
-    "cores_supply": 13,
+    "cores_supply": 18,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -2011,7 +2006,7 @@
      "water": 1
     },
     "unit_limits": {
-     "Core": 19,
+     "Core": 24,
      "Water collector": 10,
      "Wood collector": 8,
      "Ore collector": 7,
@@ -2032,7 +2027,7 @@
     "species": "wizard",
     "culture": 12,
     "culture_target": 140,
-    "economic_collectors": 15,
+    "economic_collectors": 20,
     "next_milestones": [
      21,
      42,
@@ -2061,14 +2056,14 @@
      ],
      "bonus_points_live": 0,
      "total": 3,
-     "target": 26
+     "target": 25
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 19,
+    "cores_supply": 24,
     "action_cards": {
      "build": 2,
      "moveBattle": 1,
@@ -2116,7 +2111,6 @@
       "Mana Shield": "needs a Library of Evocation",
       "Invisible": "needs a Library of Illusion",
       "Dehance": "needs a Library of Enchantment",
-      "Detection": "needs a Library of Enchantment",
       "Extra Move/Battle Card": "needs a Library of Evocation",
       "Extra Research Card": "needs a Library of Illusion",
       "Extra Build Card": "needs a Library of Enchantment",
@@ -2162,7 +2156,7 @@
     "bank": {},
     "paired_core_cost": null,
     "unit_limits": {
-     "Surf": 15,
+     "Surf": 20,
      "Subject": 10,
      "Evoker": 5,
      "Illusionist": 5,

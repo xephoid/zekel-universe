@@ -47,6 +47,8 @@ export interface NggRef {
   /** what one battle card costs on a Research action: the fixed resources, one
    *  of `either`, and the building that unlocks it per species; null when not published */
   battleCardPurchase: { cost: Cost; either: string[]; unlockedBy: Record<string, string> } | null;
+  /** the building that unlocks treaty formation, per species (and a hero's name under `hero`) */
+  treatyUnlockedBy: Record<string, string>;
   techTarget: Record<string, number>;
   militaryKillsNeeded: Record<string, number>;
 }
@@ -123,6 +125,7 @@ export function readRef(reference: GameReferenceResponse | null): NggRef | null 
         ? Object.fromEntries(Object.entries(rd['battle_card_purchase']['unlocked_by']).map(([k, b]) => [k, asStr(b)]))
         : {},
     } : null,
+    treatyUnlockedBy: isObj(rd['treaty_unlocked_by']) ? Object.fromEntries(Object.entries(rd['treaty_unlocked_by']).map(([k, b]) => [k, asStr(b)])) : {},
     techTarget: isObj(victory['tech_target']) ? Object.fromEntries(Object.entries(victory['tech_target']).map(([k, v]) => [k, asNum(v)])) : {},
     militaryKillsNeeded: isObj(victory['military_kills_needed']) ? Object.fromEntries(Object.entries(victory['military_kills_needed']).map(([k, v]) => [k, asNum(v)])) : {},
   };

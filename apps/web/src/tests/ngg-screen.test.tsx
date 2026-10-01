@@ -407,6 +407,52 @@ describe('NGnG screen', () => {
     cleanup();
   });
 
+  it('the faction board links to its species tech tree, built from the catalogue', () => {
+    const ref = (REFERENCE as { referenceData: Record<string, unknown> }).referenceData as {
+      robot_units: Array<{ name: string; requiresBuilding: string | null }>; robot_buildings: Array<{ name: string; isBase: boolean }>;
+      battle_card_purchase: { unlocked_by: Record<string, string> }; treaty_unlocked_by: Record<string, string>;
+    };
+    const f = FIXTURES.find((x) => x.name === 'action-build-robot-mid')!.f;
+    const r = render(<NggScreen input={inputFor(f.view, f.viewer, [])} yourTurn={false} busy={false} interactive onMove={vi.fn()} onForm={vi.fn()} nameFor={(p) => p} />);
+    fireEvent.click(r.getByRole('button', { name: 'Open board' }));
+    fireEvent.click(r.getByRole('button', { name: 'Tech tree' }));
+    const tree = r.getByRole('dialog', { name: 'The robot tree' });
+    // The base at the root; every other building has a row.
+    const base = ref.robot_buildings.find((b) => b.isBase)!;
+    expect(tree.querySelector('.ngg-tree-root')!.textContent).toContain(base.name);
+    const rows = [...tree.querySelectorAll('.ngg-tree-row')];
+    const rowOf = (name: string) => rows.find((row) => row.querySelector('.ngg-tree-building')?.textContent?.includes(name));
+    for (const b of ref.robot_buildings.filter((x) => !x.isBase)) expect(rowOf(b.name)).toBeTruthy();
+    // A unit sits in the row of the building it requires.
+    const needy = ref.robot_units.find((u) => u.requiresBuilding)!;
+    expect(rowOf(needy.requiresBuilding!)!.textContent).toContain(needy.name);
+    // Treaties and battle cards sit under the buildings the catalogue names.
+    expect(rowOf(ref.treaty_unlocked_by['robot']!)!.textContent).toContain('Treaties');
+    expect(rowOf(ref.battle_card_purchase.unlocked_by['robot']!)!.textContent).toContain('Battle strategy cards');
+    // What the seat has is ticked.
+    expect(tree.querySelectorAll('.ngg-tree-tile.have').length).toBeGreaterThan(0);
+    fireEvent.click(within(tree).getByRole('button', { name: 'Close the tech tree' }));
+    expect(r.queryByRole('dialog', { name: 'The robot tree' })).toBeNull();
+    cleanup();
+  });
+
+  it("an opponent's board opens their species' tree", () => {
+    const { f } = FIXTURES.find((x) => {
+      const v = x.f.view as { players: Array<{ player_id: string; species?: string }> };
+      const me = v.players.find((p) => p.player_id === x.f.viewer);
+      return !!me?.species && v.players.some((p) => p.player_id !== x.f.viewer && p.species && p.species !== me.species);
+    })!;
+    const v = f.view as { players: Array<{ player_id: string; species: string }> };
+    const them = v.players.find((p) => p.player_id !== f.viewer && p.species !== v.players.find((q) => q.player_id === f.viewer)!.species)!;
+    const r = render(<NggScreen input={inputFor(f.view, f.viewer, [])} yourTurn={false} busy={false} interactive onMove={vi.fn()} onForm={vi.fn()} nameFor={(p) => p} />);
+    const seatRow = [...r.container.querySelectorAll('.ngg-seat-row, .ngg-seats li, [data-seat]')].find((el) => el.textContent?.includes(them.player_id) || el.querySelector(`[data-flip-id="ngg-supply:${them.player_id}"]`));
+    expect(seatRow).toBeTruthy();
+    fireEvent.click((seatRow!.querySelector('button') ?? seatRow) as HTMLElement);
+    fireEvent.click(r.getByRole('button', { name: 'Tech tree' }));
+    expect(r.getByRole('dialog', { name: `The ${them.species} tree` })).toBeTruthy();
+    cleanup();
+  });
+
   it('every hero has its own initials, the same on the map as in the Heroes list', () => {
     const names = (REFERENCE as { referenceData: { heroes: Array<{ name: string }> } }).referenceData.heroes.map((h) => h.name);
     const pairs = names.map(initials);

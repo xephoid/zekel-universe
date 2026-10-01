@@ -11,6 +11,7 @@ import { coresOf, econOf, type NggPlayer } from './read';
 import { economicCollectorsFor, type RefBuilding, type RefResearch, type RefUnit } from './ref';
 import { useState, type KeyboardEvent } from 'react';
 import { inkOf } from './factions';
+import { TechTree } from './TechTree';
 import { BattleCardPrice, CardBack, CostChips, FactionChip, Icon, Panel, SpyMark } from './ui';
 
 const ACTION_CARDS: Array<{ key: string; played: string; name: string; icon: string }> = [
@@ -258,16 +259,19 @@ export function FactionBoard({ ctx, player }: { ctx: ScreenCtx; player: NggPlaye
   const treaties = v.treaties.filter((t) => t.partners.includes(player.id));
   const spy = own ? v.spies.find((s) => s.active) ?? null : null;
   const [detail, setDetail] = useState<Detail | null>(null);
+  const [treeOpen, setTreeOpen] = useState(false);
   const locked = player.locked;
   return (
     <div className={`ngg-faction-board seat-${species}`}>
       <span className="ngg-ground" aria-hidden="true" />
+      {treeOpen && <TechTree ctx={ctx} species={species} player={player} onClose={() => setTreeOpen(false)} />}
       <header className="ngg-fb-head">
         <span className="ngg-fb-mark" style={{ background: ink.fill, color: ink.on }}>{ink.mark && <Icon name={ink.mark} size={34} stroke={1.8} />}</span>
         <div>
           <div className="ngg-kicker">Faction board</div>
           <h2>{player.faction ?? (own ? 'Your seat' : ctx.seat(player.id))}</h2>
           <span className="ngg-tagchip">{species}</span>
+          <button type="button" data-view-only className="ngg-link ngg-fb-tree-link" onClick={() => setTreeOpen(true)}>Tech tree</button>
         </div>
         <Numbers p={player} need={economicCollectorsFor(ctx.ref, ctx.v.layout)} />
       </header>
