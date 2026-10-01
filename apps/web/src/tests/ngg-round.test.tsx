@@ -266,13 +266,13 @@ describe('NGnG round screens', () => {
     cleanup();
   });
 
-  it('Treaty Break: a shut treaty prints the engine reason and cannot be picked; Done keeps the rest', () => {
+  it('Treaty Break: a shut treaty prints the engine reason and cannot be picked; Keep keeps them all', () => {
     const f = fixture('pending-treaty_break_decision-blocked');
     const reason = (f.view['pending'] as { options: Array<{ blocked_reason?: string }> }).options.find((o) => o.blocked_reason)!.blocked_reason!;
     const r = draw(f.view, f.viewer, f.legalMoves);
     expect(r.column.textContent).toContain(reason);
     expect((within(r.column).getByRole('button', { name: 'Break a treaty' }) as HTMLButtonElement).disabled).toBe(true);
-    press(r.column, 'Done, keep the rest');
+    press(r.column, 'Keep');
     expectSentListed(r.onMove, f.legalMoves, { type: 'skip_action' });
     cleanup();
   });

@@ -51,9 +51,12 @@ export const TREATY_INK: Record<string, string> = {
 };
 
 /** Two initials for a hero token: heroes carry letters, never a mark. */
+/** A hero's initials, on the map and in the Heroes list alike: the first
+ *  letters of the last two words of its name ("Envoy Sable Marrow" → SM,
+ *  "Dr. Elayn Smyth" → ES). No two heroes share a pair. */
 export function initials(name: string): string {
-  const words = name.replace(/^(Dr\.|Archmage|Captain|Marshal|Warden|Technomancer)\s+/, '').split(/\s+/).filter(Boolean);
-  return ((words[0]?.[0] ?? '') + (words[1]?.[0] ?? '')).toUpperCase() || name.slice(0, 2).toUpperCase();
+  const words = name.split(/\s+/).filter(Boolean);
+  return words.map((w) => w[0]).slice(-2).join('').toUpperCase() || name.slice(0, 2).toUpperCase();
 }
 
 /** The icon for a unit's printed name; the registry's aliases cover the long names. */

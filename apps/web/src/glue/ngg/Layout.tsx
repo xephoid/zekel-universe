@@ -8,7 +8,7 @@ import { useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import type { ScreenCtx } from './ctx';
 import { HexMap, type MapMarks } from './HexMap';
-import { TREATY_INK, inkOf, inkOfSeat } from './factions';
+import { TREATY_INK, inkOf, inkOfSeat, initials } from './factions';
 import { WAITING_ON } from './route';
 import { CardBack, FactionChip, HeroFacts, HeroName, Icon, Panel, SpyMark } from './ui';
 import { cultureRaceOf, economicCollectorsFor } from './ref';
@@ -122,7 +122,7 @@ function HeroesSheet({ ctx, onClose }: { ctx: ScreenCtx; onClose: () => void }) 
                 onClick={() => setOpen(open === h.id ? null : h.id)}
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen(open === h.id ? null : h.id); } }}>
                 <span className="ngg-avatar" style={ink ? { background: ink.fill, color: ink.on } : undefined}>
-                  {h.name.split(/\s+/).map((w) => w[0]).slice(-2).join('')}
+                  {initials(h.name)}
                 </span>
                 <span className="ngg-hero-body">
                   <b><HeroName hero={h} name={h.name} /></b>
@@ -157,7 +157,10 @@ function SeatsPanel({ ctx, onOpen }: { ctx: ScreenCtx; onOpen: (playerId: string
             <li key={p.id}>
               <button type="button" data-view-only className={`ngg-seat${you ? ' you' : ''}${deciding ? ' deciding' : ''}`}
                 onClick={() => onOpen(p.id)} aria-label={`Open ${you ? 'your' : `${ctx.seat(p.id)}'s`} faction board`}>
-              <span data-flip-id={`ngg-supply:${p.id}`}><FactionChip faction={p.faction} size={24} /></span>
+              {/* A seat's supply (where its new pieces fly from) is marked once: the
+                  viewer's on their own strip below, every other seat's here. Two
+                  elements under one id would slide toward each other on every move. */}
+              <span data-flip-id={p.id === ctx.me ? undefined : `ngg-supply:${p.id}`}><FactionChip faction={p.faction} size={24} /></span>
               <span className="ngg-seat-name">
                 <span>{ctx.seat(p.id)}<SpyMark species={p.species} count={p.unrevealedSpies ?? 0} /></span>
                 <span className="ngg-seat-detail">{[you ? 'you' : null, p.species, `${p.bases.length} base${p.bases.length === 1 ? '' : 's'}`].filter(Boolean).join(' · ')}</span>

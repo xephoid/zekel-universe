@@ -190,7 +190,7 @@ function TilePieces({ v, t, proposals, refs, onInspect }: {
       {(collectors.length > 0 || dashedCollectors.length > 0) && (
         <span className="ngg-tile-collectors">
           {collectors.map((c) => (
-            <span key={c.id ?? c.name} className="ngg-tile-collector" data-flip-id={`ngg-collector:${c.id}`} data-flip-from={`ngg-supply:${c.owner}`}>
+            <span key={c.id ?? c.name} className="ngg-tile-collector" data-flip-id={`ngg-collector:${c.owner}:${c.id}`} data-flip-from={`ngg-supply:${c.owner}`}>
               <PieceBtn onInspect={onInspect} pieces={[c]}>
                 <Token kind="collector" faction={factionOf(c.owner)} name={collectorIcon(speciesOf(c.owner), c.resource)} size={18} title={title(c)} />
               </PieceBtn>
@@ -198,7 +198,7 @@ function TilePieces({ v, t, proposals, refs, onInspect }: {
           ))}
           {dashedCollectors.map((d) => (
             <span key={d.key} className="ngg-tile-collector"
-              data-flip-id={d.pieceId ? `ngg-collector:${d.pieceId}` : undefined}
+              data-flip-id={d.pieceId ? `ngg-collector:${d.owner}:${d.pieceId}` : undefined}
               data-flip-from={d.pieceId ? `ngg-supply:${d.owner}` : undefined}>
               <Token kind="collector" faction={factionOf(d.owner)} name={d.name} state="dashed" size={18} />
             </span>

@@ -271,7 +271,7 @@ describe('NGnG payment, placed by the person on tiles the engine names', () => {
     // Each dashed collector already is the collector it will become, so
     // committing turns it solid in place rather than flying a second one in.
     for (const p of payment) {
-      expect(document.querySelector(`[data-flip-id="ngg-collector:${p.collectorId}"]`)).toBeTruthy();
+      expect(document.querySelector(`[data-flip-id="ngg-collector:${f.viewer}:${p.collectorId}"]`)).toBeTruthy();
     }
     press('Commit payment');
     expect(onForm.mock.calls[0]![1]['payment']).toEqual(payment);

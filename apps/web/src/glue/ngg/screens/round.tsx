@@ -604,7 +604,7 @@ function TreatyBreak({ ctx }: { ctx: ScreenCtx }) {
       </div>
       {decide && (
         <Actions>
-          {keep && <Btn kind="secondary" disabled={!ctx.live} onClick={() => { ctx.memory.delete('ngg:treaty-break'); ctx.send(keep); }}>Done, keep the rest</Btn>}
+          {keep && <Btn kind="secondary" disabled={!ctx.live} onClick={() => { ctx.memory.delete('ngg:treaty-break'); ctx.send(keep); }}>Keep</Btn>}
           <Btn disabled={!ctx.live || !selMove} onClick={() => { if (selMove) { ctx.memory.delete('ngg:treaty-break'); ctx.send(selMove); } }}>
             {sel ? `Break ${str(sel.move?.['treaty_type']) || sel.label}` : 'Break a treaty'}
           </Btn>

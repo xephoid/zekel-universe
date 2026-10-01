@@ -576,6 +576,13 @@ function PayStage({ ctx, chosen, purchase, proposal, needsPlace, initial, onBack
   );
 }
 
+/** One action card's identity within the game: the round and how many cards
+ *  are still on the stack. A second Build in the same round is a new action,
+ *  so it starts with nothing chosen rather than the last Build's pick. */
+function actionKey(ctx: ScreenCtx): string {
+  return `${ctx.v.round}:${ctx.v.stack.length}`;
+}
+
 function skipOf(ctx: ScreenCtx): LegalMove | null {
   return ctx.movesOf('skip_action')[0] ?? null;
 }
@@ -583,7 +590,7 @@ function skipOf(ctx: ScreenCtx): LegalMove | null {
 function BuildScreen({ ctx }: { ctx: ScreenCtx }) {
   if (ctx.route.perspective !== 'decide') return <TableLayout ctx={ctx} />;
   return (
-    <Composer ctx={ctx} scope={`build:${ctx.v.round}`} buys="build" title="Buy one thing" kicker="Your Build card is resolving"
+    <Composer ctx={ctx} scope={`build:${actionKey(ctx)}`} buys="build" title="Buy one thing" kicker="Your Build card is resolving"
       skip={skipOf(ctx)} skipLabel="Skip this action">
       <Rule>One unit, building or base per Build action.</Rule>
     </Composer>
@@ -593,7 +600,7 @@ function BuildScreen({ ctx }: { ctx: ScreenCtx }) {
 function ResearchScreen({ ctx }: { ctx: ScreenCtx }) {
   if (ctx.route.perspective !== 'decide') return <TableLayout ctx={ctx} />;
   return (
-    <Composer ctx={ctx} scope={`research:${ctx.v.round}`} buys="research" title="Unlock one technology, or draw a card" kicker="Your Research card is resolving"
+    <Composer ctx={ctx} scope={`research:${actionKey(ctx)}`} buys="research" title="Unlock one technology, or draw a card" kicker="Your Research card is resolving"
       skip={skipOf(ctx)} skipLabel="Skip this action">
       <Rule>One purchase per Research action.</Rule>
       <div className="ngg-eco-deck"><Icon name="Battle card" size={16} stroke={1.8} />{ctx.v.deckCount} battle cards in the deck · {ctx.v.hand.length} in your hand</div>
@@ -605,7 +612,7 @@ function SecondPurchaseScreen({ ctx }: { ctx: ScreenCtx }) {
   if (ctx.route.perspective !== 'decide') return <TableLayout ctx={ctx} />;
   const committed = ctx.mine?.collectors ?? [];
   return (
-    <Composer ctx={ctx} scope={`second:${ctx.v.round}`} buys={ctx.v.activeAction?.cardKind === 'research' ? 'research' : ctx.v.activeAction?.cardKind === 'build' ? 'build' : null} title="A second purchase" kicker="One action, two purchases"
+    <Composer ctx={ctx} scope={`second:${actionKey(ctx)}`} buys={ctx.v.activeAction?.cardKind === 'research' ? 'research' : ctx.v.activeAction?.cardKind === 'build' ? 'build' : null} title="A second purchase" kicker="One action, two purchases"
       skip={skipOf(ctx)} skipLabel="Stop at one">
       <Rule>Separate collectors pay for each. The second falling through never undoes the first.</Rule>
       {committed.length > 0 && (

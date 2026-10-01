@@ -1013,6 +1013,20 @@ in the list.
   (#114), the 3-4 player spend of 15 (#115) and culture 35 per player (#119)
   come from the engine's data and view; nothing in Universe held them.
 
+**Settled 2026-10-01, after play:**
+- A seat's supply (where its new pieces fly from) is marked once: the
+  viewer's on their own strip, every other seat's in Seats. Both had carried
+  it for the viewer, so the two slid toward each other on every move.
+- A collector's motion id names its owner: two seats of one species each own
+  a `surf-1` (or `water-collector-1`), and the shared id slid them between
+  each other's tiles.
+- The end-of-round treaty window's button reads Keep.
+- A purchase draft belongs to one action (the round and the cards left on
+  the stack), so a second Build in a round starts with nothing chosen.
+- A hero's initials are the first letters of the last two words of its name,
+  on the map and in the Heroes list alike; no two heroes share a pair (Envoy
+  Sable Marrow is SM; Dr. Elayn Smyth stays ES).
+
 **Checked against engine 632231e (2026-09-25):** Cultural victory is 25
 culture per player (50 at two players to 150 at six) and the hero milestones
 are shares of it. The culture race reads both from the engine, so nothing in

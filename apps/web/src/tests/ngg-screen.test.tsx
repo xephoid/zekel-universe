@@ -7,6 +7,7 @@ import { render, cleanup, fireEvent, within } from '@testing-library/react';
 import type { GameReferenceResponse, LegalMove } from '@universe/shared';
 import type { GlueInput } from '../glue';
 import { NggScreen } from '../glue/ngg/NggScreen';
+import { initials } from '../glue/ngg/factions';
 import nggGlue from '../glue/ngg';
 import REFERENCE from './fixtures/ngg-reference.json';
 
@@ -382,6 +383,53 @@ describe('NGnG screen', () => {
     fireEvent.click(r.getByRole('button', { name: 'Open board' }));
     expect(r.container.textContent).toContain(`up to ${limits['Water collector']}`);
     expect(r.container.textContent).toContain(`up to ${limits['Core']}`);
+    cleanup();
+  });
+
+  it("a second Build in the same round starts with nothing chosen, not the last Build's pick", () => {
+    const f = FIXTURES.find((x) => x.name === 'action-build-robot-mid')!.f;
+    const memory = new Map<string, unknown>();
+    const draw = (view: unknown) => render(<NggScreen input={{ ...inputFor(view, f.viewer, f.legalMoves), memory }} yourTurn busy={false} interactive onMove={vi.fn()} onForm={vi.fn()} nameFor={(p) => p} />);
+    const first = draw(f.view);
+    const open = [...first.container.querySelectorAll('.ngg-column .ngg-option')].find((el) => !el.classList.contains('shut')) as HTMLElement;
+    fireEvent.click(open);
+    expect(first.container.querySelector('.ngg-column .ngg-option.selected')).not.toBeNull();
+    cleanup();
+    // The same Build again (nothing on the stack changed): the pick is kept.
+    const again = draw(f.view);
+    expect(again.container.querySelector('.ngg-column .ngg-option.selected')).not.toBeNull();
+    cleanup();
+    // Another Build card of the round: a different number of cards on the stack.
+    const next = structuredClone(f.view) as { action_stack: unknown[] };
+    next.action_stack = [...next.action_stack, { position: 99, owner: f.viewer, card_kind: null }];
+    const second = draw(next);
+    expect(second.container.querySelector('.ngg-column .ngg-option.selected')).toBeNull();
+    cleanup();
+  });
+
+  it('every hero has its own initials, the same on the map as in the Heroes list', () => {
+    const names = (REFERENCE as { referenceData: { heroes: Array<{ name: string }> } }).referenceData.heroes.map((h) => h.name);
+    const pairs = names.map(initials);
+    expect(new Set(pairs).size).toBe(names.length);
+    expect(initials('Envoy Sable Marrow')).toBe('SM');
+    expect(initials('Dr. Elayn Smyth')).toBe('ES');
+  });
+
+  it("a seat's supply is marked once: the viewer's on their strip, every other seat's in Seats", () => {
+    const { f } = FIXTURES.find((x) => x.name === 'action-build-robot-mid')!;
+    const r = render(<NggScreen input={inputFor(f.view, f.viewer, [])} yourTurn={false} busy={false} interactive onMove={vi.fn()} onForm={vi.fn()} nameFor={(p) => p} />);
+    const ids = [...r.container.querySelectorAll('[data-flip-id^="ngg-supply:"]')].map((el) => (el as HTMLElement).dataset.flipId);
+    expect(ids.length).toBe(new Set(ids).size);
+    expect(ids).toContain(`ngg-supply:${f.viewer}`);
+    cleanup();
+  });
+
+  it("a collector's flip id names its owner, since two seats can each own a surf-1", () => {
+    const { f } = FIXTURES.find((x) => (x.f.view as { players: Array<{ committed_collectors: unknown[] }> }).players.some((p) => p.committed_collectors.length > 0))!;
+    const r = render(<NggScreen input={inputFor(f.view, f.viewer, [])} yourTurn={false} busy={false} interactive onMove={vi.fn()} onForm={vi.fn()} nameFor={(p) => p} />);
+    const ids = [...r.container.querySelectorAll('[data-flip-id^="ngg-collector:"]')].map((el) => (el as HTMLElement).dataset.flipId!);
+    expect(ids.length).toBeGreaterThan(0);
+    for (const id of ids) expect(id.split(':')).toHaveLength(3);
     cleanup();
   });
 
