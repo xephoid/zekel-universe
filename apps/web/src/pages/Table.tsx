@@ -282,7 +282,7 @@ export function TablePage() {
   }, [table]);
   const turnLabel = !table ? '' : table.table.status === 'finished' ? 'Game over'
     : !state.done ? 'Playing back…'
-    : current?.yourTurn ? 'Your move'
+    : current?.yourTurn ? (glue?.yourTurnLabel?.(input) ?? 'Your move')
     : current?.nextActorPosition === null || current?.nextActorPosition === undefined ? 'The AI is thinking…'
     : `Waiting on ${table.seats.find((s) => s.position === current.nextActorPosition)?.displayName ?? 'the other player'}`;
 
@@ -326,6 +326,7 @@ export function TablePage() {
       <div className="table-topbar">
         <Link to="/" className="brand" aria-label="zekel home" style={{ textDecoration: 'none', display: 'inline-flex' }}><Wordmark size={24} /></Link>
         <span className="divider" />
+        {plan?.titleArt && <img className="title-art" src={plan.titleArt} alt="" width={30} height={30} />}
         <span className="title">{plan?.title ?? table?.table.gameName ?? 'Table'}</span>
         {plan?.status && <span className="round-note" aria-hidden="true">{plan.status}</span>}
         <span className="spacer center">
@@ -358,6 +359,7 @@ export function TablePage() {
                 busy={busy}
                 interactive
                 nameFor={nameFor}
+                seatKind={(pid) => { const m = /^p(\d+)$/.exec(pid); const seat = m ? table?.seats.find((s) => s.position === Number(m[1]) - 1) : undefined; return seat ? (seat.kind === 'ai' ? 'ai' : 'human') : null; }}
                 onMove={pick}
                 onForm={(template, move, editableKeys) => void send('form', move, { template: template.move, editableKeys })}
                 onDraw={resolveReport ? () => void send('resolve_report_button', resolveReport.move) : undefined}

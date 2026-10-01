@@ -60,7 +60,7 @@ test('a guest plays Adventurer Olympics against the AI from Play now to the end 
   await expect(page.locator('.ao-strip')).toBeVisible();
   await expect(page.locator('.ao-board')).toBeVisible();
   await expect(page.locator('.table-side .ao-order-strip')).toBeVisible();
-  await expect(page.getByText(/^Your move/)).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByText(/^Your (move|turn)/)).toBeVisible({ timeout: 60_000 });
   await page.getByRole('button', { name: 'Settings' }).click();
   const settings = page.getByRole('dialog', { name: 'Settings' });
   await settings.getByRole('button', { name: '2×' }).click();
@@ -69,7 +69,7 @@ test('a guest plays Adventurer Olympics against the AI from Play now to the end 
   const did: Record<string, number> = {};
   for (let i = 0; i < 3000; i++) {
     if (await page.getByRole('dialog', { name: 'Game over' }).isVisible()) break;
-    if (await page.getByText(/^Your move/).isVisible()) {
+    if (await page.getByText(/^Your (move|turn)/).isVisible()) {
       const d = await takeTurnStep(page);
       if (d) { did[d] = (did[d] ?? 0) + 1; await page.waitForTimeout(120); continue; }
     }

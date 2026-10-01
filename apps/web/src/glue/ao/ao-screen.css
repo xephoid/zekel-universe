@@ -56,12 +56,10 @@
 .ao-map { flex: 1; min-height: 0; position: relative; background: var(--ao-table); display: flex; }
 .ao-map .ao-map-board { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 .ao-theme .ao-map .zk-map { border: none; border-radius: 0; box-shadow: none; background: var(--ao-table); }
-.ao-caption { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); width: min(660px, calc(100% - 300px)); z-index: 4; }
-.ao-theme .ao-caption .caption-card { position: static; width: auto; margin: 0; box-shadow: var(--ao-shadow-lg); }
-/* The caption sits over the map's top, as on the canvas: only its own buttons
-   take a tap, so a glowing hex under it can still be pressed. */
-.ao-caption, .ao-caption .caption-card { pointer-events: none; }
-.ao-caption button { pointer-events: auto; }
+/* The last move's card sits at the top of the side column, above turn order,
+   so it never covers the map. */
+.ao-theme .ao-side-caption .caption-card { position: static; width: auto; margin: 0; box-shadow: var(--ao-shadow); }
+.ao-theme .ao-side-caption .caption-text { font-size: 14px; }
 .ao-legend {
   position: absolute; right: 16px; top: 16px; display: flex; flex-direction: column; gap: 5px; padding: 10px 12px;
   border-radius: 14px 9px 16px 10px / 10px 16px 9px 14px; background: var(--ao-surface); border: 2.5px solid var(--ao-line);
@@ -75,6 +73,14 @@
 }
 .ao-zoom button.fit { width: auto; padding: 0 8px; font-size: 13px; font-weight: 600; }
 .ao-zoom button:disabled { opacity: 0.45; cursor: default; }
+
+/* Drawn hexes (MapData.hex.drawn): the face and edge colours per state. */
+.ao-theme .zk-hex.drawn, .ao-theme .zk-hex.drawn.zk-lit, .ao-theme .zk-hex.drawn.ghost, .ao-theme .zk-hex.drawn.ghost.selected { background: transparent; }
+.ao-theme .zk-hex.drawn { --hex-edge: var(--ao-line); }
+.ao-theme .zk-hex.drawn.zk-lit { --hex-face: #fff3b0; }
+.ao-theme .zk-hex.drawn.ghost { --hex-face: var(--ao-you-bg); --hex-edge: var(--ao-action); }
+.ao-theme .zk-hex.drawn.ghost.selected { --hex-face: color-mix(in srgb, var(--hex-fill) 85%, white); }
+.ao-theme .zk-hex.drawn.zk-lit:focus-visible { --hex-edge: var(--ao-action); }
 
 /* The hexes as the canvas draws them: an ink edge, a meadow face, a legal step
    pale yellow with an orange dot, a legal icon with a pulsing orange ring. */
@@ -227,10 +233,19 @@
 .ao-turn .pips { display: flex; gap: 4px; }
 .ao-turn .pips i { width: 18px; height: 18px; border-radius: 50%; box-sizing: border-box; border: 2.5px solid var(--ao-line); background: transparent; transition: background 0.2s; }
 .ao-turn .pips i.on { background: var(--ao-action); }
-.ao-turn .hint { font-size: 14px; line-height: 1.35; color: var(--ao-muted); min-height: 38px; }
-.ao-turn .buttons { display: flex; flex-direction: column; gap: 6px; margin-top: auto; }
-.ao-turn .buttons .ao-btn { height: 38px; }
-.ao-turn .buttons .ao-btn.primary { height: 40px; }
+.ao-turn { min-height: 0; }
+.ao-turn .hint {
+  font-size: 14px; line-height: 1.35; color: var(--ao-muted);
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+/* The buttons always fit the board: with Stay and try again, it and Explore
+   share a row; End turn takes the row under them. */
+.ao-turn .buttons { display: grid; grid-template-columns: 1fr; gap: 6px; margin-top: auto; }
+.ao-turn .buttons.two { grid-template-columns: 1fr 1fr; }
+.ao-turn .buttons.two .ao-btn.primary { grid-column: 1 / -1; }
+.ao-turn .buttons .ao-btn { min-height: 38px; height: auto; padding: 4px 10px; line-height: 1.15; }
+.ao-turn .buttons.two .ao-btn:not(.primary) { font-size: 14px; }
+.ao-turn .buttons .ao-btn.primary { min-height: 40px; }
 .ao-turn .move-menu { display: none; }
 
 /* ---------- the side column ---------- */
@@ -257,6 +272,8 @@
 .ao-seat .body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
 .ao-seat .top { display: flex; align-items: center; gap: 6px; }
 .ao-seat .top b { font-size: 16px; }
+.ao-seat .ai { font-size: 11px; padding: 0 6px; border-radius: 6px; background: #e3ecff; color: #1f3f8a; font-weight: 600; border: 1.5px solid var(--ao-line); }
+:root[data-theme='dark'] .ao-seat .ai { background: #2a3a66; color: #dbe6ff; }
 .ao-seat .status { font-size: 12px; color: var(--ao-muted); white-space: nowrap; overflow: hidden; }
 .ao-seat .qp { margin-left: auto; display: flex; align-items: center; gap: 1px; font-size: 16px; font-weight: 700; }
 .ao-seat .line { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; font-size: 14px; font-weight: 600; }

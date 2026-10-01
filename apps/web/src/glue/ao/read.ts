@@ -217,6 +217,9 @@ export function placeMove(input: GlueInput, slot: string, rotation: number): Leg
 
 // ---- the map ---------------------------------------------------------------
 
+/** A tuft of grass, the canvas's (Main.dc.html) path drawn in its own box. */
+const TUFT = `data:image/svg+xml;charset=utf-8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 9"><path d="M2 8l2-5 2 5 2-6 2 6" fill="none" stroke="#6fa845" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>')}`;
+
 export function mapNodes(view: Record<string, unknown>, input: GlueInput, all: Player[]): MapNode[] {
   const map = isObj(view['map']) ? view['map'] : {};
   const tiles = asArr(map['tiles']).filter(isObj);
@@ -246,6 +249,8 @@ export function mapNodes(view: Record<string, unknown>, input: GlueInput, all: P
     for (const p of all.filter((pl) => pl.hex === key)) {
       pieces.push({ label: `standee:${p.id}`, artUrl: iconUrl(adventurerOf(all, p.id).toLowerCase(), { tint: tint(p.colour), wobble: false }) });
     }
+    // The canvas's grass: a tuft on about one plain hex in four, always the same ones.
+    if (!icon && !by && ((hex.q * 7 + hex.r * 3) % 4 + 4) % 4 === 0) pieces.push({ label: `tuft:${key}`, kind: 'token', size: 0.3, artUrl: TUFT });
     const kind = icon ? asStr(icon['kind']) : '';
     const name = ICON[kind]?.name ?? '';
     const where = icon ? asStr(icon['hexLabel']) : '';

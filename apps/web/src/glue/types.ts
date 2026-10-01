@@ -136,6 +136,8 @@ export interface TablePlan {
   palette: Palette;
   /** the game's display name for the top bar */
   title: string;
+  /** a small picture beside the title in the top bar (the game's mark) */
+  titleArt?: string;
   /** one line for the turn indicator, e.g. "Round 3 · Technique phase" */
   status?: string;
   /** the turn's steps, one current, for the action bar */
@@ -284,6 +286,9 @@ export interface GameScreenProps {
   sideSlot?: HTMLElement | null;
   /** a seat's display name, from its engine player id */
   nameFor(playerId: string): string;
+  /** Whether a seat is a person or the AI, from its engine player id; absent
+   *  where the seats are not known (a preview). */
+  seatKind?: (playerId: string) => 'human' | 'ai' | null;
 }
 
 export interface GlueModule {
@@ -296,6 +301,9 @@ export interface GlueModule {
    *  map), instead of the table putting it above the board or in the side
    *  column. */
   placesCaption?: boolean;
+  /** The turn indicator's words while it is this seat's turn ("Your turn · 3
+   *  steps left"), or null for the table's own. Read from the view. */
+  yourTurnLabel?(input: GlueInput): string | null;
   /** A theme for the whole table page (a class on the table shell), from the
    *  seat's own view: a seat's faction look covers every part of its page. */
   themeFor?(input: GlueInput): string | null;

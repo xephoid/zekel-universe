@@ -225,7 +225,7 @@ function plan(input: GlueInput): TablePlan | null {
   // and the quests in the side column itself; the table draws a plan's side
   // zones and points track even beside a screen, so the plan gives none.
   void side; void points;
-  return { board, bench, side: [], palette: PALETTE, title: 'Adventurer Olympics', status, prompt: prompt(view, input, me) };
+  return { board, bench, side: [], palette: PALETTE, title: 'Adventurer Olympics', titleArt: iconUrl('quest', { wobble: false }), status, prompt: prompt(view, input, me) };
 }
 
 // ---- the glue -------------------------------------------------------------------
@@ -242,6 +242,16 @@ export const adventurerOlympicsGlue: GlueModule = {
   // plan() still gives the title and the status line.
   Screen: AoScreen,
   placesCaption: true,
+
+  /** "Your turn · 3 steps left" while you move, as the canvas's top bar says. */
+  yourTurnLabel(input: GlueInput): string | null {
+    const view = isObj(input.view) ? input.view : null;
+    const p = view ? pendingOf(view) : null;
+    if (!view || !p || p.seat !== input.playerId) return null;
+    const me = players(view).find((x) => x.id === input.playerId);
+    if ((p.kind === 'move' || p.kind === 'try_again') && me) return `Your turn · ${me.stepsLeft} step${me.stepsLeft === 1 ? '' : 's'} left`;
+    return 'Your turn';
+  },
 
   litParts(input: GlueInput): string[] {
     const lit: string[] = [];

@@ -419,9 +419,9 @@ function YourBoard({ view, input, me, all, pressable, onMove, menu }: {
           <span className="pips">{Array.from({ length: movement }, (_, i) => <i key={i} className={moving && i < me.stepsLeft ? 'on' : ''} />)}</span>
           <span className="muted">{moving ? `${me.stepsLeft} of ${movement}` : ''}</span></div>
         <div className="hint">{hint}</div>
-        <div className="buttons">
+        <div className={`buttons${stay ? ' two' : ''}`}>
           {stay && <button className="ao-btn" disabled={!pressable} onClick={() => onMove(stay)}>Stay and try again</button>}
-          <button className="ao-btn" disabled={!pressable || !explore} title={explore ? undefined : exploreWhy} onClick={() => explore && onMove(explore)}>Explore · turn over a tile</button>
+          <button className="ao-btn" disabled={!pressable || !explore} title={explore ? undefined : exploreWhy} onClick={() => explore && onMove(explore)}>{stay ? 'Explore' : 'Explore · turn over a tile'}</button>
           <button className="ao-btn primary" disabled={!pressable || !stop} onClick={() => stop && onMove(stop)}>{p?.kind === 'try_again' ? 'Do nothing this turn' : 'End turn'}</button>
         </div>
         {menu}
@@ -432,7 +432,10 @@ function YourBoard({ view, input, me, all, pressable, onMove, menu }: {
 
 // ---- the side column ------------------------------------------------------------------------------
 
-function Side({ view, all, me, nameOf }: { view: Record<string, unknown>; all: Player[]; me: string | null; nameOf: (p: Player) => string }) {
+function Side({ view, all, me, nameOf, caption, isAI }: {
+  view: Record<string, unknown>; all: Player[]; me: string | null; nameOf: (p: Player) => string;
+  caption?: ReactNode; isAI: (pid: string) => boolean;
+}) {
   const rolls = isObj(view['turnOrderRolls']) && isObj(view['turnOrderRolls']['totals']) ? view['turnOrderRolls']['totals'] : {};
   const order = [...all].sort((a, b) => (a.initiative || 99) - (b.initiative || 99));
   const active = asStr(view['activeSeat']);
@@ -441,8 +444,17 @@ function Side({ view, all, me, nameOf }: { view: Record<string, unknown>; all: P
   const counts: Record<string, (p: Player) => number> = {
     most_little_monsters: (p) => p.little.length, most_big_monsters: (p) => p.big.length, most_artifacts: (p) => p.artifacts.length,
   };
+  const icons = isObj(view['map']) ? asArr(view['map']['icons']).filter(isObj) : [];
+  // What a seat is standing on, when it is an icon still open ("on the City").
+  const standingOn = (p: Player) => {
+    const icon = icons.find((i) => asStr(i['key']) === p.hex && i['completed'] !== true);
+    return icon ? `on the ${ICON[asStr(icon['kind'])]?.name ?? 'icon'}` : null;
+  };
+  // The quests with what it takes and how far each seat has got, from the engine.
+  const listed = asArr(view['quests']).filter(isObj);
   return (
     <div className="ao-side">
+      {caption && <div className="ao-side-caption">{caption}</div>}
       <div className="ao-side-block">
         <div className="label">Turn order</div>
         <div className="ao-order-strip">
@@ -460,7 +472,7 @@ function Side({ view, all, me, nameOf }: { view: Record<string, unknown>; all: P
           <div key={p.id} className={`ao-seat${p.id === active ? ' now' : ''}`}>
             <Icon name={adventurerOf(all, p.id).toLowerCase()} size={50} tint={tint(p.colour)} />
             <div className="body">
-              <div className="top"><b>{nameOf(p)}</b><span className="status">{p.id === active ? 'their turn' : adventurerOf(all, p.id)}</span>
+              <div className="top"><b>{nameOf(p)}</b>{isAI(p.id) && <span className="ai">AI</span>}<span className="status">{standingOn(p) ?? adventurerOf(all, p.id)}</span>
                 <span className="qp" title="Quest points"><Icon name="quest" size={20} />{p.questPoints}</span></div>
               <div className="line">
                 {p.stats && (Object.keys(STAT) as Array<keyof typeof STAT>).map((k) => <span key={k} title={STAT[k].name} className="stat"><Icon name={STAT[k].icon} size={18} />{p.stats![k]}</span>)}
@@ -474,7 +486,35 @@ function Side({ view, all, me, nameOf }: { view: Record<string, unknown>; all: P
       </div>
       <div className="ao-side-block">
         <div className="label">Quests in play · {Object.keys(inPlay).length}</div>
-        {Object.entries(inPlay).map(([kind, who]) => {
+        {listed.length > 0 && listed.map((q) => {
+          const kind = asStr(q['kind']);
+          const target = typeof q['target'] === 'number' ? q['target'] : null;
+          const holder = all.find((p) => p.id === asStr(q['claimedBy']));
+          const progress = isObj(q['progress']) ? q['progress'] : {};
+          const n = all.map((p) => ({ p, v: asNum(progress[p.id]) }));
+          const best = Math.max(0, ...n.map((x) => x.v));
+          const top = n.filter((x) => x.v === best);
+          let sub = q['endGame'] === true ? 'End of game · a tie scores nothing' : 'First to do it';
+          let tag: ReactNode;
+          let tagClass = '';
+          if (holder) { tag = <><span className="dot" style={{ background: tint(holder.colour) }} />{holder.id === me ? 'You' : nameOf(holder)}</>; tagClass = 'claimed'; sub += ' · claimed'; }
+          else if (q['endGame'] === true) {
+            if (best === 0) tag = 'Nobody yet';
+            else if (top.length > 1) tag = `Tied at ${best}`;
+            else { const l = top[0]!.p; tag = <><span className="dot" style={{ background: tint(l.colour) }} />{l.id === me ? `You lead, ${best}` : `${nameOf(l)} leads, ${best}`}</>; tagClass = 'lead'; }
+          } else {
+            tag = target !== null ? `${best} of ${target}` : String(best);
+            if (best > 0) sub += ` · closest: ${top.map((x) => (x.p.id === me ? 'You' : nameOf(x.p))).join(', ')}`;
+          }
+          return (
+            <div key={kind} className="ao-quest">
+              <Icon name="quest" size={30} />
+              <div className="words"><b>{asStr(q['name'], kind)}</b><span>{sub}</span></div>
+              <span className={`tag ${tagClass}`}>{tag}</span>
+            </div>
+          );
+        })}
+        {listed.length === 0 && Object.entries(inPlay).map(([kind, who]) => {
           const q = quests[kind];
           const holder = all.find((p) => p.id === who);
           let tag: ReactNode = 'Open';
@@ -531,7 +571,8 @@ export function AoScreen(props: GameScreenProps) {
     if (moves.length === 1) onMove(moves[0]!);
   };
   const nodes = mapNodes(view, withPick, all);
-  const side = <Side view={view} all={named} me={me?.id ?? null} nameOf={nameOf} />;
+  const isAI = (pid: string) => props.seatKind?.(pid) === 'ai';
+  const side = <Side view={view} all={named} me={me?.id ?? null} nameOf={nameOf} caption={caption} isAI={isAI} />;
   const panel = (
     <>
       <TestPanel view={view} previous={input.previous} all={named} mine={mine} meId={me?.id ?? null} onDraw={onDraw} />
@@ -547,8 +588,7 @@ export function AoScreen(props: GameScreenProps) {
     <div className="ao-screen">
       <DeckStrip view={view} all={named} />
       <div className="ao-map">
-        <MapPart id="ao:map" data={{ hex: { orientation: 'flat', maxRadius: 34, zoom: ZOOMS[zoom] }, fill: { minHeight: 200 }, nodes }} lit={lit} onSelect={onSelect} className="ao-map-board" />
-        {caption && <div className="ao-caption">{caption}</div>}
+        <MapPart id="ao:map" data={{ hex: { orientation: 'flat', maxRadius: 34, zoom: ZOOMS[zoom], drawn: true }, fill: { minHeight: 200 }, nodes }} lit={lit} onSelect={onSelect} className="ao-map-board" />
         <div className="ao-legend" aria-label="What the icons are">
           {LEGEND.map(([icon, name]) => <div key={icon}><Icon name={icon} size={24} />{name}</div>)}
         </div>

@@ -1240,8 +1240,14 @@ the same call Fractured Fist's arcade theme made (§17).
   hexes, token pieces, and `GlueModule.placesCaption`. Checks:
   `ao-screen.test.tsx` and `ao-glue.test.ts` (196), the web suite, and the
   full-game browser spec against a live engine.
-- **Still different from the canvas.** The seat rows carry no AI badge; the
-  instant quests show "Open" rather than progress ("2 of 3 · closest:
-  Blue"), which needs the engine to publish each quest's target; hex edges
-  are straight, with no grass tufts; the top bar is the site's own.
+- **Closed the gaps (2026-09-30).** Seat rows carry the AI badge and what a
+  seat stands on ("on the City"); quests show progress ("2 of 3 · closest:
+  Blue") from the engine's `quests` (zekel #118), falling back to "Open"
+  before it; hexes are drawn by hand (`MapData.hex.drawn`) with grass tufts;
+  the top bar has the quest medal (`TablePlan.titleArt`) and "Your turn · 3
+  steps left" (`GlueModule.yourTurnLabel`). By the owner's call the last
+  move's card sits at the top of the side column, above turn order, instead
+  of over the map; Stay, Explore and End turn share a grid so they always
+  fit the board. The table tells a screen whether a seat is the AI
+  (`GameScreenProps.seatKind`).
 

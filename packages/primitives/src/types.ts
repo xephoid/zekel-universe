@@ -258,6 +258,10 @@ export interface MapData {
     /** Drawn this many times the fitted size (1 = fit); past the room the
      *  board scrolls. */
     zoom?: number;
+    /** Each hex drawn by hand, with a wobbling ink edge, rather than as a
+     *  flat cut shape. The face and edge colours come from the --hex-face and
+     *  --hex-edge custom properties, so a theme sets them per state. */
+    drawn?: boolean;
   };
 }
 

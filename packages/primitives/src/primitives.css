@@ -368,6 +368,12 @@
   position: absolute; clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
   background: var(--hex-edge, rgba(0,0,0,0.7));
 }
+.zk-hex.drawn { background: transparent; }
+.zk-hex-drawn { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.zk-hex-drawn polygon {
+  fill: var(--hex-face, var(--hex-fill)); stroke: var(--hex-edge, rgba(0,0,0,0.7));
+  stroke-width: 3; stroke-linejoin: round; vector-effect: non-scaling-stroke;
+}
 .zk-hex-face {
   position: absolute; inset: 2.5px; clip-path: inherit; background: var(--hex-fill);
 }

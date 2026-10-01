@@ -576,6 +576,8 @@ function HexMap({ id, data, lit, onSelect, className, style }: PrimitiveProps<Ma
   const ox = Math.max(0, (size.w - spanX * s) / 2) - minX * s;
   const oy = (fill ? Math.max(0, (size.h - spanY * s) / 2) : 0) - minY * s;
   const at = (i: number) => ({ x: ox + centres[i]!.x * s, y: oy + centres[i]!.y * s });
+  const drawn = !!data.hex?.drawn;
+  const wobble = `zk-hexwob-${slug(id)}`;
   return (
     <div data-flip-id={id} className={cx(className, fill && 'zk-map-filling')} style={style}>
       {data.label && <div className="zk-zone-label">{data.label}</div>}
@@ -584,6 +586,11 @@ function HexMap({ id, data, lit, onSelect, className, style }: PrimitiveProps<Ma
         className="zk-map zk-hexmap"
         style={fill ? { flex: '1 1 auto', minHeight: fill.minHeight } : { paddingTop: `${(spanY / spanX) * 100}%` }}
       >
+        {drawn && (
+          <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
+            <defs><filter id={wobble} x="-8%" y="-8%" width="116%" height="116%"><feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="3" /><feDisplacementMap in="SourceGraphic" scale="2.2" /></filter></defs>
+          </svg>
+        )}
         {/* Holds the board's full size when zoomed past the room, so it scrolls. */}
         {s > 0 && <div className="zk-hexmap-extent" style={{ width: Math.max(size.w, spanX * s), height: Math.max(size.h, spanY * s) }} />}
         {s > 0 && nodes.map((n, i) => {
@@ -598,13 +605,19 @@ function HexMap({ id, data, lit, onSelect, className, style }: PrimitiveProps<Ma
               key={n.id}
               data-flip-id={`${id}:hex:${n.id}`}
               data-flip-from={n.arriveFrom}
-              className={cx('zk-hex', n.ghost && 'ghost', n.selected && 'selected', n.dim && 'dim', n.artUrl && 'has-art', lp.className)}
+              className={cx('zk-hex', drawn && 'drawn', n.ghost && 'ghost', n.selected && 'selected', n.dim && 'dim', n.artUrl && 'has-art', lp.className)}
               style={{ left: c.x - s, top: c.y - (R3 / 2) * s, width: 2 * s, height: R3 * s, ['--hex-fill' as string]: themeColor(n.colorKey ?? n.label) }}
               role={lp.role} tabIndex={lp.tabIndex} onClick={lp.onClick} onKeyDown={lp.onKeyDown}
               aria-label={n.describedAs ?? n.label}
               title={n.describedAs ?? n.label}
             >
-              <span className="zk-hex-face" />
+              {drawn
+                ? (
+                  <svg className="zk-hex-drawn" viewBox="0 0 68 59" preserveAspectRatio="none" aria-hidden="true">
+                    <polygon points="17,1.5 51,1.5 66.5,29.5 51,57.5 17,57.5 1.5,29.5" filter={`url(#${wobble})`} />
+                  </svg>
+                )
+                : <span className="zk-hex-face" />}
             </div>
           );
         })}
