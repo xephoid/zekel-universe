@@ -44,17 +44,24 @@ function litProps(isLit: boolean, fire: () => void): LitProps {
   };
 }
 
+/** A card that can be looked at but is not a move: it reports the tap the
+ *  same way, drawn as `zk-look` instead of lit. */
+function lookProps(isLit: boolean, inspectable: boolean | undefined, fire: () => void): LitProps {
+  if (isLit || !inspectable) return litProps(isLit, fire);
+  return { ...litProps(true, fire), className: 'zk-look' };
+}
+
 function cx(...parts: Array<string | false | undefined | null>): string {
   return parts.filter(Boolean).join(' ');
 }
 
 // ---- Card ---------------------------------------------------------------------
 
-export function Card({ id, data, lit, onSelect, arriveFrom, className, style }: PrimitiveProps<CardData>) {
+export function Card({ id, data, lit, onSelect, arriveFrom, className, style, inspectable }: PrimitiveProps<CardData> & { inspectable?: boolean }) {
   const isLit = lit?.includes(id) ?? false;
   const down = data.face === 'down';
   const handled = handledTransform(id, data.rotation ? 0 : 1);
-  const lp = litProps(isLit, () => onSelect?.({ component: 'card', id, label: data.label }));
+  const lp = lookProps(isLit, inspectable && !down, () => onSelect?.({ component: 'card', id, label: data.label }));
   const faceStyle: CSSProperties = { background: themeColor(data.colorKey ?? data.label) };
   return (
     <div
@@ -107,9 +114,9 @@ export function Card({ id, data, lit, onSelect, arriveFrom, className, style }: 
  * name, its effects and its counts. It is the same part as the card (the same
  * id, lit and flown the same way), only laid out to be read down a column.
  */
-export function CardRow({ id, data, lit, onSelect, arriveFrom, className, style }: PrimitiveProps<CardData>) {
+export function CardRow({ id, data, lit, onSelect, arriveFrom, className, style, inspectable }: PrimitiveProps<CardData> & { inspectable?: boolean }) {
   const isLit = lit?.includes(id) ?? false;
-  const lp = litProps(isLit, () => onSelect?.({ component: 'card', id, label: data.label }));
+  const lp = lookProps(isLit, inspectable, () => onSelect?.({ component: 'card', id, label: data.label }));
   return (
     <div
       data-flip-id={id}
@@ -212,7 +219,7 @@ export function CardZone({ id, data, lit, onSelect, arriveFrom, className, style
     body = (
       <div className="zk-zone-list">
         {cards.map((c, i) => (
-          <CardRow key={c.id ?? `${id}:${i}`} id={c.id ?? `${id}:${i}`} data={c} lit={lit} onSelect={onSelect} arriveFrom={arriveFrom} />
+          <CardRow key={c.id ?? `${id}:${i}`} id={c.id ?? `${id}:${i}`} data={c} lit={lit} onSelect={onSelect} arriveFrom={arriveFrom} inspectable={data.inspectable} />
         ))}
       </div>
     );
@@ -226,12 +233,12 @@ export function CardZone({ id, data, lit, onSelect, arriveFrom, className, style
         {under.map((c, i) => (
           <Card key={c.id ?? `${id}:under:${i}`} id={c.id ?? `${id}:under:${i}`} data={c} style={{ top: (i - under.length) * 2, left: (i - under.length) * 1 }} />
         ))}
-        <Card id={top.id ?? `${id}:top`} data={top} lit={lit} onSelect={onSelect} arriveFrom={arriveFrom} />
+        <Card id={top.id ?? `${id}:top`} data={top} lit={lit} onSelect={onSelect} arriveFrom={arriveFrom} inspectable={data.inspectable} />
       </div>
     );
   } else {
     const card = (c: CardData, i: number, s?: CSSProperties) => (
-      <Card key={c.id ?? `${id}:${i}`} id={c.id ?? `${id}:${i}`} data={c} lit={lit} onSelect={onSelect} arriveFrom={arriveFrom} style={s} />
+      <Card key={c.id ?? `${id}:${i}`} id={c.id ?? `${id}:${i}`} data={c} lit={lit} onSelect={onSelect} arriveFrom={arriveFrom} style={s} inspectable={data.inspectable} />
     );
     const groups = data.mode === 'fan' && !spread ? groupsOf(cards) : null;
     if (groups && cards.length > FAN_TIGHT_UP_TO) {
