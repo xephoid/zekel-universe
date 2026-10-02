@@ -9,8 +9,8 @@ import type { CardData, MapNode, TableauData } from '@universe/primitives';
 import type { GameReferenceResponse } from '@universe/shared';
 import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, PlanPrompt, PromptAction, SelectEvent, SetupField, TablePlan, Zone, SetupAnswers, SetupSeat } from './types';
 import { asArr, asNum, asStr, isObj, shapeHas, words } from './types';
-import { BOROUGH_COLUMNS, LINES, STATIONS, columnOf, pct } from './cn/metro';
-import { faceUrl } from './cn/faces';
+import { BOROUGH_COLUMNS, LINE_CODES, LINES, STATIONS, columnOf, pct } from './cn/metro';
+import { faceUrl, markUrl } from './cn/faces';
 import './cn/cn.css';
 
 /**
@@ -128,9 +128,14 @@ function contactCard(
     ...(p.affiliation && p.affiliation !== 'none' ? [n.affiliation(p.affiliation)] : []),
     ...(p.isWitness ? ['Witness'] : []),
   ];
+  // A person's card: the portrait across the top, the cost as pips (FREE for
+  // nothing), the faction's mark in the corner, a Witness's eye.
+  const mark = markUrl(p.isWitness ? 'witness' : p.affiliation ?? '');
   return {
     id, label, colorKey: p.affiliation || 'none',
+    layout: 'portrait', costStyle: 'pips',
     ...(art ? { artUrl: art } : {}),
+    ...(mark ? { emblemUrl: mark } : {}),
     // A big hand folds by faction: the field a Motive set is built from.
     ...(p.affiliation ? { groupKey: p.affiliation } : {}),
     ...(p.cost === undefined ? {} : { cost: p.cost }),
@@ -145,20 +150,27 @@ function contactCard(
 
 /** A Location as a card: its three printed facts, and who lives there —
  *  residents are what playing it puts in the Detective's reach. */
+/**
+ * A Location as a station sign: its line's bullet, its name and borough on a
+ * light plate, then its population bar and faction, then the faces of the
+ * people who live there ("nobody home" when no one does).
+ */
 function locationCard(id: string, label: string, locs: Loc[], reference: GameReferenceResponse | null, n: Names): CardData {
   const l = locs.find((x) => x.name === label);
   if (!l) return { id, label, colorKey: 'none' };
   const who = residentsOf(reference, l.name);
+  const affiliation = l.affiliation || 'none';
   return {
-    id, label, colorKey: l.affiliation || 'none',
+    id, label, colorKey: affiliation,
+    layout: 'sign',
+    ...(LINE_CODES[affiliation] ? { code: LINE_CODES[affiliation] } : {}),
     // A big hand of Locations folds by borough.
     groupKey: l.borough,
-    ...(who.length > 0 ? { subtitle: who.join(', ') } : {}),
-    badges: [
-      n.borough(l.borough),
-      residentCount(l.population),
-      ...(l.affiliation && l.affiliation !== 'none' ? [n.affiliation(l.affiliation)] : []),
-    ].filter(Boolean),
+    subtitle: n.borough(l.borough),
+    ...(typeof l.population === 'number' ? { meter: { value: Math.max(0, Math.min(3, l.population)), max: 3 } } : {}),
+    badges: [affiliation === 'none' ? 'No faction' : n.affiliation(affiliation)],
+    ...(who.length === 0 ? { note: 'nobody home' } : {}),
+    ...(who.length > 0 ? { faces: who.map((w) => ({ label: w, ...(faceUrl(w, 'square') ? { artUrl: faceUrl(w, 'square') } : {}) })) } : {}),
   };
 }
 
@@ -1015,7 +1027,12 @@ export const cybernoirGlue: GlueModule = {
           data: {
             label: 'Your location hand', mode: 'fan',
             groupNames: Object.fromEntries(boroughs.map((b) => [b, name.borough(b)])),
-            cards: hand.map((h, i) => locationCard(`cn:hand:${i}:${asStr(h)}`, asStr(h), locs, input.reference, name)),
+            // A card the engine says the Detective has ruled out, in their
+            // own list only, is stamped NOT IT in their own hand.
+            cards: hand.map((h, i) => ({
+              ...locationCard(`cn:hand:${i}:${asStr(h)}`, asStr(h), locs, input.reference, name),
+              ...(ruledOutNames(view['your_locations_ruled_out']).has(asStr(h)) ? { stamp: 'Not it' } : {}),
+            })),
           },
         });
       }

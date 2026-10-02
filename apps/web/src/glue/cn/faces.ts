@@ -17,6 +17,13 @@ const FACES = new Set([
   'kenji_watanabe', 'yumi_sato', 'hana_mori', 'anansi_the_spider',
 ]);
 
+/** Each faction's mark (column A of Logos.dc.html), and the Witnesses' eye. */
+const MARKS = new Set(['corp_1', 'corp_2', 'gang_1', 'gang_2', 'gang_3', 'witness']);
+
+export function markUrl(key: string): string | undefined {
+  return MARKS.has(key) ? `/art/cybernoir/logos/${key}.svg` : undefined;
+}
+
 export function faceUrl(name: string, shape: 'square' | 'tall' = 'tall'): string | undefined {
   const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
   if (!FACES.has(id)) return undefined;

@@ -27,7 +27,17 @@ and `cn.css` draws it as a camera grab with filters and a scanline mask on the
 image itself. Cards gained `stamp` (BLOWN) and `backLabel` (NO SIGNAL), and
 the Hacker's side has the informants facing them. Camera numbers and match
 boxes are left off for now: they are flavour, and the card faces (item 5) are
-the place to decide them.
+the place to decide them. Item 5, the cards: the card primitive has two
+layouts, `portrait` (a Contact) and `sign` (a Location), with `costStyle:
+'pips'`, `emblemUrl`, `code`, `meter`, `faces` and `note`; the faction marks
+and the Witness eye are SVG files in `apps/web/public/art/cybernoir/logos/`,
+taken from the contact cards on the canvas. Hand sizes are the boards'
+(118 × 196 and 196 × 134). Every Location in the Detective's hand is stamped
+NOT IT, because the engine counts every card they hold as ruled out. The
+camera numbers stay off. The red top edge on a Hacker's Contact is left off:
+the Hacker's view says how many informants are face down but not who, so it
+cannot single out a Contact. The full-size cards (240 × 360, 460 × 290) are
+not drawn anywhere on the table yet.
 
 ## Before anything else
 

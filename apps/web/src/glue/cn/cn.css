@@ -99,7 +99,7 @@
    The primitive paints the face in its colour key; on a dark table the line
    colours are too bright to carry text, so the face goes dark and the colour
    becomes the edge, as on the boards' Contact and Location cards. */
-.cn-theme .zk-card-face {
+.cn-theme .zk-card-face:not(.layout-portrait, .layout-sign) {
   background: var(--cn-panel) !important; color: var(--cn-text); text-shadow: none;
   border: 1px solid var(--cn-rule); border-top: 3px solid var(--cn-line, var(--cn-rule));
 }
@@ -170,3 +170,27 @@
   border: 1px dashed var(--cn-ice); color: var(--cn-ice);
 }
 .cn-theme .zk-card-back-label { font: 400 11px/1.2 var(--cn-term); letter-spacing: .12em; text-shadow: 0 0 6px var(--cn-ice); }
+
+/* ---------- the cards (build item 5) ----------
+   Contacts are tall portrait cards; Locations are wide station signs. Sizes
+   are the table boards' hand sizes. Costs are ice diamonds for both seats:
+   a Contact's price is in the Hacker's currency. */
+.cn-theme .zk-card-face:is(.layout-portrait, .layout-sign) { background: var(--cn-panel); border-color: var(--cn-rule); border-radius: 10px; }
+.cn-theme .zk-card-pip { background: var(--cn-ice); }
+.cn-theme .layout-portrait .zk-card-label { font-family: var(--cn-sign); letter-spacing: .02em; }
+.cn-theme .layout-sign .zk-card-label { font-family: var(--cn-sign); }
+.cn-theme .zk-card-meter-pip { border-color: var(--cn-text); }
+.cn-theme .zk-card-meter-pip.on { background: var(--cn-text); }
+.cn-theme .zk-card-face-pic {
+  filter: blur(1px) grayscale(.92) contrast(1.25) brightness(.9) sepia(.4) hue-rotate(65deg) saturate(1.3);
+  border-color: var(--cn-rule);
+}
+.cn-theme-hacker [data-flip-id='cn:hand'] { --zekel-card-w: 118px; --zekel-card-h: 196px; }
+.cn-theme-detective [data-flip-id='cn:hand'] { --zekel-card-w: 196px; --zekel-card-h: 134px; }
+/* In a small zone a person is a picture and a name. */
+.cn-theme .zk-zone-small .layout-portrait .zk-card-sub,
+.cn-theme .zk-zone-small .layout-portrait .zk-card-badges { display: none; }
+.cn-theme .zk-zone-small .layout-portrait .zk-card-emblem { width: 16px; height: 16px; top: 3px; right: 3px; }
+.cn-theme .zk-zone-small .layout-portrait .zk-card-cost { top: 3px; left: 3px; }
+.cn-theme .zk-zone-small .layout-portrait .zk-card-label { font-size: 9.5px; }
+.cn-theme .zk-zone-small .layout-portrait .zk-card-body { padding: 3px 5px; }

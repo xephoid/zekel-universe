@@ -61,6 +61,11 @@ export const STATIONS: Record<string, Station> = {
   'Junktown': { x: 1090, y: 790, side: 'below', short: 'Junktown' },
 };
 
+/** Each line's code, as on its bullets, keyed by the engine's affiliation id. */
+export const LINE_CODES: Record<string, string> = {
+  corp_1: 'OSU', corp_2: 'SHZ', gang_1: 'ICE', none: 'CIV', gang_2: 'CRM', gang_3: 'CHM',
+};
+
 /** The six lines, keyed by the engine's affiliation id, with 45° bends. */
 export const LINES: Record<string, Array<[number, number]>> = {
   corp_1: [[160, 250], [220, 250], [435, 250], [485, 300], [700, 300], [925, 300], [955, 270], [1180, 270], [1240, 270]],

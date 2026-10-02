@@ -676,7 +676,8 @@ describe('cybernoir-2127 glue', () => {
     const hand = cards(plan.bench.find((z) => z.id === 'cn:hand'));
     expect(hand[0]).toEqual({
       id: 'cn:hand:0:Blackice', label: 'Blackice', colorKey: 'gang_1',
-      artUrl: '/art/cybernoir/blackice-tall.jpg',
+      layout: 'portrait', costStyle: 'pips',
+      artUrl: '/art/cybernoir/blackice-tall.jpg', emblemUrl: '/art/cybernoir/logos/gang_1.svg',
       groupKey: 'gang_1', cost: 2,
       subtitle: 'Discard one Location the Detective has already played from the board.',
       badges: ['Iceden Collective'],
@@ -687,7 +688,11 @@ describe('cybernoir-2127 glue', () => {
     // A Witness says so, and its ability line would only repeat the badge.
     const witness = g.plan(input({ ...CN_VIEW, hand: ['Eddie the Doorman'] }, [], { reference: CN_REFERENCE }))!;
     expect(cards(witness.bench.find((z) => z.id === 'cn:hand'))[0])
-      .toEqual({ id: 'cn:hand:0:Eddie the Doorman', label: 'Eddie the Doorman', artUrl: '/art/cybernoir/eddie_the_doorman-tall.jpg', colorKey: 'none', groupKey: 'none', cost: 0, badges: ['Witness'] });
+      .toEqual({
+        id: 'cn:hand:0:Eddie the Doorman', label: 'Eddie the Doorman', layout: 'portrait', costStyle: 'pips',
+        artUrl: '/art/cybernoir/eddie_the_doorman-tall.jpg', emblemUrl: '/art/cybernoir/logos/witness.svg',
+        colorKey: 'none', groupKey: 'none', cost: 0, badges: ['Witness'],
+      });
   });
 
   it('draws the informants facing the Hacker: a dead feed for each face-down one, a blown portrait for each revealed one', () => {
@@ -754,12 +759,27 @@ describe('cybernoir-2127 glue', () => {
       informants: [{ person: 'Blackice', revealed: false }, { person: 'Anansi the Spider', revealed: true }],
     };
     const plan = g.plan(input(det, [], { reference: CN_REFERENCE }))!;
-    // A Location shows who lives there: residents are what playing it reaches.
+    // A Location is a station sign and shows who lives there: residents are
+    // what playing it reaches.
     expect(cards(plan.bench.find((z) => z.id === 'cn:hand'))[0]).toEqual({
       id: 'cn:hand:0:The Junction', label: 'The Junction', colorKey: 'gang_1',
-      groupKey: 'boonies', subtitle: 'Blackice, Anansi the Spider',
-      badges: ['Boonies', '2 residents', 'Iceden Collective'],
+      layout: 'sign', code: 'ICE', groupKey: 'boonies', subtitle: 'Boonies',
+      meter: { value: 2, max: 3 },
+      badges: ['Iceden Collective'],
+      faces: [
+        { label: 'Blackice', artUrl: '/art/cybernoir/blackice.jpg' },
+        { label: 'Anansi the Spider', artUrl: '/art/cybernoir/anansi_the_spider.jpg' },
+      ],
     });
+    // A card the engine puts in the Detective's own ruled-out list is
+    // stamped NOT IT in their own hand; nothing else is.
+    const held = g.plan(input({ ...det, location_hand: ['The Junction', 'Shipyard'],
+      your_locations_ruled_out: [{ location_name: 'Shipyard', reason: 'in your hand' }] }, [], { reference: CN_REFERENCE }))!;
+    expect(cards(held.bench.find((z) => z.id === 'cn:hand')).map((c) => [c.label, c.stamp]))
+      .toEqual([['The Junction', undefined], ['Shipyard', 'Not it']]);
+    // A place nobody lives says so.
+    const empty = g.plan(input({ ...det, location_hand: ['Shipyard'] }, [], { reference: CN_REFERENCE }))!;
+    expect(cards(empty.bench.find((z) => z.id === 'cn:hand'))[0]).toMatchObject({ code: 'OSU', badges: ['OmniSuperUltra Corp'], note: 'nobody home' });
     // They pay to hold their informants and are the one person entitled to
     // know who they are; the line says whether the Hacker has seen them.
     const informants = cards(plan.bench.find((z) => z.id === 'cn:informants'));
