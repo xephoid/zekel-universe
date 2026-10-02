@@ -57,9 +57,8 @@ affiliation ids:
 
 Type: **Chakra Petch** (new: signage, names, headers), Special Elite
 (Detective titles and stamps), Share Tech Mono (Hacker titles and prompt), IBM
-Plex Sans and Mono (body and figures). Chakra Petch is OFL 1.1; when it is
-bundled into `apps/web/public/fonts`, add it to the fonts section of
-`ATTRIBUTIONS.md`.
+Plex Sans and Mono (body and figures). All are OFL 1.1, self-hosted in
+`apps/web/public/fonts` and credited in `ATTRIBUTIONS.md`.
 
 ### 2. The subway map (the map primitive)
 

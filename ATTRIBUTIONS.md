@@ -5,7 +5,7 @@ project itself is Apache 2.0 (see `LICENSE`).
 
 ## Fonts (served from `apps/web/public/fonts`, declared in `apps/web/src/fonts.css`)
 
-All seven families are licensed under the SIL Open Font License 1.1, which
+All ten families are licensed under the SIL Open Font License 1.1, which
 permits bundling and self-hosting with attribution. Latin subsets only.
 
 - **Slackey** by Sideshow (the wordmark). OFL 1.1.
@@ -15,20 +15,18 @@ permits bundling and self-hosting with attribution. Latin subsets only.
   Gears wizard seat). OFL 1.1.
 - **Barlow Condensed** by Jeremy Tribby (the Fractured Fist arcade theme). OFL 1.1.
 - **Fredoka** by Milena Brandão (the Adventurer Olympics table). OFL 1.1.
+- **Chakra Petch** by Cadson Demak (signage and names in the Cybernoir 2127
+  rain and neon theme). OFL 1.1.
+- **Special Elite** by Astigmatic (the Cybernoir Detective's typewriter). OFL 1.1.
+- **Share Tech Mono** by Carrois Apostrophe (the Cybernoir Hacker's terminal). OFL 1.1.
 
-The files were obtained from Google Fonts in September 2026.
+The files were obtained from Google Fonts in September 2026; Chakra Petch,
+Special Elite and Share Tech Mono in October 2026.
 
-## Fonts used only by the design canvas (`docs/design/*.dc.html`)
+## Fonts on the design canvas (`docs/design/*.dc.html`)
 
-The artboards link these from Google Fonts when they are viewed. No font
-files for them are stored here, and the app does not use them.
-
-- **Special Elite** by Astigmatic (the Detective's typewriter). OFL 1.1.
-- **Share Tech Mono** by Carrois Apostrophe (the Hacker's terminal). OFL 1.1.
-- **Chakra Petch** by Cadson Demak (signage and names in the Cybernoir rain
-  and neon theme, `docs/design/cybernoir-rain-neon/`). OFL 1.1.
-
-The artboards also link IBM Plex Sans and IBM Plex Mono, credited above.
+The artboards link their fonts from Google Fonts when they are viewed,
+including the ones bundled above.
 
 ## Generated images
 
