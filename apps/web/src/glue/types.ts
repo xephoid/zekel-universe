@@ -69,15 +69,19 @@ export interface PlanStep { id: string; label: string; current?: boolean }
  * or to a batch: a series of taps sent one at a time, each only once the
  * engine lists the move it stands for (see glue/agency.ts).
  */
+/** What every action-bar button has; `short` is its label on a phone, where
+ *  the buttons share one row. */
+interface PromptButton { id: string; label: string; short?: string; note?: string; title?: string; primary?: boolean }
+
 export type PromptAction =
-  | { id: string; label: string; note?: string; title?: string; primary?: boolean; move: LegalMove }
-  | { id: string; label: string; note?: string; title?: string; primary?: boolean; batch: SelectEvent[] }
+  | (PromptButton & { move: LegalMove })
+  | (PromptButton & { batch: SelectEvent[] })
   /** A verb several listed moves stand behind: one opens directly, several ask
    *  which, in the engine's own words. Nothing is chosen for the player. */
-  | { id: string; label: string; note?: string; title?: string; primary?: boolean; moves: LegalMove[] }
+  | (PromptButton & { moves: LegalMove[] })
   /** A step in putting a choice together (turn the tile left): it changes
    *  what the screen shows (GlueInput.ui) and sends nothing. */
-  | { id: string; label: string; note?: string; title?: string; primary?: boolean; ui: Record<string, unknown> };
+  | (PromptButton & { ui: Record<string, unknown> });
 
 /** The action bar: what step it is, what you can do now, and the buttons
  *  that move the turn. Text only; every number in it comes from the view. */
@@ -140,6 +144,8 @@ export interface TablePlan {
   titleArt?: string;
   /** one line for the turn indicator, e.g. "Round 3 · Technique phase" */
   status?: string;
+  /** the same in a few letters ("R3"), for a phone's top bar */
+  statusShort?: string;
   /** the turn's steps, one current, for the action bar */
   steps?: PlanStep[];
   /** the action bar's words and buttons */
@@ -286,6 +292,10 @@ export interface GameScreenProps {
   sideSlot?: HTMLElement | null;
   /** a seat's display name, from its engine player id */
   nameFor(playerId: string): string;
+  /** The table is laid out for a phone (table/phone.ts), only ever for a
+   *  game whose glue has a phone layout (GlueModule.phone). The side column
+   *  is gone then, so sideSlot is absent. */
+  phone?: boolean;
   /** Whether a seat is a person or the AI, from its engine player id; absent
    *  where the seats are not known (a preview). */
   seatKind?: (playerId: string) => 'human' | 'ai' | null;
@@ -301,6 +311,11 @@ export interface GlueModule {
    *  map), instead of the table putting it above the board or in the side
    *  column. */
   placesCaption?: boolean;
+  /** The game has a phone layout: on a phone the table's top bar keeps the
+   *  title, the round and the turn, everything else moves into a menu sheet,
+   *  the side column goes, and the screen is told (GameScreenProps.phone).
+   *  Other games keep the desktop table until the brief's phone pass. */
+  phone?: boolean;
   /** The turn indicator's words while it is this seat's turn ("Your turn · 3
    *  steps left"), or null for the table's own. Read from the view. */
   yourTurnLabel?(input: GlueInput): string | null;

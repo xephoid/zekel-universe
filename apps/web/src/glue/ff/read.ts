@@ -138,11 +138,21 @@ export function artUrlFor(cardId: string): string | undefined {
  * corner (a Misstep has none), the name, the art, and the effects as chips;
  * a resource shows what it is worth. Every number is the reference data's.
  */
+/** What a resource is worth, when it is worth anything. */
+export function worthOf(def: CardDef | undefined): number | undefined {
+  return def?.type === 'RESOURCE' && def.value !== undefined && def.value > 0 ? def.value : undefined;
+}
+
+/** The chips on a card's face: a resource's worth, else its effects. */
+export function faceChips(def: CardDef | undefined): string[] {
+  const worth = worthOf(def);
+  return worth !== undefined ? [`Worth ${worth}`] : effectChips(def);
+}
+
 function cardData(cardId: string, instance: string, defs: Map<string, CardDef>, face: 'up' | 'down' = 'up'): CardData {
   const def = defs.get(cardId);
-  const resource = def?.type === 'RESOURCE';
-  const worth = resource && def.value !== undefined && def.value > 0 ? def.value : undefined;
-  const chips = worth !== undefined ? [`Worth ${worth}`] : effectChips(def);
+  const worth = worthOf(def);
+  const chips = faceChips(def);
   // A card with no effects says what it is in its own words ("Unplayable.
   // Refine to remove."), when they are short enough to sit on the face.
   const subtitle = chips.length === 0 && def?.description && def.description.length <= 40 ? def.description : undefined;
@@ -252,8 +262,16 @@ function playerZones(pid: string, p: Record<string, unknown>, isSelf: boolean, i
       mode: 'row', cards: contents.played.map((cid, i) => cardData(cid, instance('played', i), defs)),
     },
   };
-  return { hand, deck, discard, played, ids };
+  // Which engine card each drawn card is, and where it sits, in words: what
+  // the phone's card sheet needs to show a card up close.
+  const where = { hand: watching ? `In ${whose} hand` : isSelf ? 'In your hand' : 'In their hand', played: `${whose} played cards`, discard: `${whose} discard` };
+  const known: Array<[string, Spot]> = [];
+  for (const zone of ZONES) contents[zone].forEach((cid, i) => known.push([instance(zone, i), { cardId: cid, where: where[zone] }]));
+  return { hand, deck, discard, played, ids, known };
 }
+
+/** One drawn card's engine id and where it is, in words. */
+export interface Spot { cardId: string; where: string }
 
 /**
  * One shelf for both supplies. The engine has no shared market: every stack
@@ -351,7 +369,7 @@ export function promptFor(view: Record<string, unknown>, me: string | null, defs
     if (batch.length > 1) {
       const costsReload = reload !== null && focus > 0;
       actions.push({
-        id: 'play-all-resources', label: `Play all resources · +${gain}`,
+        id: 'play-all-resources', label: `Play all resources · +${gain}`, short: `All resources +${gain}`,
         note: costsReload ? `spends your ${focus} Focus` : undefined,
         title: `Plays all ${batch.length} resources into your played row at once, for ${gain} spirit.${costsReload ? ` Your ${focus} Focus go with them, so no reload after this.` : ''}`,
         batch,
@@ -362,7 +380,7 @@ export function promptFor(view: Record<string, unknown>, me: string | null, defs
     sub = 'Advance to Channel to spend spirit, or end your turn.';
   }
   const advance = find('advance_phase');
-  if (advance) actions.push({ id: 'advance-phase', label: 'Advance to Channel', move: advance });
+  if (advance) actions.push({ id: 'advance-phase', label: 'Advance to Channel', short: 'To Channel', move: advance });
   const end = find('end_turn');
   if (end) actions.push({ id: 'end-turn', label: 'End turn', primary: true, move: end });
   return { title, sub, actions };
@@ -404,6 +422,8 @@ export interface Fight {
   supply: Zone;
   steps: PlanStep[];
   prompt: PlanPrompt;
+  /** every face-up card on the table by its part id: which card, and where */
+  cards: Record<string, Spot>;
 }
 
 /**
@@ -440,10 +460,12 @@ export function fightOf(input: GlueInput): Fight | null {
   const shelfPid = me ?? order[0]!;
   const watching = input.playerId === null;
 
+  const cards: Record<string, Spot> = {};
   const fighters = order.map((pid): Fighter => {
     const p = players[pid] as Record<string, unknown>;
     const self = pid === me;
     const z = playerZones(pid, p, self, input, defs, shelfPid);
+    for (const [part, spot] of z.known) cards[part] = spot;
     return {
       pid, self,
       who: watching ? words(pid) : self ? 'You' : 'Opponent',
@@ -463,6 +485,13 @@ export function fightOf(input: GlueInput): Fight | null {
   const mine = fighters.find((f) => f.self) ?? null;
   const left = mine ?? fighters[0]!;
   const right = fighters.find((f) => f !== left)!;
+  const supply = shelfZone(order, players, shelfPid, defs, watching, phase);
+  if (supply.kind === 'card-zone') {
+    for (const c of supply.data.cards ?? []) {
+      const m = /:supply:(.+)$/.exec(c.id ?? '');
+      if (m) cards[c.id!] = { cardId: m[1]!, where: 'In the supply' };
+    }
+  }
   const myIds = mine ? identitiesFor(mine.pid, players[mine.pid] as Record<string, unknown>, input, shelfPid) : null;
   const counters = mine && mine.active ? countersFor(players[mine.pid] as Record<string, unknown>, phase) : [];
   return {
@@ -470,9 +499,10 @@ export function fightOf(input: GlueInput): Fight | null {
     phase,
     over: phase === 'game_over',
     left, right, me: mine, counters,
-    supply: shelfZone(order, players, shelfPid, defs, watching, phase),
+    supply,
     steps: Object.entries(STEP_NAMES).map(([id, label]) => ({ id, label, current: phase === id })),
     prompt: promptFor(view, me, defs, myIds, input),
+    cards,
   };
 }
 
@@ -506,6 +536,11 @@ export function litPartsFor(input: GlueInput): string[] {
     // action bar's buttons; the numbered menu lists them too.
   }
   return [...new Set(lit)];
+}
+
+/** How many of your stacks the engine lists a buy for. */
+export function buyableCount(input: GlueInput): number {
+  return new Set(input.legalMoves.filter((m) => m.move['type'] === 'buy_card').map((m) => asStr(m.move['card_id']))).size;
 }
 
 /** Given a tap on a lit part, the legal move it submits, or null. */

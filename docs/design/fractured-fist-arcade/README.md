@@ -30,6 +30,12 @@ the boards are a sample mid-game state, not a fixture.
 | `Species.dc.html` | The four species as outlines to scale, the elder Bouaux, and two fighting poses each. |
 | `Strike-Prototype.dc.html` | The strike moment, playing. Imports `Table-Channel.dc.html` as the dimmed board behind it. |
 | `Strike-Storyboard.dc.html` | The strike frozen at each step, with timings. Imports `Strike-Prototype.dc.html`. |
+| `Phone-Technique.dc.html` | The table on a phone (390 × 844), Technique step. |
+| `Phone-Channel.dc.html` | The same in the Channel step, with the Supply button. |
+| `Phone-Supply.dc.html` | The supply as a sheet that slides up over the phone table. |
+| `Phone-Card.dc.html` | A card up close: what a tap on a card opens on a phone. |
+| `Phone-Menu.dc.html` | The phone menu: undo, rules, settings, share, the last move with pace and replay, the log, leave. |
+| `Phone-Strike.dc.html` | The strike upright on a phone, playing. Imports `Phone-Channel.dc.html`. |
 | `art/*.svg` | One scene per card, 34 files. See below. |
 | `canvas.json` | The canvas layout. |
 
@@ -67,3 +73,21 @@ ids when copying them into the app.
   Unmoored, on purpose.
 - **Masters' Circle cost numbers are white**, as on the print-and-play sheet.
 - **The strike moment keeps its timings** and its rules; only its look changes.
+
+## Added 2026-10-02: the phone screens
+
+The owner asked for phone versions of every Fractured Fist screen now, ahead
+of the brief's later phone pass. They are the six `Phone-*` boards.
+
+- **Same table, stacked.** Both stamina bars stay at the top; the two played
+  rows and the strike line sit in the middle with smaller cards; the action
+  bar, then the hand along the bottom with small deck and discard piles.
+- **What the side column held moves into sheets.** The supply opens from a
+  Supply button in the Channel step; the last move, pace, replay, log, undo,
+  rules, settings, share and leave live behind the menu button.
+- **A tap on a card opens it up close; you play it from there.** On a phone a
+  tap no longer plays a lit card straight away. The card sheet shows the full
+  printed face and a Play button, only when the engine lists that play.
+- **The strike runs upright:** the opponent at the top, you at the bottom, the
+  hits crossing vertically. Same beats, timings and rules as on desktop.
+- Every control is at least 44 px tall.

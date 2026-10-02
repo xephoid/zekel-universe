@@ -658,3 +658,89 @@ label.option-card { position: relative; padding-right: 40px; }
 .pick-slots .slot .remove:hover { color: var(--danger); }
 .pick-totals { display: flex; flex-direction: column; gap: 8px; }
 .pick-totals .kicker { font: 500 11px var(--font-mono); color: var(--fg-muted); text-transform: uppercase; }
+
+/* ---- a table laid out for a phone (table/phone.ts) ----
+   Only a game whose glue has a phone layout gets the `phone` class; every
+   other table keeps the desktop layout until the brief's phone pass. The top
+   bar keeps the title, the round and the turn; undo, rules, settings, share,
+   the last move, the log and leave move into the menu sheet; the side column
+   goes; sheets rise from the bottom. */
+.table-menu-btn { display: none; }
+.table-shell.phone { height: 100dvh; }
+.table-shell.phone .table-topbar { height: 54px; gap: 8px; padding: 0 10px 0 14px; }
+/* the brand link carries its display inline */
+.table-shell.phone .table-topbar :is(.brand, .divider, .title-art, .round-note, .actions) { display: none !important; }
+.table-shell.phone .table-topbar .title { white-space: nowrap; }
+.table-shell.phone .table-topbar .spacer.center { justify-content: flex-end; min-width: 0; }
+.table-shell.phone .turn-pill { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.table-shell.phone .table-menu-btn {
+  display: grid; place-items: center; width: 44px; height: 44px; flex: none; padding: 0; cursor: pointer;
+  background: transparent; color: var(--fg); border: 1.5px solid var(--border); border-radius: 6px;
+}
+.table-shell.phone .table-menu-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.round-tag { display: inline-flex; padding: 2px 7px; font: 700 12px/1 var(--font-display); }
+.table-shell.phone .table-side { display: none; }
+.table-shell.phone .table-board { padding: 8px 12px 0; gap: 7px; }
+.table-shell.phone .sheet-backdrop { align-items: flex-end; padding: 0; animation: phone-dim var(--motion-normal) ease-out; }
+.table-shell.phone .sheet { max-width: none; max-height: 92dvh; border-radius: 16px 16px 0 0; padding: 22px 16px 16px; animation: phone-rise var(--motion-normal) var(--motion-easing); }
+/* only the dimming fades; the sheet itself slides up from the bottom edge */
+@keyframes phone-dim { from { background-color: transparent; } }
+@keyframes phone-rise { from { transform: translateY(100%); } }
+@media (prefers-reduced-motion: reduce) { .table-shell.phone .sheet { animation-name: zk-fadein; } }
+.table-shell.phone[data-motion="reduced"] .sheet { animation-name: zk-fadein; }
+.table-shell.phone .sheet .close { min-width: 44px; min-height: 44px; }
+.table-shell.phone .toast { bottom: 110px; max-width: calc(100% - 32px); }
+.menu-sheet { display: flex; flex-direction: column; gap: 14px; }
+.menu-sheet h2 { margin: 0; }
+.menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.menu-grid > * { min-height: 48px; justify-content: center; }
+.menu-kicker { margin: 0 0 8px; font: 700 11px/1 var(--font-display); letter-spacing: .1em; text-transform: uppercase; color: var(--fg-muted); }
+.menu-sheet .caption-card { position: static; width: auto; align-self: stretch; animation: none; }
+.menu-sheet .caption-controls :is(.btn, .chip-btn) { min-height: 44px; }
+.menu-sheet .log { max-height: none; }
+.menu-leave { align-self: center; min-height: 44px; display: inline-flex; align-items: center; }
+
+/* ---- the strike, upright on a phone (docs/design/fractured-fist-arcade,
+   Phone-Strike.dc.html): the opponent along the top, you along the bottom,
+   both shields between, the hits crossing up and down. The beats and their
+   lengths are the same; only the places change. ---- */
+/* above any sheet the phone has open: nothing in the moment waits on the player */
+.table-shell.phone .strike-scrim { z-index: 55; padding: 12px 12px 16px; place-items: stretch; }
+.table-shell.phone .strike-panel { height: 100%; gap: 10px; }
+.table-shell.phone .strike-arena { flex: 1; min-height: 0; height: auto; }
+.table-shell.phone .strike-fighter { left: 0; right: 0; width: auto; flex-direction: row; text-align: left; }
+.table-shell.phone .strike-fighter.right { top: 0; bottom: auto; animation-name: strike-in-top; }
+.table-shell.phone .strike-fighter.left { top: auto; bottom: 0; animation-name: strike-in-bottom; }
+.table-shell.phone .strike-fighter.struck { animation-name: strike-shake; }
+@keyframes strike-in-top { from { transform: translateY(-100vh); } }
+@keyframes strike-in-bottom { from { transform: translateY(100vh); } }
+.table-shell.phone .beat-5 .strike-fighter.right { transform: translateY(-100vh); }
+.table-shell.phone .beat-5 .strike-fighter.left { transform: translateY(100vh); }
+.table-shell.phone .strike-fighter.right .strike-fighter-body { align-items: flex-start; }
+.table-shell.phone .strike-fighter.right .strike-pips { flex-direction: row; }
+.table-shell.phone .strike-shield { left: 50%; right: auto; translate: -50% 0; flex-direction: row; gap: 10px; }
+.table-shell.phone .strike-shield.right { top: 24%; }
+.table-shell.phone .strike-shield.left { top: auto; bottom: 23%; }
+.table-shell.phone .strike-stamp { top: 2px; }
+/* the hits: yours rises left of centre, theirs falls right of it; they cross */
+.table-shell.phone .strike-hit { transition-property: top, transform, opacity; }
+.table-shell.phone .strike-hit.left { left: calc(28% - 42px); right: auto; }
+.table-shell.phone .strike-hit.right { left: calc(72% - 42px); right: auto; }
+.table-shell.phone .strike-hit.left.at-home { top: 55%; }
+.table-shell.phone .strike-hit.left.at-across { top: 34%; }
+.table-shell.phone .strike-hit.left.at-in { top: 7%; }
+.table-shell.phone .strike-hit.right.at-home { top: 34%; }
+.table-shell.phone .strike-hit.right.at-across { top: 55%; }
+.table-shell.phone .strike-hit.right.at-in { top: 80%; }
+.table-shell.phone .strike-flash { top: calc(50% - 30px); }
+.table-shell.phone .strike-impact { left: 50%; right: auto; translate: -50% 0; }
+.table-shell.phone .strike-impact.right { top: 5%; }
+.table-shell.phone .strike-impact.left { top: auto; bottom: 8%; }
+.table-shell.phone .strike-ko { top: 42%; }
+.table-shell.phone .strike-caption { align-self: stretch; text-align: center; font-size: 13.5px; }
+.table-shell.phone .strike-controls > .muted { display: none; }
+.table-shell.phone .strike-controls .btn { min-height: 44px; }
+/* reduced motion: the hits stay home and fade, as on a desktop */
+.table-shell.phone .strike-scrim.reduced .strike-hit.left { left: calc(28% - 42px) !important; top: 55% !important; }
+.table-shell.phone .strike-scrim.reduced .strike-hit.right { left: calc(72% - 42px) !important; top: 34% !important; }
+.table-shell.phone .strike-scrim.reduced.beat-5 .strike-fighter { transform: none; }

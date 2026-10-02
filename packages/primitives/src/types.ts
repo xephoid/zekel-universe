@@ -53,6 +53,12 @@ export interface CardZoneData {
   /** Hidden pile: no cards, just how many. */
   countOnly?: number;
   /**
+   * Universe addition: every face-up card in the zone reports a tap, not
+   * only the lit ones, so the screen can show it up close. Looking is always
+   * safe: a tap on a card with no move behind it sends nothing.
+   */
+  inspectable?: boolean;
+  /**
    * Universe addition: the key's printed name, for a stack's label when a
    * fan folds. A key with no name here is put into words.
    */

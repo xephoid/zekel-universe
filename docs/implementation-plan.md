@@ -1132,6 +1132,55 @@ The design canvas is `docs/design/fractured-fist-arcade/`; what to build is
   Neither Guts nor Gears watcher gets only the plain `ngg-theme` class,
   whose rules paint the same colors the page already had.
 
+### The phone (build item 7, built 2026-10-02)
+
+The boards are the six `Phone-*` files in the canvas folder. The acceptance
+check is `e2e/fractured-fist-phone.spec.ts` at 390 x 844.
+
+- **One test for "is this a phone", and only for a game that has a phone
+  layout.** `table/phone.ts` answers it (narrower than 640 px). The glue opts
+  in with `GlueModule.phone`; only Fractured Fist does. Every other game, and
+  the watch page, keep the desktop table until the brief's phone pass.
+- **The chrome stays the table's.** On a phone the top bar keeps the title,
+  the round (`TablePlan.statusShort`, "R4") and the turn, and gains a menu
+  button. The menu sheet holds what the top bar's buttons and the side
+  column held: undo, rules, settings, share, the last move with pace and
+  replay, the log, and leave. The side column is gone, so the screen gets no
+  side slot and is told `phone`.
+- **A tap on a card opens it up close; Play sends the listed move.**
+  `CardZoneData.inspectable` (a Universe addition, like the map's) lets every
+  face-up card report a tap, drawn as `zk-look`, not lit. The sheet's Play
+  button is the move `moveForTap` finds, the same function a desktop tap
+  uses; with no listed move there is no button. A refine says Remove. A lit
+  supply row still buys on its tap.
+- **The line under the card is the engine's own description** from the
+  reference data. The board's sample sentence is not copied: it would be a
+  rule written in Universe.
+- **The Supply button is always in the phone's action bar,** in the
+  Technique step and off turn too, so the supply is never out of reach.
+  This is one more button than `Phone-Technique.dc.html` draws. The count
+  ("7 to buy") shows only in your Channel step: the number of stacks the
+  engine lists a `buy_card` for.
+- **Short button words.** A prompt action may carry `short` ("To Channel",
+  "All resources +3") for the phone's one row of buttons; the full label
+  stays as the button's accessible name.
+- **The numbered move menu is left off on a phone:** every listed move is a
+  tap or a button there.
+- **Sheets slide up from the bottom; only the dimming fades.** With reduced
+  motion they fade. On a phone the strike draws above any open sheet, and a
+  strike starting (or replayed) closes the menu.
+- **The strike upright is styles only,** under `.table-shell.phone`:
+  `StrikeOverlay`, `STRIKE_BEATS`, the captions, pace, skip and replay are
+  the desktop's.
+- **The hand fan** overlaps just enough to fit the bench's width, never
+  showing less than 44 px of a card; past that the hand scrolls sideways.
+  The board's slight rotation of the fan is not drawn.
+- **Not covered:** a phone held sideways is wider than 640 px and gets the
+  desktop table, which does not fit 844 x 390.
+- **A sheet's ✕ sits in its corner on every Fractured Fist table.** The
+  theme's buttons are positioned for their slanted box, which had pulled
+  the ✕ into the flow over the title; one rule puts it back, desktop too.
+
 ## 18. Adventurer Olympics (decided 2026-09-30, not built)
 
 The design canvas is `docs/design/adventurer-olympics/` (start with its
