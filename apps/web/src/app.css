@@ -712,10 +712,10 @@ label.option-card { position: relative; padding-right: 40px; }
 .table-shell.phone .strike-fighter.right { top: 0; bottom: auto; animation-name: strike-in-top; }
 .table-shell.phone .strike-fighter.left { top: auto; bottom: 0; animation-name: strike-in-bottom; }
 .table-shell.phone .strike-fighter.struck { animation-name: strike-shake; }
-@keyframes strike-in-top { from { transform: translateY(-130%); } }
-@keyframes strike-in-bottom { from { transform: translateY(130%); } }
-.table-shell.phone .beat-5 .strike-fighter.right { transform: translateY(-130%); }
-.table-shell.phone .beat-5 .strike-fighter.left { transform: translateY(130%); }
+@keyframes strike-in-top { from { transform: translateY(-100vh); } }
+@keyframes strike-in-bottom { from { transform: translateY(100vh); } }
+.table-shell.phone .beat-5 .strike-fighter.right { transform: translateY(-100vh); }
+.table-shell.phone .beat-5 .strike-fighter.left { transform: translateY(100vh); }
 .table-shell.phone .strike-fighter.right .strike-fighter-body { align-items: flex-start; }
 .table-shell.phone .strike-fighter.right .strike-pips { flex-direction: row; }
 .table-shell.phone .strike-shield { left: 50%; right: auto; translate: -50% 0; flex-direction: row; gap: 10px; }

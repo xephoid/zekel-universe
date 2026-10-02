@@ -82,7 +82,7 @@ function Plate({ f, side, big, small, showCounts, watching, lit, onSelect }: {
   );
 }
 
-function Hit({ from, to, name, dir }: { from: Fighter; to: Fighter; name: (f: Fighter) => string; dir: 'down' | 'up' }) {
+function Hit({ from, to, name, dir, phone }: { from: Fighter; to: Fighter; name: (f: Fighter) => string; dir: 'down' | 'up'; phone: boolean }) {
   const who = name(from);
   const whom = name(to);
   const verb = who === 'You' ? 'hit' : 'hits';
@@ -91,9 +91,9 @@ function Hit({ from, to, name, dir }: { from: Fighter; to: Fighter; name: (f: Fi
       <span className={`ff-hit-arrow ${dir}`} aria-hidden="true" />
       <span className="ff-hit-who">{who} {verb} {whom === 'You' ? 'you' : whom}</span>
       {/* A phone has room for the short words only; the label above says it in full. */}
-      <span className="ff-chip damage"><span><b>{from.damageQueued}</b> <span className="ff-long">damage</span><span className="ff-short">dmg</span></span></span>
+      <span className="ff-chip damage"><span><b>{from.damageQueued}</b>{phone ? ' dmg' : ' damage'}</span></span>
       <span className="ff-vs-small" aria-hidden="true">vs</span>
-      <span className="ff-chip defense"><span><b>{to.defenseQueued}</b> <span className="ff-long">defense</span><span className="ff-short">def</span></span></span>
+      <span className="ff-chip defense"><span><b>{to.defenseQueued}</b>{phone ? ' def' : ' defense'}</span></span>
     </div>
   );
 }
@@ -322,9 +322,9 @@ export function FfScreen(props: GameScreenProps) {
       {phone && <p className="ff-phone-counts">{[left, right].filter((f) => !f.self).map(counts).join('  ·  ')}</p>}
       <Row title={big(right) === 'Opponent' ? 'Their played cards' : `${big(right)}'s played cards`} zone={right.zones.played} count={cardCount(right.zones.played)} lit={lit} onSelect={onSelect} phone={phone} />
       <section className="ff-gutter" aria-label="The strike, at the end of the round">
-        <Hit from={right} to={left} name={big} dir="down" />
+        <Hit from={right} to={left} name={big} dir="down" phone={phone} />
         <div className="ff-strike-note"><span className="ff-burst" aria-hidden="true" /><b>Strike</b><span>Both land at round end</span></div>
-        <Hit from={left} to={right} name={big} dir="up" />
+        <Hit from={left} to={right} name={big} dir="up" phone={phone} />
       </section>
       <Row title={left.self ? 'Your played cards' : `${big(left)}'s played cards`} zone={left.zones.played} count={cardCount(left.zones.played)} lit={lit} onSelect={onSelect} phone={phone} />
       {!supplyAsSheet && !sideSlot && supply}

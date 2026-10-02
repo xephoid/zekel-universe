@@ -449,7 +449,7 @@
    Phone-Strike, at 390 x 844. The same table, stacked and smaller; nothing
    scrolls. Every rule below is for `.ff-screen.phone` or `.table-shell.phone`,
    so the desktop table is untouched. */
-.ff-theme .ff-plate-stam-inline, .ff-theme .ff-short { display: none; }
+.ff-theme .ff-plate-stam-inline { display: none; }
 
 /* ---------- the top bar: title, round, the turn, the menu ---------- */
 .table-shell.phone.ff-theme .table-topbar .title { font-size: 16px; }
@@ -462,8 +462,6 @@
 
 /* ---------- the stack ---------- */
 .ff-theme .ff-screen.phone { flex: 1 0 auto; min-height: 0; gap: 7px; }
-.ff-theme .ff-screen.phone .ff-short { display: inline; }
-.ff-theme .ff-screen.phone .ff-long { display: none; }
 
 /* both plates, smaller: the name and stamina, the blocks, the missteps */
 .ff-theme .ff-screen.phone .ff-versus { padding: 8px 10px; gap: 6px; }
