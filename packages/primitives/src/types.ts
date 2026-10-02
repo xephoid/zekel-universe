@@ -37,6 +37,12 @@ export interface CardData {
    * `own` marks the viewer's count so it can be drawn stronger.
    */
   counts?: { label: string; value: number; own?: boolean }[];
+  /** Universe addition: one word stamped across the face (a revealed
+   *  informant's BLOWN), drawn over the art and said to a reader. */
+  stamp?: string;
+  /** Universe addition: words on the back of a face-down card (NO SIGNAL),
+   *  for a card whose back means something the plain back does not say. */
+  backLabel?: string;
 }
 
 /** <zekel-card-zone>: a row, a fan, or a pile of cards. */

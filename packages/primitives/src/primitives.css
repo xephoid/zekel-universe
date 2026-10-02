@@ -443,6 +443,18 @@
 @media (prefers-reduced-motion: reduce) { [data-motion] :is(.zk-track-token.filled, .zk-pool-token) .zk-token-value { animation-name: zk-fade; } }
 [data-motion='reduced'] :is(.zk-track-token.filled, .zk-pool-token) .zk-token-value { animation-name: zk-fade; }
 
+/* A word stamped across a card's face, and words on a card's back. */
+.zk-card-stamp {
+  position: absolute; left: 50%; top: 30%; transform: translate(-50%, -50%) rotate(-12deg); z-index: 2;
+  padding: 1px 6px; border: 2px solid var(--danger); border-radius: 3px; color: var(--danger);
+  font: 700 11px/1.2 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; white-space: nowrap;
+  background: rgba(0, 0, 0, .35); pointer-events: none;
+}
+.zk-card-back-label {
+  position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); text-align: center;
+  font: 600 10px/1.2 var(--font-mono); letter-spacing: .14em; text-transform: uppercase;
+}
+
 /* die */
 .zk-die {
   width: 40px; height: 40px; border-radius: 8px; background: #fff; color: #222;
