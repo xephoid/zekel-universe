@@ -239,13 +239,28 @@
 
 /* The case file: thirteen small slots, the rows side by side as on the
    boards, each filled slot just the person's face over their faction rule. */
-.cn-theme [data-flip-id='cn:case'], .cn-theme [data-flip-id='cn:case'] .zk-zone { --zekel-card-w: 44px; --zekel-card-h: 58px; }
+.cn-theme [data-flip-id='cn:case'], .cn-theme [data-flip-id='cn:case'] .zk-zone { --zekel-card-w: 54px; --zekel-card-h: 80px; }
 .cn-theme [data-flip-id='cn:case'] .zk-tableau-slot { gap: 10px 14px; }
 .cn-theme [data-flip-id='cn:case'] .zk-tableau-slot > * { flex: none; }
 .cn-theme [data-flip-id='cn:case'] .zk-zone-label { font-size: 9px; letter-spacing: .14em; margin-bottom: 3px; }
 .cn-theme [data-flip-id='cn:case'] .zk-zone-row { gap: 4px; flex-wrap: nowrap; }
-.cn-theme [data-flip-id='cn:case'] .layout-portrait .zk-card-pic { flex: 1 1 auto; }
-.cn-theme [data-flip-id='cn:case'] .layout-portrait :is(.zk-card-body, .zk-card-cost, .zk-card-emblem) { display: none; }
+/* Where each person lives is what narrows the city down, so it stays: the
+   face, then "at <home>" in small type. */
+.cn-theme [data-flip-id='cn:case'] .layout-portrait .zk-card-pic { flex: 0 0 52%; }
+.cn-theme [data-flip-id='cn:case'] .layout-portrait :is(.zk-card-label, .zk-card-badges, .zk-card-cost, .zk-card-emblem) { display: none; }
+.cn-theme [data-flip-id='cn:case'] .layout-portrait .zk-card-body { padding: 2px 3px; }
+.cn-theme [data-flip-id='cn:case'] .layout-portrait .zk-card-sub { font-size: 7.5px; line-height: 1.15; -webkit-line-clamp: 3; }
 /* The subway map is laid out for the full board width; the general cap on
    a map's width would squeeze its names together on the watch page. */
 .cn-theme .zones .zone-map { max-width: none; }
+
+/* ---------- motion (build item 7) ----------
+   The motion system moves cards, tokens and the played station's diamond.
+   A revealed informant's camera grab flickers once as it turns up: the
+   picture stutters, the card itself does not fade in. */
+@keyframes cn-grab-flicker {
+  0% { opacity: .2; } 12% { opacity: 1; } 22% { opacity: .35; } 34% { opacity: 1; } 46% { opacity: .6; } 58%, 100% { opacity: 1; }
+}
+.cn-theme .zk-card:has(.zk-card-stamp) .zk-card-art { animation: cn-grab-flicker 520ms steps(1, end) 1; }
+[data-motion='reduced'].cn-theme .zk-card-art, [data-motion='reduced'] .cn-theme .zk-card-art { animation: none; }
+@media (prefers-reduced-motion: reduce) { .cn-theme .zk-card-art { animation: none !important; } }

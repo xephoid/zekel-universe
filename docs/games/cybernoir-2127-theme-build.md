@@ -45,7 +45,21 @@ puts the jail, both seats' counts and the deck in the side column, the case
 first. The Location deck count is in the top bar as the case clock. Who you
 can reach is a list of rows; a tap still offers Arrest and Recruit as the
 engine lists them, rather than buttons on each row. On a 900 px tall window
-with the lesson note open, the clue row scrolls just out of view.
+with the lesson note open, the clue row scrolls just out of view. Item 7,
+motion: `data-flip-from` may now name several origins separated by "|" (the
+first that was on the table wins), and a part marked `data-flip-ghost` flies
+as a copy over the table, as cards do. Hand card ids carry their place, so
+each card names every place it could have held: cards slide along the hand
+when one leaves, and the played station's diamond (`MapNode.markFrom`) flies
+from the card to the station. Discards and the case file fly from the hand, a
+recruited informant from the reach list, a revealed one (Hacker's side) from
+where a face-down one was. Tokens and diamonds are moved by the motion system
+only, so nothing animates on page load. A revealed informant's camera grab
+flickers once; the card itself does not fade. The case file shows each face
+and the line "at <home>" (54 × 80 slots), since where Evidence lives is how
+the Detective narrows the city down.
+
+All seven items are built.
 
 ## Before anything else
 

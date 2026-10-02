@@ -174,6 +174,18 @@ function locationCard(id: string, label: string, locs: Loc[], reference: GameRef
   };
 }
 
+/**
+ * Every id a card of this name could have had in a hand. A hand card's id
+ * carries its place (the engine's moves name a hand card by index), so when
+ * a card leaves, the ones after it get new ids; naming every place lets the
+ * motion system find where each card, or the mark it leaves, was a moment
+ * ago, and fly it from there instead of dropping it in place.
+ */
+const HAND_SPAN = 24;
+function handOrigins(name: string, also: string[] = []): string {
+  return [...Array.from({ length: HAND_SPAN }, (_, j) => `cn:hand:${j}:${name}`), ...also].join('|');
+}
+
 /** The locations a move names, however it names them. */
 function namedLocations(m: LegalMove): string[] {
   const out: string[] = [];
@@ -509,9 +521,13 @@ function evidenceCase(
       ...(p.affiliation && p.affiliation !== 'none' ? [n.affiliation(p.affiliation)] : []),
       ...(p.isWitness ? ['Witness'] : []),
     ];
+    const art = faceUrl(label);
     return {
       id, label,
       colorKey: p.affiliation || 'none',
+      layout: 'portrait',
+      ...(art ? { artUrl: art } : {}),
+      arriveFrom: handOrigins(label),
       ...(p.home ? { subtitle: `at ${p.home}` } : {}),
       ...(p.cost === undefined ? {} : { cost: p.cost }),
       ...(badges.length > 0 ? { badges } : {}),
@@ -714,7 +730,9 @@ function stationMap(
       labelSide: st.side,
       colorKey: l.affiliation || 'none',
       meter: { value: Math.max(0, Math.min(3, l.population ?? 0)), max: 3 },
-      ...(isPlayed ? { mark: 'diamond' as const, markColorKey: 'played' } : isHideout ? { mark: 'frame' as const, markColorKey: 'safehouse' } : {}),
+      // The diamond flies from the card the Detective played and lands on the
+      // station; a seat that never held the card sees it drop.
+      ...(isPlayed ? { mark: 'diamond' as const, markColorKey: 'played', markFrom: handOrigins(l.name) } : isHideout ? { mark: 'frame' as const, markColorKey: 'safehouse' } : {}),
       dim: isOut,
       crossed: isCrossed,
       glow: !isPlayed && !isOut && !isCrossed,
@@ -786,7 +804,10 @@ function informantsFacing(
     ...Array.from({ length: down }, (_, i): CardData => ({
       id: `cn:informant:${i + 1}`, label: `Face-down informant ${i + 1}`, face: 'down', backLabel: 'No signal',
     })),
-    ...revealed.map((who): CardData => ({ ...contactCard(`cn:informant:${who}`, who, people, n, abilities), stamp: 'Blown' })),
+    ...revealed.map((who): CardData => ({
+      ...contactCard(`cn:informant:${who}`, who, people, n, abilities), stamp: 'Blown',
+      arriveFrom: Array.from({ length: 8 }, (_, k) => `cn:informant:${k + 1}`).join('|'),
+    })),
   ];
   return {
     kind: 'card-zone', id: 'cn:informants-facing',
@@ -1039,6 +1060,7 @@ export const cybernoirGlue: GlueModule = {
             // own list only, is stamped NOT IT in their own hand.
             cards: hand.map((h, i) => ({
               ...locationCard(`cn:hand:${i}:${asStr(h)}`, asStr(h), locs, input.reference, name),
+              arriveFrom: handOrigins(asStr(h), ['cn:location-deck']),
               ...(ruledOutNames(view['your_locations_ruled_out']).has(asStr(h)) ? { stamp: 'Not it' } : {}),
             })),
           },
@@ -1057,6 +1079,7 @@ export const cybernoirGlue: GlueModule = {
             const revealed = !!o['revealed'];
             return {
               ...contactCard(`cn:informant:${ORDINALS[i] ?? String(i)}`, asStr(o['person']), people, name, abilities),
+              arriveFrom: personId(asStr(o['person'])),
               subtitle: revealed ? 'revealed to the Hacker' : 'face down to the Hacker',
               ...(revealed ? { stamp: 'Blown' } : {}),
             };
@@ -1073,7 +1096,7 @@ export const cybernoirGlue: GlueModule = {
           kind: 'card-zone', id: 'cn:location-discard',
           data: {
             label: `Locations discarded (${locDiscard.length})`, mode: 'row', size: 'small',
-            cards: locDiscard.map((l, i) => locationCard(`cn:discard:loc:${i}:${l}`, l, locs, input.reference, name)),
+            cards: locDiscard.map((l, i) => ({ ...locationCard(`cn:discard:loc:${i}:${l}`, l, locs, input.reference, name), arriveFrom: handOrigins(l) })),
           },
         });
       }
@@ -1091,7 +1114,12 @@ export const cybernoirGlue: GlueModule = {
             label: 'Your contacts', mode: 'fan',
             groupNames: Object.fromEntries([...new Set([...people.values()].map((p) => p.affiliation).filter(Boolean))]
               .map((a) => [a as string, name.affiliation(a as string)])),
-            cards: hand.map((h, i) => contactCard(`cn:hand:${i}:${asStr(h)}`, asStr(h), people, name, abilities)),
+            // From its old place in the hand, from the discard (taken back),
+            // or from the deck.
+            cards: hand.map((h, i) => ({
+              ...contactCard(`cn:hand:${i}:${asStr(h)}`, asStr(h), people, name, abilities),
+              arriveFrom: [handOrigins(asStr(h)), ...Array.from({ length: HAND_SPAN }, (_, j) => `cn:discard:contact:${j}:${asStr(h)}`), 'cn:contacts-deck'].join('|'),
+            })),
           },
         });
       }
@@ -1138,7 +1166,7 @@ export const cybernoirGlue: GlueModule = {
         kind: 'card-zone', id: 'cn:contacts-discard',
         data: {
           label: `Contacts discarded (${contactDiscard.length})`, mode: 'row', size: 'small',
-          cards: contactDiscard.map((c, i) => contactCard(`cn:discard:contact:${i}:${c}`, c, people, name, abilities)),
+          cards: contactDiscard.map((c, i) => ({ ...contactCard(`cn:discard:contact:${i}:${c}`, c, people, name, abilities), arriveFrom: handOrigins(c) })),
         },
       });
     }

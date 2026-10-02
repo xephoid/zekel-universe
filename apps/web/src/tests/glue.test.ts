@@ -4,7 +4,7 @@
 
 import { describe, expect, it } from 'vitest';
 import type { GameReferenceResponse } from '@universe/shared';
-import type { CardZoneData, MapData, PoolData, TableauData, TrackData } from '@universe/primitives';
+import type { CardData, CardZoneData, MapData, PoolData, TableauData, TrackData } from '@universe/primitives';
 import { GLUES } from '../glue';
 import type { GlueInput, LegalMove, TablePlan, Zone } from '../glue';
 import { readFileSync } from 'node:fs';
@@ -624,6 +624,8 @@ const CN_HIDEOUT_MOVE = {
 
 describe('cybernoir-2127 glue', () => {
   const g = GLUES['cybernoir-2127']!;
+  /** A card as it reads, without where it flies in from (checked on its own). */
+  const face = (c: CardData | undefined) => { const { arriveFrom: _from, ...rest } = c ?? ({} as CardData); return rest; };
   it('puts the rain and neon theme on the table in the seat\'s own voice, the plain city for a watcher, and nothing on another game', () => {
     expect(g.themeFor!(input(CN_VIEW, []))).toBe('cn-theme cn-theme-hacker');
     expect(g.themeFor!(input({ ...CN_VIEW, role: 'detective' }, []))).toBe('cn-theme cn-theme-detective');
@@ -677,7 +679,10 @@ describe('cybernoir-2127 glue', () => {
   it('gives a Contact its cost, its field and what playing it does, without a tooltip', () => {
     const plan = g.plan(input(CN_VIEW, [], { reference: CN_REFERENCE }))!;
     const hand = cards(plan.bench.find((z) => z.id === 'cn:hand'));
-    expect(hand[0]).toEqual({
+    // A card that moved along the hand flies from its old place; a new one
+    // from the discard (taken back) or the deck.
+    expect(hand[0]!.arriveFrom!.split('|')).toEqual(expect.arrayContaining(['cn:hand:3:Blackice', 'cn:discard:contact:0:Blackice', 'cn:contacts-deck']));
+    expect(face(hand[0])).toEqual({
       id: 'cn:hand:0:Blackice', label: 'Blackice', colorKey: 'gang_1',
       layout: 'portrait', costStyle: 'pips',
       artUrl: '/art/cybernoir/blackice-tall.jpg', emblemUrl: '/art/cybernoir/logos/gang_1.svg',
@@ -687,10 +692,10 @@ describe('cybernoir-2127 glue', () => {
     });
     // The Weapon is in the Contacts deck but not among the people; it is drawn
     // as itself rather than given facts it does not have.
-    expect(hand[1]).toEqual({ id: 'cn:hand:1:The Weapon', label: 'The Weapon', colorKey: 'none' });
+    expect(face(hand[1])).toEqual({ id: 'cn:hand:1:The Weapon', label: 'The Weapon', colorKey: 'none' });
     // A Witness says so, and its ability line would only repeat the badge.
     const witness = g.plan(input({ ...CN_VIEW, hand: ['Eddie the Doorman'] }, [], { reference: CN_REFERENCE }))!;
-    expect(cards(witness.bench.find((z) => z.id === 'cn:hand'))[0])
+    expect(face(cards(witness.bench.find((z) => z.id === 'cn:hand'))[0]))
       .toEqual({
         id: 'cn:hand:0:Eddie the Doorman', label: 'Eddie the Doorman', layout: 'portrait', costStyle: 'pips',
         artUrl: '/art/cybernoir/eddie_the_doorman-tall.jpg', emblemUrl: '/art/cybernoir/logos/witness.svg',
@@ -764,7 +769,8 @@ describe('cybernoir-2127 glue', () => {
     const plan = g.plan(input(det, [], { reference: CN_REFERENCE }))!;
     // A Location is a station sign and shows who lives there: residents are
     // what playing it reaches.
-    expect(cards(plan.bench.find((z) => z.id === 'cn:hand'))[0]).toEqual({
+    expect(cards(plan.bench.find((z) => z.id === 'cn:hand'))[0]!.arriveFrom).toMatch(/cn:hand:1:The Junction\|.*cn:location-deck$/);
+    expect(face(cards(plan.bench.find((z) => z.id === 'cn:hand'))[0])).toEqual({
       id: 'cn:hand:0:The Junction', label: 'The Junction', colorKey: 'gang_1',
       layout: 'sign', code: 'ICE', groupKey: 'boonies', subtitle: 'Boonies',
       meter: { value: 2, max: 3 },
@@ -832,9 +838,12 @@ describe('cybernoir-2127 glue', () => {
     };
     const rows = (g.plan(input(played, [], { reference: CN_REFERENCE }))!.points as { children?: Zone[] }).children!;
     const witnesses = cards(rows.find((r) => r.id === 'cn:case:witnesses'));
-    // Where they live is the fact that narrows nineteen locations down.
-    expect(witnesses[0]).toEqual({
-      id: 'cn:ev:witness:Eddie the Doorman', label: 'Eddie the Doorman',
+    // Where they live is the fact that narrows nineteen locations down. The
+    // face shows in the slot, and the card flies in from the Hacker's hand.
+    expect(witnesses[0]!.arriveFrom).toContain('cn:hand:0:Eddie the Doorman');
+    expect(face(witnesses[0])).toEqual({
+      id: 'cn:ev:witness:Eddie the Doorman', label: 'Eddie the Doorman', layout: 'portrait',
+      artUrl: '/art/cybernoir/eddie_the_doorman-tall.jpg',
       colorKey: 'none', subtitle: 'at Xistential Club', cost: 0, badges: ['Witness'],
     });
     const motive = cards(rows.find((r) => r.id === 'cn:case:motive_set_1'));
