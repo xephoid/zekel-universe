@@ -598,6 +598,18 @@ const CN_REFERENCE: GameReferenceResponse = {
   },
 };
 
+// The same city with one place the subway map has no spot for.
+const CN_UNMAPPED_REFERENCE: GameReferenceResponse = {
+  ...CN_REFERENCE,
+  referenceData: {
+    ...(CN_REFERENCE.referenceData as Record<string, unknown>),
+    locations: [
+      ...(CN_REFERENCE.referenceData as { locations: unknown[] }).locations,
+      { name: 'Somewhere New', borough: 'boonies', population: 1, affiliation: 'none' },
+    ],
+  },
+};
+
 // The setup phase, before the Hacker has hidden: no board, no hand, and one
 // legal move with a blank for the location name.
 const CN_SETUP_VIEW = {
@@ -641,20 +653,21 @@ describe('cybernoir-2127 glue', () => {
     expect(junction.colorKey).toBe('gang_1');
     expect(map.nodes.find((n) => n.id === 'cn:loc:dark-city-central-station')!.badges)
       .toEqual(['played', '3 residents']);
-    // The bands carry the printed borough names: "Gang 1" is an alias the
-    // engine happens to list, not a faction's name, and no id reaches the eye.
+    // The borough columns carry the printed borough names: "Gang 1" is an
+    // alias the engine happens to list, not a faction's name, and no id
+    // reaches the eye.
     expect(map.areas!.map((a) => [a.key, a.label, a.note])).toEqual([
-      ['downtown', 'Downtown', '2 locations'],
-      ['boonies', 'Boonies', '2 locations'],
+      ['downtown', 'Downtown', 'neon & concrete'],
+      ['boonies', 'Boonies', 'off the grid'],
     ]);
-    expect(map.nodeShape).toBe('pill');
+    expect(map.nodeShape).toBe('station');
     expect(JSON.stringify(plan)).not.toContain('Gang ');
     // Without the reference data there is no name to print, so the id is put
     // into words rather than shown raw — and never guessed at.
     const bare = g.plan(input(CN_VIEW, [], { reference: { ...CN_REFERENCE, referenceData: { locations: (CN_REFERENCE.referenceData as { locations: unknown[] }).locations } } }))!;
     const bareMap = bare.board.find((z) => z.kind === 'map')!.data as MapData;
     expect(bareMap.areas!.map((a) => a.label)).toEqual(['Downtown', 'Boonies']);
-    expect(map.nodes.find((n) => n.id === 'cn:loc:the-junction')!.pieces).toEqual([{ label: 'safehouse', colorKey: 'safehouse' }]);
+    expect(junction).toMatchObject({ mark: 'frame', markColorKey: 'safehouse' });
     expect(ids(plan.bench)).toEqual(['cn:hacker', 'cn:hand']);
     expect(plan.board.find((z) => z.id === 'cn:evidence')).toBeUndefined();
   });
@@ -795,15 +808,16 @@ describe('cybernoir-2127 glue', () => {
     const plan = g.plan(input(CN_VIEW, [], { reference: CN_REFERENCE }))!;
     const map = plan.board.find((z) => z.kind === 'map')!.data as MapData;
     const played = map.nodes.find((n) => n.id === 'cn:loc:dark-city-central-station')!;
-    // Played is what happened to it, not what it is: the faction colour stays.
+    // Played is what happened to it, not what it is: the faction colour stays,
+    // and the red diamond says it was played.
     expect(played.colorKey).toBe('none');
-    expect(played.dim).toBe(true);
+    expect(played).toMatchObject({ mark: 'diamond', markColorKey: 'played', dim: false, glow: false });
     // A reader hears everything colour and position are carrying.
     expect(map.nodes.find((n) => n.id === 'cn:loc:the-junction')!.describedAs)
       .toBe('The Junction, Boonies, 2 residents, Iceden Collective, your safehouse');
     expect(played.describedAs).toContain('played');
     // And the colours say what they mean.
-    expect(map.legend!.map((k) => k.label)).toEqual(['No faction', 'Crimson Clan', 'OmniSuperUltra Corp', 'Iceden Collective']);
+    expect(map.legend!.filter((k) => !k.shape).map((k) => k.label)).toEqual(['No faction', 'Crimson Clan', 'OmniSuperUltra Corp', 'Iceden Collective']);
     expect(map.inspectable).toBe(true);
 
     // The clues sit right under the city, not below everything else.
@@ -811,8 +825,14 @@ describe('cybernoir-2127 glue', () => {
   });
 
   it('gives the city the height the table has left, and bands the short panels under it', () => {
-    const plan = g.plan(input(CN_VIEW, [], { reference: CN_REFERENCE }))!;
+    const subway = g.plan(input(CN_VIEW, [], { reference: CN_REFERENCE }))!.board.find((z) => z.id === 'cn:map')!.data as MapData;
+    expect(subway.fill).toEqual({ minHeight: 300 });
+    expect(subway.aspect).toBeUndefined();
+    // A location the subway map has no place for keeps the whole city in the
+    // plain bands rather than guessing where to draw it.
+    const plan = g.plan(input(CN_VIEW, [], { reference: CN_UNMAPPED_REFERENCE }))!;
     const map = plan.board.find((z) => z.id === 'cn:map')!.data as MapData;
+    expect(map.nodeShape).toBe('pill');
     // The city asks for the room that is there. Working its height out from
     // its width is what pushed the bottom borough behind the action bar on a
     // wide window, so there is no aspect to fall back on.
@@ -830,6 +850,52 @@ describe('cybernoir-2127 glue', () => {
     // The three short panels share one band instead of taking a row each.
     const band = plan.board.filter((z) => z.span === 'row').map((z) => z.id);
     expect(band).toEqual(['cn:clues', 'cn:not-clues', 'cn:jail']);
+  });
+
+  it("draws the city as a subway map: a line per faction, each station marked from its own seat's view only", () => {
+    const map = (view: Record<string, unknown>) =>
+      g.plan(input(view, [], { reference: CN_REFERENCE }))!.board.find((z) => z.id === 'cn:map')!.data as MapData;
+    const node = (m: MapData, name: string) => m.nodes.find((n) => n.id === `cn:loc:${name}`)!;
+    const outs = {
+      // Public: a clue rules out Shipyard (Central Station and the Club are played).
+      locations_ruled_out: [{ location_name: 'Shipyard', reason: 'NOT OmniSuperUltra Corp' }],
+      // The Detective's own: they have held The Junction. The engine sends this to them alone.
+      your_locations_ruled_out: [
+        { location_name: 'Shipyard', reason: 'NOT OmniSuperUltra Corp' },
+        { location_name: 'The Junction', reason: 'in your discard' },
+      ],
+    };
+    const det = map({ ...CN_VIEW, ...outs, role: 'detective', hideout: null, location_hand: [] });
+    expect(node(det, 'shipyard')).toMatchObject({ dim: true, crossed: false, glow: false });
+    expect(node(det, 'the-junction')).toMatchObject({ dim: false, crossed: true, glow: false });
+    expect(node(det, 'the-junction').describedAs).toContain('ruled out: in your discard');
+    expect(node(det, 'xistential-club')).toMatchObject({ mark: 'diamond', dim: false, crossed: false, glow: false });
+    expect(det.nodes.some((n) => n.mark === 'frame')).toBe(false);
+
+    // The Hacker's view never crosses anything off, even if a list arrived.
+    const hak = map({ ...CN_VIEW, ...outs });
+    expect(node(hak, 'the-junction')).toMatchObject({ crossed: false, glow: true, mark: 'frame' });
+    expect(node(hak, 'shipyard').dim).toBe(true);
+    expect(hak.legend!.some((k) => k.shape === 'crossed')).toBe(false);
+    expect(det.legend!.some((k) => k.shape === 'frame')).toBe(false);
+
+    // Lines: one per faction on the table, decoration only, inside the board.
+    expect(hak.lines!.map((l) => l.key).sort()).toEqual(['corp_1', 'gang_1', 'gang_2', 'none']);
+    for (const l of hak.lines!) {
+      expect(l.colorKey).toBe(l.key);
+      for (const p of l.points) { expect(p.x).toBeGreaterThanOrEqual(0); expect(p.x).toBeLessThanOrEqual(100); }
+    }
+    expect(hak.legendNote).toMatch(/Nobody travels on them/);
+    // Short names on the map; the full printed name is what a reader hears.
+    expect(node(hak, 'dark-city-central-station').label).toBe('Central Station');
+    expect(node(hak, 'dark-city-central-station').describedAs).toMatch(/^Dark City Central Station, Downtown, 3 residents/);
+    expect(node(hak, 'dark-city-central-station').meter).toEqual({ value: 3, max: 3 });
+    // Every station stands inside its own borough's column.
+    for (const n of hak.nodes) {
+      const col = hak.areas!.find((a) => a.key === n.area)!;
+      expect(n.x).toBeGreaterThan(col.x!);
+      expect(n.x).toBeLessThan(col.x! + col.width!);
+    }
   });
 
   it('shows what a location is when there is no move behind it', () => {
@@ -1308,7 +1374,7 @@ describe('cybernoir-2127 glue', () => {
   it("names the Hacker's own safehouse on the map and in their panel, and marks nothing when the view will not name it", () => {
     const named = g.plan(input(CN_VIEW, [], { reference: CN_REFERENCE }))!;
     const namedMap = named.board.find((z) => z.kind === 'map')!.data as MapData;
-    expect(namedMap.nodes.find((n) => n.id === 'cn:loc:the-junction')!.pieces).toEqual([{ label: 'safehouse', colorKey: 'safehouse' }]);
+    expect(namedMap.nodes.filter((n) => n.mark === 'frame').map((n) => n.id)).toEqual(['cn:loc:the-junction']);
     const panel = (z: TablePlan) => (z.bench.find((b) => b.id === 'cn:hacker')!.data as TableauData).stats!;
     expect(panel(named).find((st) => st.label === 'Safehouse')!.value).toBe('The Junction');
 
@@ -1317,13 +1383,13 @@ describe('cybernoir-2127 glue', () => {
     const factsOnly = { ...CN_VIEW, hideout: { location_name: null, borough: 'boonies', population: 2, affiliation: 'gang_1' } };
     const quiet = g.plan(input(factsOnly, [], { reference: CN_REFERENCE }))!;
     const quietMap = quiet.board.find((z) => z.kind === 'map')!.data as MapData;
-    expect(quietMap.nodes.every((n) => (n.pieces ?? []).length === 0)).toBe(true);
+    expect(quietMap.nodes.some((n) => n.mark === 'frame')).toBe(false);
     expect(panel(quiet).find((st) => st.label === 'Safehouse')!.value).toBe('Boonies · Iceden Collective');
 
     // The Detective's view carries no hideout at all: no mark, no stat.
     const det = g.plan(input({ ...CN_VIEW, role: 'detective', hideout: null, location_hand: [] }, [], { reference: CN_REFERENCE }))!;
     const detMap = det.board.find((z) => z.kind === 'map')!.data as MapData;
-    expect(detMap.nodes.every((n) => (n.pieces ?? []).length === 0)).toBe(true);
+    expect(detMap.nodes.some((n) => n.mark === 'frame')).toBe(false);
     expect((det.side.find((z) => z.id === 'cn:hacker')!.data as TableauData).stats!.some((st) => st.label === 'Safehouse')).toBe(false);
   });
 

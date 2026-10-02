@@ -125,3 +125,18 @@
    The line colours are bright, so a station's name is dark on its colour. */
 .cn-theme .zk-map-blob { border-color: rgba(0, 0, 0, .55); }
 .cn-theme .zk-map-blob-name { color: var(--cn-ground); text-shadow: none; font-family: var(--cn-sign); font-weight: 700; }
+
+/* ---------- the subway map (build item 2) ----------
+   Columns are faint panels, the rings sit on the asphalt, the lines are
+   muted so the stations carry the light. */
+.cn-theme .zk-stationmap { background: var(--cn-ground); border-color: var(--cn-rule); --bg-raised: var(--cn-ground); --station-head: 24px; }
+.cn-theme .zk-station-area { background: rgba(255, 255, 255, .015); border-color: var(--cn-rule); border-radius: 12px; }
+.cn-theme .zk-station-area-head .zk-map-area-name {
+  font: 700 12px/1 var(--cn-sign); letter-spacing: .14em; text-transform: uppercase; color: var(--cn-text);
+}
+.cn-theme .zk-station-area-head .zk-map-area-note { font: 400 10px/1 var(--font-mono); color: var(--cn-muted); opacity: 1; }
+.cn-theme .zk-station-lines polyline { opacity: .32; }
+.cn-theme .zk-station-name { font-family: var(--cn-sign); font-weight: 600; color: var(--cn-muted); }
+.cn-theme .zk-station.glow .zk-station-name { font-weight: 700; color: var(--cn-text); }
+.cn-theme .zk-station.crossed .zk-station-name { text-decoration-color: var(--cn-stamp); }
+.cn-theme .zk-map-legend { color: var(--cn-muted); }

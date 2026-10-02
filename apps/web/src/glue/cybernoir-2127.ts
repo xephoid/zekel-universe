@@ -9,6 +9,7 @@ import type { CardData, MapNode, TableauData } from '@universe/primitives';
 import type { GameReferenceResponse } from '@universe/shared';
 import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, PlanPrompt, PromptAction, SelectEvent, SetupField, TablePlan, Zone, SetupAnswers, SetupSeat } from './types';
 import { asArr, asNum, asStr, isObj, shapeHas, words } from './types';
+import { BOROUGH_COLUMNS, LINES, STATIONS, columnOf, pct } from './cn/metro';
 import './cn/cn.css';
 
 /**
@@ -649,6 +650,102 @@ export function locId(name: string): string {
 
 const ORDINALS = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth'];
 
+/** The engine's location names for one list of ruled-out reasons. */
+function ruledOutNames(list: unknown): Set<string> {
+  return new Set(asArr(list).filter(isObj).map((r) => asStr(r['location_name'])).filter(Boolean));
+}
+
+/**
+ * The city as a subway map (docs/games/cybernoir-2127-theme-build.md, item 2):
+ * three borough columns, each faction a line through its own locations, and
+ * every location a station with its name and a 0–3 population bar. Null when
+ * a location has no place on the map, so the table falls back to the bands.
+ *
+ * A station's state comes only from the seat's own view:
+ * - played (public, on the board): a red diamond in place of the ring;
+ * - ruled out by a clue (public, the engine's `locations_ruled_out`): faded;
+ * - crossed off (the Detective's own `your_locations_ruled_out`, which the
+ *   engine sends to no one else): a dashed ring and a struck name;
+ * - the safehouse (the Hacker's own `hideout`): an ice diamond round it;
+ * - anything else is still possible, and its ring glows.
+ */
+function stationMap(
+  locs: Loc[], view: Record<string, unknown>, role: string, hideout: string, played: Set<string>, n: Names,
+): Zone | null {
+  if (locs.length === 0 || !locs.every((l) => STATIONS[l.name] && columnOf(l.borough))) return null;
+  const publicOut = ruledOutNames(view['locations_ruled_out']);
+  const ownOut = role === 'detective' ? ruledOutNames(view['your_locations_ruled_out']) : new Set<string>();
+  const reasons = ruledOutReasons(view);
+  const boroughs = [...new Set(locs.map((l) => l.borough))];
+  const affiliations = [...new Set(locs.map((l) => l.affiliation || 'none'))];
+
+  const nodes: MapNode[] = locs.map((l) => {
+    const st = STATIONS[l.name]!;
+    const isPlayed = played.has(l.name);
+    const isOut = !isPlayed && publicOut.has(l.name);
+    const isCrossed = !isPlayed && !isOut && ownOut.has(l.name);
+    const isHideout = role === 'hacker' && hideout === l.name;
+    return {
+      id: locId(l.name),
+      label: st.short,
+      area: l.borough,
+      ...pct(st.x, st.y),
+      labelSide: st.side,
+      colorKey: l.affiliation || 'none',
+      meter: { value: Math.max(0, Math.min(3, l.population ?? 0)), max: 3 },
+      ...(isPlayed ? { mark: 'diamond' as const, markColorKey: 'played' } : isHideout ? { mark: 'frame' as const, markColorKey: 'safehouse' } : {}),
+      dim: isOut,
+      crossed: isCrossed,
+      glow: !isPlayed && !isOut && !isCrossed,
+      describedAs: [
+        l.name,
+        n.borough(l.borough),
+        residentCount(l.population),
+        l.affiliation && l.affiliation !== 'none' ? n.affiliation(l.affiliation) : 'no faction',
+        isPlayed ? 'played' : '',
+        isOut || isCrossed ? `ruled out: ${reasons.get(l.name) ?? 'by a clue'}` : '',
+        isHideout ? 'your safehouse' : '',
+      ].filter(Boolean).join(', '),
+      badges: [
+        ...(isPlayed ? ['played'] : []),
+        ...(isOut || isCrossed ? ['ruled out'] : []),
+        ...(isHideout ? ['safehouse'] : []),
+        residentCount(l.population),
+      ].filter(Boolean),
+    };
+  });
+
+  const out = reasons.size;
+  return {
+    kind: 'map', id: 'cn:map',
+    data: {
+      label: `The city · ${locs.length} locations · ${locs.length - out} still standing`,
+      fill: { minHeight: 300 }, nodeShape: 'station', nodes,
+      inspectable: true,
+      areas: boroughs.map((b) => ({
+        key: b,
+        label: n.borough(b),
+        note: BOROUGH_COLUMNS[b]!.tagline,
+        y: 0, height: 100,
+        ...columnOf(b)!,
+      })),
+      lines: affiliations.filter((a) => LINES[a]).map((a) => ({
+        key: a, colorKey: a, label: a === 'none' ? 'No faction' : n.affiliation(a),
+        points: LINES[a]!.map(([x, y]) => pct(x, y)),
+      })),
+      legend: [
+        ...affiliations.map((a) => ({ colorKey: a, label: a === 'none' ? 'No faction' : n.affiliation(a) })),
+        { colorKey: 'none', label: 'Still possible', shape: 'glow' as const },
+        { colorKey: 'played', label: 'Played', shape: 'diamond' as const },
+        { colorKey: 'none', label: 'Ruled out by a clue', shape: 'faded' as const },
+        ...(role === 'detective' ? [{ colorKey: 'none', label: 'Crossed off (you have seen it)', shape: 'crossed' as const }] : []),
+        ...(role === 'hacker' ? [{ colorKey: 'safehouse', label: 'Your safehouse', shape: 'frame' as const }] : []),
+      ],
+      legendNote: 'Each line is a faction and shows who owns a place. Nobody travels on them.',
+    },
+  };
+}
+
 export const cybernoirGlue: GlueModule = {
   gameId: 'cybernoir-2127',
   title: 'Cybernoir 2127',
@@ -739,8 +836,11 @@ export const cybernoirGlue: GlueModule = {
       });
     });
 
+    // The rain and neon theme draws the city as a subway map when it knows
+    // where every location stands; a location it has no place for keeps the
+    // whole city in the plain bands above, rather than guessing a spot.
     const board: Zone[] = [
-      {
+      stationMap(locs, view, role, hideout, played, name) ?? {
         kind: 'map', id: 'cn:map',
         data: {
           label: `The city · ${locs.length} locations · ${locs.length - crossedOff.size} still standing`,

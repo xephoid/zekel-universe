@@ -10,8 +10,14 @@ verb bar, who you can reach, upkeep and block panels, hands that grow) is
 already built; this pass changes how those pieces look and adds the map and
 the portraits. It moves no rule and adds no new move.
 
-Built so far: item 1, the theme hook, with Chakra Petch, Special Elite and
-Share Tech Mono self-hosted (2026-10-02).
+Built so far (2026-10-02): item 1, the theme hook, with Chakra Petch, Special
+Elite and Share Tech Mono self-hosted; item 2, the subway map. The map is a
+new station mode of the map primitive (`nodeShape: 'station'`, with `lines`,
+column `areas` and per-station marks); its positions are in
+`apps/web/src/glue/cn/metro.ts`, taken from `Metro-Map.dc.html` with the table
+board's short names. The table stretches the map to the room it has, as the
+table boards do, so the bends are 45° only at the design's proportions. Below
+300 px tall the names collide, so the map stops shrinking there.
 
 ## Before anything else
 

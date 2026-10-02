@@ -58,7 +58,8 @@ test('two signed-in humans at one Cybernoir table, each seeing only their own pr
     b.locator('.turn-pill', { hasText: /^Your move/ }).waitFor({ state: 'visible', timeout: 30_000 }).then(() => false),
   ]).catch(() => false);
   if (asked) {
-    await a.locator('.zk-map-blob.zk-lit').first().click();
+    // A lit place on the city map: a station on the subway map, a pill on the plain one.
+    await a.locator('.zk-map .zk-lit[role="button"]').first().click();
     await a.getByRole('button', { name: 'Hide here' }).click();
   }
 
