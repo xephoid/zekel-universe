@@ -3,6 +3,8 @@
 **Built 2026-09-29** on the branch `ff-arcade-theme`, items 1 to 6 in order,
 one commit each. Item 2 went the game-drawn-screen way (the owner's pick);
 what the build decided is in `docs/implementation-plan.md`, section 17.
+Item 7, the phone, was built on 2026-10-02; its decisions are in the same
+section, under "The phone".
 
 Status 2026-09-29. Written for whoever implements the next Fractured Fist
 table pass. It builds on [fractured-fist-build.md](fractured-fist-build.md),
@@ -196,7 +198,7 @@ lanes run together; a fully blocked hit shows "Blocked!"; lost blocks break
 off one at a time; K.O. hands over to the end panel; pace, skip and replay
 work; reduced motion still works.
 
-**7. The phone (added 2026-10-02, not built).** The owner brought the phone
+**7. The phone (added and built 2026-10-02).** The owner brought the phone
 layout forward for Fractured Fist only; the brief's later phone pass still
 holds for everything else. The boards are the six `Phone-*` files in the
 canvas folder, at 390 × 844. Build it inside `FfScreen` and `ff.css` for
