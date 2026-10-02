@@ -136,8 +136,10 @@ export interface TrackSpace {
   index: number | string;
   label?: string;
   filled?: boolean;
-  /** Pieces standing ON the space (pawns): theme-colored dots. */
-  pieces?: { label: string; colorKey?: string }[];
+  /** Pieces standing ON the space (pawns): theme-colored dots. Universe
+   *  addition: on a `named` track, `artUrl` draws a small picture beside the
+   *  name (who is in a jail cell). */
+  pieces?: { label: string; colorKey?: string; artUrl?: string }[];
 }
 
 /** <zekel-track>: a line or ring of spaces. */

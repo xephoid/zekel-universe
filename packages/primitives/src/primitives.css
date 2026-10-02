@@ -508,6 +508,10 @@
 .layout-sign .zk-card-stamp { top: auto; left: auto; right: 8px; bottom: 10px; transform: rotate(-8deg); }
 .zk-card-face-pic { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; background: #000; border: 1px solid var(--border); flex: none; }
 
+/* A named piece with its picture (who is in a jail cell). */
+.zk-track-card.has-art { display: inline-flex; align-items: center; gap: 6px; }
+.zk-track-card-art { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; flex: none; background: #000; }
+
 /* die */
 .zk-die {
   width: 40px; height: 40px; border-radius: 8px; background: #fff; color: #222;

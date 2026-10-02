@@ -493,8 +493,11 @@ export function Track({ id, data, lit, onSelect, className, style }: PrimitivePr
                   <div className="zk-track-slot-name">{s.index}</div>
                   {(s.pieces ?? []).length > 0
                     ? (s.pieces ?? []).map((p) => (
-                      <span key={p.label} className="zk-track-card" data-flip-id={`${id}:piece:${p.label}`}
-                        style={{ borderLeftColor: themeColor(p.colorKey ?? p.label) }}>{p.label}</span>
+                      <span key={p.label} className={cx('zk-track-card', p.artUrl && 'has-art')} data-flip-id={`${id}:piece:${p.label}`}
+                        style={{ borderLeftColor: themeColor(p.colorKey ?? p.label) }}>
+                        {p.artUrl && <img className="zk-track-card-art" src={p.artUrl} alt="" />}
+                        {p.label}
+                      </span>
                     ))
                     : <span className="zk-track-slot-empty">{s.label ?? 'empty'}</span>}
                 </div>
