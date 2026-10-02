@@ -146,6 +146,9 @@
 /* ---------- sheets over the table ---------- */
 .ff-theme .sheet { background: var(--ff-panel); color: var(--ff-text); border: 2px solid #000; border-radius: var(--ff-radius); box-shadow: var(--shadow-pop); }
 .ff-theme .sheet h2 { font: italic 800 28px/1 var(--ff-display); letter-spacing: .02em; text-transform: uppercase; }
+/* The theme's buttons are position: relative (for the slanted box behind
+   them), which would pull a sheet's ✕ out of its corner and into the flow. */
+.ff-theme .sheet .close { position: absolute; }
 .ff-theme .sheet-backdrop { background: rgba(8, 7, 10, .72); }
 .ff-theme .rules-text { background: var(--ff-ground); border: 2px solid #000; border-radius: var(--ff-radius); }
 .ff-theme .end-panel h2 { font: italic 800 44px/1 var(--ff-display); text-transform: uppercase; }
@@ -327,14 +330,14 @@
    in italic capitals, a strip of the card's art, the effects as chips; a
    resource shows what it is worth top right. The corner's color comes from
    the card's color key, published by the table from the glue's palette. */
-.ff-theme :is(.zk-card, .zk-card-row) { --ff-corner: var(--zekel-c-technique, #2A74B8); --ff-ink: #111; }
-.ff-theme :is(.zk-card, .zk-card-row)[data-color-key='resource'] { --ff-corner: var(--zekel-c-resource, #F2E53A); }
-.ff-theme :is(.zk-card, .zk-card-row)[data-color-key='starter'] { --ff-corner: var(--zekel-c-starter, #19A58B); }
-.ff-theme :is(.zk-card, .zk-card-row)[data-color-key='misstep'] { --ff-corner: var(--zekel-c-misstep, #111); --ff-ink: var(--ff-text); }
-.ff-theme :is(.zk-card, .zk-card-row)[data-color-key='masters-circle'] { --ff-corner: var(--zekel-c-masters-circle); --ff-ink: var(--zekel-c-ink-masters-circle); }
-.ff-theme :is(.zk-card, .zk-card-row)[data-color-key='uncounted'] { --ff-corner: var(--zekel-c-uncounted); --ff-ink: var(--zekel-c-ink-uncounted); }
-.ff-theme :is(.zk-card, .zk-card-row)[data-color-key='titan-entertainment'] { --ff-corner: var(--zekel-c-titan-entertainment); --ff-ink: var(--zekel-c-ink-titan-entertainment); }
-.ff-theme :is(.zk-card, .zk-card-row)[data-color-key='the-awakened'] { --ff-corner: var(--zekel-c-the-awakened); --ff-ink: var(--zekel-c-ink-the-awakened); }
+.ff-theme :is(.zk-card, .zk-card-row, .ff-printed) { --ff-corner: var(--zekel-c-technique, #2A74B8); --ff-ink: #111; }
+.ff-theme :is(.zk-card, .zk-card-row, .ff-printed)[data-color-key='resource'] { --ff-corner: var(--zekel-c-resource, #F2E53A); }
+.ff-theme :is(.zk-card, .zk-card-row, .ff-printed)[data-color-key='starter'] { --ff-corner: var(--zekel-c-starter, #19A58B); }
+.ff-theme :is(.zk-card, .zk-card-row, .ff-printed)[data-color-key='misstep'] { --ff-corner: var(--zekel-c-misstep, #111); --ff-ink: var(--ff-text); }
+.ff-theme :is(.zk-card, .zk-card-row, .ff-printed)[data-color-key='masters-circle'] { --ff-corner: var(--zekel-c-masters-circle); --ff-ink: var(--zekel-c-ink-masters-circle); }
+.ff-theme :is(.zk-card, .zk-card-row, .ff-printed)[data-color-key='uncounted'] { --ff-corner: var(--zekel-c-uncounted); --ff-ink: var(--zekel-c-ink-uncounted); }
+.ff-theme :is(.zk-card, .zk-card-row, .ff-printed)[data-color-key='titan-entertainment'] { --ff-corner: var(--zekel-c-titan-entertainment); --ff-ink: var(--zekel-c-ink-titan-entertainment); }
+.ff-theme :is(.zk-card, .zk-card-row, .ff-printed)[data-color-key='the-awakened'] { --ff-corner: var(--zekel-c-the-awakened); --ff-ink: var(--zekel-c-ink-the-awakened); }
 
 .ff-theme .zk-card { border-radius: 5px; font-family: var(--font-body); }
 .ff-theme .zk-card-face {
@@ -443,3 +446,203 @@
 .ff-theme .strike-caption { background: #0b0a0d; border: 2px solid #000; box-shadow: var(--ff-shadow); color: var(--ff-text); }
 .ff-theme .strike-controls { justify-content: flex-end; }
 .ff-theme .strike-controls .muted { font: 700 11px var(--ff-display); letter-spacing: .1em; text-transform: uppercase; }
+
+/* ================= the phone (build item 7) =================
+   Phone-Technique, Phone-Channel, Phone-Supply, Phone-Card, Phone-Menu and
+   Phone-Strike, at 390 x 844. The same table, stacked and smaller; nothing
+   scrolls. Every rule below is for `.ff-screen.phone` or `.table-shell.phone`,
+   so the desktop table is untouched. */
+.ff-theme .ff-plate-stam-inline { display: none; }
+
+/* ---------- the top bar: title, round, the turn, the menu ---------- */
+.table-shell.phone.ff-theme .table-topbar .title { font-size: 16px; }
+.ff-theme .round-tag { position: relative; isolation: isolate; padding: 3px 8px; color: #111; font: 800 12px/1 var(--ff-display); letter-spacing: .08em; text-transform: uppercase; }
+.ff-theme .round-tag::before { content: ''; position: absolute; inset: 0; z-index: -1; transform: skewX(-12deg); background: var(--ff-hi); border: 2px solid #000; }
+.table-shell.phone.ff-theme .turn-pill { padding: 6px 12px; font-size: 14px; }
+.table-shell.phone.ff-theme .table-menu-btn { border-color: rgba(255, 255, 255, .22); color: var(--ff-text); }
+.table-shell.phone.ff-theme .table-board { padding: 8px 12px 0; gap: 7px; overflow-x: hidden; }
+.table-shell.phone.ff-theme .table-play > .lesson-note { top: 8px; left: 12px; right: 12px; width: auto; }
+
+/* ---------- the stack ---------- */
+.ff-theme .ff-screen.phone { flex: 1 0 auto; min-height: 0; gap: 7px; }
+
+/* both plates, smaller: the name and stamina, the blocks, the missteps */
+.ff-theme .ff-screen.phone .ff-versus { padding: 8px 10px; gap: 6px; }
+.ff-theme .ff-screen.phone :is(.ff-plate-badge, .ff-plate-discard, .ff-plate-counts, .ff-plate-sub, .ff-plate-stam, .ff-plate-head .ff-tag) { display: none; }
+.ff-theme .ff-screen.phone .ff-plate { gap: 0; }
+.ff-theme .ff-screen.phone .ff-plate-body { gap: 5px; }
+.ff-theme .ff-screen.phone .ff-plate-head { gap: 6px; flex-wrap: nowrap; }
+.ff-theme .ff-screen.phone .ff-plate-name { font-size: 15px; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.ff-theme .ff-screen.phone .ff-plate-stam-inline { display: inline-flex; align-items: baseline; gap: 2px; font: 700 10px/1 var(--ff-display); letter-spacing: .08em; color: var(--ff-muted); }
+.ff-theme .ff-screen.phone .ff-plate.right .ff-plate-stam-inline { flex-direction: row-reverse; }
+.ff-theme .ff-screen.phone .ff-plate-stam-inline b { font: italic 800 22px/1 var(--ff-display); color: var(--ff-hi); }
+.ff-theme .ff-screen.phone .ff-blocks .zk-track { gap: 2px; }
+.ff-theme .ff-screen.phone .ff-blocks .zk-track-cell { width: 17px; height: 13px; transform: skewX(-12deg); }
+.ff-theme .ff-screen.phone .ff-missteps { gap: 5px; white-space: nowrap; }
+.ff-theme .ff-screen.phone .ff-missteps .ff-kicker { font-size: 9px; }
+.ff-theme .ff-screen.phone .ff-ticks .zk-track { gap: 1px; }
+.ff-theme .ff-screen.phone .ff-ticks .zk-track-cell { width: 5px; height: 4px; }
+.ff-theme .ff-screen.phone .ff-missteps b { font-size: 11px; }
+.ff-theme .ff-screen.phone .ff-vs { width: 36px; height: 36px; font-size: 13px; }
+.ff-theme .ff-phone-counts { margin: -1px 0 0; text-align: right; font: 700 10px/1.2 var(--ff-display); letter-spacing: .08em; text-transform: uppercase; color: var(--ff-muted); }
+
+/* the played rows: cards about 62 x 88, name and art */
+.ff-theme .ff-screen.phone .ff-row { gap: 4px; --zekel-card-w: 62px; --zekel-card-h: 88px; }
+.ff-theme .ff-screen.phone .ff-row-head { font-size: 11px; }
+.ff-theme .ff-screen.phone .ff-count { margin-left: 8px; }
+.ff-theme .ff-row-hint { margin-left: auto; font: 700 9px/1 var(--ff-display); letter-spacing: .1em; color: var(--ff-muted); }
+.ff-theme .ff-screen.phone .ff-row-cards .zk-zone-row { flex-wrap: nowrap; overflow-x: auto; gap: 6px; padding: 0 4px 4px 0; scrollbar-width: none; }
+.ff-theme .ff-screen.phone :is(.ff-row, .ff-hand) .zk-card-face { padding: 3px 3px 4px; gap: 3px; }
+.ff-theme .ff-screen.phone :is(.ff-row, .ff-hand) :is(.zk-card-badges, .zk-card-sub) { display: none; }
+.ff-theme .ff-screen.phone .ff-row .zk-card-label { font-size: 9px; padding: 0 18%; }
+.ff-theme .ff-screen.phone .ff-row :is(.zk-card-cost, .zk-card-value) { font-size: 11px; }
+.ff-theme .ff-screen.phone .zk-look { cursor: pointer; }
+
+/* the strike line: two short rows beside the burst */
+.ff-theme .ff-screen.phone .ff-gutter { grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 12px; row-gap: 8px; padding: 8px 10px; }
+.ff-theme .ff-screen.phone .ff-strike-note { grid-column: 1; grid-row: 1 / 3; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.ff-theme .ff-screen.phone .ff-strike-note .ff-burst { width: 30px; height: 30px; }
+.ff-theme .ff-screen.phone .ff-strike-note b { font-size: 13px; }
+.ff-theme .ff-screen.phone .ff-strike-note span:last-child { display: none; }
+.ff-theme .ff-screen.phone .ff-hit { grid-column: 2; flex-wrap: nowrap; gap: 6px; }
+.ff-theme .ff-screen.phone .ff-hit:first-child { grid-row: 1; }
+.ff-theme .ff-screen.phone .ff-hit:last-child { grid-row: 2; justify-content: flex-start; }
+.ff-theme .ff-screen.phone .ff-hit-who { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; font-size: 14px; }
+.ff-theme .ff-screen.phone .ff-chip { padding: 3px 8px; font-size: 10px; }
+.ff-theme .ff-screen.phone .ff-chip b { font-size: 14px; }
+
+/* the action bar: the step tags; the counters beside one line; the buttons in one row */
+.ff-theme .ff-screen.phone .ff-actionbar { margin-top: auto; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 10px; padding: 10px 12px 12px; }
+.ff-theme .ff-screen.phone .ff-steps { grid-column: 1 / -1; }
+.ff-theme .ff-screen.phone .ff-steps .ff-kicker { display: none; }
+.ff-theme .ff-screen.phone .ff-step { padding: 5px 12px; font-size: 12px; }
+.ff-theme .ff-screen.phone .ff-counters { padding-left: 0; border-left: 0; gap: 4px; align-self: center; }
+.ff-theme .ff-screen.phone .ff-counter { flex-direction: row; align-items: baseline; gap: 4px; min-width: 0; padding: 4px 8px; }
+.ff-theme .ff-screen.phone .ff-counter b { font-size: 22px; }
+.ff-theme .ff-screen.phone .ff-counter span { font-size: 9px; }
+.ff-theme .ff-screen.phone .ff-words { min-width: 0; font-size: 13px; line-height: 1.3; }
+.ff-theme .ff-screen.phone .ff-actionbar:not(:has(.ff-counters)) .ff-words { grid-column: 1 / -1; }
+.ff-theme .ff-screen.phone .ff-words b { font-size: 15px; }
+.ff-theme .ff-screen.phone .ff-buttons { grid-column: 1 / -1; flex-wrap: nowrap; gap: 8px; }
+.ff-theme .ff-screen.phone .ff-buttons:empty { display: none; }
+.ff-theme .ff-screen.phone .ff-buttons .btn {
+  flex: 1 1 0; min-width: 0; height: auto; min-height: 46px; padding: 4px 8px;
+  flex-direction: column; justify-content: center; gap: 2px; font-size: 15px; line-height: 1.05; text-align: center;
+}
+.ff-theme .ff-screen.phone .ff-buttons .btn:not(.secondary) { flex-grow: 1.3; }
+.ff-theme .ff-screen.phone .ff-buttons .btn .note { font-size: 10px; line-height: 1.1; }
+
+/* the bench: your hand fanned along the bottom, small piles beside its label */
+.ff-theme .ff-screen.phone .ff-bench {
+  container-type: inline-size; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "label piles" "cards cards";
+  align-items: center; gap: 4px 10px; margin: 0 -12px; padding: 8px 12px 0;
+  background: linear-gradient(var(--ff-bench-top), var(--ff-bench-foot)); border-top: 2px solid #000;
+  --zekel-card-w: 92px; --zekel-card-h: 128px;
+}
+.ff-theme .ff-screen.phone .ff-hand { display: contents; }
+.ff-theme .ff-screen.phone .ff-bench-label { grid-area: label; flex-direction: column; gap: 4px; }
+.ff-theme .ff-screen.phone .ff-hint { font-size: 10px; }
+.ff-theme .ff-screen.phone .ff-hand > .zk-zone { grid-area: cards; min-width: 0; }
+.ff-theme .ff-screen.phone .ff-piles { grid-area: piles; gap: 12px; }
+.ff-theme .ff-screen.phone .ff-pile { flex-direction: row; gap: 6px; --zekel-card-w: 36px; --zekel-card-h: 50px; }
+.ff-theme .ff-screen.phone .ff-pile :is(.zk-card-label, .zk-card-badges, .zk-card-sub, .zk-card-cost, .zk-card-value) { display: none; }
+.ff-theme .ff-screen.phone .ff-pile .zk-card-face { padding: 2px; justify-content: center; }
+.ff-theme .ff-screen.phone .ff-pile .zk-card-back > div:not(:empty) { font-size: 12px; }
+.ff-theme .ff-screen.phone .ff-pile figcaption { font-size: 10px; }
+/* The fan shares the bench's width: the overlap is what it takes to fit,
+   never leaving less than a thumb of a card showing; past that it scrolls
+   sideways (the page never does). */
+.ff-theme .ff-screen.phone .ff-hand .zk-zone-fan { overflow-x: auto; overflow-y: hidden; padding: 12px 4px 10px 0; scrollbar-width: none; }
+.ff-theme .ff-screen.phone .ff-hand .zk-zone-fan > .zk-card:not(:first-child) {
+  margin-left: calc(-1 * min(var(--zekel-card-w) - 44px, max(0px, (var(--ff-fan-n) * var(--zekel-card-w) - 100cqw + 6px) / (var(--ff-fan-n) - 1)))) !important;
+}
+.ff-theme .ff-screen.phone .ff-hand .zk-card.zk-lit { translate: 0 -8px; z-index: 2; }
+.ff-theme .ff-screen.phone .ff-hand .zk-card-label { font-size: 11px; }
+
+/* ---------- sheets: rise from the bottom, a highlight rule along the top ---------- */
+.table-shell.phone.ff-theme .sheet {
+  border: 0; border-top: 3px solid var(--ff-hi); border-radius: 16px 16px 0 0; background: #141217;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, .6);
+}
+.table-shell.phone.ff-theme .sheet::before { content: ''; position: absolute; top: 8px; left: 50%; width: 40px; height: 4px; margin-left: -20px; border-radius: 2px; background: rgba(255, 255, 255, .25); }
+.table-shell.phone.ff-theme .sheet .close::before { transform: none; border-radius: 6px; background: transparent; border-color: rgba(255, 255, 255, .22); box-shadow: none; }
+.table-shell.phone.ff-theme .sheet .close { color: var(--ff-text); font-size: 18px; }
+.ff-theme .ff-sheet-head { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; padding-right: 52px; margin-bottom: 14px; }
+.ff-theme .ff-sheet-head h2 { margin: 0; padding: 0; font: italic 800 26px/1 var(--ff-display); letter-spacing: .02em; text-transform: uppercase; }
+.ff-theme .ff-sheet-status { font: 800 11px/1.2 var(--ff-display); letter-spacing: .1em; text-transform: uppercase; color: var(--ff-hi); }
+.ff-theme .ff-sheet-head .ff-tag { padding: 3px 9px; }
+.ff-theme .ff-sheet-head .ff-tag b { font-size: 14px; font-style: italic; }
+.ff-theme .ff-sheet-buttons { margin-top: auto; align-self: stretch; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-top: 8px; }
+.ff-theme .ff-sheet-buttons .btn { min-height: 48px; height: auto; font: italic 800 16px/1 var(--ff-display); letter-spacing: .02em; }
+.ff-theme .ff-sheet-buttons .btn:only-child { grid-column: 1 / -1; }
+
+/* a card up close: the printed face, its chips, its words, Close and Play */
+.ff-theme .ff-card-sheet { display: flex; flex-direction: column; align-items: center; gap: 12px; min-height: min(80dvh, 700px); }
+.ff-theme .ff-card-sheet .ff-sheet-head { align-self: stretch; margin-bottom: 4px; }
+.ff-theme .ff-card-chips { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.ff-theme .ff-card-chips .zk-card-badge { font-size: 12px; padding: 2px 10px; }
+.ff-theme .ff-card-words { margin: 0; max-width: 34ch; text-align: center; color: var(--ff-muted); font-size: 14px; line-height: 1.4; }
+.ff-theme .ff-printed {
+  position: relative; flex: none; width: min(250px, 64vw, 38dvh); aspect-ratio: 5 / 7; overflow: hidden;
+  background: #f4efe6; color: #111; border: 3px solid #000; border-radius: 10px; box-shadow: 6px 6px 0 #000;
+}
+.ff-theme .ff-printed-corner {
+  position: absolute; left: 0; top: 0; width: 40%; aspect-ratio: 1; box-sizing: border-box; padding: 8px 0 0 10px;
+  background: var(--ff-corner); color: var(--ff-ink); clip-path: polygon(0 0, 100% 0, 0 100%);
+  font: italic 800 30px/1 var(--ff-display);
+}
+.ff-theme .ff-printed-corner.br { left: auto; top: auto; right: 0; bottom: 0; rotate: 180deg; }
+.ff-theme .ff-printed-fx { position: absolute; max-width: 50%; font: 600 12px/1.25 var(--font-body); text-align: right; }
+.ff-theme .ff-printed-fx.tl { top: 10px; right: 10px; }
+.ff-theme .ff-printed-fx.br { bottom: 10px; left: 10px; rotate: 180deg; }
+.ff-theme .ff-printed.worth .ff-printed-fx { font: italic 800 28px/1 var(--ff-display); }
+.ff-theme .ff-printed-panel { position: absolute; inset: 17% 17%; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.ff-theme .ff-printed-name { font: italic 800 20px/1 var(--ff-display); letter-spacing: .01em; text-transform: uppercase; text-align: center; }
+.ff-theme .ff-printed-name.turned, .ff-theme .ff-printed-art img.turned { rotate: 180deg; }
+.ff-theme .ff-printed-art { flex: 1; min-height: 0; width: 100%; display: flex; flex-direction: column; background: #111; border: 2px solid #111; border-radius: 4px; overflow: hidden; }
+.ff-theme .ff-printed-art img { flex: 1; min-height: 0; width: 100%; display: block; object-fit: cover; }
+.ff-theme .ff-printed-art img.turned { border-top: 2px solid #f4efe6; }
+
+/* the supply as a sheet: the same list, taller rows */
+.ff-theme .ff-supply-sheet .zk-zone-label { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin: 0 0 8px;
+  font: 400 13px/1.3 var(--font-body); letter-spacing: 0; text-transform: none; color: var(--ff-muted); }
+.ff-theme .ff-supply-sheet .zk-zone-cols { display: inline-flex; flex: none; font: 800 11px/1 var(--ff-display); letter-spacing: .08em; text-transform: uppercase; color: var(--ff-text); }
+.ff-theme .ff-supply-sheet .zk-zone-cols span { width: 34px; text-align: center; }
+.ff-theme .ff-supply-sheet .zk-zone-list { display: flex; flex-direction: column; gap: 6px; }
+.ff-theme .ff-supply-sheet .zk-card-row {
+  grid-template-columns: 30px 48px minmax(0, 1fr) auto; grid-template-areas: "cost art label counts" "cost art sub counts";
+  row-gap: 4px; min-height: 58px; padding: 6px 8px 6px 6px; background: var(--ff-panel); border: 2px solid #000;
+}
+.ff-theme .ff-supply-sheet .zk-card-row-cost { grid-area: cost; width: 28px; height: 32px; font-size: 18px; }
+.ff-theme .ff-supply-sheet .zk-card-row-art { grid-area: art; width: 48px; height: 40px; }
+.ff-theme .ff-supply-sheet .zk-card-row-label { grid-area: label; font-size: 18px; }
+.ff-theme .ff-supply-sheet .zk-card-row-sub { grid-area: sub; justify-self: start; }
+.ff-theme .ff-supply-sheet .zk-card-row-counts { grid-area: counts; }
+.ff-theme .ff-supply-sheet .zk-card-row-counts b { width: 34px; text-align: center; }
+.ff-theme .ff-supply-sheet .zk-card-row.zk-lit { border-color: var(--ff-hi); }
+.ff-theme .ff-supply-sheet.buying .zk-card-row:not(.zk-lit) { opacity: .38; }
+
+/* the menu sheet, in the theme */
+.table-shell.phone.ff-theme .menu-sheet { min-height: min(84dvh, 760px); }
+.table-shell.phone.ff-theme .menu-sheet h2 { font: italic 800 26px/1 var(--ff-display); text-transform: uppercase; }
+.table-shell.phone.ff-theme .menu-grid .chip-btn { font: italic 800 16px/1 var(--ff-display); letter-spacing: .02em; color: var(--ff-text); display: inline-flex; align-items: center; }
+.table-shell.phone.ff-theme .menu-grid .chip-btn::before { background: var(--ff-raised); border-color: #000; box-shadow: 3px 3px 0 #000; }
+.table-shell.phone.ff-theme .menu-kicker { font-family: var(--ff-display); color: var(--ff-muted); }
+.table-shell.phone.ff-theme .menu-leave { margin-top: auto; font: 800 15px/1 var(--ff-display); letter-spacing: .08em; }
+
+/* ---------- the strike, upright: the arcade look at phone size ---------- */
+.table-shell.phone.ff-theme .strike-banner { padding: 8px 28px; }
+.table-shell.phone.ff-theme .strike-banner span { font-size: 16px; }
+.table-shell.phone.ff-theme .strike-banner b { font-size: 50px; }
+.table-shell.phone.ff-theme .strike-fighter { top: auto; }
+.table-shell.phone.ff-theme .strike-fighter.right { top: 0; }
+.table-shell.phone.ff-theme .strike-badge { width: 40px; height: 40px; font-size: 22px; }
+.table-shell.phone.ff-theme .strike-fighter-name { font-size: 26px; }
+.table-shell.phone.ff-theme .strike-pip { width: 26px; height: 20px; }
+.table-shell.phone.ff-theme .strike-stam b { font-size: 44px; }
+.table-shell.phone.ff-theme .strike-shield { width: 200px; height: 52px; top: auto; background: linear-gradient(90deg, #8cc6ff, #4ea3ff); }
+.table-shell.phone.ff-theme .strike-shield.right { top: 24%; }
+.table-shell.phone.ff-theme .strike-shield b { font-size: 34px; }
+.table-shell.phone.ff-theme .strike-shield > span:not([class]) { writing-mode: horizontal-tb; rotate: none; }
+.table-shell.phone.ff-theme .strike-ko { font-size: 104px; }
+.table-shell.phone.ff-theme .strike-controls .btn { min-height: 44px; }

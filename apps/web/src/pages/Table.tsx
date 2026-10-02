@@ -17,6 +17,7 @@ import { BoardZones, JsonInspector, ZoneRenderer } from '../glue/ZoneRenderer';
 import { useTable } from '../table/useTable';
 import { ActionBar, CaptionWords, LessonNote, EndPanel, Log, MoveChooser, MoveFormSheet, MoveMenuList, NoticeToast, PaceControl, Sheet, lessonsOf, type Lesson, type Notice, Notices } from '../table/parts';
 import { StrikeOverlay } from '../table/StrikeMoment';
+import { usePhone } from '../table/phone';
 import { api } from '../api';
 import { useSession } from '../session';
 import { Wordmark } from '../ui';
@@ -72,6 +73,8 @@ export function TablePage() {
   const [lessonsOn, setLessonsOn] = useState(() => { try { return localStorage.getItem(LESSONS_KEY) !== 'off'; } catch { return true; } });
   const [sideOpen, setSideOpen] = useState(true);
   const [sheet, setSheet] = useState<'rules' | 'settings' | null>(null);
+  /** the phone's menu sheet: what the top bar's buttons and the side column hold on a desktop */
+  const [menuOpen, setMenuOpen] = useState(false);
   const [chooser, setChooser] = useState<LegalMove[] | null>(null);
   const [shared, setShared] = useState(false);
   const [form, setForm] = useState<MoveForm | null>(null);
@@ -102,6 +105,12 @@ export function TablePage() {
 
   const gameId = table?.table.gameId ?? '';
   const glue = gameId ? glueFor(gameId) : null;
+  // A phone layout only for a game that has one; the rest keep the desktop table.
+  const phoneSized = usePhone();
+  const phone = !!glue?.phone && phoneSized;
+  useEffect(() => { if (!phone) setMenuOpen(false); }, [phone]);
+  // A strike starting (or replayed from the menu) is the thing to watch.
+  useEffect(() => { if (moment) setMenuOpen(false); }, [moment]);
   const myPlayerId = current?.playerId ?? null;
   const legalMoves: LegalMove[] = state.done && current?.yourTurn ? current.legalMoves : [];
   const unavailable = useMemo(() => (state.done && current?.yourTurn ? current.unavailable ?? [] : []), [state.done, current]);
@@ -297,7 +306,10 @@ export function TablePage() {
 
   // A game-drawn screen keeps the last move and the playback speed in the side
   // column, just above the log; any other table shows them over the board.
-  const captionInSide = (!!glue?.Screen || !!glue?.captionInSide) && sideOpen && !glue?.placesCaption;
+  // On a phone there is no side column: they are in the menu sheet.
+  const captionInSide = (!!glue?.Screen || !!glue?.captionInSide) && sideOpen && !glue?.placesCaption && !phone;
+  const captionInMenu = phone && !glue?.placesCaption;
+  const share = () => { void navigator.clipboard?.writeText(`${window.location.origin}/table/${id}/watch`); setShared(true); };
   const captionCard = (
     <div className={`caption-card${state.done ? '' : ' pending'}`} aria-live="polite">
       {current?.actorSeatPosition !== null && current?.actorSeatPosition !== undefined && table ? (
@@ -322,13 +334,14 @@ export function TablePage() {
   );
 
   return (
-    <FlipRoot viewKey={state.tick} className={`table-shell${glue?.themeFor?.(input) ? ` ${glue.themeFor(input)}` : ''}`} style={paletteVars(plan?.palette)} reducedMotion={reduced}>
+    <FlipRoot viewKey={state.tick} className={`table-shell${glue?.themeFor?.(input) ? ` ${glue.themeFor(input)}` : ''}${phone ? ' phone' : ''}`} style={paletteVars(plan?.palette)} reducedMotion={reduced}>
       <div className="table-topbar">
         <Link to="/" className="brand" aria-label="zekel home" style={{ textDecoration: 'none', display: 'inline-flex' }}><Wordmark size={24} /></Link>
         <span className="divider" />
         {plan?.titleArt && <img className="title-art" src={plan.titleArt} alt="" width={30} height={30} />}
         <span className="title">{plan?.title ?? table?.table.gameName ?? 'Table'}</span>
         {plan?.status && <span className="round-note" aria-hidden="true">{plan.status}</span>}
+        {phone && plan?.statusShort && <span className="round-tag" aria-hidden="true"><span>{plan.statusShort}</span></span>}
         <span className="spacer center">
           <span className={`turn-pill${yourTurn ? ' mine' : ''}`} aria-live="polite">
             <span className="dot" />{turnLabel}
@@ -339,16 +352,21 @@ export function TablePage() {
           <button className="chip-btn" onClick={() => void undo()} disabled={!table || table.table.status !== 'playing'}>Undo</button>
           <button className="chip-btn" onClick={() => setSheet('rules')}>Rules</button>
           <button className="chip-btn" onClick={() => setSheet('settings')}>Settings</button>
-          <button className="chip-btn" onClick={() => { void navigator.clipboard?.writeText(`${window.location.origin}/table/${id}/watch`); setShared(true); }} title="Anyone with the link can watch this table">{shared ? 'Link copied' : 'Share'}</button>
+          <button className="chip-btn" onClick={share} title="Anyone with the link can watch this table">{shared ? 'Link copied' : 'Share'}</button>
           <button className="chip-btn" onClick={() => setSideOpen((v) => !v)} aria-label="Toggle the side column">{sideOpen ? 'Hide panel' : 'Panel'}</button>
           <Link className="chip-btn leave" to="/">Leave</Link>
         </div>
+        {phone && (
+          <button type="button" className="table-menu-btn" aria-label="Menu: undo, rules, settings, share, the last move and the log" aria-haspopup="dialog" onClick={() => setMenuOpen(true)}>
+            <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M3 6h16M3 11h16M3 16h16" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" /></svg>
+          </button>
+        )}
       </div>
 
       <div className="table-main">
         <div className="table-play">
         <div className="table-board">
-          {result === null && !captionInSide && !glue?.placesCaption && captionCard}
+          {result === null && !captionInSide && !captionInMenu && !glue?.placesCaption && captionCard}
           {dice && dice.length > 0 && (
             <div className="dice-row">{dice.map((d, i) => <Die key={i} value={d} rollKey={current?.seq} />)}</div>
           )}
@@ -371,7 +389,8 @@ export function TablePage() {
                 caption={glue.placesCaption && result === null ? captionCard : undefined}
                 menu={yourTurn ? <MoveMenuList menu={current?.moveMenu ?? null} legalMoves={legalMoves} onPick={pick} disabled={busy} open={false} /> : null}
                 benchSlot={benchSlot}
-                sideSlot={sideOpen ? sideSlot : null}
+                sideSlot={sideOpen && !phone ? sideSlot : null}
+                phone={phone}
               />
             : plan
             ? <BoardZones zones={plan.board} lit={lit} onSelect={onSelect} />
@@ -449,6 +468,24 @@ export function TablePage() {
         </Sheet>
       )}
 
+      {menuOpen && (
+        <Sheet title="Menu" className="menu-sheet" onClose={() => setMenuOpen(false)}>
+          <div className="menu-grid">
+            <button className="chip-btn" onClick={() => { setMenuOpen(false); void undo(); }} disabled={!table || table.table.status !== 'playing'}>Undo</button>
+            <button className="chip-btn" onClick={() => { setMenuOpen(false); setSheet('rules'); }}>Rules</button>
+            <button className="chip-btn" onClick={() => { setMenuOpen(false); setSheet('settings'); }}>Settings</button>
+            <button className="chip-btn" onClick={share} title="Anyone with the link can watch this table">{shared ? 'Link copied' : 'Share'}</button>
+          </div>
+          {result === null && captionInMenu && (
+            <section className="menu-last" aria-label="Last move">
+              <h3 className="menu-kicker">Last move</h3>
+              {captionCard}
+            </section>
+          )}
+          <Log events={state.applied} currentSeq={current?.seq ?? null} me={myPlayerId} />
+          <Link className="chip-btn leave menu-leave" to="/">Leave the table</Link>
+        </Sheet>
+      )}
       {sheet === 'rules' && (
         <Sheet title="Rules" onClose={() => setSheet(null)}>
           {t.reference ? <div className="rules-text">{t.reference.rules}</div> : <p className="muted">Loading…</p>}

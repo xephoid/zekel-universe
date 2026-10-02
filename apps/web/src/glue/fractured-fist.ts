@@ -27,6 +27,9 @@ export const fracturedFistGlue: GlueModule = {
   gameId: 'fractured-fist',
   title: 'Fractured Fist',
   Screen: FfScreen,
+  /** The phone boards (docs/design/fractured-fist-arcade, Phone-*): the
+   *  table stacked, the side column in sheets, a card up close on a tap. */
+  phone: true,
 
   /** The arcade theme (docs/design/fractured-fist-arcade): the table's own
    *  look, for every seat and for a watcher, once the view is this game's. */
@@ -45,7 +48,7 @@ export const fracturedFistGlue: GlueModule = {
     const board: Zone[] = [f.right.zones.played, f.left.zones.played];
     const bench: Zone[] = f.me ? [f.me.zones.hand, f.me.zones.deck, f.me.zones.discard] : [];
     const status = `Round ${f.round} · ${f.over ? 'over' : `${words(f.phase)} step`}`;
-    return { board, bench, side: [], palette: PALETTE, title: 'Fractured Fist', status, steps: f.steps, prompt: f.prompt };
+    return { board, bench, side: [], palette: PALETTE, title: 'Fractured Fist', status, statusShort: `R${f.round}`, steps: f.steps, prompt: f.prompt };
   },
 
   litParts(input: GlueInput): string[] {

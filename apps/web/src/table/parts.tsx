@@ -407,7 +407,13 @@ function KeyLog({ lines, currentSeq, me }: { lines: Array<{ line: LogLine; seq: 
  * own buttons behind the sheet — which on this table means spending action
  * points by accident while a question is still on screen.
  */
-export function Sheet({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
+export function Sheet({ title, onClose, children, className, heading }: {
+  title: string; onClose: () => void; children: ReactNode;
+  /** a class beside `sheet`, for a sheet laid out its own way */
+  className?: string;
+  /** drawn in place of the plain title heading (the title still names the dialog) */
+  heading?: ReactNode;
+}) {
   const box = useRef<HTMLDivElement | null>(null);
   const opener = useRef<Element | null>(null);
 
@@ -442,7 +448,7 @@ export function Sheet({ title, onClose, children }: { title: string; onClose: ()
     <div className="sheet-backdrop" onClick={onClose} role="presentation">
       <div
         ref={box}
-        className="sheet"
+        className={className ? `sheet ${className}` : 'sheet'}
         role="dialog"
         aria-modal="true"
         aria-label={title}
@@ -451,7 +457,7 @@ export function Sheet({ title, onClose, children }: { title: string; onClose: ()
         onClick={(e) => e.stopPropagation()}
       >
         <button className="btn secondary small close" onClick={onClose} aria-label="Close">✕</button>
-        <h2>{title}</h2>
+        {heading ?? <h2>{title}</h2>}
         {children}
       </div>
     </div>

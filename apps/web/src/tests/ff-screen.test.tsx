@@ -15,7 +15,7 @@ function inputFor(view: unknown, legalMoves: LegalMove[], playerId: string | nul
   };
 }
 
-function draw(opts: { view?: unknown; moves?: LegalMove[]; playerId?: string | null; yourTurn?: boolean; interactive?: boolean; sideSlot?: HTMLElement | null } = {}) {
+function draw(opts: { view?: unknown; moves?: LegalMove[]; playerId?: string | null; yourTurn?: boolean; interactive?: boolean; sideSlot?: HTMLElement | null; phone?: boolean } = {}) {
   const onMove = vi.fn();
   const onBatch = vi.fn();
   const r = render(
@@ -28,6 +28,7 @@ function draw(opts: { view?: unknown; moves?: LegalMove[]; playerId?: string | n
       onForm={vi.fn()}
       onBatch={onBatch}
       sideSlot={opts.sideSlot}
+      phone={opts.phone}
       nameFor={(pid) => (pid === 'p1' ? 'Ada' : 'AI')}
     />,
   );
@@ -143,5 +144,75 @@ describe('Fractured Fist screen', () => {
     expect(container.querySelectorAll('.zk-lit')).toHaveLength(0);
     for (const c of container.querySelectorAll('.zk-card')) fireEvent.click(c);
     expect(onMove).not.toHaveBeenCalled();
+  });
+});
+
+describe('Fractured Fist screen on a phone (build item 7)', () => {
+  it('a tap on a lit card opens it up close and sends nothing; Play sends the listed move', () => {
+    const { container, onMove } = draw({ phone: true });
+    const lit = container.querySelector('.ff-hand .zk-lit')!;
+    fireEvent.click(lit);
+    expect(onMove).not.toHaveBeenCalled();
+    const sheet = screen.getByRole('dialog', { name: 'Quicken' });
+    expect(sheet.textContent).toContain('In your hand · can be played now');
+    expect(sheet.textContent).toContain('+2 Draw.');
+    expect(sheet.querySelector('.ff-printed')).not.toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Play Quicken' }));
+    expect(onMove).toHaveBeenCalledTimes(1);
+    expect(onMove.mock.calls[0]![0].move_id).toBe('play-2-quicken');
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('any card can be looked at; one with no listed play has no Play button', () => {
+    const { container, onMove } = draw({ phone: true });
+    // A Misstep in your hand, their discard on your side of the table, a card in your played row.
+    fireEvent.click(container.querySelector('.ff-hand .zk-card.zk-look')!);
+    expect(screen.getByRole('dialog').textContent).toContain('In your hand');
+    expect(screen.queryByRole('button', { name: /^(Play|Remove) / })).toBeNull();
+    fireEvent.click(screen.getAllByRole('button', { name: 'Close' })[0]!);
+    fireEvent.click(container.querySelector('[data-flip-id="p:p1:played"] .zk-card')!);
+    expect(screen.getByRole('dialog', { name: 'Attack' }).textContent).toContain('Your played cards');
+    expect(screen.queryByRole('button', { name: /^Play / })).toBeNull();
+    expect(onMove).not.toHaveBeenCalled();
+  });
+
+  it('a watcher or an off-turn seat can look but never gets a Play button', () => {
+    const { container } = draw({ phone: true, yourTurn: false });
+    fireEvent.click(container.querySelector('.ff-hand .zk-card')!);
+    expect(screen.getByRole('dialog')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: /^Play / })).toBeNull();
+  });
+
+  it('the supply is a sheet from the action bar: the count is the stacks the engine lists a buy for, a lit row buys on its tap', () => {
+    const view = { ...FF_VIEW, phase: 'channel' };
+    const moves: LegalMove[] = [
+      { move_id: 'buy-attack', description: 'Buy Attack', move: { type: 'buy_card', card_id: 'attack' } },
+      { move_id: 'buy-focus', description: 'Buy Focus', move: { type: 'buy_card', card_id: 'focus' } },
+    ];
+    const { container, onMove } = draw({ view, moves, phone: true });
+    // Not in the stack, not in the side column: behind the button.
+    expect(container.querySelector('.ff-supply')).toBeNull();
+    const button = screen.getByRole('button', { name: /^Supply/ });
+    expect(button.textContent).toBe('Supply2 to buy');
+    fireEvent.click(button);
+    const sheet = screen.getByRole('dialog', { name: 'Supply' });
+    const rows = [...sheet.querySelectorAll('.zk-card-row')];
+    expect(rows).toHaveLength(3);
+    expect(rows.filter((r) => r.classList.contains('zk-lit'))).toHaveLength(2);
+    // An unlit row opens the card up close; a lit one buys, as on a desktop.
+    fireEvent.click(rows[2]!);
+    expect(onMove).not.toHaveBeenCalled();
+    expect(screen.getByRole('dialog', { name: 'Momentum' }).textContent).toContain('In the supply');
+    fireEvent.click(screen.getAllByRole('button', { name: 'Close' }).at(-1)!);
+    fireEvent.click(rows[0]!);
+    expect(onMove.mock.calls[0]![0].move_id).toBe('buy-attack');
+  });
+
+  it('buttons share one row with their short words, keeping the full words for a screen reader', () => {
+    draw({ phone: true });
+    const advance = screen.getByRole('button', { name: 'Advance to Channel' });
+    expect(advance.textContent).toBe('To Channel');
+    // Off the Channel step the Supply button opens the sheet but counts nothing.
+    expect(screen.getByRole('button', { name: /^Supply/ }).textContent).toBe('Supply');
   });
 });
