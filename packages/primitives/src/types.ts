@@ -204,7 +204,41 @@ export interface MapNode {
   /** Universe addition: what a reader hears instead of just the label, when
    *  the region's facts are carried by colour and position. */
   describedAs?: string;
+  /**
+   * Universe additions for a station board (MapData.nodeShape 'station').
+   * `meter` is a small bar of `max` pips with `value` filled (a population).
+   * `mark` replaces the ring with a solid diamond ('diamond', something put
+   * on the place) or draws a diamond round it ('frame', a place that is
+   * yours), in `markColorKey`, which the name then takes too. `crossed` draws
+   * the ring dashed and strikes the name through. `glow` lights the ring in
+   * its own colour. `labelSide` puts the name above or below the ring. A
+   * station shows its state by these marks; its badges are not drawn, so say
+   * the state in `describedAs` as well.
+   */
+  meter?: { value: number; max: number };
+  mark?: 'diamond' | 'frame';
+  markColorKey?: string;
+  crossed?: boolean;
+  glow?: boolean;
+  labelSide?: 'above' | 'below';
 }
+
+/**
+ * Universe addition: a line drawn under a station board, through the places
+ * it belongs to. Decoration that encodes ownership: never a route, never
+ * tapped, never animated as travel. Points are in percent of the board, like
+ * the nodes; the line stretches with the board.
+ */
+export interface MapLine {
+  key: string;
+  colorKey: string;
+  label?: string;
+  points: Array<{ x: number; y: number }>;
+}
+
+/** How a legend entry is drawn: a colour dot (the default), or a station
+ *  state from a station board, so the key matches the marks on the map. */
+export type MapKeyShape = 'dot' | 'ring' | 'glow' | 'diamond' | 'crossed' | 'faded' | 'frame';
 
 /** <zekel-map>: a positional board of named regions. */
 export interface MapData {
@@ -218,13 +252,17 @@ export interface MapData {
    * grouped in three boroughs. The nodes keep their own coordinates; a band
    * says what part of the board they are standing in.
    */
-  areas?: Array<{ key: string; label: string; note?: string; y: number; height: number; colorKey?: string }>;
+  areas?: Array<{ key: string; label: string; note?: string; y: number; height: number; colorKey?: string; x?: number; width?: number }>;
   /**
    * Universe addition: `pill` draws a region wide enough to hold its name,
    * for a board whose regions are places rather than spaces. `dot` is the
-   * default, for boards with many small spaces.
+   * default, for boards with many small spaces. `station` draws each region
+   * as a ring on a transit map, its name and meter beside it, over `lines`;
+   * an area with `x` and `width` is then a column with its name above it.
    */
-  nodeShape?: 'dot' | 'pill';
+  nodeShape?: 'dot' | 'pill' | 'station';
+  /** Universe addition, station boards only: the lines under the stations. */
+  lines?: MapLine[];
   /**
    * Universe addition: every region can be looked at, not only the ones that
    * are legal moves. Looking is always safe: a region with no move behind it
@@ -233,7 +271,9 @@ export interface MapData {
   inspectable?: boolean;
   /** Universe addition: what the colours mean, drawn under the board. A board
    *  that codes anything by colour owes the reader this. */
-  legend?: Array<{ colorKey: string; label: string }>;
+  legend?: Array<{ colorKey: string; label: string; shape?: MapKeyShape }>;
+  /** Universe addition: one sentence under the legend (what the lines mean). */
+  legendNote?: string;
   /**
    * Universe addition: take the height the board has left instead of working
    * it out from the width. `aspect` says a board's height is a fraction of how

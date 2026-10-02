@@ -340,6 +340,77 @@
 .zk-map-badges .zk-card-badge { white-space: nowrap; flex: none; }
 .zk-map-road { position: absolute; height: 3px; background: var(--border); transform-origin: 0 50%; opacity: 0.8; border-radius: 2px; }
 
+/* A transit map (nodeShape 'station'). Areas are columns with their names
+   above them; the lines run under everything and take no taps; each region is
+   a ring with its name and meter on one side. Colours come in as --station
+   (the region's) and --station-mark (what was put on it). */
+.zk-stationmap { --station-ring: 16px; --station-head: 22px; }
+/* Everything is placed in the plane under the area names, so a node's y and
+   a line's points are measured in the same frame. */
+.zk-station-plane { position: absolute; left: 0; right: 0; bottom: 0; top: var(--station-head); }
+.zk-station-area {
+  position: absolute; box-sizing: border-box; pointer-events: none;
+  border: 1px solid var(--border); border-radius: var(--radius-md);
+}
+.zk-station-area-head {
+  position: absolute; left: 4px; bottom: 100%; padding-bottom: 4px;
+  display: flex; align-items: baseline; gap: 8px; white-space: nowrap;
+}
+.zk-station-lines { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.zk-station-lines polyline { stroke-width: 5px; opacity: 0.45; }
+.zk-station { position: absolute; width: 0; height: 0; }
+.zk-station-ring {
+  position: absolute; left: calc(var(--station-ring) / -2); top: calc(var(--station-ring) / -2);
+  width: var(--station-ring); height: var(--station-ring); box-sizing: border-box;
+  border-radius: 50%; background: var(--bg-raised); border: 4px solid var(--station);
+  display: grid; place-items: center; z-index: 1;
+}
+.zk-station.glow .zk-station-ring { box-shadow: 0 0 0 3px var(--bg-raised), 0 0 12px var(--station); }
+.zk-station.crossed .zk-station-ring { border: 3px dashed var(--fg-muted); }
+.zk-station.dim { opacity: 0.3; }
+.zk-station-label {
+  position: absolute; left: 0; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 3px; pointer-events: none;
+}
+.zk-station.above .zk-station-label { bottom: calc(var(--station-ring) / 2 + 3px); flex-direction: column; }
+.zk-station.below .zk-station-label { top: calc(var(--station-ring) / 2 + 3px); flex-direction: column-reverse; }
+.zk-station-name {
+  font: 700 11px/1.1 var(--font-display); letter-spacing: .04em; text-transform: uppercase;
+  white-space: nowrap; color: var(--fg);
+}
+.zk-station.glow .zk-station-name { font-weight: 700; }
+.zk-station.crossed .zk-station-name { color: var(--fg-muted); text-decoration: line-through; text-decoration-color: var(--danger); text-decoration-thickness: 2px; }
+.zk-station:is(.mark-diamond, .mark-frame) .zk-station-name { color: var(--station-mark); }
+.zk-station-meter { display: flex; gap: 2px; }
+.zk-station-pip { width: 7px; height: 4px; box-sizing: border-box; border: 1px solid var(--station); }
+.zk-station-pip.on { background: var(--station); }
+/* Something put on the place: a solid diamond in place of the ring, which
+   drops onto the station rather than appearing on it. */
+.zk-station.mark-diamond .zk-station-ring { border-color: transparent; background: transparent; }
+.zk-station-diamond { position: absolute; inset: -4px; animation: zk-drop var(--motion-drop, 420ms) var(--motion-settle, ease-out) both; }
+.zk-station-diamond::before {
+  content: ''; position: absolute; inset: 0; border-radius: 3px; transform: rotate(45deg);
+  background: var(--station-mark); box-shadow: 0 0 0 3px var(--bg-raised), 0 0 12px var(--station-mark);
+}
+/* A place that is yours: a diamond drawn round the ring. */
+.zk-station-frame {
+  position: absolute; inset: -9px; transform: rotate(45deg); border-radius: 3px; pointer-events: none;
+  border: 2px solid var(--station-mark); box-shadow: 0 0 12px var(--station-mark);
+}
+.zk-station-ring.zk-lit { animation: zk-breathe 1400ms ease-in-out infinite; }
+.zk-map-legend-note { flex-basis: 100%; font-style: italic; }
+.zk-map-key-station {
+  position: relative; width: 12px; height: 12px; box-sizing: border-box; border-radius: 50%;
+  border: 3px solid var(--station); background: var(--bg-raised);
+}
+.zk-map-key-station.glow { box-shadow: 0 0 6px var(--station); }
+.zk-map-key-station.crossed { border: 2px dashed var(--fg-muted); }
+.zk-map-key-station.faded { opacity: 0.3; }
+.zk-map-key-station.diamond { border: none; border-radius: 2px; background: var(--station); transform: rotate(45deg) scale(0.8); }
+.zk-map-key-station.frame { border-radius: 2px; border: 2px solid var(--station); background: transparent; transform: rotate(45deg) scale(0.85); }
+@media (prefers-reduced-motion: reduce) { [data-motion] .zk-station-diamond { animation-name: zk-fade; } }
+[data-motion='reduced'] .zk-station-diamond { animation-name: zk-fade; }
+
 /* die */
 .zk-die {
   width: 40px; height: 40px; border-radius: 8px; background: #fff; color: #222;

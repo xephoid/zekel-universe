@@ -7,7 +7,7 @@
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from 'react';
 import { handledTransform, slug, themeColor } from './theme.js';
 import type {
-  BagData, CardData, CardZoneData, GridData, MapData, MapNode, PoolData, SelectEvent, TableauData, TrackData,
+  BagData, CardData, CardZoneData, GridData, MapData, MapKeyShape, MapNode, PoolData, SelectEvent, TableauData, TrackData,
 } from './types.js';
 
 export interface PrimitiveProps<T> {
@@ -531,7 +531,116 @@ export function Grid({ id, data, lit, onSelect, className, style }: PrimitivePro
 // ---- Map --------------------------------------------------------------------------
 
 export function Map(props: PrimitiveProps<MapData>) {
-  return props.data.hex ? <HexMap {...props} /> : <PlainMap {...props} />;
+  if (props.data.hex) return <HexMap {...props} />;
+  return props.data.nodeShape === 'station' ? <StationMap {...props} /> : <PlainMap {...props} />;
+}
+
+/** What the colours (and, on a station board, the marks) mean, under the board. */
+function MapLegend({ data }: { data: MapData }) {
+  if ((!data.legend || data.legend.length === 0) && !data.legendNote) return null;
+  return (
+    <div className="zk-map-legend" aria-label="What the colours mean">
+      {(data.legend ?? []).map((k) => (
+        <span key={`${k.shape ?? 'dot'}:${k.colorKey}:${k.label}`} className="zk-map-key">
+          <MapKeySwatch shape={k.shape ?? 'dot'} colorKey={k.colorKey} />
+          {k.label}
+        </span>
+      ))}
+      {data.legendNote && <span className="zk-map-legend-note">{data.legendNote}</span>}
+    </div>
+  );
+}
+
+function MapKeySwatch({ shape, colorKey }: { shape: MapKeyShape; colorKey: string }) {
+  if (shape === 'dot') return <span className="zk-map-key-dot" style={{ background: themeColor(colorKey) }} />;
+  return <span className={cx('zk-map-key-station', shape)} style={{ ['--station' as string]: themeColor(colorKey) }} aria-hidden="true" />;
+}
+
+/**
+ * A transit map (MapData.nodeShape 'station'): column areas with their names
+ * above them, coloured lines under everything, and each region a station: a
+ * ring in its colour with its name and meter above or below. The lines are
+ * drawn in one SVG that stretches with the board and takes no pointer
+ * events; they say what a place belongs to and are never a way to go. Only
+ * the ring is a button, so a tap lands on the place it looks like it lands
+ * on. Marks show what happened to a place; the whole station fades when
+ * `dim`.
+ */
+function StationMap({ id, data, lit, onSelect, className, style }: PrimitiveProps<MapData>) {
+  const fill = data.fill;
+  return (
+    <div data-flip-id={id} className={cx(className, fill && 'zk-map-filling')} style={style}>
+      {data.label && <div className="zk-zone-label">{data.label}</div>}
+      <div
+        className="zk-map zk-stationmap"
+        style={fill ? { flex: '1 1 auto', minHeight: fill.minHeight } : { paddingTop: `${data.aspect ?? 48}%` }}
+      >
+        <div className="zk-station-plane">
+        {(data.areas ?? []).map((a) => (
+          <div
+            key={a.key}
+            className="zk-station-area"
+            style={{ left: `${a.x ?? 0}%`, width: `${a.width ?? 100}%`, top: `${a.y}%`, height: `${a.height}%`, ...(a.colorKey ? { borderColor: themeColor(a.colorKey) } : {}) }}
+          >
+            <span className="zk-station-area-head">
+              <span className="zk-map-area-name">{a.label}</span>
+              {a.note && <span className="zk-map-area-note">{a.note}</span>}
+            </span>
+          </div>
+        ))}
+        <svg className="zk-station-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          {(data.lines ?? []).map((l) => (
+            <polyline
+              key={l.key}
+              points={l.points.map((p) => `${p.x},${p.y}`).join(' ')}
+              fill="none"
+              stroke={themeColor(l.colorKey)}
+              vectorEffect="non-scaling-stroke"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+            />
+          ))}
+        </svg>
+        {data.nodes.map((n) => {
+          const isLit = lit?.includes(n.id) ?? false;
+          const fire = () => onSelect?.({ component: 'map', id: n.id, label: n.label });
+          const lp: LitProps = isLit || data.inspectable
+            ? { ...litProps(true, fire), className: isLit ? 'zk-lit' : 'zk-look' }
+            : {};
+          const color = themeColor(n.colorKey ?? n.label);
+          const markColor = n.markColorKey ? themeColor(n.markColorKey) : color;
+          const meter = n.meter && n.meter.max > 0 ? n.meter : null;
+          return (
+            <div
+              key={n.id}
+              className={cx('zk-station', n.labelSide === 'below' ? 'below' : 'above', n.dim && 'dim', n.crossed && 'crossed', n.glow && 'glow', n.mark && `mark-${n.mark}`)}
+              style={{ left: `${n.x}%`, top: `${n.y}%`, ['--station' as string]: color, ['--station-mark' as string]: markColor }}
+            >
+              <div
+                className={cx('zk-station-ring', lp.className)}
+                role={lp.role} tabIndex={lp.tabIndex} onClick={lp.onClick} onKeyDown={lp.onKeyDown}
+                aria-label={n.describedAs ?? n.label}
+                title={n.describedAs ?? n.label}
+              >
+                {n.mark === 'diamond' && <span className="zk-station-diamond" />}
+                {n.mark === 'frame' && <span className="zk-station-frame" />}
+              </div>
+              <div className="zk-station-label" aria-hidden="true">
+                <span className="zk-station-name">{n.label}</span>
+                {meter && (
+                  <span className="zk-station-meter">
+                    {Array.from({ length: meter.max }, (_, i) => <span key={i} className={cx('zk-station-pip', i < meter.value && 'on')} />)}
+                  </span>
+                )}
+              </div>
+            </div>
+          );
+        })}
+        </div>
+      </div>
+      <MapLegend data={data} />
+    </div>
+  );
 }
 
 const R3 = Math.sqrt(3);
@@ -639,16 +748,7 @@ function HexMap({ id, data, lit, onSelect, className, style }: PrimitiveProps<Ma
           );
         })}
       </div>
-      {data.legend && data.legend.length > 0 && (
-        <div className="zk-map-legend" aria-label="What the colours mean">
-          {data.legend.map((k) => (
-            <span key={k.colorKey} className="zk-map-key">
-              <span className="zk-map-key-dot" style={{ background: themeColor(k.colorKey) }} />
-              {k.label}
-            </span>
-          ))}
-        </div>
-      )}
+      <MapLegend data={data} />
     </div>
   );
 }
@@ -769,16 +869,7 @@ function PlainMap({ id, data, lit, onSelect, className, style }: PrimitiveProps<
           );
         })}
       </div>
-      {data.legend && data.legend.length > 0 && (
-        <div className="zk-map-legend" aria-label="What the colours mean">
-          {data.legend.map((k) => (
-            <span key={k.colorKey} className="zk-map-key">
-              <span className="zk-map-key-dot" style={{ background: themeColor(k.colorKey) }} />
-              {k.label}
-            </span>
-          ))}
-        </div>
-      )}
+      <MapLegend data={data} />
     </div>
   );
 }
