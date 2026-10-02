@@ -17,7 +17,10 @@ column `areas` and per-station marks); its positions are in
 `apps/web/src/glue/cn/metro.ts`, taken from `Metro-Map.dc.html` with the table
 board's short names. The table stretches the map to the room it has, as the
 table boards do, so the bends are 45° only at the design's proportions. Below
-300 px tall the names collide, so the map stops shrinking there.
+300 px tall the names collide, so the map stops shrinking there. Item 3, the
+clue tokens: a `token` shape for the track (`spaceShape`) and the pool
+(`itemShape`, with `caption` and `sash` per item); each coin's lettering is
+sized to its longest word so a faction name never breaks mid-word.
 
 ## Before anything else
 

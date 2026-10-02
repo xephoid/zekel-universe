@@ -39,7 +39,7 @@ const PALETTE: Record<string, string> = {
   witness: '#A7ADB8',
   motive: '#E23B45',
   weapon: '#c9a227',
-  not: '#8a8578',
+  not: '#E8ECF2',
 };
 
 interface Loc { name: string; borough: string; population?: number; affiliation?: string }
@@ -450,11 +450,13 @@ function clueValue(category: string, value: unknown, n: Names): string {
   return typeof value === 'number' ? String(value) : asStr(value);
 }
 
-/** A negative token id (`population_0`) as its category and printed value. */
-function negativeClue(tokenId: string, n: Names): { category: string; value: string } | null {
+/** A negative token id (`population_0`) as its category, printed value, and
+ *  the engine's own id for that value (`gang_1`), which keys its colour. */
+function negativeClue(tokenId: string, n: Names): { key: string; category: string; value: string; raw: string } | null {
   const cat = CLUE_CATEGORIES.find((c) => tokenId.startsWith(`${c.key}_`));
   if (!cat) return null;
-  return { category: cat.label, value: clueValue(cat.key, tokenId.slice(cat.key.length + 1), n) };
+  const raw = tokenId.slice(cat.key.length + 1);
+  return { key: cat.key, category: cat.label, value: clueValue(cat.key, raw, n), raw };
 }
 
 /**
@@ -876,6 +878,9 @@ export const cybernoirGlue: GlueModule = {
       kind: 'track', id: 'cn:clues', span: 'row',
       data: {
         label: 'What the Detective knows',
+        // Fare tokens: a round slot per category, dashed with "?" until the
+        // Hacker reveals it.
+        spaceShape: 'token',
         spaces: CLUE_CATEGORIES.map((c) => ({
           index: c.label,
           label: revealed[c.key] ? clueValue(c.key, values[c.key], name) : undefined,
@@ -886,12 +891,21 @@ export const cybernoirGlue: GlueModule = {
 
     const ruledOut = asArr(view['negative_clues'])
       .map((t) => negativeClue(asStr(t), name))
-      .filter((x): x is { category: string; value: string } => x !== null);
+      .filter((x): x is NonNullable<ReturnType<typeof negativeClue>> => x !== null);
     board.push({
       kind: 'pool', id: 'cn:not-clues', span: 'row',
       data: {
         label: ruledOut.length > 0 ? `Ruled out (${ruledOut.length})` : 'Ruled out — nothing yet',
-        items: ruledOut.map((r) => ({ label: `${r.category} ${r.value}`, count: 1, colorKey: 'not' })),
+        // Each NOT is its own fare token: the value inside, the category over
+        // it, a red NOT sash across it. An affiliation NOT wears that
+        // faction's line colour, so "NOT Chimera" reads as the purple line.
+        // The values of the three categories never overlap (numbers, borough
+        // names, faction names), so the value alone names the token.
+        itemShape: 'token',
+        items: ruledOut.map((r) => ({
+          label: r.value, caption: r.category, sash: 'NOT', count: 1,
+          colorKey: r.key === 'affiliation' ? r.raw : 'not',
+        })),
       },
     });
 

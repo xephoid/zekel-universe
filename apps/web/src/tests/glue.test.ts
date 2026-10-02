@@ -978,11 +978,17 @@ describe('cybernoir-2127 glue', () => {
       { index: 'Population', label: undefined, filled: false },
       { index: 'Affiliation', label: undefined, filled: false },
     ]);
-    // A ruled-out token is a category and a printed value, not "NOT ×4".
+    expect((rail.data as TrackData).spaceShape).toBe('token');
+    // A ruled-out token is a category and a printed value, not "NOT ×4": a
+    // fare token with the value inside, the category over it and a NOT sash.
+    // An affiliation NOT wears its faction's line colour.
     const nots = plan.board.find((z) => z.id === 'cn:not-clues')!;
     expect((nots.data as PoolData).label).toBe('Ruled out (2)');
-    expect((nots.data as PoolData).items.map((i) => i.label))
-      .toEqual(['Population 0', 'Affiliation Iceden Collective']);
+    expect((nots.data as PoolData).itemShape).toBe('token');
+    expect((nots.data as PoolData).items).toEqual([
+      { label: '0', caption: 'Population', sash: 'NOT', count: 1, colorKey: 'not' },
+      { label: 'Iceden Collective', caption: 'Affiliation', sash: 'NOT', count: 1, colorKey: 'gang_1' },
+    ]);
     // Both seats see the same rail: it is public.
     const det = g.plan(input({ ...CN_VIEW, role: 'detective', hideout: null, location_hand: [] }, [], { reference: CN_REFERENCE }))!;
     expect(det.board.find((z) => z.id === 'cn:clues')!.data).toEqual(rail.data);
