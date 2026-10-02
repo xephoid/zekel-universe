@@ -124,12 +124,31 @@ export interface TrackData {
   /** Universe addition: draw an arrow between spaces, for a track whose
    *  pieces are carried along it rather than moved by the player. */
   arrows?: boolean;
+  /**
+   * Universe addition: `token` draws each space as a round slot a token sits
+   * in (Cybernoir's three clue categories): the space's index small along
+   * the top, its label large in the middle, a dashed rim and "?" while the
+   * space is empty, a solid rim once it is `filled`. `cell` is the default.
+   */
+  spaceShape?: 'cell' | 'token';
 }
 
 /** <zekel-pool>: a supply of counted things. */
 export interface PoolData {
   label?: string;
-  items: { label: string; count: number; colorKey?: string }[];
+  /**
+   * Universe additions: `caption` is a small word over the label, and `sash`
+   * a word on a band across the token (a ruled-out clue's NOT). Both are
+   * drawn only by the `token` shape.
+   */
+  items: { label: string; count: number; colorKey?: string; caption?: string; sash?: string }[];
+  /**
+   * Universe addition: `token` draws each item as one round token with its
+   * label inside, its caption above, rimmed and lettered in its colour, the
+   * sash across it; a fare token rather than a swatch and a name. `chip` is
+   * the default.
+   */
+  itemShape?: 'chip' | 'token';
 }
 
 export interface GridCell {

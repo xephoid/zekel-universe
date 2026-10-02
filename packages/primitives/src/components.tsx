@@ -386,12 +386,30 @@ export function Track({ id, data, lit, onSelect, className, style }: PrimitivePr
   return (
     <div data-flip-id={id} className={className} style={style}>
       {data.label && <div className="zk-zone-label">{data.label}</div>}
-      <div className={cx('zk-track', data.pieceShape === 'named' && 'named')}>
+      <div className={cx('zk-track', data.pieceShape === 'named' && 'named', data.spaceShape === 'token' && 'tokens')}>
         {data.spaces.map((s, si) => {
           const spaceId = `${id}:${s.index}`;
           const isLit = lit?.includes(spaceId) ?? false;
           const lp = litProps(isLit, () => onSelect?.({ component: 'track', id: spaceId, label: s.label ?? String(s.index) }));
           const named = data.pieceShape === 'named';
+          if (data.spaceShape === 'token') {
+            // A round slot a token sits in: what it is for along the top, what
+            // landed in it in the middle. The value is mounted only once the
+            // slot is filled, so it drops in rather than appearing in place.
+            return (
+              <div
+                key={String(s.index)}
+                className={cx('zk-track-token', s.filled && 'filled', lp.className)}
+                role={lp.role} tabIndex={lp.tabIndex} onClick={lp.onClick} onKeyDown={lp.onKeyDown}
+                aria-label={s.filled && s.label ? `${s.index}: ${s.label}` : `${s.index}: not known yet`}
+              >
+                <span className="zk-token-caption">{s.index}</span>
+                {s.filled && s.label
+                  ? <span className="zk-token-value" data-flip-id={`${spaceId}:token`} style={tokenFont(s.label)}>{s.label}</span>
+                  : <span className="zk-token-value unknown" aria-hidden="true">?</span>}
+              </div>
+            );
+          }
           if (named) {
             // A space that holds a stack of face-up cards: who is standing on
             // it is the point, so they are named rather than drawn as dots.
@@ -444,6 +462,14 @@ export function Track({ id, data, lit, onSelect, className, style }: PrimitivePr
 
 // ---- Pool ------------------------------------------------------------------------
 
+/** A token's lettering, sized so its longest word fits across the coin
+ *  ("Downtown", "OmniSuperUltra") instead of breaking mid-word. Capitals in
+ *  the display face run about 0.72 of the size wide, wide letters more. */
+function tokenFont(label: string): CSSProperties {
+  const longest = Math.max(1, ...label.split(/\s+/).map((w) => w.length));
+  return { fontSize: `${Math.max(6.5, Math.min(12, 56 / (longest * 0.74))).toFixed(1)}px` };
+}
+
 const MAX_TOKENS_DRAWN = 12;
 
 // A pool of one-offs — named things that are each on the table once, like
@@ -455,12 +481,27 @@ export function Pool({ id, data, lit, onSelect, className, style }: PrimitivePro
   return (
     <div data-flip-id={id} className={cx('zk-pool', className)} style={style}>
       {data.label && <div className="zk-zone-label">{data.label}</div>}
-      <div className="zk-pool-items">
+      <div className={cx('zk-pool-items', data.itemShape === 'token' && 'tokens')}>
         {data.items.map((it) => {
           const itemId = `${id}:${it.label}`;
           const isLit = lit?.includes(itemId) ?? false;
           const lp = litProps(isLit, () => onSelect?.({ component: 'pool', id: itemId, label: it.label }));
           const drawn = Math.min(MAX_TOKENS_DRAWN, Math.max(0, it.count));
+          if (data.itemShape === 'token') {
+            const said = [it.sash, it.caption, it.label].filter(Boolean).join(' ');
+            return (
+              <span key={it.label} className={cx('zk-pool-token', lp.className)}
+                data-flip-id={`${itemId}:token:0`}
+                style={{ ['--token' as string]: themeColor(it.colorKey ?? it.label) }}
+                role={lp.role} tabIndex={lp.tabIndex} onClick={lp.onClick} onKeyDown={lp.onKeyDown}
+                aria-label={it.count > 1 ? `${said}: ${it.count}` : said}>
+                {it.sash && <span className="zk-token-sash" aria-hidden="true">{it.sash}</span>}
+                {it.caption && <span className="zk-token-caption" aria-hidden="true">{it.caption}</span>}
+                <span className="zk-token-value" aria-hidden="true" style={tokenFont(it.label)}>{it.label}</span>
+                {it.count > 1 && <b className="zk-token-count" aria-hidden="true">×{it.count}</b>}
+              </span>
+            );
+          }
           return (
             <span key={it.label} className={cx('zk-pool-item', lp.className)}
               role={lp.role} tabIndex={lp.tabIndex} onClick={lp.onClick} onKeyDown={lp.onKeyDown}

@@ -411,6 +411,38 @@
 @media (prefers-reduced-motion: reduce) { [data-motion] .zk-station-diamond { animation-name: zk-fade; } }
 [data-motion='reduced'] .zk-station-diamond { animation-name: zk-fade; }
 
+/* Tokens (TrackData.spaceShape and PoolData.itemShape 'token'): round
+   coins. A track's slot is dashed with "?" until it is filled; a pool's token
+   is rimmed and lettered in its colour (--token), with an optional sash
+   across it. The value drops in when it arrives. */
+.zk-track.tokens, .zk-pool-items.tokens { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.zk-track-token, .zk-pool-token {
+  position: relative; overflow: hidden; flex: none;
+  width: 72px; height: 72px; box-sizing: border-box; border-radius: 50%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  padding: 4px; text-align: center; background: var(--bg-raised);
+}
+.zk-track-token { border: 2px dashed var(--border); color: var(--fg-muted); }
+.zk-track-token.filled { border: 3px solid var(--fg); color: var(--fg); }
+.zk-pool-token { border: 2px dashed var(--token); color: var(--token); }
+.zk-token-caption { font: 500 7px/1 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--fg-muted); }
+.zk-token-value {
+  font: 700 10px/1.05 var(--font-display); text-transform: uppercase;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+}
+.zk-track-token.filled .zk-token-value, .zk-pool-token .zk-token-value { animation: zk-drop var(--motion-drop, 420ms) var(--motion-settle, ease-out) both; }
+.zk-track-token .zk-token-value.unknown { font-size: 16px; animation: none; }
+.zk-pool-token { justify-content: flex-start; padding-top: 27px; }
+.zk-pool-token .zk-token-caption { margin-bottom: 2px; }
+.zk-token-sash {
+  position: absolute; left: -10px; right: -10px; top: 4px; height: 13px;
+  transform: rotate(-22deg); background: var(--danger); color: #fff;
+  font: 700 8px/13px var(--font-display); letter-spacing: .2em; text-align: center;
+}
+.zk-token-count { position: absolute; bottom: 4px; font-size: 9px; }
+@media (prefers-reduced-motion: reduce) { [data-motion] :is(.zk-track-token.filled, .zk-pool-token) .zk-token-value { animation-name: zk-fade; } }
+[data-motion='reduced'] :is(.zk-track-token.filled, .zk-pool-token) .zk-token-value { animation-name: zk-fade; }
+
 /* die */
 .zk-die {
   width: 40px; height: 40px; border-radius: 8px; background: #fff; color: #222;
