@@ -668,7 +668,10 @@ describe('cybernoir-2127 glue', () => {
     const bareMap = bare.board.find((z) => z.kind === 'map')!.data as MapData;
     expect(bareMap.areas!.map((a) => a.label)).toEqual(['Downtown', 'Boonies']);
     expect(junction).toMatchObject({ mark: 'frame', markColorKey: 'safehouse' });
-    expect(ids(plan.bench)).toEqual(['cn:hacker', 'cn:hand']);
+    // The table boards' layout: the hand along the bottom, everything else in
+    // the side column (the case file is the table's points zone).
+    expect(ids(plan.bench)).toEqual(['cn:hand']);
+    expect(ids(plan.side)).toEqual(['cn:informants-facing', 'cn:jail', 'cn:detective', 'cn:hacker', 'cn:contacts-deck', 'cn:contacts-discard']);
     expect(plan.board.find((z) => z.id === 'cn:evidence')).toBeUndefined();
   });
   it('gives a Contact its cost, its field and what playing it does, without a tooltip', () => {
@@ -731,7 +734,7 @@ describe('cybernoir-2127 glue', () => {
 
   it('tells the Hacker how many informants are facing them, which is their central risk', () => {
     const plan = g.plan(input(CN_VIEW, [], { reference: CN_REFERENCE }))!;
-    const stats = (plan.bench.find((z) => z.id === 'cn:hacker')!.data as TableauData).stats!;
+    const stats = (plan.side.find((z) => z.id === 'cn:hacker')!.data as TableauData).stats!;
     expect(stats.find((st) => st.label === 'Informants facing you')!.value).toBe(1);
   });
 
@@ -902,9 +905,11 @@ describe('cybernoir-2127 glue', () => {
     // Three bands, so three distinct rows down the board.
     expect(new Set(map.nodes.map((n) => n.y)).size).toBe(map.areas!.length);
 
-    // The three short panels share one band instead of taking a row each.
+    // The two clue panels share one band under the map; the jail is in the
+    // side column with the case.
     const band = plan.board.filter((z) => z.span === 'row').map((z) => z.id);
-    expect(band).toEqual(['cn:clues', 'cn:not-clues', 'cn:jail']);
+    expect(band).toEqual(['cn:clues', 'cn:not-clues']);
+    expect(plan.side.some((z) => z.id === 'cn:jail')).toBe(true);
   });
 
   it("draws the city as a subway map: a line per faction, each station marked from its own seat's view only", () => {
@@ -1158,11 +1163,12 @@ describe('cybernoir-2127 glue', () => {
         slot_3_release_pending_then_freed: ['Anansi the Spider', 'Eddie the Doorman'],
       },
     };
-    const jail = g.plan(input(held, [], { reference: CN_REFERENCE }))!.board.find((z) => z.id === 'cn:jail')!;
+    const jail = g.plan(input(held, [], { reference: CN_REFERENCE }))!.side.find((z) => z.id === 'cn:jail')!;
     const d = jail.data as TrackData;
     expect(d.label).toBe('Jail · 3 held');
     expect(d.pieceShape).toBe('named');
     expect(d.arrows).toBe(true);
+    expect(d.spaces[0]!.pieces![0]!.artUrl).toBe('/art/cybernoir/blackice.jpg');
     expect(d.spaces.map((sp) => [sp.index, sp.filled, (sp.pieces ?? []).map((p) => [p.label, p.colorKey])])).toEqual([
       ['Booked', true, [['Blackice', 'gang_1']]],
       ['Processing', false, []],
@@ -1170,7 +1176,7 @@ describe('cybernoir-2127 glue', () => {
     ]);
     // An empty jail says so rather than showing three bare slots.
     const none = { ...CN_VIEW, jail: { slot_1_booked: [], slot_2_processing: [], slot_3_release_pending_then_freed: [] } };
-    const empty = g.plan(input(none, [], { reference: CN_REFERENCE }))!.board.find((z) => z.id === 'cn:jail')!;
+    const empty = g.plan(input(none, [], { reference: CN_REFERENCE }))!.side.find((z) => z.id === 'cn:jail')!;
     expect((empty.data as TrackData).label).toBe('Jail · nobody held');
   });
 
@@ -1436,7 +1442,7 @@ describe('cybernoir-2127 glue', () => {
     const named = g.plan(input(CN_VIEW, [], { reference: CN_REFERENCE }))!;
     const namedMap = named.board.find((z) => z.kind === 'map')!.data as MapData;
     expect(namedMap.nodes.filter((n) => n.mark === 'frame').map((n) => n.id)).toEqual(['cn:loc:the-junction']);
-    const panel = (z: TablePlan) => (z.bench.find((b) => b.id === 'cn:hacker')!.data as TableauData).stats!;
+    const panel = (z: TablePlan) => (z.side.find((b) => b.id === 'cn:hacker')!.data as TableauData).stats!;
     expect(panel(named).find((st) => st.label === 'Safehouse')!.value).toBe('The Junction');
 
     // A view that gives only the three printed facts marks no node: two

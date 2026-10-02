@@ -245,7 +245,9 @@ function whoYouCanReach(
     kind: 'card-zone', id: 'cn:reach',
     data: {
       label: here.length > 0 ? `Who you can reach (${here.length})` : 'Who you can reach',
-      mode: 'row', size: 'small',
+      // One row per person: their face, name, and what they do (or where they
+      // are, when spoken for), as in the table board's list.
+      mode: 'list',
       cards: here.map((who) => {
         // Not the Contact's play cost: that is what the HACKER pays for them.
         // What reaching them costs the Detective is in the engine's own words,
@@ -795,6 +797,7 @@ function informantsFacing(
 export const cybernoirGlue: GlueModule = {
   gameId: 'cybernoir-2127',
   title: 'Cybernoir 2127',
+  captionInSide: true,
 
   /** The rain and neon theme (docs/design/cybernoir-rain-neon), once the view
    *  is this game's: the seat's own look from the role the engine puts in
@@ -962,8 +965,10 @@ export const cybernoirGlue: GlueModule = {
     // Three slots in a line with arrows between them, each holding a stack of
     // face-up cards. Who is in them is the whole point, so they are named.
     const jailed = slots.reduce((n, [key]) => n + asArr(jail[key]).length, 0);
-    board.push({
-      kind: 'track', id: 'cn:jail', span: 'row',
+    // The holding cells sit in the side column with the case, as on the table
+    // boards; each person shows their face beside their name.
+    const jailZone: Zone = {
+      kind: 'track', id: 'cn:jail',
       data: {
         label: jailed > 0 ? `Jail · ${jailed} held` : 'Jail · nobody held',
         pieceShape: 'named', arrows: true,
@@ -973,10 +978,11 @@ export const cybernoirGlue: GlueModule = {
           pieces: asArr(jail[key]).map((who) => ({
             label: asStr(who),
             colorKey: people.get(asStr(who))?.affiliation || 'none',
+            ...(faceUrl(asStr(who), 'square') ? { artUrl: faceUrl(asStr(who), 'square') } : {}),
           })),
         })),
       },
-    });
+    };
 
     const caseFile = evidenceCase(view, input.reference, role, people, name);
 
@@ -1006,7 +1012,7 @@ export const cybernoirGlue: GlueModule = {
         : []),
       // Block risk is the Hacker's central risk, and their view carries the
       // count (never the names). It said nothing about it before.
-      { label: 'Informants facing you', value: asNum(view['informants_facedown_count']) },
+      { label: role === 'hacker' ? 'Informants facing you' : 'Informants face down', value: asNum(view['informants_facedown_count']) },
       { label: 'Contacts deck', value: asNum(hak['contacts_deck_size']) },
       { label: 'Hand', value: asNum(hak['hand_size']) },
       { label: 'Safehouse burned', value: view['safehouse_burned'] ? 'yes' : 'no' },
@@ -1017,9 +1023,11 @@ export const cybernoirGlue: GlueModule = {
 
     const bench: Zone[] = [];
     const side: Zone[] = [];
+    // The table boards' layout (docs/design/cybernoir-rain-neon/Table-*.dc.html):
+    // the map and clue row, then the hand along the bottom; the side column
+    // holds the case, who you can reach or who is facing you, the holding
+    // cells, the other seat's summary, your own counts and the deck.
     if (role === 'detective') {
-      bench.push(detTz);
-      side.push(hakTz);
       const hand = view['location_hand'];
       if (Array.isArray(hand)) {
         bench.push({
@@ -1056,7 +1064,7 @@ export const cybernoirGlue: GlueModule = {
         },
       });
       side.push(whoYouCanReach(view, input.reference, people, name, abilities));
-      side.push({ kind: 'card-zone', id: 'cn:location-deck', data: { label: 'Location deck', mode: 'pile', countOnly: asNum(det['location_deck_size']) } });
+      side.push(jailZone);
       // Discards are face up by the rules and the engine publishes both. They
       // are what a Detective crosses off, and they were nowhere on screen.
       const locDiscard = asArr(det['location_discard']).map((d) => asStr(d)).filter(Boolean);
@@ -1069,10 +1077,12 @@ export const cybernoirGlue: GlueModule = {
           },
         });
       }
+      side.push(hakTz, detTz);
+      side.push({ kind: 'card-zone', id: 'cn:location-deck', data: { label: 'Location deck', mode: 'pile', countOnly: asNum(det['location_deck_size']) } });
     } else {
-      bench.push(hakTz);
-      side.push(detTz);
       side.push(informantsFacing(view, role === 'hacker', people, name, abilities));
+      side.push(jailZone);
+      side.push(detTz, hakTz);
       const hand = view['hand'];
       if (Array.isArray(hand)) {
         bench.push({
@@ -1133,7 +1143,8 @@ export const cybernoirGlue: GlueModule = {
       });
     }
 
-    const status = `Turn ${asNum(view['turn'], 1)} · ${words(asStr(view['phase']))}`;
+    const deckLeft = asNum(det['location_deck_size']);
+    const status = `Turn ${asNum(view['turn'], 1)} · ${words(asStr(view['phase']))} · Case clock: ${deckLeft} Location${deckLeft === 1 ? '' : 's'} left in the deck`;
     return { board, bench, side, points: caseFile, palette: PALETTE, title: 'Cybernoir 2127', status, prompt };
   },
 

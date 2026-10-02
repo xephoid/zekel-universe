@@ -194,3 +194,58 @@
 .cn-theme .zk-zone-small .layout-portrait .zk-card-cost { top: 3px; left: 3px; }
 .cn-theme .zk-zone-small .layout-portrait .zk-card-label { font-size: 9.5px; }
 .cn-theme .zk-zone-small .layout-portrait .zk-card-body { padding: 3px 5px; }
+
+/* ---------- the two tables (build item 6) ----------
+   The table boards' layout: the top bar across; on the left the map and the
+   clue row, then the hand, then the lesson and the verb bar along the
+   bottom; on the right a 404 px column (the case first, then who you can
+   reach or who is facing you, the holding cells, both seats' counts, the
+   deck, the last move and the log). The page's own parts are placed on one
+   grid; nothing is moved between them. Overlays are fixed and stay out of
+   it. */
+.table-shell.cn-theme {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr) auto auto auto;
+  grid-template-areas: "top top" "board side" "bench side" "lesson side" "actions side";
+}
+.cn-theme > .table-topbar { grid-area: top; }
+.cn-theme .table-main, .cn-theme .table-play { display: contents; }
+.cn-theme .table-board { grid-area: board; min-height: 0; padding-bottom: 8px; }
+.cn-theme .table-bench { grid-area: bench; border-top: none; background: transparent; padding: 0 16px 8px; min-height: 0; align-items: flex-start; }
+.cn-theme .table-play > .lesson-note { grid-area: lesson; }
+.cn-theme .table-play > .action-bar { grid-area: actions; margin: 0 16px 12px; }
+.cn-theme .table-side { grid-area: side; width: 404px; box-sizing: border-box; background: var(--cn-ground); border-left: 1px solid var(--cn-rule); }
+.cn-theme .table-side.collapsed { width: 0; }
+.cn-theme .table-side > [data-flip-id='cn:case'] { order: -1; }
+/* The deck is a counter here (the top bar says how many are left), small. */
+.cn-theme .table-side > [data-flip-id$='-deck'] { --zekel-card-w: 52px; --zekel-card-h: 72px; }
+
+/* Holding cells: dashed manila wells, the person's face beside their name. */
+.cn-theme [data-flip-id='cn:jail'] { background: var(--cn-manila); border: 1px solid var(--cn-manila-edge); border-radius: 10px; padding: 10px 12px; }
+.cn-theme [data-flip-id='cn:jail'] .zk-track-slot {
+  border: 1px dashed var(--cn-manila-edge); background: repeating-linear-gradient(135deg, transparent 0 8px, rgba(255, 255, 255, .02) 8px 16px);
+}
+.cn-theme [data-flip-id='cn:jail'] .zk-track-slot-name { font: 400 10px/1.2 var(--cn-type); letter-spacing: .12em; text-transform: uppercase; color: #8c826f; }
+.cn-theme [data-flip-id='cn:jail'] .zk-track-card { background: transparent; border-left: none; padding: 0; font-weight: 600; white-space: normal; overflow: visible; line-height: 1.15; }
+.cn-theme .zk-track-card-art { filter: blur(1px) grayscale(.92) contrast(1.25) brightness(.9) sepia(.4) hue-rotate(65deg) saturate(1.3); }
+/* Who you can reach: rows with a face. */
+.cn-theme [data-flip-id='cn:reach'] .zk-card-row-art { filter: blur(1.2px) grayscale(.92) contrast(1.25) brightness(.9) sepia(.4) hue-rotate(65deg) saturate(1.3); border-radius: 50%; }
+.cn-theme [data-flip-id='cn:reach'] .zk-card-row { grid-template-columns: 5px 30px auto minmax(0, 1fr); gap: 8px; background: var(--cn-panel); border-color: var(--cn-rule); }
+.cn-theme [data-flip-id='cn:reach'] .zk-card-row-cost { width: 5px; height: 26px; border-radius: 3px; font-size: 0; }
+.cn-theme [data-flip-id='cn:reach'] .zk-card-row-art { width: 30px; height: 30px; }
+.cn-theme [data-flip-id='cn:reach'] .zk-card-row-label { max-width: 150px; font-family: var(--cn-sign); }
+.cn-theme [data-flip-id='cn:reach'] .zk-card-row-sub { overflow: hidden; text-overflow: ellipsis; }
+
+/* The case file: thirteen small slots, the rows side by side as on the
+   boards, each filled slot just the person's face over their faction rule. */
+.cn-theme [data-flip-id='cn:case'], .cn-theme [data-flip-id='cn:case'] .zk-zone { --zekel-card-w: 44px; --zekel-card-h: 58px; }
+.cn-theme [data-flip-id='cn:case'] .zk-tableau-slot { gap: 10px 14px; }
+.cn-theme [data-flip-id='cn:case'] .zk-tableau-slot > * { flex: none; }
+.cn-theme [data-flip-id='cn:case'] .zk-zone-label { font-size: 9px; letter-spacing: .14em; margin-bottom: 3px; }
+.cn-theme [data-flip-id='cn:case'] .zk-zone-row { gap: 4px; flex-wrap: nowrap; }
+.cn-theme [data-flip-id='cn:case'] .layout-portrait .zk-card-pic { flex: 1 1 auto; }
+.cn-theme [data-flip-id='cn:case'] .layout-portrait :is(.zk-card-body, .zk-card-cost, .zk-card-emblem) { display: none; }
+/* The subway map is laid out for the full board width; the general cap on
+   a map's width would squeeze its names together on the watch page. */
+.cn-theme .zones .zone-map { max-width: none; }

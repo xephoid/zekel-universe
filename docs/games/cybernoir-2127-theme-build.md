@@ -37,7 +37,15 @@ NOT IT, because the engine counts every card they hold as ruled out. The
 camera numbers stay off. The red top edge on a Hacker's Contact is left off:
 the Hacker's view says how many informants are face down but not who, so it
 cannot single out a Contact. The full-size cards (240 × 360, 460 × 290) are
-not drawn anywhere on the table yet.
+not drawn anywhere on the table yet. Item 6, the tables: `cn.css` places the
+page's own parts on one grid (map and clue row, then the hand, then the
+lesson and verbs on the left; a 404 px column on the right), the caption
+moves to the side column (`captionInSide`, a new glue flag), and the glue
+puts the jail, both seats' counts and the deck in the side column, the case
+first. The Location deck count is in the top bar as the case clock. Who you
+can reach is a list of rows; a tap still offers Arrest and Recruit as the
+engine lists them, rather than buttons on each row. On a 900 px tall window
+with the lesson note open, the clue row scrolls just out of view.
 
 ## Before anything else
 
