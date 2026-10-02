@@ -20,7 +20,14 @@ table boards do, so the bends are 45° only at the design's proportions. Below
 300 px tall the names collide, so the map stops shrinking there. Item 3, the
 clue tokens: a `token` shape for the track (`spaceShape`) and the pool
 (`itemShape`, with `caption` and `sash` per item); each coin's lettering is
-sized to its longest word so a faction name never breaks mid-word.
+sized to its longest word so a faction name never breaks mid-word. Item 4,
+the portraits: the 50 crops are in `apps/web/public/art/cybernoir/` under the
+engine's person ids (`glue/cn/faces.ts`); Contact cards carry the tall crop,
+and `cn.css` draws it as a camera grab with filters and a scanline mask on the
+image itself. Cards gained `stamp` (BLOWN) and `backLabel` (NO SIGNAL), and
+the Hacker's side has the informants facing them. Camera numbers and match
+boxes are left off for now: they are flavour, and the card faces (item 5) are
+the place to decide them.
 
 ## Before anything else
 

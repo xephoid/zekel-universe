@@ -140,3 +140,33 @@
 .cn-theme .zk-station.glow .zk-station-name { font-weight: 700; color: var(--cn-text); }
 .cn-theme .zk-station.crossed .zk-station-name { text-decoration-color: var(--cn-stamp); }
 .cn-theme .zk-map-legend { color: var(--cn-muted); }
+
+/* ---------- people as street-camera grabs (build item 4) ----------
+   The crops are plain; the look is applied here. Blurred, drained, a green
+   cast, a little dark, and scanlines: the mask lets the dark card show
+   through one line in three. The image is clipped to its own box so the blur
+   does not bleed. Small pictures blur less. Nothing here changes with the
+   game: no camera number, timestamp or match box carries information. */
+.cn-theme .zk-card-art {
+  filter: blur(2.2px) grayscale(.92) contrast(1.25) brightness(.9) sepia(.4) hue-rotate(65deg) saturate(1.3);
+  clip-path: inset(0 round 4px);
+  -webkit-mask-image: repeating-linear-gradient(to bottom, #000 0 2px, rgba(0, 0, 0, .55) 2px 3px);
+  mask-image: repeating-linear-gradient(to bottom, #000 0 2px, rgba(0, 0, 0, .55) 2px 3px);
+  object-position: 50% 30%;
+}
+.cn-theme .zk-zone-small .zk-card-art { filter: blur(1.4px) grayscale(.92) contrast(1.25) brightness(.9) sepia(.4) hue-rotate(65deg) saturate(1.3); }
+/* A revealed informant: a rubber stamp, in the Detective's typewriter. */
+.cn-theme .zk-card-stamp {
+  font: 400 12px/1.2 var(--cn-type); letter-spacing: .1em; color: var(--cn-stamp);
+  border-color: var(--cn-stamp); background: rgba(10, 13, 19, .55);
+}
+/* A face-down informant, as the Hacker sees it: a dead camera feed. */
+.cn-theme .zk-card-back:has(.zk-card-back-label) {
+  background:
+    repeating-linear-gradient(to bottom, rgba(255, 255, 255, .05) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(97deg, rgba(255, 255, 255, .07) 0 2px, transparent 2px 5px, rgba(0, 0, 0, .25) 5px 7px),
+    repeating-linear-gradient(13deg, rgba(255, 255, 255, .04) 0 1px, transparent 1px 4px),
+    #0f131b;
+  border: 1px dashed var(--cn-ice); color: var(--cn-ice);
+}
+.cn-theme .zk-card-back-label { font: 400 11px/1.2 var(--cn-term); letter-spacing: .12em; text-shadow: 0 0 6px var(--cn-ice); }

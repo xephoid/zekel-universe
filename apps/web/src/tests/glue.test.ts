@@ -676,6 +676,7 @@ describe('cybernoir-2127 glue', () => {
     const hand = cards(plan.bench.find((z) => z.id === 'cn:hand'));
     expect(hand[0]).toEqual({
       id: 'cn:hand:0:Blackice', label: 'Blackice', colorKey: 'gang_1',
+      artUrl: '/art/cybernoir/blackice-tall.jpg',
       groupKey: 'gang_1', cost: 2,
       subtitle: 'Discard one Location the Detective has already played from the board.',
       badges: ['Iceden Collective'],
@@ -686,7 +687,41 @@ describe('cybernoir-2127 glue', () => {
     // A Witness says so, and its ability line would only repeat the badge.
     const witness = g.plan(input({ ...CN_VIEW, hand: ['Eddie the Doorman'] }, [], { reference: CN_REFERENCE }))!;
     expect(cards(witness.bench.find((z) => z.id === 'cn:hand'))[0])
-      .toEqual({ id: 'cn:hand:0:Eddie the Doorman', label: 'Eddie the Doorman', colorKey: 'none', groupKey: 'none', cost: 0, badges: ['Witness'] });
+      .toEqual({ id: 'cn:hand:0:Eddie the Doorman', label: 'Eddie the Doorman', artUrl: '/art/cybernoir/eddie_the_doorman-tall.jpg', colorKey: 'none', groupKey: 'none', cost: 0, badges: ['Witness'] });
+  });
+
+  it('draws the informants facing the Hacker: a dead feed for each face-down one, a blown portrait for each revealed one', () => {
+    const facing = (view: Record<string, unknown>) => {
+      const plan = g.plan(input(view, [], { reference: CN_REFERENCE }))!;
+      return plan.side.find((z) => z.id === 'cn:informants-facing')!.data as CardZoneData;
+    };
+    const mine = facing(CN_VIEW);
+    expect(mine.label).toBe('Informants facing you (2)');
+    // Only how many are face down: no name, no picture, nothing to guess from.
+    expect(mine.cards![0]).toEqual({ id: 'cn:informant:1', label: 'Face-down informant 1', face: 'down', backLabel: 'No signal' });
+    expect(JSON.stringify(mine.cards![0])).not.toMatch(/art|Anansi|Blackice/);
+    // The revealed one by name, with its portrait and the stamp. The id is
+    // the engine's own name for the target, so a move at it lights the card.
+    expect(mine.cards![1]).toMatchObject({
+      id: 'cn:informant:Anansi the Spider', label: 'Anansi the Spider',
+      artUrl: '/art/cybernoir/anansi_the_spider-tall.jpg', stamp: 'Blown',
+    });
+    const remove = { move_id: 'r1', description: 'Remove facedown informant #1', move: { type: 'informant_removal_choice', target_informant: '1' } };
+    expect(g.litParts(input(CN_VIEW, [remove], { reference: CN_REFERENCE }))).toContain('cn:informant:1');
+    // A watcher's table says whose they are.
+    const { role: _r, hand: _h, hideout: _o, ...watcher } = CN_VIEW;
+    expect(facing(watcher).label).toBe('Informants facing the Hacker (2)');
+  });
+
+  it("stamps a revealed informant BLOWN on the Detective's own row too", () => {
+    const det = g.plan(input({ ...CN_VIEW, role: 'detective', hideout: null, location_hand: [],
+      informants: [{ person: 'Blackice', revealed: true }, { person: 'Eddie the Doorman', revealed: false }] }, [], { reference: CN_REFERENCE }))!;
+    const row = cards(det.bench.find((z) => z.id === 'cn:informants'));
+    expect(row.map((c) => [c.label, c.stamp, c.artUrl])).toEqual([
+      ['Blackice', 'Blown', '/art/cybernoir/blackice-tall.jpg'],
+      ['Eddie the Doorman', undefined, '/art/cybernoir/eddie_the_doorman-tall.jpg'],
+    ]);
+    expect(det.side.find((z) => z.id === 'cn:informants-facing')).toBeUndefined();
   });
 
   it('tells the Hacker how many informants are facing them, which is their central risk', () => {

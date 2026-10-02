@@ -10,6 +10,7 @@ import type { GameReferenceResponse } from '@universe/shared';
 import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, PlanPrompt, PromptAction, SelectEvent, SetupField, TablePlan, Zone, SetupAnswers, SetupSeat } from './types';
 import { asArr, asNum, asStr, isObj, shapeHas, words } from './types';
 import { BOROUGH_COLUMNS, LINES, STATIONS, columnOf, pct } from './cn/metro';
+import { faceUrl } from './cn/faces';
 import './cn/cn.css';
 
 /**
@@ -118,7 +119,10 @@ function contactCard(
   abilities?: Map<string, { name: string; text: string }>,
 ): CardData {
   const p = people.get(label);
-  if (!p) return { id, label, colorKey: 'none' };
+  // The portrait, when there is one for this name; the theme draws it as a
+  // street-camera grab.
+  const art = faceUrl(label);
+  if (!p) return { id, label, colorKey: 'none', ...(art ? { artUrl: art } : {}) };
   const ability = p.ability ? abilities?.get(p.ability) : undefined;
   const badges = [
     ...(p.affiliation && p.affiliation !== 'none' ? [n.affiliation(p.affiliation)] : []),
@@ -126,6 +130,7 @@ function contactCard(
   ];
   return {
     id, label, colorKey: p.affiliation || 'none',
+    ...(art ? { artUrl: art } : {}),
     // A big hand folds by faction: the field a Motive set is built from.
     ...(p.affiliation ? { groupKey: p.affiliation } : {}),
     ...(p.cost === undefined ? {} : { cost: p.cost }),
@@ -748,6 +753,33 @@ function stationMap(
   };
 }
 
+/**
+ * The informants facing the Hacker, as the Hacker may know them: the face-down
+ * ones only by how many there are, each a dead camera feed ("NO SIGNAL"), and
+ * the revealed ones by name, with their portrait and a BLOWN stamp. Card ids
+ * follow the engine's own way of naming a target: a face-down informant by its
+ * position among the face-down ones (1, 2, ...), a revealed one by name, so a
+ * move that targets one lights that card.
+ */
+function informantsFacing(
+  view: Record<string, unknown>, mine: boolean, people: Map<string, Person>, n: Names,
+  abilities: Map<string, { name: string; text: string }>,
+): Zone {
+  const down = Math.max(0, asNum(view['informants_facedown_count']));
+  const revealed = asArr(view['informants_revealed'])
+    .map((r) => asStr(isObj(r) ? r['person'] : r)).filter(Boolean);
+  const cards: CardData[] = [
+    ...Array.from({ length: down }, (_, i): CardData => ({
+      id: `cn:informant:${i + 1}`, label: `Face-down informant ${i + 1}`, face: 'down', backLabel: 'No signal',
+    })),
+    ...revealed.map((who): CardData => ({ ...contactCard(`cn:informant:${who}`, who, people, n, abilities), stamp: 'Blown' })),
+  ];
+  return {
+    kind: 'card-zone', id: 'cn:informants-facing',
+    data: { label: `Informants facing ${mine ? 'you' : 'the Hacker'} (${down + revealed.length})`, mode: 'row', size: 'small', cards },
+  };
+}
+
 export const cybernoirGlue: GlueModule = {
   gameId: 'cybernoir-2127',
   title: 'Cybernoir 2127',
@@ -1001,6 +1033,7 @@ export const cybernoirGlue: GlueModule = {
             return {
               ...contactCard(`cn:informant:${ORDINALS[i] ?? String(i)}`, asStr(o['person']), people, name, abilities),
               subtitle: revealed ? 'revealed to the Hacker' : 'face down to the Hacker',
+              ...(revealed ? { stamp: 'Blown' } : {}),
             };
           }),
         },
@@ -1022,6 +1055,7 @@ export const cybernoirGlue: GlueModule = {
     } else {
       bench.push(hakTz);
       side.push(detTz);
+      side.push(informantsFacing(view, role === 'hacker', people, name, abilities));
       const hand = view['hand'];
       if (Array.isArray(hand)) {
         bench.push({
