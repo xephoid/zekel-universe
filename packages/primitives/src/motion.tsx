@@ -6,7 +6,10 @@
 // Rules from the brief, enforced here:
 //   - Nothing appears in place. A new element flies from the element named
 //     by its data-flip-from attribute; with no origin it drops in from above
-//     and settles. A fade-in is never used with motion on.
+//     and settles. A fade-in is never used with motion on. data-flip-from may
+//     name several ids separated by "|" (ids may hold spaces): the first that
+//     was on the table is the origin (a card whose id carries its place in a hand, say, names
+//     every place it could have been).
 //   - A moving thing lifts: its shadow grows while it travels.
 //   - Motion is short: a few hundred milliseconds.
 //   - Reduced motion turns movement into a fade and keeps the timing.
@@ -16,7 +19,9 @@
 // card itself waits hidden in place. So a card crossing from the bench into
 // a scrolling board, or out of a row that clips, is never cut off and never
 // painted behind what it passes. Every other part (a zone, a pool, a pawn)
-// moves within its own box and slides in place.
+// moves within its own box and slides in place, unless it carries
+// data-flip-ghost: a mark that travels from a card into a clipped board (a
+// station's diamond) flies as a ghost too.
 
 import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 
@@ -185,9 +190,12 @@ export function FlipRoot({ viewKey, reducedMotion, children, className, style }:
         else slide(el, `translate(${dx}px, ${dy}px)`, ms, ease);
         continue;
       }
-      // New: fly from its origin, or drop in.
-      const fromId = el.dataset.flipFrom;
-      const originRect = fromId ? (prevRects.current.get(fromId) ?? (currentById.get(fromId) ? rectOf(currentById.get(fromId)!) : undefined)) : undefined;
+      // New: fly from its origin, or drop in. The first named origin that
+      // was on the table, or failing that is on it now, is the one.
+      const fromIds = (el.dataset.flipFrom ?? '').split('|').map((f) => f.trim()).filter(Boolean);
+      const wasId = fromIds.find((f) => prevRects.current.has(f));
+      const nowId = wasId ? undefined : fromIds.find((f) => currentById.has(f));
+      const originRect = wasId ? prevRects.current.get(wasId) : nowId ? rectOf(currentById.get(nowId)!) : undefined;
       if (reduced) {
         fade(el, ms, ease);
         continue;
@@ -196,7 +204,7 @@ export function FlipRoot({ viewKey, reducedMotion, children, className, style }:
         const from = center(originRect);
         const to = center(rect);
         const fromTransform = `translate(${from.x - to.x}px, ${from.y - to.y}px) scale(0.7)`;
-        if (el.classList.contains('zk-card')) fly(root, el, rect, fromTransform, ms, ease, flying);
+        if (el.classList.contains('zk-card') || el.dataset.flipGhost !== undefined) fly(root, el, rect, fromTransform, ms, ease, flying);
         else slide(el, fromTransform, ms, ease);
       } else {
         drop(el);

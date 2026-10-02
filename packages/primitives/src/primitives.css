@@ -387,7 +387,7 @@
 /* Something put on the place: a solid diamond in place of the ring, which
    drops onto the station rather than appearing on it. */
 .zk-station.mark-diamond .zk-station-ring { border-color: transparent; background: transparent; }
-.zk-station-diamond { position: absolute; inset: -4px; animation: zk-drop var(--motion-drop, 420ms) var(--motion-settle, ease-out) both; }
+.zk-station-diamond { position: absolute; inset: -4px; }
 .zk-station-diamond::before {
   content: ''; position: absolute; inset: 0; border-radius: 3px; transform: rotate(45deg);
   background: var(--station-mark); box-shadow: 0 0 0 3px var(--bg-raised), 0 0 12px var(--station-mark);
@@ -408,8 +408,7 @@
 .zk-map-key-station.faded { opacity: 0.3; }
 .zk-map-key-station.diamond { border: none; border-radius: 2px; background: var(--station); transform: rotate(45deg) scale(0.8); }
 .zk-map-key-station.frame { border-radius: 2px; border: 2px solid var(--station); background: transparent; transform: rotate(45deg) scale(0.85); }
-@media (prefers-reduced-motion: reduce) { [data-motion] .zk-station-diamond { animation-name: zk-fade; } }
-[data-motion='reduced'] .zk-station-diamond { animation-name: zk-fade; }
+
 
 /* Tokens (TrackData.spaceShape and PoolData.itemShape 'token'): round
    coins. A track's slot is dashed with "?" until it is filled; a pool's token
@@ -430,7 +429,6 @@
   font: 700 10px/1.05 var(--font-display); text-transform: uppercase;
   display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
 }
-.zk-track-token.filled .zk-token-value, .zk-pool-token .zk-token-value { animation: zk-drop var(--motion-drop, 420ms) var(--motion-settle, ease-out) both; }
 .zk-track-token .zk-token-value.unknown { font-size: 16px; animation: none; }
 .zk-pool-token { justify-content: flex-start; padding-top: 27px; }
 .zk-pool-token .zk-token-caption { margin-bottom: 2px; }
@@ -440,8 +438,7 @@
   font: 700 8px/13px var(--font-display); letter-spacing: .2em; text-align: center;
 }
 .zk-token-count { position: absolute; bottom: 4px; font-size: 9px; }
-@media (prefers-reduced-motion: reduce) { [data-motion] :is(.zk-track-token.filled, .zk-pool-token) .zk-token-value { animation-name: zk-fade; } }
-[data-motion='reduced'] :is(.zk-track-token.filled, .zk-pool-token) .zk-token-value { animation-name: zk-fade; }
+
 
 /* A word stamped across a card's face, and words on a card's back. */
 .zk-card-stamp {

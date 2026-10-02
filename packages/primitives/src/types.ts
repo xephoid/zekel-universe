@@ -70,6 +70,10 @@ export interface CardData {
   /** Universe addition, `sign` layout: one quiet line where the faces go
    *  (nobody home). */
   note?: string;
+  /** Universe addition: where this card comes from when it is new, as flip
+   *  ids separated by "|" (the first that was on the table wins). Overrides
+   *  the zone's arriveFrom for this card. */
+  arriveFrom?: string;
 }
 
 /** <zekel-card-zone>: a row, a fan, or a pile of cards. */
@@ -272,6 +276,10 @@ export interface MapNode {
   meter?: { value: number; max: number };
   mark?: 'diamond' | 'frame';
   markColorKey?: string;
+  /** Universe addition: where a new diamond comes from, as flip ids
+   *  separated by "|" (the first that was on the table wins), such as the card that was played;
+   *  it flies from there and lands on the station. Without one it drops. */
+  markFrom?: string;
   crossed?: boolean;
   glow?: boolean;
   labelSide?: 'above' | 'below';

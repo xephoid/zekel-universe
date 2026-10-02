@@ -285,7 +285,7 @@ export function CardZone({ id, data, lit, onSelect, arriveFrom, className, style
     body = (
       <div className="zk-zone-list">
         {cards.map((c, i) => (
-          <CardRow key={c.id ?? `${id}:${i}`} id={c.id ?? `${id}:${i}`} data={c} lit={lit} onSelect={onSelect} arriveFrom={arriveFrom} />
+          <CardRow key={c.id ?? `${id}:${i}`} id={c.id ?? `${id}:${i}`} data={c} lit={lit} onSelect={onSelect} arriveFrom={c.arriveFrom ?? arriveFrom} />
         ))}
       </div>
     );
@@ -299,12 +299,12 @@ export function CardZone({ id, data, lit, onSelect, arriveFrom, className, style
         {under.map((c, i) => (
           <Card key={c.id ?? `${id}:under:${i}`} id={c.id ?? `${id}:under:${i}`} data={c} style={{ top: (i - under.length) * 2, left: (i - under.length) * 1 }} />
         ))}
-        <Card id={top.id ?? `${id}:top`} data={top} lit={lit} onSelect={onSelect} arriveFrom={arriveFrom} />
+        <Card id={top.id ?? `${id}:top`} data={top} lit={lit} onSelect={onSelect} arriveFrom={top.arriveFrom ?? arriveFrom} />
       </div>
     );
   } else {
     const card = (c: CardData, i: number, s?: CSSProperties) => (
-      <Card key={c.id ?? `${id}:${i}`} id={c.id ?? `${id}:${i}`} data={c} lit={lit} onSelect={onSelect} arriveFrom={arriveFrom} style={s} />
+      <Card key={c.id ?? `${id}:${i}`} id={c.id ?? `${id}:${i}`} data={c} lit={lit} onSelect={onSelect} arriveFrom={c.arriveFrom ?? arriveFrom} style={s} />
     );
     const groups = data.mode === 'fan' && !spread ? groupsOf(cards) : null;
     if (groups && cards.length > FAN_TIGHT_UP_TO) {
@@ -739,7 +739,8 @@ function StationMap({ id, data, lit, onSelect, className, style }: PrimitiveProp
                 aria-label={n.describedAs ?? n.label}
                 title={n.describedAs ?? n.label}
               >
-                {n.mark === 'diamond' && <span className="zk-station-diamond" />}
+                {n.mark === 'diamond' && <span className="zk-station-diamond" data-flip-id={`${id}:mark:${n.id}`} data-flip-from={n.markFrom} data-flip-ghost=""
+                  style={{ ['--station-mark' as string]: markColor }} />}
                 {n.mark === 'frame' && <span className="zk-station-frame" />}
               </div>
               <div className="zk-station-label" aria-hidden="true">
