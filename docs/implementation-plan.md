@@ -1177,6 +1177,9 @@ check is `e2e/fractured-fist-phone.spec.ts` at 390 x 844.
   The board's slight rotation of the fan is not drawn.
 - **Not covered:** a phone held sideways is wider than 640 px and gets the
   desktop table, which does not fit 844 x 390.
+- **A sheet's ✕ sits in its corner on every Fractured Fist table.** The
+  theme's buttons are positioned for their slanted box, which had pulled
+  the ✕ into the flow over the title; one rule puts it back, desktop too.
 
 ## 18. Adventurer Olympics (decided 2026-09-30, not built)
 

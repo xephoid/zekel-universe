@@ -146,6 +146,9 @@
 /* ---------- sheets over the table ---------- */
 .ff-theme .sheet { background: var(--ff-panel); color: var(--ff-text); border: 2px solid #000; border-radius: var(--ff-radius); box-shadow: var(--shadow-pop); }
 .ff-theme .sheet h2 { font: italic 800 28px/1 var(--ff-display); letter-spacing: .02em; text-transform: uppercase; }
+/* The theme's buttons are position: relative (for the slanted box behind
+   them), which would pull a sheet's ✕ out of its corner and into the flow. */
+.ff-theme .sheet .close { position: absolute; }
 .ff-theme .sheet-backdrop { background: rgba(8, 7, 10, .72); }
 .ff-theme .rules-text { background: var(--ff-ground); border: 2px solid #000; border-radius: var(--ff-radius); }
 .ff-theme .end-panel h2 { font: italic 800 44px/1 var(--ff-display); text-transform: uppercase; }
@@ -563,7 +566,7 @@
 }
 .table-shell.phone.ff-theme .sheet::before { content: ''; position: absolute; top: 8px; left: 50%; width: 40px; height: 4px; margin-left: -20px; border-radius: 2px; background: rgba(255, 255, 255, .25); }
 .table-shell.phone.ff-theme .sheet .close::before { transform: none; border-radius: 6px; background: transparent; border-color: rgba(255, 255, 255, .22); box-shadow: none; }
-.table-shell.phone.ff-theme .sheet .close { position: absolute; color: var(--ff-text); font-size: 18px; }
+.table-shell.phone.ff-theme .sheet .close { color: var(--ff-text); font-size: 18px; }
 .ff-theme .ff-sheet-head { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; padding-right: 52px; margin-bottom: 14px; }
 .ff-theme .ff-sheet-head h2 { margin: 0; padding: 0; font: italic 800 26px/1 var(--ff-display); letter-spacing: .02em; text-transform: uppercase; }
 .ff-theme .ff-sheet-status { font: 800 11px/1.2 var(--ff-display); letter-spacing: .1em; text-transform: uppercase; color: var(--ff-hi); }
