@@ -43,6 +43,33 @@ export interface CardData {
   /** Universe addition: words on the back of a face-down card (NO SIGNAL),
    *  for a card whose back means something the plain back does not say. */
   backLabel?: string;
+  /**
+   * Universe additions: how the face is laid out. `portrait` puts the art
+   * across the top, edge to edge, with the cost and the emblem in its
+   * corners, then a rule in the card's colour, the name, the subtitle and the
+   * badges (a person). `sign` puts a light plate across the top holding
+   * `code` in a disc of the card's colour, the name and the subtitle (a
+   * station sign), then the meter and badges, then `faces` (a place and who
+   * lives there). Without a layout the face is the plain card painted in its
+   * colour.
+   */
+  layout?: 'portrait' | 'sign';
+  /** Universe addition: a small picture in the face's top corner (a faction
+   *  mark). Decoration: say what it means in a badge too. */
+  emblemUrl?: string;
+  /** Universe addition: `pips` draws a numeric cost as that many pips, and a
+   *  cost of nothing as FREE. */
+  costStyle?: 'number' | 'pips';
+  /** Universe addition, `sign` layout: a short code in a disc (a line bullet). */
+  code?: string;
+  /** Universe addition, `sign` layout: a bar of `max` pips, `value` filled. */
+  meter?: { value: number; max: number };
+  /** Universe addition, `sign` layout: small round pictures of people, each
+   *  named by its title. */
+  faces?: { label: string; artUrl?: string }[];
+  /** Universe addition, `sign` layout: one quiet line where the faces go
+   *  (nobody home). */
+  note?: string;
 }
 
 /** <zekel-card-zone>: a row, a fan, or a pile of cards. */

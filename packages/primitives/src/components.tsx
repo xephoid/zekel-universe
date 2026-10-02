@@ -55,7 +55,12 @@ export function Card({ id, data, lit, onSelect, arriveFrom, className, style }: 
   const down = data.face === 'down';
   const handled = handledTransform(id, data.rotation ? 0 : 1);
   const lp = litProps(isLit, () => onSelect?.({ component: 'card', id, label: data.label }));
-  const faceStyle: CSSProperties = { background: themeColor(data.colorKey ?? data.label) };
+  const color = themeColor(data.colorKey ?? data.label);
+  // A laid-out face keeps its colour for its edge and its line bullet; the
+  // plain card is painted in it.
+  const faceStyle: CSSProperties = data.layout
+    ? { ['--card-color' as string]: color }
+    : { background: color };
   return (
     <div
       data-flip-id={id}
@@ -72,6 +77,51 @@ export function Card({ id, data, lit, onSelect, arriveFrom, className, style }: 
       onKeyDown={lp.onKeyDown}
     >
       <div className={cx('zk-card-flipper', down && 'down')}>
+        {data.layout === 'portrait' ? (
+          <div className="zk-card-face layout-portrait" style={faceStyle}>
+            <div className="zk-card-pic">
+              {data.artUrl && <img className="zk-card-art" src={data.artUrl} alt="" />}
+              {data.cost !== undefined && <CardCost data={data} />}
+              {data.emblemUrl && <img className="zk-card-emblem" src={data.emblemUrl} alt="" />}
+            </div>
+            {data.stamp && <span className="zk-card-stamp" aria-hidden="true">{data.stamp}</span>}
+            <div className="zk-card-body">
+              <div className="zk-card-label">{data.label}</div>
+              {data.subtitle && <div className="zk-card-sub">{data.subtitle}</div>}
+              {data.badges && data.badges.length > 0 && (
+                <div className="zk-card-badges">{data.badges.map((b, i) => <span key={i} className="zk-card-badge">{b}</span>)}</div>
+              )}
+            </div>
+          </div>
+        ) : data.layout === 'sign' ? (
+          <div className="zk-card-face layout-sign" style={faceStyle}>
+            <div className="zk-card-plate">
+              {data.code && <span className="zk-card-code">{data.code}</span>}
+              <div className="zk-card-plate-text">
+                <div className="zk-card-label">{data.label}</div>
+                {data.subtitle && <div className="zk-card-sub">{data.subtitle}</div>}
+              </div>
+              {data.emblemUrl && <img className="zk-card-emblem" src={data.emblemUrl} alt="" />}
+            </div>
+            <div className="zk-card-body">
+              <div className="zk-card-meta">
+                {data.meter && <CardMeter meter={data.meter} />}
+                {data.badges && data.badges.length > 0 && (
+                  <div className="zk-card-badges">{data.badges.map((b, i) => <span key={i} className="zk-card-badge">{b}</span>)}</div>
+                )}
+              </div>
+              {data.faces && data.faces.length > 0 && (
+                <div className="zk-card-faces">
+                  {data.faces.map((f) => (f.artUrl
+                    ? <img key={f.label} className="zk-card-face-pic" src={f.artUrl} alt="" title={f.label} />
+                    : <span key={f.label} className="zk-card-face-pic" title={f.label} />))}
+                </div>
+              )}
+              {data.note && <div className="zk-card-note">{data.note}</div>}
+            </div>
+            {data.stamp && <span className="zk-card-stamp" aria-hidden="true">{data.stamp}</span>}
+          </div>
+        ) : (
         <div className="zk-card-face" style={faceStyle}>
           {data.artUrl && <img className="zk-card-art" src={data.artUrl} alt="" />}
           {data.stamp && <span className="zk-card-stamp" aria-hidden="true">{data.stamp}</span>}
@@ -95,12 +145,33 @@ export function Card({ id, data, lit, onSelect, arriveFrom, className, style }: 
             )}
           </div>
         </div>
+        )}
         <div className="zk-card-back">
           <div>{data.count !== undefined && data.count > 1 ? <><span className="zk-card-back-x">×</span>{data.count}</> : ''}</div>
           {data.backLabel && <span className="zk-card-back-label" aria-hidden="true">{data.backLabel}</span>}
         </div>
       </div>
     </div>
+  );
+}
+
+/** A cost as a number, or as that many pips with nothing to pay said FREE. */
+function CardCost({ data }: { data: CardData }) {
+  if (data.costStyle !== 'pips' || typeof data.cost !== 'number') return <span className="zk-card-cost">{data.cost}</span>;
+  if (data.cost <= 0) return <span className="zk-card-cost pips free">Free</span>;
+  return (
+    <span className="zk-card-cost pips" aria-label={`costs ${data.cost}`}>
+      {Array.from({ length: data.cost }, (_, i) => <span key={i} className="zk-card-pip" />)}
+    </span>
+  );
+}
+
+/** A small bar of `max` pips with `value` filled. */
+function CardMeter({ meter }: { meter: { value: number; max: number } }) {
+  return (
+    <span className="zk-card-meter" aria-hidden="true">
+      {Array.from({ length: meter.max }, (_, i) => <span key={i} className={cx('zk-card-meter-pip', i < meter.value && 'on')} />)}
+    </span>
   );
 }
 

@@ -455,6 +455,59 @@
   font: 600 10px/1.2 var(--font-mono); letter-spacing: .14em; text-transform: uppercase;
 }
 
+/* Laid-out card faces (CardData.layout). The face is the page's raised
+   colour; the card's own colour (--card-color) is its rule, its line bullet
+   and its pips. */
+.zk-card-face:is(.layout-portrait, .layout-sign) {
+  background: var(--bg-raised); color: var(--fg); text-shadow: none;
+  padding: 0; justify-content: flex-start; gap: 0; border: 1px solid var(--border);
+}
+.layout-portrait .zk-card-pic {
+  position: relative; flex: 0 0 52%; overflow: hidden; background: #000;
+  border-bottom: 3px solid var(--card-color);
+}
+.layout-portrait .zk-card-pic .zk-card-art { width: 100%; height: 100%; border-radius: 0; object-fit: cover; display: block; }
+.layout-portrait .zk-card-cost, .layout-portrait .zk-card-emblem { position: absolute; top: 5px; }
+.layout-portrait .zk-card-cost { left: 5px; float: none; margin: 0; }
+.layout-portrait .zk-card-emblem { right: 5px; width: 22px; height: 22px; object-fit: contain; }
+.zk-card-body { display: flex; flex-direction: column; gap: 3px; padding: 6px 7px; min-height: 0; flex: 1 1 auto; overflow: hidden; }
+.layout-portrait .zk-card-label { font: 700 11px/1.1 var(--font-display); text-transform: uppercase; overflow-wrap: normal; }
+.layout-portrait .zk-card-sub { font-size: 10px; line-height: 1.25; color: var(--fg); opacity: .85;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden; }
+.layout-portrait .zk-card-badges { margin-top: auto; }
+:is(.layout-portrait, .layout-sign) .zk-card-badge { background: transparent; border: 1px solid var(--border); color: var(--fg-muted); }
+/* A cost as pips: diamonds in a dark lozenge; nothing to pay says FREE. */
+.zk-card-cost.pips {
+  display: inline-flex; gap: 3px; align-items: center; min-width: 0; height: auto;
+  padding: 3px 5px; border-radius: 4px; background: rgba(0, 0, 0, .55);
+}
+.zk-card-cost.pips.free { font: 600 8px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--fg-muted); }
+.zk-card-pip { width: 7px; height: 7px; transform: rotate(45deg); background: var(--accent); }
+/* A station sign: a light plate, the line bullet, the name, the borough. */
+.layout-sign .zk-card-plate {
+  display: flex; align-items: center; gap: 7px; padding: 6px 8px;
+  background: #f1f0ea; color: #111318; border-bottom: 4px solid var(--card-color);
+}
+.zk-card-code {
+  flex: none; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--card-color); color: #0A0D13; font: 700 8px/1 var(--font-display); letter-spacing: .02em;
+}
+.zk-card-plate-text { min-width: 0; flex: 1 1 auto; }
+.layout-sign .zk-card-label { font: 700 12px/1.05 var(--font-display); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.layout-sign .zk-card-sub { font: 400 8px/1.2 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: #4a4e58; }
+.layout-sign .zk-card-emblem { flex: none; width: 20px; height: 20px; object-fit: contain; }
+.zk-card-meta { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+.layout-sign .zk-card-badges { justify-content: flex-end; min-width: 0; }
+.layout-sign .zk-card-badge { border: none; padding: 0; font-size: 10px; color: var(--card-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.zk-card-meter { display: inline-flex; gap: 3px; flex: none; }
+.zk-card-meter-pip { width: 12px; height: 5px; box-sizing: border-box; border: 1px solid var(--fg); }
+.zk-card-meter-pip.on { background: var(--fg); }
+.zk-card-faces { display: flex; gap: 4px; margin-top: 4px; }
+.zk-card-note { margin-top: 6px; font: 400 10px/1.2 var(--font-mono); color: var(--fg-muted); }
+/* On a sign the stamp goes in the lower corner, clear of the name. */
+.layout-sign .zk-card-stamp { top: auto; left: auto; right: 8px; bottom: 10px; transform: rotate(-8deg); }
+.zk-card-face-pic { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; background: #000; border: 1px solid var(--border); flex: none; }
+
 /* die */
 .zk-die {
   width: 40px; height: 40px; border-radius: 8px; background: #fff; color: #222;
