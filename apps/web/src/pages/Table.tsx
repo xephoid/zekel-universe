@@ -297,7 +297,7 @@ export function TablePage() {
 
   // A game-drawn screen keeps the last move and the playback speed in the side
   // column, just above the log; any other table shows them over the board.
-  const captionInSide = !!glue?.Screen && sideOpen && !glue.placesCaption;
+  const captionInSide = (!!glue?.Screen || !!glue?.captionInSide) && sideOpen && !glue?.placesCaption;
   const captionCard = (
     <div className={`caption-card${state.done ? '' : ' pending'}`} aria-live="polite">
       {current?.actorSeatPosition !== null && current?.actorSeatPosition !== undefined && table ? (

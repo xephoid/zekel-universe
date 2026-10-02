@@ -301,6 +301,10 @@ export interface GlueModule {
    *  map), instead of the table putting it above the board or in the side
    *  column. */
   placesCaption?: boolean;
+  /** The caption card (the last move and playback) goes in the side column,
+   *  just above the log, instead of above the board, as it does beside a
+   *  game-drawn screen: for a board whose map needs the height. */
+  captionInSide?: boolean;
   /** The turn indicator's words while it is this seat's turn ("Your turn · 3
    *  steps left"), or null for the table's own. Read from the view. */
   yourTurnLabel?(input: GlueInput): string | null;
