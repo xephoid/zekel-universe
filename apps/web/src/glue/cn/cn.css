@@ -1,0 +1,127 @@
+/* Cybernoir 2127's rain and neon theme (docs/design/cybernoir-rain-neon/, the
+   build in docs/games/cybernoir-2127-theme-build.md). Every rule is scoped
+   under .cn-theme, the class the glue's themeFor puts on the table shell, so
+   no other game and no other page changes. The city is dark in both of the
+   site's light and dark settings: it is the game's own look, not a mode.
+
+   The seat adds .cn-theme-detective (stamp red, a case file after dark) or
+   .cn-theme-hacker (glacier ice, a terminal); a watcher gets neither.
+
+   Values are the boards' (Main.dc.html, Table-Detective.dc.html,
+   Table-Hacker.dc.html). The faction colours are the glue's palette, keyed
+   by the engine's affiliation ids, so the map, the cards and the case file
+   all read them from --zekel-c-<id>. */
+
+.table-shell.cn-theme {
+  --cn-ground: #0A0D13;
+  --cn-bar: #0c1018;
+  --cn-panel: #121722;
+  --cn-raised: #1a2130;
+  --cn-rule: #242B3A;
+  --cn-text: #E8ECF2;
+  --cn-muted: #8A93A6;
+  --cn-stamp: #E23B45;
+  --cn-ice: #5FE3FF;
+  --cn-manila: #1F1B15;
+  --cn-manila-edge: #3A3226;
+  /* The seat's accent; a watcher sees the neutral text colour. */
+  --cn-accent: var(--cn-text);
+  --cn-accent-ink: var(--cn-ground);
+
+  /* Self-hosted in fonts.css: Chakra Petch for signage, Special Elite for
+     the Detective, Share Tech Mono for the Hacker. */
+  --cn-sign: 'Chakra Petch', 'IBM Plex Sans', system-ui, sans-serif;
+  --cn-type: 'Special Elite', 'Courier New', 'IBM Plex Mono', monospace;
+  --cn-term: 'Share Tech Mono', 'IBM Plex Mono', ui-monospace, monospace;
+
+  /* Universe's own tokens, redefined for everything on the page. */
+  --bg: var(--cn-ground); --bg-raised: var(--cn-panel); --card: var(--cn-panel); --chip: var(--cn-raised);
+  --fg: var(--cn-text); --fg-muted: var(--cn-muted);
+  --accent: var(--cn-accent); --accent-tint: var(--cn-raised); --accent-tint-2: var(--cn-raised); --highlight: var(--cn-raised);
+  --border: var(--cn-rule); --line: var(--cn-rule);
+  --you-bg: var(--cn-raised); --you-fg: var(--cn-accent);
+  --lit: var(--cn-accent);
+  --danger: var(--cn-stamp);
+  --card-back: #0f131b;
+  --shadow-sm: none; --shadow-md: none;
+  --shadow-card: 0 1px 0 rgba(0, 0, 0, .5), 0 6px 18px rgba(0, 0, 0, .45);
+  --shadow-card-hover: 0 10px 28px rgba(0, 0, 0, .6);
+  --shadow-pop: 0 18px 40px rgba(0, 0, 0, .6);
+  --shadow-lift: 0 12px 22px rgba(0, 0, 0, .6);
+  --font-display: var(--cn-sign);
+
+  background: var(--cn-ground);
+  color: var(--cn-text);
+}
+.table-shell.cn-theme.cn-theme-detective { --cn-accent: var(--cn-stamp); --cn-accent-ink: #ffffff; }
+.table-shell.cn-theme.cn-theme-hacker { --cn-accent: var(--cn-ice); --cn-accent-ink: var(--cn-ground); }
+
+/* ---------- small labels and signage ---------- */
+.cn-theme :is(.zk-zone-label, .zk-tableau-title, .move-menu summary, .side-section h3) {
+  font-family: var(--cn-sign); font-weight: 700; text-transform: uppercase; letter-spacing: .14em;
+}
+/* Stat names stay quiet and in plain case, as on the boards' bench. */
+.cn-theme .zk-stat span { color: var(--cn-muted); }
+.cn-theme-detective .zk-tableau-title { font-family: var(--cn-type); font-weight: 400; letter-spacing: .08em; }
+.cn-theme-hacker .zk-tableau-title { font-family: var(--cn-term); font-weight: 400; letter-spacing: .1em; }
+
+/* ---------- the top bar: near black, a rule under it ---------- */
+.cn-theme .table-topbar { background: var(--cn-bar); border-bottom: 1px solid var(--cn-rule); }
+.cn-theme .table-topbar .divider { background: var(--cn-rule); }
+.cn-theme .table-topbar .wordmark { color: var(--cn-text); }
+.cn-theme .table-topbar .title {
+  font: 700 15px/1 var(--cn-sign); letter-spacing: .1em; text-transform: uppercase;
+}
+.cn-theme .table-topbar .round-note { font-family: var(--font-mono); font-size: 11px; color: var(--cn-muted); }
+/* "Your move": an outlined box in the seat's voice. */
+.cn-theme .turn-pill { border-radius: 4px; background: transparent; border: 1px solid var(--cn-rule); color: var(--cn-muted); }
+.cn-theme .turn-pill.mine { border-color: var(--cn-accent); color: var(--cn-accent); background: transparent; }
+.cn-theme-detective .turn-pill.mine { font-family: var(--cn-type); }
+.cn-theme-hacker .turn-pill.mine { font-family: var(--cn-term); }
+.cn-theme .turn-pill .dot { display: none; }
+
+/* ---------- panels: flat, a hairline edge ---------- */
+.cn-theme :is(.zone:not(.zone-tableau), .zk-tableau, .caption-card, .action-bar, .move-menu, .lesson-note, .toast, .json-inspector) {
+  background: var(--cn-panel); color: var(--cn-text); border: 1px solid var(--cn-rule); border-radius: 10px;
+}
+/* The Detective's panel is a case folder after dark, for both seats. */
+.cn-theme .zk-tableau[data-flip-id='cn:detective'] { background: var(--cn-manila); border-color: var(--cn-manila-edge); }
+.cn-theme .zk-tableau.active { box-shadow: 0 0 0 1px var(--cn-accent); }
+
+/* ---------- buttons ---------- */
+.cn-theme :is(.chip-btn, .btn) { border-radius: 6px; }
+.cn-theme .btn:not(.secondary) { background: var(--cn-raised); color: var(--cn-text); border: 1px solid var(--cn-accent); }
+.cn-theme .btn:not(.secondary):hover:not(:disabled) { background: #222a3b; }
+.cn-theme .btn.secondary { background: var(--cn-raised); color: var(--cn-text); border: 1px solid var(--cn-rule); }
+.cn-theme :is(.chip-btn, .btn):focus-visible { outline: 2px solid var(--cn-accent); outline-offset: 2px; }
+
+/* ---------- cards: a dark face, the faction's line along the top ----------
+   The primitive paints the face in its colour key; on a dark table the line
+   colours are too bright to carry text, so the face goes dark and the colour
+   becomes the edge, as on the boards' Contact and Location cards. */
+.cn-theme .zk-card-face {
+  background: var(--cn-panel) !important; color: var(--cn-text); text-shadow: none;
+  border: 1px solid var(--cn-rule); border-top: 3px solid var(--cn-line, var(--cn-rule));
+}
+.cn-theme .zk-card-row-cost { color: var(--cn-ground); }
+.cn-theme :is(.zk-card, .zk-card-row)[data-color-key='none'] { --cn-line: var(--zekel-c-none); }
+.cn-theme :is(.zk-card, .zk-card-row)[data-color-key='corp-1'] { --cn-line: var(--zekel-c-corp-1); }
+.cn-theme :is(.zk-card, .zk-card-row)[data-color-key='corp-2'] { --cn-line: var(--zekel-c-corp-2); }
+.cn-theme :is(.zk-card, .zk-card-row)[data-color-key='gang-1'] { --cn-line: var(--zekel-c-gang-1); }
+.cn-theme :is(.zk-card, .zk-card-row)[data-color-key='gang-2'] { --cn-line: var(--zekel-c-gang-2); }
+.cn-theme :is(.zk-card, .zk-card-row)[data-color-key='gang-3'] { --cn-line: var(--zekel-c-gang-3); }
+/* The case file's kinds of Evidence and the reach states use the same edge. */
+.cn-theme :is(.zk-card, .zk-card-row):is([data-color-key='witness'], [data-color-key='motive'], [data-color-key='weapon'], [data-color-key='evidence'], [data-color-key='out-of-reach'], [data-color-key='not']) {
+  --cn-line: var(--zekel-c-witness);
+}
+.cn-theme :is(.zk-card, .zk-card-row)[data-color-key='motive'] { --cn-line: var(--zekel-c-motive); }
+.cn-theme :is(.zk-card, .zk-card-row)[data-color-key='weapon'] { --cn-line: var(--zekel-c-weapon); }
+.cn-theme :is(.zk-card, .zk-card-row)[data-color-key='evidence'] { --cn-line: var(--zekel-c-evidence); }
+.cn-theme :is(.zk-card, .zk-card-row):is([data-color-key='out-of-reach'], [data-color-key='not']) { --cn-line: var(--cn-rule); }
+.cn-theme .zk-card.zk-lit .zk-card-face { border-color: var(--cn-accent); box-shadow: 0 0 0 1px var(--cn-accent), 0 0 14px color-mix(in srgb, var(--cn-accent) 45%, transparent); }
+.cn-theme .zk-card.zk-lit:focus-visible .zk-card-face { box-shadow: 0 0 0 3px var(--cn-accent); }
+
+/* ---------- the map, until it is a subway map (build item 2) ----------
+   The line colours are bright, so a station's name is dark on its colour. */
+.cn-theme .zk-map-blob { border-color: rgba(0, 0, 0, .55); }
+.cn-theme .zk-map-blob-name { color: var(--cn-ground); text-shadow: none; font-family: var(--cn-sign); font-weight: 700; }

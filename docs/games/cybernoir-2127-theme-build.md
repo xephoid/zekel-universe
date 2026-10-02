@@ -10,7 +10,8 @@ verb bar, who you can reach, upkeep and block panels, hands that grow) is
 already built; this pass changes how those pieces look and adds the map and
 the portraits. It moves no rule and adds no new move.
 
-Nothing here is built yet.
+Built so far: item 1, the theme hook, with Chakra Petch, Special Elite and
+Share Tech Mono self-hosted (2026-10-02).
 
 ## Before anything else
 

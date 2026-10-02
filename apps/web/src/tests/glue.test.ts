@@ -612,6 +612,21 @@ const CN_HIDEOUT_MOVE = {
 
 describe('cybernoir-2127 glue', () => {
   const g = GLUES['cybernoir-2127']!;
+  it('puts the rain and neon theme on the table in the seat\'s own voice, the plain city for a watcher, and nothing on another game', () => {
+    expect(g.themeFor!(input(CN_VIEW, []))).toBe('cn-theme cn-theme-hacker');
+    expect(g.themeFor!(input({ ...CN_VIEW, role: 'detective' }, []))).toBe('cn-theme cn-theme-detective');
+    const { role: _role, hand: _hand, hideout: _hideout, ...watcher } = CN_VIEW;
+    expect(g.themeFor!(input(watcher, []))).toBe('cn-theme');
+    expect(g.themeFor!(input({ game_id: 'something-else' }, []))).toBeNull();
+    expect(g.themeFor!(input(null, []))).toBeNull();
+  });
+  it('colours each faction with its subway line, keyed by the engine\'s affiliation ids', () => {
+    const plan = g.plan(input(CN_VIEW, [], { reference: CN_REFERENCE }))!;
+    expect(plan.palette).toMatchObject({
+      none: '#A7ADB8', corp_1: '#4D7CFF', corp_2: '#1ED19A', gang_1: '#5FE3FF', gang_2: '#FF3B5C', gang_3: '#B26BFF',
+      detective: '#E23B45', hacker: '#5FE3FF',
+    });
+  });
   it('plans the city from the reference data with played and safehouse marks, and the hacker hand', () => {
     const plan = g.plan(input(CN_VIEW, [], { reference: CN_REFERENCE }))!;
     const map = plan.board.find((z) => z.kind === 'map')!.data as MapData;

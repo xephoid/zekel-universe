@@ -9,32 +9,34 @@ import type { CardData, MapNode, TableauData } from '@universe/primitives';
 import type { GameReferenceResponse } from '@universe/shared';
 import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, PlanPrompt, PromptAction, SelectEvent, SetupField, TablePlan, Zone, SetupAnswers, SetupSeat } from './types';
 import { asArr, asNum, asStr, isObj, shapeHas, words } from './types';
+import './cn/cn.css';
 
 /**
- * The game's own colours, from the design canvas (docs/design/Cybernoir
- * Hacker Table.dc.html and Big Hands). Affiliation is the code that matters:
- * it is the field a Motive set is built from and what a big hand folds on, so
- * every person and every location wears their faction's colour rather than
- * the seat that happens to hold them.
+ * The game's own colours, from the rain and neon theme
+ * (docs/design/cybernoir-rain-neon/, docs/games/cybernoir-2127-theme-build.md).
+ * Affiliation is the code that matters: it is the field a Motive set is built
+ * from and what a big hand folds on, so every person and every location wears
+ * their faction's colour rather than the seat that happens to hold them. The
+ * faction colours are also the subway lines on the map.
  */
 const PALETTE: Record<string, string> = {
-  // The six factions, keyed by the engine's own ids.
-  none: '#575b61',
-  corp_1: '#1c2a5e',
-  corp_2: '#0b6155',
-  gang_1: '#1f6e8c',
-  gang_2: '#7a1220',
-  gang_3: '#5a3d8a',
-  // The two seats, for panels and owner accents.
-  detective: '#b3222a',
-  hacker: '#1f6e8c',
+  // The six factions, keyed by the engine's own ids; line codes in brackets.
+  none: '#A7ADB8', // No affiliation (CIV)
+  corp_1: '#4D7CFF', // OmniSuperUltra Corp (OSU)
+  corp_2: '#1ED19A', // Shizuoka Inc (SHZ)
+  gang_1: '#5FE3FF', // Iceden Collective (ICE)
+  gang_2: '#FF3B5C', // Crimson Clan (CRM)
+  gang_3: '#B26BFF', // Chimera (CHM)
+  // The two seats: stamp red and glacier ice.
+  detective: '#E23B45',
+  hacker: '#5FE3FF',
   // States and the case file's three kinds of Evidence.
-  played: '#3b3f46',
-  safehouse: '#c9a227',
+  played: '#E23B45',
+  safehouse: '#5FE3FF',
   out_of_reach: '#8a8578',
   evidence: '#3E7C4F',
-  witness: '#1f6e8c',
-  motive: '#b3222a',
+  witness: '#A7ADB8',
+  motive: '#E23B45',
   weapon: '#c9a227',
   not: '#8a8578',
 };
@@ -650,6 +652,16 @@ const ORDINALS = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seven
 export const cybernoirGlue: GlueModule = {
   gameId: 'cybernoir-2127',
   title: 'Cybernoir 2127',
+
+  /** The rain and neon theme (docs/design/cybernoir-rain-neon), once the view
+   *  is this game's: the seat's own look from the role the engine puts in
+   *  that seat's view, and the plain city for a watcher. */
+  themeFor(input: GlueInput): string | null {
+    const { view } = input;
+    if (!shapeHas(view, 'phase', 'board', 'detective', 'hacker')) return null;
+    const role = asStr(view['role'], '');
+    return role === 'detective' || role === 'hacker' ? `cn-theme cn-theme-${role}` : 'cn-theme';
+  },
 
   plan(input: GlueInput): TablePlan | null {
     const { view } = input;
