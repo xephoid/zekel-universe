@@ -196,9 +196,47 @@ lanes run together; a fully blocked hit shows "Blocked!"; lost blocks break
 off one at a time; K.O. hands over to the end panel; pace, skip and replay
 work; reduced motion still works.
 
+**7. The phone (added 2026-10-02, not built).** The owner brought the phone
+layout forward for Fractured Fist only; the brief's later phone pass still
+holds for everything else. The boards are the six `Phone-*` files in the
+canvas folder, at 390 × 844. Build it inside `FfScreen` and `ff.css` for
+narrow screens, with the same reading of the view (`glue/ff/read.ts`); the
+desktop table does not change.
+
+- *The table, stacked:* top bar (title, round, "Your move", a menu button);
+  both fighters' plates at the top, smaller; their played row, the strike
+  line as two short rows, your played row, with cards about 62 × 88; the
+  action bar (step tags; the step's counters beside one line of help; the
+  buttons in one row); the hand fanned along the bottom, with small deck and
+  discard piles beside its label. Nothing scrolls at 390 × 844.
+- *The supply is a sheet.* In the Channel step the action bar shows a Supply
+  button with how many stacks the engine lists a `buy_card` for. The sheet
+  is the same list, with taller rows; tapping a lit row buys, as on desktop.
+- *The menu is a sheet* holding what the side column held: undo, rules,
+  settings, share, the last move with pace and replay, the log, and leave.
+- *A tap on a card opens it up close.* On a phone, tapping a card (yours,
+  theirs, played or in hand) opens a sheet with the full printed face from
+  the card art and a line of what it does. When the engine lists a play for
+  that card, the sheet has a Play button that sends that move; otherwise
+  only Close. This is the one change in how you play on a phone: two taps
+  instead of one, so a small card is never played by mistake. The batch
+  "Play all resources" keeps its button in the action bar.
+- *The strike, upright:* the opponent's plate at the top, yours at the
+  bottom, both shields between, the hits crossing up and down. Same
+  `STRIKE_BEATS`, captions, pace, skip, replay, Blocked and K.O. as desktop.
+- Every control is at least 44 px tall; no fake status bar or keyboard.
+
+*Acceptance:* at 390 × 844 the Technique and Channel steps match their
+boards without scrolling; the supply and menu sheets open and close and
+nothing in the side column is lost; a tap on a lit card opens the card sheet
+and its Play button sends the listed move, and a card with no listed play has
+no Play button; the strike plays upright with pace, skip and replay; the
+desktop table is unchanged. Record what the build decides in
+`docs/implementation-plan.md`, section 17.
+
 ## Out of scope
 
-Phone layouts (a later pass, per the brief), the other three games, the
+The other three games, the
 printed cards themselves (the art is the same files, but no print output is
 built here), and the opponent's turn beyond what the table already does.
 
