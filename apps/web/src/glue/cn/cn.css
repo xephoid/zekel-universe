@@ -203,19 +203,19 @@
    deck, the last move and the log). The page's own parts are placed on one
    grid; nothing is moved between them. Overlays are fixed and stay out of
    it. */
-.table-shell.cn-theme {
+.table-shell.cn-theme:not(.phone) {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-rows: auto minmax(0, 1fr) auto auto auto;
   grid-template-areas: "top top" "board side" "bench side" "lesson side" "actions side";
 }
-.cn-theme > .table-topbar { grid-area: top; }
-.cn-theme .table-main, .cn-theme .table-play { display: contents; }
-.cn-theme .table-board { grid-area: board; min-height: 0; padding-bottom: 8px; }
-.cn-theme .table-bench { grid-area: bench; border-top: none; background: transparent; padding: 0 16px 8px; min-height: 0; align-items: flex-start; }
-.cn-theme .table-play > .lesson-note { grid-area: lesson; }
-.cn-theme .table-play > .action-bar { grid-area: actions; margin: 0 16px 12px; }
-.cn-theme .table-side { grid-area: side; width: 404px; box-sizing: border-box; background: var(--cn-ground); border-left: 1px solid var(--cn-rule); }
+.cn-theme:not(.phone) > .table-topbar { grid-area: top; }
+.cn-theme:not(.phone) :is(.table-main, .table-play) { display: contents; }
+.cn-theme:not(.phone) .table-board { grid-area: board; min-height: 0; padding-bottom: 8px; }
+.cn-theme:not(.phone) .table-bench { grid-area: bench; border-top: none; background: transparent; padding: 0 16px 8px; min-height: 0; align-items: flex-start; }
+.cn-theme:not(.phone) .table-play > .lesson-note { grid-area: lesson; }
+.cn-theme:not(.phone) .table-play > .action-bar { grid-area: actions; margin: 0 16px 12px; }
+.cn-theme:not(.phone) .table-side { grid-area: side; width: 404px; box-sizing: border-box; background: var(--cn-ground); border-left: 1px solid var(--cn-rule); }
 .cn-theme .table-side.collapsed { width: 0; }
 .cn-theme .table-side > [data-flip-id='cn:case'] { order: -1; }
 /* The deck is a counter here (the top bar says how many are left), small. */
@@ -264,3 +264,70 @@
 .cn-theme .zk-card:has(.zk-card-stamp) .zk-card-art { animation: cn-grab-flicker 520ms steps(1, end) 1; }
 [data-motion='reduced'].cn-theme .zk-card-art, [data-motion='reduced'] .cn-theme .zk-card-art { animation: none; }
 @media (prefers-reduced-motion: reduce) { .cn-theme .zk-card-art { animation: none !important; } }
+
+/* ---------- the phone (build item 8) ----------
+   The shared phone frame: the top bar keeps the title, the turn and the case
+   clock, the menu sheet holds the rest, the side column goes and sheets rise
+   from the bottom. The glue puts every zone in one column (phoneColumn); here
+   each is sized for 390 px. */
+.cn-theme.phone .table-board { padding: 8px 12px 0; }
+.cn-theme.phone .table-board .zones { flex-direction: column; flex-wrap: nowrap; align-items: stretch; gap: 12px; }
+.cn-theme.phone .table-board .zones > *, .cn-theme.phone .zones .zone-map { width: 100%; max-width: none; flex: none; margin: 0; }
+.cn-theme.phone .zk-zone-label { font-size: 11px; letter-spacing: .12em; }
+/* The city: the small overview, the borough tabs and the station list. */
+.cn-theme.phone .zk-stationmap.overview { background: var(--cn-panel); }
+.cn-theme.phone .zk-station-tab { border-color: var(--cn-rule); font-family: var(--cn-sign); }
+.cn-theme.phone .zk-station-tab.current { border-color: var(--cn-accent); color: var(--cn-text); }
+.cn-theme.phone .zk-station-row { background: var(--cn-panel); border-color: var(--cn-rule); }
+.cn-theme.phone .zk-station-row .zk-station-name { font-size: 13px; font-family: var(--cn-sign); }
+.cn-theme.phone .zk-station-row-faces .zk-card-face-pic { width: 22px; height: 22px; }
+.cn-theme.phone .zk-map-legend { display: none; }
+/* Clues, NOT tokens and the holding cells share a strip: 40 px tokens. */
+.cn-theme.phone .zone-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.cn-theme.phone .zone-row > * { flex: 1 1 auto; min-width: 0; }
+.cn-theme.phone :is(.zk-track-token, .zk-pool-token) { zoom: .56; }
+.cn-theme.phone [data-flip-id='cn:jail'] { flex-basis: 100%; padding: 8px 10px; }
+.cn-theme.phone [data-flip-id='cn:jail'] .zk-track-slot { min-height: 0; padding: 4px 6px; }
+.cn-theme.phone [data-flip-id='cn:jail'] .zk-track-card { font-size: 11px; }
+/* Your hand is a row you swipe; the next card peeks at the edge. */
+.cn-theme.phone [data-flip-id='cn:hand'] .zk-zone-row {
+  flex-wrap: nowrap; overflow-x: auto; scroll-snap-type: x mandatory; gap: 10px; padding: 2px 40px 6px 2px;
+  -webkit-overflow-scrolling: touch;
+}
+.cn-theme.phone [data-flip-id='cn:hand'] .zk-card { flex: none; scroll-snap-align: start; }
+/* Informants: four small camera grabs for the Detective; one strip facing the Hacker. */
+.cn-theme.phone :is([data-flip-id='cn:informants'], [data-flip-id='cn:informants-facing']) { --zekel-card-w: 76px; --zekel-card-h: 104px; }
+.cn-theme.phone :is([data-flip-id='cn:informants'], [data-flip-id='cn:informants-facing']) .zk-zone-row { flex-wrap: nowrap; overflow-x: auto; gap: 6px; }
+.cn-theme.phone [data-flip-id='cn:informants'] .layout-portrait :is(.zk-card-sub, .zk-card-badges, .zk-card-emblem) { display: none; }
+/* The case: the 1 + 3 + 3 × 3 grid of small slots. Where each person lives
+   is on the card up close, a tap away. */
+.cn-theme.phone [data-flip-id='cn:case'], .cn-theme.phone [data-flip-id='cn:case'] .zk-zone { --zekel-card-w: 30px; --zekel-card-h: 40px; }
+.cn-theme.phone [data-flip-id='cn:case'] .layout-portrait .zk-card-pic { flex: 1 1 auto; }
+.cn-theme.phone [data-flip-id='cn:case'] .layout-portrait .zk-card-body { display: none; }
+.cn-theme.phone [data-flip-id='cn:case'] .zk-tableau-slot { gap: 8px 10px; }
+/* The verbs: a grid above the bottom of the screen, every button 48 px tall
+   (3 across for the Detective, 4 for the Hacker). */
+.cn-theme.phone .action-bar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin: 6px 10px 10px; padding: 8px; }
+.cn-theme-hacker.phone .action-bar { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.cn-theme.phone .action-bar > :is(.words, .steps) { grid-column: 1 / -1; }
+.cn-theme.phone .action-bar > .divider { display: none; }
+.cn-theme.phone .action-bar .words .sub { display: none; }
+.cn-theme.phone .action-bar > .btn {
+  min-height: 48px; margin: 0; padding: 4px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; white-space: normal; text-align: center; line-height: 1.1;
+}
+.cn-theme.phone .action-bar > .btn .note { font-size: 9px; opacity: .75; }
+/* A card up close, in a sheet from the bottom: the full-size card. */
+.cn-theme .card-up-close-card { display: flex; justify-content: center; padding: 4px 0 12px; }
+.cn-theme .card-up-close-card .zk-card { --zekel-card-w: 240px; --zekel-card-h: 360px; }
+.cn-theme .card-up-close-card .zk-card:has(.layout-sign) { --zekel-card-w: 340px; --zekel-card-h: 214px; }
+.cn-theme .card-up-close-card .layout-portrait .zk-card-label { font-size: 18px; }
+.cn-theme .card-up-close-card .layout-portrait .zk-card-sub { font-size: 13px; -webkit-line-clamp: 6; }
+.cn-theme .card-up-close-card .layout-portrait .zk-card-emblem { width: 34px; height: 34px; }
+.cn-theme .card-up-close-card .zk-card-art { filter: blur(3px) grayscale(.92) contrast(1.25) brightness(.9) sepia(.4) hue-rotate(65deg) saturate(1.3); }
+.cn-theme .card-up-close-lines { margin: 0 0 12px; padding: 0; list-style: none; color: var(--cn-muted); font-size: 13px; }
+.cn-theme .card-up-close-moves { display: flex; flex-direction: column; gap: 8px; }
+.cn-theme .card-up-close-moves .btn { min-height: 48px; }
+.cn-theme.phone .zone-row > :is([data-flip-id='cn:clues'], [data-flip-id='cn:not-clues']) { flex: 1 1 0; min-width: 0; padding: 8px 10px; }
+.cn-theme.phone .zone-row > [data-flip-id='cn:clues'] { flex: 0 0 auto; }
+.cn-theme .card-up-close-moves .btn { white-space: normal; height: auto; text-align: left; justify-content: flex-start; line-height: 1.3; padding: 10px 14px; }

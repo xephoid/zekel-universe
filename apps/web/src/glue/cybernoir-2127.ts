@@ -708,6 +708,7 @@ function ruledOutNames(list: unknown): Set<string> {
  */
 function stationMap(
   locs: Loc[], view: Record<string, unknown>, role: string, hideout: string, played: Set<string>, n: Names,
+  phone = false, reference: GameReferenceResponse | null = null,
 ): Zone | null {
   if (locs.length === 0 || !locs.every((l) => STATIONS[l.name] && columnOf(l.borough))) return null;
   const publicOut = ruledOutNames(view['locations_ruled_out']);
@@ -736,6 +737,12 @@ function stationMap(
       dim: isOut,
       crossed: isCrossed,
       glow: !isPlayed && !isOut && !isCrossed,
+      // The phone's list says each station's state in a word (build item 8).
+      ...(phone ? {
+        note: isPlayed ? 'Canvassed' : isOut ? 'Ruled out' : isCrossed ? 'Seen in hand' : isHideout ? 'Your hideout' : 'Still possible',
+        ...(LINE_CODES[l.affiliation || 'none'] ? { code: LINE_CODES[l.affiliation || 'none'] } : {}),
+        faces: residentsOf(reference, l.name).map((w) => ({ label: w, ...(faceUrl(w, 'square') ? { artUrl: faceUrl(w, 'square') } : {}) })),
+      } : {}),
       describedAs: [
         l.name,
         n.borough(l.borough),
@@ -755,11 +762,17 @@ function stationMap(
   });
 
   const out = reasons.size;
+  // On a phone the list opens on the borough with the most places still
+  // possible, where the search is.
+  const first = phone
+    ? [...boroughs].sort((a, b) => nodes.filter((x) => x.area === b && x.glow).length - nodes.filter((x) => x.area === a && x.glow).length)[0]
+    : undefined;
   return {
     kind: 'map', id: 'cn:map',
     data: {
       label: `The city · ${locs.length} locations · ${locs.length - out} still standing`,
-      fill: { minHeight: 300 }, nodeShape: 'station', nodes,
+      ...(phone ? { aspect: 50, listView: { first } } : { fill: { minHeight: 300 } }),
+      nodeShape: 'station', nodes,
       inspectable: true,
       areas: boroughs.map((b) => ({
         key: b,
@@ -815,7 +828,34 @@ function informantsFacing(
   };
 }
 
+/**
+ * The phone (build item 8): there is no side column, so every zone goes in
+ * one column, in the order the phone boards read: the city, the clues and
+ * the holding cells, then your informants or the ones facing you, your hand,
+ * who you can reach, the case, the discards, and both seats' counts. The
+ * deck piles go (the top bar says how many Locations are left). The hand is
+ * a row you swipe, and every card can be tapped to open it up close.
+ */
+function phoneColumn(role: string, board: Zone[], bench: Zone[], side: Zone[], caseFile: Zone): { board: Zone[]; bench: Zone[]; side: Zone[] } {
+  const byId = new Map([...board, ...bench, ...side, caseFile].map((z) => [z.id, z] as const));
+  const order = role === 'detective'
+    ? ['cn:map', 'cn:clues', 'cn:not-clues', 'cn:jail', 'cn:hand', 'cn:informants', 'cn:reach', 'cn:case', 'cn:location-discard', 'cn:hacker', 'cn:detective']
+    : ['cn:map', 'cn:clues', 'cn:not-clues', 'cn:jail', 'cn:informants-facing', 'cn:hand', 'cn:case', 'cn:contacts-discard', 'cn:detective', 'cn:hacker'];
+  const look = (z: Zone): Zone => {
+    if (z.kind === 'card-zone') return { ...z, data: { ...z.data, inspectable: true, ...(z.id === 'cn:hand' ? { mode: 'row' as const } : {}) } };
+    if (z.kind === 'tableau' && z.children) return { ...z, children: z.children.map(look) };
+    return z;
+  };
+  const column = order.map((id) => byId.get(id)).filter((z): z is Zone => !!z).map((z) => {
+    const zone = look(z);
+    // The clues, the NOT tokens and the jail share a strip.
+    return ['cn:clues', 'cn:not-clues', 'cn:jail'].includes(zone.id) ? { ...zone, span: 'row' } as Zone : zone;
+  });
+  return { board: column, bench: [], side: [] };
+}
+
 export const cybernoirGlue: GlueModule = {
+  phone: true,
   gameId: 'cybernoir-2127',
   title: 'Cybernoir 2127',
   captionInSide: true,
@@ -910,7 +950,7 @@ export const cybernoirGlue: GlueModule = {
     // where every location stands; a location it has no place for keeps the
     // whole city in the plain bands above, rather than guessing a spot.
     const board: Zone[] = [
-      stationMap(locs, view, role, hideout, played, name) ?? {
+      stationMap(locs, view, role, hideout, played, name, !!input.phone, input.reference) ?? {
         kind: 'map', id: 'cn:map',
         data: {
           label: `The city · ${locs.length} locations · ${locs.length - crossedOff.size} still standing`,
@@ -1173,7 +1213,11 @@ export const cybernoirGlue: GlueModule = {
 
     const deckLeft = asNum(det['location_deck_size']);
     const status = `Turn ${asNum(view['turn'], 1)} · ${words(asStr(view['phase']))} · Case clock: ${deckLeft} Location${deckLeft === 1 ? '' : 's'} left in the deck`;
-    return { board, bench, side, points: caseFile, palette: PALETTE, title: 'Cybernoir 2127', status, prompt };
+    const statusShort = `T${asNum(view['turn'], 1)} · ${deckLeft} left`;
+    if (input.phone) {
+      return { ...phoneColumn(role, board, bench, side, caseFile), palette: PALETTE, title: 'Cybernoir 2127', status, statusShort, prompt };
+    }
+    return { board, bench, side, points: caseFile, palette: PALETTE, title: 'Cybernoir 2127', status, statusShort, prompt };
   },
 
   litParts(input: GlueInput): string[] {
