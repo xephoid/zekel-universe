@@ -5,7 +5,8 @@
 import { Fragment, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import type { GameOverResult, LegalMove, LogLine, MoveMenu, MoveMenuEntry, RulesBriefing, SeatSummary, TableEventWire } from '@universe/shared';
-import type { MoveForm, PlanPrompt, PlanStep, PromptAction } from '../glue';
+import type { MoveForm, PlanPrompt, PlanStep, PromptAction, TablePlan, Zone } from '../glue';
+import { Card, type CardData } from '@universe/primitives';
 import { PACES, type Pace } from '../playback/PlaybackQueue';
 import { Avatar } from '../ui';
 
@@ -506,5 +507,55 @@ export function EndPanel({ result, stat = null, seats, myPlayerId, gameId, gameN
         <Link className="btn quiet" to={`/games/${gameId}`}>Game page</Link>
       </div>
     </div>
+  );
+}
+
+/** The card a part id names, wherever the plan put it (a zone's own cards, or
+ *  a tableau's rows). */
+export function findCard(plan: TablePlan, id: string): CardData | null {
+  const seek = (zones: Zone[]): CardData | null => {
+    for (const z of zones) {
+      if (z.kind === 'card-zone') {
+        const hit = (z.data.cards ?? []).find((c) => c.id === id);
+        if (hit) return hit;
+      }
+      if (z.kind === 'tableau' && z.children) {
+        const hit = seek(z.children);
+        if (hit) return hit;
+      }
+    }
+    return null;
+  };
+  return seek([...plan.board, ...plan.bench, ...plan.side, ...(plan.points ? [plan.points] : [])]);
+}
+
+/**
+ * A card up close, on a phone: the card at its full size, what the game says
+ * about it, and the moves the engine lists for it, each with its price. The
+ * moves are the engine's own; nothing is chosen until one is pressed, and a
+ * card with no move behind it is only looked at.
+ */
+export function CardUpClose({ card, lines, options, disabled, onPick, onClose }: {
+  card: CardData; lines: string[]; options: LegalMove[]; disabled: boolean;
+  onPick: (m: LegalMove) => void; onClose: () => void;
+}) {
+  return (
+    <Sheet title={card.label} className="card-up-close" onClose={onClose}>
+      <div className="card-up-close-card">
+        <Card id={`upclose:${card.id ?? card.label}`} data={{ ...card, arriveFrom: undefined }} />
+      </div>
+      {lines.length > 0 && <ul className="card-up-close-lines">{lines.map((l) => <li key={l}>{l}</li>)}</ul>}
+      {options.length > 0 && (
+        <div className="card-up-close-moves">
+          {options.map((m, i) => (
+            <button key={m.move_id ?? i} type="button" className={i === 0 ? 'btn' : 'btn secondary'} disabled={disabled} onClick={() => onPick(m)}>
+              {m.description ?? m.move_id ?? 'move'}
+              {/* the price, unless the engine's own words already say it */}
+              {m.cost && !(m.description ?? '').includes(m.cost) && <span className="note"> · {m.cost}</span>}
+            </button>
+          ))}
+        </div>
+      )}
+    </Sheet>
   );
 }

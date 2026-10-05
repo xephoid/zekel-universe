@@ -31,6 +31,10 @@ export interface GlueInput {
   actorPlayerId: string | null;
   /** scratch space the table keeps for this glue across events */
   memory: Map<string, unknown>;
+  /** The table is on a phone and the glue said it has a phone layout
+   *  (GlueModule.phone): a plan-drawn game lays its zones out for one
+   *  column, since the side column is not shown. */
+  phone?: boolean;
   /**
    * A choice the player is putting together on screen and has not sent (the
    * slot a tile is going in, the way it is turned). Set only by the player's

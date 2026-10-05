@@ -10,12 +10,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import type { LegalMove } from '@universe/shared';
-import { Die, FlipRoot, paletteVars, useSystemReducedMotion, type SelectEvent } from '@universe/primitives';
+import { Die, FlipRoot, paletteVars, useSystemReducedMotion, type CardData, type SelectEvent } from '@universe/primitives';
 import { glueFor, submitMove, type GlueInput, formForMove, movesForSelect } from '../glue';
 import type { MoveForm, FormContext, Moment, PromptAction } from '../glue';
 import { BoardZones, JsonInspector, ZoneRenderer } from '../glue/ZoneRenderer';
 import { useTable } from '../table/useTable';
-import { ActionBar, CaptionWords, LessonNote, EndPanel, Log, MoveChooser, MoveFormSheet, MoveMenuList, NoticeToast, PaceControl, Sheet, lessonsOf, type Lesson, type Notice, Notices } from '../table/parts';
+import { ActionBar, CaptionWords, CardUpClose, LessonNote, EndPanel, Log, MoveChooser, MoveFormSheet, MoveMenuList, NoticeToast, PaceControl, Sheet, findCard, lessonsOf, type Lesson, type Notice, Notices } from '../table/parts';
 import { StrikeOverlay } from '../table/StrikeMoment';
 import { usePhone } from '../table/phone';
 import { api } from '../api';
@@ -79,6 +79,8 @@ export function TablePage() {
   const [shared, setShared] = useState(false);
   const [form, setForm] = useState<MoveForm | null>(null);
   const [detail, setDetail] = useState<{ title: string; lines: string[] } | null>(null);
+  /** a card up close on a phone: the card, what is known about it, and its moves */
+  const [looking, setLooking] = useState<{ card: CardData; lines: string[]; options: LegalMove[] } | null>(null);
   // The narration on the card is cut to a few lines; this holds the whole of
   // it while the player reads it.
   const [captionClamped, setCaptionClamped] = useState(false);
@@ -150,7 +152,8 @@ export function TablePage() {
       : `p${current.actorSeatPosition + 1}`,
     memory: memory.current,
     ui,
-  }), [state.view, state.previousView, legalMoves, unavailable, myPlayerId, t.reference, current, ui]);
+    phone,
+  }), [state.view, state.previousView, legalMoves, unavailable, myPlayerId, t.reference, current, ui, phone]);
 
   const plan = useMemo(() => (glue ? glue.plan(input) : null), [glue, input]);
   const lit = useMemo(() => (glue && yourTurn ? glue.litParts(input) : []), [glue, input, yourTurn]);
@@ -209,17 +212,27 @@ export function TablePage() {
     // A tap that changes what the player is putting together sends nothing.
     const change = yourTurn ? glue.uiForSelect?.(sel, input) ?? null : null;
     if (change) { setUi((u) => ({ ...u, ...change })); return; }
+    // On a phone a card opens up close first, with what can be done with it
+    // as the engine lists it; a second tap does it. A game that draws its
+    // own screen handles its own taps.
+    if (phone && !glue.Screen && sel.component === 'card' && plan) {
+      const card = findCard(plan, sel.id);
+      if (card) {
+        setLooking({ card, options: yourTurn ? movesForSelect(glue, sel, input) : [], lines: glue.detailFor?.(sel, input)?.lines ?? [] });
+        return;
+      }
+    }
     const options = movesForSelect(glue, sel, input);
     if (options.length === 1) { pick(options[0]!); return; }
     if (options.length > 1) { setChooser(options); return; }
     // No move behind it: looking is safe, so show what it is.
     const detail = glue.detailFor?.(sel, input) ?? null;
     if (detail) setDetail(detail);
-  }, [glue, input, pick, yourTurn]);
+  }, [glue, input, pick, yourTurn, phone, plan]);
 
   // A new event closes any chooser or form, and drops a choice being put
   // together: their moves may no longer exist.
-  useEffect(() => { setChooser(null); setForm(null); setDetail(null); setUi({}); }, [current?.seq]);
+  useEffect(() => { setChooser(null); setForm(null); setDetail(null); setLooking(null); setUi({}); }, [current?.seq]);
 
   // An action-bar button: one listed move, or a batch of taps.
   const onAction = useCallback((a: PromptAction) => {
@@ -454,6 +467,13 @@ export function TablePage() {
         <Sheet title="What happened" onClose={() => setCaptionFull(null)}>
           <p className="caption-full">{captionFull}</p>
         </Sheet>
+      )}
+      {looking && (
+        <CardUpClose
+          card={looking.card} lines={looking.lines} options={looking.options} disabled={busy || !yourTurn}
+          onPick={(m) => { setLooking(null); pick(m); }}
+          onClose={() => setLooking(null)}
+        />
       )}
       {detail && (
         <Sheet title={detail.title} onClose={() => setDetail(null)}>
