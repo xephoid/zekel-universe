@@ -36,6 +36,10 @@ was rendered and checked on 2026-10-02 (see "Rendered and fixed" below).
 | `Main.dc.html` | Palette, type, motifs, the two seats' looks. | Chosen |
 | `Location-Cards.dc.html` | Three dressings for a Location card. The tables use A (platform sign). | Open |
 | `Mugshots.dc.html` | The same six portraits at three blur levels. B (camera grab) is chosen. Reference only. | Reference |
+| `Phone-Detective-Map.dc.html` | Phone (390 × 844): the Detective's map as a small overview plus borough tabs with a station list. | Proposed |
+| `Phone-Detective-Hand.dc.html` | Phone: holding cells, the Location hand, informants, who you can reach, the verbs. | Proposed |
+| `Phone-Hacker-Hand.dc.html` | Phone: informants facing you, the Contact hand, the case, clues, holding cells, the verbs. | Proposed |
+| `Phone-Hacker-Card.dc.html` | Phone: a Contact opened up close in a sheet from the bottom. | Proposed |
 | `assets/faces/*.jpg` | Face crops of the 25 generated portraits: `<name>.jpg` square, `<name>-tall.jpg` 3:4. | Chosen |
 | `assets/faces/crops.json` | The crop box for every image, so the crops can be remade from the originals. | — |
 | `canvas.json` | The canvas layout. | — |
@@ -100,6 +104,32 @@ off. Fixed in the working files:
 Checked and left alone: Junktown's label clears the map edge; the blur and
 grain on `Logos.dc.html` render as intended. The canvas runtime
 (`support.js`) is not in this folder; the boards render without it.
+
+## The phone boards (added 2026-10-02, rendered and built 2026-10-04)
+
+Four phone screens, same turn-7 position as the tables. The owner asked for
+them after the desktop theme was built; what to build is item 8 of the build
+document. They were drawn before the desktop build settled a few things, so
+where a phone board and the built desktop table disagree, the built table
+wins: no camera numbers or match boxes, no red edge on a Hacker's Contact, NOT
+IT on every Location in the Detective's hand, and who you can reach as rows
+that open the engine's own Arrest and Recruit choices rather than buttons on
+each row. The bottom tab bar (Map, Hand, Case, Log) is a proposal; the shared
+phone frame from the Fractured Fist work (menu button and sheets) may be the
+better home for Case and Log.
+
+Rendered at 390 × 844 on 2026-10-04 and checked for overlaps. Fixed in the
+working files, as on the desktop boards: the NOT tokens' values ran under the
+sash (`Phone-Detective-Map`, `Phone-Hacker-Hand`), and the Detective's
+informant names were cut to "DECKARD V..." (`Phone-Detective-Hand`; they wrap
+now, over "face down" or "face up"). The hand rows running past the right
+edge are the swipe, on purpose.
+
+Decided in the build where the boards left it open: the phone is one
+scrolling column under the shared phone frame's top bar and menu (the log and
+the last move are in the menu sheet), not a bottom tab bar; the station list
+opens on the borough with the most stations still possible; where an
+Evidence card's person lives is on the card up close, a tap away.
 
 ## The portraits and their rights
 
