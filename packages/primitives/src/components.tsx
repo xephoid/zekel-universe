@@ -690,7 +690,9 @@ function MapKeySwatch({ shape, colorKey }: { shape: MapKeyShape; colorKey: strin
  * on. Marks show what happened to a place; the whole station fades when
  * `dim`.
  */
-function StationMap({ id, data, lit, onSelect, className, style }: PrimitiveProps<MapData>) {
+function StationMap(props: PrimitiveProps<MapData>) {
+  if (props.data.listView) return <StationList {...props} />;
+  const { id, data, lit, onSelect, className, style } = props;
   const fill = data.fill;
   return (
     <div data-flip-id={id} className={cx(className, fill && 'zk-map-filling')} style={style}>
@@ -773,6 +775,110 @@ const R3 = Math.sqrt(3);
 /** A flat-topped hex's centre, in hex radii, from its axial coordinate. */
 function hexCentre(h: { q: number; r: number }): { x: number; y: number } {
   return { x: 1.5 * h.q, y: R3 * (h.r + h.q / 2) };
+}
+
+/**
+ * A station board on a phone (MapData.listView): the whole board small, with
+ * its lines and its stations' marks but no names, then a tab per area and the
+ * chosen area's stations as a list. A row is the station: a tap on it is a tap
+ * on the station, lit or looked at exactly as on the full board. The diamond
+ * keeps its flip id in the overview, so it still flies in when played.
+ */
+function StationList({ id, data, lit, onSelect, className, style }: PrimitiveProps<MapData>) {
+  const areas = data.areas ?? [];
+  const [tab, setTab] = useState<string | null>(data.listView?.first ?? areas[0]?.key ?? null);
+  const shown = areas.some((a) => a.key === tab) ? tab : areas[0]?.key ?? null;
+  const rows = data.nodes.filter((n) => !shown || n.area === shown);
+  const mark = (n: MapNode, inOverview: boolean) => {
+    const color = themeColor(n.colorKey ?? n.label);
+    const markColor = n.markColorKey ? themeColor(n.markColorKey) : color;
+    return (
+      <span
+        className={cx('zk-station', 'mark-only', n.dim && 'dim', n.crossed && 'crossed', n.glow && 'glow', n.mark && `mark-${n.mark}`)}
+        style={{ ['--station' as string]: color, ['--station-mark' as string]: markColor, ...(inOverview ? { left: `${n.x}%`, top: `${n.y}%` } : {}) }}
+      >
+        <span className="zk-station-ring" aria-hidden="true">
+          {n.mark === 'diamond' && (inOverview
+            ? <span className="zk-station-diamond" data-flip-id={`${id}:mark:${n.id}`} data-flip-from={n.markFrom} data-flip-ghost="" style={{ ['--station-mark' as string]: markColor }} />
+            : <span className="zk-station-diamond" style={{ ['--station-mark' as string]: markColor }} />)}
+          {n.mark === 'frame' && <span className="zk-station-frame" />}
+        </span>
+      </span>
+    );
+  };
+  return (
+    <div data-flip-id={id} className={cx(className, 'zk-stationlist')} style={style}>
+      {data.label && <div className="zk-zone-label">{data.label}</div>}
+      <div className="zk-map zk-stationmap overview" style={{ paddingTop: `${data.aspect ?? 48}%` }} aria-hidden="true">
+        <div className="zk-station-plane">
+          {areas.map((a) => (
+            <div key={a.key} className={cx('zk-station-area', a.key === shown && 'current')}
+              style={{ left: `${a.x ?? 0}%`, width: `${a.width ?? 100}%`, top: `${a.y}%`, height: `${a.height}%` }}>
+              <span className="zk-station-area-head"><span className="zk-map-area-name">{a.label}</span></span>
+            </div>
+          ))}
+          <svg className="zk-station-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
+            {(data.lines ?? []).map((l) => (
+              <polyline key={l.key} points={l.points.map((p) => `${p.x},${p.y}`).join(' ')} fill="none"
+                stroke={themeColor(l.colorKey)} vectorEffect="non-scaling-stroke" strokeLinejoin="round" strokeLinecap="round" />
+            ))}
+          </svg>
+          {data.nodes.map((n) => <span key={n.id}>{mark(n, true)}</span>)}
+        </div>
+      </div>
+      {areas.length > 0 && (
+        <div className="zk-station-tabs" role="tablist" aria-label="Areas">
+          {areas.map((a) => {
+            const count = data.nodes.filter((n) => n.area === a.key).length;
+            return (
+              <button key={a.key} type="button" role="tab" aria-selected={a.key === shown}
+                className={cx('zk-station-tab', a.key === shown && 'current')} onClick={() => setTab(a.key)}>
+                {a.label} <span className="zk-station-tab-count">{count}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+      <ul className="zk-station-rows" role="tabpanel">
+        {rows.map((n) => {
+          const isLit = lit?.includes(n.id) ?? false;
+          const fire = () => onSelect?.({ component: 'map', id: n.id, label: n.label });
+          const lp: LitProps = isLit || data.inspectable
+            ? { ...litProps(true, fire), className: isLit ? 'zk-lit' : 'zk-look' }
+            : {};
+          return (
+            <li key={n.id}
+              className={cx('zk-station-row', n.dim && 'dim', n.crossed && 'crossed', n.glow && 'glow', n.mark && `mark-${n.mark}`, lp.className)}
+              style={{ ['--station' as string]: themeColor(n.colorKey ?? n.label), ['--station-mark' as string]: themeColor(n.markColorKey ?? n.colorKey ?? n.label) }}
+              role={lp.role} tabIndex={lp.tabIndex} onClick={lp.onClick} onKeyDown={lp.onKeyDown}
+              aria-label={n.describedAs ?? n.label}>
+              {mark(n, false)}
+              <span className="zk-station-row-text" aria-hidden="true">
+                <span className="zk-station-name">{n.label}</span>
+                <span className="zk-station-row-sub">
+                  {n.meter && n.meter.max > 0 && (
+                    <span className="zk-station-meter">
+                      {Array.from({ length: n.meter.max }, (_, i) => <span key={i} className={cx('zk-station-pip', i < n.meter!.value && 'on')} />)}
+                    </span>
+                  )}
+                  {n.note && <span className="zk-station-note">{n.note}</span>}
+                </span>
+              </span>
+              {n.faces && n.faces.length > 0 && (
+                <span className="zk-station-row-faces" aria-hidden="true">
+                  {n.faces.map((f) => (f.artUrl
+                    ? <img key={f.label} className="zk-card-face-pic" src={f.artUrl} alt="" title={f.label} />
+                    : <span key={f.label} className="zk-card-face-pic" title={f.label} />))}
+                </span>
+              )}
+              {n.code && <span className="zk-card-code zk-station-row-code" aria-hidden="true" style={{ ['--card-color' as string]: themeColor(n.colorKey ?? n.label) }}>{n.code}</span>}
+            </li>
+          );
+        })}
+      </ul>
+      <MapLegend data={data} />
+    </div>
+  );
 }
 
 /**

@@ -289,6 +289,12 @@ export interface MapNode {
   crossed?: boolean;
   glow?: boolean;
   labelSide?: 'above' | 'below';
+  /** Universe additions for a station board's list view (MapData.listView):
+   *  a state word ("Still possible"), a line bullet's short code, and small
+   *  pictures of the people there. */
+  note?: string;
+  code?: string;
+  faces?: { label: string; artUrl?: string }[];
 }
 
 /**
@@ -331,6 +337,14 @@ export interface MapData {
   nodeShape?: 'dot' | 'pill' | 'station';
   /** Universe addition, station boards only: the lines under the stations. */
   lines?: MapLine[];
+  /**
+   * Universe addition, station boards only: a phone's way to draw the board.
+   * A small overview of the whole board (stations and lines, no names) over a
+   * tab per area, and the chosen area's stations as a list, one row each
+   * (at least 44 px): the mark, the name, the meter, the note, the faces and
+   * the line bullet. `first` is the area whose tab opens first.
+   */
+  listView?: { first?: string };
   /**
    * Universe addition: every region can be looked at, not only the ones that
    * are legal moves. Looking is always safe: a region with no move behind it
