@@ -5,7 +5,7 @@
  "view": {
   "game_id": "neither-guts-nor-gears",
   "phase": "claims",
-  "round": 1,
+  "round": 3,
   "active_player_id": "p2",
   "first_player_id": "p1",
   "layout": "two",
@@ -19,9 +19,11 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Archmage Chaimidious (p1)"
+     ],
      "collectors": [
-      "surf-2 (p1)"
+      "surf-1 (p1)"
      ]
     },
     {
@@ -33,9 +35,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "surf-1 (p1)"
-     ]
+     "collectors": []
     },
     {
      "coord": "-2,8",
@@ -45,9 +45,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Archmage Chaimidious (p1)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -59,7 +57,9 @@
      "base_owner": "p1",
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "surf-2 (p1)"
+     ]
     },
     {
      "coord": "-1,3",
@@ -259,7 +259,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [
-      "Chronicler Ottoline Vey (p2)"
+      "Captain Rook Malvane (p2)"
      ],
      "collectors": []
     },
@@ -302,8 +302,8 @@
   },
   "victory_status": {
    "p1": {
-    "culture": 0,
-    "tech": 2,
+    "culture": 2,
+    "tech": 5,
     "leader_kills": 0,
     "leader_alive": true
    },
@@ -321,7 +321,7 @@
     "kind": "human",
     "faction": "The Covenant",
     "species": "wizard",
-    "culture": 0,
+    "culture": 2,
     "culture_target": 70,
     "economic_collectors": 12,
     "next_milestones": [
@@ -333,26 +333,36 @@
     ],
     "mana_current": 5,
     "mana_max": 5,
-    "buildings": [],
-    "building_counts": {},
+    "buildings": [
+     "Amphitheatre"
+    ],
+    "building_counts": {
+     "amphitheatre": 1
+    },
     "research": [],
     "tech_progress": {
      "acquired_types": [
+      "battle-strategy-card",
       "surf",
-      "castle"
+      "castle",
+      "amphitheatre",
+      "subject"
      ],
      "acquired_type_names": [
+      "Battle strategy card",
       "Surf",
-      "Castle"
+      "Castle",
+      "Amphitheatre",
+      "Subject"
      ],
      "bonus_points_live": 0,
-     "total": 2,
-     "target": 25
+     "total": 5,
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
     "leader_alive": true,
-    "subjects": 0,
+    "subjects": 1,
     "cores_reserve": 0,
     "cores_supply": 16,
     "action_cards": {
@@ -379,7 +389,7 @@
     "heroes": [
      {
       "hero": "Archmage Chaimidious",
-      "coord": "-2,8",
+      "coord": "-2,4",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
@@ -413,12 +423,12 @@
      {
       "collector": "surf-1",
       "type": "Surf",
-      "placed_at": "-2,6"
+      "placed_at": "-2,4"
      },
      {
       "collector": "surf-2",
       "type": "Surf",
-      "placed_at": "-2,4"
+      "placed_at": "-2,10"
      },
      {
       "collector": "surf-3",
@@ -434,13 +444,13 @@
     "committed_collectors": [
      {
       "collector": "surf-1",
-      "coord": "-2,6",
+      "coord": "-2,4",
       "resource": "water"
      },
      {
       "collector": "surf-2",
-      "coord": "-2,4",
-      "resource": "water"
+      "coord": "-2,10",
+      "resource": "wood"
      }
     ],
     "bank": {},
@@ -489,14 +499,14 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 25
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
     "leader_alive": true,
     "subjects": 0,
-    "cores_reserve": 1,
-    "cores_supply": 11,
+    "cores_reserve": 3,
+    "cores_supply": 9,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -520,11 +530,11 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Chronicler Ottoline Vey",
+      "hero": "Captain Rook Malvane",
       "coord": "2,6",
       "is_leader": true,
       "dead": false,
-      "stats": "Init 30 DMG 1 DEF 5"
+      "stats": "Init 70 DMG 3 DEF 6"
      }
     ],
     "bases": [
@@ -636,18 +646,18 @@
   },
   {
    "move_id": "",
-   "description": "Claim Captain Rook Malvane — All other allied units in the battle gain +2 DMG, subject to the DMG-0 restriction. Does not stack with an identical hero effect.",
-   "move": {
-    "type": "choose_milestone_hero",
-    "hero": "Captain Rook Malvane"
-   }
-  },
-  {
-   "move_id": "",
    "description": "Claim Kestrel Nine — All other allied units in the battle gain +2 DMG, subject to the DMG-0 restriction. Does not stack with an identical hero effect.",
    "move": {
     "type": "choose_milestone_hero",
     "hero": "Kestrel Nine"
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Claim Chronicler Ottoline Vey — +5 culture per round during the income step. No income while reserved.",
+   "move": {
+    "type": "choose_milestone_hero",
+    "hero": "Chronicler Ottoline Vey"
    }
   },
   {
@@ -660,7 +670,7 @@
   },
   {
    "move_id": "",
-   "description": "Claim Envoy Sable Marrow — Unlocks treaties. Existing treaties survive Envoy's death; forming new ones still requires an unlock held by either partner. In a battle Envoy is in, no spy (Invisible or Spy Attack) can kill a hero on Envoy's side (ruling #105).",
+   "description": "Claim Envoy Sable Marrow — Unlocks treaties. Existing treaties survive Envoy's death; forming new ones still requires an unlock held by either partner. In a battle Envoy is in, no spy (Invisible or Spy Attack) can kill a hero on Envoy's side.",
    "move": {
     "type": "choose_milestone_hero",
     "hero": "Envoy Sable Marrow"
@@ -676,7 +686,7 @@
   },
   {
    "move_id": "",
-   "description": "Claim Dowser Wren Calloway — When placed, grants four free collectors at once: Surfs for a wizard; for a robot, four collectors, the owner choosing the type of each, each with a Core already in it (rulings #106, #117). The grant stops at the supply limits. No resource overlay.",
+   "description": "Claim Dowser Wren Calloway — When placed, grants free collectors at once: two Surfs for a wizard; for a robot, four collectors, the owner choosing the type of each, each with a Core already in it. The grant stops at the supply limits. No resource overlay.",
    "move": {
     "type": "choose_milestone_hero",
     "hero": "Dowser Wren Calloway"
@@ -724,7 +734,7 @@
   },
   {
    "move_id": "",
-   "description": "Claim Motherboard — +5 bonus tech points while alive, owned, and in play (ruling #113). Available to either species.",
+   "description": "Claim Motherboard — +5 bonus tech points while alive, owned, and in play. Robots only.",
    "move": {
     "type": "choose_milestone_hero",
     "hero": "Motherboard"
@@ -736,7 +746,7 @@
  "watcherView": {
   "game_id": "neither-guts-nor-gears",
   "phase": "claims",
-  "round": 1,
+  "round": 3,
   "active_player_id": "p2",
   "first_player_id": "p1",
   "layout": "two",
@@ -750,9 +760,11 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Archmage Chaimidious (p1)"
+     ],
      "collectors": [
-      "surf-2 (p1)"
+      "surf-1 (p1)"
      ]
     },
     {
@@ -764,9 +776,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "surf-1 (p1)"
-     ]
+     "collectors": []
     },
     {
      "coord": "-2,8",
@@ -776,9 +786,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Archmage Chaimidious (p1)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -790,7 +798,9 @@
      "base_owner": "p1",
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "surf-2 (p1)"
+     ]
     },
     {
      "coord": "-1,3",
@@ -990,7 +1000,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [
-      "Chronicler Ottoline Vey (p2)"
+      "Captain Rook Malvane (p2)"
      ],
      "collectors": []
     },
@@ -1033,8 +1043,8 @@
   },
   "victory_status": {
    "p1": {
-    "culture": 0,
-    "tech": 2,
+    "culture": 2,
+    "tech": 5,
     "leader_kills": 0,
     "leader_alive": true
    },
@@ -1052,7 +1062,7 @@
     "kind": "human",
     "faction": "The Covenant",
     "species": "wizard",
-    "culture": 0,
+    "culture": 2,
     "culture_target": 70,
     "economic_collectors": 12,
     "next_milestones": [
@@ -1064,26 +1074,36 @@
     ],
     "mana_current": 5,
     "mana_max": 5,
-    "buildings": [],
-    "building_counts": {},
+    "buildings": [
+     "Amphitheatre"
+    ],
+    "building_counts": {
+     "amphitheatre": 1
+    },
     "research": [],
     "tech_progress": {
      "acquired_types": [
+      "battle-strategy-card",
       "surf",
-      "castle"
+      "castle",
+      "amphitheatre",
+      "subject"
      ],
      "acquired_type_names": [
+      "Battle strategy card",
       "Surf",
-      "Castle"
+      "Castle",
+      "Amphitheatre",
+      "Subject"
      ],
      "bonus_points_live": 0,
-     "total": 2,
-     "target": 25
+     "total": 5,
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
     "leader_alive": true,
-    "subjects": 0,
+    "subjects": 1,
     "cores_reserve": 0,
     "cores_supply": 16,
     "action_cards": {
@@ -1110,7 +1130,7 @@
     "heroes": [
      {
       "hero": "Archmage Chaimidious",
-      "coord": "-2,8",
+      "coord": "-2,4",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
@@ -1144,12 +1164,12 @@
      {
       "collector": "surf-1",
       "type": "Surf",
-      "placed_at": "-2,6"
+      "placed_at": "-2,4"
      },
      {
       "collector": "surf-2",
       "type": "Surf",
-      "placed_at": "-2,4"
+      "placed_at": "-2,10"
      },
      {
       "collector": "surf-3",
@@ -1165,13 +1185,13 @@
     "committed_collectors": [
      {
       "collector": "surf-1",
-      "coord": "-2,6",
+      "coord": "-2,4",
       "resource": "water"
      },
      {
       "collector": "surf-2",
-      "coord": "-2,4",
-      "resource": "water"
+      "coord": "-2,10",
+      "resource": "wood"
      }
     ],
     "bank": {},
@@ -1220,14 +1240,14 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 25
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
     "leader_alive": true,
     "subjects": 0,
-    "cores_reserve": 1,
-    "cores_supply": 11,
+    "cores_reserve": 3,
+    "cores_supply": 9,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -1251,11 +1271,11 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Chronicler Ottoline Vey",
+      "hero": "Captain Rook Malvane",
       "coord": "2,6",
       "is_leader": true,
       "dead": false,
-      "stats": "Init 30 DMG 1 DEF 5"
+      "stats": "Init 70 DMG 3 DEF 6"
      }
     ],
     "bases": [

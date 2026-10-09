@@ -100,7 +100,9 @@ export function treeRows(ctx: ScreenCtx, species: string, player: NggPlayer | nu
       tiles.push({ kind: 'ability', name: 'Treaties', icon: 'Offer a treaty', cost: null, body: 'Offer and form treaties with other players.', have: built(b) });
     }
     if (cards?.unlockedBy[species] === b.name) {
-      tiles.push({ kind: 'ability', name: 'Battle strategy cards', icon: 'Battle card', cost: cards.cost, either: cards.either, body: 'Bought on a Research action.', have: built(b) });
+      // The first card bought (or gained from Archmage Chaimidious) earns the
+      // battle strategy card type, one of the tech target's types (ruling #129).
+      tiles.push({ kind: 'ability', name: 'Battle strategy cards', icon: 'Battle card', cost: cards.cost, either: cards.either, body: 'Bought on a Research action. The first one is a tech type.', have: has('Battle strategy card') });
     }
     if (tiles.length === 0) {
       tiles.push({ kind: 'ability', name: firstSentence(b.effect).replace(/\.$/, ''), icon: b.name, cost: null, body: b.repeatableMax ? `Build up to ${b.repeatableMax}.` : 'From the building itself.', have: built(b) });
@@ -143,6 +145,7 @@ export function TechTree({ ctx, species, player, onClose }: {
             <span><i>Buildings</i><b>{count(ref?.buildings)}</b></span>
             <span><i>Units</i><b>{count(ref?.units)}</b></span>
             <span><i>Research</i><b>{count(ref?.research)}</b></span>
+            {ref?.battleCardPurchase && <span><i>Battle card</i><b>1</b></span>}
             {target !== null && <span className="hl"><i>Tech target</i><b>{target}</b></span>}
           </div>
         </header>

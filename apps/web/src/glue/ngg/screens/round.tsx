@@ -730,7 +730,7 @@ function DowserCollector({ ctx }: { ctx: ScreenCtx }) {
   const decide = minePending(ctx, 'dowser_collector');
   const owner = ctx.v.pending?.for ?? null;
   const faction = ctx.v.players.find((p) => p.id === owner)?.faction ?? null;
-  // Ruling #117: four free collectors, picked one at a time; the engine says how many are left.
+  // Ruling #117: a robot takes four free collectors, picked one at a time; the engine says how many are left.
   const left = num(ctx.v.pending?.context['remaining']);
   const panel = (
     <Panel kicker={left !== null ? `${left} left to pick` : undefined}

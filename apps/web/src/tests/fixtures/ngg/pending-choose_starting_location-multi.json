@@ -20,7 +20,7 @@
      "base_owner": "p4",
      "units": [],
      "heroes": [
-      "Quartermaster Bertram Hollis (p4)"
+      "Dowser Wren Calloway (p4)"
      ],
      "collectors": []
     },
@@ -66,7 +66,7 @@
      "base_owner": "p3",
      "units": [],
      "heroes": [
-      "Foreman Hadrik Stoll (p3)"
+      "Kestrel Nine (p3)"
      ],
      "collectors": []
     },
@@ -288,7 +288,7 @@
      "base_owner": "p2",
      "units": [],
      "heroes": [
-      "Chronicler Ottoline Vey (p2)"
+      "Captain Rook Malvane (p2)"
      ],
      "collectors": []
     },
@@ -354,7 +354,7 @@
   "victory_status": {
    "p1": {
     "culture": 0,
-    "tech": 0,
+    "tech": 1,
     "leader_kills": 0,
     "leader_alive": true
    },
@@ -400,11 +400,15 @@
     "building_counts": {},
     "research": [],
     "tech_progress": {
-     "acquired_types": [],
-     "acquired_type_names": [],
+     "acquired_types": [
+      "battle-strategy-card"
+     ],
+     "acquired_type_names": [
+      "Battle strategy card"
+     ],
      "bonus_points_live": 0,
-     "total": 0,
-     "target": 25
+     "total": 1,
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -515,7 +519,7 @@
      ],
      "bonus_points_live": 0,
      "total": 2,
-     "target": 25
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -546,11 +550,11 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Chronicler Ottoline Vey",
+      "hero": "Captain Rook Malvane",
       "coord": "2,4",
       "is_leader": true,
       "dead": false,
-      "stats": "Init 30 DMG 1 DEF 5"
+      "stats": "Init 70 DMG 3 DEF 6"
      }
     ],
     "bases": [
@@ -642,7 +646,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 25
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -673,11 +677,11 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Foreman Hadrik Stoll",
+      "hero": "Kestrel Nine",
       "coord": "-2,12",
       "is_leader": true,
       "dead": false,
-      "stats": "Init 30 DMG 1 DEF 5"
+      "stats": "Init 70 DMG 3 DEF 6"
      }
     ],
     "bases": [
@@ -776,7 +780,7 @@
      ],
      "bonus_points_live": 0,
      "total": 2,
-     "target": 25
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -785,14 +789,13 @@
     "cores_reserve": 0,
     "cores_supply": 24,
     "action_cards": {
-     "build": 2,
+     "build": 1,
      "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base",
-      "hero_extra"
+      "base"
      ],
      "moveBattle": [
       "base"
@@ -808,7 +811,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Quartermaster Bertram Hollis",
+      "hero": "Dowser Wren Calloway",
       "coord": "-2,4",
       "is_leader": true,
       "dead": false,
@@ -852,6 +855,16 @@
      },
      {
       "collector": "surf-3",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-4",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-5",
       "type": "Surf",
       "placed_at": null
      }
@@ -913,7 +926,7 @@
      "base_owner": "p4",
      "units": [],
      "heroes": [
-      "Quartermaster Bertram Hollis (p4)"
+      "Dowser Wren Calloway (p4)"
      ],
      "collectors": []
     },
@@ -959,7 +972,7 @@
      "base_owner": "p3",
      "units": [],
      "heroes": [
-      "Foreman Hadrik Stoll (p3)"
+      "Kestrel Nine (p3)"
      ],
      "collectors": []
     },
@@ -1181,7 +1194,7 @@
      "base_owner": "p2",
      "units": [],
      "heroes": [
-      "Chronicler Ottoline Vey (p2)"
+      "Captain Rook Malvane (p2)"
      ],
      "collectors": []
     },
@@ -1247,7 +1260,7 @@
   "victory_status": {
    "p1": {
     "culture": 0,
-    "tech": 0,
+    "tech": 1,
     "leader_kills": 0,
     "leader_alive": true
    },
@@ -1293,11 +1306,15 @@
     "building_counts": {},
     "research": [],
     "tech_progress": {
-     "acquired_types": [],
-     "acquired_type_names": [],
+     "acquired_types": [
+      "battle-strategy-card"
+     ],
+     "acquired_type_names": [
+      "Battle strategy card"
+     ],
      "bonus_points_live": 0,
-     "total": 0,
-     "target": 25
+     "total": 1,
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -1408,7 +1425,7 @@
      ],
      "bonus_points_live": 0,
      "total": 2,
-     "target": 25
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -1439,11 +1456,11 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Chronicler Ottoline Vey",
+      "hero": "Captain Rook Malvane",
       "coord": "2,4",
       "is_leader": true,
       "dead": false,
-      "stats": "Init 30 DMG 1 DEF 5"
+      "stats": "Init 70 DMG 3 DEF 6"
      }
     ],
     "bases": [
@@ -1535,7 +1552,7 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 25
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -1566,11 +1583,11 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Foreman Hadrik Stoll",
+      "hero": "Kestrel Nine",
       "coord": "-2,12",
       "is_leader": true,
       "dead": false,
-      "stats": "Init 30 DMG 1 DEF 5"
+      "stats": "Init 70 DMG 3 DEF 6"
      }
     ],
     "bases": [
@@ -1669,7 +1686,7 @@
      ],
      "bonus_points_live": 0,
      "total": 2,
-     "target": 25
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -1678,14 +1695,13 @@
     "cores_reserve": 0,
     "cores_supply": 24,
     "action_cards": {
-     "build": 2,
+     "build": 1,
      "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base",
-      "hero_extra"
+      "base"
      ],
      "moveBattle": [
       "base"
@@ -1701,7 +1717,7 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Quartermaster Bertram Hollis",
+      "hero": "Dowser Wren Calloway",
       "coord": "-2,4",
       "is_leader": true,
       "dead": false,
@@ -1745,6 +1761,16 @@
      },
      {
       "collector": "surf-3",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-4",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-5",
       "type": "Surf",
       "placed_at": null
      }

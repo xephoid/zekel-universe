@@ -436,6 +436,21 @@ describe('NGnG screen', () => {
     cleanup();
   });
 
+  it('the battle strategy card type is ticked from the seat, and counted toward the target (#129)', () => {
+    const f = FIXTURES.find((x) => x.name === 'action-build-multi')!.f;
+    const r = render(<NggScreen input={inputFor(f.view, f.viewer, [])} yourTurn={false} busy={false} interactive onMove={vi.fn()} onForm={vi.fn()} nameFor={(p) => p} />);
+    fireEvent.click(r.getByRole('button', { name: 'Open board' }));
+    fireEvent.click(r.getByRole('button', { name: 'Tech tree' }));
+    const tree = r.getByRole('dialog', { name: 'The robot tree' });
+    const tile = [...tree.querySelectorAll('.ngg-tree-tile')].find((t) => t.textContent?.includes('Battle strategy cards'))!;
+    expect(tile.classList.contains('have')).toBe(true);
+    // Buildings + units + research + the battle card type = the target.
+    const nums = [...tree.querySelectorAll('.ngg-tree-counts b')].map((b) => Number(b.textContent));
+    const target = nums.pop()!;
+    expect(nums.reduce((a, b) => a + b, 0)).toBe(target);
+    cleanup();
+  });
+
   it("an opponent's board opens their species' tree", () => {
     const { f } = FIXTURES.find((x) => {
       const v = x.f.view as { players: Array<{ player_id: string; species?: string }> };

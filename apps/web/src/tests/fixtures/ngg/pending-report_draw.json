@@ -293,7 +293,7 @@
   "victory_status": {
    "p1": {
     "culture": 0,
-    "tech": 0,
+    "tech": 1,
     "leader_kills": 0,
     "leader_alive": true
    },
@@ -327,11 +327,15 @@
     "building_counts": {},
     "research": [],
     "tech_progress": {
-     "acquired_types": [],
-     "acquired_type_names": [],
+     "acquired_types": [
+      "battle-strategy-card"
+     ],
+     "acquired_type_names": [
+      "Battle strategy card"
+     ],
      "bonus_points_live": 0,
-     "total": 0,
-     "target": 25
+     "total": 1,
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
@@ -446,7 +450,7 @@
      "acquired_type_names": [],
      "bonus_points_live": 0,
      "total": 0,
-     "target": 25
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
@@ -477,11 +481,11 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Chronicler Ottoline Vey",
+      "hero": "Captain Rook Malvane",
       "coord": "reserved",
       "is_leader": true,
       "dead": false,
-      "stats": "Init 30 DMG 1 DEF 5"
+      "stats": "Init 70 DMG 3 DEF 6"
      }
     ],
     "bases": [],
@@ -837,7 +841,7 @@
   "victory_status": {
    "p1": {
     "culture": 0,
-    "tech": 0,
+    "tech": 1,
     "leader_kills": 0,
     "leader_alive": true
    },
@@ -871,11 +875,15 @@
     "building_counts": {},
     "research": [],
     "tech_progress": {
-     "acquired_types": [],
-     "acquired_type_names": [],
+     "acquired_types": [
+      "battle-strategy-card"
+     ],
+     "acquired_type_names": [
+      "Battle strategy card"
+     ],
      "bonus_points_live": 0,
-     "total": 0,
-     "target": 25
+     "total": 1,
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
@@ -990,7 +998,7 @@
      "acquired_type_names": [],
      "bonus_points_live": 0,
      "total": 0,
-     "target": 25
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
@@ -1021,11 +1029,11 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Chronicler Ottoline Vey",
+      "hero": "Captain Rook Malvane",
       "coord": "reserved",
       "is_leader": true,
       "dead": false,
-      "stats": "Init 30 DMG 1 DEF 5"
+      "stats": "Init 70 DMG 3 DEF 6"
      }
     ],
     "bases": [],
@@ -1076,7 +1084,7 @@
   "your_spy_assignments": [],
   "your_knowledge": [],
   "your_reserved_heroes": [
-   "Chronicler Ottoline Vey"
+   "Captain Rook Malvane"
   ]
  },
  "watcherLegalMoves": []

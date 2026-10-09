@@ -5,9 +5,9 @@
  "view": {
   "game_id": "neither-guts-nor-gears",
   "phase": "action",
-  "round": 2,
+  "round": 5,
   "active_player_id": "p2",
-  "first_player_id": "p2",
+  "first_player_id": "p1",
   "layout": "two",
   "map": {
    "tiles": [
@@ -19,7 +19,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Archmage Chaimidious (p1)"
+     ],
      "collectors": [
       "surf-1 (p1)"
      ]
@@ -32,9 +34,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Archmage Chaimidious (p1)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -56,7 +56,9 @@
      "start": 1,
      "base_owner": "p1",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Quartermaster Bertram Hollis (p1)"
+     ],
      "collectors": [
       "surf-2 (p1)"
      ]
@@ -81,9 +83,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "surf-3 (p1)"
-     ]
+     "collectors": []
     },
     {
      "coord": "-1,7",
@@ -105,9 +105,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "surf-4 (p1)"
-     ]
+     "collectors": []
     },
     {
      "coord": "-1,11",
@@ -251,10 +249,7 @@
      "start": 2,
      "base_owner": "p2",
      "units": [],
-     "heroes": [
-      "Chronicler Ottoline Vey (p2)",
-      "Foreman Hadrik Stoll (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -265,7 +260,11 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Captain Rook Malvane (p2)",
+      "Chronicler Ottoline Vey (p2)",
+      "Foreman Hadrik Stoll (p2)"
+     ],
      "collectors": []
     },
     {
@@ -292,10 +291,15 @@
     }
    ]
   },
-  "hero_pool_count": 17,
+  "hero_pool_count": 15,
   "action_stack": [
    {
     "position": 1,
+    "owner": "p1",
+    "face": "down"
+   },
+   {
+    "position": 2,
     "owner": "p2",
     "card_kind": "build"
    }
@@ -320,13 +324,13 @@
   },
   "victory_status": {
    "p1": {
-    "culture": 0,
-    "tech": 3,
+    "culture": 6,
+    "tech": 5,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p2": {
-    "culture": 6,
+    "culture": 15,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
@@ -339,11 +343,10 @@
     "kind": "human",
     "faction": "The Covenant",
     "species": "wizard",
-    "culture": 0,
+    "culture": 6,
     "culture_target": 70,
     "economic_collectors": 12,
     "next_milestones": [
-     4,
      11,
      21,
      35,
@@ -360,33 +363,38 @@
     "research": [],
     "tech_progress": {
      "acquired_types": [
+      "battle-strategy-card",
       "surf",
       "castle",
-      "amphitheatre"
+      "amphitheatre",
+      "subject"
      ],
      "acquired_type_names": [
+      "Battle strategy card",
       "Surf",
       "Castle",
-      "Amphitheatre"
+      "Amphitheatre",
+      "Subject"
      ],
      "bonus_points_live": 0,
-     "total": 3,
-     "target": 25
+     "total": 5,
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
     "leader_alive": true,
-    "subjects": 0,
+    "subjects": 3,
     "cores_reserve": 0,
     "cores_supply": 16,
     "action_cards": {
-     "build": 1,
+     "build": 2,
      "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base"
+      "base",
+      "hero_extra"
      ],
      "moveBattle": [
       "base"
@@ -395,7 +403,7 @@
       "base"
      ]
     },
-    "action_cards_played_count": 3,
+    "action_cards_played_count": 4,
     "battle_hand_count": 1,
     "spy_recruitments": 0,
     "unrevealed_spies": 0,
@@ -403,10 +411,17 @@
     "heroes": [
      {
       "hero": "Archmage Chaimidious",
-      "coord": "-2,6",
+      "coord": "-2,4",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
+     },
+     {
+      "hero": "Quartermaster Bertram Hollis",
+      "coord": "-2,10",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
@@ -447,12 +462,12 @@
      {
       "collector": "surf-3",
       "type": "Surf",
-      "placed_at": "-1,5"
+      "placed_at": null
      },
      {
       "collector": "surf-4",
       "type": "Surf",
-      "placed_at": "-1,9"
+      "placed_at": null
      }
     ],
     "committed_collectors": [
@@ -464,16 +479,6 @@
      {
       "collector": "surf-2",
       "coord": "-2,10",
-      "resource": "wood"
-     },
-     {
-      "collector": "surf-3",
-      "coord": "-1,5",
-      "resource": "wood"
-     },
-     {
-      "collector": "surf-4",
-      "coord": "-1,9",
       "resource": "wood"
      }
     ],
@@ -494,11 +499,10 @@
     "kind": "ai",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 6,
+    "culture": 15,
     "culture_target": 70,
     "economic_collectors": 12,
     "next_milestones": [
-     11,
      21,
      35,
      53
@@ -523,14 +527,14 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 25
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
     "leader_alive": true,
     "subjects": 0,
-    "cores_reserve": 2,
-    "cores_supply": 10,
+    "cores_reserve": 5,
+    "cores_supply": 7,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -554,15 +558,22 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Chronicler Ottoline Vey",
-      "coord": "2,4",
+      "hero": "Captain Rook Malvane",
+      "coord": "2,6",
       "is_leader": true,
       "dead": false,
-      "stats": "Init 30 DMG 1 DEF 5"
+      "stats": "Init 70 DMG 3 DEF 6"
+     },
+     {
+      "hero": "Chronicler Ottoline Vey",
+      "coord": "2,6",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 30 DMG 1 DEF 3"
      },
      {
       "hero": "Foreman Hadrik Stoll",
-      "coord": "2,4",
+      "coord": "2,6",
       "is_leader": false,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 3"
@@ -800,7 +811,7 @@
   {
    "moveType": "build",
    "item": "Home",
-   "reason": "A new base goes on a tile holding your unit or hero, no opposing unit and no base — no tile qualifies now (ruling 55)"
+   "reason": "costs 3 wood + 1 ore — that is 4 resources and you have 3 free collectors"
   },
   {
    "moveType": "build",
@@ -831,9 +842,9 @@
  "watcherView": {
   "game_id": "neither-guts-nor-gears",
   "phase": "action",
-  "round": 2,
+  "round": 5,
   "active_player_id": "p2",
-  "first_player_id": "p2",
+  "first_player_id": "p1",
   "layout": "two",
   "map": {
    "tiles": [
@@ -845,7 +856,9 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Archmage Chaimidious (p1)"
+     ],
      "collectors": [
       "surf-1 (p1)"
      ]
@@ -858,9 +871,7 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [
-      "Archmage Chaimidious (p1)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -882,7 +893,9 @@
      "start": 1,
      "base_owner": "p1",
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Quartermaster Bertram Hollis (p1)"
+     ],
      "collectors": [
       "surf-2 (p1)"
      ]
@@ -907,9 +920,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "surf-3 (p1)"
-     ]
+     "collectors": []
     },
     {
      "coord": "-1,7",
@@ -931,9 +942,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "surf-4 (p1)"
-     ]
+     "collectors": []
     },
     {
      "coord": "-1,11",
@@ -1077,10 +1086,7 @@
      "start": 2,
      "base_owner": "p2",
      "units": [],
-     "heroes": [
-      "Chronicler Ottoline Vey (p2)",
-      "Foreman Hadrik Stoll (p2)"
-     ],
+     "heroes": [],
      "collectors": []
     },
     {
@@ -1091,7 +1097,11 @@
      "start": null,
      "base_owner": null,
      "units": [],
-     "heroes": [],
+     "heroes": [
+      "Captain Rook Malvane (p2)",
+      "Chronicler Ottoline Vey (p2)",
+      "Foreman Hadrik Stoll (p2)"
+     ],
      "collectors": []
     },
     {
@@ -1118,10 +1128,15 @@
     }
    ]
   },
-  "hero_pool_count": 17,
+  "hero_pool_count": 15,
   "action_stack": [
    {
     "position": 1,
+    "owner": "p1",
+    "card_kind": "build"
+   },
+   {
+    "position": 2,
     "owner": "p2",
     "card_kind": "build"
    }
@@ -1146,13 +1161,13 @@
   },
   "victory_status": {
    "p1": {
-    "culture": 0,
-    "tech": 3,
+    "culture": 6,
+    "tech": 5,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p2": {
-    "culture": 6,
+    "culture": 15,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
@@ -1165,11 +1180,10 @@
     "kind": "human",
     "faction": "The Covenant",
     "species": "wizard",
-    "culture": 0,
+    "culture": 6,
     "culture_target": 70,
     "economic_collectors": 12,
     "next_milestones": [
-     4,
      11,
      21,
      35,
@@ -1186,33 +1200,38 @@
     "research": [],
     "tech_progress": {
      "acquired_types": [
+      "battle-strategy-card",
       "surf",
       "castle",
-      "amphitheatre"
+      "amphitheatre",
+      "subject"
      ],
      "acquired_type_names": [
+      "Battle strategy card",
       "Surf",
       "Castle",
-      "Amphitheatre"
+      "Amphitheatre",
+      "Subject"
      ],
      "bonus_points_live": 0,
-     "total": 3,
-     "target": 25
+     "total": 5,
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
     "leader_alive": true,
-    "subjects": 0,
+    "subjects": 3,
     "cores_reserve": 0,
     "cores_supply": 16,
     "action_cards": {
-     "build": 1,
+     "build": 2,
      "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base"
+      "base",
+      "hero_extra"
      ],
      "moveBattle": [
       "base"
@@ -1221,7 +1240,7 @@
       "base"
      ]
     },
-    "action_cards_played_count": 3,
+    "action_cards_played_count": 4,
     "battle_hand_count": 1,
     "spy_recruitments": 0,
     "unrevealed_spies": 0,
@@ -1229,10 +1248,17 @@
     "heroes": [
      {
       "hero": "Archmage Chaimidious",
-      "coord": "-2,6",
+      "coord": "-2,4",
       "is_leader": true,
       "dead": false,
       "stats": "Init 70 DMG 3 DEF 6"
+     },
+     {
+      "hero": "Quartermaster Bertram Hollis",
+      "coord": "-2,10",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
@@ -1273,12 +1299,12 @@
      {
       "collector": "surf-3",
       "type": "Surf",
-      "placed_at": "-1,5"
+      "placed_at": null
      },
      {
       "collector": "surf-4",
       "type": "Surf",
-      "placed_at": "-1,9"
+      "placed_at": null
      }
     ],
     "committed_collectors": [
@@ -1290,16 +1316,6 @@
      {
       "collector": "surf-2",
       "coord": "-2,10",
-      "resource": "wood"
-     },
-     {
-      "collector": "surf-3",
-      "coord": "-1,5",
-      "resource": "wood"
-     },
-     {
-      "collector": "surf-4",
-      "coord": "-1,9",
       "resource": "wood"
      }
     ],
@@ -1320,11 +1336,10 @@
     "kind": "ai",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 6,
+    "culture": 15,
     "culture_target": 70,
     "economic_collectors": 12,
     "next_milestones": [
-     11,
      21,
      35,
      53
@@ -1349,14 +1364,14 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 25
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 1,
     "leader_alive": true,
     "subjects": 0,
-    "cores_reserve": 2,
-    "cores_supply": 10,
+    "cores_reserve": 5,
+    "cores_supply": 7,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -1380,15 +1395,22 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Chronicler Ottoline Vey",
-      "coord": "2,4",
+      "hero": "Captain Rook Malvane",
+      "coord": "2,6",
       "is_leader": true,
       "dead": false,
-      "stats": "Init 30 DMG 1 DEF 5"
+      "stats": "Init 70 DMG 3 DEF 6"
+     },
+     {
+      "hero": "Chronicler Ottoline Vey",
+      "coord": "2,6",
+      "is_leader": false,
+      "dead": false,
+      "stats": "Init 30 DMG 1 DEF 3"
      },
      {
       "hero": "Foreman Hadrik Stoll",
-      "coord": "2,4",
+      "coord": "2,6",
       "is_leader": false,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 3"
@@ -1474,6 +1496,7 @@
   ],
   "your_action_cards_played": [
    "build:base",
+   "build:hero_extra",
    "research:base",
    "move_battle:base"
   ],

@@ -20,10 +20,10 @@
      "base_owner": "p4",
      "units": [],
      "heroes": [
-      "Archmage Elara (p4)"
+      "Foreman Hadrik Stoll (p4)"
      ],
      "collectors": [
-      "water-collector-1 (p1)"
+      "water-collector-1 (p3)"
      ]
     },
     {
@@ -35,7 +35,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [
-      "Quartermaster Bertram Hollis (p4)"
+      "Dowser Wren Calloway (p4)"
      ],
      "collectors": []
     },
@@ -61,7 +61,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [
-      "Foreman Hadrik Stoll (p3)"
+      "Kestrel Nine (p3)"
      ],
      "collectors": []
     },
@@ -73,12 +73,8 @@
      "start": 1,
      "base_owner": "p3",
      "units": [],
-     "heroes": [
-      "Evo Angel (p3)"
-     ],
-     "collectors": [
-      "water-collector-1 (p3)"
-     ]
+     "heroes": [],
+     "collectors": []
     },
     {
      "coord": "-1,3",
@@ -148,9 +144,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "wood-collector-1 (p3)"
-     ]
+     "collectors": []
     },
     {
      "coord": "0,2",
@@ -227,9 +221,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "water-collector-2 (p3)"
-     ]
+     "collectors": []
     },
     {
      "coord": "1,3",
@@ -306,7 +298,7 @@
      "base_owner": "p2",
      "units": [],
      "heroes": [
-      "Marshal Corvin Ashlock (p2)"
+      "Chronicler Ottoline Vey (p2)"
      ],
      "collectors": []
     },
@@ -319,7 +311,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [
-      "Chronicler Ottoline Vey (p2)"
+      "Captain Rook Malvane (p2)"
      ],
      "collectors": [
       "surf-1 (p2)"
@@ -360,13 +352,15 @@
      "base_owner": "p1",
      "units": [],
      "heroes": [
-      "Warden Hesper Quill (p1)"
+      "Quartermaster Bertram Hollis (p1)"
      ],
-     "collectors": []
+     "collectors": [
+      "water-collector-1 (p1)"
+     ]
     }
    ]
   },
-  "hero_pool_count": 12,
+  "hero_pool_count": 13,
   "action_stack": [],
   "active_action": null,
   "resolving_action": null,
@@ -375,7 +369,7 @@
     "treaty": "Open Borders",
     "partners": [
      "p4",
-     "p1"
+     "p2"
     ],
     "culture_income": 5
    },
@@ -383,7 +377,7 @@
     "treaty": "Shared Resources",
     "partners": [
      "p4",
-     "p2"
+     "p3"
     ],
     "culture_income": 4
    },
@@ -391,25 +385,25 @@
     "treaty": "Peace",
     "partners": [
      "p4",
-     "p3"
+     "p1"
     ],
     "culture_income": 3
    },
    {
-    "treaty": "Open Borders",
-    "partners": [
-     "p2",
-     "p3"
-    ],
-    "culture_income": 5
-   },
-   {
-    "treaty": "Peace",
+    "treaty": "Shared Resources",
     "partners": [
      "p2",
      "p1"
     ],
-    "culture_income": 3
+    "culture_income": 4
+   },
+   {
+    "treaty": "Culture Treaty",
+    "partners": [
+     "p2",
+     "p3"
+    ],
+    "culture_income": 1
    }
   ],
   "battle": null,
@@ -421,45 +415,45 @@
    "question": "p2 may break any of their breakable treaties (end of round, §5.6), or keep them",
    "options": [
     {
-     "option_id": "shared-resources:p4",
-     "label": "Shared Resources with The Brass Circle",
+     "option_id": "open-borders:p4",
+     "label": "Open Borders with The Brass Circle",
      "detail": {
       "partner": "p4",
-      "culture_income": 4,
-      "break_condition": "End of round, if no unit is collecting from a partner's space."
-     },
-     "move": {
-      "type": "break_treaty",
-      "treaty_type": "Shared Resources",
-      "partner": "p4"
-     }
-    },
-    {
-     "option_id": "open-borders:p3",
-     "label": "Open Borders with The Ledger",
-     "detail": {
-      "partner": "p3",
       "culture_income": 5,
       "break_condition": "End of round, provided allied units do not share a space."
      },
      "move": {
       "type": "break_treaty",
       "treaty_type": "Open Borders",
-      "partner": "p3"
+      "partner": "p4"
      }
     },
     {
-     "option_id": "peace:p1",
-     "label": "Peace with The Foundry",
+     "option_id": "shared-resources:p1",
+     "label": "Shared Resources with The Foundry",
      "detail": {
       "partner": "p1",
-      "culture_income": 3,
-      "break_condition": "End of round only."
+      "culture_income": 4,
+      "break_condition": "End of round, if no unit is collecting from a partner's space."
      },
      "move": {
       "type": "break_treaty",
-      "treaty_type": "Peace",
+      "treaty_type": "Shared Resources",
       "partner": "p1"
+     }
+    },
+    {
+     "option_id": "culture-treaty:p3",
+     "label": "Culture Treaty with The Ledger",
+     "detail": {
+      "partner": "p3",
+      "culture_income": 1,
+      "break_condition": "Outside the culture phase, only when no action or battle is resolving."
+     },
+     "move": {
+      "type": "break_treaty",
+      "treaty_type": "Culture Treaty",
+      "partner": "p3"
      }
     },
     {
@@ -474,19 +468,19 @@
   },
   "victory_status": {
    "p1": {
-    "culture": 9,
-    "tech": 4,
+    "culture": 8,
+    "tech": 5,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p2": {
-    "culture": 17,
+    "culture": 10,
     "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p3": {
-    "culture": 10,
+    "culture": 6,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
@@ -505,7 +499,7 @@
     "kind": "human",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 9,
+    "culture": 8,
     "culture_target": 140,
     "economic_collectors": 20,
     "next_milestones": [
@@ -521,20 +515,22 @@
     "research": [],
     "tech_progress": {
      "acquired_types": [
+      "battle-strategy-card",
       "core",
       "water-collector",
       "wood-collector",
       "home"
      ],
      "acquired_type_names": [
+      "Battle strategy card",
       "Core",
       "Water collector",
       "Wood collector",
       "Home"
      ],
      "bonus_points_live": 0,
-     "total": 4,
-     "target": 25
+     "total": 5,
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -543,13 +539,14 @@
     "cores_reserve": 1,
     "cores_supply": 19,
     "action_cards": {
-     "build": 1,
+     "build": 2,
      "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base"
+      "base",
+      "hero_extra"
      ],
      "moveBattle": [
       "base"
@@ -572,11 +569,11 @@
       "stats": "Init 70 DMG 3 DEF 6"
      },
      {
-      "hero": "Warden Hesper Quill",
+      "hero": "Quartermaster Bertram Hollis",
       "coord": "2,12",
       "is_leader": false,
       "dead": false,
-      "stats": "Init 70 DMG 3 DEF 4"
+      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
@@ -602,7 +599,7 @@
      {
       "collector": "water-collector-1",
       "type": "Water collector",
-      "placed_at": "-2,4",
+      "placed_at": "2,12",
       "core": "allocated"
      },
      {
@@ -627,7 +624,7 @@
     "committed_collectors": [
      {
       "collector": "water-collector-1",
-      "coord": "-2,4",
+      "coord": "2,12",
       "resource": "water"
      }
     ],
@@ -655,7 +652,7 @@
     "kind": "ai",
     "faction": "The Schism",
     "species": "wizard",
-    "culture": 17,
+    "culture": 10,
     "culture_target": 140,
     "economic_collectors": 20,
     "next_milestones": [
@@ -686,7 +683,7 @@
      ],
      "bonus_points_live": 0,
      "total": 3,
-     "target": 25
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -696,7 +693,7 @@
     "cores_supply": 24,
     "action_cards": {
      "build": 1,
-     "moveBattle": 2,
+     "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
@@ -704,8 +701,7 @@
       "base"
      ],
      "moveBattle": [
-      "base",
-      "hero_extra"
+      "base"
      ],
      "research": [
       "base"
@@ -718,18 +714,18 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Chronicler Ottoline Vey",
+      "hero": "Captain Rook Malvane",
       "coord": "2,6",
       "is_leader": true,
       "dead": false,
-      "stats": "Init 30 DMG 1 DEF 5"
+      "stats": "Init 70 DMG 3 DEF 6"
      },
      {
-      "hero": "Marshal Corvin Ashlock",
+      "hero": "Chronicler Ottoline Vey",
       "coord": "2,4",
       "is_leader": false,
       "dead": false,
-      "stats": "Init 70 DMG 3 DEF 4"
+      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
@@ -802,10 +798,11 @@
     "kind": "ai",
     "faction": "The Ledger",
     "species": "robot",
-    "culture": 10,
+    "culture": 6,
     "culture_target": 140,
     "economic_collectors": 20,
     "next_milestones": [
+     7,
      21,
      42,
      70,
@@ -831,14 +828,14 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 25
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
     "leader_alive": true,
     "subjects": 0,
-    "cores_reserve": 2,
-    "cores_supply": 18,
+    "cores_reserve": 1,
+    "cores_supply": 19,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -862,18 +859,11 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Foreman Hadrik Stoll",
+      "hero": "Kestrel Nine",
       "coord": "-2,10",
       "is_leader": true,
       "dead": false,
-      "stats": "Init 30 DMG 1 DEF 5"
-     },
-     {
-      "hero": "Evo Angel",
-      "coord": "-2,12",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 80 DMG 4 DEF 4"
+      "stats": "Init 70 DMG 3 DEF 6"
      }
     ],
     "bases": [
@@ -899,19 +889,19 @@
      {
       "collector": "water-collector-1",
       "type": "Water collector",
-      "placed_at": "-2,12",
+      "placed_at": "-2,4",
       "core": "allocated"
      },
      {
       "collector": "water-collector-2",
       "type": "Water collector",
-      "placed_at": "0,14",
+      "placed_at": null,
       "core": "allocated"
      },
      {
       "collector": "wood-collector-1",
       "type": "Wood collector",
-      "placed_at": "-1,13",
+      "placed_at": null,
       "core": "allocated"
      },
      {
@@ -924,17 +914,7 @@
     "committed_collectors": [
      {
       "collector": "water-collector-1",
-      "coord": "-2,12",
-      "resource": "water"
-     },
-     {
-      "collector": "wood-collector-1",
-      "coord": "-1,13",
-      "resource": "wood"
-     },
-     {
-      "collector": "water-collector-2",
-      "coord": "0,14",
+      "coord": "-2,4",
       "resource": "water"
      }
     ],
@@ -993,7 +973,7 @@
      ],
      "bonus_points_live": 0,
      "total": 3,
-     "target": 25
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -1002,14 +982,13 @@
     "cores_reserve": 0,
     "cores_supply": 24,
     "action_cards": {
-     "build": 2,
+     "build": 1,
      "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base",
-      "hero_extra"
+      "base"
      ],
      "moveBattle": [
       "base"
@@ -1018,25 +997,25 @@
       "base"
      ]
     },
-    "action_cards_played_count": 4,
+    "action_cards_played_count": 3,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Quartermaster Bertram Hollis",
+      "hero": "Dowser Wren Calloway",
       "coord": "-2,6",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
      },
      {
-      "hero": "Archmage Elara",
+      "hero": "Foreman Hadrik Stoll",
       "coord": "-2,4",
       "is_leader": false,
       "dead": false,
-      "stats": "Init 70 DMG 3 DEF 4"
+      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
@@ -1078,6 +1057,16 @@
       "collector": "surf-3",
       "type": "Surf",
       "placed_at": "-1,9"
+     },
+     {
+      "collector": "surf-4",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-5",
+      "type": "Surf",
+      "placed_at": null
      }
     ],
     "committed_collectors": [
@@ -1123,34 +1112,34 @@
  "legalMoves": [
   {
    "move_id": "",
-   "description": "Break Shared Resources with p4.",
+   "description": "Break Open Borders with p4.",
    "move": {
     "type": "break_treaty",
-    "treaty_type": "Shared Resources",
+    "treaty_type": "Open Borders",
     "partner": "p4"
    }
   },
   {
    "move_id": "",
-   "description": "Break Open Borders with p3.",
+   "description": "Break Shared Resources with p1.",
    "move": {
     "type": "break_treaty",
-    "treaty_type": "Open Borders",
-    "partner": "p3"
-   }
-  },
-  {
-   "move_id": "",
-   "description": "Break Peace with p1.",
-   "move": {
-    "type": "break_treaty",
-    "treaty_type": "Peace",
+    "treaty_type": "Shared Resources",
     "partner": "p1"
    }
   },
   {
    "move_id": "",
-   "description": "Keep all treaties (shared-resources, open-borders, peace) — upkeep begins when everyone has answered.",
+   "description": "Break Culture Treaty with p3.",
+   "move": {
+    "type": "break_treaty",
+    "treaty_type": "Culture Treaty",
+    "partner": "p3"
+   }
+  },
+  {
+   "move_id": "",
+   "description": "Keep all treaties (open-borders, shared-resources) — upkeep begins when everyone has answered.",
    "move": {
     "type": "skip_action"
    }
@@ -1176,10 +1165,10 @@
      "base_owner": "p4",
      "units": [],
      "heroes": [
-      "Archmage Elara (p4)"
+      "Foreman Hadrik Stoll (p4)"
      ],
      "collectors": [
-      "water-collector-1 (p1)"
+      "water-collector-1 (p3)"
      ]
     },
     {
@@ -1191,7 +1180,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [
-      "Quartermaster Bertram Hollis (p4)"
+      "Dowser Wren Calloway (p4)"
      ],
      "collectors": []
     },
@@ -1217,7 +1206,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [
-      "Foreman Hadrik Stoll (p3)"
+      "Kestrel Nine (p3)"
      ],
      "collectors": []
     },
@@ -1229,12 +1218,8 @@
      "start": 1,
      "base_owner": "p3",
      "units": [],
-     "heroes": [
-      "Evo Angel (p3)"
-     ],
-     "collectors": [
-      "water-collector-1 (p3)"
-     ]
+     "heroes": [],
+     "collectors": []
     },
     {
      "coord": "-1,3",
@@ -1304,9 +1289,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "wood-collector-1 (p3)"
-     ]
+     "collectors": []
     },
     {
      "coord": "0,2",
@@ -1383,9 +1366,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [],
-     "collectors": [
-      "water-collector-2 (p3)"
-     ]
+     "collectors": []
     },
     {
      "coord": "1,3",
@@ -1462,7 +1443,7 @@
      "base_owner": "p2",
      "units": [],
      "heroes": [
-      "Marshal Corvin Ashlock (p2)"
+      "Chronicler Ottoline Vey (p2)"
      ],
      "collectors": []
     },
@@ -1475,7 +1456,7 @@
      "base_owner": null,
      "units": [],
      "heroes": [
-      "Chronicler Ottoline Vey (p2)"
+      "Captain Rook Malvane (p2)"
      ],
      "collectors": [
       "surf-1 (p2)"
@@ -1516,13 +1497,15 @@
      "base_owner": "p1",
      "units": [],
      "heroes": [
-      "Warden Hesper Quill (p1)"
+      "Quartermaster Bertram Hollis (p1)"
      ],
-     "collectors": []
+     "collectors": [
+      "water-collector-1 (p1)"
+     ]
     }
    ]
   },
-  "hero_pool_count": 12,
+  "hero_pool_count": 13,
   "action_stack": [],
   "active_action": null,
   "resolving_action": null,
@@ -1531,7 +1514,7 @@
     "treaty": "Open Borders",
     "partners": [
      "p4",
-     "p1"
+     "p2"
     ],
     "culture_income": 5
    },
@@ -1539,7 +1522,7 @@
     "treaty": "Shared Resources",
     "partners": [
      "p4",
-     "p2"
+     "p3"
     ],
     "culture_income": 4
    },
@@ -1547,25 +1530,25 @@
     "treaty": "Peace",
     "partners": [
      "p4",
-     "p3"
+     "p1"
     ],
     "culture_income": 3
    },
    {
-    "treaty": "Open Borders",
-    "partners": [
-     "p2",
-     "p3"
-    ],
-    "culture_income": 5
-   },
-   {
-    "treaty": "Peace",
+    "treaty": "Shared Resources",
     "partners": [
      "p2",
      "p1"
     ],
-    "culture_income": 3
+    "culture_income": 4
+   },
+   {
+    "treaty": "Culture Treaty",
+    "partners": [
+     "p2",
+     "p3"
+    ],
+    "culture_income": 1
    }
   ],
   "battle": null,
@@ -1577,45 +1560,45 @@
    "question": "p2 may break any of their breakable treaties (end of round, §5.6), or keep them",
    "options": [
     {
-     "option_id": "shared-resources:p4",
-     "label": "Shared Resources with The Brass Circle",
+     "option_id": "open-borders:p4",
+     "label": "Open Borders with The Brass Circle",
      "detail": {
       "partner": "p4",
-      "culture_income": 4,
-      "break_condition": "End of round, if no unit is collecting from a partner's space."
-     },
-     "move": {
-      "type": "break_treaty",
-      "treaty_type": "Shared Resources",
-      "partner": "p4"
-     }
-    },
-    {
-     "option_id": "open-borders:p3",
-     "label": "Open Borders with The Ledger",
-     "detail": {
-      "partner": "p3",
       "culture_income": 5,
       "break_condition": "End of round, provided allied units do not share a space."
      },
      "move": {
       "type": "break_treaty",
       "treaty_type": "Open Borders",
-      "partner": "p3"
+      "partner": "p4"
      }
     },
     {
-     "option_id": "peace:p1",
-     "label": "Peace with The Foundry",
+     "option_id": "shared-resources:p1",
+     "label": "Shared Resources with The Foundry",
      "detail": {
       "partner": "p1",
-      "culture_income": 3,
-      "break_condition": "End of round only."
+      "culture_income": 4,
+      "break_condition": "End of round, if no unit is collecting from a partner's space."
      },
      "move": {
       "type": "break_treaty",
-      "treaty_type": "Peace",
+      "treaty_type": "Shared Resources",
       "partner": "p1"
+     }
+    },
+    {
+     "option_id": "culture-treaty:p3",
+     "label": "Culture Treaty with The Ledger",
+     "detail": {
+      "partner": "p3",
+      "culture_income": 1,
+      "break_condition": "Outside the culture phase, only when no action or battle is resolving."
+     },
+     "move": {
+      "type": "break_treaty",
+      "treaty_type": "Culture Treaty",
+      "partner": "p3"
      }
     },
     {
@@ -1630,19 +1613,19 @@
   },
   "victory_status": {
    "p1": {
-    "culture": 9,
-    "tech": 4,
+    "culture": 8,
+    "tech": 5,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p2": {
-    "culture": 17,
+    "culture": 10,
     "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p3": {
-    "culture": 10,
+    "culture": 6,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
@@ -1661,7 +1644,7 @@
     "kind": "human",
     "faction": "The Foundry",
     "species": "robot",
-    "culture": 9,
+    "culture": 8,
     "culture_target": 140,
     "economic_collectors": 20,
     "next_milestones": [
@@ -1677,20 +1660,22 @@
     "research": [],
     "tech_progress": {
      "acquired_types": [
+      "battle-strategy-card",
       "core",
       "water-collector",
       "wood-collector",
       "home"
      ],
      "acquired_type_names": [
+      "Battle strategy card",
       "Core",
       "Water collector",
       "Wood collector",
       "Home"
      ],
      "bonus_points_live": 0,
-     "total": 4,
-     "target": 25
+     "total": 5,
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -1699,13 +1684,14 @@
     "cores_reserve": 1,
     "cores_supply": 19,
     "action_cards": {
-     "build": 1,
+     "build": 2,
      "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base"
+      "base",
+      "hero_extra"
      ],
      "moveBattle": [
       "base"
@@ -1728,11 +1714,11 @@
       "stats": "Init 70 DMG 3 DEF 6"
      },
      {
-      "hero": "Warden Hesper Quill",
+      "hero": "Quartermaster Bertram Hollis",
       "coord": "2,12",
       "is_leader": false,
       "dead": false,
-      "stats": "Init 70 DMG 3 DEF 4"
+      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
@@ -1758,7 +1744,7 @@
      {
       "collector": "water-collector-1",
       "type": "Water collector",
-      "placed_at": "-2,4",
+      "placed_at": "2,12",
       "core": "allocated"
      },
      {
@@ -1783,7 +1769,7 @@
     "committed_collectors": [
      {
       "collector": "water-collector-1",
-      "coord": "-2,4",
+      "coord": "2,12",
       "resource": "water"
      }
     ],
@@ -1811,7 +1797,7 @@
     "kind": "ai",
     "faction": "The Schism",
     "species": "wizard",
-    "culture": 17,
+    "culture": 10,
     "culture_target": 140,
     "economic_collectors": 20,
     "next_milestones": [
@@ -1842,7 +1828,7 @@
      ],
      "bonus_points_live": 0,
      "total": 3,
-     "target": 25
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -1852,7 +1838,7 @@
     "cores_supply": 24,
     "action_cards": {
      "build": 1,
-     "moveBattle": 2,
+     "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
@@ -1860,8 +1846,7 @@
       "base"
      ],
      "moveBattle": [
-      "base",
-      "hero_extra"
+      "base"
      ],
      "research": [
       "base"
@@ -1874,18 +1859,18 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Chronicler Ottoline Vey",
+      "hero": "Captain Rook Malvane",
       "coord": "2,6",
       "is_leader": true,
       "dead": false,
-      "stats": "Init 30 DMG 1 DEF 5"
+      "stats": "Init 70 DMG 3 DEF 6"
      },
      {
-      "hero": "Marshal Corvin Ashlock",
+      "hero": "Chronicler Ottoline Vey",
       "coord": "2,4",
       "is_leader": false,
       "dead": false,
-      "stats": "Init 70 DMG 3 DEF 4"
+      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
@@ -1958,10 +1943,11 @@
     "kind": "ai",
     "faction": "The Ledger",
     "species": "robot",
-    "culture": 10,
+    "culture": 6,
     "culture_target": 140,
     "economic_collectors": 20,
     "next_milestones": [
+     7,
      21,
      42,
      70,
@@ -1987,14 +1973,14 @@
      ],
      "bonus_points_live": 0,
      "total": 4,
-     "target": 25
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
     "leader_alive": true,
     "subjects": 0,
-    "cores_reserve": 2,
-    "cores_supply": 18,
+    "cores_reserve": 1,
+    "cores_supply": 19,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -2018,18 +2004,11 @@
     "units": [],
     "heroes": [
      {
-      "hero": "Foreman Hadrik Stoll",
+      "hero": "Kestrel Nine",
       "coord": "-2,10",
       "is_leader": true,
       "dead": false,
-      "stats": "Init 30 DMG 1 DEF 5"
-     },
-     {
-      "hero": "Evo Angel",
-      "coord": "-2,12",
-      "is_leader": false,
-      "dead": false,
-      "stats": "Init 80 DMG 4 DEF 4"
+      "stats": "Init 70 DMG 3 DEF 6"
      }
     ],
     "bases": [
@@ -2055,19 +2034,19 @@
      {
       "collector": "water-collector-1",
       "type": "Water collector",
-      "placed_at": "-2,12",
+      "placed_at": "-2,4",
       "core": "allocated"
      },
      {
       "collector": "water-collector-2",
       "type": "Water collector",
-      "placed_at": "0,14",
+      "placed_at": null,
       "core": "allocated"
      },
      {
       "collector": "wood-collector-1",
       "type": "Wood collector",
-      "placed_at": "-1,13",
+      "placed_at": null,
       "core": "allocated"
      },
      {
@@ -2080,17 +2059,7 @@
     "committed_collectors": [
      {
       "collector": "water-collector-1",
-      "coord": "-2,12",
-      "resource": "water"
-     },
-     {
-      "collector": "wood-collector-1",
-      "coord": "-1,13",
-      "resource": "wood"
-     },
-     {
-      "collector": "water-collector-2",
-      "coord": "0,14",
+      "coord": "-2,4",
       "resource": "water"
      }
     ],
@@ -2149,7 +2118,7 @@
      ],
      "bonus_points_live": 0,
      "total": 3,
-     "target": 25
+     "target": 26
     },
     "leader_kills": 0,
     "military_kills_needed": 2,
@@ -2158,14 +2127,13 @@
     "cores_reserve": 0,
     "cores_supply": 24,
     "action_cards": {
-     "build": 2,
+     "build": 1,
      "moveBattle": 1,
      "research": 1
     },
     "action_card_slots": {
      "build": [
-      "base",
-      "hero_extra"
+      "base"
      ],
      "moveBattle": [
       "base"
@@ -2174,25 +2142,25 @@
       "base"
      ]
     },
-    "action_cards_played_count": 4,
+    "action_cards_played_count": 3,
     "battle_hand_count": 0,
     "spy_recruitments": 0,
     "unrevealed_spies": 0,
     "units": [],
     "heroes": [
      {
-      "hero": "Quartermaster Bertram Hollis",
+      "hero": "Dowser Wren Calloway",
       "coord": "-2,6",
       "is_leader": true,
       "dead": false,
       "stats": "Init 30 DMG 1 DEF 5"
      },
      {
-      "hero": "Archmage Elara",
+      "hero": "Foreman Hadrik Stoll",
       "coord": "-2,4",
       "is_leader": false,
       "dead": false,
-      "stats": "Init 70 DMG 3 DEF 4"
+      "stats": "Init 30 DMG 1 DEF 3"
      }
     ],
     "bases": [
@@ -2234,6 +2202,16 @@
       "collector": "surf-3",
       "type": "Surf",
       "placed_at": "-1,9"
+     },
+     {
+      "collector": "surf-4",
+      "type": "Surf",
+      "placed_at": null
+     },
+     {
+      "collector": "surf-5",
+      "type": "Surf",
+      "placed_at": null
      }
     ],
     "committed_collectors": [
