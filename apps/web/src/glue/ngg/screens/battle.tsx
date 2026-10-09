@@ -226,6 +226,8 @@ interface MoveStash { stamp: string; from?: string; to?: string; left: string[] 
 interface ParkedMove { round: number; from: string; to: string; units: string[] }
 const MOVE_KEY = 'ngg:move-battle';
 const PARKED_KEY = 'ngg:move-battle:parked';
+/** The action (by stamp) in which the person said no to Elara, or she cast. */
+const ELARA_DONE_KEY = 'ngg:move-battle:elara-done';
 
 function MoveBattleScreen({ ctx }: { ctx: ScreenCtx }) {
   const { v } = ctx;
@@ -233,6 +235,11 @@ function MoveBattleScreen({ ctx }: { ctx: ScreenCtx }) {
   const skip = ctx.movesOf('skip_action')[0];
   const stamp = `${v.round}:${v.activeAction?.owner ?? ''}:${v.stack.length}`;
   const [raw, setStash] = useStash<MoveStash>(ctx, MOVE_KEY);
+  const [elaraDone, setElaraDone] = useStash<string>(ctx, ELARA_DONE_KEY);
+  // Elara's spell comes first, before any movement (§6.4): the engine lists
+  // it beside the ordinary moves at the start of the action, and the
+  // person casts or says no before choosing a move.
+  const casts = ctx.movesOf('cast_elara_spell').filter((m) => typeof m.move['target_location'] === 'string');
   const st: MoveStash = raw && raw.stamp === stamp ? raw : { stamp, left: [] };
 
   const origins = [...new Set(moves.map((m) => asStr(m.move['from'])))];
@@ -276,6 +283,12 @@ function MoveBattleScreen({ ctx }: { ctx: ScreenCtx }) {
     const tos = [...byTile.keys()];
     marks = { origin: from, lit: new Set(tos), greyRest: true, onTile: pickTo, selected: to ?? null, tags: new Map([[from, 'FROM']]) };
   }
+
+  if (casts.length > 0 && elaraDone !== stamp && ctx.route.perspective === 'decide') {
+    return <ElaraScreen ctx={ctx} onDone={() => setElaraDone(stamp)} />;
+  }
+  // After her spell, movement is optional: the engine's skip then ends the action.
+  const afterSpell = elaraDone === stamp && casts.length === 0;
 
   const mine = ctx.route.perspective === 'decide';
   const panel = (
@@ -333,7 +346,7 @@ function MoveBattleScreen({ ctx }: { ctx: ScreenCtx }) {
       )}
       {mine && (
         <Actions>
-          {skip && <Btn kind="secondary" disabled={!live} onClick={() => ctx.send(skip)}>Skip this action</Btn>}
+          {skip && <Btn kind="secondary" disabled={!live} onClick={() => ctx.send(skip)}>{afterSpell ? 'End without moving' : 'Skip this action'}</Btn>}
           {from && <Btn disabled={!live || !template || coming.length === 0} onClick={send}>{to ? `Move to ${ctx.tile(to)}` : 'Move'}</Btn>}
         </Actions>
       )}
@@ -343,12 +356,14 @@ function MoveBattleScreen({ ctx }: { ctx: ScreenCtx }) {
 }
 
 // ---------------------------------------------------------------------------
-// Elara's spell: before the move already chosen.
+// Elara's spell: at the start of a Move/Battle action, before any movement.
+// Older sessions ask it as a pending (with a skip move); the engine now lists
+// the casts beside the ordinary moves, and "Do not cast" goes on to them.
 // ---------------------------------------------------------------------------
 
 const ELARA_KEY = 'ngg:elara';
 
-function ElaraScreen({ ctx }: { ctx: ScreenCtx }) {
+function ElaraScreen({ ctx, onDone }: { ctx: ScreenCtx; onDone?: () => void }) {
   const { v } = ctx;
   const moves = ctx.movesOf('cast_elara_spell');
   const casts = moves.filter((m) => typeof m.move['target_location'] === 'string');
@@ -407,8 +422,8 @@ function ElaraScreen({ ctx }: { ctx: ScreenCtx }) {
             </div>
           )}
           <Actions>
-            {skip && <Btn kind="secondary" disabled={!live} onClick={() => { setStash(undefined); ctx.send(skip); }}>Do not cast</Btn>}
-            <Btn disabled={!live || !pick} onClick={() => { if (pick) { setStash(undefined); ctx.send(pick); } }}>{target ? `Cast at ${ctx.tile(target)}` : 'Cast'}</Btn>
+            {(skip || onDone) && <Btn kind="secondary" disabled={!live} onClick={() => { setStash(undefined); if (skip) ctx.send(skip); else onDone?.(); }}>Do not cast</Btn>}
+            <Btn disabled={!live || !pick} onClick={() => { if (pick) { setStash(undefined); onDone?.(); ctx.send(pick); } }}>{target ? `Cast at ${ctx.tile(target)}` : 'Cast'}</Btn>
           </Actions>
         </>
       )}

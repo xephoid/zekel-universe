@@ -102,6 +102,30 @@ write('pending-extra_selection-shut', fx.extraSelection().s);
   write('pending-battle_defense-self_destruct', s);
 }
 
+// Archmage Elara at the start of a Move/Battle action: the engine lists her
+// spell beside the ordinary moves (no pending since its 279ae04).
+{
+  const s = fx.base2p();
+  const g = s.gameState;
+  const wiz = g.players.find((p: { playerId: string }) => p.playerId === 'wiz');
+  wiz.manaCurrent = wiz.manaMax;
+  g.heroPool = g.heroPool.filter((x: string) => x !== 'elara');
+  g.heroes.push({ id: 'elara', ownerId: 'wiz', coord: '0,4', isLeader: false, dead: false });
+  fx.placeUnit(g, 'wiz', '0,4', 'evoker');
+  fx.placeUnit(g, 'rob', '0,2', 'spitter');
+  g.pending = null;
+  g.phase = 'action';
+  g.activeAction = { ownerId: 'wiz', cardKind: 'move_battle', slotId: 'move_battle:base' };
+  g.actionStack = [g.activeAction];
+  g.activePlayerId = 'wiz';
+  writeFileSync(join(outDir, 'action-move_battle-elara.json'), JSON.stringify({
+    key: 'action-move_battle', players: 2, viewer: 'wiz',
+    view: game.getPlayerView(s, 'wiz'), legalMoves: game.getLegalMoves(s, 'wiz'),
+    watcher: 'rob', watcherView: game.getPlayerView(s, 'rob'), watcherLegalMoves: game.getLegalMoves(s, 'rob'),
+  }, null, 1));
+  console.log('action-move_battle-elara');
+}
+
 // Each human picks their own faction: the second human's turn, one taken.
 {
   let s = game.createSession([

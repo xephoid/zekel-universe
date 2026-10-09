@@ -27,7 +27,7 @@ const ALL = Object.fromEntries(
 );
 
 const BATTLE_FIXTURES = [
-  'action-move_battle', 'action-move_battle-multi', 'pending-elara_spell', 'pending-elara_spell-multi',
+  'action-move_battle', 'action-move_battle-multi', 'pending-elara_spell', 'pending-elara_spell-multi', 'action-move_battle-elara',
   'pending-battle_commit-multi', 'pending-battle_commit-shared_tactics', 'pending-battle_commit-reserved',
   'pending-counter_target-batches', 'pending-extra_selection-multi', 'pending-extra_selection-shut',
   'battle-activations-multi', 'battle-activations-infiltrator',
@@ -302,6 +302,23 @@ describe('NGnG battle screens', () => {
     const s = decider('pending-elara_spell');
     press(s.container, 'Do not cast');
     expect(sentListed(s.onMove, s.legalMoves)).toEqual({ type: 'cast_elara_spell', target_location: null, skip: true });
+  });
+  it("Elara's spell at the start of a Move/Battle action comes before the move (engine lists it beside the moves)", () => {
+    const r = decider('action-move_battle-elara');
+    expect(r.container.textContent).toContain('may cast first');
+    const lit = r.legalMoves.filter((m) => m.move['type'] === 'cast_elara_spell').length;
+    expect(r.container.querySelectorAll('button.ngg-hex')).toHaveLength(lit);
+    press(r.container, 'E2');
+    press(r.container, /^Cast at /);
+    expect(sentListed(r.onMove, r.legalMoves)).toEqual({ type: 'cast_elara_spell', target_location: '0,2' });
+    cleanup();
+    // Do not cast: nothing is sent, and the ordinary move screen follows.
+    const s = decider('action-move_battle-elara');
+    press(s.container, 'Do not cast');
+    expect(s.onMove).not.toHaveBeenCalled();
+    expect(s.container.textContent).toContain('One tile, as many units as you like');
+    press(s.container, 'Skip this action');
+    expect(sentListed(s.onMove, s.legalMoves)['type']).toBe('skip_action');
   });
   it('Move Battle: one row per destination tile even when the engine lists several moves there', () => {
     const f = fx('pinned:action-move_battle-mid');
