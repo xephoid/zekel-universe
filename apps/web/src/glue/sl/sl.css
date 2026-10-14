@@ -377,3 +377,15 @@ button.sl-piece { cursor: pointer; }
 .sl-mark { position: absolute; inset: -3px; z-index: 3; border: 3px dashed var(--sl-ink); border-radius: 8px; pointer-events: none; }
 .sl-mark.chosen { border-style: solid; box-shadow: 0 0 0 3px #fff, 0 0 0 6px #f5a623; }
 .sl-mark-n { position: absolute; top: -10px; border: 2px solid #fff; pointer-events: auto; cursor: pointer; padding: 0; }
+
+/* ======================================================================
+   The color guide (ColorGuide.tsx)
+   ====================================================================== */
+.sl-guide { display: block; padding: 12px 14px; }
+.sl-guide ul { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.sl-guide li { display: flex; gap: 10px; align-items: flex-start; padding: 5px 6px; border-radius: 8px; border: 2px solid transparent; }
+.sl-guide li.on { border-color: var(--sl-ink); background: #fff0f5; }
+.sl-guide-swatch { width: 20px; height: 20px; border-radius: 5px; border-width: 2px; margin-top: 2px; }
+.sl-guide-name { display: block; font-size: 12.5px; }
+.sl-guide-name > span { color: var(--sl-quiet); }
+.sl-guide-text { display: block; font-size: 11.5px; line-height: 1.35; color: var(--sl-ink-2); }

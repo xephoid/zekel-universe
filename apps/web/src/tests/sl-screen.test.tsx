@@ -270,3 +270,19 @@ describe('the turn panel', () => {
     expect(inf.onMove).toHaveBeenCalledWith(spend[1]);
   });
 });
+
+describe('the color guide', () => {
+  it('is always on screen, one row per color, and outlines the picked card’s color', () => {
+    const legal = [{ move_id: 'b', description: 'Play double blue (acts twice): move ambassador only (no action).', move: { type: 'play_intel', cardId: 'c2', unit: 'ambassador', viaRoad: false, takeAction: false } }] as LegalMove[];
+    render(<SlScreen {...slProps({ legalMoves: legal }, { yourTurn: false })} />);
+    const guide = screen.getByRole('region', { name: 'What each color does' });
+    const rows = within(guide).getAllByRole('listitem');
+    expect(rows.map((r) => r.querySelector('b')!.textContent)).toEqual(['Red · Battle', 'Orange · Influence', 'Yellow · Taxes', 'Green · Free play', 'Blue · Intel', 'Purple · Castle']);
+    expect(guide.querySelector('li.on')).toBeNull();
+    cleanup();
+    render(<SlScreen {...slProps({ legalMoves: legal })} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Blue double card: Intel' }));
+    const on = screen.getByRole('region', { name: 'What each color does' }).querySelector('li.on')!;
+    expect(on.querySelector('b')!.textContent).toBe('Blue · Intel');
+  });
+});

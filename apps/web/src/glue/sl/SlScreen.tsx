@@ -12,6 +12,7 @@ import { Piece, pieceTitle } from './Piece';
 import { Players } from './Players';
 import { Hand } from './Hand';
 import { StepTracker, TurnPanel, readBattle } from './TurnPanel';
+import { ColorGuide } from './ColorGuide';
 import { cardChoices, turnStep, type PlayOption } from './turn';
 import { readTable, tileOf, UNITS, type SlTable } from './read';
 import { sweetlandsGlue } from '../sweetlands-imperium';
@@ -96,6 +97,7 @@ export function SlScreen(props: GameScreenProps) {
     const moves = sweetlandsGlue.movesForSelect!(sel, input);
     if (moves.length === 1) onMove(moves[0]!);
   };
+  const pickedColor = picked?.startsWith('token:') ? picked.slice(6) : table.hand?.find((c) => c.cardId === picked)?.color || null;
   const pick = (id: string | null) => { setPicked(id); setChosen(null); setArming(null); };
   const involved = (pid: string | null) => !!pid && pid === table.me?.pid;
   const shownBattle = battle && battle.id > seenBattle && (involved(battle.attacker.pid) || involved(battle.defender.pid)) ? battle : null;
@@ -111,6 +113,7 @@ export function SlScreen(props: GameScreenProps) {
         battle={shownBattle} onBattleSeen={() => setSeenBattle(battle?.id ?? 0)}
         template={template} setTemplate={setTemplate}
       />
+      <ColorGuide highlight={pickedColor} />
     </div>
   );
 
