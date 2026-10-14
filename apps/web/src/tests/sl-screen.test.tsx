@@ -2,7 +2,7 @@
 // shape. What it shows comes from the view and the reference data; what it
 // sends is only ever a move the engine listed.
 
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import type { GameReferenceResponse } from '@universe/shared';
 import { SlScreen } from '../glue/sl/SlScreen';
@@ -53,6 +53,7 @@ export function slProps(over: { view?: unknown; legalMoves?: LegalMove[]; refere
   };
 }
 
+beforeEach(() => { localStorage.setItem('zk:sl-how-to-play-seen', '1'); });
 afterEach(cleanup);
 
 describe('the players panel', () => {
@@ -284,5 +285,37 @@ describe('the color guide', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Blue double card: Intel' }));
     const on = screen.getByRole('region', { name: 'What each color does' }).querySelector('li.on')!;
     expect(on.querySelector('b')!.textContent).toBe('Blue · Intel');
+  });
+});
+
+describe('how to play', () => {
+  const ref = () => slReference({
+    public_objectives: [{ id: 'defeat_foe', points: 3, description: 'Defeat the foe in the castle.' }, { id: 'capture_leader', points: 1, description: 'Capture a leader.' }],
+    secret_objectives: [{ id: 'defeat_knight', points: 2, description: 'Defeat a knight in battle.' }],
+    sugar_die_faces: [0, 0, 0, 1, 2, 3],
+  });
+
+  it('opens by itself before a seat’s first game, with the goals and dice from the reference data, and not again', () => {
+    localStorage.clear();
+    render(<SlScreen {...slProps({ reference: ref() }, { yourTurn: false })} />);
+    const sheet = screen.getByRole('dialog', { name: 'How to play Sweetlands Imperium' });
+    expect(within(sheet).getByText('Be first to 5 points')).toBeTruthy();
+    expect(within(sheet).getAllByRole('listitem').slice(0, 3).map((li) => li.textContent)).toEqual([
+      'Defeat the foe in the castle.3', 'Your secret goal (only you can see it).2', 'Capture a leader.1',
+    ]);
+    expect(within(sheet).getByText(/Each one rolls 0, 0, 0, 1, 2 or 3\./)).toBeTruthy();
+    fireEvent.click(within(sheet).getByRole('button', { name: 'Got it, let’s play' }));
+    expect(screen.queryByRole('dialog')).toBeNull();
+    cleanup();
+    render(<SlScreen {...slProps({ reference: ref() }, { yourTurn: false })} />);
+    expect(screen.queryByRole('dialog')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'How to play' }));
+    expect(screen.getByRole('dialog', { name: 'How to play Sweetlands Imperium' })).toBeTruthy();
+  });
+
+  it('does not open by itself for a watcher', () => {
+    localStorage.clear();
+    render(<SlScreen {...slProps({ playerId: null }, { yourTurn: false, interactive: false })} />);
+    expect(screen.queryByRole('dialog')).toBeNull();
   });
 });

@@ -13,6 +13,7 @@ import { Players } from './Players';
 import { Hand } from './Hand';
 import { StepTracker, TurnPanel, readBattle } from './TurnPanel';
 import { ColorGuide } from './ColorGuide';
+import { FirstGame, howToPlaySeen, markHowToPlaySeen } from './FirstGame';
 import { cardChoices, turnStep, type PlayOption } from './turn';
 import { readTable, tileOf, UNITS, type SlTable } from './read';
 import { sweetlandsGlue } from '../sweetlands-imperium';
@@ -76,6 +77,10 @@ export function SlScreen(props: GameScreenProps) {
   /** the battle the engine last resolved, and the one this seat has already seen */
   const battle = useMemo(() => readBattle(input.view), [input.view]);
   const [seenBattle, setSeenBattle] = useState<number>(() => battle?.id ?? 0);
+  /** the How to play page: shown by itself before a seat's first Sweetlands game here */
+  const [howTo, setHowTo] = useState(false);
+  const seated = !!table?.me && interactive;
+  useEffect(() => { if (seated && !howToPlaySeen()) setHowTo(true); }, [seated]);
 
   const step = table ? turnStep(table, input.legalMoves, interactive && yourTurn) : 'waiting';
   const choices = useMemo(
@@ -104,6 +109,7 @@ export function SlScreen(props: GameScreenProps) {
 
   const turn = (
     <div className="sl-turn">
+      <button type="button" className="sl-howto-btn" onClick={() => setHowTo(true)}>How to play</button>
       <StepTracker step={step} />
       <TurnPanel
         table={table} input={input} step={step} pressable={pressable} busy={busy} nameFor={nameFor}
@@ -136,6 +142,7 @@ export function SlScreen(props: GameScreenProps) {
         {menu && <div className="sl-menu">{menu}</div>}
       </div>
       {sideSlot ? createPortal(turn, sideSlot) : turn}
+      {howTo && <FirstGame input={input} onClose={() => { markHowToPlaySeen(); setHowTo(false); }} />}
     </div>
   );
 }

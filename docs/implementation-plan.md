@@ -1374,6 +1374,12 @@ The design canvas is `docs/design/sweetlands-candy/`; what to build is
   knight battle starts with the action's own button, since the engine does
   not say beforehand whether one will happen. Either way the dice shown are
   the engine's, after the press.
+- **How to play** (build item 8) is a sheet opened from a button at the top
+  of the turn column (the table's top bar belongs to the table, not the
+  game). It opens by itself the first time a seat sits at a Sweetlands table
+  in a browser, remembered in that browser's localStorage only: a convenience,
+  so a cleared or private browser shows it again. Its goals, points, points
+  to win and die faces are the engine's reference data.
 - **Still open:** the Quiche (Nomads) pieces, home and off-board pool; the
   phone; dark mode. And an engine defect the panel cannot fix: when Red can
   capture, the engine picks the target itself (zekel `choices.ts`,

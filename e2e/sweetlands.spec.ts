@@ -36,6 +36,11 @@ test('Sweetlands: the player makes every setup choice, draws with the button, an
   await start.click();
   await expect(page).toHaveURL(/\/table\//, { timeout: 20_000 });
   await expect(page.locator('.turn-pill')).toHaveText(/^Your move/, { timeout: 30_000 });
+  // Before a first Sweetlands game the How to play page opens by itself.
+  const howTo = page.getByRole('dialog', { name: 'How to play Sweetlands Imperium' });
+  await expect(howTo).toBeVisible();
+  await howTo.getByRole('button', { name: 'Got it, let’s play' }).click();
+  await expect(howTo).toBeHidden();
 
   // The board: 80 spaces and 4 homes, the castle with the orc's three sugar
   // cubes, the treat art in place, both factions seated.
