@@ -19,6 +19,7 @@ import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, SelectEvent
 import { asArr, asNum, asStr, isObj, shapeHas, words } from './types';
 import { answerList, answerText } from './forms';
 import { SPACES, REGION_FACTION, SPACE_COLORS, TREATS, BOARD } from './sweetlands-board';
+import './sl/sl.css';
 
 const PALETTE: Record<string, string> = {
   ...SPACE_COLORS,
@@ -138,6 +139,12 @@ function myPlayer(view: Record<string, unknown>, me: string | null): Record<stri
   return isObj(p) ? p : null;
 }
 
+/** The view is this game's: the shared fields, and this game's id or its taxes. */
+function isSweetlandsView(view: unknown): view is Record<string, unknown> {
+  if (!shapeHas(view, 'players', 'phase')) return false;
+  return asStr(view['game_id'], 'sweetlands-imperium') === 'sweetlands-imperium' || 'taxes' in view;
+}
+
 function cardIdOf(m: LegalMove): string | null {
   const id = m.move['cardId'];
   return typeof id === 'string' ? id : null;
@@ -147,10 +154,15 @@ export const sweetlandsGlue: GlueModule = {
   gameId: 'sweetlands-imperium',
   title: 'Sweetlands Imperium',
 
+  /** The candy theme (docs/design/sweetlands-candy): the table's own look,
+   *  for every seat and for a watcher, once the view is this game's. */
+  themeFor(input: GlueInput): string | null {
+    return isSweetlandsView(input.view) ? 'sl-theme' : null;
+  },
+
   plan(input: GlueInput): TablePlan | null {
     const { view } = input;
-    if (!shapeHas(view, 'players', 'phase')) return null;
-    if (asStr(view['game_id'], 'sweetlands-imperium') !== 'sweetlands-imperium' && !('taxes' in view)) return null;
+    if (!isSweetlandsView(view)) return null;
     const players = asArr(view['players']);
     if (players.length === 0) return null;
     const me = input.playerId;

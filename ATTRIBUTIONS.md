@@ -5,7 +5,7 @@ project itself is Apache 2.0 (see `LICENSE`).
 
 ## Fonts (served from `apps/web/public/fonts`, declared in `apps/web/src/fonts.css`)
 
-All ten families are licensed under the SIL Open Font License 1.1, which
+All eleven families are licensed under the SIL Open Font License 1.1, which
 permits bundling and self-hosting with attribution. Latin subsets only.
 
 - **Slackey** by Sideshow (the wordmark). OFL 1.1.
@@ -19,9 +19,11 @@ permits bundling and self-hosting with attribution. Latin subsets only.
   rain and neon theme). OFL 1.1.
 - **Special Elite** by Astigmatic (the Cybernoir Detective's typewriter). OFL 1.1.
 - **Share Tech Mono** by Carrois Apostrophe (the Cybernoir Hacker's terminal). OFL 1.1.
+- **Sniglet** by Haley Fiege (headings and card names in the Sweetlands Imperium
+  candy theme). OFL 1.1.
 
 The files were obtained from Google Fonts in September 2026; Chakra Petch,
-Special Elite and Share Tech Mono in October 2026.
+Special Elite, Share Tech Mono and Sniglet in October 2026.
 
 ## Fonts on the design canvas (`docs/design/*.dc.html`)
 

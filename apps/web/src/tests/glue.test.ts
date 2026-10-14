@@ -424,6 +424,12 @@ function referenceBoard(): Map<string, string> {
 
 describe('sweetlands-imperium glue', () => {
   const g = GLUES['sweetlands-imperium']!;
+  it('puts the candy theme on the table for a seat and a watcher, and nothing on a view from another game', () => {
+    expect(g.themeFor!(input(SL_VIEW, [], { playerId: 's1' }))).toBe('sl-theme');
+    expect(g.themeFor!(input(SL_VIEW, []))).toBe('sl-theme');
+    expect(g.themeFor!(input({ game_id: 'something-else', players: [], phase: 'play' }, []))).toBeNull();
+    expect(g.themeFor!(input(null, []))).toBeNull();
+  });
   it('board data matches the reference: 80 spaces + 4 junction roads', () => {
     expect(SPACES).toHaveLength(80);
     expect(Object.keys(JUNCTION_ROADS)).toHaveLength(4);

@@ -1,0 +1,104 @@
+/* Sweetlands Imperium's candy theme (docs/design/sweetlands-candy/, the
+   build in docs/games/sweetlands-candy-theme-build.md). Every rule is scoped
+   under .sl-theme, the class the glue's themeFor puts on the table shell, so
+   no other game and no other page changes. The table is light in both of the
+   site's light and dark settings: it is the game's own look, not a mode.
+
+   Values are the board's (Table.dc.html). The wordmark keeps its brand green. */
+
+.table-shell.sl-theme {
+  --sl-page: #fdeef3;
+  --sl-bar: #ffd6e6;
+  --sl-choc: #5a3214;
+  --sl-caramel: #e9b07a;
+  --sl-panel: #fffaf6;
+  --sl-ink: #3d200b;
+  --sl-ink-2: #5e3a28;
+  --sl-quiet: #8a5a44;
+  --sl-rasp: #c2255c;
+  --sl-rasp-hover: #9c1c49;
+  --sl-pink-line: #e8a9bd;
+  --sl-blush: #fff0f5;
+  --sl-mint: #dff7e8;
+  --sl-display: 'Sniglet', 'Bricolage Grotesque', 'IBM Plex Sans', system-ui, sans-serif;
+
+  /* Universe's own tokens, redefined for everything on the page. */
+  --bg: var(--sl-page); --bg-raised: var(--sl-panel); --card: var(--sl-panel); --chip: #ffe3ec;
+  --fg: var(--sl-ink); --fg-muted: var(--sl-quiet);
+  --accent: var(--sl-rasp); --accent-tint: #ffe3ec; --accent-tint-2: #ffe3ec; --highlight: #ffe3ec;
+  --border: var(--sl-pink-line); --line: rgba(90, 50, 20, .14);
+  /* --brand-orange stays: the wordmark's meeple is always orange. */
+  --lit: var(--sl-rasp);
+  --you-bg: var(--sl-rasp); --you-fg: #ffffff;
+  --danger: #b3261e;
+  --card-back: #f7c8d8;
+  --shadow-sm: 0 2px 0 var(--sl-choc); --shadow-md: 0 3px 0 var(--sl-choc);
+  --shadow-card: 0 3px 0 var(--sl-choc);
+  --shadow-card-hover: 0 5px 0 var(--sl-choc);
+  --shadow-pop: 0 4px 0 var(--sl-choc), 0 14px 34px rgba(90, 50, 20, .25);
+  --shadow-lift: 0 10px 18px rgba(90, 50, 20, .3);
+  --font-display: var(--sl-display);
+  --radius-md: 10px;
+
+  /* The sprinkled page: three dot patterns on a 44 px tile. */
+  background-color: var(--sl-page);
+  background-image:
+    radial-gradient(circle at 20% 30%, #ffb3c9 1.6px, transparent 2.2px),
+    radial-gradient(circle at 70% 60%, #b8e8ff 1.6px, transparent 2.2px),
+    radial-gradient(circle at 45% 85%, #ffe48a 1.5px, transparent 2.1px);
+  background-size: 44px 44px;
+  color: var(--sl-ink);
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+}
+
+/* ---------- headings ---------- */
+.sl-theme :is(.zk-zone-label, .zk-tableau-title, .move-menu summary, .side-section h3) {
+  font-family: var(--sl-display); font-weight: 800; color: var(--sl-ink);
+}
+
+/* ---------- the top bar: pink, a chocolate edge, a caramel rim under it ---------- */
+.sl-theme .table-topbar {
+  height: 56px; gap: 18px; background: var(--sl-bar);
+  border-bottom: 3px solid var(--sl-choc); box-shadow: 0 3px 0 var(--sl-caramel);
+  position: relative; z-index: 2;
+}
+.sl-theme .table-topbar .divider { background: var(--sl-choc); height: 22px; }
+.sl-theme .table-topbar .title { font: 800 17px/1 var(--sl-display); }
+.sl-theme .table-topbar .round-note { font: 400 13px var(--font-body); color: var(--sl-quiet); }
+.sl-theme .turn-pill {
+  padding: 6px 14px; background: var(--sl-panel); color: var(--sl-ink);
+  border: 2px solid var(--sl-ink); font-size: 14px; font-weight: 700;
+}
+.sl-theme .turn-pill.mine { background: #f5a623; color: var(--sl-ink); }
+.sl-theme .turn-pill .dot { background: var(--sl-ink); }
+
+/* ---------- buttons: raspberry for the main one, cream with a pink rim for the rest ---------- */
+.sl-theme .btn { background: var(--sl-rasp); color: #fff; border-radius: 8px; box-shadow: 0 3px 0 var(--sl-choc); }
+.sl-theme .btn:hover:not(:disabled) { background: var(--sl-rasp-hover); }
+.sl-theme .btn.secondary { background: var(--sl-panel); color: var(--sl-ink); border: 2px solid var(--sl-pink-line); box-shadow: none; }
+.sl-theme .btn.secondary:hover:not(:disabled) { background: #ffe3ec; }
+.sl-theme .chip-btn {
+  height: 36px; padding: 0 14px; border: 2px solid var(--sl-pink-line);
+  background: var(--sl-panel); color: var(--sl-ink); font-weight: 500; font-size: 14px;
+}
+.sl-theme .chip-btn:hover:not(:disabled) { background: #ffe3ec; }
+.sl-theme .chip-btn.leave { border: none; background: transparent; color: var(--sl-quiet); }
+.sl-theme .chip-btn.leave:hover { color: var(--sl-rasp); }
+.sl-theme .chip-btn.watching { background: var(--sl-rasp); color: #fff; border-color: transparent; }
+.sl-theme :is(.btn, .chip-btn):focus-visible { outline: 3px solid var(--sl-rasp); outline-offset: 2px; }
+
+/* ---------- panels: cream, a chocolate outline, a raised bottom edge ---------- */
+.sl-theme :is(.zone:not(.zone-tableau), .zk-tableau, .caption-card, .action-bar, .move-menu, .lesson-note, .toast, .json-inspector, .sheet) {
+  background: var(--sl-panel); color: var(--sl-ink);
+  border: 2px solid var(--sl-choc); border-radius: 16px; box-shadow: 0 3px 0 var(--sl-choc);
+}
+
+/* ---------- the play column, the side column, the bench ---------- */
+.sl-theme .table-play, .sl-theme .table-bench { background: transparent; }
+.sl-theme .table-side { background: rgba(255, 250, 246, .55); border-left: 2px solid var(--sl-choc); }
+.sl-theme .table-bench { border-top: 0; }
+
+/* ---------- the last move and the log ---------- */
+.sl-theme .side-section h3 { font-size: 15px; }
+.sl-theme .log li { border-bottom-color: rgba(90, 50, 20, .1); }
+.sl-theme .log li.current { color: var(--sl-rasp); }
