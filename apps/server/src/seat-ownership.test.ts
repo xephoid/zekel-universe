@@ -82,4 +82,10 @@ describe('per-seat payload stripping', () => {
     expect(wire.engineMove).toEqual({ action: 'play' });
     expect(wire.nextActorPosition).toBe(0);
   });
+
+  it("keeps the raw move to the seat that made it (SEC-07-F21)", () => {
+    expect(toWireEvent(event, 1).engineMove).toBeNull();
+    expect(toWireEvent(event, null).engineMove).toBeNull();
+    expect(toWireEvent({ ...event, actorSeatPosition: null }, 0).engineMove).toBeNull();
+  });
 });

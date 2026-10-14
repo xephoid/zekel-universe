@@ -35,6 +35,8 @@ export class FakeEngine implements EngineService {
   lastOptions: Record<string, unknown> | undefined;
   /** how many moves each AI turn plays */
   aiMovesPerTurn = 2;
+  /** extra fields every AI move_taken carries (a secret choice, say) */
+  aiMoveFields: Record<string, unknown> = {};
   /** the AI opens the game instead of the first human */
   aiOpens = false;
   /** the AI's turn ends the game */
@@ -214,7 +216,7 @@ export class FakeEngine implements EngineService {
       s.history.push(`${playerId}:ai${i}`);
       const player_views: Record<string, unknown> = {};
       for (const h of this.humans(s)) player_views[h] = this.view(s, h);
-      moves.push({ player_id: playerId, move_taken: { type: `ai-${i}` }, narration: 'ai', state_summary: `AI move ${i + 1}.`, player_views });
+      moves.push({ player_id: playerId, move_taken: { type: `ai-${i}`, ...this.aiMoveFields }, narration: 'ai', state_summary: `AI move ${i + 1}.`, player_views });
     }
     if (this.aiWins) {
       s.over = RESULT;

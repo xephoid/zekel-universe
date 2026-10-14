@@ -350,6 +350,7 @@ export interface TableEventWire {
   kind: TableEventKind;
   actorSeatPosition: number | null;
   summary: string;
+  /** the raw move, for the seat that made it only; null for every other seat and for AI moves */
   engineMove: Record<string, unknown> | null;
   /** the receiving seat's view after this event */
   view: unknown;
