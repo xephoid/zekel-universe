@@ -4,13 +4,12 @@
 // Every move it sends is one the engine listed.
 
 import { useMemo, useState, type ReactNode } from 'react';
-import { createPortal } from 'react-dom';
 import type { SelectEvent } from '@universe/primitives';
 import type { GameScreenProps } from '../types';
-import { ZoneRenderer } from '../ZoneRenderer';
 import { Board } from './Board';
 import { Piece, pieceTitle } from './Piece';
 import { Players } from './Players';
+import { Hand } from './Hand';
 import { readTable, tileOf, UNITS, type SlTable } from './read';
 import { sweetlandsGlue } from '../sweetlands-imperium';
 import './sl.css';
@@ -35,12 +34,13 @@ function piecesOn(table: SlTable, focus: string | null, onFocus: (id: string) =>
 }
 
 export function SlScreen(props: GameScreenProps) {
-  const { input, yourTurn, busy, interactive, onMove, onDraw, menu, benchSlot, nameFor } = props;
+  const { input, yourTurn, busy, interactive, onMove, onForm, onDraw, menu, nameFor } = props;
   const table = useMemo(() => readTable(input), [input]);
-  const plan = useMemo(() => sweetlandsGlue.plan(input), [input]);
   const lit = useMemo(() => (interactive && yourTurn ? sweetlandsGlue.litParts(input) : []), [input, interactive, yourTurn]);
   /** the piece being looked at ("p2:knight"): ringed on the board and in the players panel */
   const [focus, setFocus] = useState<string | null>(null);
+  /** the card picked from the hand, by its engine card id */
+  const [picked, setPicked] = useState<string | null>(null);
   if (!table) return null;
   const onFocus = (id: string) => setFocus((f) => (f === id ? null : id));
 
@@ -50,28 +50,26 @@ export function SlScreen(props: GameScreenProps) {
     const moves = sweetlandsGlue.movesForSelect!(sel, input);
     if (moves.length === 1) onMove(moves[0]!);
   };
-  const piles = plan?.board.filter((z) => z.kind === 'card-zone') ?? [];
-  const bench = (
-    <div className="sl-bench">
-      {piles.map((z) => <ZoneRenderer key={z.id} zone={z} lit={lit} onSelect={onSelect} />)}
-      {plan?.bench.filter((z) => z.kind !== 'tableau').map((z) => <ZoneRenderer key={z.id} zone={z} lit={lit} onSelect={onSelect} />)}
-    </div>
-  );
 
   return (
     <div className="sl-screen">
       <Players table={table} focus={focus} onFocus={onFocus} nameFor={nameFor} />
       <div className="sl-main">
-      <Board table={table} pieces={piecesOn(table, focus, onFocus)} lit={lit} onTile={(id) => onSelect({ component: 'map', id, label: id })} />
-      {/* Dice and Intel draws are resolved by the engine only when the person presses this. */}
-      {onDraw && interactive && (
-        <button type="button" className="btn big sl-draw" onClick={onDraw} disabled={busy}>
-          {/draw|deal/i.test(sweetlandsGlue.resolveReportMove(input.legalMoves)?.description ?? '') ? 'Draw' : 'Roll'}
-        </button>
-      )}
-      {menu}
+        <Board table={table} pieces={piecesOn(table, focus, onFocus)} lit={lit} onTile={(id) => onSelect({ component: 'map', id, label: id })} />
+        {/* Dice and Intel draws are resolved by the engine only when the person presses this. */}
+        {onDraw && interactive && (
+          <button type="button" className="btn big sl-draw" onClick={onDraw} disabled={busy}>
+            {/draw|deal/i.test(sweetlandsGlue.resolveReportMove(input.legalMoves)?.description ?? '') ? 'Draw' : 'Roll'}
+          </button>
+        )}
+        {table.me && (
+          <Hand
+            table={table} input={input} picked={picked} onPick={setPicked} pressable={pressable}
+            formFor={(m) => sweetlandsGlue.formFor!(m, input)} onForm={onForm}
+          />
+        )}
+        {menu}
       </div>
-      {benchSlot ? createPortal(bench, benchSlot) : bench}
     </div>
   );
 }

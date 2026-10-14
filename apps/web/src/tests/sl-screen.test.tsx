@@ -94,3 +94,75 @@ describe('the players panel', () => {
     expect(props.onMove).not.toHaveBeenCalled();
   });
 });
+
+describe('the hand', () => {
+  const LEGAL: LegalMove[] = [
+    { move_id: 'r1', description: 'Play red: move knight and take the red action.', move: { type: 'play_intel', cardId: 'c1', unit: 'knight', viaRoad: false, takeAction: true } },
+    { move_id: 'b1', description: 'Play double blue (acts twice): move ambassador only (no action).', move: { type: 'play_intel', cardId: 'c2', unit: 'ambassador', viaRoad: false, takeAction: false } },
+    { move_id: 't1', description: 'Discard 4 Intel to gain one purple Intel.', move: { type: 'discard_for_color', cardIds: ['c1', 'c2', 'c3', 'c4'], color: 'purple' } },
+    { move_id: 't2', description: 'Discard 4 Intel to gain one red Intel.', move: { type: 'discard_for_color', cardIds: ['c1', 'c2', 'c3', 'c4'], color: 'red' } },
+  ];
+
+  it('draws each card as a named wrapper: the action, who it helps, ×2 on a double, the treat’s picture', () => {
+    render(<SlScreen {...slProps({ legalMoves: LEGAL })} />);
+    const hand = screen.getByRole('region', { name: 'Your hand' });
+    const red = within(hand).getByRole('button', { name: 'Red card: Battle' });
+    expect(red.textContent).toContain('Best with your Knight');
+    const blue = within(hand).getByRole('button', { name: 'Blue double card: Intel' });
+    expect(blue.textContent).toContain('×2');
+    expect(blue.textContent).toContain('Twice, same piece');
+    const treat = within(hand).getByRole('button', { name: 'Gummy Bear treat card' });
+    expect(treat.querySelector('img')!.getAttribute('src')).toBe('/art/sweetlands/treat-jellybean-2.png');
+    expect(within(hand).getByText('Deck 52')).toBeTruthy();
+    expect(within(hand).getByText('Discard 13')).toBeTruthy();
+    expect(within(hand).getByText(/Blue Intel token/)).toBeTruthy();
+  });
+
+  it('lifts a picked card and sends nothing; a card the engine lists no move for cannot be picked', () => {
+    const props = slProps({ legalMoves: LEGAL });
+    render(<SlScreen {...props} />);
+    const red = screen.getByRole('button', { name: 'Red card: Battle' });
+    fireEvent.click(red);
+    expect(red.getAttribute('aria-pressed')).toBe('true');
+    expect(red.classList.contains('picked')).toBe(true);
+    fireEvent.click(red);
+    expect(red.getAttribute('aria-pressed')).toBe('false');
+    expect((screen.getByRole('button', { name: 'Green card: Free play' }) as HTMLButtonElement).disabled).toBe(true);
+    expect(props.onMove).not.toHaveBeenCalled();
+  });
+
+  it('names the trade-in from the engine’s own move: how many cards, and only when it is listed', () => {
+    const { unmount } = render(<SlScreen {...slProps({ legalMoves: LEGAL })} />);
+    expect(screen.getByRole('button', { name: 'Trade 4 cards for any color' })).toBeTruthy();
+    unmount();
+    render(<SlScreen {...slProps({ legalMoves: LEGAL.slice(0, 2) })} />);
+    expect(screen.queryByRole('button', { name: /^Trade/ })).toBeNull();
+  });
+
+  it('trades in only the cards and color the player picks, as the engine’s listed template', () => {
+    const props = slProps({ legalMoves: LEGAL });
+    render(<SlScreen {...props} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Trade 4 cards for any color' }));
+    fireEvent.click(screen.getByRole('button', { name: /Red · Battle/ }));
+    const form = screen.getByRole('dialog', { name: 'Discard 4 Intel for Red' });
+    const boxes = within(form).getAllByRole('checkbox');
+    expect(boxes.every((b) => !(b as HTMLInputElement).checked)).toBe(true);
+    for (const b of boxes) fireEvent.click(b);
+    fireEvent.click(within(form).getByRole('button', { name: 'Send' }));
+    expect(props.onForm).toHaveBeenCalledTimes(1);
+    const [template, move] = (props.onForm as ReturnType<typeof vi.fn>).mock.calls[0]!;
+    expect(template.move_id).toBe('t2');
+    expect(move).toEqual({ type: 'discard_for_color', cardIds: ['c1', 'c2', 'c3', 'c4'], color: 'red' });
+    expect(props.onMove).not.toHaveBeenCalled();
+  });
+
+  it('dims the rest of the hand once the card is played', () => {
+    render(<SlScreen {...slProps({ view: { ...SL_SCREEN_VIEW, your_turn_step: 'influence' } })} />);
+    expect(screen.getByRole('button', { name: 'Red card: Battle' }).classList.contains('dim')).toBe(true);
+  });
+
+  it('shows the secret goal in the engine’s words', () => {
+    render(<SlScreen {...slProps({ reference: slReference({ secret_objectives: [{ id: 'defeat_knight', description: 'Defeat a knight in battle.' }] }) })} />);
+    expect(screen.getByText('Defeat a knight in battle.')).toBeTruthy();
+  });
+});
