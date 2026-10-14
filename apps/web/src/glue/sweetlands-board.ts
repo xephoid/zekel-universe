@@ -77,9 +77,11 @@ export const REGION_FACTION: Record<number, { name: string; colorKey: string; co
   4: { name: 'Grand Vizier Cheesecake', colorKey: 'cheesecake', color: '#f0f0f0', treatArt: '/art/sweetlands/treat-cheesecake-1.png' },
 };
 
+/** The printed (PICO-8) space colors, purple the muted one; the same on the
+ *  cards and in the color guide (docs/design/sweetlands-candy). */
 export const SPACE_COLORS: Record<SpaceColor, string> = {
-  red: '#d63031', orange: '#e8862e', yellow: '#f5d76e',
-  green: '#3e7c4f', blue: '#0984e3', purple: '#9013fe',
+  red: '#ff004d', orange: '#ffa300', yellow: '#ffec27',
+  green: '#00e436', blue: '#29adff', purple: '#83769c',
 };
 
 /** Board extents: rows 1..11, cols 0..13. */

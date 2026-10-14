@@ -19,7 +19,7 @@ import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, SelectEvent
 import { asArr, asNum, asStr, isObj, shapeHas, words } from './types';
 import { answerList, answerText } from './forms';
 import { SPACES, REGION_FACTION, SPACE_COLORS, TREATS, BOARD } from './sweetlands-board';
-import './sl/sl.css';
+import { SlScreen } from './sl/SlScreen';
 
 const PALETTE: Record<string, string> = {
   ...SPACE_COLORS,
@@ -153,6 +153,9 @@ function cardIdOf(m: LegalMove): string | null {
 export const sweetlandsGlue: GlueModule = {
   gameId: 'sweetlands-imperium',
   title: 'Sweetlands Imperium',
+  /** The candy table (docs/design/sweetlands-candy) draws its own screen;
+   *  the plan below keeps the shared primitives' shape for the debug client. */
+  Screen: SlScreen,
 
   /** The candy theme (docs/design/sweetlands-candy): the table's own look,
    *  for every seat and for a watcher, once the view is this game's. */

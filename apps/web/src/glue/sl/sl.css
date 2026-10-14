@@ -102,3 +102,99 @@
 .sl-theme .side-section h3 { font-size: 15px; }
 .sl-theme .log li { border-bottom-color: rgba(90, 50, 20, .1); }
 .sl-theme .log li.current { color: var(--sl-rasp); }
+
+/* ======================================================================
+   The screen (SlScreen.tsx)
+   ====================================================================== */
+.sl-screen { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 12px; }
+.sl-draw { align-self: center; }
+.sl-bench { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; padding: 10px 16px 14px; }
+
+/* ======================================================================
+   The board (Board.tsx): the printed 14 x 11 grid of candies
+   ====================================================================== */
+.sl-board-box { flex: 1 1 auto; min-height: 340px; display: flex; align-items: center; justify-content: center; }
+.sl-board-fit { position: relative; flex: none; }
+.sl-board-frame {
+  position: absolute; left: 0; top: 0; transform-origin: 0 0;
+  display: grid; grid-template-columns: 28px 672px 28px; grid-template-rows: 28px 528px 28px; gap: 14px;
+}
+.sl-board {
+  position: relative; width: 672px; height: 528px; display: grid;
+  grid-template-columns: repeat(14, 48px); grid-template-rows: repeat(11, 48px);
+  background-color: #fff4e2; border-radius: 6px;
+  box-shadow: 0 0 0 7px #e9b07a, 0 0 0 9px #b8733a, 0 0 0 11px var(--sl-choc);
+}
+
+/* ---------- lands: each filled with its sprinkles, outlined where it meets another ---------- */
+.sl-land { position: relative; }
+.sl-land > span { position: absolute; inset: -1px; box-sizing: border-box; pointer-events: none; }
+.sl-land-1 { background: radial-gradient(circle at 25% 30%, #ff8fb1 1.7px, transparent 2.3px) 0 0 / 16px 16px, radial-gradient(circle at 75% 72%, #ffffff 1.9px, transparent 2.5px) 0 0 / 16px 16px; background-color: #fde3b4; }
+.sl-land-2 { background: radial-gradient(circle at 30% 35%, #5f3415 2px, transparent 2.6px) 0 0 / 16px 16px, radial-gradient(circle at 72% 75%, #f3e2cc 1.5px, transparent 2.1px) 0 0 / 16px 16px; background-color: #d6ad84; }
+.sl-land-3 { background: radial-gradient(3.2px 1.9px at 28% 30%, #00b82c 90%, transparent 100%) 0 0 / 16px 16px, radial-gradient(3.2px 1.9px at 72% 72%, #ff4f8b 90%, transparent 100%) 0 0 / 16px 16px; background-color: #e6d2ff; }
+.sl-land-4 { background: radial-gradient(circle at 30% 30%, #e3bd84 1.7px, transparent 2.3px) 0 0 / 16px 16px, radial-gradient(circle at 70% 72%, #ffc2cf 1.5px, transparent 2.1px) 0 0 / 16px 16px; background-color: #fffaf0; }
+
+/* ---------- tiles ---------- */
+.sl-tile {
+  position: relative; z-index: 1; margin: 2px; min-width: 0; padding: 0;
+  display: flex; align-items: center; justify-content: center; box-sizing: border-box;
+  font: inherit; color: inherit;
+}
+button.sl-tile { cursor: pointer; }
+/* A space is a glossy rounded candy: a white gloss on the top half, a darker
+   inner bottom edge, a chocolate outline and a raised edge. */
+.sl-space {
+  border-radius: 10px; border: 0;
+  background-image: linear-gradient(rgba(255, 255, 255, .5), rgba(255, 255, 255, 0) 48%);
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .18), 0 0 0 1.5px var(--sl-choc), 0 2px 0 1.5px var(--sl-choc);
+}
+.sl-c-red { background-color: var(--zekel-c-red); }
+.sl-c-orange { background-color: var(--zekel-c-orange); }
+.sl-c-yellow { background-color: var(--zekel-c-yellow); }
+.sl-c-green { background-color: var(--zekel-c-green); }
+.sl-c-blue { background-color: var(--zekel-c-blue); }
+.sl-c-purple { background-color: var(--zekel-c-purple); }
+.sl-road-arrow { position: absolute; opacity: .55; pointer-events: none; }
+.sl-signpost { position: absolute; right: 1px; top: -3px; width: 17px; height: 19px; z-index: 2; display: flex; }
+/* Treat spaces are round white plates; a random one has a dashed rim. */
+.sl-plate {
+  border-radius: 50%; background: #ffffff; border: 0;
+  box-shadow: inset 0 0 0 3px #ffd6e6, 0 0 0 1.5px var(--sl-choc), 0 2px 0 1.5px var(--sl-choc);
+}
+.sl-plate.random { box-shadow: none; border: 2px dashed var(--sl-choc); }
+.sl-plate-art { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 30px; height: 30px; object-fit: contain; opacity: .85; pointer-events: none; }
+/* Homes: a tinted tile with a border in the faction color. */
+.sl-start { border-radius: 10px; border: 3px solid; }
+.sl-home-milkshake { background: #fdebc8; border-color: #f5a623; }
+.sl-home-fudge { background: #efe0d0; border-color: #8b5a2b; }
+.sl-home-jellybean { background: #efe0ff; border-color: #9013fe; }
+.sl-home-cheesecake { background: #f4f1ea; border-color: #9a9180; }
+.sl-home-art { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -52%); pointer-events: none; }
+.sl-tile.zk-lit { outline: 3px solid var(--sl-rasp); outline-offset: 2px; z-index: 3; }
+
+/* ---------- pieces on a tile: two to a row, centred ---------- */
+.sl-tile-pieces { position: relative; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; width: 50px; flex: none; }
+.sl-token {
+  width: 18px; height: 18px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--sl-choc);
+  color: #fff; font: 700 10px/14px var(--font-body); text-align: center; text-shadow: 0 0 2px #000;
+}
+
+/* ---------- the castle: one place across four squares ---------- */
+.sl-castle {
+  position: relative; z-index: 1; margin: 3px; border-radius: 14px; background: #ffd6e6;
+  border: 2.5px solid var(--sl-choc); box-shadow: inset 0 -4px 0 rgba(90, 50, 20, .18);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+}
+.sl-foe { display: flex; align-items: center; gap: 2px; padding: 3px 6px; border-radius: 999px; background: #7a1f1f; }
+.sl-castle-pieces { position: absolute; left: 50%; bottom: 4px; transform: translateX(-50%); width: auto; }
+
+/* ---------- the side labels ---------- */
+.sl-side {
+  display: flex; align-items: center; gap: 8px; font-size: 12px; padding: 0 10px; min-width: 0;
+  border-radius: 999px; background: var(--sl-panel); border: 2px solid var(--sl-choc); white-space: nowrap; overflow: hidden;
+}
+.sl-side.mine { border-color: #f5a623; background: #fdebc8; }
+.sl-side-note { color: var(--sl-quiet); font-size: 11px; }
+.sl-side-fill { flex: 1; }
+.sl-side-left, .sl-side-right { writing-mode: vertical-rl; text-orientation: sideways; padding: 10px 0; }
+.sl-side-right { transform: rotate(180deg); }
