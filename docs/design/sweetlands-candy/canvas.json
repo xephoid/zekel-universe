@@ -1,0 +1,31 @@
+{
+  "v": 3,
+  "title": "Sweetlands Imperium — candy theme",
+  "launch": {
+    "view": "canvas"
+  },
+  "pages": [],
+  "boards": {
+    "Table.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 960,
+      "title": "Table — your turn (click a card)",
+      "is_interactive": true
+    },
+    "First-Game.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1200,
+      "h": 920,
+      "title": "First game — the whole game on one page"
+    }
+  },
+  "order": [
+    "Table.dc.html",
+    "First-Game.dc.html"
+  ],
+  "notes": {},
+  "designSystems": []
+}

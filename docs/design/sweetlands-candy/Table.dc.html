@@ -1,0 +1,626 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sweetlands table</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Sniglet:wght@400;800&family=Slackey&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#c2255c}a:hover{color:#9c1c49}
+@keyframes sl-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width:1440px;height:960px;box-sizing:border-box;background-color:#fdeef3;background-image:radial-gradient(circle at 20% 30%,#ffb3c9 1.6px,transparent 2.2px),radial-gradient(circle at 70% 60%,#b8e8ff 1.6px,transparent 2.2px),radial-gradient(circle at 45% 85%,#ffe48a 1.5px,transparent 2.1px);background-size:44px 44px;font-family:'IBM Plex Sans',sans-serif;color:#3d200b;display:flex;flex-direction:column">
+
+  <!-- top bar -->
+  <div style="height:56px;flex:none;display:flex;align-items:center;gap:18px;padding:0 20px;background:#ffd6e6;border-bottom:3px solid #5a3214;box-shadow:0 3px 0 #e9b07a">
+    <div style="font:400 24px 'Slackey',sans-serif;color:#1f4d3a;letter-spacing:-.02em">zekel</div>
+    <div style="width:1px;height:22px;background:#5a3214"></div>
+    <div style="font:700 17px 'Sniglet','Bricolage Grotesque',sans-serif">Sweetlands Imperium</div>
+    <div style="font-size:13px;color:#8a5a44">Round 4 · first to 5 points wins</div>
+    <div style="flex:1;display:flex;justify-content:center">
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:#f5a623;color:#3d200b;font-size:14px;font-weight:700;border:2px solid #3d200b">
+        <span style="width:8px;height:8px;border-radius:50%;background:#3d200b"></span>{{ pill }}
+      </div>
+    </div>
+    <a href="First-Game.dc.html" style="height:36px;display:inline-flex;align-items:center;gap:6px;padding:0 14px;border-radius:8px;background:#c2255c;color:#ffffff;font-size:14px;font-weight:600;text-decoration:none">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5V14"></path><path d="M12 17.5v.01"></path></svg>How to play</a>
+    <button onClick="{{ reset }}" style="height:36px;padding:0 14px;border-radius:8px;border:2px solid #e8a9bd;background:#fffaf6;color:#3d200b;font-size:14px;font-weight:500;cursor:pointer">Undo</button>
+    <button style="height:36px;padding:0 12px;border-radius:8px;border:none;background:transparent;color:#8a5a44;font-size:14px;font-weight:500;cursor:pointer">Leave</button>
+  </div>
+
+  <div style="flex:1;min-height:0;display:grid;grid-template-columns:280px minmax(0,1fr) 340px;gap:16px;padding:16px">
+
+    <!-- LEFT: players and where every piece is -->
+    <div style="display:flex;flex-direction:column;gap:8px;min-height:0;overflow:hidden">
+      <div style="display:flex;flex-direction:column;gap:1px;white-space:nowrap">
+        <div style="font:700 15px 'Sniglet','Bricolage Grotesque',sans-serif">Players and their pieces</div>
+        <div style="font-size:11.5px;color:#8a5a44">Click a piece to find it on the board.</div>
+      </div>
+      <sc-for list="{{ players }}" as="p" hint-placeholder-count="4">
+        <div style="{{ p.cardStyle }}">
+          <div style="display:flex;align-items:center;gap:10px">
+            <img src="{{ p.img }}" alt="" style="{{ p.imgStyle }}">
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.short }}</div>
+              <div style="font-size:11px;color:#8a5a44;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.name }}</div>
+            </div>
+            <span style="{{ p.tagStyle }}">{{ p.tag }}</span>
+          </div>
+          <div role="img" aria-label="{{ p.pts }} of 5 points, {{ p.toGo }}" style="position:relative;margin-top:7px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;height:18px;padding:2px;border:2px solid #5a3214;border-radius:999px;background:#fff0f5;box-shadow:inset 0 2px 0 rgba(90,50,20,.12)">
+            <sc-for list="{{ p.pips }}" as="pip" hint-placeholder-count="5"><span style="{{ pip.style }}"></span></sc-for>
+            <span style="{{ p.toGoPos }}display:flex;align-items:center;justify-content:center;font:800 11.5px 'Sniglet','Bricolage Grotesque',sans-serif;color:#3d200b;letter-spacing:.02em;text-shadow:0 0 3px #ffffff,0 0 3px #ffffff,0 0 2px #ffffff;pointer-events:none">{{ p.toGo }}</span>
+          </div>
+          <div style="display:flex;gap:12px;font-size:12px;color:#5e3a28;margin:6px 0 3px;padding-bottom:4px;border-bottom:2px dotted #f0b8c9">
+            <span><b>{{ p.inf }}</b>/5 influence</span><span><b>{{ p.sugar }}</b> sugar</span><span><b>{{ p.hand }}</b> cards</span>
+          </div>
+          <sc-for list="{{ p.units }}" as="u" hint-placeholder-count="3">
+            <button onClick="{{ u.click }}" style="{{ u.rowStyle }}">
+              <span style="{{ u.miniStyle }}"><sc-if value="{{ u.isMS }}" hint-placeholder-val="{{ false }}"><svg width="100%" height="100%" viewBox="0 0 24 24" style="position:absolute;inset:0;overflow:visible"><path d="M6 10.5h12l-1.8 11.5H7.8z M4.5 11a3.2 3.2 0 0 1 3-3.4A4.5 4.5 0 0 1 16.5 7.6a3.2 3.2 0 0 1 3 3.4z" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linejoin="round"></path><path d="M14.6 8l2.8-6" stroke="#ffffff" stroke-width="4" stroke-linecap="round"></path><path d="M14.6 8l2.8-6" stroke="#ff4f8b" stroke-width="1.8" stroke-linecap="round"></path><path d="M6 10.5h12l-1.8 11.5H7.8z" fill="#f5a623" stroke="#3d200b" stroke-width="1.6" stroke-linejoin="round"></path><path d="M4.5 11a3.2 3.2 0 0 1 3-3.4A4.5 4.5 0 0 1 16.5 7.6a3.2 3.2 0 0 1 3 3.4z" fill="#fff8ec" stroke="#3d200b" stroke-width="1.6" stroke-linejoin="round"></path><circle cx="10.6" cy="5.4" r="1.8" fill="#ff004d" stroke="#3d200b" stroke-width="1"></circle></svg></sc-if><sc-if value="{{ u.isFD }}" hint-placeholder-val="{{ false }}"><svg width="100%" height="100%" viewBox="0 0 24 24" style="position:absolute;inset:0;overflow:visible"><rect x="3" y="3" width="18" height="18" rx="3.5" fill="none" stroke="#ffffff" stroke-width="4.5"></rect><rect x="3" y="3" width="18" height="18" rx="3.5" fill="#8b5a2b" stroke="#3d200b" stroke-width="1.6"></rect><path d="M6.2 6.3h11.6" stroke="#c99062" stroke-width="1.8" stroke-linecap="round"></path></svg></sc-if><sc-if value="{{ u.isJB }}" hint-placeholder-val="{{ false }}"><svg width="100%" height="100%" viewBox="0 0 24 24" style="position:absolute;inset:0;overflow:visible"><path d="M8 3.6C12.6 1.8 19.4 3.4 21 9c1.5 5.4-1.6 11.4-7.6 11.6-3.5.1-4.3-2.3-7.2-2.8C2.6 17.2 2 14.2 2.6 11 3.3 7.3 4.8 4.9 8 3.6z" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linejoin="round"></path><path d="M8 3.6C12.6 1.8 19.4 3.4 21 9c1.5 5.4-1.6 11.4-7.6 11.6-3.5.1-4.3-2.3-7.2-2.8C2.6 17.2 2 14.2 2.6 11 3.3 7.3 4.8 4.9 8 3.6z" fill="#9013fe" stroke="#3d200b" stroke-width="1.6" stroke-linejoin="round"></path><ellipse cx="7.6" cy="7.2" rx="2.6" ry="1.2" fill="#ffffff" opacity=".55" transform="rotate(-35 7.6 7.2)"></ellipse></svg></sc-if><sc-if value="{{ u.isCC }}" hint-placeholder-val="{{ false }}"><svg width="100%" height="100%" viewBox="0 0 24 24" style="position:absolute;inset:0;overflow:visible"><path d="M3 8h18v13.5H3z" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linejoin="round"></path><circle cx="12" cy="5.6" r="2.3" fill="none" stroke="#ffffff" stroke-width="4"></circle><path d="M3 8h18v13.5H3z" fill="#f7f2e6" stroke="#3d200b" stroke-width="1.6" stroke-linejoin="round"></path><path d="M3 19.4h18v2.1H3z" fill="#c98a4b" stroke="#3d200b" stroke-width="1.1"></path><path d="M3 8h18v1.6c-1.4 0-1.4 1.5-2.8 1.5S16.8 9.6 15.4 9.6 14 11.3 12.6 11.3 11.2 9.6 9.8 9.6 8.4 11.1 7 11.1 5.6 9.6 4.2 9.6 3 10 3 10z" fill="#ff004d" stroke="#3d200b" stroke-width="1.1" stroke-linejoin="round"></path><circle cx="12" cy="5.6" r="2.3" fill="#ff004d" stroke="#3d200b" stroke-width="1.1"></circle></svg></sc-if><span style="{{ u.glyphPos }}"><sc-if value="{{ u.isLeader }}" hint-placeholder-val="{{ true }}"><svg width="{{ u.g }}" height="{{ u.g }}" viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 18L3 9.5l5 3.5 4-7 4 7 5-3.5-1.5 8.5z"></path><circle cx="3" cy="8" r="2.2"></circle><circle cx="12" cy="4.2" r="2.4"></circle><circle cx="21" cy="8" r="2.2"></circle><rect x="4.5" y="18.8" width="15" height="2.6" rx="1.3"></rect></svg></sc-if><sc-if value="{{ u.isKnight }}" hint-placeholder-val="{{ false }}"><svg width="{{ u.g }}" height="{{ u.g }}" viewBox="0 0 24 24" fill="currentColor"><path d="M19.6 2.6l1.8-.2-.2 1.8-9.4 9.4-1.6-1.6z"></path><path d="M5.8 11.2l1.4-1.4 7 7-1.4 1.4z"></path><path d="M8.6 15.4l1.4 1.4-4.2 4.2a1 1 0 0 1-1.4-1.4z"></path><circle cx="3.6" cy="20.4" r="1.6"></circle></svg></sc-if><sc-if value="{{ u.isAmb }}" hint-placeholder-val="{{ false }}"><svg width="{{ u.g }}" height="{{ u.g }}" viewBox="0 0 24 24" fill="currentColor"><ellipse cx="12" cy="12" rx="6.2" ry="4.8"></ellipse><path d="M6.6 12L1.2 7v10z"></path><path d="M17.4 12l5.4-5v10z"></path></svg></sc-if></span>
+              </span>
+              <span style="font-weight:600;width:78px;flex:none">{{ u.label }}</span>
+              <span title="{{ u.where }}" style="display:flex;align-items:center;gap:5px;min-width:0;color:#5e3a28;white-space:nowrap"><span style="{{ u.swatch }}"></span><span style="overflow:hidden;text-overflow:ellipsis">{{ u.whereShort }}</span></span>
+            </button>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+
+    <!-- CENTER: the board, drawn like the printed one -->
+    <div style="display:flex;flex-direction:column;gap:12px;min-width:0;min-height:0">
+      <div style="display:grid;grid-template-columns:28px 672px 28px;grid-template-rows:28px 528px 28px;gap:14px;justify-content:center">
+        <div></div>
+        <div style="{{ banners.top.style }}">
+          <svg width="18" height="18" viewBox="0 0 24 24" style="flex:none;overflow:visible"><path d="M8 3.6C12.6 1.8 19.4 3.4 21 9c1.5 5.4-1.6 11.4-7.6 11.6-3.5.1-4.3-2.3-7.2-2.8C2.6 17.2 2 14.2 2.6 11 3.3 7.3 4.8 4.9 8 3.6z" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linejoin="round"></path><path d="M8 3.6C12.6 1.8 19.4 3.4 21 9c1.5 5.4-1.6 11.4-7.6 11.6-3.5.1-4.3-2.3-7.2-2.8C2.6 17.2 2 14.2 2.6 11 3.3 7.3 4.8 4.9 8 3.6z" fill="#9013fe" stroke="#3d200b" stroke-width="1.6" stroke-linejoin="round"></path><ellipse cx="7.6" cy="7.2" rx="2.6" ry="1.2" fill="#ffffff" opacity=".55" transform="rotate(-35 7.6 7.2)"></ellipse></svg><b>{{ banners.top.title }}</b><span style="color:#8a5a44">Region 3 · tax {{ banners.top.tax }}</span>
+          <span style="flex:1"></span><span style="color:#8a5a44;font-size:11px">pieces travel</span>
+          <svg width="18" height="12" viewBox="0 0 18 12" fill="none" stroke="#3d200b" stroke-width="2" stroke-linecap="round"><path d="M17 6H2M6 2L2 6l4 4"></path></svg>
+        </div>
+        <div></div>
+
+        <div style="{{ banners.left.style }}">
+          <svg width="18" height="18" viewBox="0 0 24 24" style="flex:none;overflow:visible"><path d="M3 8h18v13.5H3z" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linejoin="round"></path><circle cx="12" cy="5.6" r="2.3" fill="none" stroke="#ffffff" stroke-width="4"></circle><path d="M3 8h18v13.5H3z" fill="#f7f2e6" stroke="#3d200b" stroke-width="1.6" stroke-linejoin="round"></path><path d="M3 19.4h18v2.1H3z" fill="#c98a4b" stroke="#3d200b" stroke-width="1.1"></path><path d="M3 8h18v1.6c-1.4 0-1.4 1.5-2.8 1.5S16.8 9.6 15.4 9.6 14 11.3 12.6 11.3 11.2 9.6 9.8 9.6 8.4 11.1 7 11.1 5.6 9.6 4.2 9.6 3 10 3 10z" fill="#ff004d" stroke="#3d200b" stroke-width="1.1" stroke-linejoin="round"></path><circle cx="12" cy="5.6" r="2.3" fill="#ff004d" stroke="#3d200b" stroke-width="1.1"></circle></svg><b>{{ banners.left.title }}</b><span style="color:#8a5a44">Region 4 · tax {{ banners.left.tax }}</span>
+          <span style="flex:1"></span><span style="color:#8a5a44;font-size:11px">pieces travel</span>
+          <svg width="18" height="12" viewBox="0 0 18 12" fill="none" stroke="#3d200b" stroke-width="2" stroke-linecap="round" style="transform:rotate(90deg)"><path d="M1 6h15M12 2l4 4-4 4"></path></svg>
+        </div>
+
+        <!-- the 14 x 11 board -->
+        <div style="position:relative;width:672px;height:528px;display:grid;grid-template-columns:repeat(14,48px);grid-template-rows:repeat(11,48px);background-color:#fff4e2;border-radius:6px;box-shadow:0 0 0 7px #e9b07a,0 0 0 9px #b8733a,0 0 0 11px #5a3214">
+          <sc-for list="{{ zones }}" as="z" hint-placeholder-count="20">
+            <div style="{{ z.style }}"><span style="{{ z.edgeStyle }}"></span></div>
+          </sc-for>
+          <sc-for list="{{ cells }}" as="c" hint-placeholder-count="20">
+            <div title="{{ c.tip }}" style="{{ c.style }}">
+              <span style="{{ c.edgeStyle }}"></span>
+              <sc-if value="{{ c.isRoad }}" hint-placeholder-val="{{ false }}">
+                <svg width="30" height="30" viewBox="0 0 30 30" style="{{ c.arrowStyle }}" fill="none" stroke="#5a3214" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15h19M18 9l6 6-6 6"></path></svg>
+              </sc-if>
+              <sc-if value="{{ c.isJunction }}" hint-placeholder-val="{{ false }}">
+                <span title="Crossroads: you may turn onto the road toward the castle here" style="position:absolute;right:1px;top:-3px;width:17px;height:19px;z-index:2;pointer-events:none"><svg width="17" height="19" viewBox="0 0 22 24" stroke="#5a3214" stroke-width="1.3" stroke-linejoin="round"><path d="M10 4h2.2v19H10z" fill="#7a4520"></path><path d="M3 4.5h13l3.2 2.6L16 9.7H3z" fill="#ffd6e6"></path><path d="M19 11H6l-3.2 2.6L6 16.2h13z" fill="#e9b07a"></path><circle cx="11.1" cy="2.6" r="1.8" fill="#ff004d"></circle></svg></span>
+              </sc-if>
+              <sc-if value="{{ c.isTreat }}" hint-placeholder-val="{{ false }}">
+                <img src="{{ c.treatImg }}" alt="{{ c.treatName }}" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:30px;height:30px;object-fit:contain;opacity:.85">
+              </sc-if>
+              <sc-if value="{{ c.isStart }}" hint-placeholder-val="{{ false }}">
+                <sc-if value="{{ c.homeMS }}" hint-placeholder-val="{{ false }}"><svg width="36" height="34" viewBox="0 0 36 34" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-52%)" stroke="#5a3214" stroke-width="1.4" stroke-linejoin="round" aria-label="Milkshake’s home: the sundae palace"><path d="M7 33l3-17h16l3 17z" fill="#ffd6e6"></path><path d="M8 32.5h20" stroke="#ff9ec0" stroke-width="2"></path><path d="M6 17a6 6 0 0 1 8-6 5.5 5.5 0 0 1 8 0 6 6 0 0 1 8 6z" fill="#fff8ec"></path><path d="M12 11.5a6 6 0 0 1 12 0" fill="#ffd6e6"></path><circle cx="18" cy="4.6" r="2.6" fill="#ff004d"></circle><path d="M18 2l1.5-2" fill="none"></path><path d="M15.5 33v-6a2.5 2.5 0 0 1 5 0v6" fill="#f5a623"></path></svg></sc-if><sc-if value="{{ c.homeFD }}" hint-placeholder-val="{{ false }}"><svg width="36" height="34" viewBox="0 0 36 34" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-52%)" stroke="#5a3214" stroke-width="1.4" stroke-linejoin="round" aria-label="Fudge’s home: the chocolate fort"><path d="M5 33V14h4v-3h4v3h3v-3h4v3h3v-3h4v3h4v19z" fill="#8b5a2b"></path><path d="M14 11V3h8v8" fill="#6b3d1a"></path><path d="M14 3h8l-4-3z" fill="#6b3d1a"></path><path d="M22 4h6l-1.5 2 1.5 2h-6z" fill="#ffa300"></path><path d="M7 20h22M7 26h22M18 14v6M12 20v6M24 20v6" fill="none" stroke="#c99062" stroke-width="1"></path><path d="M15 33v-5a3 3 0 0 1 6 0v5" fill="#3d200b"></path></svg></sc-if><sc-if value="{{ c.homeJB }}" hint-placeholder-val="{{ false }}"><svg width="36" height="34" viewBox="0 0 36 34" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-52%)" stroke="#5a3214" stroke-width="1.4" stroke-linejoin="round" aria-label="Jellybean’s home: the jellybean cottage"><path d="M9 33V20h18v13z" fill="#fff0f6"></path><path d="M4 21c0-9 6-15 14-15s14 6 14 15z" fill="#ff9ec0"></path><ellipse cx="11" cy="14.5" rx="2.8" ry="1.7" fill="#00e436" stroke-width="1" transform="rotate(-30 11 14.5)"></ellipse><ellipse cx="18" cy="10.5" rx="2.8" ry="1.7" fill="#ffec27" stroke-width="1"></ellipse><ellipse cx="25" cy="14.5" rx="2.8" ry="1.7" fill="#29adff" stroke-width="1" transform="rotate(30 25 14.5)"></ellipse><path d="M15 33v-6a3 3 0 0 1 6 0v6" fill="#9013fe"></path><path d="M2 33c0-4 1-7 2.5-9M33.5 33c0-4-1-7-2.5-9" fill="none" stroke="#00b82c" stroke-width="1.6" stroke-linecap="round"></path><circle cx="4.6" cy="23.4" r="1.6" fill="#00e436"></circle><circle cx="31" cy="23.4" r="1.6" fill="#00e436"></circle></svg></sc-if><sc-if value="{{ c.homeCC }}" hint-placeholder-val="{{ false }}"><svg width="36" height="34" viewBox="0 0 36 34" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-52%)" stroke="#5a3214" stroke-width="1.4" stroke-linejoin="round" aria-label="Cheesecake’s home: the cheesecake tower"><path d="M6 33V13h24v20z" fill="#fffaf0"></path><path d="M6 29.5h24V33H6z" fill="#c98a4b"></path><path d="M6 13h24v2.4c-2 0-2 2-4 2s-2-2.2-4-2.2-2 2.6-4 2.6-2-2.6-4-2.6-2 2.2-4 2.2-2-2-4-2z" fill="#ff004d"></path><path d="M11 13V7a7 7 0 0 1 14 0v6" fill="#f0e2c4"></path><path d="M18 0v-0" fill="none"></path><circle cx="18" cy="2.6" r="2.4" fill="#ff004d"></circle><path d="M15 33v-7a3 3 0 0 1 6 0v7" fill="#8b5a2b"></path><circle cx="11" cy="22" r="1.4" fill="#ffd6e6"></circle><circle cx="25" cy="22" r="1.4" fill="#ffd6e6"></circle></svg></sc-if>
+              </sc-if>
+              <div style="position:relative;display:flex;flex-wrap:wrap;gap:0;align-items:center;justify-content:center;width:50px;flex:none;z-index:2">
+                <sc-for list="{{ c.units }}" as="u" hint-placeholder-count="0">
+                  <button onClick="{{ u.click }}" title="{{ u.title }}" aria-label="{{ u.title }}" style="{{ u.style }}"><sc-if value="{{ u.isMS }}" hint-placeholder-val="{{ false }}"><svg width="100%" height="100%" viewBox="0 0 24 24" style="position:absolute;inset:0;overflow:visible"><path d="M6 10.5h12l-1.8 11.5H7.8z M4.5 11a3.2 3.2 0 0 1 3-3.4A4.5 4.5 0 0 1 16.5 7.6a3.2 3.2 0 0 1 3 3.4z" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linejoin="round"></path><path d="M14.6 8l2.8-6" stroke="#ffffff" stroke-width="4" stroke-linecap="round"></path><path d="M14.6 8l2.8-6" stroke="#ff4f8b" stroke-width="1.8" stroke-linecap="round"></path><path d="M6 10.5h12l-1.8 11.5H7.8z" fill="#f5a623" stroke="#3d200b" stroke-width="1.6" stroke-linejoin="round"></path><path d="M4.5 11a3.2 3.2 0 0 1 3-3.4A4.5 4.5 0 0 1 16.5 7.6a3.2 3.2 0 0 1 3 3.4z" fill="#fff8ec" stroke="#3d200b" stroke-width="1.6" stroke-linejoin="round"></path><circle cx="10.6" cy="5.4" r="1.8" fill="#ff004d" stroke="#3d200b" stroke-width="1"></circle></svg></sc-if><sc-if value="{{ u.isFD }}" hint-placeholder-val="{{ false }}"><svg width="100%" height="100%" viewBox="0 0 24 24" style="position:absolute;inset:0;overflow:visible"><rect x="3" y="3" width="18" height="18" rx="3.5" fill="none" stroke="#ffffff" stroke-width="4.5"></rect><rect x="3" y="3" width="18" height="18" rx="3.5" fill="#8b5a2b" stroke="#3d200b" stroke-width="1.6"></rect><path d="M6.2 6.3h11.6" stroke="#c99062" stroke-width="1.8" stroke-linecap="round"></path></svg></sc-if><sc-if value="{{ u.isJB }}" hint-placeholder-val="{{ false }}"><svg width="100%" height="100%" viewBox="0 0 24 24" style="position:absolute;inset:0;overflow:visible"><path d="M8 3.6C12.6 1.8 19.4 3.4 21 9c1.5 5.4-1.6 11.4-7.6 11.6-3.5.1-4.3-2.3-7.2-2.8C2.6 17.2 2 14.2 2.6 11 3.3 7.3 4.8 4.9 8 3.6z" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linejoin="round"></path><path d="M8 3.6C12.6 1.8 19.4 3.4 21 9c1.5 5.4-1.6 11.4-7.6 11.6-3.5.1-4.3-2.3-7.2-2.8C2.6 17.2 2 14.2 2.6 11 3.3 7.3 4.8 4.9 8 3.6z" fill="#9013fe" stroke="#3d200b" stroke-width="1.6" stroke-linejoin="round"></path><ellipse cx="7.6" cy="7.2" rx="2.6" ry="1.2" fill="#ffffff" opacity=".55" transform="rotate(-35 7.6 7.2)"></ellipse></svg></sc-if><sc-if value="{{ u.isCC }}" hint-placeholder-val="{{ false }}"><svg width="100%" height="100%" viewBox="0 0 24 24" style="position:absolute;inset:0;overflow:visible"><path d="M3 8h18v13.5H3z" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linejoin="round"></path><circle cx="12" cy="5.6" r="2.3" fill="none" stroke="#ffffff" stroke-width="4"></circle><path d="M3 8h18v13.5H3z" fill="#f7f2e6" stroke="#3d200b" stroke-width="1.6" stroke-linejoin="round"></path><path d="M3 19.4h18v2.1H3z" fill="#c98a4b" stroke="#3d200b" stroke-width="1.1"></path><path d="M3 8h18v1.6c-1.4 0-1.4 1.5-2.8 1.5S16.8 9.6 15.4 9.6 14 11.3 12.6 11.3 11.2 9.6 9.8 9.6 8.4 11.1 7 11.1 5.6 9.6 4.2 9.6 3 10 3 10z" fill="#ff004d" stroke="#3d200b" stroke-width="1.1" stroke-linejoin="round"></path><circle cx="12" cy="5.6" r="2.3" fill="#ff004d" stroke="#3d200b" stroke-width="1.1"></circle></svg></sc-if><span style="{{ u.glyphPos }}"><sc-if value="{{ u.isLeader }}" hint-placeholder-val="{{ true }}"><svg width="{{ u.g }}" height="{{ u.g }}" viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 18L3 9.5l5 3.5 4-7 4 7 5-3.5-1.5 8.5z"></path><circle cx="3" cy="8" r="2.2"></circle><circle cx="12" cy="4.2" r="2.4"></circle><circle cx="21" cy="8" r="2.2"></circle><rect x="4.5" y="18.8" width="15" height="2.6" rx="1.3"></rect></svg></sc-if><sc-if value="{{ u.isKnight }}" hint-placeholder-val="{{ false }}"><svg width="{{ u.g }}" height="{{ u.g }}" viewBox="0 0 24 24" fill="currentColor"><path d="M19.6 2.6l1.8-.2-.2 1.8-9.4 9.4-1.6-1.6z"></path><path d="M5.8 11.2l1.4-1.4 7 7-1.4 1.4z"></path><path d="M8.6 15.4l1.4 1.4-4.2 4.2a1 1 0 0 1-1.4-1.4z"></path><circle cx="3.6" cy="20.4" r="1.6"></circle></svg></sc-if><sc-if value="{{ u.isAmb }}" hint-placeholder-val="{{ false }}"><svg width="{{ u.g }}" height="{{ u.g }}" viewBox="0 0 24 24" fill="currentColor"><ellipse cx="12" cy="12" rx="6.2" ry="4.8"></ellipse><path d="M6.6 12L1.2 7v10z"></path><path d="M17.4 12l5.4-5v10z"></path></svg></sc-if></span>
+                  </button>
+                </sc-for>
+              </div>
+              <sc-for list="{{ c.ghosts }}" as="g" hint-placeholder-count="0">
+                <button onClick="{{ g.click }}" aria-label="{{ g.label }}" style="{{ g.style }}"><span style="{{ g.badge }}">{{ g.n }}</span></button>
+              </sc-for>
+            </div>
+          </sc-for>
+
+          <!-- the castle: one location -->
+          <div style="grid-row:5 / span 2;grid-column:8 / span 2;position:relative;margin:3px;border-radius:14px;background:#ffd6e6;border:2.5px solid #5a3214;box-shadow:inset 0 -4px 0 rgba(90,50,20,.18);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;z-index:1" title="The Candy Castle">
+            <svg width="76" height="58" viewBox="0 0 44 34" style="overflow:visible" stroke="#5a3214" stroke-width="1.2" stroke-linejoin="round" aria-label="Candy Castle"><path d="M4 33V13h6v4h5v-6h4v-6l3-3 3 3v6h4v6h5v-4h6v20z" fill="#ff9ec0"></path><path d="M4 16c2 2 4 2 6 0 2 2 3 2 5 1M29 17c2 1 3 1 5-1 2 2 4 2 6 0M18 9c1.4 1.5 2.6 1.5 4 0 1.4 1.5 2.6 1.5 4 0" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"></path><path d="M18 33v-8a4 4 0 0 1 8 0v8" fill="#7a4520"></path><path d="M22 2.2V-3" stroke-width="1"></path><path d="M22 -3l5 1.4-5 1.4z" fill="#ff004d" stroke-width=".8"></path><circle cx="9" cy="23" r="1.5" fill="#29adff"></circle><circle cx="35" cy="23" r="1.5" fill="#00e436"></circle><circle cx="13" cy="28" r="1.3" fill="#ffec27"></circle><circle cx="31" cy="28" r="1.3" fill="#ff004d"></circle></svg>
+            
+            <div title="The castle foe rolls 3 sugar cubes when a Knight attacks it" aria-label="Castle foe: rolls 3 sugar cubes" style="display:flex;align-items:center;gap:2px;padding:3px 6px;border-radius:999px;background:#7a1f1f;color:#ffffff;font:800 12px 'Sniglet','Bricolage Grotesque',sans-serif"><svg width="11" height="11" viewBox="0 0 12 12"><path d="M6 1l4.5 2.3v5.4L6 11 1.5 8.7V3.3z" fill="#ffffff" stroke="#5a3214" stroke-width="1"></path><path d="M1.5 3.3L6 5.6l4.5-2.3M6 5.6V11" fill="none" stroke="#5a3214" stroke-width=".8"></path></svg><svg width="11" height="11" viewBox="0 0 12 12"><path d="M6 1l4.5 2.3v5.4L6 11 1.5 8.7V3.3z" fill="#ffffff" stroke="#5a3214" stroke-width="1"></path><path d="M1.5 3.3L6 5.6l4.5-2.3M6 5.6V11" fill="none" stroke="#5a3214" stroke-width=".8"></path></svg><svg width="11" height="11" viewBox="0 0 12 12"><path d="M6 1l4.5 2.3v5.4L6 11 1.5 8.7V3.3z" fill="#ffffff" stroke="#5a3214" stroke-width="1"></path><path d="M1.5 3.3L6 5.6l4.5-2.3M6 5.6V11" fill="none" stroke="#5a3214" stroke-width=".8"></path></svg></div>
+          </div>
+        </div>
+
+        <div style="{{ banners.right.style }}">
+          <svg width="18" height="18" viewBox="0 0 24 24" style="flex:none;overflow:visible"><rect x="3" y="3" width="18" height="18" rx="3.5" fill="none" stroke="#ffffff" stroke-width="4.5"></rect><rect x="3" y="3" width="18" height="18" rx="3.5" fill="#8b5a2b" stroke="#3d200b" stroke-width="1.6"></rect><path d="M6.2 6.3h11.6" stroke="#c99062" stroke-width="1.8" stroke-linecap="round"></path></svg><b>{{ banners.right.title }}</b><span style="color:#8a5a44">Region 2 · tax {{ banners.right.tax }}</span>
+          <span style="flex:1"></span><span style="color:#8a5a44;font-size:11px">pieces travel</span>
+          <svg width="18" height="12" viewBox="0 0 18 12" fill="none" stroke="#3d200b" stroke-width="2" stroke-linecap="round" style="transform:rotate(90deg)"><path d="M1 6h15M12 2l4 4-4 4"></path></svg>
+        </div>
+
+        <div></div>
+        <div style="{{ banners.bottom.style }}">
+          <svg width="18" height="18" viewBox="0 0 24 24" style="flex:none;overflow:visible"><path d="M6 10.5h12l-1.8 11.5H7.8z M4.5 11a3.2 3.2 0 0 1 3-3.4A4.5 4.5 0 0 1 16.5 7.6a3.2 3.2 0 0 1 3 3.4z" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linejoin="round"></path><path d="M14.6 8l2.8-6" stroke="#ffffff" stroke-width="4" stroke-linecap="round"></path><path d="M14.6 8l2.8-6" stroke="#ff4f8b" stroke-width="1.8" stroke-linecap="round"></path><path d="M6 10.5h12l-1.8 11.5H7.8z" fill="#f5a623" stroke="#3d200b" stroke-width="1.6" stroke-linejoin="round"></path><path d="M4.5 11a3.2 3.2 0 0 1 3-3.4A4.5 4.5 0 0 1 16.5 7.6a3.2 3.2 0 0 1 3 3.4z" fill="#fff8ec" stroke="#3d200b" stroke-width="1.6" stroke-linejoin="round"></path><circle cx="10.6" cy="5.4" r="1.8" fill="#ff004d" stroke="#3d200b" stroke-width="1"></circle></svg><b>{{ banners.bottom.title }}</b><span style="color:#8a5a44">Region 1 · tax {{ banners.bottom.tax }}</span>
+          <span style="flex:1"></span><span style="color:#8a5a44;font-size:11px">pieces travel</span>
+          <svg width="18" height="12" viewBox="0 0 18 12" fill="none" stroke="#3d200b" stroke-width="2" stroke-linecap="round"><path d="M1 6h15M12 2l4 4-4 4"></path></svg>
+        </div>
+        <div></div>
+      </div>
+
+      <!-- HAND -->
+      <div style="flex:1;min-height:0;display:flex;flex-direction:column;gap:10px;background:#fffaf6;border:2px solid #5a3214;border-radius:16px;box-shadow:0 3px 0 #5a3214;padding:12px 14px">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <div style="font:700 15px 'Sniglet','Bricolage Grotesque',sans-serif">Your hand</div>
+            <div style="font-size:12px;color:#8a5a44;flex:1;min-width:0">{{ handHint }}</div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#5e3a28"><span style="width:14px;height:14px;border-radius:50%;background:#29adff;border:2px solid #3d200b"></span>Blue Intel token</div>
+            <div style="font-size:12px;color:#5e3a28">· Deck 52 · Discard 13</div>
+            <button style="height:30px;padding:0 10px;border-radius:8px;border:2px solid #e8a9bd;background:#fffaf6;color:#3d200b;font-size:12px;cursor:pointer">Trade 4 cards for any color</button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;padding-top:6px">
+            <sc-for list="{{ hand }}" as="k" hint-placeholder-count="6">
+              <button onClick="{{ k.click }}" aria-pressed="{{ k.selected }}" aria-label="{{ k.label }}" style="{{ k.style }}">
+                <svg width="100%" height="12" viewBox="0 0 112 12" preserveAspectRatio="none" style="position:absolute;top:0;left:0;z-index:1"><path d="M0 12 L0 9 L7 0 L14 9 L21 0 L28 9 L35 0 L42 9 L49 0 L56 9 L63 0 L70 9 L77 0 L84 9 L91 0 L98 9 L105 0 L112 9 L112 12 Z" fill="{{ k.hex }}" stroke="#5a3214" stroke-width="1.6" stroke-linejoin="round"></path></svg>
+                <div style="{{ k.aBody }}">
+                  <sc-if value="{{ k.isTreat }}" hint-placeholder-val="{{ false }}"><span style="width:38px;height:38px;flex:none;border-radius:50%;background:#fffaf6;border:2px solid #5a3214;display:flex;align-items:center;justify-content:center"><img src="{{ k.img }}" alt="" width="26" height="26" style="object-fit:contain"></span></sc-if>
+                  <div style="width:100%;box-sizing:border-box;background:#fffaf6;border-top:2px solid #5a3214;border-bottom:2px solid #5a3214;padding:5px 6px;text-align:center">
+                    <div style="font:800 15px/1.1 'Sniglet','Bricolage Grotesque',sans-serif;color:#3d200b">{{ k.name }}</div>
+                    <div style="font-size:10.5px;line-height:1.25;color:#5e3a28;margin-top:2px">{{ k.line }}</div>
+                  </div>
+                </div>
+                <svg width="100%" height="12" viewBox="0 0 112 12" preserveAspectRatio="none" style="position:absolute;bottom:0;left:0;z-index:1"><path d="M0 0 L0 3 L7 12 L14 3 L21 12 L28 3 L35 12 L42 3 L49 12 L56 3 L63 12 L70 3 L77 12 L84 3 L91 12 L98 3 L105 12 L112 3 L112 0 Z" fill="{{ k.hex }}" stroke="#5a3214" stroke-width="1.6" stroke-linejoin="round"></path></svg>
+                <sc-if value="{{ k.isDouble }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:17px;right:7px;padding:3px 8px 4px;border-radius:999px;background:#3d200b;border:2px solid #ffffff;box-shadow:0 0 0 1.5px #3d200b;font:800 15px/1 'Sniglet','Bricolage Grotesque',sans-serif;color:#ffffff;white-space:nowrap;z-index:3">×2</span></sc-if>
+              </button>
+            </sc-for>
+          </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: what to do now -->
+    <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+      <div style="background:#fffaf6;border:2px solid #5a3214;border-radius:16px;box-shadow:0 3px 0 #5a3214;padding:14px">
+        <div style="font-size:12px;color:#8a5a44;margin-bottom:8px">Your turn has four steps</div>
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px">
+          <sc-for list="{{ steps }}" as="s" hint-placeholder-count="4">
+            <div style="{{ s.style }}"><div style="font-size:10px;opacity:.8">{{ s.n }}</div>{{ s.name }}</div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="flex:1 1 auto;min-height:0;overflow-y:auto;background:#fffaf6;border:2.5px solid #5a3214;border-radius:16px;box-shadow:0 4px 0 #5a3214,0 0 0 5px #ffd6e6;padding:16px;display:flex;flex-direction:column;gap:10px">
+        <sc-if value="{{ v.noCard }}" hint-placeholder-val="{{ true }}">
+          <div style="font:800 20px 'Sniglet','Bricolage Grotesque',sans-serif">Play one card</div>
+          <div style="font-size:14px;line-height:1.5;color:#4a2a18">Pick a card from your hand. A card moves <b>one</b> of your pieces forward to the <b>next space of its color</b>, then lets you take that color’s action.</div>
+          <div style="font-size:13px;line-height:1.5;color:#5e3a28;background:#fff0f5;border-radius:8px;padding:8px 10px">Tip: you can move any piece with any card, but each action only helps one kind of piece. The Battle card is best with your Knight.</div>
+          <button onClick="{{ pass }}" style="align-self:flex-start;height:40px;padding:0 14px;border-radius:8px;border:2px solid #e8a9bd;background:#fffaf6;color:#3d200b;font-size:13px;font-weight:600;cursor:pointer">Pass instead (+1 influence, ends turn)</button>
+        </sc-if>
+
+        <sc-if value="{{ v.choose }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:8px"><span style="{{ v.swatch }}"></span><div style="font:800 20px 'Sniglet','Bricolage Grotesque',sans-serif">{{ v.cardTitle }}</div></div>
+          <div style="font-size:14px;line-height:1.5;color:#4a2a18">Which piece moves? The numbers match the dashed outlines on the board.</div>
+          <sc-for list="{{ options }}" as="o" hint-placeholder-count="3">
+            <button onClick="{{ o.click }}" style="flex:none;text-align:left;display:flex;gap:10px;padding:7px 10px;border-radius:10px;border:2px solid #e8a9bd;background:#fffaf6;color:#3d200b;cursor:pointer;min-height:44px">
+              <span style="flex:none;width:22px;height:22px;border-radius:50%;background:#3d200b;color:#ffffff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ o.n }}</span>
+              <span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:13px;font-weight:700">{{ o.title }}</span><span style="font-size:12px;line-height:1.4;color:{{ o.outColor }}">{{ o.outcome }}</span></span>
+            </button>
+          </sc-for>
+          <button onClick="{{ cancel }}" style="align-self:flex-start;height:36px;padding:0 12px;border-radius:8px;border:none;background:transparent;color:#8a5a44;font-size:13px;cursor:pointer">Put the card back</button>
+        </sc-if>
+
+        <sc-if value="{{ v.confirm }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:12px;color:#8a5a44">{{ v.cardTitle }}</div>
+          <div style="font:800 19px 'Sniglet','Bricolage Grotesque',sans-serif">{{ v.optTitle }}</div>
+          <div style="font-size:14px;line-height:1.5;color:#4a2a18">{{ v.optOutcome }}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <button onClick="{{ doAct }}" style="height:44px;padding:0 16px;border-radius:8px;border:none;background:#c2255c;color:#ffffff;font-size:14px;font-weight:700;cursor:pointer">{{ v.actLabel }}</button>
+            <sc-if value="{{ v.canSkip }}" hint-placeholder-val="{{ true }}">
+              <button onClick="{{ doMove }}" style="height:44px;padding:0 14px;border-radius:8px;border:2px solid #e8a9bd;background:#fffaf6;color:#3d200b;font-size:14px;font-weight:600;cursor:pointer">Just move</button>
+            </sc-if>
+          </div>
+          <button onClick="{{ back }}" style="align-self:flex-start;height:32px;padding:0;border:none;background:transparent;color:#8a5a44;font-size:13px;cursor:pointer">← Pick a different piece</button>
+        </sc-if>
+
+        <sc-if value="{{ v.battle }}" hint-placeholder-val="{{ false }}">
+          <div style="font:800 20px 'Sniglet','Bricolage Grotesque',sans-serif">Battle!</div>
+          <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center">
+            <div style="padding:10px;border-radius:10px;background:#fdebc8;border:2px solid #f5a623"><div style="font-size:12px;font-weight:700">Your Knight</div>
+              <div style="display:flex;gap:4px;margin-top:6px"><sc-for list="{{ myDice }}" as="d" hint-placeholder-count="4"><span style="{{ d.style }}">{{ d.face }}</span></sc-for></div>
+              <div style="font-size:12px;margin-top:6px">{{ v.myTotal }}</div></div>
+            <div style="font-weight:800;color:#8a5a44">vs</div>
+            <div style="padding:10px;border-radius:10px;background:#efe0d0;border:2px solid #8b5a2b"><div style="font-size:12px;font-weight:700">Fudge’s Knight</div>
+              <div style="display:flex;gap:4px;margin-top:6px"><sc-for list="{{ theirDice }}" as="d" hint-placeholder-count="3"><span style="{{ d.style }}">{{ d.face }}</span></sc-for></div>
+              <div style="font-size:12px;margin-top:6px">{{ v.theirTotal }}</div></div>
+          </div>
+          <div style="font-size:13px;line-height:1.5;color:#4a2a18">{{ v.battleText }}</div>
+          <sc-if value="{{ v.needRoll }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ roll }}" style="height:48px;border-radius:10px;border:2px solid #3d200b;background:#ffec27;color:#3d200b;font:800 16px 'Sniglet','Bricolage Grotesque',sans-serif;cursor:pointer">Roll</button>
+          </sc-if>
+          <sc-if value="{{ v.rolled }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ toInfluence }}" style="height:44px;border-radius:8px;border:none;background:#c2255c;color:#ffffff;font-size:14px;font-weight:700;cursor:pointer">Continue to step 4</button>
+          </sc-if>
+        </sc-if>
+
+        <sc-if value="{{ v.influence }}" hint-placeholder-val="{{ false }}">
+          <div style="font:800 20px 'Sniglet','Bricolage Grotesque',sans-serif">Spend influence</div>
+          <div style="font-size:14px;line-height:1.5;color:#4a2a18">{{ v.influenceText }} You have <b>{{ v.inf }} influence</b>. Spending is optional.</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <button style="text-align:left;min-height:44px;padding:8px 12px;border-radius:8px;border:2px solid #e8a9bd;background:#fffaf6;color:#3d200b;font-size:13px;cursor:pointer"><b>Buy an Intel token</b> · 1 influence<br><span style="color:#8a5a44;font-size:12px">A kept color you can play later like a card.</span></button>
+            <button style="text-align:left;min-height:44px;padding:8px 12px;border-radius:8px;border:2px solid #e8a9bd;background:#fffaf6;color:#3d200b;font-size:13px;cursor:pointer"><b>Buy a sugar cube</b> · 3 influence<br><span style="color:#8a5a44;font-size:12px">One more die when your Knight fights.</span></button>
+          </div>
+          <button onClick="{{ reset }}" style="height:44px;border-radius:8px;border:none;background:#c2255c;color:#ffffff;font-size:14px;font-weight:700;cursor:pointer">End turn</button>
+        </sc-if>
+      </div>
+
+      <div style="flex:none;background:#fffaf6;border:2px solid #5a3214;border-radius:16px;box-shadow:0 3px 0 #5a3214;padding:12px 14px">
+        <div style="font:700 14px 'Sniglet','Bricolage Grotesque',sans-serif;margin-bottom:8px">What each color does</div>
+        <sc-for list="{{ legend }}" as="l" hint-placeholder-count="6">
+          <div style="{{ l.rowStyle }}">
+            <span style="{{ l.swatch }}"></span>
+            <div style="min-width:0"><div style="font-size:12.5px"><b>{{ l.name }}</b> <span style="color:#8a5a44">· {{ l.who }}</span></div>
+              <div style="font-size:11.5px;line-height:1.35;color:#5e3a28">{{ l.text }}</div></div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":960}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { sel: null, pick: null, stage: 'play', focus: null, pos: {} };
+  }
+  renderVals() {
+    const st = this.state || {};
+    const set = (o) => this.setState(o);
+    const INK = '#3d200b';
+    const C = ['red', 'orange', 'yellow', 'green', 'blue', 'purple'];
+    const HEX = { red: '#ff004d', orange: '#ffa300', yellow: '#ffec27', green: '#00e436', blue: '#29adff', purple: '#83769c' };
+    const ACT = {
+      red: { name: 'Battle', who: 'Knight', text: 'Fight an enemy Knight in this land, capture a Leader or Ambassador, or attack the castle foe.' },
+      orange: { name: 'Influence', who: 'Leader', text: 'Gain influence. The farther your Leader is from home, the more you get.' },
+      yellow: { name: 'Taxes', who: 'any piece', text: 'Rivals in your home land pay you its tax. Then you may raise the tax.' },
+      green: { name: 'Free play', who: 'any piece', text: 'No action. Or discard it without moving to play any number of cards this turn.' },
+      blue: { name: 'Intel', who: 'Ambassador', text: 'Draw cards. The farther your Ambassador is from home, the more you draw.' },
+      purple: { name: 'Castle', who: 'Leader or Knight', text: 'From a road or junction, step into the Candy Castle.' }
+    };
+    const RING = {
+      1: [[11,3],[10,3],[10,4],[10,5],[11,5],[11,6],[10,7],[10,8],[10,9],[11,9],[11,10],[11,11]],
+      2: [[11,12],[10,12],[10,13],[9,13],[8,13],[8,12],[6,12],[6,13],[5,13],[4,12],[3,12],[2,12]],
+      3: [[2,11],[2,10],[1,10],[1,9],[1,8],[2,8],[2,6],[1,6],[1,5],[1,3],[1,2],[2,2]],
+      4: [[3,2],[4,2],[4,1],[5,1],[6,1],[6,2],[8,2],[8,1],[9,1],[10,0],[11,0],[11,1]]
+    };
+    const ROAD = {
+      1: [[10,6],[9,6],[9,7],[9,8],[8,8],[7,8]],
+      2: [[8,11],[8,10],[7,10],[6,10],[5,10],[5,9]],
+      3: [[3,8],[3,7],[3,6],[4,6],[4,7],[4,8]],
+      4: [[6,3],[6,4],[7,4],[7,5],[6,5],[6,6]]
+    };
+    const ROAD_END = { 1: [6,8], 2: [5,8], 3: [5,8], 4: [6,7] };
+    const TRE = { 1: { reg: [11,2], rnd: [11,7], start: [11,4] }, 2: { reg: [7,12], rnd: [4,13], start: [11,13] }, 3: { reg: [2,7], rnd: [1,4], start: [1,11] }, 4: { reg: [7,2], rnd: [9,0], start: [3,1] } };
+    const TIMG = {
+      milkshake: '../assets/treat-milkshake-1.png', ice_cream: '../assets/treat-milkshake-2.png',
+      fudge: '../assets/treat-fudge-1.png', chocolate_bar: '../assets/treat-fudge-2.png',
+      jellybean: '../assets/treat-jellybean-1.png', gummy_bear: '../assets/treat-jellybean-2.png',
+      cheesecake: '../assets/treat-cheesecake-1.png', cupcake: '../assets/treat-cheesecake-2.png'
+    };
+    const TNAME = { milkshake: 'Milkshake', ice_cream: 'Ice Cream', fudge: 'Fudge', chocolate_bar: 'Chocolate Bar', jellybean: 'Jellybean', gummy_bear: 'Gummy Bear', cheesecake: 'Cheesecake', cupcake: 'Cupcake' };
+    const REGT = { 1: 'milkshake', 2: 'fudge', 3: 'jellybean', 4: 'cheesecake' };
+    const RNDT = { 1: 'cupcake', 2: 'gummy_bear', 3: 'ice_cream', 4: 'chocolate_bar' };
+    const F = {
+      milkshake: { name: 'Arch Duchess of Milkshake', short: 'Milkshake', region: 1, color: '#f5a623', ink: INK, tint: '#fdebc8', img: '../assets/sweet-milkshake.jpg' },
+      fudge: { name: 'General Fudge', short: 'Fudge', region: 2, color: '#8b5a2b', ink: '#ffffff', tint: '#efe0d0', img: '../assets/sweet-fudge.jpg' },
+      jellybean: { name: 'Princess Jellybean', short: 'Jellybean', region: 3, color: '#9013fe', ink: '#ffffff', tint: '#efe0ff', img: '../assets/sweet-jellybean.jpg' },
+      cheesecake: { name: 'Grand Vizier Cheesecake', short: 'Cheesecake', region: 4, color: '#f0f0f0', ink: INK, tint: '#f4f1ea', img: '../assets/sweet-cheesecake.jpg' }
+    };
+    const FOFR = { 1: 'milkshake', 2: 'fudge', 3: 'jellybean', 4: 'cheesecake' };
+    const TAX = { 1: 0, 2: 2, 3: 1, 4: 0 };
+    const UN = { leader: 'Leader', knight: 'Knight', ambassador: 'Ambassador' };
+    const PLAYERS = [
+      { f: 'milkshake', you: true, pts: 2, inf: 3, sugar: 4, hand: 6, units: { leader: { z: 'ring', r: 1, i: 2 }, knight: { z: 'ring', r: 2, i: 3 }, ambassador: { z: 'ring', r: 4, i: 1 } } },
+      { f: 'fudge', pts: 3, inf: 4, sugar: 3, hand: 4, units: { leader: { z: 'ring', r: 2, i: 1 }, knight: { z: 'ring', r: 2, i: 6 }, ambassador: { z: 'ring', r: 3, i: 8 } } },
+      { f: 'jellybean', pts: 1, inf: 2, sugar: 2, hand: 5, units: { leader: { z: 'start', r: 3 }, knight: { z: 'road', r: 1, i: 2 }, ambassador: { z: 'ring', r: 1, i: 9 } } },
+      { f: 'cheesecake', pts: 0, inf: 1, sugar: 5, hand: 3, units: { leader: { z: 'treat', r: 4, k: 'reg' }, knight: { z: 'ring', r: 4, i: 6 }, ambassador: { z: 'ring', r: 2, i: 3 } } }
+    ];
+    const HAND = [
+      { id: 'c1', color: 'red' }, { id: 'c2', color: 'orange' }, { id: 'c3', color: 'blue', double: true },
+      { id: 'c4', color: 'yellow' }, { id: 'c5', treat: 'gummy_bear' }, { id: 'c6', color: 'green' }
+    ];
+    const pos = st.pos || {};
+    const locOf = (p, u) => pos[p.f + '-' + u] || p.units[u];
+    const keyOf = (l) => l.z === 'ring' ? 'ring-' + l.r + '-' + l.i : l.z === 'road' ? 'road-' + l.r + '-' + l.i : l.z === 'treat' ? 'treat-' + l.r + '-' + l.k : l.z === 'start' ? 'start-' + l.r : 'castle';
+    const land = (r) => F[FOFR[r]].short + '’s land';
+    const where = (l) => {
+      if (l.z === 'ring') return C[l.i % 6] + ' space · ' + land(l.r);
+      if (l.z === 'road') return C[l.i] + ' road · ' + land(l.r);
+      if (l.z === 'treat') return 'on the ' + TNAME[l.k === 'reg' ? REGT[l.r] : RNDT[l.r]] + ' treat';
+      if (l.z === 'start') return 'at home (start tile)';
+      return 'in the Candy Castle';
+    };
+    const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+    // the players panel is narrow: the space's color as a swatch, then the land
+    const whereShort = (l) => l.z === 'ring' ? land(l.r) : l.z === 'road' ? 'road · ' + land(l.r) : l.z === 'treat' ? TNAME[l.k === 'reg' ? REGT[l.r] : RNDT[l.r]] + ' treat' : l.z === 'start' ? 'at home' : 'in the castle';
+    const swatchOf = (l) => (l.z === 'ring' || l.z === 'road') ? 'width:10px;height:10px;flex:none;border-radius:3px;border:1.5px solid #5a3214;background:' + HEX[l.z === 'ring' ? C[l.i % 6] : C[l.i]] : 'display:none';
+
+    // all units on the table
+    const units = [];
+    PLAYERS.forEach((p) => ['leader', 'knight', 'ambassador'].forEach((u) => {
+      units.push({ id: p.f + '-' + u, p: p, u: u, loc: locOf(p, u) });
+    }));
+    const me = PLAYERS[0];
+
+    // where a color card takes a piece (counter-clockwise, next space of that color)
+    const dests = (l, color) => {
+      const ci = C.indexOf(color);
+      const out = [];
+      if (l.z === 'ring') {
+        let r = l.r, i = l.i, passJ = false;
+        for (let k = 0; k < 12; k++) {
+          i += 1; if (i > 11) { i = 0; r = r % 4 + 1; }
+          if (r === l.r && i === 5 && l.i < 5) passJ = true;
+          if (i % 6 === ci) break;
+          if (r === l.r && i === 5) passJ = true;
+        }
+        out.push({ loc: { z: 'ring', r: r, i: i }, via: 'ring' });
+        if ((passJ || l.i === 5) && !(r === l.r && i === 5)) {
+          if (color === 'purple') out.push({ loc: { z: 'castle' }, via: 'castle' });
+          else out.push({ loc: { z: 'road', r: l.r, i: ci }, via: 'road' });
+        }
+      } else if (l.z === 'road') {
+        if (color === 'purple') out.push({ loc: { z: 'castle' }, via: 'castle' });
+        else if (ci > l.i) out.push({ loc: { z: 'road', r: l.r, i: ci }, via: 'road' });
+      }
+      return out;
+    };
+    const dist = (r) => ((r - F[me.f].region) + 4) % 4;
+    const enemiesIn = (r) => units.filter((x) => x.p !== me && x.loc.r === r && x.loc.z !== 'start' && x.loc.z !== 'castle' && x.loc.z !== 'treat');
+    const outcome = (u, l, card) => {
+      if (card.treat) return { text: 'No color action. Pieces on treat spaces never pay taxes.', act: false };
+      const c = card.color;
+      if (c === 'red') {
+        if (u !== 'knight') return { text: 'Only your Knight can battle, so the Battle action does nothing here.', act: false };
+        const ek = enemiesIn(l.r).filter((x) => x.u === 'knight');
+        if (ek.length) return { text: 'Battle ' + F[ek[0].p.f].short + '’s Knight: your ' + me.sugar + ' sugar cubes against their ' + ek[0].p.sugar + '. Ties go to the defender. The loser goes home.', act: true, battle: true };
+        const ev = enemiesIn(l.r).filter((x) => x.u !== 'knight');
+        if (ev.length) return { text: 'Capture ' + F[ev[0].p.f].short + '’s ' + UN[ev[0].u] + ' and send it home.', act: true };
+        return { text: 'No rivals in this land, so there is no one to fight.', act: false };
+      }
+      if (c === 'orange') {
+        if (u !== 'leader') return { text: 'Only your Leader gathers influence, so this action does nothing.', act: false };
+        const g = l.z === 'castle' ? 5 : [0, 1, 2, 3][dist(l.r)];
+        return { text: g ? 'Gain +' + g + ' influence (your Leader is ' + dist(l.r) + ' lands from home).' : 'Your Leader would still be at home, which gives +0 influence.', act: g > 0 };
+      }
+      if (c === 'yellow') return { text: 'Collect taxes in your home land. Your tax is 0, so nobody pays yet. You may then raise it to 1 for 1 influence.', act: true };
+      if (c === 'green') return { text: 'No action. (Or discard this card without moving to play any number of cards this turn.)', act: false };
+      if (c === 'blue') {
+        if (u !== 'ambassador') return { text: 'Only your Ambassador draws Intel, so this action does nothing.', act: false };
+        const n = [1, 2, 3, 2][dist(l.r)];
+        return { text: 'Draw ' + n + ' Intel card' + (n > 1 ? 's' : '') + (card.double ? ', then move and draw again.' : '.'), act: true };
+      }
+      return { text: 'Step into the Candy Castle.', act: true };
+    };
+
+    const card = HAND.find((h) => h.id === st.sel) || null;
+    let options = [];
+    if (card && st.stage === 'play') {
+      let n = 0;
+      ['leader', 'knight', 'ambassador'].forEach((u) => {
+        const l = locOf(me, u);
+        let ds = [];
+        if (card.treat) {
+          const rr = [1, 2, 3, 4].find((r) => RNDT[r] === card.treat);
+          ds = [{ loc: { z: 'treat', r: rr, k: 'rnd' }, via: 'treat' }];
+        } else ds = dests(l, card.color);
+        ds.forEach((d) => {
+          n += 1;
+          const oc = outcome(u, d.loc, card);
+          const title = UN[u] + ' → ' + (d.via === 'road' ? 'the road toward the castle' : d.via === 'castle' ? 'the Candy Castle' : d.via === 'treat' ? 'the ' + TNAME[card.treat] + ' treat' : 'the ' + C[d.loc.i % 6] + ' space in ' + land(d.loc.r));
+          const id = u + '-' + n;
+          options.push({ n: n, id: id, u: u, loc: d.loc, title: title, outcome: oc.text, act: oc.act, battle: !!oc.battle,
+            outColor: oc.act ? '#c2255c' : '#8a5a44', click: () => set({ pick: id }) });
+        });
+      });
+    }
+    const picked = options.find((o) => o.id === st.pick) || null;
+
+    // board cells
+    const ghostsAt = {};
+    options.forEach((o) => {
+      const k = keyOf(o.loc);
+      (ghostsAt[k] = ghostsAt[k] || []).push(o);
+    });
+    const unitsAt = {};
+    units.forEach((x) => { const k = keyOf(x.loc); (unitsAt[k] = unitsAt[k] || []).push(x); });
+
+    const FK = { milkshake: 'MS', fudge: 'FD', jellybean: 'JB', cheesecake: 'CC' };
+    // each faction's pieces are shaped like its treat; the picture inside says which piece
+    const GLYPH = { MS: [12, 16.4, .44], FD: [12, 13, .52], JB: [12.2, 11.8, .48], CC: [12, 15.1, .44] };
+    const tokenStyle = (x, size, focus) => 'position:relative;flex:none;width:' + size + 'px;height:' + size + 'px;padding:0;border:none;background:transparent;cursor:pointer;border-radius:50%;' + (focus ? 'outline:3px solid #c2255c;outline-offset:2px;animation:sl-pulse 1.2s ease-in-out infinite;' : '');
+    const pieceVals = (x, size) => {
+      const k = FK[x.p.f], gp = GLYPH[k];
+      return { isMS: k === 'MS', isFD: k === 'FD', isJB: k === 'JB', isCC: k === 'CC', g: Math.round(size * gp[2]),
+        glyphPos: 'position:absolute;left:' + (gp[0] / 24 * 100) + '%;top:' + (gp[1] / 24 * 100) + '%;transform:translate(-50%,-50%);display:flex;pointer-events:none;color:' + F[x.p.f].ink };
+    };
+    const mkUnit = (x) => Object.assign(pieceVals(x, 25), { title: (x.p.you ? 'Your ' : F[x.p.f].short + '’s ') + UN[x.u] + ' — ' + where(x.loc), style: tokenStyle(x, 25, st.focus === x.id),
+      isLeader: x.u === 'leader', isKnight: x.u === 'knight', isAmb: x.u === 'ambassador', click: () => set({ focus: st.focus === x.id ? null : x.id }) });
+
+    // which region owns each grid square, so region outlines can be drawn
+    const EDGE = { 1: '#f5a623', 2: '#8b5a2b', 3: '#9013fe', 4: '#8a8270' };
+    const REGAT = {};
+    [1, 2, 3, 4].forEach((r) => {
+      RING[r].concat(ROAD[r], [TRE[r].reg, TRE[r].rnd, TRE[r].start]).forEach((rc) => { REGAT[rc[0] + ',' + rc[1]] = r; });
+    });
+    // every grid square belongs to a region: tiles by their own region,
+    // empty squares by the nearest tile; the castle belongs to no one
+    const TINT = {
+      1: '#fde3b4;background-image:radial-gradient(circle at 25% 30%,#ff8fb1 1.7px,transparent 2.3px),radial-gradient(circle at 75% 72%,#ffffff 1.9px,transparent 2.5px);background-size:16px 16px',
+      2: '#d6ad84;background-image:radial-gradient(circle at 30% 35%,#5f3415 2px,transparent 2.6px),radial-gradient(circle at 72% 75%,#f3e2cc 1.5px,transparent 2.1px);background-size:16px 16px',
+      3: '#e6d2ff;background-image:radial-gradient(3.2px 1.9px at 28% 30%,#00b82c 90%,transparent 100%),radial-gradient(3.2px 1.9px at 72% 72%,#ff4f8b 90%,transparent 100%);background-size:16px 16px',
+      4: '#fffaf0;background-image:radial-gradient(circle at 30% 30%,#e3bd84 1.7px,transparent 2.3px),radial-gradient(circle at 70% 72%,#ffc2cf 1.5px,transparent 2.1px);background-size:16px 16px'
+    };
+    const tiles = Object.keys(REGAT).map((k) => ({ rr: +k.split(',')[0], cc: +k.split(',')[1], r: REGAT[k] }));
+    const FULL = {};
+    for (let rr = 1; rr <= 11; rr++) for (let cc = 0; cc <= 13; cc++) {
+      const k = rr + ',' + cc;
+      if (REGAT[k]) { FULL[k] = REGAT[k]; continue; }
+      if ((rr === 5 || rr === 6) && (cc === 7 || cc === 8)) { FULL[k] = 0; continue; }
+      let best = 99, br = 0;
+      tiles.forEach((t) => { const d = Math.hypot(t.rr - rr, t.cc - cc); if (d < best - 1e-6) { best = d; br = t.r; } });
+      FULL[k] = br;
+    }
+    const edgeFor = (rc, r) => {
+      if (!r) return 'display:none';
+      const side = (dr, dc) => FULL[(rc[0] + dr) + ',' + (rc[1] + dc)] === r ? '0' : '5px solid ' + EDGE[r];
+      return 'position:absolute;inset:-1px;pointer-events:none;z-index:1;box-sizing:border-box;border-top:' + side(-1, 0) + ';border-bottom:' + side(1, 0) + ';border-left:' + side(0, -1) + ';border-right:' + side(0, 1);
+    };
+    const zones = [];
+    Object.keys(FULL).forEach((k) => {
+      const r = FULL[k];
+      if (!r) return;
+      const rc = [+k.split(',')[0], +k.split(',')[1]];
+      zones.push({ style: 'grid-row:' + rc[0] + ';grid-column:' + (rc[1] + 1) + ';position:relative;background:' + TINT[r] + ';',
+        edgeStyle: edgeFor(rc, r).replace('z-index:1', 'z-index:0') });
+    });
+    const cells = [];
+    const addCell = (k, rc, base, extra, r) => {
+      const us = (unitsAt[k] || []).map(mkUnit);
+      const gs = (ghostsAt[k] || []).map((o, j) => {
+        const isPick = picked && picked.id === o.id;
+        const dim = picked && !isPick;
+        return { n: o.n, label: 'Option ' + o.n + ': ' + o.title, click: o.click,
+          style: 'position:absolute;inset:-3px;z-index:3;padding:0;cursor:pointer;background:transparent;border:3px ' + (isPick ? 'solid' : 'dashed') + ' ' + INK + ';border-radius:8px;opacity:' + (dim ? '.25' : '1') + ';' + (isPick ? 'box-shadow:0 0 0 3px #ffffff,0 0 0 6px ' + F.milkshake.color + ';' : ''),
+          badge: 'position:absolute;top:-10px;right:' + (-10 + j * 20) + 'px;width:20px;height:20px;border-radius:50%;background:' + INK + ';color:#ffffff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #ffffff' };
+      });
+      const focus = (unitsAt[k] || []).some((x) => x.id === st.focus);
+      cells.push(Object.assign({ units: us, ghosts: gs, edgeStyle: 'display:none', isRoad: false, isJunction: false, isTreat: false, isStart: false, tip: '',
+        style: 'grid-row:' + rc[0] + ';grid-column:' + (rc[1] + 1) + ';position:relative;display:flex;align-items:center;justify-content:center;box-sizing:border-box;' + base + (focus ? 'z-index:2;' : '') }, extra));
+    };
+    [1, 2, 3, 4].forEach((r) => {
+      RING[r].forEach((rc, i) => {
+        const c = C[i % 6];
+        addCell('ring-' + r + '-' + i, rc, 'background-color:' + HEX[c] + ';background-image:linear-gradient(rgba(255,255,255,.5),rgba(255,255,255,0) 48%);border-radius:10px;margin:2px;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18),0 0 0 1.5px #5a3214,0 2px 0 1.5px #5a3214;',
+          { isJunction: i === 5,
+            tip: cap(c) + ' space · ' + land(r) + (i === 5 ? ' · junction: may turn onto the road' : '') + ' · ' + ACT[c].name }, r);
+      });
+      ROAD[r].forEach((rc, i) => {
+        const c = C[i];
+        const nx = i < 5 ? ROAD[r][i + 1] : ROAD_END[r];
+        const dr = nx[0] - rc[0], dc = nx[1] - rc[1];
+        const rot = dc === 1 ? 0 : dc === -1 ? 180 : dr === 1 ? 90 : -90;
+        addCell('road-' + r + '-' + i, rc, 'background-color:' + HEX[c] + ';background-image:linear-gradient(rgba(255,255,255,.5),rgba(255,255,255,0) 48%);border-radius:10px;margin:2px;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18),0 0 0 1.5px #5a3214,0 2px 0 1.5px #5a3214;',
+          { isRoad: true, arrowStyle: 'position:absolute;opacity:.55;transform:rotate(' + rot + 'deg)',
+            tip: cap(c) + ' road space · ' + land(r) + ' · leads to the castle' }, r);
+      });
+      addCell('treat-' + r + '-reg', TRE[r].reg, 'background:#ffffff;border-radius:50%;margin:2px;box-shadow:inset 0 0 0 3px #ffd6e6,0 0 0 1.5px #5a3214,0 2px 0 1.5px #5a3214;',
+        { isTreat: true, treatImg: TIMG[REGT[r]], treatName: TNAME[REGT[r]], tip: TNAME[REGT[r]] + ' treat space · reach it with the ' + TNAME[REGT[r]] + ' card'  }, r);
+      addCell('treat-' + r + '-rnd', TRE[r].rnd, 'background:#ffffff;border-radius:50%;margin:2px;border:2px dashed #5a3214;',
+        { isTreat: true, treatImg: TIMG[RNDT[r]], treatName: TNAME[RNDT[r]], tip: TNAME[RNDT[r]] + ' treat space (placed at random this game)'  }, r);
+      const fk = FOFR[r];
+      addCell('start-' + r, TRE[r].start, 'background:' + F[fk].tint + ';border:3px solid ' + (fk === 'cheesecake' ? '#9a9180' : F[fk].color) + ';border-radius:10px;margin:2px;',
+        { isStart: true, homeMS: fk === 'milkshake', homeFD: fk === 'fudge', homeJB: fk === 'jellybean', homeCC: fk === 'cheesecake', tip: F[fk].short + '’s home: pieces start here and return here when captured' });
+    });
+
+    // banners
+    const bannerBase = 'display:flex;align-items:center;gap:8px;font-size:12px;padding:0 10px;border-radius:999px;background:#fffaf6;border:2px solid #5a3214;white-space:nowrap;';
+    const chip = (fk) => 'width:14px;height:14px;border-radius:3px;flex:none;background:' + EDGE[F[fk].region] + ';border:1.5px solid ' + INK;
+    const banners = {
+      top: { style: bannerBase, chip: chip('jellybean'), title: 'Jellybean’s land', tax: TAX[3] },
+      bottom: { style: bannerBase + 'border:2px solid #f5a623;background:#fdebc8;', chip: chip('milkshake'), title: 'Your land (Milkshake)', tax: TAX[1] },
+      left: { style: bannerBase + 'writing-mode:vertical-rl;text-orientation:sideways;padding:10px 0;justify-content:flex-start;', chip: chip('cheesecake'), title: 'Cheesecake’s land', tax: TAX[4] },
+      right: { style: bannerBase + 'writing-mode:vertical-rl;text-orientation:sideways;transform:rotate(180deg);padding:10px 0;', chip: chip('fudge'), title: 'Fudge’s land', tax: TAX[2] }
+    };
+
+    // players panel
+    const players = PLAYERS.map((p, idx) => ({
+      short: p.you ? 'You · ' + F[p.f].short : F[p.f].short, name: F[p.f].name, img: F[p.f].img,
+      tag: p.you ? 'Your turn' : 'AI', tagStyle: 'flex:none;align-self:flex-start;white-space:nowrap;font-size:11px;line-height:1;padding:5px 9px;border-radius:999px;border:2px solid #5a3214;' + (p.you ? 'font-weight:800;background:#c2255c;color:#ffffff;box-shadow:0 2px 0 #5a3214' : 'font-weight:700;background:#ffe3ec;color:#5e3a28'),
+      imgStyle: 'width:40px;height:40px;border-radius:50%;object-fit:cover;flex:none;border:3px solid ' + (p.f === 'cheesecake' ? '#9a9180' : F[p.f].color),
+      cardStyle: 'background:#fffaf6;border-radius:16px;padding:8px 12px 6px;box-shadow:0 3px 0 #5a3214;' + (p.you ? 'border:2.5px solid #5a3214;outline:4px solid #f5a623;outline-offset:-7px;' : 'border:2px solid #5a3214;'),
+      pts: p.pts, toGo: p.pts >= 5 ? 'Winner!' : (5 - p.pts) + ' to go',
+      toGoPos: 'position:absolute;top:0;bottom:0;right:0;left:' + (p.pts >= 5 ? 0 : p.pts * 20) + '%;', inf: p.inf, sugar: p.sugar, hand: p.hand,
+      pips: [0, 1, 2, 3, 4].map((i) => ({ style: 'display:block;height:100%;border-radius:' + (i === 0 ? '999px 3px 3px 999px' : i === 4 ? '3px 999px 999px 3px' : '3px') + ';' + (i < p.pts ? 'background-color:' + EDGE[F[p.f].region] + ';background-image:repeating-linear-gradient(-45deg,rgba(255,255,255,.5) 0 3px,transparent 3px 7px)' : 'background:transparent') })),
+      units: ['leader', 'knight', 'ambassador'].map((u) => {
+        const x = units.find((y) => y.id === p.f + '-' + u);
+        const f = st.focus === x.id;
+        return Object.assign(pieceVals(x, 20), { label: UN[u], where: cap(where(x.loc)), whereShort: whereShort(x.loc), swatch: swatchOf(x.loc), isLeader: u === 'leader', isKnight: u === 'knight', isAmb: u === 'ambassador',
+          miniStyle: tokenStyle(x, 20, false) + 'display:inline-block;cursor:inherit;',
+          rowStyle: 'width:100%;display:flex;align-items:center;gap:8px;padding:2px 6px;margin:0;border:none;border-radius:6px;font-size:12px;text-align:left;cursor:pointer;color:' + INK + ';background:' + (f ? '#ffe3ec' : 'transparent'),
+          click: () => set({ focus: f ? null : x.id }) });
+      })
+    }));
+
+    // hand
+    const hand = HAND.map((h) => {
+      const sel = st.sel === h.id && st.stage === 'play';
+      const isT = !!h.treat;
+      return {
+        selected: sel, isTreat: isT, isColor: !isT, isDouble: !!h.double, img: isT ? TIMG[h.treat] : '',
+        hex: isT ? '#ffd6e6' : HEX[h.color],
+        name: isT ? TNAME[h.treat] : ACT[h.color].name,
+        line: isT ? 'Treat card' : h.double ? 'Twice, same piece' : ACT[h.color].who === 'any piece' ? 'Any piece' : 'Best with your ' + ACT[h.color].who,
+        label: isT ? TNAME[h.treat] + ' treat card' : cap(h.color) + (h.double ? ' double' : '') + ' card: ' + ACT[h.color].name,
+        aBody: 'position:absolute;top:10px;bottom:10px;left:0;right:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:' + (isT ? 6 : 10) + 'px;background-color:' + (isT ? '#ffd6e6' : HEX[h.color]) + ';background-image:linear-gradient(90deg,rgba(255,255,255,0) 14%,rgba(255,255,255,.45) 24%,rgba(255,255,255,0) 36%);border-left:2px solid #5a3214;border-right:2px solid #5a3214',
+        style: 'position:relative;width:100%;height:150px;padding:0;border:none;background:transparent;cursor:pointer;color:' + INK + ';filter:drop-shadow(0 3px 0 #5a3214);transition:transform .15s;' + (sel ? 'transform:translateY(-10px);outline:3px solid #c2255c;outline-offset:4px;border-radius:6px;' : '') + (st.stage !== 'play' ? 'opacity:.45;' : ''),
+        click: () => { if (st.stage === 'play') set({ sel: sel ? null : h.id, pick: null }); }
+      };
+    });
+
+    // steps
+    const cur = st.stage === 'influence' ? 3 : 2;
+    const steps = ['Recall', 'Draw', 'Play a card', 'Influence'].map((name, i) => ({ n: i < cur ? 'done' : 'step ' + (i + 1), name: name,
+      style: 'padding:6px 6px;border-radius:8px;font-size:12px;font-weight:600;line-height:1.2;' + (i === cur ? 'background:#c2255c;color:#ffffff;' : i < cur ? 'background:#d6f5e0;color:#1d6b3e;' : 'background:#fff0f5;color:#8a5a44;') }));
+
+    // battle dice (the person presses Roll; faces are 0,0,0,1,2,3)
+    const myFaces = st.stage === 'rolled' ? [1, 0, 3, 2] : [null, null, null, null];
+    const thFaces = st.stage === 'rolled' ? [0, 2, 0] : [null, null, null];
+    const die = (f) => ({ face: f === null ? '' : String(f), style: 'width:24px;height:24px;border-radius:5px;background:#ffffff;border:2px solid ' + INK + ';display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px' });
+
+    const doMoveTo = (extra) => {
+      const p2 = Object.assign({}, st.pos);
+      p2['milkshake-' + picked.u] = picked.loc;
+      set(Object.assign({ pos: p2, focus: 'milkshake-' + picked.u }, extra));
+    };
+    const v = {
+      noCard: st.stage === 'play' && !card,
+      choose: st.stage === 'play' && !!card && !picked,
+      confirm: st.stage === 'play' && !!picked,
+      battle: st.stage === 'battle' || st.stage === 'rolled',
+      needRoll: st.stage === 'battle', rolled: st.stage === 'rolled',
+      influence: st.stage === 'influence',
+      cardTitle: card ? (card.treat ? TNAME[card.treat] + ' treat card' : cap(card.color) + (card.double ? ' ×2' : '') + ' card · ' + ACT[card.color].name) : '',
+      swatch: card ? 'width:22px;height:22px;border-radius:5px;border:2px solid ' + INK + ';background:' + (card.treat ? '#ffffff' : HEX[card.color]) : '',
+      optTitle: picked ? picked.title : '', optOutcome: picked ? 'Then: ' + picked.outcome : '',
+      actLabel: picked ? (picked.act ? 'Move and ' + (picked.battle ? 'battle' : card.treat ? 'go' : ACT[card.color].name.toLowerCase()) : 'Move') : '',
+      canSkip: !!(picked && picked.act),
+      myTotal: st.stage === 'rolled' ? 'Total 6' : '4 sugar cubes = 4 dice',
+      theirTotal: st.stage === 'rolled' ? 'Total 2' : '3 sugar cubes = 3 dice',
+      battleText: st.stage === 'rolled' ? 'You win. Fudge’s Knight goes home to its start tile. (Losing costs no sugar cubes.)' : 'Each sugar cube is a die with faces 0, 0, 0, 1, 2, 3. Higher total wins; a tie goes to the defender. Press Roll when you are ready.',
+      influenceText: st.stage === 'influence' && st.passed ? 'You passed and gained +1 influence.' : 'Your card is played.',
+      inf: me.inf + (st.passed ? 1 : 0)
+    };
+
+    const legend = C.map((c) => ({ name: cap(c) + ' · ' + ACT[c].name, who: ACT[c].who, text: ACT[c].text,
+      rowStyle: 'display:flex;gap:10px;align-items:flex-start;padding:5px 6px;border-radius:8px;' + (card && card.color === c ? 'background:#fff0f5;outline:2px solid ' + INK + ';' : ''),
+      swatch: 'width:20px;height:20px;flex:none;margin-top:1px;border-radius:4px;border:2px solid ' + INK + ';background:' + HEX[c] }));
+
+    const pill = st.stage === 'influence' ? 'Your turn — spend influence' : st.stage === 'battle' || st.stage === 'rolled' ? 'Your turn — battle' : card ? 'Your turn — choose a piece' : 'Your turn — play a card';
+
+    return {
+      pill: pill, players: players, cells: cells, zones: zones, banners: banners, hand: hand, steps: steps, options: options, legend: legend, v: v,
+      myDice: myFaces.map(die), theirDice: thFaces.map(die),
+      handHint: st.stage === 'play' ? (card ? 'Click the card again to put it back.' : 'Click a card to see where it can take each of your pieces.') : 'Card played.',
+      cancel: () => set({ sel: null, pick: null }),
+      back: () => set({ pick: null }),
+      doMove: () => doMoveTo({ stage: 'influence', sel: null, pick: null }),
+      doAct: () => doMoveTo({ stage: picked && picked.battle ? 'battle' : 'influence', sel: null, pick: null }),
+      roll: () => {
+        const p2 = Object.assign({}, st.pos);
+        p2['fudge-knight'] = { z: 'start', r: 2 };
+        set({ stage: 'rolled', pos: p2 });
+      },
+      toInfluence: () => set({ stage: 'influence' }),
+      pass: () => set({ stage: 'influence', passed: true, sel: null, pick: null }),
+      reset: () => set({ sel: null, pick: null, stage: 'play', focus: null, pos: {}, passed: false })
+    };
+  }
+}
+</script>
+</body>
+</html>
