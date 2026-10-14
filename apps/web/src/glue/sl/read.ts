@@ -99,6 +99,8 @@ export interface SlTable {
   hand: SlCard[] | null;
   secrets: string[];
   pointsToWin: number | null;
+  /** The most influence a player may hold, when the engine's reference data says (influence_cap). */
+  influenceCap: number | null;
   seated: boolean; // factions are assigned
 }
 
@@ -173,6 +175,7 @@ export function readTable(input: GlueInput): SlTable | null {
     hand,
     secrets: asArr(view['your_secret_objectives']).map((x) => asStr(x)).filter(Boolean),
     pointsToWin: isObj(rd) && typeof rd['points_to_win'] === 'number' ? rd['points_to_win'] : null,
+    influenceCap: isObj(rd) && typeof rd['influence_cap'] === 'number' ? rd['influence_cap'] : null,
     seated,
   };
 }

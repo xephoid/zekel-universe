@@ -315,12 +315,15 @@ export const sweetlandsGlue: GlueModule = {
         data: { label: 'Your secret objectives', mode: 'row', cards: secrets.map((s) => ({ id: `sl:secret:${s}`, label: words(s), subtitle: 'Secret', colorKey: 'treat' })) },
       });
     }
-    const points: Zone = { kind: 'track', id: 'sl:points', data: { label: 'Points', spaces: pointsSpaces } };
+    // The other seats, the taxes and the points ride with the board zones,
+    // not in the side column: the table draws a plan's side zones even
+    // beside a screen, and the candy screen draws its own players panel.
+    board.push(...side, { kind: 'track', id: 'sl:points', data: { label: 'Points', spaces: pointsSpaces } });
     const step = asStr(view['your_turn_step']);
     const status = phase.startsWith('setup')
       ? `Setup · ${words(phase.replace(/^setup_/, ''))}`
       : `Round ${asNum(view['round'], 1)} · ${words(phase)}${step ? ` · ${words(step)}` : ''}`;
-    return { board, bench, side, points, palette: PALETTE, title: 'Sweetlands Imperium', status };
+    return { board, bench, side: [], palette: PALETTE, title: 'Sweetlands Imperium', status };
   },
 
   litParts(input: GlueInput): string[] {

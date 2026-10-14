@@ -479,8 +479,9 @@ describe('sweetlands-imperium glue', () => {
     const me = plan.bench[0]!.data as { artUrl?: string; stats: Array<{ label: string; max?: number }> };
     expect(me.artUrl).toBe('/art/sweetlands/sweet-milkshake.jpg');
     expect(me.stats.find((s) => s.label === 'Points')!.max).toBe(5);
-    expect(ids(plan.side)).toEqual(['sl:p:s2', 'sl:taxes']);
-    const points = plan.points!.data as TrackData;
+    expect(plan.side).toEqual([]);
+    expect(ids(plan.board)).toEqual(['sl:map', 'sl:intel-deck', 'sl:intel-discard', 'sl:p:s2', 'sl:taxes', 'sl:points']);
+    const points = plan.board.find((z) => z.id === 'sl:points')!.data as TrackData;
     expect(points.spaces).toHaveLength(6);
     expect(points.spaces[1]!.pieces).toEqual([{ label: 'milkshake (s1)', colorKey: 'milkshake' }]);
   });

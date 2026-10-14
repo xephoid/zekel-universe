@@ -10,6 +10,7 @@ import type { GameScreenProps } from '../types';
 import { ZoneRenderer } from '../ZoneRenderer';
 import { Board } from './Board';
 import { Piece, pieceTitle } from './Piece';
+import { Players } from './Players';
 import { readTable, tileOf, UNITS, type SlTable } from './read';
 import { sweetlandsGlue } from '../sweetlands-imperium';
 import './sl.css';
@@ -34,7 +35,7 @@ function piecesOn(table: SlTable, focus: string | null, onFocus: (id: string) =>
 }
 
 export function SlScreen(props: GameScreenProps) {
-  const { input, yourTurn, busy, interactive, onMove, onDraw, menu, benchSlot } = props;
+  const { input, yourTurn, busy, interactive, onMove, onDraw, menu, benchSlot, nameFor } = props;
   const table = useMemo(() => readTable(input), [input]);
   const plan = useMemo(() => sweetlandsGlue.plan(input), [input]);
   const lit = useMemo(() => (interactive && yourTurn ? sweetlandsGlue.litParts(input) : []), [input, interactive, yourTurn]);
@@ -53,12 +54,14 @@ export function SlScreen(props: GameScreenProps) {
   const bench = (
     <div className="sl-bench">
       {piles.map((z) => <ZoneRenderer key={z.id} zone={z} lit={lit} onSelect={onSelect} />)}
-      {plan?.bench.map((z) => <ZoneRenderer key={z.id} zone={z} lit={lit} onSelect={onSelect} />)}
+      {plan?.bench.filter((z) => z.kind !== 'tableau').map((z) => <ZoneRenderer key={z.id} zone={z} lit={lit} onSelect={onSelect} />)}
     </div>
   );
 
   return (
     <div className="sl-screen">
+      <Players table={table} focus={focus} onFocus={onFocus} nameFor={nameFor} />
+      <div className="sl-main">
       <Board table={table} pieces={piecesOn(table, focus, onFocus)} lit={lit} onTile={(id) => onSelect({ component: 'map', id, label: id })} />
       {/* Dice and Intel draws are resolved by the engine only when the person presses this. */}
       {onDraw && interactive && (
@@ -67,6 +70,7 @@ export function SlScreen(props: GameScreenProps) {
         </button>
       )}
       {menu}
+      </div>
       {benchSlot ? createPortal(bench, benchSlot) : bench}
     </div>
   );

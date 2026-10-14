@@ -8,7 +8,7 @@ import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testi
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import type { MoveAck, TableEventWire } from '@universe/shared';
 import { useFakeSocket } from '../socket';
-import { submissionLog } from '../glue';
+import { GLUES, submissionLog } from '../glue';
 import { SessionProvider } from '../session';
 import { TablePage } from '../pages/Table';
 import { ev } from './fixtures';
@@ -77,6 +77,17 @@ function fakeFetch(url: string): Promise<Response> {
   return Promise.resolve(new Response('{"error":"not_found"}', { status: 404 }));
 }
 
+/** These tests are about the table's own chooser and forms, which a game
+ *  without a screen of its own gets; Sweetlands is only the vehicle. Its candy
+ *  screen (glue/sl) asks the same questions in its own turn panel, tested in
+ *  sl-screen.test.tsx, so here the table draws the plan's zones instead. */
+function withoutCandyScreen() {
+  const glue = GLUES['sweetlands-imperium']!;
+  const screen = glue.Screen;
+  beforeEach(() => { delete glue.Screen; });
+  afterEach(() => { glue.Screen = screen; });
+}
+
 function renderTable() {
   return render(
     <SessionProvider>
@@ -88,6 +99,7 @@ function renderTable() {
 }
 
 describe('choosers and forms on the table page', () => {
+  withoutCandyScreen();
   let socket: FakeSocket;
   beforeEach(() => {
     socket = new FakeSocket();
@@ -342,6 +354,7 @@ describe("cybernoir's verb bar", () => {
 // the table's own buttons behind an open question, which on the Cybernoir
 // table means spending action points while a question is still on screen.
 describe('a sheet keeps the keyboard', () => {
+  withoutCandyScreen();
   let socket: FakeSocket;
   beforeEach(() => {
     socket = new FakeSocket();
