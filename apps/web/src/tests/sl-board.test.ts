@@ -7,6 +7,7 @@ import { CASTLE_POS, SPACES } from '../glue/sweetlands-board';
 import { COLS, LAND, ROAD_ARROW, ROWS, TILES, landEdges } from '../glue/sl/geometry';
 import { readTable, tileOf } from '../glue/sl/read';
 import { pieceTitle } from '../glue/sl/Piece';
+import { hopTiles } from '../glue/sl/motion';
 import type { GlueInput } from '../glue/types';
 
 describe('the candy board', () => {
@@ -76,5 +77,18 @@ describe('the candy board', () => {
     expect(pieceTitle(t, me!, 'knight')).toBe('Your Knight — yellow road space · your land');
     expect(pieceTitle(t, me!, 'leader')).toBe('Your Leader — at home (start tile)');
     expect(pieceTitle(t, fudge!, 'ambassador')).toBe('Fudge’s Ambassador — on the Ice Cream treat · Jellybean’s land');
+  });
+
+  it('hops a piece over the spaces the engine listed for its move, and nowhere it did not say', () => {
+    const ring = (region: number, ringIndex: number) => ({ zone: 'ring', region, ringIndex });
+    const listed = {
+      move_id: 'm', description: '', move: { type: 'play_intel', unit: 'knight' },
+      landing: { piece: 'knight', from: ring(1, 4), to: { zone: 'road', region: 1, roadIndex: 0 }, path: [ring(1, 5), { zone: 'road', region: 1, roadIndex: 0 }] },
+    };
+    expect(hopTiles(listed as never, 'knight')).toEqual(['r1-ring-5', 'r1-road-0']);
+    // Another piece, or a move with no landing, gets no path: it moves in one arc.
+    expect(hopTiles(listed as never, 'leader')).toEqual([]);
+    expect(hopTiles({ move_id: 'p', description: '', move: { type: 'pass' } } as never, 'knight')).toEqual([]);
+    expect(hopTiles(null, 'knight')).toEqual([]);
   });
 });

@@ -435,3 +435,15 @@ button.sl-piece { cursor: pointer; }
 .sl-howto-colors p { margin: 2px 0 0 !important; font-size: 12px; }
 .sl-howto-cap { display: block; height: 14px; margin: 0 -10px 8px; border-bottom: 2px solid var(--sl-choc); }
 .sl-howto-foot { text-align: center; margin: 0; }
+
+/* ======================================================================
+   Motion (build item 9). Pieces hop by script (motion.ts); cards fly by the
+   table's FLIP; the dice tumble here. Reduced motion keeps none of it.
+   ====================================================================== */
+.sl-discard { display: inline-flex; align-items: center; gap: 5px; }
+.sl-discard-top { width: 12px; height: 16px; border-radius: 2px; border: 1.5px solid var(--sl-choc); display: inline-block; }
+.sl-die.rolled { animation: zk-tumble var(--motion-tumble, 640ms) var(--motion-settle, ease-out) both; }
+.sl-mark { animation: sl-mark-in 160ms ease-out; }
+@keyframes sl-mark-in { from { opacity: 0; transform: scale(1.12); } }
+@media (prefers-reduced-motion: reduce) { .sl-die.rolled, .sl-mark { animation: none; } }
+.table-shell[data-motion="reduced"] :is(.sl-die.rolled, .sl-mark) { animation: none; }

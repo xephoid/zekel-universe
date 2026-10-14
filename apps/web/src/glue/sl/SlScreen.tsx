@@ -3,10 +3,10 @@
 // engine debug client's shape; this screen draws the same view its own way.
 // Every move it sends is one the engine listed.
 
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import type { SelectEvent } from '@universe/primitives';
-import type { GameScreenProps, LegalMove } from '../types';
+import { useReducedMotion, type SelectEvent } from '@universe/primitives';
+import type { GameScreenProps, GlueInput, LegalMove } from '../types';
 import { Board } from './Board';
 import { Piece, pieceTitle } from './Piece';
 import { Players } from './Players';
@@ -15,7 +15,9 @@ import { StepTracker, TurnPanel, readBattle } from './TurnPanel';
 import { ColorGuide } from './ColorGuide';
 import { FirstGame, howToPlaySeen, markHowToPlaySeen } from './FirstGame';
 import { cardChoices, turnStep, type PlayOption } from './turn';
-import { readTable, tileOf, UNITS, type SlTable } from './read';
+import { readTable, tileOf, UNITS, type SlCard, type SlTable } from './read';
+import { usePieceHops } from './motion';
+import { asArr, asStr, isObj } from '../types';
 import { sweetlandsGlue } from '../sweetlands-imperium';
 import './sl.css';
 
@@ -29,7 +31,7 @@ function piecesOn(table: SlTable, focus: string | null, onFocus: (id: string) =>
       const id = `${p.pid}:${u}`;
       (out[tile] ??= []).push(
         <Piece
-          key={id} player={p} unit={u} size={25} flipId={`sl:unit:${id}`}
+          key={id} player={p} unit={u} size={25} pieceId={id}
           title={pieceTitle(table, p, u)} focused={focus === id} onClick={() => onFocus(id)}
         />,
       );
@@ -60,6 +62,17 @@ function marksFor(options: PlayOption[], chosen: number | null, onChoose: (n: nu
   return out;
 }
 
+/** The card in this seat's hand that the move on screen played, read from the hand before it. */
+function justPlayed(input: GlueInput): SlCard | null {
+  const m = input.engineMove;
+  if (!m || input.actorPlayerId !== input.playerId) return null;
+  const ids = m['type'] === 'play_intel' ? [asStr(m['cardId'])] : m['type'] === 'discard_for_color' ? asArr(m['cardIds']).map((x) => asStr(x)) : [];
+  const before = isObj(input.previous) ? asArr(input.previous['your_hand']).filter(isObj) : [];
+  const c = before.find((x) => x['card_id'] === ids[ids.length - 1]);
+  if (!c) return null;
+  return { cardId: asStr(c['card_id']), kind: c['kind'] === 'double' ? 'double' : c['kind'] === 'treat' ? 'treat' : 'single', color: asStr(c['color']), treat: asStr(c['treat']) };
+}
+
 export function SlScreen(props: GameScreenProps) {
   const { input, yourTurn, busy, interactive, onMove, onForm, onDraw, menu, nameFor, sideSlot } = props;
   const table = useMemo(() => readTable(input), [input]);
@@ -79,6 +92,12 @@ export function SlScreen(props: GameScreenProps) {
   const [seenBattle, setSeenBattle] = useState<number>(() => battle?.id ?? 0);
   /** the How to play page: shown by itself before a seat's first Sweetlands game here */
   const [howTo, setHowTo] = useState(false);
+  const main = useRef<HTMLDivElement>(null);
+  usePieceHops(main, table, input, useReducedMotion());
+  // The card this seat last played, so it can fly onto the discard pile.
+  const lastPlayed = useRef<SlCard | null>(null);
+  const played = justPlayed(input);
+  if (played) lastPlayed.current = played;
   const seated = !!table?.me && interactive;
   useEffect(() => { if (seated && !howToPlaySeen()) setHowTo(true); }, [seated]);
 
@@ -126,7 +145,7 @@ export function SlScreen(props: GameScreenProps) {
   return (
     <div className={`sl-screen${sideSlot ? '' : ' with-right'}`}>
       <Players table={table} focus={focus} onFocus={onFocus} nameFor={nameFor} />
-      <div className="sl-main">
+      <div className="sl-main" ref={main}>
         <Board
           table={table} pieces={piecesOn(table, focus, onFocus)} lit={lit}
           marks={marksFor(choices.options, chosen, setChosen)}
@@ -134,7 +153,7 @@ export function SlScreen(props: GameScreenProps) {
         />
         {table.me && (
           <Hand
-            table={table} input={input} picked={picked?.startsWith('token:') ? null : picked} onPick={pick}
+            table={table} input={input} picked={picked?.startsWith('token:') ? null : picked} onPick={pick} discardTop={lastPlayed.current}
             pressable={pressable && step === 'play'}
             formFor={(m) => sweetlandsGlue.formFor!(m, input)} onForm={onForm}
           />

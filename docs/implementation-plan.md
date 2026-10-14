@@ -1380,6 +1380,15 @@ The design canvas is `docs/design/sweetlands-candy/`; what to build is
   in a browser, remembered in that browser's localStorage only: a convenience,
   so a cleared or private browser shows it again. Its goals, points, points
   to win and die faces are the engine's reference data.
+- **Motion** (build item 9). A piece hops space by space along the `landing`
+  path of the move this seat chose, turning at the crossroads when the path
+  does. Another seat's move, a capture sending a piece home and a treat card
+  are one lifted arc from where the piece was to where it is, because the
+  applied move the table receives does not carry its path; an engine field on
+  the applied move would let those hop too. Your played card flies onto the
+  discard pile; dealt cards fly from the deck; the dice tumble after Roll.
+  Other seats' played cards are not shown, since the view does not say which
+  card they played. Under reduced motion all of it becomes the table's fade.
 - **Still open:** the Quiche (Nomads) pieces, home and off-board pool; the
   phone; dark mode. And an engine defect the panel cannot fix: when Red can
   capture, the engine picks the target itself (zekel `choices.ts`,

@@ -63,6 +63,8 @@ function WrapperCard({ c, picked, playable, dim, disabled, onPick }: { c: SlCard
 
 interface HandProps {
   table: SlTable;
+  /** the card this seat last played: it flies from the hand onto the discard pile */
+  discardTop?: SlCard | null;
   input: GlueInput;
   picked: string | null;
   onPick(cardId: string | null): void;
@@ -78,7 +80,7 @@ function secretWords(input: GlueInput, id: string): { name: string; text: string
   return { name: words(id), text: isObj(def) ? asStr(def['description']) : '' };
 }
 
-export function Hand({ table, input, picked, onPick, pressable, formFor, onForm }: HandProps) {
+export function Hand({ table, input, picked, onPick, pressable, formFor, onForm, discardTop }: HandProps) {
   const hand = table.hand ?? [];
   const playing = table.step === 'play';
   // Step 4 comes after the card: the rest of the hand dims until your next turn.
@@ -102,7 +104,17 @@ export function Hand({ table, input, picked, onPick, pressable, formFor, onForm 
           </span>
         ))}
         <span className="sl-counts">
-          <span data-flip-id="sl:intel-deck">Deck {table.deckCount}</span> · <span data-flip-id="sl:intel-discard">Discard {table.discardCount}</span>
+          <span data-flip-id="sl:intel-deck">Deck {table.deckCount}</span> ·{' '}
+          <span className="sl-discard" data-flip-id="sl:intel-discard">
+            {discardTop && (
+              <span
+                key={discardTop.cardId} className="sl-discard-top" aria-hidden="true"
+                style={{ backgroundColor: discardTop.kind === 'treat' ? '#ffd6e6' : `var(--zekel-c-${discardTop.color})` }}
+                data-flip-id={`sl:discard-top:${discardTop.cardId}`} data-flip-from={`sl:card:${discardTop.cardId}`} data-flip-ghost=""
+              />
+            )}
+            Discard {table.discardCount}
+          </span>
         </span>
         {trades.length > 0 && (
           <button type="button" className="sl-quiet-btn" disabled={!pressable} onClick={() => setTrading(true)}>

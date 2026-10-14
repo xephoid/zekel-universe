@@ -40,22 +40,22 @@ interface PieceProps {
   size: number;
   title: string;
   focused?: boolean;
-  /** the board's pieces carry the FLIP id that slides them between spaces */
-  flipId?: string;
+  /** on the board: "pid:unit", which the hops (motion.ts) animate by */
+  pieceId?: string;
   onClick?: () => void;
 }
 
-export function Piece({ player, unit, size, title, focused, flipId, onClick }: PieceProps) {
+export function Piece({ player, unit, size, title, focused, pieceId, onClick }: PieceProps) {
   const cls = `sl-piece${focused ? ' focused' : ''}`;
   const art = player.faction
     ? <PieceArt faction={player.faction} unit={unit} size={size} />
     : <span className="sl-piece-plain" style={{ width: size, height: size }}>{UNIT_NAME[unit].charAt(0)}</span>;
   if (onClick) {
     return (
-      <button type="button" className={cls} style={{ width: size, height: size }} title={title} aria-label={title} aria-pressed={!!focused} data-flip-id={flipId} onClick={onClick}>
+      <button type="button" className={cls} style={{ width: size, height: size }} title={title} aria-label={title} aria-pressed={!!focused} data-piece={pieceId} onClick={onClick}>
         {art}
       </button>
     );
   }
-  return <span className={cls} style={{ width: size, height: size }} title={title} data-flip-id={flipId}>{art}</span>;
+  return <span className={cls} style={{ width: size, height: size }} title={title} data-piece={pieceId}>{art}</span>;
 }
