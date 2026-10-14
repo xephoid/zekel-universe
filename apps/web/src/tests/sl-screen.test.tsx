@@ -166,3 +166,107 @@ describe('the hand', () => {
     expect(screen.getByText('Defeat a knight in battle.')).toBeTruthy();
   });
 });
+
+
+describe('the turn panel', () => {
+  const ring = (region: number, ringIndex: number) => ({ zone: 'ring', region, ringIndex });
+  const knightLanding = { piece: 'knight', from: ring(2, 3), to: ring(2, 6), path: [ring(2, 4), ring(2, 5), ring(2, 6)] };
+  const roadLanding = { piece: 'knight', from: ring(2, 3), to: { zone: 'road', region: 2, roadIndex: 0 }, path: [ring(2, 4), ring(2, 5), { zone: 'road', region: 2, roadIndex: 0 }] };
+  const PLAY: LegalMove[] = [
+    { move_id: 'k-act', description: 'Play red: move knight around ring and take the red action.', move: { type: 'play_intel', cardId: 'c1', unit: 'knight', viaRoad: false, takeAction: true }, landing: knightLanding },
+    { move_id: 'k-move', description: 'Play red: move knight around ring only (no action).', move: { type: 'play_intel', cardId: 'c1', unit: 'knight', viaRoad: false, takeAction: false }, landing: knightLanding },
+    { move_id: 'k-road', description: 'Play red: move knight via road and take the red action.', move: { type: 'play_intel', cardId: 'c1', unit: 'knight', viaRoad: true, takeAction: true }, landing: roadLanding },
+    { move_id: 'k-road-move', description: 'Play red: move knight via road only (no action).', move: { type: 'play_intel', cardId: 'c1', unit: 'knight', viaRoad: true, takeAction: false }, landing: roadLanding },
+    { move_id: 'pass', description: 'Pass your turn to gain 1 influence.', move: { type: 'pass' } },
+  ] as LegalMove[];
+  const panel = () => screen.getByRole('region', { name: 'What to do now' });
+
+  it('starts at "Play one card", with Pass as a choice the player presses', () => {
+    const props = slProps({ legalMoves: PLAY });
+    render(<SlScreen {...props} />);
+    expect(within(panel()).getByRole('heading', { name: 'Play one card' })).toBeTruthy();
+    expect(screen.getByLabelText('Your turn has four steps').querySelector('[aria-current="step"]')!.textContent).toContain('Play a card');
+    fireEvent.click(within(panel()).getByRole('button', { name: 'Pass instead (+1 influence, ends turn)' }));
+    expect(props.onMove).toHaveBeenCalledWith(PLAY[4]);
+  });
+
+  it('numbers one option per piece per destination, ring and road apart, outlined where the engine says it lands', () => {
+    const props = slProps({ legalMoves: PLAY });
+    render(<SlScreen {...props} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Red card: Battle' }));
+    const options = within(panel()).getAllByRole('button').filter((b) => b.classList.contains('sl-option'));
+    expect(options.map((b) => b.querySelector('b')!.textContent)).toEqual([
+      'Knight → the red space in Fudge’s land',
+      'Knight → the red road space in Fudge’s land',
+    ]);
+    // The sentence is the engine's own description.
+    expect(options[0]!.textContent).toContain('Play red: move knight around ring and take the red action.');
+    // The outlines sit on the engine's landing tiles, with the same numbers.
+    expect(document.querySelector('[data-tile="r2-ring-5"] .sl-mark-n')).toBeNull();
+    expect(document.querySelector('[data-tile="r2-ring-6"] .sl-mark-n')!.textContent).toBe('1');
+    expect(document.querySelector('[data-tile="r2-road-0"] .sl-mark-n')!.textContent).toBe('2');
+    expect(props.onMove).not.toHaveBeenCalled();
+    // Choosing on the board: only that outline stays, and the panel asks act or just move.
+    fireEvent.click(screen.getByRole('button', { name: /^Option 2:/ }));
+    expect(document.querySelectorAll('.sl-mark')).toHaveLength(1);
+    expect(document.querySelector('.sl-mark.chosen')).toBeTruthy();
+    fireEvent.click(within(panel()).getByRole('button', { name: 'Just move' }));
+    expect(props.onMove).toHaveBeenCalledWith(PLAY[3]);
+  });
+
+  it('asks for Roll before a foe battle: blank dice first, and the engine rolls only on the press', () => {
+    const foe = { ...PLAY[0]!, description: 'Play red: move knight and take the red action. The server rolls your sugar cubes against the foe when you press this.' } as LegalMove;
+    const props = slProps({ legalMoves: [foe, PLAY[1]!] });
+    render(<SlScreen {...props} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Red card: Battle' }));
+    fireEvent.click(within(panel()).getAllByRole('button').find((b) => b.classList.contains('sl-option'))!);
+    fireEvent.click(within(panel()).getByRole('button', { name: 'Move and battle' }));
+    expect(props.onMove).not.toHaveBeenCalled();
+    expect(panel().querySelectorAll('.sl-die.blank')).toHaveLength(4 + 3); // your 4 sugar cubes, the orc's 3
+    fireEvent.click(within(panel()).getByRole('button', { name: 'Roll' }));
+    expect(props.onMove).toHaveBeenCalledWith(foe);
+  });
+
+  it('shows a battle’s dice from the engine’s record once it is new, until Continue', () => {
+    const { rerender } = render(<SlScreen {...slProps({ legalMoves: [] }, { yourTurn: false })} />);
+    expect(screen.queryByRole('heading', { name: 'Battle!' })).toBeNull();
+    const view = { ...SL_SCREEN_VIEW, last_battle: { id: 1, round: 4, kind: 'knight', attacker: { player_id: 'p1', faces: [3, 0, 2, 1], total: 6 }, defender: { player_id: 'p2', foe: null, faces: [1, 0, 0], total: 1 }, winner: 'attacker' } };
+    rerender(<SlScreen {...slProps({ view, legalMoves: [] }, { yourTurn: false })} />);
+    expect(within(panel()).getByRole('heading', { name: 'Battle!' })).toBeTruthy();
+    expect([...panel().querySelectorAll('.sl-die.rolled')].map((d) => d.textContent)).toEqual(['3', '0', '2', '1', '1', '0', '0']);
+    expect(within(panel()).getByText('Your Knight wins.')).toBeTruthy();
+    fireEvent.click(within(panel()).getByRole('button', { name: 'Continue' }));
+    expect(screen.queryByRole('heading', { name: 'Battle!' })).toBeNull();
+  });
+
+  it('gives Recall, Draw and Influence the same panel, each choice in the engine’s words', () => {
+    const recall: LegalMove[] = [
+      { move_id: 'r0', description: 'Skip recall (gain Intel, then play).', move: { type: 'recall', units: [] } },
+      { move_id: 'r1', description: 'Recall your knight to start, then gain Intel.', move: { type: 'recall', units: ['knight'] } },
+    ];
+    const props = slProps({ view: { ...SL_SCREEN_VIEW, your_turn_step: 'recall' }, legalMoves: recall });
+    const first = render(<SlScreen {...props} />);
+    expect(within(panel()).getByRole('heading', { name: 'Recall' })).toBeTruthy();
+    fireEvent.click(within(panel()).getByRole('button', { name: 'Recall your knight to start, then gain Intel.' }));
+    expect(props.onMove).toHaveBeenCalledWith(recall[1]);
+    first.unmount();
+
+    const onDraw = vi.fn();
+    const draw = slProps({ legalMoves: [{ move_id: 'd', description: 'Draw 2 Intel card(s) (the server deals them when you press this).', move: { type: 'resolve_report' } }] }, { onDraw });
+    const second = render(<SlScreen {...draw} />);
+    fireEvent.click(within(panel()).getByRole('button', { name: 'Draw' }));
+    expect(onDraw).toHaveBeenCalledTimes(1);
+    expect(draw.onMove).not.toHaveBeenCalled();
+    second.unmount();
+
+    const spend: LegalMove[] = [
+      { move_id: 'b', description: 'Buy a red Intel token (1 influence).', move: { type: 'buy_intel_token', color: 'red' } },
+      { move_id: 'e', description: 'End your turn.', move: { type: 'end_turn' } },
+    ];
+    const inf = slProps({ view: { ...SL_SCREEN_VIEW, your_turn_step: 'influence' }, legalMoves: spend });
+    render(<SlScreen {...inf} />);
+    expect(within(panel()).getByRole('heading', { name: 'Spend influence' })).toBeTruthy();
+    fireEvent.click(within(panel()).getByRole('button', { name: 'End turn' }));
+    expect(inf.onMove).toHaveBeenCalledWith(spend[1]);
+  });
+});

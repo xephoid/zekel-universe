@@ -1,10 +1,11 @@
 // M4: Sweetlands Imperium against one AI, from setup through the first
-// play. Every setup choice is the player's: the faction form starts empty,
-// the foe is a tap on the lit castle and a pick in the chooser, the secret
-// objective is a menu row, and the Intel comes from the Draw button. Then a
-// card tap opens the chooser with the engine's own move descriptions, and
-// the pick is what goes to the engine. The board carries the treat art and
-// the faction portraits.
+// play, on the candy table (docs/design/sweetlands-candy). Every setup choice
+// is the player's: the faction form starts empty, the secret goal is a button
+// in the turn panel, and the Intel comes from the Draw button. Then a picked
+// card lists one numbered option per piece and destination, each in the
+// engine's own words and outlined where the engine says the piece lands, and
+// only the button the player presses goes to the engine. The board carries the
+// treat art and the faction portraits.
 // Needs the full stack (engine + server on BASE_URL).
 
 import { test, expect, type Page } from '@playwright/test';
@@ -17,7 +18,7 @@ async function menuRow(page: Page, pattern: RegExp) {
   await row.click();
 }
 
-test('Sweetlands: the player makes every setup choice, draws with the button, and plays a card through the chooser', async ({ page }) => {
+test('Sweetlands: the player makes every setup choice, draws with the button, and plays a card through the turn panel', async ({ page }) => {
   await page.goto('/games/sweetlands-imperium/setup');
   await expect(page.getByRole('heading', { name: 'Set up the table' })).toBeVisible();
   await expect(page.getByRole('group', { name: 'Seat 2', exact: true })).toBeVisible();
@@ -36,14 +37,14 @@ test('Sweetlands: the player makes every setup choice, draws with the button, an
   await expect(page).toHaveURL(/\/table\//, { timeout: 20_000 });
   await expect(page.locator('.turn-pill')).toHaveText(/^Your move/, { timeout: 30_000 });
 
-  // The board: 80 spaces, 4 starts and the castle, with the treat art in
-  // place, the factions seated and the foe in the castle.
-  await expect(page.locator('.zk-map-node')).toHaveCount(85);
-  await expect(page.locator('.zk-map-art')).toHaveCount(8);
-  await expect(page.locator('.zk-portrait')).toHaveCount(2);
-  await expect(page.locator('.zk-map-badges').filter({ hasText: 'Orc' })).toHaveCount(1);
-  await expect(page.locator('.zk-tableau').filter({ hasText: 'Grand Vizier Cheesecake (you)' })).toHaveCount(1);
-  await expect(page.locator('.zk-tableau').filter({ hasText: 'Princess Jellybean' })).toHaveCount(1);
+  // The board: 80 spaces and 4 homes, the castle with the orc's three sugar
+  // cubes, the treat art in place, both factions seated.
+  await expect(page.locator('.sl-board [data-tile]')).toHaveCount(85);
+  await expect(page.locator('.sl-plate-art')).toHaveCount(8);
+  await expect(page.locator('img.sl-portrait')).toHaveCount(2);
+  await expect(page.getByLabel('Castle foe: rolls 3 sugar cubes')).toBeVisible();
+  await expect(page.getByRole('region', { name: 'You, Grand Vizier Cheesecake' })).toBeVisible();
+  await expect(page.locator('.sl-player-full').filter({ hasText: 'Princess Jellybean' })).toHaveCount(1);
 
   // 2. Two seats cannot share a faction: the setup screen says so before the
   //    engine would. (On a second setup page, so this table is untouched.)
@@ -56,49 +57,43 @@ test('Sweetlands: the player makes every setup choice, draws with the button, an
   await expect(other.getByRole('alert')).toContainText('same faction');
   await other.close();
 
-  // 3. The secret objective: a menu row; the kept card shows in the bench.
-  await expect(page.locator('.round-note')).toHaveText('Setup · Secrets');
-  await menuRow(page, /Keep secret objective/);
+  const now = page.getByRole('region', { name: 'What to do now' });
+  const lastLog = () => page.locator('.log li').first().textContent();
+
+  // 3. The secret goal: a button in the turn panel; the kept goal shows under the hand.
+  await expect(now.getByRole('heading', { name: 'Keep one secret goal' })).toBeVisible();
+  await now.locator('.sl-quiet-choice').first().click();
   await expect(page.locator('.log li').first()).toContainText('kept a secret objective', { timeout: 20_000 });
-  await expect(page.locator('[data-flip-id="sl:secrets"] .zk-card').first()).toBeVisible();
+  await expect(page.locator('.sl-secret').first()).toBeVisible();
 
   // 4. The starting hand comes from the Draw button, not by itself.
-  await expect(page.locator('.round-note')).toHaveText('Setup · Intel');
-  await expect(page.locator('[data-flip-id="sl:hand"] .zk-card')).toHaveCount(0);
-  const draw = page.getByRole('button', { name: 'Draw', exact: true });
-  await expect(draw).toBeVisible();
-  await draw.click();
-  await expect(page.locator('[data-flip-id="sl:hand"] .zk-card')).toHaveCount(3, { timeout: 30_000 });
+  await expect(now.getByRole('heading', { name: 'Draw your Intel' })).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator('.sl-card')).toHaveCount(0);
+  await now.getByRole('button', { name: 'Draw', exact: true }).click();
+  await expect(page.locator('.sl-card')).toHaveCount(3, { timeout: 30_000 });
 
-  // 5. Play: the recall step first (the home start tile lights up), then the
-  //    turn's Intel gain (Draw), then a card whose tap opens the chooser.
-  await expect(page.locator('.turn-pill')).toHaveText(/^Your move/, { timeout: 30_000 });
+  // 5. Play: skip the recall, draw the turn's Intel, then pick a card.
   for (let i = 0; i < 6; i++) {
-    const note = await page.locator('.round-note').textContent();
-    const before = await page.locator('.log li').first().textContent();
-    if (/Recall/i.test(note ?? '')) {
-      await page.locator('.zk-map-blob.zk-lit').first().click();
-      await page.getByRole('dialog', { name: 'Which move?' }).getByRole('button', { name: /Skip recall/ }).click();
-    } else if (await page.getByRole('button', { name: 'Draw', exact: true }).isVisible()) {
-      await page.getByRole('button', { name: 'Draw', exact: true }).click();
-    } else if (/Play/i.test(note ?? '')) {
-      break;
-    }
-    // The reply plays back before the next step shows; wait for it.
+    const title = (await now.locator('h2').first().textContent({ timeout: 30_000 })) ?? '';
+    if (/Play one card/.test(title)) break;
+    const before = await lastLog();
+    if (/^Recall/.test(title)) await now.getByRole('button', { name: /Skip recall/ }).click();
+    else if (/Draw your Intel/.test(title)) await now.getByRole('button', { name: 'Draw', exact: true }).click();
+    else { await page.waitForTimeout(1000); continue; }
     await expect(page.locator('.log li').first()).not.toHaveText(before ?? '', { timeout: 30_000 });
-    await expect(page.locator('.turn-pill')).toHaveText(/^Your move/, { timeout: 30_000 });
   }
-  await expect(page.locator('.round-note')).toContainText('Play');
-  const card = page.locator('[data-flip-id="sl:hand"] .zk-card.zk-lit').first();
-  await expect(card).toBeVisible();
-  const before = await page.locator('.log li').first().textContent();
+  await expect(now.getByRole('heading', { name: 'Play one card' })).toBeVisible({ timeout: 30_000 });
+  const card = page.locator('.sl-card.playable').first();
   await card.click();
-  const moves = page.getByRole('dialog', { name: 'Which move?' });
-  await expect(moves).toBeVisible();
-  const rows = moves.locator('.chooser button');
-  expect(await rows.count()).toBeGreaterThan(1);
-  await expect(rows.first()).toContainText(/^(Play|Use)/);
-  await rows.first().click();
+  await expect(card).toHaveAttribute('aria-pressed', 'true');
+  const options = now.locator('.sl-option');
+  expect(await options.count()).toBeGreaterThan(0);
+  await expect(options.first()).toContainText(/(Play|Use) /);
+  // Each option's number is outlined on the board where the engine says it lands.
+  expect(await page.locator('.sl-mark-n').count()).toBeGreaterThan(0);
+  await options.first().click();
+  await expect(page.locator('.sl-mark.chosen')).toHaveCount(1);
+  const before = await lastLog();
+  await now.locator('.sl-main-btn').first().click();
   await expect(page.locator('.log li').first()).not.toHaveText(before ?? '', { timeout: 30_000 });
-  await expect(moves).toBeHidden();
 });

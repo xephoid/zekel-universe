@@ -28,6 +28,12 @@ export interface BoardProps {
   onTile?: (tileId: string) => void;
 }
 
+/** A land inside a sentence: "your land", "Fudge’s land". */
+export function landWords(table: SlTable, r: Region): string {
+  return table.me?.homeRegion === r ? 'your land' : `${FACTION_LOOK[REGION_HOME[r]].short}’s land`;
+}
+
+/** A land on its own, as a label: "Your land (Milkshake)", "Fudge’s land". */
 export function landName(table: SlTable, r: Region): string {
   const home = FACTION_LOOK[REGION_HOME[r]].short;
   return table.me?.homeRegion === r ? `Your land (${home})` : `${home}’s land`;

@@ -73,7 +73,7 @@ describe('the candy board', () => {
     const t = readTable({ view, previous: null, legalMoves: [], unavailable: [], playerId: 'p1', reference: null, seq: 1, engineMove: null, actorPlayerId: null, memory: new Map() } as unknown as GlueInput)!;
     const [me, fudge] = t.players;
     expect(pieceTitle(t, fudge!, 'knight')).toBe('Fudge’s Knight — red space · Fudge’s land');
-    expect(pieceTitle(t, me!, 'knight')).toBe('Your Knight — yellow road space · Your land (Milkshake)');
+    expect(pieceTitle(t, me!, 'knight')).toBe('Your Knight — yellow road space · your land');
     expect(pieceTitle(t, me!, 'leader')).toBe('Your Leader — at home (start tile)');
     expect(pieceTitle(t, fudge!, 'ambassador')).toBe('Fudge’s Ambassador — on the Ice Cream treat · Jellybean’s land');
   });

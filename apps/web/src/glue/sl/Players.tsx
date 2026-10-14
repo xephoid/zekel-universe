@@ -5,7 +5,8 @@
 
 import type { UnitKey } from './art';
 import { Piece, pieceTitle, placeWords } from './Piece';
-import { landName } from './Board';
+import { landWords } from './Board';
+import { cap } from './colors';
 import { TILE_BY_ID } from './geometry';
 import { FACTION_LOOK, LAND_EDGE, REGION_TREAT, UNITS, UNIT_NAME, tileOf, treatName, type SlPlayer, type SlTable, type UnitLocation } from './read';
 
@@ -25,7 +26,7 @@ function shortPlace(table: SlTable, loc: UnitLocation | null): { color: string |
   if (!t) return { color: null, words: 'off the board' };
   if (loc.zone === 'start') return { color: null, words: 'at home' };
   if (loc.zone === 'treat') return { color: null, words: `${treatName(loc.slotKind === 'random' ? table.randomTreat[t.region] : REGION_TREAT[t.region])} treat` };
-  const land = landName(table, t.region);
+  const land = cap(landWords(table, t.region));
   return { color: t.space?.color ?? null, words: loc.zone === 'road' ? `road · ${land}` : land };
 }
 

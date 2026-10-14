@@ -5,7 +5,7 @@
 // plain dark disc with the piece's initial.
 
 import { PieceArt } from './art';
-import { landName } from './Board';
+import { landWords } from './Board';
 import { TILE_BY_ID } from './geometry';
 import { FACTION_LOOK, REGION_TREAT, UNIT_NAME, tileOf, treatName, type SlPlayer, type SlTable, type UnitLocation } from './read';
 import type { UnitKey } from './art';
@@ -19,7 +19,7 @@ export function placeWords(table: SlTable, loc: UnitLocation | null): string {
   if (tile === 'castle') return 'in the Candy Castle';
   const t = TILE_BY_ID[tile];
   if (!t) return 'off the board';
-  const land = landName(table, t.region);
+  const land = landWords(table, t.region);
   if (loc.zone === 'start') return table.me?.homeRegion === t.region ? 'at home (start tile)' : `at home (start tile) · ${land}`;
   if (loc.zone === 'treat') {
     const treat = loc.slotKind === 'random' ? table.randomTreat[t.region] : REGION_TREAT[t.region];

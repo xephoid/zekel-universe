@@ -1341,3 +1341,40 @@ the same call Fractured Fist's arcade theme made (§17).
   fit the board. The table tells a screen whether a seat is the AI
   (`GameScreenProps.seatKind`).
 
+
+## 19. Sweetlands Imperium's candy theme (decided 2026-10-13)
+
+The design canvas is `docs/design/sweetlands-candy/`; what to build is
+`docs/games/sweetlands-candy-theme-build.md`.
+
+- **The theme is the table's own.** `themeFor` returns `sl-theme` and
+  `glue/sl/sl.css` scopes every rule under it. Sniglet is self-hosted. The
+  wordmark keeps its green and its orange meeple.
+- **DECIDED: a game-drawn screen.** The candy table's columns (players, board
+  and hand, the turn panel) do not fit the bench layout, so `SlScreen` draws
+  them, as Fractured Fist and Adventurer Olympics do. The board is drawn by
+  hand on the printed 14 × 11 grid (`glue/sl/Board.tsx`); every piece carries
+  a FLIP id, so moves are still the table's motion. The turn panel and the
+  color guide sit in the side column, above the log; with the side column
+  hidden they take a third column of the screen.
+- **`plan()` stays** in the primitives' shape for the title, the status line,
+  the watch page and the table-page tests. Its other seats, taxes and points
+  ride on its board list, since the table draws a plan's side zones even
+  beside a screen.
+- **What the engine now publishes for the candy table** (zekel branch
+  `claude/sweetlands-landing`, not yet merged): every listed play that moves a
+  piece carries `landing` (`piece`, `from`, `to`, the `path` it passes, and
+  both `stops` of a double card), the public view carries `last_battle` with
+  each die's face, and the reference data carries `influence_cap`. The turn
+  panel's numbered outlines, the battle dice and "N/5 influence" read these
+  and show nothing in their place when they are absent; Universe never works
+  a destination or a roll out for itself.
+- **Battles.** A foe battle (the engine's description says the server rolls)
+  asks for Roll with blank dice first; the Roll button sends the move. A
+  knight battle starts with the action's own button, since the engine does
+  not say beforehand whether one will happen. Either way the dice shown are
+  the engine's, after the press.
+- **Still open:** the Quiche (Nomads) pieces, home and off-board pool; the
+  phone; dark mode. And an engine defect the panel cannot fix: when Red can
+  capture, the engine picks the target itself (zekel `choices.ts`,
+  "capture-target"), so the player is not asked which piece to take.

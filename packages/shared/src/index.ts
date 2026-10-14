@@ -252,6 +252,13 @@ export interface LegalMove {
    * cost out of `description` or works one out for itself.
    */
   cost?: string;
+  /**
+   * Where taking this move puts a piece, for a game whose moves move pieces:
+   * `{ piece, from, to, path, stops? }` in the game's own location shape. The
+   * engine supplies it; Universe outlines the destination and slides the piece
+   * along the path from it, and never works movement out for itself.
+   */
+  landing?: { piece: string; from: unknown; to: unknown; path: unknown[]; stops?: unknown[] };
 }
 
 export interface MoveMenuEntry {
