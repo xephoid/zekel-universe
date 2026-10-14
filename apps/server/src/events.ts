@@ -45,6 +45,12 @@ export interface EventRow {
  * Turn a stored event into what one seat may see. Payloads never cross:
  * the wire event carries the receiving seat's entry only, and nothing else
  * from the payload map. A null seat (nobody) gets no view at all.
+ *
+ * The raw engine move goes only to the seat that made it. A move can carry
+ * a choice the engine keeps secret from the other players (Neither Guts nor
+ * Gears' spy or battle card), so every other seat, and every seat for an AI
+ * move, gets null and reads what happened from the summary, the log and its
+ * own view.
  */
 export function toWireEvent(event: EventRow, seatPosition: number | null): TableEventWire {
   const payload = seatPosition === null ? undefined : event.payloads[String(seatPosition)];
@@ -53,7 +59,7 @@ export function toWireEvent(event: EventRow, seatPosition: number | null): Table
     kind: event.kind,
     actorSeatPosition: event.actorSeatPosition,
     summary: event.summary,
-    engineMove: event.engineMove,
+    engineMove: seatPosition !== null && event.actorSeatPosition === seatPosition ? event.engineMove : null,
     view: payload?.view ?? null,
     legalMoves: payload?.legalMoves ?? [],
     unavailable: payload?.unavailable ?? [],

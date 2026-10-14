@@ -25,7 +25,7 @@ export interface GlueInput {
   reference: GameReferenceResponse | null;
   /** the sequence number of the event on screen; the same view is planned many times */
   seq: number;
-  /** the move that produced this view, when known */
+  /** the move that produced this view, when this seat made it; null otherwise */
   engineMove: Record<string, unknown> | null;
   /** the engine player id of the seat that made the move, when known */
   actorPlayerId: string | null;

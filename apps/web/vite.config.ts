@@ -21,8 +21,10 @@ const target = `http://127.0.0.1:${serverPort}`;
 export default defineConfig({
   plugins: [react()],
   server: {
+    host: true, // bind all interfaces so the ngrok tunnel (universe-zekel.ngrok.app) can reach it
     port: 5173,
     strictPort: true,
+    allowedHosts: (process.env.VITE_ALLOWED_HOSTS ?? 'zekel.ngrok.app,universe-zekel.ngrok.app').split(',').map((h) => h.trim()).filter(Boolean),
     proxy: {
       '/api': target,
       '/socket.io': { target, ws: true },
