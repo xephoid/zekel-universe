@@ -5,7 +5,8 @@ table. The design is in
 [`docs/design/sweetlands-candy/`](../design/sweetlands-candy/README.md); read
 its README first. Rules, spaces and counts come only from
 [`sweetlands-imperium.md`](sweetlands-imperium.md), with the engine over the
-rulebook. Nothing is built yet.
+rulebook. Built 2026-10-13, items 1 to 9; the decisions taken while
+building are in `docs/implementation-plan.md` §19.
 
 Today the table is drawn by `apps/web/src/glue/sweetlands-imperium.ts` and
 `apps/web/src/glue/sweetlands-board.ts` on the shared primitives: the board is
