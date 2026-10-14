@@ -185,6 +185,68 @@ describe('socket privacy', () => {
     expect(evA.log[0]).toMatchObject({ headline: 'p1 passed', subject: 'p1', subjectHeadline: 'You passed' });
   });
 
+  it("a seat's raw move reaches only that seat, live and on replay (SEC-07-F21)", async () => {
+    const tableId = await twoHumanTable(userA, userB);
+    const sockA = client('user-a');
+    const sockB = client('user-b');
+    await Promise.all([connected(sockA), connected(sockB)]);
+    await Promise.all([join(sockA, tableId), join(sockB, tableId)]);
+    await new Promise((r) => setTimeout(r, 50)); // drain the opening replay
+
+    // Seat 0's move carries a hidden choice, as Neither Guts nor Gears' spy does.
+    const gotA = waitEvent(sockA, 'table_event');
+    const gotB = waitEvent(sockB, 'table_event');
+    const secretMove = { type: 'pass', hero: 'marker-of-seat-0' };
+    const ack = await new Promise<MoveAck>((r) => sockA.emit('move', { tableId, seat: 0, move: secretMove }, r));
+    expect(ack).toMatchObject({ ok: true });
+    const [evA, evB] = await Promise.all([gotA, gotB]);
+    expect(evA.engineMove).toEqual(secretMove);
+    expect(evB.engineMove).toBeNull();
+    expect(evB.summary).toBe(evA.summary);
+    expect(JSON.stringify(evB)).not.toContain('marker-of-seat-0');
+
+    // The REST replay keeps the same line.
+    const replay = async (userId: string) => (await universe.fastify.inject({
+      method: 'GET', url: `/api/tables/${tableId}/events`, headers: { cookie: `universe_auth=${tokens[userId]}` },
+    })).json() as { events: TableEventWire[] };
+    const restA = await replay('user-a');
+    const restB = await replay('user-b');
+    expect(restA.events.some((e) => e.engineMove?.['hero'] === 'marker-of-seat-0')).toBe(true);
+    expect(JSON.stringify(restB)).not.toContain('marker-of-seat-0');
+
+    // So does the socket replay a reconnecting browser gets.
+    const late = client('user-b');
+    await connected(late);
+    const replayed: TableEventWire[] = [];
+    late.on('table_event', (e: TableEventWire) => replayed.push(e));
+    await join(late, tableId);
+    await new Promise((r) => setTimeout(r, 50));
+    expect(replayed.length).toBeGreaterThan(1);
+    expect(JSON.stringify(replayed)).not.toContain('marker-of-seat-0');
+  });
+
+  it("an AI's raw move reaches no human seat (SEC-07-F21)", async () => {
+    fake.aiMoveFields = { card: 'marker-of-the-ai' };
+    const { tableId } = await universe.tableService.createTable(userA, {
+      gameId: 'fractured-fist', mode: 'live', seatSpecs: [{ kind: 'human' }, { kind: 'ai' }], hostPosition: 0,
+    });
+    const sockA = client('user-a');
+    await connected(sockA);
+    await join(sockA, tableId);
+    await new Promise((r) => setTimeout(r, 50));
+    const received: TableEventWire[] = [];
+    sockA.on('table_event', (e: TableEventWire) => received.push(e));
+    expect(await move(sockA, tableId, 0)).toMatchObject({ ok: true });
+    await new Promise((r) => setTimeout(r, 100));
+    expect(received.some((e) => e.kind === 'ai_move')).toBe(true);
+    expect(JSON.stringify(received)).not.toContain('marker-of-the-ai');
+    const rest = (await universe.fastify.inject({
+      method: 'GET', url: `/api/tables/${tableId}/events`, headers: { cookie: `universe_auth=${tokens['user-a']}` },
+    })).json() as { events: TableEventWire[] };
+    expect(rest.events.some((e) => e.kind === 'ai_move')).toBe(true);
+    expect(JSON.stringify(rest)).not.toContain('marker-of-the-ai');
+  });
+
   it('one socket at two tables never receives a view for a seat it does not own', async () => {
     // At table 1, A owns seat 1 (B hosts). At table 2, A owns seat 0.
     const table1 = await twoHumanTable(userB, userA);
