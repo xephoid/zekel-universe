@@ -174,10 +174,22 @@ button.sl-tile { cursor: pointer; }
 
 /* ---------- pieces on a tile: two to a row, centred ---------- */
 .sl-tile-pieces { position: relative; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; width: 50px; flex: none; }
-.sl-token {
-  width: 18px; height: 18px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--sl-choc);
-  color: #fff; font: 700 10px/14px var(--font-body); text-align: center; text-shadow: 0 0 2px #000;
+/* A piece: its treat shape; focused, a raspberry ring and a slow pulse. */
+.sl-piece {
+  position: relative; flex: none; display: inline-flex; align-items: center; justify-content: center;
+  padding: 0; border: 0; background: transparent; border-radius: 50%; color: inherit;
 }
+button.sl-piece { cursor: pointer; }
+.sl-piece-art { display: block; overflow: visible; }
+.sl-piece.focused { outline: 3px solid var(--sl-rasp); outline-offset: 2px; animation: sl-pulse 1.2s ease-in-out infinite; z-index: 3; }
+.sl-piece:focus-visible { outline: 3px solid var(--sl-rasp); outline-offset: 2px; }
+.sl-piece-plain {
+  display: inline-flex; align-items: center; justify-content: center; border-radius: 50%;
+  background: #2c2c2c; color: #fff; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--sl-choc);
+  font: 700 10px/1 var(--font-body);
+}
+@keyframes sl-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+@media (prefers-reduced-motion: reduce) { .sl-piece.focused { animation: none; } }
 
 /* ---------- the castle: one place across four squares ---------- */
 .sl-castle {

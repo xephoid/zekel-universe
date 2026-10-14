@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { CASTLE_POS, SPACES } from '../glue/sweetlands-board';
 import { COLS, LAND, ROAD_ARROW, ROWS, TILES, landEdges } from '../glue/sl/geometry';
 import { readTable, tileOf } from '../glue/sl/read';
+import { pieceTitle } from '../glue/sl/Piece';
 import type { GlueInput } from '../glue/types';
 
 describe('the candy board', () => {
@@ -58,5 +59,22 @@ describe('the candy board', () => {
     expect(readTable({ ...base, reference: null })!.foe).toEqual({ type: 'orc', dice: null, defeated: false });
     const reference = { gameId: 'sweetlands-imperium', rules: '', moveSchema: {}, optionsSchema: {}, referenceData: { foes: [{ type: 'orc', dice: 3 }] } };
     expect(readTable({ ...base, reference } as GlueInput)!.foe!.dice).toBe(3);
+  });
+
+  it('names a piece by owner, piece and place in its tooltip', () => {
+    const player = (pid: string, faction: string, home: number, knight: unknown) => ({
+      player_id: pid, faction, faction_name: faction, home_region: home, kind: 'human',
+      unit_locations: { leader: { zone: 'start', region: home }, knight, ambassador: { zone: 'treat', region: 3, slotKind: 'random' } },
+    });
+    const view = {
+      game_id: 'sweetlands-imperium', phase: 'play', taxes: {}, random_treat_placement: { 3: 'ice_cream' },
+      players: [player('p1', 'milkshake', 1, { zone: 'road', region: 1, roadIndex: 2 }), player('p2', 'fudge', 2, { zone: 'ring', region: 2, ringIndex: 6 })],
+    };
+    const t = readTable({ view, previous: null, legalMoves: [], unavailable: [], playerId: 'p1', reference: null, seq: 1, engineMove: null, actorPlayerId: null, memory: new Map() } as unknown as GlueInput)!;
+    const [me, fudge] = t.players;
+    expect(pieceTitle(t, fudge!, 'knight')).toBe('Fudge’s Knight — red space · Fudge’s land');
+    expect(pieceTitle(t, me!, 'knight')).toBe('Your Knight — yellow road space · Your land (Milkshake)');
+    expect(pieceTitle(t, me!, 'leader')).toBe('Your Leader — at home (start tile)');
+    expect(pieceTitle(t, fudge!, 'ambassador')).toBe('Fudge’s Ambassador — on the Ice Cream treat · Jellybean’s land');
   });
 });
