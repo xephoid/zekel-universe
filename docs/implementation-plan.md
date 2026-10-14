@@ -1361,8 +1361,8 @@ The design canvas is `docs/design/sweetlands-candy/`; what to build is
   the watch page and the table-page tests. Its other seats, taxes and points
   ride on its board list, since the table draws a plan's side zones even
   beside a screen.
-- **What the engine now publishes for the candy table** (zekel branch
-  `claude/sweetlands-landing`, not yet merged): every listed play that moves a
+- **What the engine now publishes for the candy table** (zekel #131, merged
+  2026-10-14): every listed play that moves a
   piece carries `landing` (`piece`, `from`, `to`, the `path` it passes, and
   both `stops` of a double card), the public view carries `last_battle` with
   each die's face, and the reference data carries `influence_cap`. The turn
