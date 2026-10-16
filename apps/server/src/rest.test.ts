@@ -72,6 +72,8 @@ describe('REST', () => {
     const ff = games.games[0]!;
     expect(ff.designerName).toBe('Zekel Games');
     expect(ff.minPlayers).toBe(2);
+    expect(ff.coverImage).toBe('/art/covers/fractured-fist.webp');
+    expect(games.games[1]!.coverImage).toBeNull();
     const one = (await app.fastify.inject({ method: 'GET', url: '/api/games/fractured-fist' })).json<GameResponse>();
     expect(one.game.name).toBe('Fractured Fist');
     expect((await app.fastify.inject({ method: 'GET', url: '/api/games/nope' })).statusCode).toBe(404);

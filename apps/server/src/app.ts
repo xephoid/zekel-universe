@@ -626,7 +626,7 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
       if (existing) {
         await db.updateTable('games').set({
           ...shared,
-          ...(own ? { designer_name: designerName, description: own.description, play_time: own.playTime, tags: JSON.stringify(own.tags) } : {}),
+          ...(own ? { designer_name: designerName, description: own.description, play_time: own.playTime, tags: JSON.stringify(own.tags), cover_image: own.coverImage } : {}),
         }).where('engine_game_id', '=', g.game_id).execute();
       } else {
         await db.insertInto('games').values({
@@ -635,7 +635,7 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
           designer_name: designerName,
           play_time: own?.playTime ?? '',
           tags: JSON.stringify(own?.tags ?? []),
-          cover_image: null,
+          cover_image: own?.coverImage ?? null,
           description: own?.description ?? g.description ?? '',
           rules_url: null,
           visibility: 'public',

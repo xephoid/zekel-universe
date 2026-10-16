@@ -1,7 +1,7 @@
 // Storefront content the catalog does not get from the engine: the
 // designer of record, the copy written for players (the engine's own
 // descriptions are written for the agent that runs a physical table), and
-// the designer's updates, which show as the devlog on a game page and as
+// the square cover art served by the web app, the designer's updates, which show as the devlog on a game page and as
 // the feed on the home page. All of it is Zekel Games' own; a designer
 // dashboard that edits it is later work (the brief leaves it a place in the
 // navigation and nothing more).
@@ -20,42 +20,48 @@ export const DESIGNERS: Record<string, Designer> = {
   },
 };
 
-export const ZEKEL_GAMES: Record<string, { designer: string; description: string; playTime: string; tags: string[] }> = {
+export const ZEKEL_GAMES: Record<string, { designer: string; description: string; playTime: string; tags: string[]; coverImage: string }> = {
   'fractured-fist': {
     designer: 'zekel-games',
     description: "A two-player card fight. Start with a small, weak deck, buy better techniques as you go, and knock your opponent's stamina from 7 to 0. Ten to twenty rounds.",
     playTime: '10–20 min',
     tags: ['deck-building', 'duel', 'two players'],
+    coverImage: '/art/covers/fractured-fist.webp',
   },
   'cybernoir-2127': {
     designer: 'zekel-games',
     description: 'A two-player detective duel in a neon city: the Detective chases leads across nineteen locations while the Hacker hides the truth.',
     playTime: '30–45 min',
     tags: ['deduction', 'duel', 'two players'],
+    coverImage: '/art/covers/cybernoir-2127.webp',
   },
   'warble-way-galaxy': {
     designer: 'zekel-games',
     description: 'A solo space adventure: build a character, gather a crew, travel the galaxy, and chase one of five season endings.',
     playTime: '45–90 min',
     tags: ['solo', 'adventure', 'dice'],
+    coverImage: '/art/covers/warble-way-galaxy.webp',
   },
   'neither-guts-nor-gears': {
     designer: 'zekel-games',
     description: 'Wizards and robots for two to six players on a hex map: collect five resources, build, research, fight in secret-card battles, hold treaties, and win by military, culture, economy or technology.',
     playTime: '90–150 min',
     tags: ['strategy', 'area control', 'hex map'],
+    coverImage: '/art/covers/neither-guts-nor-gears.webp',
   },
   'adventurer-olympics': {
     designer: 'zekel-games',
     description: 'An exploration race for two to four players: walk a map of hex tiles that grows as you explore, recruit companions, fight monsters, delve into dungeons, and claim the most quests before the last tile is placed.',
     playTime: '30–45 min',
     tags: ['exploration', 'hex map', 'dice'],
+    coverImage: '/art/covers/adventurer-olympics.webp',
   },
   'sweetlands-imperium': {
     designer: 'zekel-games',
     description: 'Area control for two to five players on an 80-space candy kingdom: move your leader, knight and ambassador, play Intel, and hold the castle.',
     playTime: '45–75 min',
     tags: ['area control', 'strategy'],
+    coverImage: '/art/covers/sweetlands-imperium.webp',
   },
 };
 
