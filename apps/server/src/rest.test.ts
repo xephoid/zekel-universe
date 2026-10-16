@@ -118,6 +118,7 @@ describe('REST', () => {
     const mine = (await app.fastify.inject({ method: 'GET', url: '/api/my-tables', headers: { cookie } })).json<MyTablesResponse>();
     expect(mine.tables.map((t) => t.id)).toEqual([tableId]);
     expect(mine.tables[0]!.waitingOnMe).toBe(true);
+    expect(mine.tables[0]!.gameCoverImage).toBe('/art/covers/fractured-fist.webp');
   });
 
   it('a guest cannot host a friends table but a signed-in user can', async () => {

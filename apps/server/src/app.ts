@@ -779,12 +779,13 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
   }
 
   async function tableSummary(table: TableRecord, seats: SeatRecord[], p: Principal): Promise<TableSummary> {
-    const game = await db.selectFrom('games').select('name').where('engine_game_id', '=', table.gameId).executeTakeFirst();
+    const game = await db.selectFrom('games').select(['name', 'cover_image']).where('engine_game_id', '=', table.gameId).executeTakeFirst();
     const next = table.nextActorPosition === null ? null : seats.find((s) => s.position === table.nextActorPosition);
     return {
       id: table.id,
       gameId: table.gameId,
       gameName: game?.name ?? table.gameId,
+      gameCoverImage: game?.cover_image ?? null,
       mode: table.mode,
       status: table.status,
       createdAt: table.createdAt,

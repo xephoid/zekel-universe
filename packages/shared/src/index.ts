@@ -175,6 +175,8 @@ export interface TableSummary {
   id: string;
   gameId: string;
   gameName: string;
+  /** the game's catalog cover, for the table's tile */
+  gameCoverImage: string | null;
   mode: TableMode;
   status: TableStatus;
   createdAt: string;
