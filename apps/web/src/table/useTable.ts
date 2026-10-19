@@ -38,6 +38,9 @@ export interface TableApi {
   reference: GameReferenceResponse | null;
   mySeat: number | null;
   playback: PlaybackApi;
+  /** the table's past before this page started showing it, for the log:
+   *  summaries and log lines only (no views) */
+  history: TableEventWire[];
   connected: boolean;
   error: string | null;
   refreshTable: () => Promise<void>;
@@ -53,6 +56,7 @@ export function useTable(tableId: string, enabled: boolean): TableApi {
   const [mySeat, setMySeat] = useState<number | null>(null);
   const [connected, setConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [history, setHistory] = useState<TableEventWire[]>([]);
   const connRef = useRef<TableConnection | null>(null);
 
   const refreshTable = useCallback(async () => {
@@ -84,17 +88,34 @@ export function useTable(tableId: string, enabled: boolean): TableApi {
     let cancelled = false;
     let conn: TableConnection | null = null;
     (async () => {
+      // The playback starts at one event, and the log reads the table's
+      // past from its history: without it, a reload showed only the lines
+      // of the last move.
       const saved = loadSaved(tableId);
+      let past: TableEventWire[] = [];
+      try {
+        past = (await api.tableHistory(tableId)).events;
+      } catch (e) {
+        if (!saved) {
+          if (!cancelled) setError(e instanceof ApiRequestError ? e.message : (e as Error).message);
+          return;
+        }
+      }
+      if (cancelled) return;
+      setHistory(past);
       if (saved) {
         playback.seed(saved.event);
       } else {
-        try {
-          const { events } = await api.tableEvents(tableId, 0);
-          const last = events[events.length - 1];
-          if (last && !cancelled) playback.seed(last);
-        } catch (e) {
-          if (!cancelled) setError(e instanceof ApiRequestError ? e.message : (e as Error).message);
-          return;
+        const lastSeq = past[past.length - 1]?.seq;
+        if (lastSeq !== undefined) {
+          try {
+            const { events } = await api.tableEvents(tableId, lastSeq - 1);
+            const last = events[events.length - 1];
+            if (last && !cancelled) playback.seed(last);
+          } catch (e) {
+            if (!cancelled) setError(e instanceof ApiRequestError ? e.message : (e as Error).message);
+            return;
+          }
         }
       }
       if (cancelled) return;
@@ -133,6 +154,7 @@ export function useTable(tableId: string, enabled: boolean): TableApi {
     reference,
     mySeat,
     playback,
+    history,
     connected,
     error,
     refreshTable,

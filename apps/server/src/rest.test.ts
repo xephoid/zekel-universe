@@ -109,9 +109,18 @@ describe('REST', () => {
     expect(events.events[0]!.view).toMatchObject({ player: 'p1' });
     expect(events.events[0]!.legalMoves.length).toBeGreaterThan(0);
 
-    // Someone else cannot read the feed.
+    // The history for the log: the same events, without views or moves.
+    const history = (await app.fastify.inject({ method: 'GET', url: `/api/tables/${tableId}/events?after=0&history=1`, headers: { cookie } })).json<TableEventsResponse>();
+    expect(history.events.map((e) => e.seq)).toEqual(events.events.map((e) => e.seq));
+    expect(history.events[0]!.summary).toBe(events.events[0]!.summary);
+    expect(history.events[0]!.view).toBeNull();
+    expect(history.events[0]!.legalMoves).toEqual([]);
+    expect(history.events[0]!.briefing).toBeNull();
+
+    // Someone else cannot read the feed, or its history.
     const other = await guest();
     expect((await app.fastify.inject({ method: 'GET', url: `/api/tables/${tableId}/events`, headers: { cookie: other } })).statusCode).toBe(403);
+    expect((await app.fastify.inject({ method: 'GET', url: `/api/tables/${tableId}/events?history=1`, headers: { cookie: other } })).statusCode).toBe(403);
 
     const mine = (await app.fastify.inject({ method: 'GET', url: '/api/my-tables', headers: { cookie } })).json<MyTablesResponse>();
     expect(mine.tables.map((t) => t.id)).toEqual([tableId]);

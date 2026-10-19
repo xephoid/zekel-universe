@@ -24,7 +24,7 @@ import type { Mailer } from './email.js';
 import type { EngineService } from './engine.js';
 import { isHostOf, TableError, TableService, type SeatRecord, type TableRecord } from './tables/service.js';
 import { Realtime, MoveError } from './realtime.js';
-import { ownsSeat, toWireEvent } from './events.js';
+import { historyEvent, ownsSeat, toWireEvent } from './events.js';
 import { originAllowed } from './sockets.js';
 
 export const AUTH_COOKIE = 'universe_auth';
@@ -885,13 +885,16 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
   app.get('/api/tables/:id/events', async (req): Promise<TableEventsResponse> => {
     const p = await requirePrincipal(req);
     const { id } = req.params as { id: string };
-    const { after } = req.query as { after?: string };
+    const { after, history } = req.query as { after?: string; history?: string };
     const table = await tableService.getTable(id);
     if (!table) throw new HttpError(404, 'no_table');
     const mine = (await tableService.getSeats(id)).filter((s) => ownsSeat(s, p));
     if (mine.length === 0) throw new HttpError(403, 'not_seated', 'Only players at this table can read it');
     const seatPosition = mine[0]!.position;
     const events = await realtime.eventsAfter(id, Number(after ?? 0) || 0);
+    // ?history=1: the table's past for its log, without each seat's view,
+    // moves and briefing (a long game's views would be megabytes).
+    if (history === '1') return { events: events.map((e) => historyEvent(toWireEvent(e, seatPosition))) };
     return { events: events.map((e) => toWireEvent(e, seatPosition)) };
   });
 

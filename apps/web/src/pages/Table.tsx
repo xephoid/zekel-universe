@@ -66,6 +66,11 @@ export function TablePage() {
   const { playback, table } = t;
   const state = playback.state;
   const current = state.current;
+  // The log: the table's past before this page started, then what it played.
+  const logEvents = useMemo(() => {
+    const first = state.applied[0]?.seq ?? Infinity;
+    return [...t.history.filter((e) => e.seq < first), ...state.applied];
+  }, [t.history, state.applied]);
 
   const [notice, setNotice] = useState<Notice | null>(null);
   const [lessons, setLessons] = useState<Lesson[]>([]);
@@ -435,7 +440,7 @@ export function TablePage() {
               {plan?.side.map((z) => <ZoneRenderer key={z.id} zone={z} lit={lit} onSelect={onSelect} />)}
               {plan?.points && <ZoneRenderer zone={plan.points} lit={lit} onSelect={onSelect} />}
               {result === null && captionInSide && captionCard}
-              <Log events={state.applied} currentSeq={current?.seq ?? null} me={myPlayerId} />
+              <Log events={logEvents} currentSeq={current?.seq ?? null} me={myPlayerId} />
             </>
           )}
         </div>
@@ -502,7 +507,7 @@ export function TablePage() {
               {captionCard}
             </section>
           )}
-          <Log events={state.applied} currentSeq={current?.seq ?? null} me={myPlayerId} />
+          <Log events={logEvents} currentSeq={current?.seq ?? null} me={myPlayerId} />
           <Link className="chip-btn leave menu-leave" to="/">Leave the table</Link>
         </Sheet>
       )}
