@@ -41,7 +41,7 @@ function Numbers({ p, need }: { p: NggPlayer; need: number | null }) {
       {p.species === 'robot'
         ? (
           <>
-            <span className="ngg-number"><i>CORES FITTED</i><b>{cores.used}</b></span>
+            <span className="ngg-number" title="In platforms and in collectors"><i>CORES FITTED</i><b>{cores.used}</b></span>
             <span className="ngg-number"><i>CORES SPARE</i><b>{cores.free}</b></span>
             <span className="ngg-number" title="Collectors owned, against the Economic victory's count"><i>COLLECTORS</i><b>{econ ? econ.owned : '—'}{of}</b></span>
           </>
@@ -285,8 +285,8 @@ export function FactionBoard({ ctx, player }: { ctx: ScreenCtx; player: NggPlaye
         : (
           <Panel title="Core bay">
             <div className="ngg-core-bay">
-              <span><i>FITTED</i><b>{player.units.filter((u) => u.core === 'allocated').length}</b></span>
-              <span className="hl"><i>SPARE</i><b>{player.coresReserve}</b></span>
+              <span title="In platforms and in collectors"><i>FITTED</i><b>{coresOf(player).used}</b></span>
+              <span className="hl"><i>SPARE</i><b>{coresOf(player).free}</b></span>
               <span className="dashed"><i>UNPURCHASED</i><b>{player.coresSupply}</b></span>
             </div>
           </Panel>
