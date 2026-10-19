@@ -126,6 +126,17 @@ describe('NGnG screen', () => {
     expect(onMove).not.toHaveBeenCalled();
     cleanup();
   });
+  it("shows a map unit's DEF now, from the engine, beside the printed DEF when research changed it", () => {
+    const f = FIXTURES.find((x) => x.name === 'map-metal-platforms')!.f;
+    const ref = (REFERENCE as { referenceData: { robot_units: Array<{ name: string; def: number | null }> } }).referenceData;
+    const printed = ref.robot_units.find((u) => u.name === 'Spinner Platform')!.def!;
+    const r = render(<NggScreen input={inputFor(f.view, f.viewer, f.legalMoves)} yourTurn={false} busy={false} interactive onMove={vi.fn()} onForm={vi.fn()} nameFor={(p) => p} />);
+    const piece = [...r.container.querySelectorAll<HTMLButtonElement>('button.ngg-piece-btn')].find((b) => b.querySelector('[title]')?.getAttribute('title')?.startsWith('Spinner Platform'))!;
+    expect(piece.querySelector('[title]')!.getAttribute('title')).toContain(`DEF ${printed + 1} (printed ${printed})`);
+    fireEvent.click(piece);
+    expect(r.getByRole('dialog', { name: /^Pieces at / }).textContent).toContain(`printed ${printed}, raised by research`);
+    cleanup();
+  });
   it("shows a seat its own planned cards and a rival's only as a face-down count", () => {
     const f = FIXTURES.find((x) => x.name === 'phase-planning')!.f;
     const view = f.view as { players: Array<Record<string, unknown>>; your_action_cards_played?: unknown };
