@@ -119,7 +119,7 @@ function purchasesOf(ctx: ScreenCtx, buys: Buys | null): Purchase[] {
       out.set(name, p);
     } else if (t === 'research' && m.move['kind'] === 'tech') {
       const name = String(m.move['tech'] ?? '');
-      const r = researchByName(ctx.ref, name);
+      const r = researchByName(ctx.ref, name, ctx.mine?.species);
       out.set(name, { key: name, label: name, kind: 'tech', cost: r?.cost ?? null, either: r?.either, text: r?.effect ?? null, moves: [m], shut: null });
     } else if (t === 'research' && m.move['kind'] === 'battle_card') {
       out.set('battle_card', { key: 'battle_card', label: 'Draw a battle card', kind: 'battle_card', cost: ctx.ref?.battleCardPurchase?.cost ?? null, either: ctx.ref?.battleCardPurchase?.either, text: null, moves: [m], shut: null });
@@ -149,7 +149,7 @@ function purchasesOf(ctx: ScreenCtx, buys: Buys | null): Purchase[] {
         continue;
       }
       if (out.has(u.item)) continue;
-      const r = researchByName(ctx.ref, u.item);
+      const r = researchByName(ctx.ref, u.item, ctx.mine?.species);
       shut.push({ key: `shut:${u.item}`, label: u.item, kind: 'tech', cost: r?.cost ?? null, either: r?.either, text: r?.effect ?? null, moves: [], shut: reason });
     }
   }
@@ -634,7 +634,7 @@ function SmythScreen({ ctx }: { ctx: ScreenCtx }) {
       <div className="ngg-options">
         {techs.map((m, i) => {
           const name = String(m.move['tech'] ?? '');
-          const r = researchByName(ctx.ref, name);
+          const r = researchByName(ctx.ref, name, ctx.mine?.species);
           return (
             <OptionRow key={i} disabled={!ctx.live} onPress={() => ctx.send(m)}
               mark={<Icon name={name} size={20} stroke={1.8} />}
