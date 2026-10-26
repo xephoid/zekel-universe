@@ -4,7 +4,7 @@
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import type { GlueInput, LegalMove } from '../glue';
+import type { GlueInput, LegalMove } from '@universe/glue-kit';
 import { FfScreen } from '../glue/ff/FfScreen';
 import { FF_MOVES, FF_REFERENCE, FF_VIEW } from './fixtures/ff';
 

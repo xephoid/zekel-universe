@@ -7,7 +7,7 @@
 //   - no prose is parsed, with one stated exception: an older engine's
 //     `active_action` sentence (see activeActionOf).
 
-import { asArr, asBool, asNum, asStr, isObj } from '../types';
+import { asArr, asBool, asNum, asStr, isObj } from '@universe/glue-kit';
 
 export type Species = 'wizard' | 'robot';
 export type CardKind = 'build' | 'research' | 'move_battle';

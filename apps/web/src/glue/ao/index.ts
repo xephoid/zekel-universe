@@ -20,9 +20,9 @@ import type { GameReferenceResponse } from '@universe/shared';
 import type {
   FormField, GlueInput, GlueModule, LegalMove, MoveForm, PlanPrompt, PromptAction, SelectEvent,
   SetupAnswers, SetupField, SetupSeat, TablePlan, Zone,
-} from '../types';
-import { asArr, asNum, asStr, isObj, shapeHas } from '../types';
-import { answerText } from '../forms';
+} from '@universe/glue-kit';
+import { asArr, asNum, asStr, isObj, shapeHas } from '@universe/glue-kit';
+import { answerText } from '@universe/glue-kit';
 import { iconUrl } from './icons';
 import './ao.css';
 import { AoScreen } from './AoScreen';

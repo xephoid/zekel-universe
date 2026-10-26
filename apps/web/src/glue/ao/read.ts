@@ -5,8 +5,8 @@
 // redrawn at (q + r, -q): a change of drawing axes, not a rule.
 
 import type { CardData, MapNode } from '@universe/primitives';
-import type { GlueInput, LegalMove } from '../types';
-import { asArr, asNum, asStr, isObj } from '../types';
+import type { GlueInput, LegalMove } from '@universe/glue-kit';
+import { asArr, asNum, asStr, isObj } from '@universe/glue-kit';
 import { iconUrl } from './icons';
 
 export const GAME = 'adventurer-olympics';

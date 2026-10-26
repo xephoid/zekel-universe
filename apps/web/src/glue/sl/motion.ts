@@ -7,7 +7,7 @@
 // there, and this only animates the getting there.
 
 import { useLayoutEffect, useRef, type RefObject } from 'react';
-import type { GlueInput, LegalMove } from '../types';
+import type { GlueInput, LegalMove } from '@universe/glue-kit';
 import { landingOf } from './turn';
 import { tileOf, UNITS, type SlTable } from './read';
 

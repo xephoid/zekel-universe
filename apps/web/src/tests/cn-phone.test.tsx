@@ -7,7 +7,8 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { Map as MapPart } from '@universe/primitives';
 import type { CardZoneData, MapData, SelectEvent } from '@universe/primitives';
 import type { GameReferenceResponse } from '@universe/shared';
-import { GLUES, type GlueInput, type TablePlan } from '../glue';
+import { GLUES } from '../glue';
+import type { GlueInput, TablePlan } from '@universe/glue-kit';
 import { CardUpClose, findCard } from '../table/parts';
 
 afterEach(cleanup);

@@ -16,9 +16,26 @@
 
 import { useEffect, useState } from 'react';
 import { motionMs } from '@universe/tokens';
-import type { Moment, StrikeLane } from '../glue';
-import { type Pace } from '../playback/PlaybackQueue';
-import { PaceControl } from './parts';
+import type { Moment, MomentProps } from '@universe/glue-kit';
+import { PaceControl } from '@universe/table-parts';
+
+/** One hit of a strike: what was queued, what was in the way, what the
+ *  engine says got through, and the target's meter before and after. */
+export interface StrikeLane {
+  /** engine player ids; the table names them from the seats */
+  attacker: string;
+  target: string;
+  hit: number;
+  shield: number;
+  /** read from the engine's result, never computed here */
+  through: number;
+  before: number;
+  after: number;
+  max: number;
+}
+
+/** The strike as the table's moment: both hits, and whether it ended the fight. */
+export interface StrikeMoment extends Moment { kind: 'strike'; lanes: StrikeLane[] }
 
 /** Beat lengths at 1×, in the motion tokens. */
 export const STRIKE_BEATS = {
@@ -45,16 +62,10 @@ function absorbedOf(l: StrikeLane): number {
   return Math.max(0, Math.min(l.shield, l.hit - l.through));
 }
 
-export function StrikeOverlay({ moment, nameFor, youPid, pace, setPace, onDone, reduced }: {
-  moment: Moment;
-  nameFor: (pid: string) => string;
-  youPid: string | null;
-  pace: Pace;
-  setPace: (p: Pace) => void;
-  /** the beats are done (or skipped): let the event land */
-  onDone: () => void;
-  reduced: boolean;
-}) {
+/** The table draws this over the board whenever momentFor found a strike
+ *  (GlueModule.Moment); the moment it gets is always the strike's own. */
+export function StrikeOverlay({ moment: m, nameFor, youPid, pace, setPace, onDone, reduced }: MomentProps) {
+  const moment = m as StrikeMoment;
   const [beat, setBeat] = useState<Beat>(0);
   const [skipped, setSkipped] = useState(false);
 

@@ -10,8 +10,10 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@universe/glue-kit": "workspace:*",
     "@universe/primitives": "workspace:*",
     "@universe/shared": "workspace:*",
+    "@universe/table-parts": "workspace:*",
     "@universe/tokens": "workspace:*",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

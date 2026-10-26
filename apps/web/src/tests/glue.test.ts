@@ -6,13 +6,14 @@ import { describe, expect, it } from 'vitest';
 import type { GameReferenceResponse } from '@universe/shared';
 import type { CardData, CardZoneData, MapData, PoolData, TableauData, TrackData } from '@universe/primitives';
 import { GLUES } from '../glue';
-import type { GlueInput, LegalMove, TablePlan, Zone } from '../glue';
+import type { GlueInput, LegalMove, TablePlan, Zone } from '@universe/glue-kit';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { formForMove, isSubmissionAllowed, movesForSelect, templateForm } from '../glue';
+import { formForMove, isSubmissionAllowed, movesForSelect, templateForm } from '@universe/glue-kit';
 import { SPACES, JUNCTION_ROADS, TREATS, CASTLE_POS } from '../glue/sweetlands-board';
 import { fightOf } from '../glue/ff/read';
+import type { StrikeMoment } from '../glue/ff/StrikeMoment';
 import { FF_MOVES, FF_REFERENCE, FF_VIEW } from './fixtures/ff';
 
 function input(view: unknown, legalMoves: GlueInput['legalMoves'] = [], extra: Partial<GlueInput> = {}): GlueInput {
@@ -231,7 +232,7 @@ describe('fractured-fist glue', () => {
   it('reads the strike from the views before and after the round ended, never from arithmetic of its own', () => {
     const before = { ...FF_VIEW, players: { ...FF_VIEW.players, p1: { ...FF_VIEW.players.p1, damage_queued: 2, defense_queued: 0 }, p2: { ...FF_VIEW.players.p2, damage_queued: 3, defense_queued: 1, stamina: 6 } } };
     const after = { ...FF_VIEW, round: 3, players: { ...FF_VIEW.players, p1: { ...FF_VIEW.players.p1, stamina: 3, damage_queued: 0, played: [] }, p2: { ...FF_VIEW.players.p2, stamina: 5, damage_queued: 0, defense_queued: 0 } } };
-    const m = g.momentFor!({ before, after, summary: 'End of round 2. Strike: p1 dealt 1, p2 dealt 3.', engineMove: { type: 'end_turn' }, playerId: 'p1', reference: FF_REFERENCE })!;
+    const m = g.momentFor!({ before, after, summary: 'End of round 2. Strike: p1 dealt 1, p2 dealt 3.', engineMove: { type: 'end_turn' }, playerId: 'p1', reference: FF_REFERENCE })! as StrikeMoment;
     expect(m.kind).toBe('strike');
     expect(m.title).toBe('Round 2 · strike');
     expect(m.over).toBe(false);

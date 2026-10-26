@@ -5,10 +5,10 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
-import type { Moment } from '../glue';
-import { STRIKE_BEATS, StrikeOverlay } from '../table/StrikeMoment';
+import type { StrikeMoment } from '../glue/ff/StrikeMoment';
+import { STRIKE_BEATS, StrikeOverlay } from '../glue/ff/StrikeMoment';
 
-const MOMENT: Moment = {
+const MOMENT: StrikeMoment = {
   kind: 'strike', key: 'strike:3', title: 'Round 3 · strike', over: false,
   lanes: [
     // You hit them for 3 into 1 defense; the engine took 2 off.
@@ -18,7 +18,7 @@ const MOMENT: Moment = {
   ],
 };
 
-function play(moment: Moment, opts: { pace?: 0.5 | 1 | 2; reduced?: boolean } = {}) {
+function play(moment: StrikeMoment, opts: { pace?: 0.5 | 1 | 2; reduced?: boolean } = {}) {
   const onDone = vi.fn();
   const r = render(
     <StrikeOverlay moment={moment} nameFor={(pid) => (pid === 'p2' ? 'AI' : pid)} youPid="p1" pace={opts.pace ?? 1} setPace={vi.fn()} onDone={onDone} reduced={opts.reduced ?? false} />,

@@ -4,7 +4,7 @@
 
 import type { ReactNode } from 'react';
 import type { UnavailableMove } from '@universe/shared';
-import type { GameScreenProps, LegalMove } from '../types';
+import type { GameScreenProps, LegalMove } from '@universe/glue-kit';
 import { labelOf, moveType, playerOf, withViewer, type NggPlayer, type NggView } from './read';
 import { readRef, type NggRef } from './ref';
 import type { Route } from './route';

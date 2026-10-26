@@ -10,9 +10,12 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import type { GameReferenceResponse, LegalMove, UnavailableMove } from '@universe/shared';
 import { FlipRoot, paletteVars } from '@universe/primitives';
-import type { GlueInput } from '../glue';
-import { adventurerOlympicsGlue as glue } from '../glue/ao';
-import { AoScreen } from '../glue/ao/AoScreen';
+import type { GlueInput } from '@universe/glue-kit';
+import { adventurerOlympicsGlue as glue } from '../glue';
+
+// The game's own screen, through its glue module: the dev page reaches the
+// game the same way the table does.
+const AoScreen = glue.Screen!;
 
 interface Fixture {
   key: string; viewer: string; view: unknown; legalMoves: LegalMove[]; unavailable?: UnavailableMove[];

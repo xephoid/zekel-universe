@@ -3,7 +3,7 @@
 // from the deck; a tap on the third of three identical cards moves the third.
 
 import { describe, expect, it } from 'vitest';
-import { trackIdentities } from '../glue/identity';
+import { trackIdentities } from './identity';
 
 const SOURCES = { hand: 'deck', discard: 'supply' };
 

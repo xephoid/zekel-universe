@@ -7,8 +7,8 @@
 
 import type { CardData, MapNode, TableauData } from '@universe/primitives';
 import type { GameReferenceResponse } from '@universe/shared';
-import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, PlanPrompt, PromptAction, SelectEvent, SetupField, TablePlan, Zone, SetupAnswers, SetupSeat } from './types';
-import { asArr, asNum, asStr, isObj, shapeHas, words } from './types';
+import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, PlanPrompt, PromptAction, SelectEvent, SetupField, TablePlan, Zone, SetupAnswers, SetupSeat } from '@universe/glue-kit';
+import { asArr, asNum, asStr, isObj, shapeHas, words } from '@universe/glue-kit';
 import { BOROUGH_COLUMNS, LINE_CODES, LINES, STATIONS, columnOf, pct } from './cn/metro';
 import { faceUrl, markUrl } from './cn/faces';
 import './cn/cn.css';

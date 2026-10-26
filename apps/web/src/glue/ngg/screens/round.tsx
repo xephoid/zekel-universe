@@ -14,9 +14,9 @@
 //   - text is state, printed card or rules text, or a short how-to line.
 
 import { useCallback, useState, type ComponentType, type ReactNode } from 'react';
-import type { LegalMove } from '../../types';
-import { isObj } from '../../types';
-import { movesEqual } from '../../agency';
+import type { LegalMove } from '@universe/glue-kit';
+import { isObj } from '@universe/glue-kit';
+import { movesEqual } from '@universe/glue-kit';
 import type { ScreenCtx } from '../ctx';
 import type { ScreenKey } from '../route';
 import type { MapMarks } from '../HexMap';

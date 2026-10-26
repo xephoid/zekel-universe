@@ -15,9 +15,9 @@
 
 import type { CardData, MapNode, TableauData } from '@universe/primitives';
 import type { GameReferenceResponse } from '@universe/shared';
-import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, SelectEvent, SetupAnswers, SetupField, SetupSeat, TablePlan, Zone } from './types';
-import { asArr, asNum, asStr, isObj, shapeHas, words } from './types';
-import { answerList, answerText } from './forms';
+import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, SelectEvent, SetupAnswers, SetupField, SetupSeat, TablePlan, Zone } from '@universe/glue-kit';
+import { asArr, asNum, asStr, isObj, shapeHas, words } from '@universe/glue-kit';
+import { answerList, answerText } from '@universe/glue-kit';
 import { SPACES, REGION_FACTION, SPACE_COLORS, TREATS, BOARD } from './sweetlands-board';
 import { SlScreen } from './sl/SlScreen';
 

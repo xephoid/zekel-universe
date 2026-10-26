@@ -21,9 +21,9 @@
 
 import type { CardData } from '@universe/primitives';
 import type { GameReferenceResponse } from '@universe/shared';
-import type { GlueInput, LegalMove, PlanPrompt, PlanStep, PromptAction, SelectEvent, Zone } from '../types';
-import { asArr, asNum, asStr, isObj, shapeHas, words } from '../types';
-import { trackIdentities, type IdentityState } from '../identity';
+import type { GlueInput, LegalMove, PlanPrompt, PlanStep, PromptAction, SelectEvent, Zone } from '@universe/glue-kit';
+import { asArr, asNum, asStr, isObj, shapeHas, words } from '@universe/glue-kit';
+import { trackIdentities, type IdentityState } from '@universe/glue-kit';
 
 /**
  * Card colors from the print-and-play sheet. The corner is the card's kind:

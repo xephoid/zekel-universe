@@ -76,6 +76,9 @@ packages/
   engine-client/ typed wrapper over the engine's tools; the only MCP code
   shared/        types shared by server and web (tables, seats, events, views)
   primitives/    the eight board primitives as React components
+  glue-kit/      the rules a game's drawing code follows (the glue module
+                 interface, the table plan, agency, forms, card identity)
+  table-parts/   the table furniture a game may draw (sheet, move form, pace)
   tokens/        design tokens as CSS variables and TypeScript
 infra/
   docker-compose.yml   engine + server + web + postgres, one command
@@ -90,7 +93,26 @@ never sees either.
 
 **apps/web.** React with Vite. Routes for home, game page, table setup, lobby,
 table, profile, sign-in. The table route hosts a game glue module that maps
-the seat's view onto primitives.
+the seat's view onto primitives. The games' glue sits under `src/glue/<game>`
+behind a wall the test `glue-boundary.test.ts` keeps: a glue imports only
+from its own folder, the workspace packages and React, and the rest of the
+app reaches a game only through the list in `glue/index.ts`. The games are
+moving to their own packages in the public zekel-games repository, one
+`@zekel/<game>` package per game with the rules and the drawing code as two
+halves that never import each other.
+
+**packages/glue-kit.** What every glue is written against: `GlueModule`,
+`GlueInput`, `TablePlan`, the setup fields, the agency rules (`submitMove`
+and the five triggers), template forms, card identity across views, and the
+zone renderer. A glue with a moment (Fractured Fist's strike) supplies its own
+overlay component; the kit holds only the moment's key, title and whether the
+game ended.
+
+**packages/table-parts.** The sheet (the table's one dialog), the move form
+sheet and the pace control: the furniture a game's own screen may draw. The
+rest of the table's furniture stays in `apps/web/src/table/parts.tsx`. The
+styles for these classes are still the web app's `app.css`; they move with
+the package when it is published.
 
 **packages/engine-client.** One class with one method per engine tool.
 Connects with the official MCP client SDK over streamable HTTP with the

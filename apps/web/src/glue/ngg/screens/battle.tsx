@@ -8,9 +8,9 @@
 // moves on every render, so a pick from an older state is never trusted.
 
 import { useState, type ComponentType, type ReactNode } from 'react';
-import type { LegalMove } from '../../types';
-import { asArr, asNum, asStr, isObj } from '../../types';
-import { movesEqual } from '../../agency';
+import type { LegalMove } from '@universe/glue-kit';
+import { asArr, asNum, asStr, isObj } from '@universe/glue-kit';
+import { movesEqual } from '@universe/glue-kit';
 import type { ScreenCtx } from '../ctx';
 import type { ScreenKey } from '../route';
 import type { NggBattleUnit, NggOption } from '../read';

@@ -4,8 +4,8 @@
 import { describe, expect, it, vi, afterEach } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import type { GameReferenceResponse, LegalMove, UnavailableMove } from '@universe/shared';
-import type { GlueInput } from '../glue';
-import { isSubmissionAllowed } from '../glue/agency';
+import type { GlueInput } from '@universe/glue-kit';
+import { isSubmissionAllowed } from '@universe/glue-kit';
 import { NggScreen } from '../glue/ngg/NggScreen';
 import REFERENCE from './fixtures/ngg-reference.json';
 // A pinned view: these tests name the items it offers (fixtures/ngg-pinned/README.md).

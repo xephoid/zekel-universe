@@ -8,9 +8,9 @@
 // the React hook in usePlaybackQueue.ts wraps it.
 
 import type { TableEventWire } from '@universe/shared';
+import { PACES, type Pace } from '@universe/glue-kit';
 
-export type Pace = 0.5 | 1 | 2;
-export const PACES: readonly Pace[] = [0.5, 1, 2];
+export { PACES, type Pace };
 
 /** Base dwell per event at 1×; slower on purpose: AI turns are a slideshow. */
 export const BASE_MS = 1600;

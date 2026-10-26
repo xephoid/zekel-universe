@@ -97,28 +97,44 @@ export interface PlanPrompt {
   urgent?: boolean;
 }
 
-/** One hit of a strike: what was queued, what was in the way, what the
- *  engine says got through, and the target's meter before and after. */
-export interface StrikeLane {
-  /** engine player ids; the table names them from the seats */
-  attacker: string;
-  target: string;
-  hit: number;
-  shield: number;
-  /** read from the engine's result, never computed here */
-  through: number;
-  before: number;
-  after: number;
-  max: number;
-}
+/** Playback pace: how fast the table replays moves and moments. */
+export type Pace = 0.5 | 1 | 2;
+export const PACES: readonly Pace[] = [0.5, 1, 2];
 
 /**
  * A scripted beat the table plays over the board before an event lands,
  * when the glue reads a resolution in the difference between the view on
- * screen and the one arriving. Nothing in it asks the player anything, so
- * it closes itself; pace, skip and replay are the playback queue's.
+ * screen and the one arriving (Fractured Fist's strike). Nothing in it asks
+ * the player anything, so it closes itself; pace, skip and replay are the
+ * playback queue's. Each game defines its own shape on top of these fields
+ * and draws it with its own component (GlueModule.Moment); the table only
+ * reads the key, the title and whether the game is over.
  */
-export type Moment = { kind: 'strike'; key: string; title: string; lanes: StrikeLane[]; over: boolean };
+export interface Moment {
+  /** which kind of beat this is, in the game's own words ("strike") */
+  kind: string;
+  /** one key per moment; a new key means a new moment */
+  key: string;
+  /** names the dialog, and the replay button ("Replay the strike") */
+  title: string;
+  /** the game ended with this moment */
+  over: boolean;
+}
+
+/** What the table hands a glue's moment component. */
+export interface MomentProps<M extends Moment = Moment> {
+  moment: M;
+  /** a seat's display name, from its engine player id */
+  nameFor: (pid: string) => string;
+  /** the viewing seat's engine player id */
+  youPid: string | null;
+  pace: Pace;
+  setPace: (p: Pace) => void;
+  /** the beats are done (or skipped): let the event land */
+  onDone: () => void;
+  /** the person asked for reduced motion */
+  reduced: boolean;
+}
 
 /** What a glue gets to decide whether an arriving event deserves a moment. */
 export interface MomentInput {
@@ -366,6 +382,9 @@ export interface GlueModule {
    * event lands, so the board still shows the state the moment resolves.
    */
   momentFor?(input: MomentInput): Moment | null;
+  /** Draws the moment momentFor returned, over the board. A glue with a
+   *  momentFor has one of these too; the table draws nothing of its own. */
+  Moment?: ComponentType<MomentProps>;
   /**
    * The game's own setup choices, from the engine's options schema and
    * reference data, for the seats as set up. Choices that belong to a friend

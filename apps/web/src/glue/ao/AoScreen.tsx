@@ -13,8 +13,8 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { CardZone, Map as MapPart, type CardData, type SelectEvent } from '@universe/primitives';
-import type { GameScreenProps, GlueInput, LegalMove } from '../types';
-import { asArr, asNum, asStr, isObj } from '../types';
+import type { GameScreenProps, GlueInput, LegalMove } from '@universe/glue-kit';
+import { asArr, asNum, asStr, isObj } from '@universe/glue-kit';
 import { iconUrl } from './icons';
 import {
   ADVENTURERS, COMPANION_ART, DECKS, DUNGEON_CARD, ICON, LAND, MONSTER_ART,

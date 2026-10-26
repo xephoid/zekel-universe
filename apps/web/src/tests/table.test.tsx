@@ -9,7 +9,7 @@ import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testi
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import type { MoveAck, TableEventWire } from '@universe/shared';
 import { useFakeSocket } from '../socket';
-import { submissionLog } from '../glue';
+import { submissionLog } from '@universe/glue-kit';
 import { SessionProvider } from '../session';
 import { TablePage } from '../pages/Table';
 import { ev } from './fixtures';

@@ -4,7 +4,7 @@
 // client evaluates; it is the text and numbers on the cards.
 
 import type { GameReferenceResponse } from '@universe/shared';
-import { asArr, asNum, asStr, isObj } from '../types';
+import { asArr, asNum, asStr, isObj } from '@universe/glue-kit';
 
 export type Cost = Partial<Record<Resource, number>>;
 export type Resource = 'water' | 'wood' | 'ore' | 'oil' | 'ether';

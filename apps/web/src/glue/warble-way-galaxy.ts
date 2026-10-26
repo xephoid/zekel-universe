@@ -7,9 +7,9 @@
 
 import type { CardData, GridData, TableauData } from '@universe/primitives';
 import type { GameReferenceResponse } from '@universe/shared';
-import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, SelectEvent, SetupAnswers, SetupField, SetupSeat, TablePlan, Zone } from './types';
-import { asArr, asNum, asStr, isObj, shapeHas, words } from './types';
-import { answerNumber, answerText } from './forms';
+import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, SelectEvent, SetupAnswers, SetupField, SetupSeat, TablePlan, Zone } from '@universe/glue-kit';
+import { asArr, asNum, asStr, isObj, shapeHas, words } from '@universe/glue-kit';
+import { answerNumber, answerText } from '@universe/glue-kit';
 
 /** The twelve abilities as the reference data prints them: "SWA (Swashbuckling)". */
 function abilityOptions(reference: GameReferenceResponse | null): Array<{ code: string; name: string; stat: string }> {
