@@ -42,8 +42,10 @@ drove the first pass.
 
 The code is one pnpm workspace: `apps/server` (the API and websockets, the
 engine's only client), `apps/web` (React + Vite), and `packages/` (shared
-wire types, the engine client, the eight primitives, the rules a game's
-drawing code follows, the table parts a game may draw, the design tokens).
+types, the engine client, and the five packages published on npm under the
+`@zekel` scope for game authors: the game wire types, the design tokens, the
+eight primitives, the rules a game's drawing code follows, and the table
+parts a game may draw).
 
 You need Node 22 or newer, pnpm 10, and a checkout of the zekel engine next
 to this repository:

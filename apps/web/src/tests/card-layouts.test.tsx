@@ -4,7 +4,7 @@
 
 import { describe, expect, it, afterEach } from 'vitest';
 import { cleanup, render } from '@testing-library/react';
-import { Card } from '@universe/primitives';
+import { Card } from '@zekel/primitives';
 
 afterEach(cleanup);
 

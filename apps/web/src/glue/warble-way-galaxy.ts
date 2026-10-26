@@ -5,11 +5,11 @@
 // progress from xp_to_next_level, the season finish lines from
 // season_endings. Nothing here knows a threshold.
 
-import type { CardData, GridData, TableauData } from '@universe/primitives';
-import type { GameReferenceResponse } from '@universe/shared';
-import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, SelectEvent, SetupAnswers, SetupField, SetupSeat, TablePlan, Zone } from '@universe/glue-kit';
-import { asArr, asNum, asStr, isObj, shapeHas, words } from '@universe/glue-kit';
-import { answerNumber, answerText } from '@universe/glue-kit';
+import type { CardData, GridData, TableauData } from '@zekel/primitives';
+import type { GameReferenceResponse } from '@zekel/wire-types';
+import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, SelectEvent, SetupAnswers, SetupField, SetupSeat, TablePlan, Zone } from '@zekel/glue-kit';
+import { asArr, asNum, asStr, isObj, shapeHas, words } from '@zekel/glue-kit';
+import { answerNumber, answerText } from '@zekel/glue-kit';
 
 /** The twelve abilities as the reference data prints them: "SWA (Swashbuckling)". */
 function abilityOptions(reference: GameReferenceResponse | null): Array<{ code: string; name: string; stat: string }> {

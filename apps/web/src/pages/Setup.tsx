@@ -12,7 +12,7 @@ import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import type { GameCatalogEntry, GameReferenceResponse, SeatSpec, TableMode } from '@universe/shared';
 import { api, ApiRequestError } from '../api';
 import { glueFor } from '../glue';
-import type { SetupAnswers, SetupField, SetupSeat } from '@universe/glue-kit';
+import type { SetupAnswers, SetupField, SetupSeat } from '@zekel/glue-kit';
 import { useSession } from '../session';
 import { GroupedPicker, PickSlots, isGrouped } from './GroupedPick';
 import { Nav } from './Nav';

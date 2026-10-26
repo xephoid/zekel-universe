@@ -8,7 +8,7 @@
 // the React hook in usePlaybackQueue.ts wraps it.
 
 import type { TableEventWire } from '@universe/shared';
-import { PACES, type Pace } from '@universe/glue-kit';
+import { PACES, type Pace } from '@zekel/glue-kit';
 
 export { PACES, type Pace };
 

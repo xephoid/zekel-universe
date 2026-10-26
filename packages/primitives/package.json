@@ -1,7 +1,14 @@
 {
-  "name": "@universe/primitives",
-  "version": "0.0.0",
-  "private": true,
+  "name": "@zekel/primitives",
+  "version": "0.1.0",
+  "description": "The eight board primitives as React components: card, card zone, tableau, bag, track, pool, grid and map, taking the same data fields as the zekel engine's web components.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xephoid/zekel-universe.git",
+    "directory": "packages/primitives"
+  },
+  "homepage": "https://github.com/xephoid/zekel-universe#readme",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -12,7 +19,15 @@
     },
     "./css": "./src/primitives.css"
   },
-  "files": ["dist", "src/primitives.css"],
+  "files": [
+    "dist",
+    "src/primitives.css",
+    "LICENSE",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "dev": "tsc -p tsconfig.build.json --watch --preserveWatchOutput",
@@ -24,8 +39,7 @@
     "react-dom": "^18.3.1"
   },
   "dependencies": {
-    "@universe/shared": "workspace:*",
-    "@universe/tokens": "workspace:*"
+    "@zekel/tokens": "workspace:^"
   },
   "devDependencies": {
     "@types/react": "^18.3.12",
@@ -34,5 +48,8 @@
     "react-dom": "^18.3.1",
     "typescript": "^5.6.3",
     "vitest": "^2.1.8"
+  },
+  "engines": {
+    "node": ">=22.13.0"
   }
 }

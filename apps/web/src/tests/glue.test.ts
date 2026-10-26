@@ -4,13 +4,13 @@
 
 import { describe, expect, it } from 'vitest';
 import type { GameReferenceResponse } from '@universe/shared';
-import type { CardData, CardZoneData, MapData, PoolData, TableauData, TrackData } from '@universe/primitives';
+import type { CardData, CardZoneData, MapData, PoolData, TableauData, TrackData } from '@zekel/primitives';
 import { GLUES } from '../glue';
-import type { GlueInput, LegalMove, TablePlan, Zone } from '@universe/glue-kit';
+import type { GlueInput, LegalMove, TablePlan, Zone } from '@zekel/glue-kit';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { formForMove, isSubmissionAllowed, movesForSelect, templateForm } from '@universe/glue-kit';
+import { formForMove, isSubmissionAllowed, movesForSelect, templateForm } from '@zekel/glue-kit';
 import { SPACES, JUNCTION_ROADS, TREATS, CASTLE_POS } from '../glue/sweetlands-board';
 import { fightOf } from '../glue/ff/read';
 import type { StrikeMoment } from '../glue/ff/StrikeMoment';

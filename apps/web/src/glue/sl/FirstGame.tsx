@@ -6,9 +6,9 @@
 // window simply shows it again). The goals, their points, points to win and
 // the sugar die's faces are the engine's reference data.
 
-import { Sheet } from '@universe/table-parts';
-import { asArr, asNum, asStr, isObj } from '@universe/glue-kit';
-import type { GlueInput } from '@universe/glue-kit';
+import { Sheet } from '@zekel/table-parts';
+import { asArr, asNum, asStr, isObj } from '@zekel/glue-kit';
+import type { GlueInput } from '@zekel/glue-kit';
 import { PieceArt, TreatChip, type FactionKey, type UnitKey } from './art';
 import { COLOR_ACTION, COLORS, cap } from './colors';
 

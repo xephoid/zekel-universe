@@ -15,9 +15,9 @@
 // fade (the fighters slide out and the board comes back).
 
 import { useEffect, useState } from 'react';
-import { motionMs } from '@universe/tokens';
-import type { Moment, MomentProps } from '@universe/glue-kit';
-import { PaceControl } from '@universe/table-parts';
+import { motionMs } from '@zekel/tokens';
+import type { Moment, MomentProps } from '@zekel/glue-kit';
+import { PaceControl } from '@zekel/table-parts';
 
 /** One hit of a strike: what was queued, what was in the way, what the
  *  engine says got through, and the target's meter before and after. */

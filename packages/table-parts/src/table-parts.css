@@ -1,0 +1,21 @@
+/* The sheet, the move form and the pace control (@zekel/table-parts). The
+   colors, radii and shadows are the host's tokens (@zekel/tokens/css), and
+   the form fields inside a move form take the host's own .field, .label,
+   .radio-row and .btn styles; this file holds only what these parts add. */
+
+.pace { display: inline-flex; gap: 2px; }
+.pace .btn.small { border-radius: 6px; }
+.sheet-backdrop { position: fixed; inset: 0; background: rgba(28,26,23,0.45); z-index: 50; display: flex; align-items: center; justify-content: center; padding: 20px; animation: zk-fadein .2s ease-out; }
+.sheet { background: var(--bg-raised); border-radius: 12px; padding: 28px 30px; max-width: 720px; width: 100%; max-height: 90vh; overflow: auto; box-shadow: var(--shadow-pop); position: relative; }
+.sheet .close { position: absolute; top: 14px; right: 14px; }
+.sheet h2 { font-size: 24px; margin-bottom: 12px; padding-right: 40px; }
+.move-form { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
+.move-form fieldset { border: 0; padding: 0; margin: 0; }
+.move-form .radio-row { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+.form-help { margin: 4px 0 0; }
+
+/* what the answers so far add up to, above a form's send button */
+.form-total {
+  margin: 4px 0 0; padding: 8px 10px; border-radius: 8px;
+  background: var(--chip); color: var(--fg); font-size: 13px; font-weight: 600;
+}

@@ -74,12 +74,15 @@ apps/
   web/           React + Vite; the browser app
 packages/
   engine-client/ typed wrapper over the engine's tools; the only MCP code
-  shared/        types shared by server and web (tables, seats, events, views)
-  primitives/    the eight board primitives as React components
-  glue-kit/      the rules a game's drawing code follows (the glue module
-                 interface, the table plan, agency, forms, card identity)
-  table-parts/   the table furniture a game may draw (sheet, move form, pace)
-  tokens/        design tokens as CSS variables and TypeScript
+  shared/        types shared by server and web (people, tables, events)
+  wire-types/    @zekel/wire-types: the three shapes a game's drawing code
+                 reads (a legal move, an unavailable move, reference data)
+  primitives/    @zekel/primitives: the eight board primitives as React components
+  glue-kit/      @zekel/glue-kit: the rules a game's drawing code follows (the
+                 glue module interface, the table plan, agency, forms, identity)
+  table-parts/   @zekel/table-parts: the table furniture a game may draw
+                 (sheet, move form, pace), with its own stylesheet
+  tokens/        @zekel/tokens: design tokens as CSS variables and TypeScript
 infra/
   docker-compose.yml   engine + server + web + postgres, one command
 ```
@@ -109,10 +112,20 @@ overlay component; the kit holds only the moment's key, title and whether the
 game ended.
 
 **packages/table-parts.** The sheet (the table's one dialog), the move form
-sheet and the pace control: the furniture a game's own screen may draw. The
-rest of the table's furniture stays in `apps/web/src/table/parts.tsx`. The
-styles for these classes are still the web app's `app.css`; they move with
-the package when it is published.
+sheet and the pace control: the furniture a game's own screen may draw, with
+their styles (`@zekel/table-parts/css`). The rest of the table's furniture
+stays in `apps/web/src/table/parts.tsx`.
+
+**Published packages.** Five packages are public on npm under the `@zekel`
+scope so that game authors can write a game's drawing code against them:
+`wire-types`, `tokens`, `primitives`, `glue-kit` and `table-parts`, in that
+dependency order. Each has a `LICENSE`, a `README.md`, a `files` list and
+`publishConfig.access: public`. Inside this workspace they link to each other
+with `workspace:^`, which `pnpm publish` rewrites to the released version;
+`npm publish` would ship the link unchanged, so always publish with pnpm.
+The server, the web app, `engine-client` and `shared` stay private under
+`@universe`; `shared` re-exports the three wire types so the apps keep one
+import.
 
 **packages/engine-client.** One class with one method per engine tool.
 Connects with the official MCP client SDK over streamable HTTP with the

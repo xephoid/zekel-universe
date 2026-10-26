@@ -1,9 +1,9 @@
 // A template move's questions, in a sheet. Nothing is preselected; the move
 // is built from the person's answers and sent only when they press Send
-// (see the agency rules in @universe/glue-kit).
+// (see the agency rules in @zekel/glue-kit).
 
 import { useState } from 'react';
-import type { MoveForm } from '@universe/glue-kit';
+import type { MoveForm } from '@zekel/glue-kit';
 import { Sheet } from './Sheet.js';
 
 /** A template move's questions. The Send button is live only once every

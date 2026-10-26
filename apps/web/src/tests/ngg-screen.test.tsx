@@ -5,7 +5,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, cleanup, fireEvent, within } from '@testing-library/react';
 import type { GameReferenceResponse, LegalMove } from '@universe/shared';
-import type { GlueInput } from '@universe/glue-kit';
+import type { GlueInput } from '@zekel/glue-kit';
 import { NggScreen } from '../glue/ngg/NggScreen';
 import { initials } from '../glue/ngg/factions';
 import nggGlue from '../glue/ngg';

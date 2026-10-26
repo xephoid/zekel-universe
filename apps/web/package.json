@@ -10,11 +10,12 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@universe/glue-kit": "workspace:*",
-    "@universe/primitives": "workspace:*",
     "@universe/shared": "workspace:*",
-    "@universe/table-parts": "workspace:*",
-    "@universe/tokens": "workspace:*",
+    "@zekel/glue-kit": "workspace:*",
+    "@zekel/primitives": "workspace:*",
+    "@zekel/table-parts": "workspace:*",
+    "@zekel/tokens": "workspace:*",
+    "@zekel/wire-types": "workspace:*",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.18.4",

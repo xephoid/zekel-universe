@@ -4,11 +4,11 @@
 
 import { describe, expect, it, afterEach } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { Map as MapPart } from '@universe/primitives';
-import type { CardZoneData, MapData, SelectEvent } from '@universe/primitives';
+import { Map as MapPart } from '@zekel/primitives';
+import type { CardZoneData, MapData, SelectEvent } from '@zekel/primitives';
 import type { GameReferenceResponse } from '@universe/shared';
 import { GLUES } from '../glue';
-import type { GlueInput, TablePlan } from '@universe/glue-kit';
+import type { GlueInput, TablePlan } from '@zekel/glue-kit';
 import { CardUpClose, findCard } from '../table/parts';
 
 afterEach(cleanup);

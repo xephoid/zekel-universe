@@ -3,8 +3,8 @@
 // group of moves the engine listed, and where a piece lands is the move's own
 // `landing` (zekel core/game.ts LegalMove.landing).
 
-import type { LegalMove } from '@universe/glue-kit';
-import { asNum, asStr, isObj } from '@universe/glue-kit';
+import type { LegalMove } from '@zekel/glue-kit';
+import { asNum, asStr, isObj } from '@zekel/glue-kit';
 import type { UnitKey } from './art';
 import { landWords } from './Board';
 import { TILE_BY_ID } from './geometry';

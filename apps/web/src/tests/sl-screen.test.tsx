@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import type { GameReferenceResponse } from '@universe/shared';
 import { SlScreen } from '../glue/sl/SlScreen';
-import type { GameScreenProps, GlueInput, LegalMove } from '@universe/glue-kit';
+import type { GameScreenProps, GlueInput, LegalMove } from '@zekel/glue-kit';
 
 const loc = {
   start: (region: number) => ({ zone: 'start', region }),

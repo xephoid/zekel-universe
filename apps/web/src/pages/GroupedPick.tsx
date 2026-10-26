@@ -5,7 +5,7 @@
 // preselected, and a pick past the limit says why instead of swapping.
 
 import { useState, type CSSProperties } from 'react';
-import type { MultiOption, SetupField } from '@universe/glue-kit';
+import type { MultiOption, SetupField } from '@zekel/glue-kit';
 
 export type GroupedField = Extract<SetupField, { kind: 'multi' }> & { groups: NonNullable<Extract<SetupField, { kind: 'multi' }>['groups']> };
 

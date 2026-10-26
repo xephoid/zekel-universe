@@ -3,8 +3,8 @@
 // routes to. The plan below is only the top bar's words for the shared table
 // chrome; the screen does the drawing.
 
-import type { GameReferenceResponse } from '@universe/shared';
-import type { GlueModule, SetupAnswers, SetupField, SetupSeat, TablePlan } from '@universe/glue-kit';
+import type { GameReferenceResponse } from '@zekel/wire-types';
+import type { GlueModule, SetupAnswers, SetupField, SetupSeat, TablePlan } from '@zekel/glue-kit';
 import { NggScreen } from './NggScreen';
 import { readView } from './read';
 import { readRef } from './ref';

@@ -10,13 +10,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import type { LegalMove } from '@universe/shared';
-import { Die, FlipRoot, paletteVars, useSystemReducedMotion, type CardData, type SelectEvent } from '@universe/primitives';
+import { Die, FlipRoot, paletteVars, useSystemReducedMotion, type CardData, type SelectEvent } from '@zekel/primitives';
 import { glueFor } from '../glue';
-import { BoardZones, JsonInspector, ZoneRenderer, formForMove, movesForSelect, submitMove } from '@universe/glue-kit';
-import type { GlueInput, MoveForm, FormContext, Moment, PromptAction } from '@universe/glue-kit';
+import { BoardZones, JsonInspector, ZoneRenderer, formForMove, movesForSelect, submitMove } from '@zekel/glue-kit';
+import type { GlueInput, MoveForm, FormContext, Moment, PromptAction } from '@zekel/glue-kit';
 import { useTable } from '../table/useTable';
 import { ActionBar, CaptionWords, CardUpClose, LessonNote, EndPanel, Log, MoveChooser, MoveMenuList, NoticeToast, findCard, lessonsOf, type Lesson, type Notice, Notices } from '../table/parts';
-import { MoveFormSheet, PaceControl, Sheet } from '@universe/table-parts';
+import { MoveFormSheet, PaceControl, Sheet } from '@zekel/table-parts';
 import { usePhone } from '../table/phone';
 import { api } from '../api';
 import { useSession } from '../session';

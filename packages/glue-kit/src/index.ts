@@ -1,5 +1,5 @@
 // The rules every game's drawing code follows, and the shared code behind
-// them. A game's glue imports from here and from @universe/primitives, never
+// them. A game's glue imports from here and from @zekel/primitives, never
 // from the web app.
 
 export type {

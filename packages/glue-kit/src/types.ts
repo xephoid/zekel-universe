@@ -5,8 +5,8 @@
 
 import type {
   BagData, CardZoneData, GridData, MapData, Palette, PoolData, SelectEvent, TableauData, TrackData,
-} from '@universe/primitives';
-import type { GameReferenceResponse, LegalMove, UnavailableMove } from '@universe/shared';
+} from '@zekel/primitives';
+import type { GameReferenceResponse, LegalMove, UnavailableMove } from '@zekel/wire-types';
 import type { ComponentType, ReactNode } from 'react';
 
 export type { LegalMove, SelectEvent, Palette };

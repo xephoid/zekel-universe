@@ -9,13 +9,13 @@
 import { describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, within } from '@testing-library/react';
 import type { GameReferenceResponse, LegalMove } from '@universe/shared';
-import type { GameScreenProps, GlueInput } from '@universe/glue-kit';
+import type { GameScreenProps, GlueInput } from '@zekel/glue-kit';
 import { NggScreen } from '../glue/ngg/NggScreen';
 import { DiplomacyPanel } from '../glue/ngg/screens/round';
 import { makeCtx } from '../glue/ngg/ctx';
 import { readView } from '../glue/ngg/read';
 import { route } from '../glue/ngg/route';
-import { isSubmissionAllowed } from '@universe/glue-kit';
+import { isSubmissionAllowed } from '@zekel/glue-kit';
 import REFERENCE from './fixtures/ngg-reference.json';
 
 interface Fixture {

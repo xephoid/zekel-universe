@@ -1,9 +1,9 @@
 // The games this Universe can draw: each game's glue module by engine game
-// id. The rules a glue follows are @universe/glue-kit; this file is only the
+// id. The rules a glue follows are @zekel/glue-kit; this file is only the
 // list. When the games move to their own packages (zekel-games), this
 // becomes "the game packages installed".
 
-import type { GlueModule } from '@universe/glue-kit';
+import type { GlueModule } from '@zekel/glue-kit';
 import { fracturedFistGlue } from './fractured-fist';
 import { warbleWayGlue } from './warble-way-galaxy';
 import { sweetlandsGlue } from './sweetlands-imperium';

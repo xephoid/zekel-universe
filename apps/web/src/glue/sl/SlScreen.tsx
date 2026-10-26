@@ -5,8 +5,8 @@
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import { useReducedMotion, type SelectEvent } from '@universe/primitives';
-import type { GameScreenProps, GlueInput, LegalMove } from '@universe/glue-kit';
+import { useReducedMotion, type SelectEvent } from '@zekel/primitives';
+import type { GameScreenProps, GlueInput, LegalMove } from '@zekel/glue-kit';
 import { Board } from './Board';
 import { Piece, pieceTitle } from './Piece';
 import { Players } from './Players';
@@ -17,7 +17,7 @@ import { FirstGame, howToPlaySeen, markHowToPlaySeen } from './FirstGame';
 import { cardChoices, turnStep, type PlayOption } from './turn';
 import { readTable, tileOf, UNITS, type SlCard, type SlTable } from './read';
 import { usePieceHops } from './motion';
-import { asArr, asStr, isObj } from '@universe/glue-kit';
+import { asArr, asStr, isObj } from '@zekel/glue-kit';
 import { sweetlandsGlue } from '../sweetlands-imperium';
 import './sl.css';
 

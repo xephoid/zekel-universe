@@ -8,7 +8,7 @@ import { COLS, LAND, ROAD_ARROW, ROWS, TILES, landEdges } from '../glue/sl/geome
 import { readTable, tileOf } from '../glue/sl/read';
 import { pieceTitle } from '../glue/sl/Piece';
 import { hopTiles } from '../glue/sl/motion';
-import type { GlueInput } from '@universe/glue-kit';
+import type { GlueInput } from '@zekel/glue-kit';
 
 describe('the candy board', () => {
   it('paints every grid square as a land, the four castle squares as nobody', () => {

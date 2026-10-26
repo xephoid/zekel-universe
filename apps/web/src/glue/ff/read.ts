@@ -19,11 +19,11 @@
 // every draw inside the move that causes it and lists no draw step, so the
 // deck never lights up here (fractured-fist-build.md, the open question).
 
-import type { CardData } from '@universe/primitives';
-import type { GameReferenceResponse } from '@universe/shared';
-import type { GlueInput, LegalMove, PlanPrompt, PlanStep, PromptAction, SelectEvent, Zone } from '@universe/glue-kit';
-import { asArr, asNum, asStr, isObj, shapeHas, words } from '@universe/glue-kit';
-import { trackIdentities, type IdentityState } from '@universe/glue-kit';
+import type { CardData } from '@zekel/primitives';
+import type { GameReferenceResponse } from '@zekel/wire-types';
+import type { GlueInput, LegalMove, PlanPrompt, PlanStep, PromptAction, SelectEvent, Zone } from '@zekel/glue-kit';
+import { asArr, asNum, asStr, isObj, shapeHas, words } from '@zekel/glue-kit';
+import { trackIdentities, type IdentityState } from '@zekel/glue-kit';
 
 /**
  * Card colors from the print-and-play sheet. The corner is the card's kind:

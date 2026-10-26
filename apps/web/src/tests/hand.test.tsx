@@ -5,8 +5,8 @@
 
 import { describe, expect, it, afterEach } from 'vitest';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
-import { CardZone, fanOverlap } from '@universe/primitives';
-import type { CardData } from '@universe/primitives';
+import { CardZone, fanOverlap } from '@zekel/primitives';
+import type { CardData } from '@zekel/primitives';
 
 afterEach(cleanup);
 
