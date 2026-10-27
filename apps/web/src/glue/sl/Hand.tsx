@@ -7,7 +7,7 @@
 // engine's listed moves.
 
 import { useState } from 'react';
-import { MoveFormSheet, Sheet } from '@zekel/table-parts';
+import { MoveFormSheet, Sheet } from '@zekel/glue-kit';
 import { asArr, asStr, isObj, words } from '@zekel/glue-kit';
 import type { GlueInput, LegalMove, MoveForm } from '@zekel/glue-kit';
 import { COLOR_ACTION, cap, isColor } from './colors';

@@ -1,8 +1,7 @@
 // The wall around the games' drawing code. Each game's glue is on its way to
 // its own package in zekel-games, so nothing under glue/ may reach into the
 // rest of the web app: a glue imports from its own folder, from the
-// published packages (@zekel/glue-kit, @zekel/table-parts,
-// @zekel/primitives, @zekel/wire-types, @zekel/tokens) or from React.
+// published packages (@zekel/glue-kit, @zekel/primitives, @zekel/wire-types, @zekel/tokens) or from React.
 // The list of games (glue/index.ts) is the web app's and is the one file
 // that may be imported from outside; the rest of the app reaches a game only
 // through it.
@@ -33,7 +32,7 @@ function importsOf(file: string): string[] {
   return specs;
 }
 
-const ALLOWED_PACKAGES = ['react', 'react-dom', '@zekel/glue-kit', '@zekel/table-parts', '@zekel/primitives', '@zekel/wire-types', '@zekel/tokens'];
+const ALLOWED_PACKAGES = ['react', 'react-dom', '@zekel/glue-kit', '@zekel/primitives', '@zekel/wire-types', '@zekel/tokens'];
 
 describe('the games\' drawing code stays behind its wall', () => {
   const files = walk(GLUE);

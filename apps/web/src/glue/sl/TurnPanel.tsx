@@ -6,7 +6,7 @@
 // engine's record of the battle.
 
 import type { ReactNode } from 'react';
-import { MoveFormSheet } from '@zekel/table-parts';
+import { MoveFormSheet } from '@zekel/glue-kit';
 import { asArr, asStr, isObj, words } from '@zekel/glue-kit';
 import type { GlueInput, LegalMove, MoveForm } from '@zekel/glue-kit';
 import { SugarCube } from './art';

@@ -81,9 +81,6 @@ importers:
       '@zekel/primitives':
         specifier: workspace:*
         version: link:../../packages/primitives
-      '@zekel/table-parts':
-        specifier: workspace:*
-        version: link:../../packages/table-parts
       '@zekel/tokens':
         specifier: workspace:*
         version: link:../../packages/tokens
@@ -203,25 +200,6 @@ importers:
         specifier: workspace:*
         version: link:../wire-types
     devDependencies:
-      typescript:
-        specifier: ^5.6.3
-        version: 5.9.3
-      vitest:
-        specifier: ^2.1.8
-        version: 2.1.9(@types/node@22.20.3)(jsdom@30.0.1)
-
-  packages/table-parts:
-    dependencies:
-      '@zekel/glue-kit':
-        specifier: workspace:^
-        version: link:../glue-kit
-    devDependencies:
-      '@types/react':
-        specifier: ^18.3.12
-        version: 18.3.31
-      react:
-        specifier: ^18.3.1
-        version: 18.3.1
       typescript:
         specifier: ^5.6.3
         version: 5.9.3

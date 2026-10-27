@@ -1,7 +1,7 @@
 import './fonts.css';
 import '@zekel/tokens/css';
 import '@zekel/primitives/css';
-import '@zekel/table-parts/css';
+import '@zekel/glue-kit/css';
 import './app.css';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';

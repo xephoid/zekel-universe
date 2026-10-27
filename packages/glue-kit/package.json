@@ -1,7 +1,7 @@
 {
   "name": "@zekel/glue-kit",
   "version": "0.1.0",
-  "description": "The rules every zekel game's drawing code follows: the glue module interface, the table plan, player agency, template forms, card identity and the zone renderer.",
+  "description": "The rules every zekel game's drawing code follows: the glue module interface, the table plan, player agency, template forms, card identity, the zone renderer, and the table furniture a game's screen may draw.",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -16,10 +16,12 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    }
+    },
+    "./css": "./src/glue-kit.css"
   },
   "files": [
     "dist",
+    "src/glue-kit.css",
     "LICENSE",
     "README.md"
   ],

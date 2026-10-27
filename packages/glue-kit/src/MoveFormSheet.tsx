@@ -3,7 +3,7 @@
 // (see the agency rules in @zekel/glue-kit).
 
 import { useState } from 'react';
-import type { MoveForm } from '@zekel/glue-kit';
+import type { MoveForm } from './types.js';
 import { Sheet } from './Sheet.js';
 
 /** A template move's questions. The Send button is live only once every

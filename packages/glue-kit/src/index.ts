@@ -1,6 +1,8 @@
-// The rules every game's drawing code follows, and the shared code behind
-// them. A game's glue imports from here and from @zekel/primitives, never
-// from the web app.
+// The rules every game's drawing code follows, the shared code behind them,
+// and the three pieces of table furniture a game's own screen may draw (the
+// sheet, the move form sheet, the pace control; their styles are ./css). A
+// game's glue imports from here and from @zekel/primitives, never from the
+// web app.
 
 export type {
   GlueModule, GameScreenProps, GlueInput, TablePlan, Zone, SetupField, MultiOption, SetupSeat, SetupAnswers,
@@ -14,3 +16,6 @@ export { answerList, answerNumber, answerText, blankKeys, formForMove, looksLike
 export { trackIdentities } from './identity.js';
 export type { IdentityHints, IdentityState, ZoneContents } from './identity.js';
 export { BoardZones, JsonInspector, ZoneRenderer } from './ZoneRenderer.js';
+export { Sheet } from './Sheet.js';
+export { MoveFormSheet } from './MoveFormSheet.js';
+export { PaceControl } from './PaceControl.js';

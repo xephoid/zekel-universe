@@ -1,13 +1,12 @@
 // The table's furniture: the action bar, the numbered move menu, the rules
 // lessons, the rejection notice, the log, the card up close, and the
 // end-of-game panel. The sheet, the move form and the pace control, which a
-// game's own screen may draw too, are @zekel/table-parts.
+// game's own screen may draw too, are @zekel/glue-kit.
 
 import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import type { GameOverResult, LegalMove, LogLine, MoveMenu, MoveMenuEntry, RulesBriefing, SeatSummary, TableEventWire } from '@universe/shared';
-import type { PlanPrompt, PlanStep, PromptAction, TablePlan, Zone } from '@zekel/glue-kit';
-import { Sheet } from '@zekel/table-parts';
+import { Sheet, type PlanPrompt, type PlanStep, type PromptAction, type TablePlan, type Zone } from '@zekel/glue-kit';
 import { Card, type CardData } from '@zekel/primitives';
 import { Avatar } from '../ui';
 

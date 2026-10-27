@@ -16,8 +16,7 @@
 
 import { useEffect, useState } from 'react';
 import { motionMs } from '@zekel/tokens';
-import type { Moment, MomentProps } from '@zekel/glue-kit';
-import { PaceControl } from '@zekel/table-parts';
+import { PaceControl, type Moment, type MomentProps } from '@zekel/glue-kit';
 
 /** One hit of a strike: what was queued, what was in the way, what the
  *  engine says got through, and the target's meter before and after. */

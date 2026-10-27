@@ -21,6 +21,18 @@ What is here:
 - Card identity across views (`trackIdentities`), so a card flies from where
   it was instead of appearing where it is.
 - `ZoneRenderer`, `BoardZones`, `JsonInspector`: a zone onto its primitive.
+- The table furniture a game's own screen may draw: `Sheet` (the table's one
+  dialog; it traps focus, closes on Escape or a tap outside, and hands focus
+  back), `MoveFormSheet` (a template move's questions, sent only when the
+  person presses Send) and `PaceControl` (the playback pace buttons). Their
+  styles are `@zekel/glue-kit/css`; the colors come from `@zekel/tokens/css`,
+  and the fields inside a move form take the host's own `.field`, `.label`,
+  `.radio-row` and `.btn` styles.
+
+```ts
+import { Sheet, MoveFormSheet, PaceControl } from '@zekel/glue-kit';
+import '@zekel/glue-kit/css';
+```
 
 Needs `react` 18. Depends on `@zekel/primitives` and `@zekel/wire-types`.
 
