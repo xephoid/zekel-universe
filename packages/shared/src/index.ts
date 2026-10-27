@@ -78,6 +78,9 @@ export interface GameCatalogEntry {
   playTime: string;
   tags: string[];
   coverImage: string | null;
+  /** where a frame that crops the square cover keeps its focus, as a CSS
+   *  object-position ("50% 18%"); null keeps the center */
+  coverFocus: string | null;
   description: string;
   rulesUrl: string | null;
   visibility: 'public' | 'unlisted';

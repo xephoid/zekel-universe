@@ -20,7 +20,7 @@ export const DESIGNERS: Record<string, Designer> = {
   },
 };
 
-export const ZEKEL_GAMES: Record<string, { designer: string; description: string; playTime: string; tags: string[]; coverImage: string }> = {
+export const ZEKEL_GAMES: Record<string, { designer: string; description: string; playTime: string; tags: string[]; coverImage: string; coverFocus?: string }> = {
   'fractured-fist': {
     designer: 'zekel-games',
     description: "A two-player card fight. Start with a small, weak deck, buy better techniques as you go, and knock your opponent's stamina from 7 to 0. Ten to twenty rounds.",
@@ -41,6 +41,8 @@ export const ZEKEL_GAMES: Record<string, { designer: string; description: string
     playTime: '45–90 min',
     tags: ['solo', 'adventure', 'dice'],
     coverImage: '/art/covers/warble-way-galaxy.webp',
+    // the captain's face sits high in the square; the wide banner keeps it
+    coverFocus: '50% 18%',
   },
   'neither-guts-nor-gears': {
     designer: 'zekel-games',

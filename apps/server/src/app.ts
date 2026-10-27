@@ -584,6 +584,7 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
       playTime: g.play_time,
       tags: parseJson<string[]>(g.tags, []),
       coverImage: g.cover_image,
+      coverFocus: ZEKEL_GAMES[g.engine_game_id]?.coverFocus ?? null,
       description: g.description,
       rulesUrl: g.rules_url,
       visibility: g.visibility === 'unlisted' ? 'unlisted' : 'public',
