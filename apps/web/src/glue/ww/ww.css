@@ -131,3 +131,34 @@
 .ww-theme .zk-grid { background: var(--ww-void); border-color: var(--ww-line); }
 .ww-theme .zk-grid-cell { border-color: rgba(61, 72, 128, .5); }
 
+/* ---------- icons: a game-icons shape as a mask, with a glitch ----------
+   Drawn by icons.tsx: a pink ghost under the icon in its own colour, each a
+   mask in currentColor. Both jump 2 px now and then on steps(1) timing, the
+   ghost at 2.3 to 3.1 s by its place in the row and the icon at 3.4 s the
+   other way, copied from the boards' .gx rules (Main.dc.html). These rules
+   are not scoped to the table shell: the icons go wherever the game is
+   drawn. Reduced motion stops the jumps and tucks the ghost away. */
+.ww-gx { display: inline-grid; flex: none; vertical-align: middle; }
+.ww-gx > .ww-ic {
+  grid-area: 1 / 1; display: block; background-color: currentColor;
+  -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+}
+.ww-gx > .ww-gh { background-color: #ff4f7b; opacity: .55; transform: translate(2px, 0); animation: ww-gxjit 2.7s steps(1) infinite; }
+.ww-gx > .ww-ic:not(.ww-gh) { animation: ww-gxjit 3.4s steps(1) infinite reverse; }
+.ww-gx:nth-child(2n) > .ww-gh { animation-duration: 3.1s; }
+.ww-gx:nth-child(3n) > .ww-gh { animation-duration: 2.3s; }
+@keyframes ww-gxjit {
+  0%, 100% { transform: translate(0, 0); }
+  18% { transform: translate(-2px, 0); }
+  19% { transform: translate(2px, 0); }
+  20% { transform: translate(0, 0); }
+  66% { transform: translate(2px, 0); }
+  67% { transform: translate(0, 0); }
+}
+[data-motion='reduced'] .ww-gx > .ww-ic { animation: none; }
+[data-motion='reduced'] .ww-gx > .ww-gh { transform: none; opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .ww-gx > .ww-ic { animation: none !important; }
+  .ww-gx > .ww-gh { transform: none; opacity: 0; }
+}
