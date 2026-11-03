@@ -287,6 +287,12 @@ const WW_VIEW = {
 
 describe('warble-way-galaxy glue', () => {
   const g = GLUES['warble-way-galaxy']!;
+  it('puts the hologram logbook theme on the table for the captain and a watcher, and nothing on a view from another game', () => {
+    expect(g.themeFor!(input(WW_VIEW, [], { playerId: 'p1' }))).toBe('ww-theme');
+    expect(g.themeFor!(input(WW_VIEW, []))).toBe('ww-theme');
+    expect(g.themeFor!(input({ game_id: 'something-else', phase: 'play' }, []))).toBeNull();
+    expect(g.themeFor!(input(null, []))).toBeNull();
+  });
   it('plans the character, crew, ship, travel deck, journey and ruin from the view', () => {
     const plan = g.plan(input(WW_VIEW))!;
     expect(ids(plan.bench)).toEqual(['ww:crew', 'ww:items']);

@@ -10,6 +10,7 @@ import type { GameReferenceResponse } from '@universe/shared';
 import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, SelectEvent, SetupAnswers, SetupField, SetupSeat, TablePlan, Zone } from './types';
 import { asArr, asNum, asStr, isObj, shapeHas, words } from './types';
 import { answerNumber, answerText } from './forms';
+import './ww/ww.css';
 
 /** The twelve abilities as the reference data prints them: "SWA (Swashbuckling)". */
 function abilityOptions(reference: GameReferenceResponse | null): Array<{ code: string; name: string; stat: string }> {
@@ -39,6 +40,13 @@ function archetypeOptions(reference: GameReferenceResponse | null): Array<{ name
       return [{ name: a['name'], label: `${a['name']} ${asStr(a['stars'])} ${asStr(a['difficulty'])} — ${scores}` }];
     })
     : [];
+}
+
+/** A Warble Way view: it has a phase and at least one of the captain's
+ *  character, the ship or the travel deck (zekel views.ts getView). */
+function isWarbleWayView(view: unknown): view is Record<string, unknown> {
+  if (!shapeHas(view, 'phase')) return false;
+  return 'travel_deck' in view || 'character' in view || 'ship' in view;
 }
 
 const PALETTE: Record<string, string> = {
@@ -98,10 +106,16 @@ export const warbleWayGlue: GlueModule = {
   gameId: 'warble-way-galaxy',
   title: 'Warble Way Galaxy',
 
+  /** The hologram logbook theme (docs/design/warble-way-galaxy): the table's
+   *  own look, for the captain's seat and for a watcher, once the view is
+   *  this game's. */
+  themeFor(input: GlueInput): string | null {
+    return isWarbleWayView(input.view) ? 'ww-theme' : null;
+  },
+
   plan(input: GlueInput): TablePlan | null {
     const { view } = input;
-    if (!shapeHas(view, 'phase')) return null;
-    if (!('travel_deck' in view) && !('character' in view) && !('ship' in view)) return null;
+    if (!isWarbleWayView(view)) return null;
 
     const char = isObj(view['character']) ? view['character'] : null;
     const ship = isObj(view['ship']) ? view['ship'] : null;

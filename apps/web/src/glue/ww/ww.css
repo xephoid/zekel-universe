@@ -1,0 +1,133 @@
+/* Warble Way Galaxy's hologram logbook theme (docs/design/warble-way-galaxy/,
+   the build in docs/games/warble-way-galaxy-theme-build.md). Every rule is
+   scoped under .ww-theme, the class the glue's themeFor puts on the table
+   shell, so no other game and no other page changes. The table is a ship's
+   console in deep space, so it is dark in both of the site's light and dark
+   settings: it is the game's own look, not a mode.
+
+   Values are the boards' (Main.dc.html, Table-Space.dc.html). Build item 1:
+   the tokens and the base look. Icons, holograms, the travel cards and the
+   game-drawn screens are later items. */
+
+.table-shell.ww-theme {
+  --ww-void: #0d1124;
+  --ww-hull: #1a2042;
+  --ww-navy: #1f2650;
+  --ww-star: #ece8dc;
+  --ww-muted: #9aa3c7;
+  --ww-dim: #6d7499;
+  --ww-pencil: #a9c4ff;
+  --ww-line: #3d4880;
+  --ww-gold: #FFD700;
+  --ww-gold-ink: #10142a;
+  --ww-recruit: #4cc9b0;
+  --ww-pirate: #f07070;
+  --ww-ruin: #f2b544;
+  --ww-hazard: #ad90f7;
+  --ww-job: #6eaaff;
+  --ww-redshirt: #f07070;
+  --ww-dread: #e070d0;
+
+  /* Self-hosted in fonts.css: Chakra Petch for names and labels, IBM Plex
+     Sans for reading, IBM Plex Mono for every number, Kalam only for what
+     the captain wrote in pencil (the ship's name, crew names on the map). */
+  --ww-sign: 'Chakra Petch', 'IBM Plex Sans', system-ui, sans-serif;
+  --ww-hand: 'Kalam', 'Comic Sans MS', cursive;
+
+  /* Universe's own tokens, redefined for everything on the page. */
+  --bg: var(--ww-void); --bg-raised: var(--ww-hull); --card: var(--ww-navy); --chip: #262e5c;
+  --fg: var(--ww-star); --fg-muted: var(--ww-muted);
+  --accent: var(--ww-gold); --accent-tint: #262e5c; --accent-tint-2: #262e5c; --highlight: #262e5c;
+  --border: var(--ww-line); --line: var(--ww-line);
+  --you-bg: var(--ww-gold); --you-fg: var(--ww-gold-ink);
+  --lit: var(--ww-gold);
+  --danger: var(--ww-pirate);
+  --card-back: #161c3c;
+  --shadow-sm: none; --shadow-md: none;
+  --shadow-card: 0 1px 0 rgba(0, 0, 0, .5), 0 6px 18px rgba(0, 0, 0, .45);
+  --shadow-card-hover: 0 10px 28px rgba(0, 0, 0, .6);
+  --shadow-pop: 0 18px 40px rgba(0, 0, 0, .6);
+  --shadow-lift: 0 12px 22px rgba(0, 0, 0, .6);
+  --font-display: var(--ww-sign);
+
+  /* The void: a faint 24 px dot grid of starlight at 16%, as on Main. */
+  background-color: var(--ww-void);
+  background-image: radial-gradient(rgba(232, 228, 216, .16) 1px, transparent 1.4px);
+  background-size: 24px 24px;
+  color: var(--ww-star);
+}
+
+/* ---------- labels and signage: Chakra Petch, spaced capitals ---------- */
+.ww-theme :is(.zk-zone-label, .zk-tableau-title, .move-menu summary, .side-section h3) {
+  font-family: var(--ww-sign); font-weight: 600; text-transform: uppercase; letter-spacing: .14em; color: var(--ww-muted);
+}
+.ww-theme .zk-tableau-title { color: var(--ww-star); font-weight: 700; }
+.ww-theme .zk-stat span { color: var(--ww-muted); }
+/* Every number in Plex Mono, as on the sheet. */
+.ww-theme :is(.zk-stat b, .zk-stat strong, .zk-stat-value, .zk-track-value, .zk-pool-count, .zk-zone-count) { font-family: var(--font-mono); }
+
+/* ---------- the top bar: hull, a rule under it ---------- */
+.ww-theme .table-topbar { background: var(--ww-hull); border-bottom: 1px solid var(--ww-line); }
+.ww-theme .table-topbar .divider { background: var(--ww-line); }
+.ww-theme .table-topbar .wordmark { color: var(--ww-star); }
+.ww-theme .table-topbar .title { font: 700 15px/1 var(--ww-sign); letter-spacing: .1em; text-transform: uppercase; }
+.ww-theme .table-topbar .round-note { font-family: var(--font-mono); font-size: 11px; color: var(--ww-muted); }
+/* "Your move": gold on the console, dark text on gold, never light. */
+.ww-theme .turn-pill { border-radius: 4px; background: transparent; border: 1px solid var(--ww-line); color: var(--ww-muted); font-family: var(--ww-sign); letter-spacing: .06em; }
+.ww-theme .turn-pill.mine { background: var(--ww-gold); border-color: var(--ww-gold); color: var(--ww-gold-ink); box-shadow: 0 0 12px rgba(255, 215, 0, .35); }
+.ww-theme .turn-pill .dot { display: none; }
+.ww-theme .chip-btn { background: var(--ww-hull); border-color: var(--ww-line); color: var(--ww-star); border-radius: 6px; }
+.ww-theme .chip-btn:hover { background: var(--chip); }
+.ww-theme .chip-btn.watching { background: var(--ww-gold); color: var(--ww-gold-ink); }
+
+/* ---------- panels: hull navy, a hairline edge ---------- */
+.ww-theme :is(.zone:not(.zone-tableau), .zk-tableau, .caption-card, .action-bar, .move-menu, .lesson-note, .toast, .json-inspector) {
+  background: var(--ww-navy); color: var(--ww-star); border: 1px solid var(--ww-line); border-radius: 10px; box-shadow: none;
+}
+.ww-theme .zk-tableau.active { box-shadow: 0 0 0 1px var(--ww-gold); }
+.ww-theme .table-side { background: var(--ww-hull); border-left: 1px solid var(--ww-line); }
+.ww-theme .table-bench { background: transparent; border-top: 1px solid var(--ww-line); }
+
+/* ---------- buttons: gold is the primary, dark text on it ---------- */
+.ww-theme :is(.chip-btn, .btn) { border-radius: 6px; }
+.ww-theme .btn:not(.secondary, .quiet) { background: var(--ww-gold); color: var(--ww-gold-ink); border: 1px solid var(--ww-gold); box-shadow: none; font-family: var(--ww-sign); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.ww-theme .btn:not(.secondary, .quiet):hover:not(:disabled) { background: #ffe14d; }
+.ww-theme .btn:disabled { box-shadow: none; }
+.ww-theme .btn.secondary { background: var(--ww-hull); color: var(--ww-star); border: 1px solid var(--ww-line); }
+.ww-theme .btn.secondary:hover { background: var(--chip); }
+.ww-theme .btn.green { background: var(--ww-gold); color: var(--ww-gold-ink); box-shadow: none; }
+.ww-theme :is(.chip-btn, .btn):focus-visible { outline: 2px solid var(--ww-gold); outline-offset: 2px; }
+.ww-theme .move-menu button:hover, .ww-theme .move-menu button:focus-visible { background: var(--chip); }
+
+/* ---------- cards: hull navy faces, the kind's colour along the top ----------
+   The primitive paints a face in its colour key; on the void the glue's
+   colours are too bright to carry text, so the face goes navy and the colour
+   becomes the edge, as on the boards' travel cards. The kinds' colours come
+   in with the travel cards (item 4); until then the glue's keys map here. */
+.ww-theme .zk-card-face:not(.layout-portrait, .layout-sign) {
+  background: var(--ww-navy) !important; color: var(--ww-star); text-shadow: none;
+  border: 1px solid var(--ww-line); border-top: 3px solid var(--ww-edge, var(--ww-line));
+}
+.ww-theme .zk-card-row { background: var(--ww-navy); color: var(--ww-star); border-color: var(--ww-line); }
+.ww-theme :is(.zk-card, .zk-card-row)[data-color-key='ship'] { --ww-edge: var(--ww-job); }
+.ww-theme :is(.zk-card, .zk-card-row)[data-color-key='character'] { --ww-edge: var(--ww-gold); }
+.ww-theme :is(.zk-card, .zk-card-row)[data-color-key='crew'] { --ww-edge: var(--ww-recruit); }
+.ww-theme :is(.zk-card, .zk-card-row):is([data-color-key='danger'], [data-color-key='attacker']) { --ww-edge: var(--ww-pirate); }
+.ww-theme :is(.zk-card, .zk-card-row):is([data-color-key='credits'], [data-color-key='item']) { --ww-edge: var(--ww-ruin); }
+.ww-theme :is(.zk-card, .zk-card-row)[data-color-key='party'] { --ww-edge: var(--ww-recruit); }
+.ww-theme .zk-card.zk-lit .zk-card-face { border-color: var(--ww-gold); box-shadow: 0 0 0 1px var(--ww-gold), 0 0 14px rgba(255, 215, 0, .45); }
+.ww-theme .zk-card.zk-lit:focus-visible .zk-card-face { box-shadow: 0 0 0 3px var(--ww-gold); }
+.ww-theme .zk-card-back { border-color: var(--ww-line); }
+
+/* The log: the newest line in starlight, bold, not in gold; gold is for
+   what asks for the captain's hand. */
+.ww-theme .log li { border-color: rgba(61, 72, 128, .5); }
+.ww-theme .log li.current { color: var(--ww-star); }
+
+/* ---------- the ship's name and the captain's pencil: Kalam ---------- */
+.ww-theme .zk-tableau[data-flip-id='ww:ship'] .zk-tableau-title { font-family: var(--ww-hand); font-weight: 700; text-transform: none; letter-spacing: 0; font-size: 20px; color: var(--ww-pencil); }
+
+/* ---------- the ruin grid: a space scan ---------- */
+.ww-theme .zk-grid { background: var(--ww-void); border-color: var(--ww-line); }
+.ww-theme .zk-grid-cell { border-color: rgba(61, 72, 128, .5); }
+
