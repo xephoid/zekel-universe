@@ -296,15 +296,16 @@ describe('warble-way-galaxy glue', () => {
   it('plans the character, crew, ship, travel deck, journey and ruin from the view', () => {
     const plan = g.plan(input(WW_VIEW))!;
     expect(ids(plan.bench)).toEqual(['ww:crew', 'ww:items']);
-    expect(ids(plan.side)).toEqual(['ww:character', 'ww:season', 'ww:ship']);
-    expect(ids(plan.board)).toEqual(['ww:travel-draw', 'ww:travel-discard', 'ww:journey', 'ww:ruin', 'ww:habitat']);
+    // Beside the screen the side rides with the board (the screen draws its own sheet, ship and crew).
+    expect(ids(plan.side)).toEqual([]);
+    expect(ids(plan.board)).toEqual(['ww:travel-draw', 'ww:travel-discard', 'ww:journey', 'ww:ruin', 'ww:habitat', 'ww:character', 'ww:season', 'ww:ship']);
     // Item 3: the captain and each crew member wear their race's portrait; an unknown race gets none.
-    expect((plan.side[0]!.data as { artUrl?: string }).artUrl).toBe('/art/warble-way/portraits/human.jpg');
+    expect((plan.board[5]!.data as { artUrl?: string }).artUrl).toBe('/art/warble-way/portraits/human.jpg');
     const crew = plan.bench[0]!.data as { cards: { artUrl?: string; label: string }[] };
     expect(crew.cards[0]).toMatchObject({ label: 'Bolt', artUrl: '/art/warble-way/portraits/kralkin.jpg' });
     // Crew capacity comes from the ship, level progress from xp_to_next_level.
     expect((plan.bench[0]!.data as CardZoneData).label).toBe('Crew (1/3) +2 unnamed');
-    const stats = (plan.side[0]!.data as { stats: Array<{ label: string; value: unknown; max?: number }> }).stats;
+    const stats = (plan.board[5]!.data as { stats: Array<{ label: string; value: unknown; max?: number }> }).stats;
     expect(stats.find((s) => s.label === 'XP to next level')).toEqual({ label: 'XP to next level', value: 2, max: 6 });
     const grid = plan.board[3]!.data as { extent: { maxX: number; maxY: number }; cells: Array<{ x: number; y: number }> };
     expect(grid.extent).toEqual({ minX: 0, minY: 0, maxX: 4, maxY: 1 });

@@ -1,0 +1,401 @@
+{
+ "key": "habitat-2",
+ "viewer": "p1",
+ "view": {
+  "phase": "at_habitat",
+  "pending": null,
+  "character": {
+   "name": "Bot Pilot",
+   "race": "human",
+   "disposition_roleplay_hint": null,
+   "level": 4,
+   "xp": 7,
+   "xp_to_next_level": 41,
+   "credits": 1850,
+   "wounded": false,
+   "dread": 0,
+   "abilities": {
+    "RES": {
+     "name": "Research",
+     "stat": "smarts",
+     "natural": 1,
+     "effective": 1
+    },
+    "MEC": {
+     "name": "Mechanics",
+     "stat": "smarts",
+     "natural": 2,
+     "effective": 2
+    },
+    "PIL": {
+     "name": "Piloting",
+     "stat": "finesse",
+     "natural": 6,
+     "effective": 6
+    }
+   },
+   "skills": [
+    "Research (RES basic)",
+    "Mechanics (MEC basic)",
+    "Piloting (PIL basic)",
+    "Piloting advanced"
+   ],
+   "equipped": {
+    "weapon": null,
+    "armor": null
+   }
+  },
+  "crew": [
+   {
+    "name": "Hexapod (SNE+2 DIP+1)",
+    "race": "hexapod",
+    "idealizes": "smarts",
+    "abilities": {
+     "SNE": 2,
+     "DIP": 1
+    },
+    "skills": [
+     "Sneaking (SNE basic)",
+     "Diplomacy (DIP basic)"
+    ],
+    "anger_tokens": 2,
+    "equipped": {
+     "weapon": null,
+     "armor": null
+    }
+   },
+   {
+    "name": "Kralkin (MEC+3)",
+    "race": "kralkin",
+    "idealizes": "moxie",
+    "abilities": {
+     "MEC": 3
+    },
+    "skills": [
+     "Mechanics (MEC basic)",
+     "Mechanics advanced"
+    ],
+    "anger_tokens": 2,
+    "equipped": {
+     "weapon": null,
+     "armor": null
+    }
+   }
+  ],
+  "unnamed_crew": 1,
+  "season_endings": {
+   "conquest": "clear the depth-3 ruin beyond Habitat #3",
+   "fortune": "1850/6000c banked while at a habitat",
+   "legend": "level 4/5",
+   "plunder": "0/6 ruin caches opened",
+   "bounty": "0/8 foes defeated face to face (boarding captures + ruin kills)"
+  },
+  "ship": {
+   "name": "Harness Runner",
+   "capacity": 3,
+   "speed": 0,
+   "handling": 0,
+   "armor": 2,
+   "damage": "pristine",
+   "parts": [
+    "fabricated-armor-1",
+    "fabricated-armor-2"
+   ]
+  },
+  "items": [
+   {
+    "id": "fabricated-armor-1",
+    "name": "Fabricated part: +1 armor",
+    "type": "ship_part",
+    "consumed": false
+   },
+   {
+    "id": "fabricated-armor-2",
+    "name": "Fabricated part: +1 armor",
+    "type": "ship_part",
+    "consumed": false
+   }
+  ],
+  "bulkheads_spent": false,
+  "habitat": {
+   "number": 2,
+   "name": "Kookookachaa",
+   "shop": [
+    {
+     "name": "Ship part +3 Capacity",
+     "cost": 1200,
+     "purchased": false
+    },
+    {
+     "name": "Ship part +2 Handling",
+     "cost": 600,
+     "purchased": false
+    },
+    {
+     "name": "Ship part Space Combat Advantage",
+     "cost": 600,
+     "purchased": false
+    },
+    {
+     "name": "Ship part +2 Speed",
+     "cost": 800,
+     "purchased": false
+    },
+    {
+     "name": "Weapon +2 GUN",
+     "cost": 600,
+     "purchased": false
+    },
+    {
+     "name": "Armor +2 SNE",
+     "cost": 400,
+     "purchased": false
+    }
+   ],
+   "cantina": [
+    {
+     "recruit": "Kralkin (HAK +1, min roll 11)",
+     "status": "available"
+    },
+    {
+     "recruit": "Grull (PIL +2, min roll 12)",
+     "status": "available"
+    },
+    {
+     "recruit": "Human (SWA +1 DIP +1, min roll 11)",
+     "status": "available"
+    },
+    {
+     "recruit": "Kralkin (HAK +2, min roll 12)",
+     "status": "available"
+    },
+    {
+     "recruit": "Kralkin (GUN +1, min roll 11)",
+     "status": "available"
+    }
+   ],
+   "missions": [
+    {
+     "id": "h2-m1",
+     "mission": "distance 5, PIL 11, 400c, 2 XP",
+     "status": "available"
+    },
+    {
+     "id": "h2-m2",
+     "mission": "distance 5, GUN 12, 500c, 2 XP",
+     "status": "available"
+    },
+    {
+     "id": "h2-m3",
+     "mission": "distance 5, SNE 11, 400c, 2 XP",
+     "status": "available"
+    },
+    {
+     "id": "h2-m4",
+     "mission": "distance 6, HAK 12, 500c, 2 XP",
+     "status": "available"
+    },
+    {
+     "id": "h2-m5",
+     "mission": "distance 6, LEA 12, 500c, 2 XP",
+     "status": "available"
+    },
+    {
+     "id": "h2-m6",
+     "mission": "distance 7, R2 ruin, 1000c, 4 XP",
+     "status": "available"
+    }
+   ],
+   "progression": "travel 12 one-way to the next habitat",
+   "repair_roll_available": true,
+   "unrest_roll_available": true,
+   "docks_unnamed_roll_available": true,
+   "fabrication_available_this_visit": true
+  },
+  "journey": null,
+  "space_combat": null,
+  "ruin": null,
+  "travel_deck": {
+   "cards_in_draw_pile": 51,
+   "cards_in_discard": 1,
+   "discard": [
+    "4D"
+   ]
+  },
+  "stat_reference": {
+   "brawn": "SWA/ARM/DEM",
+   "smarts": "HAK/RES/MEC",
+   "finesse": "PIL/GUN/SNE",
+   "moxie": "LEA/DIP/ACT"
+  },
+  "lore_refs": [
+   "galaxy-overview",
+   "humans",
+   "hexapods",
+   "kralkin"
+  ],
+  "result": null
+ },
+ "legalMoves": [
+  {
+   "move_id": "buy-h2-s1",
+   "description": "Buy Ship part +3 Capacity for 1200c (you have 1850c).",
+   "move": {
+    "type": "buy_item",
+    "item_name": "Ship part +3 Capacity"
+   }
+  },
+  {
+   "move_id": "buy-h2-s2",
+   "description": "Buy Ship part +2 Handling for 600c (you have 1850c).",
+   "move": {
+    "type": "buy_item",
+    "item_name": "Ship part +2 Handling"
+   }
+  },
+  {
+   "move_id": "buy-h2-s3",
+   "description": "Buy Ship part Space Combat Advantage for 600c (you have 1850c).",
+   "move": {
+    "type": "buy_item",
+    "item_name": "Ship part Space Combat Advantage"
+   }
+  },
+  {
+   "move_id": "buy-h2-s4",
+   "description": "Buy Ship part +2 Speed for 800c (you have 1850c).",
+   "move": {
+    "type": "buy_item",
+    "item_name": "Ship part +2 Speed"
+   }
+  },
+  {
+   "move_id": "buy-h2-s5",
+   "description": "Buy Weapon +2 GUN for 600c (you have 1850c).",
+   "move": {
+    "type": "buy_item",
+    "item_name": "Weapon +2 GUN"
+   }
+  },
+  {
+   "move_id": "buy-h2-s6",
+   "description": "Buy Armor +2 SNE for 400c (you have 1850c).",
+   "move": {
+    "type": "buy_item",
+    "item_name": "Armor +2 SNE"
+   }
+  },
+  {
+   "move_id": "recruit-h2-c1",
+   "description": "Attempt to recruit the Kralkin (HAK +1, min roll 11) at the cantina.",
+   "move": {
+    "type": "attempt_recruit",
+    "recruit_name": "h2-c1"
+   }
+  },
+  {
+   "move_id": "recruit-h2-c2",
+   "description": "Attempt to recruit the Grull (PIL +2, min roll 12) at the cantina.",
+   "move": {
+    "type": "attempt_recruit",
+    "recruit_name": "h2-c2"
+   }
+  },
+  {
+   "move_id": "recruit-h2-c3",
+   "description": "Attempt to recruit the Human (SWA +1 DIP +1, min roll 11) at the cantina.",
+   "move": {
+    "type": "attempt_recruit",
+    "recruit_name": "h2-c3"
+   }
+  },
+  {
+   "move_id": "recruit-h2-c4",
+   "description": "Attempt to recruit the Kralkin (HAK +2, min roll 12) at the cantina.",
+   "move": {
+    "type": "attempt_recruit",
+    "recruit_name": "h2-c4"
+   }
+  },
+  {
+   "move_id": "recruit-h2-c5",
+   "description": "Attempt to recruit the Kralkin (GUN +1, min roll 11) at the cantina.",
+   "move": {
+    "type": "attempt_recruit",
+    "recruit_name": "h2-c5"
+   }
+  },
+  {
+   "move_id": "fabricate-speed",
+   "description": "Shipwright (A18): pay 400c — fabricate a +1 speed part (ship speed 0 → 1). Once per habitat visit.",
+   "move": {
+    "type": "fabricate_part",
+    "stat": "speed"
+   }
+  },
+  {
+   "move_id": "fabricate-handling",
+   "description": "Shipwright (A18): pay 400c — fabricate a +1 handling part (ship handling 0 → 1). Once per habitat visit.",
+   "move": {
+    "type": "fabricate_part",
+    "stat": "handling"
+   }
+  },
+  {
+   "move_id": "fabricate-armor",
+   "description": "Shipwright (A18): pay 400c — fabricate a +1 armor part (ship armor 2 → 3). Once per habitat visit.",
+   "move": {
+    "type": "fabricate_part",
+    "stat": "armor"
+   }
+  },
+  {
+   "move_id": "release-Hexapod (SNE+2 DIP+1)",
+   "description": "Release Hexapod (SNE+2 DIP+1) from the crew (they take their equipped gear).",
+   "move": {
+    "type": "release_crew",
+    "crew_name": "Hexapod (SNE+2 DIP+1)"
+   }
+  },
+  {
+   "move_id": "release-Kralkin (MEC+3)",
+   "description": "Release Kralkin (MEC+3) from the crew (they take their equipped gear).",
+   "move": {
+    "type": "release_crew",
+    "crew_name": "Kralkin (MEC+3)"
+   }
+  },
+  {
+   "move_id": "take-mission-h2-m1",
+   "description": "Take the PIL 11 mission (distance 5, PIL 11, 400c, 2 XP).",
+   "move": {
+    "type": "take_mission",
+    "mission_name": "h2-m1"
+   }
+  },
+  {
+   "move_id": "take-mission-h2-m3",
+   "description": "Take the SNE 11 mission (distance 5, SNE 11, 400c, 2 XP).",
+   "move": {
+    "type": "take_mission",
+    "mission_name": "h2-m3"
+   }
+  },
+  {
+   "move_id": "take-mission-h2-m6",
+   "description": "Take the R2 RUINS mission (distance 7, R2 ruin, 1000c, 4 XP) — travel there, then delve to depth 2.",
+   "move": {
+    "type": "take_mission",
+    "mission_name": "h2-m6"
+   }
+  },
+  {
+   "move_id": "depart",
+   "description": "Depart for Habitat #3 — one-way trip, distance 12.",
+   "move": {
+    "type": "depart_for_next_habitat"
+   }
+  }
+ ],
+ "unavailable": []
+}

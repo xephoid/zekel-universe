@@ -12,6 +12,7 @@ import { asArr, asNum, asStr, isObj, shapeHas, words } from './types';
 import { answerNumber, answerText } from './forms';
 import { GLYPH, KIND, travelCard } from './ww/cards';
 import { faceUrl } from './ww/faces';
+import { WwScreen } from './ww/WwScreen';
 import './ww/ww.css';
 
 /** The twelve abilities as the reference data prints them: "SWA (Swashbuckling)". */
@@ -115,6 +116,11 @@ function ruinGrid(ruin: Record<string, unknown>): Zone | null {
 export const warbleWayGlue: GlueModule = {
   gameId: 'warble-way-galaxy',
   title: 'Warble Way Galaxy',
+  /** The hologram logbook table (docs/design/warble-way-galaxy) draws its
+   *  own screen, one part per board, and has a phone layout. The plan's
+   *  zones stay the engine debug client's shape. */
+  Screen: WwScreen,
+  phone: true,
 
   /** The hologram logbook theme (docs/design/warble-way-galaxy): the table's
    *  own look, for the captain's seat and for a watcher, once the view is
@@ -259,7 +265,9 @@ export const warbleWayGlue: GlueModule = {
       });
     }
     const status = `${words(asStr(view['phase']))}${isObj(view['pending']) ? ` · ${words(asStr((view['pending'] as Record<string, unknown>)['kind']))}` : ''}`;
-    return { board, bench, side, palette: PALETTE, title: 'Warble Way Galaxy', status };
+    // The table draws a plan's side zones even beside a screen, and the
+    // screen draws its own sheet, ship and crew: the side rides with the board.
+    return { board: [...board, ...side], bench, side: [], palette: PALETTE, title: 'Warble Way Galaxy', status };
   },
 
   litParts(input: GlueInput): string[] {
@@ -339,6 +347,41 @@ export const warbleWayGlue: GlueModule = {
   /** Character creation: the engine lists two skeletons ("FILL IN the
    *  values the player chose"); each becomes a form with nothing filled in. */
   formFor(move: LegalMove, input: GlueInput): MoveForm | null {
+    // The ruin's two templates (the screen fills them from taps; the menu
+    // asks the same questions in words).
+    if (move.move['type'] === 'move_being') {
+      return {
+        title: `Move ${asStr(move.move['being'])}`, help: move.description, template: move, editableKeys: ['to'], submitLabel: 'Move',
+        fields: [{ kind: 'text', key: 'to', label: 'Destination square (row and column, like r5c3)', maxLength: 6 }],
+        build(answers) { const to = (answerText(answers, 'to') ?? '').trim().toLowerCase(); return /^r\d+c\d+$/.test(to) ? { ...move.move, to } : null; },
+      };
+    }
+    if (move.move['type'] === 'setup_encounter') {
+      const view = isObj(input.view) ? input.view : {};
+      const crew = asArr(view['crew']).filter(isObj).map((c) => asStr(c['name'])).filter(Boolean);
+      const starts = (/start_location \(([^)]+)\)/.exec(move.description ?? '')?.[1] ?? '').split(/\s+or\s+/).map((x) => x.trim()).filter(Boolean);
+      const spots = (/exactly 3 of: ([^)—]+)/.exec(move.description ?? '')?.[1] ?? '').split(',').map((x) => x.trim()).filter(Boolean);
+      return {
+        title: 'Set up the ruin', help: move.description, template: move, submitLabel: 'Enter',
+        editableKeys: ['crew_names', 'include_character', 'start_location', 'threat_level', 'attacker_placements'],
+        fields: [
+          { kind: 'choice', key: 'include_character', label: 'Does the captain go in?', options: [{ value: 'yes', label: 'Yes' }, { value: 'no', label: 'No, stays aboard' }] },
+          ...(crew.length ? [{ kind: 'multi' as const, key: 'crew_names', label: 'Crew who go in', options: crew.map((c) => ({ value: c, label: c })), pick: crew.length }] : []),
+          { kind: 'choice', key: 'start_location', label: 'Start spot', options: starts.map((x) => ({ value: x, label: x })) },
+          { kind: 'choice', key: 'threat_level', label: 'Threat level', options: [1, 2, 3].map((n) => ({ value: String(n), label: `Threat ${n}` })) },
+          { kind: 'multi', key: 'attacker_placements', label: 'Three attacker spots', options: spots.map((x) => ({ value: x, label: x })), pick: 3 },
+        ],
+        build(answers) {
+          const inc = answerText(answers, 'include_character');
+          const names = Array.isArray(answers['crew_names']) ? (answers['crew_names'] as unknown[]).map((x) => asStr(x)).filter(Boolean) : [];
+          const start = answerText(answers, 'start_location');
+          const threat = answerNumber(answers, 'threat_level');
+          const placed = Array.isArray(answers['attacker_placements']) ? (answers['attacker_placements'] as unknown[]).map((x) => asStr(x)).filter(Boolean) : [];
+          if (!inc || !start || threat === null || placed.length !== 3 || (inc === 'no' && names.length === 0)) return null;
+          return { ...move.move, include_character: inc === 'yes', crew_names: names, start_location: start, threat_level: threat, attacker_placements: placed };
+        },
+      };
+    }
     if (move.move['type'] !== 'create_character') return null;
     const method = asStr(move.move['method']);
     const races = raceOptions(input.reference);

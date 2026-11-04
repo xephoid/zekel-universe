@@ -57,8 +57,9 @@ test('Warble Way: the character is the player\'s to create, and dice and cards w
   await start.click();
   await expect(page).toHaveURL(/\/table\//, { timeout: 20_000 });
   await expect(page.locator('.turn-pill')).toHaveText(/^Your move/, { timeout: 30_000 });
-  await expect(page.locator('.zk-tableau').filter({ hasText: 'Zara' }).first()).toBeVisible();
-  await expect(page.locator('.zk-tableau').filter({ hasText: 'Wandering Star' }).first()).toBeVisible();
+  // The game-drawn screen (build item 5): the captain's sheet and the ship panel.
+  await expect(page.locator('.ww-sheet').filter({ hasText: 'Zara' }).first()).toBeVisible();
+  await expect(page.locator('.ww-ship-name').filter({ hasText: 'Wandering Star' }).first()).toBeVisible();
   const rows = page.locator('.move-menu ol button');
   await expect(rows.filter({ hasText: /Create your character/ })).toHaveCount(0);
 

@@ -11,9 +11,8 @@ screens for player decisions that have none yet, and adds flavour names. It
 moves no rule. Where a board and the engine disagree, the engine wins; note it
 here and tell the owner.
 
-Items 0 to 4 are done (2026-11-02 to 2026-11-04; item 0's fixes are in
-the design README under "Rendered and fixed"). Nothing from item 5 on has
-been built yet.
+Items 0 to 5 are done (2026-11-02 to 2026-11-04; item 0's fixes are in
+the design README under "Rendered and fixed"). Items 6 and 7 are not built.
 
 ## 0. Render and check the boards first
 
@@ -278,6 +277,47 @@ since the amount is the engine's and it publishes only the kind of loss.
 there (52 cards, every kind, every portrait and icon loading, the sizes,
 colours and fonts of the board) and on a live game, where the first draw's
 pirates showed up named in the discard; 676 unit tests.
+
+**Step 5 done 2026-11-04** on the same branch: `apps/web/src/glue/ww/WwScreen.tsx`
+is the glue's `Screen`, with `phone: true`; it reads the view into one shape
+(`read.ts`) and picks a part from the engine's phase and pending (`modeOf`):
+in space (`parts/SpacePart.tsx`: the deck and discard, the drawn card, a
+hazard's options, the roll panel), encounters (`EncounterPart.tsx`: recruit
+adrift, job offer with the legs it would add, ruin expedition, ruin found with
+the depth picker stopping at the card's depth), the pirate fight
+(`PiratePart.tsx`: the pirate's card with its stamps, the step tracker in the
+strip, the six exchange actions with the ones the engine did not list greyed,
+boarding, the captured ship against yours), the habitat (`HabitatPart.tsx`:
+named rows with PASSED, FAILED, SOLD, MARKED, ABOARD stamps, the visit's
+actions, the equip, release and workshop overlays), the ruin
+(`RuinPart.tsx`: setup fills the engine's `setup_encounter` template from
+taps on the party, the threat, a start square and three attacker squares,
+nothing chosen until tapped; a round draws the party, the attackers and the
+acting being's listed moves, a tap on a floor square completing its
+`move_being` template; the terrain is picked per visit from the map and
+level, a display choice), and the overlays (`Overlays.tsx`: level up, release
+over capacity, the departure peek from the cards the engine reveals). The
+shared pieces are `ui.tsx` (sheet, ship plates, crew rows, counters, journey,
+galaxy strip, action cards) and the rules `ww-screen.css`. The phone layout
+is the strip, the moment, and Now / Sheet / Ship / Journey tabs. Character
+creation stays on the setup page's form (item 6 may bring it the Setup
+board's look). The views are captured from the engine by
+`scripts/ww-fixtures.mjs` (49 moments in `apps/web/src/tests/fixtures/ww/`),
+which `/dev/ww?f=<moment>` draws and `ww-screen.test.tsx` checks: every moment
+draws in its part, every button sends a listed move, the two templates are
+completed from taps, a watcher presses nothing. The plan's side zones now ride
+with the board, as the Sweetlands glue does, so the side column holds the
+screen's own panels. `e2e/warble-way.spec.ts` reads the captain and the ship
+off the screen's sheet and ship panel instead of `.zk-tableau`; the Roll and
+Draw buttons keep those names for a reader, and the numbered move list
+under the screen is always open, in the engine's words, since the table's
+own menu closes beside a screen.
+
+What waits for item 6: the engine lists no grey reasons for Warble Way (no
+`describeMoveGates`), so an unlisted fight action says "not offered" rather
+than "needs SNE"; reachable ruin squares are not marked, since the engine
+answers a move rather than listing destinations; the last exchange's dice
+show in the table's own dice row, not bracketed into pairs on the board.
 
 **Unblocked 2026-11-04: the portraits.** The 17 tokens, 4 sketches and 4
 holograms were regenerated with Qwen-Image-2512 and Qwen-Image-Edit-2511 (both
