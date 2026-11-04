@@ -315,6 +315,21 @@ describe('warble-way-galaxy glue', () => {
     expect(g.resolveReportMove(moves)?.move_id).toBe('r');
     expect(g.diceFor!({ engineMove: null, summary: 'Rolled 3, 5 + 1 for research.', view: null })).toEqual([3, 5, 1]);
   });
+  it('names the discard pile cards from the reference data, and falls back to the code without it', () => {
+    const ref: GameReferenceResponse = {
+      gameId: 'warble-way-galaxy', rules: '', moveSchema: {}, optionsSchema: {},
+      referenceData: {
+        travel_tables: { spades_hazards: { '3': { option1: { ability: 'RES', min_roll: 10 }, option2: { ability: 'SWA', min_roll: 15 } } }, hearts_recruits: { Q: { race: 'grull', idealized: 'finesse', min_roll: 12, abilities: {} } }, clubs_missions: {} },
+        cards: { '3S': { title: 'Gravity snare' }, QH: { title: 'Obsidian', line: 'Grull of Pumice, brood' } },
+      },
+    };
+    const named = (g.plan(input(WW_VIEW, [], { reference: ref }))!.board[1]!.data as CardZoneData).cards!;
+    expect(named.map((c) => [c.label, c.subtitle, c.colorKey])).toEqual([
+      ['Gravity snare', '♠ 3 · Hazard', 'hazard'], ['Obsidian', '♥ Q · Recruit', 'recruit'], ['7♣', undefined, 'ship'],
+    ]);
+    const plain = (g.plan(input(WW_VIEW))!.board[1]!.data as CardZoneData).cards!;
+    expect(plain.map((c) => c.label)).toEqual(['3♠', 'Q♥', '7♣']);
+  });
   it('setup screen: the character is created from the answers, as one create_character move', () => {
     const ref: GameReferenceResponse = {
       gameId: 'warble-way-galaxy', rules: '', moveSchema: {}, optionsSchema: {},

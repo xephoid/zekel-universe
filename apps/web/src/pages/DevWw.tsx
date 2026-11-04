@@ -10,6 +10,10 @@ import { ICON_FILES, Icon, MEANINGS, MeaningIcon, type IconName, type Meaning } 
 import { ATTACKERS, RACES, REDSHIRT, faceUrl } from '../glue/ww/faces';
 import { Hologram } from '../glue/ww/holo';
 import { Card, CardZone } from '@universe/primitives';
+import { useEffect, useState } from 'react';
+import type { GameReferenceResponse } from '@universe/shared';
+import { deckIds, travelCard } from '../glue/ww/cards';
+import { TravelCard, TravelCardBack } from '../glue/ww/TravelCard';
 
 const KIND_COLOURS: Partial<Record<Meaning, string>> = {
   recruit: 'var(--ww-recruit)', being: 'var(--ww-recruit)', pirate: 'var(--ww-pirate)', attacker: 'var(--ww-pirate)',
@@ -19,6 +23,17 @@ const KIND_COLOURS: Partial<Record<Meaning, string>> = {
 const HEADING = { font: '600 12px/1 var(--ww-sign)', letterSpacing: '.14em', textTransform: 'uppercase' as const, color: 'var(--ww-muted)', marginTop: 32 };
 
 export function DevWwPage() {
+  // The whole travel deck from the engine's reference data (item 4), so it
+  // can be compared with Cards.dc.html; nothing is drawn until it arrives.
+  const [reference, setReference] = useState<GameReferenceResponse | null>(null);
+  const [failed, setFailed] = useState<string | null>(null);
+  useEffect(() => {
+    fetch('/api/games/warble-way-galaxy/reference')
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`${r.status}`))))
+      .then((j: GameReferenceResponse) => setReference(j))
+      .catch((e: Error) => setFailed(e.message));
+  }, []);
+  const deck = deckIds(reference).map((id) => travelCard(id, reference)).filter((f) => f !== null);
   return (
     <div className="table-shell ww-theme" style={{ minHeight: '100vh', padding: 24, fontFamily: 'var(--font-body)' }}>
       <h1 style={{ ...HEADING, fontSize: 15, fontWeight: 700, marginTop: 0 }}>Warble Way Galaxy · icons</h1>
@@ -53,6 +68,11 @@ export function DevWwPage() {
           { id: 'dev:crew:2', label: 'Mica', subtitle: 'grull', colorKey: 'crew', artUrl: faceUrl('grull') },
           { id: 'dev:crew:3', label: 'Aaliyah', subtitle: 'human', colorKey: 'crew', artUrl: faceUrl('human') },
         ] }} />
+      </div>
+      <h2 style={HEADING}>Travel cards · {deck.length} from the engine's reference data{failed ? ` · not loaded (${failed})` : ''}</h2>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, marginTop: 12 }}>
+        <TravelCardBack />
+        {deck.map((f) => <TravelCard key={f.id} face={f} />)}
       </div>
       <h2 style={HEADING}>Every shape</h2>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 12, marginTop: 12 }}>

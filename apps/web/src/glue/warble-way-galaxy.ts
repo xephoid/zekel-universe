@@ -10,6 +10,7 @@ import type { GameReferenceResponse } from '@universe/shared';
 import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, SelectEvent, SetupAnswers, SetupField, SetupSeat, TablePlan, Zone } from './types';
 import { asArr, asNum, asStr, isObj, shapeHas, words } from './types';
 import { answerNumber, answerText } from './forms';
+import { GLYPH, KIND, travelCard } from './ww/cards';
 import { faceUrl } from './ww/faces';
 import './ww/ww.css';
 
@@ -61,6 +62,12 @@ const PALETTE: Record<string, string> = {
   party: '#3E7C4F',
   attacker: '#b4452f',
   item: '#c9a227',
+  // The travel cards' kinds (Cards.dc.html).
+  recruit: '#4cc9b0',
+  pirate: '#f07070',
+  ruin: '#f2b544',
+  hazard: '#ad90f7',
+  job: '#6eaaff',
 };
 
 function crewCard(c: unknown, i: number): CardData {
@@ -210,7 +217,13 @@ export const warbleWayGlue: GlueModule = {
         kind: 'card-zone', id: 'ww:travel-discard', arriveFrom: 'ww:travel-draw',
         data: {
           label: 'Discard', mode: 'pile',
-          cards: discard.map((c, i) => ({ id: `ww:travel:${i}:${c}`, label: c, colorKey: 'ship' })),
+          // Each discard shows its name and kind when the reference carries them (item 4).
+          cards: discard.map((c, i) => {
+            const face = travelCard(c, input.reference);
+            return face
+              ? { id: `ww:travel:${i}:${c}`, label: face.title, subtitle: `${GLYPH[face.suit]} ${face.rank} · ${KIND[face.kind].word}`, colorKey: face.kind }
+              : { id: `ww:travel:${i}:${c}`, label: c, colorKey: 'ship' };
+          }),
         },
       });
     }

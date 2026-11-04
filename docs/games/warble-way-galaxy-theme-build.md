@@ -11,8 +11,8 @@ screens for player decisions that have none yet, and adds flavour names. It
 moves no rule. Where a board and the engine disagree, the engine wins; note it
 here and tell the owner.
 
-Items 0 to 3 are done (2026-11-02 to 2026-11-04; item 0's fixes are in
-the design README under "Rendered and fixed"). Nothing from item 4 on has
+Items 0 to 4 are done (2026-11-02 to 2026-11-04; item 0's fixes are in
+the design README under "Rendered and fixed"). Nothing from item 5 on has
 been built yet.
 
 ## 0. Render and check the boards first
@@ -255,6 +255,29 @@ now draws the five gold tokens at the card's ring size, the twelve red ones at
 the ruin's, and a crew card and row from the primitives. Checked there and on a
 live game: every file loads from the app's own origin, the filters, mask,
 blend and timings match the board, no console errors.
+
+**Step 4 done 2026-11-04** on the same branch, with the engine side as
+[xephoid/zekel-games#9](https://github.com/xephoid/zekel-games/pull/9) (the
+games moved out of the engine repository into `zekel-games`, one package per
+game; the change is `data/flavour.ts` in the Warble Way package, published by
+`getReferenceData` as `cards` by card id and as `title` / `name` fields on the
+habitat pages' missions, shop items and cantina beings, with a test that every
+card and row has a name). In Universe: `apps/web/src/glue/ww/cards.ts` reads a
+card by its code in any spelling the view uses (`AH`, `3♠`) and arranges what
+the reference carries (the kind from which travel table holds the rank, the
+numbers from that row, the name and line from `cards`, a hazard's failure from
+`hazard_consequence_by_stat` through `ability_stats`); a code the reference
+does not carry draws as a plain card. `TravelCard.tsx` is the 200 × 290 face
+from `Cards.dc.html` (the band, the dashed ring with the kind's icon or a
+recruit's portrait, the name and line, then the kind's block) and the back;
+its rules are the `.ww-tc` block in `ww.css`. The discard pile on today's
+table shows each card's name and kind with the kind's colour along the edge.
+A failed hazard check reads "lose credits" rather than the board's "−100c",
+since the amount is the engine's and it publishes only the kind of loss.
+`/dev/ww` draws the back and all 52 faces from the reference data. Checked
+there (52 cards, every kind, every portrait and icon loading, the sizes,
+colours and fonts of the board) and on a live game, where the first draw's
+pirates showed up named in the discard; 676 unit tests.
 
 **Unblocked 2026-11-04: the portraits.** The 17 tokens, 4 sketches and 4
 holograms were regenerated with Qwen-Image-2512 and Qwen-Image-Edit-2511 (both

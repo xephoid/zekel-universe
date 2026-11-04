@@ -102,8 +102,8 @@
 /* ---------- cards: hull navy faces, the kind's colour along the top ----------
    The primitive paints a face in its colour key; on the void the glue's
    colours are too bright to carry text, so the face goes navy and the colour
-   becomes the edge, as on the boards' travel cards. The kinds' colours come
-   in with the travel cards (item 4); until then the glue's keys map here. */
+   becomes the edge, as on the boards' travel cards. The glue's keys and the
+   travel cards' kinds map here. */
 .ww-theme .zk-card-face:not(.layout-portrait, .layout-sign) {
   background: var(--ww-navy) !important; color: var(--ww-star); text-shadow: none;
   border: 1px solid var(--ww-line); border-top: 3px solid var(--ww-edge, var(--ww-line));
@@ -115,6 +115,11 @@
 .ww-theme :is(.zk-card, .zk-card-row):is([data-color-key='danger'], [data-color-key='attacker']) { --ww-edge: var(--ww-pirate); }
 .ww-theme :is(.zk-card, .zk-card-row):is([data-color-key='credits'], [data-color-key='item']) { --ww-edge: var(--ww-ruin); }
 .ww-theme :is(.zk-card, .zk-card-row)[data-color-key='party'] { --ww-edge: var(--ww-recruit); }
+.ww-theme :is(.zk-card, .zk-card-row)[data-color-key='recruit'] { --ww-edge: var(--ww-recruit); }
+.ww-theme :is(.zk-card, .zk-card-row)[data-color-key='pirate'] { --ww-edge: var(--ww-pirate); }
+.ww-theme :is(.zk-card, .zk-card-row)[data-color-key='ruin'] { --ww-edge: var(--ww-ruin); }
+.ww-theme :is(.zk-card, .zk-card-row)[data-color-key='hazard'] { --ww-edge: var(--ww-hazard); }
+.ww-theme :is(.zk-card, .zk-card-row)[data-color-key='job'] { --ww-edge: var(--ww-job); }
 .ww-theme .zk-card.zk-lit .zk-card-face { border-color: var(--ww-gold); box-shadow: 0 0 0 1px var(--ww-gold), 0 0 14px rgba(255, 215, 0, .45); }
 .ww-theme .zk-card.zk-lit:focus-visible .zk-card-face { box-shadow: 0 0 0 3px var(--ww-gold); }
 .ww-theme .zk-card-back { border-color: var(--ww-line); }
@@ -214,3 +219,48 @@
 @media (prefers-reduced-motion: reduce) {
   .ww-theme :is(.zk-card-art, .zk-portrait, .zk-card-row-art, .zk-card-face-pic) { animation: none !important; }
 }
+
+/* ---------- travel cards: 200 × 290, as Cards.dc.html draws them ----------
+   Drawn by TravelCard.tsx from the engine's reference data. The kind's
+   colour comes in as --ww-kind: the band, the ring's icon, the chips and
+   the pips. Hull stock: navy face, starlight ink, muted #aab1d3, line
+   #3d4880. Not scoped to the table shell, like the icons. */
+.ww-tc {
+  width: 200px; height: 290px; flex: none; box-sizing: border-box; border-radius: 14px; overflow: hidden;
+  display: flex; flex-direction: column; background: #1f2650; color: #ece8dc; border: 2px solid var(--ww-kind, #3d4880);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, .35); font-family: var(--font-body, 'IBM Plex Sans', system-ui, sans-serif); text-align: left;
+}
+.ww-tc-band { height: 30px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; background: var(--ww-kind); color: #10142a; }
+.ww-tc-kind { display: flex; align-items: center; gap: 6px; font: 600 10px/1 var(--ww-sign, 'Chakra Petch', sans-serif); letter-spacing: .14em; text-transform: uppercase; }
+.ww-tc-code { font: 500 12px/1 var(--font-mono, 'IBM Plex Mono', monospace); }
+.ww-tc-pic { height: 98px; flex: none; display: flex; align-items: center; justify-content: center; }
+.ww-tc-ring { width: 90px; height: 90px; box-sizing: border-box; border-radius: 50%; border: 1.5px dashed #3d4880; display: flex; align-items: center; justify-content: center; color: var(--ww-kind); }
+.ww-tc-ring .ww-gxi img { border-radius: 50%; }
+.ww-tc-head { padding: 0 12px; display: flex; flex-direction: column; gap: 1px; }
+.ww-tc-title { font: 700 18px/1.15 var(--ww-sign, 'Chakra Petch', sans-serif); color: #ece8dc; }
+.ww-tc-line { font-size: 11px; line-height: 1.3; color: #aab1d3; }
+.ww-tc-foot { flex: 1; padding: 8px 12px 10px; display: flex; flex-direction: column; justify-content: flex-end; min-height: 0; }
+.ww-tc-small { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: #aab1d3; }
+.ww-tc-tiny { font-size: 9px; color: #aab1d3; }
+.ww-tc-big { font: 500 26px/1 var(--font-mono, 'IBM Plex Mono', monospace); }
+.ww-tc-stat { display: flex; flex-direction: column; }
+.ww-tc-recruit, .ww-tc-ruin { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; }
+.ww-tc-chips { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+.ww-tc-chip { font: 500 12px/1.3 var(--font-mono, 'IBM Plex Mono', monospace); padding: 2px 7px; border-radius: 6px; border: 1.5px solid var(--ww-kind); color: var(--ww-kind); }
+.ww-tc-pirate { display: flex; flex-direction: column; gap: 6px; }
+.ww-tc-attack { display: flex; align-items: baseline; gap: 6px; }
+.ww-tc-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 2px; text-align: center; }
+.ww-tc-cell { display: flex; flex-direction: column; }
+.ww-tc-v { font: 500 13px/1.3 var(--font-mono, 'IBM Plex Mono', monospace); }
+.ww-tc-pips { display: flex; gap: 4px; }
+.ww-tc-pip { width: 14px; height: 22px; border-radius: 3px; box-sizing: border-box; border: 1.5px solid #3d4880; }
+.ww-tc-pip.on { background: var(--ww-kind); border-color: var(--ww-kind); }
+.ww-tc-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 6px 0; border-top: 1px solid #3d4880; }
+.ww-tc-row-head { font: 500 15px/1.2 var(--font-mono, 'IBM Plex Mono', monospace); }
+.ww-tc-row-tail { display: flex; align-items: center; gap: 5px; font-size: 11px; }
+/* The back: hull, a gold edge and inner ring, the swirl, the word, the night sky at half strength. */
+.ww-tc-back { background: #161c3c; border-color: #FFD700; padding: 10px; }
+.ww-tc-back-inner { flex: 1; border-radius: 8px; border: 1px solid rgba(255, 215, 0, .45); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; color: #FFD700; }
+.ww-tc-back-word { font: 600 15px/1.4 var(--ww-sign, 'Chakra Petch', sans-serif); letter-spacing: .24em; text-align: center; }
+.ww-tc-back-sky { opacity: .55; }
+.ww-tc-back-sky > .ww-ic { height: 34px; }
