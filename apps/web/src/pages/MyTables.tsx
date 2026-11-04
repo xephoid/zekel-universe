@@ -62,7 +62,7 @@ export function MyTablesPage() {
             <div className="row-head"><h2 style={{ fontSize: 22 }}>{g.title}</h2><span className="muted" style={{ fontSize: 13 }}>{g.tables.length}</span></div>
             <div className="stack" style={{ gap: 10 }}>
               {g.tables.map((t) => {
-                const game: GameCatalogEntry = { engineGameId: t.gameId, name: t.gameName } as GameCatalogEntry;
+                const game: GameCatalogEntry = { engineGameId: t.gameId, name: t.gameName, coverImage: t.gameCoverImage } as GameCatalogEntry;
                 const to = t.status === 'lobby' ? `/table/${t.id}/lobby` : `/table/${t.id}`;
                 const asking = confirm === t.id;
                 return (
