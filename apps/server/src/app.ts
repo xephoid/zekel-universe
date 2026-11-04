@@ -584,6 +584,7 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
       playTime: g.play_time,
       tags: parseJson<string[]>(g.tags, []),
       coverImage: g.cover_image,
+      coverFocus: ZEKEL_GAMES[g.engine_game_id]?.coverFocus ?? null,
       description: g.description,
       rulesUrl: g.rules_url,
       visibility: g.visibility === 'unlisted' ? 'unlisted' : 'public',
@@ -626,7 +627,7 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
       if (existing) {
         await db.updateTable('games').set({
           ...shared,
-          ...(own ? { designer_name: designerName, description: own.description, play_time: own.playTime, tags: JSON.stringify(own.tags) } : {}),
+          ...(own ? { designer_name: designerName, description: own.description, play_time: own.playTime, tags: JSON.stringify(own.tags), cover_image: own.coverImage } : {}),
         }).where('engine_game_id', '=', g.game_id).execute();
       } else {
         await db.insertInto('games').values({
@@ -635,7 +636,7 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
           designer_name: designerName,
           play_time: own?.playTime ?? '',
           tags: JSON.stringify(own?.tags ?? []),
-          cover_image: null,
+          cover_image: own?.coverImage ?? null,
           description: own?.description ?? g.description ?? '',
           rules_url: null,
           visibility: 'public',
@@ -779,12 +780,13 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
   }
 
   async function tableSummary(table: TableRecord, seats: SeatRecord[], p: Principal): Promise<TableSummary> {
-    const game = await db.selectFrom('games').select('name').where('engine_game_id', '=', table.gameId).executeTakeFirst();
+    const game = await db.selectFrom('games').select(['name', 'cover_image']).where('engine_game_id', '=', table.gameId).executeTakeFirst();
     const next = table.nextActorPosition === null ? null : seats.find((s) => s.position === table.nextActorPosition);
     return {
       id: table.id,
       gameId: table.gameId,
       gameName: game?.name ?? table.gameId,
+      gameCoverImage: game?.cover_image ?? null,
       mode: table.mode,
       status: table.status,
       createdAt: table.createdAt,

@@ -72,7 +72,7 @@ function GameCard({ g, featured }: { g: GameCatalogEntry; featured?: boolean }) 
 
 function MyTableCard({ t, hero, others }: { t: TableSummary; hero?: boolean; others: string }) {
   const to = t.status === 'lobby' ? `/table/${t.id}/lobby` : `/table/${t.id}`;
-  const game: GameCatalogEntry = { engineGameId: t.gameId, name: t.gameName } as GameCatalogEntry;
+  const game: GameCatalogEntry = { engineGameId: t.gameId, name: t.gameName, coverImage: t.gameCoverImage } as GameCatalogEntry;
   const status = t.status === 'lobby' ? 'In the lobby' : t.waitingOnMe ? 'Your move' : 'In progress';
   return (
     <Link className={`card my-card${hero ? ' hero' : ''}`} to={to}>
