@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Warble Way Galaxy travel cards</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;600&amp;display=swap">
+<style>
+body{margin:0;background:#0d1124}
+a{color:#FFD700}a:hover{color:#fff1a8}
+.void{background-color:#0d1124;background-image:radial-gradient(rgba(232,228,216,.16) 1px,transparent 1.4px);background-size:24px 24px}
+.ic{display:inline-block;flex:none;background-color:currentColor;-webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center}
+.i-disintegrate{-webkit-mask-image:url(assets/icons/disintegrate.png);mask-image:url(assets/icons/disintegrate.png)}
+.lbl{font-family:'Chakra Petch',sans-serif;font-weight:600;letter-spacing:.14em}
+.num{font-family:'IBM Plex Mono',monospace;font-weight:600}
+.i-distress{-webkit-mask-image:url(assets/icons/distress-signal.svg);mask-image:url(assets/icons/distress-signal.svg)}
+.i-pirate{-webkit-mask-image:url(assets/icons/pirate-flag.png);mask-image:url(assets/icons/pirate-flag.png)}
+.i-rings{-webkit-mask-image:url(assets/icons/transportation-rings.svg);mask-image:url(assets/icons/transportation-rings.svg)}
+.i-meteorimpact{-webkit-mask-image:url(assets/icons/meteor-impact.svg);mask-image:url(assets/icons/meteor-impact.svg)}
+.i-satcom{-webkit-mask-image:url(assets/icons/satellite-communication.svg);mask-image:url(assets/icons/satellite-communication.svg)}
+.i-ufo{-webkit-mask-image:url(assets/icons/ufo.svg);mask-image:url(assets/icons/ufo.svg)}
+.i-scout{-webkit-mask-image:url(assets/icons/scout-ship.svg);mask-image:url(assets/icons/scout-ship.svg)}
+.i-starfighter{-webkit-mask-image:url(assets/icons/starfighter.svg);mask-image:url(assets/icons/starfighter.svg)}
+.i-interceptor{-webkit-mask-image:url(assets/icons/interceptor-ship.svg);mask-image:url(assets/icons/interceptor-ship.svg)}
+.i-shuttle{-webkit-mask-image:url(assets/icons/space-shuttle.svg);mask-image:url(assets/icons/space-shuttle.svg)}
+.i-strafe{-webkit-mask-image:url(assets/icons/strafe.svg);mask-image:url(assets/icons/strafe.svg)}
+.i-lunar{-webkit-mask-image:url(assets/icons/lunar-module.svg);mask-image:url(assets/icons/lunar-module.svg)}
+.i-rocket2{-webkit-mask-image:url(assets/icons/rocket.svg);mask-image:url(assets/icons/rocket.svg)}
+.i-asteroid{-webkit-mask-image:url(assets/icons/asteroid.svg);mask-image:url(assets/icons/asteroid.svg)}
+.i-blackhole{-webkit-mask-image:url(assets/icons/black-hole-bolas.svg);mask-image:url(assets/icons/black-hole-bolas.svg)}
+.i-bug{-webkit-mask-image:url(assets/icons/alien-bug.svg);mask-image:url(assets/icons/alien-bug.svg)}
+.i-spiky{-webkit-mask-image:url(assets/icons/spiky-field.svg);mask-image:url(assets/icons/spiky-field.svg)}
+.i-vortex{-webkit-mask-image:url(assets/icons/vortex.svg);mask-image:url(assets/icons/vortex.svg)}
+.i-bubble{-webkit-mask-image:url(assets/icons/bubble-field.svg);mask-image:url(assets/icons/bubble-field.svg)}
+.i-eclipse{-webkit-mask-image:url(assets/icons/eclipse.svg);mask-image:url(assets/icons/eclipse.svg)}
+.i-explplanet{-webkit-mask-image:url(assets/icons/exploding-planet.svg);mask-image:url(assets/icons/exploding-planet.svg)}
+.i-bolt{-webkit-mask-image:url(assets/icons/hypersonic-bolt.svg);mask-image:url(assets/icons/hypersonic-bolt.svg)}
+.i-evilmoon{-webkit-mask-image:url(assets/icons/evil-moon.svg);mask-image:url(assets/icons/evil-moon.svg)}
+.i-rays{-webkit-mask-image:url(assets/icons/explosion-rays.svg);mask-image:url(assets/icons/explosion-rays.svg)}
+.i-egg{-webkit-mask-image:url(assets/icons/alien-egg.svg);mask-image:url(assets/icons/alien-egg.svg)}
+.i-radar{-webkit-mask-image:url(assets/icons/radar-dish.svg);mask-image:url(assets/icons/radar-dish.svg)}
+.i-beam{-webkit-mask-image:url(assets/icons/beam-satellite.svg);mask-image:url(assets/icons/beam-satellite.svg)}
+.i-observ{-webkit-mask-image:url(assets/icons/observatory.svg);mask-image:url(assets/icons/observatory.svg)}
+.i-defsat{-webkit-mask-image:url(assets/icons/defense-satellite.svg);mask-image:url(assets/icons/defense-satellite.svg)}
+.i-curiosity{-webkit-mask-image:url(assets/icons/mars-curiosity.svg);mask-image:url(assets/icons/mars-curiosity.svg)}
+.i-ringed{-webkit-mask-image:url(assets/icons/ringed-planet.svg);mask-image:url(assets/icons/ringed-planet.svg)}
+.i-orbrays{-webkit-mask-image:url(assets/icons/orbital-rays.svg);mask-image:url(assets/icons/orbital-rays.svg)}
+.i-starcycle{-webkit-mask-image:url(assets/icons/star-cycle.svg);mask-image:url(assets/icons/star-cycle.svg)}
+.i-conquest{-webkit-mask-image:url(assets/icons/planet-conquest.svg);mask-image:url(assets/icons/planet-conquest.svg)}
+.i-helmet{-webkit-mask-image:url(assets/icons/astronaut-helmet.svg);mask-image:url(assets/icons/astronaut-helmet.svg)}
+.i-suit{-webkit-mask-image:url(assets/icons/space-suit.svg);mask-image:url(assets/icons/space-suit.svg)}
+.i-nightsky{-webkit-mask-image:url(assets/icons/night-sky.svg);mask-image:url(assets/icons/night-sky.svg)}
+.i-solar{-webkit-mask-image:url(assets/icons/solar-system.svg);mask-image:url(assets/icons/solar-system.svg)}
+.i-swirl{-webkit-mask-image:url(assets/icons/star-swirl.png);mask-image:url(assets/icons/star-swirl.png)}
+.i-crack{-webkit-mask-image:url(assets/icons/cracked-glass.png);mask-image:url(assets/icons/cracked-glass.png)}
+.i-credits{-webkit-mask-image:url(assets/icons/credits-currency.png);mask-image:url(assets/icons/credits-currency.png)}
+.i-convince{-webkit-mask-image:url(assets/icons/convince.png);mask-image:url(assets/icons/convince.png)}
+.i-alien{-webkit-mask-image:url(assets/icons/alien-skull.png);mask-image:url(assets/icons/alien-skull.png)}
+.ga{filter:grayscale(1) invert(1) contrast(1.45) sepia(1) saturate(3) hue-rotate(8deg) brightness(1.08);background:#170d02;-webkit-mask-image:repeating-linear-gradient(0deg,#000 0 2px,rgba(0,0,0,.55) 2px 3px);mask-image:repeating-linear-gradient(0deg,#000 0 2px,rgba(0,0,0,.55) 2px 3px)}
+.gx{display:inline-grid;flex:none;vertical-align:middle}
+.gx>.ic{grid-area:1/1}
+.gx>.gh{background-color:#ff4f7b!important;opacity:.55;transform:translate(2px,0);animation:gxjit 2.7s steps(1) infinite}
+.gx>.ic:not(.gh){animation:gxjit 3.4s steps(1) infinite reverse}
+.gx:nth-child(2n)>.gh{animation-duration:3.1s}.gx:nth-child(3n)>.gh{animation-duration:2.3s}
+@keyframes gxjit{0%,100%{transform:translate(0,0)}18%{transform:translate(-2px,0)}19%{transform:translate(2px,0)}20%{transform:translate(0,0)}66%{transform:translate(2px,0)}67%{transform:translate(0,0)}}
+.gxi{display:inline-grid;flex:none;vertical-align:middle;position:relative}
+.gxi>img{grid-area:1/1}
+.gxi>.gh{opacity:.6;transform:translate(3px,0);animation:gxjit 2.9s steps(1) infinite}
+.gxi>.ga.gh{filter:grayscale(1) invert(1) contrast(1.45) sepia(1) saturate(5) hue-rotate(290deg) brightness(1.05)}
+.gxi>.ga-red.gh{filter:grayscale(1) invert(1) contrast(1.45) sepia(1) saturate(5) hue-rotate(150deg) brightness(1.05)}
+.gxi>img:not(.gh){mix-blend-mode:screen;animation:gxjit 3.7s steps(1) infinite reverse}
+.gxi:nth-child(2n)>.gh{animation-duration:3.3s}.gxi:nth-child(3n)>.gh{animation-duration:2.4s}
+.i-being{-webkit-mask-image:url(assets/icons/being-icon.png);mask-image:url(assets/icons/being-icon.png)}
+.i-skull{-webkit-mask-image:url(assets/icons/skull-crossed-bones.png);mask-image:url(assets/icons/skull-crossed-bones.png)}
+.i-silo{-webkit-mask-image:url(assets/icons/round-silo.png);mask-image:url(assets/icons/round-silo.png)}
+</style>
+</helmet>
+<div class="void" style="width: 2900px; min-height: 2800px; box-sizing: border-box; padding: 72px 66px; color: #e8e4d8; font-family: 'IBM Plex Sans', system-ui, sans-serif; display: flex; flex-direction: column; gap: 56px">
+
+  <header style="display: flex; justify-content: space-between; align-items: flex-end; gap: 64px">
+    <div style="display: flex; flex-direction: column; gap: 14px; max-width: 980px">
+      <div class="num" style="font-size: 14px; letter-spacing: 0.18em; color: #FFD700">THE TRAVEL DECK · 52 CARDS · 5 KINDS</div>
+      <h1 style="margin: 0; font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 80px; line-height: 0.95; color: #ece8dc">Travel cards</h1>
+      <p style="margin: 4px 0 0; font-size: 20px; line-height: 1.5; color: #b9bdd4">Every card says what it is: a coloured band and an icon for its kind, a picture in the middle, and the numbers you need printed on its face, so nobody looks anything up in a table. The small code in each band (♠ A) still names the matching playing card, so a normal deck works until these are printed.</p>
+    </div>
+    <div style="display: flex; gap: 14px; flex-wrap: wrap; justify-content: flex-end; max-width: 900px">
+      <sc-for list="{{ legend }}" as="t" hint-placeholder-count="5">
+        <div style="{{ t.chipStyle }}"><span class="gx"><span class="ic {{ t.icon }} gh" style="width: 22px; height: 22px"></span><span class="ic {{ t.icon }}" style="width: 22px; height: 22px"></span></span><span class="lbl" style="font-size: 14px">{{ t.label }}</span><span class="num" style="font-size: 13px; opacity: .75">{{ t.count }}</span></div>
+      </sc-for>
+    </div>
+  </header>
+
+  <section style="display: flex; gap: 56px; align-items: flex-start">
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      <h2 class="lbl" style="margin: 0; font-size: 15px; color: #9aa3c7">CARD STOCK · INSTEAD OF WHITE</h2>
+      <div style="display: flex; gap: 24px">
+        <sc-for list="{{ compare }}" as="o" hint-placeholder-count="4">
+          <div style="display: flex; flex-direction: column; gap: 12px; align-items: flex-start">
+            <div style="{{ o.card.cardStyle }}">
+              <div style="{{ o.card.bandStyle }}"><span style="display: flex; align-items: center; gap: 6px"><span class="gx"><span class="ic {{ o.card.typeIcon }} gh" style="width: 15px; height: 15px"></span><span class="ic {{ o.card.typeIcon }}" style="width: 15px; height: 15px"></span></span><span class="lbl" style="font-size: 10px">{{ o.card.typeName }}</span></span><span class="num" style="font-size: 12px">{{ o.card.code }}</span></div>
+              <div style="height: 98px; display: flex; align-items: center; justify-content: center"><div style="{{ o.card.ringStyle }}"><span class="gx"><span class="ic {{ o.card.artIcon }} gh" style="{{ o.card.artStyle }}"></span><span class="ic {{ o.card.artIcon }}" style="{{ o.card.artStyle }}"></span></span></div></div>
+              <div style="padding: 0 12px; display: flex; flex-direction: column; gap: 1px"><span style="{{ o.card.titleStyle }}">{{ o.card.title }}</span><span style="{{ o.card.subStyle }}">{{ o.card.sub }}</span></div>
+              <div style="flex: 1; padding: 8px 12px 10px; display: flex; flex-direction: column; justify-content: flex-end; gap: 0">
+                <sc-for list="{{ o.card.options }}" as="op" hint-placeholder-count="2">
+                  <div style="{{ op.rowStyle }}"><span class="num" style="font-size: 15px">{{ op.head }}</span><span style="display: flex; align-items: center; gap: 5px; font-size: 11px"><span class="gx"><span class="ic {{ op.icon }} gh" style="width: 13px; height: 13px"></span><span class="ic {{ op.icon }}" style="width: 13px; height: 13px"></span></span>{{ op.tail }}</span></div>
+                </sc-for>
+              </div>
+            </div>
+            <span style="{{ o.labelStyle }}">{{ o.name }}</span>
+            <span class="num" style="font-size: 12px; color: #9aa3c7">{{ o.hex }} {{ o.note }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      <h2 class="lbl" style="margin: 0; font-size: 15px; color: #9aa3c7">THE BACK</h2>
+      <div style="width: 200px; height: 290px; box-sizing: border-box; border-radius: 14px; background: #161c3c; border: 2px solid #FFD700; padding: 10px; display: flex">
+        <div style="flex: 1; border-radius: 8px; border: 1px solid rgba(255,215,0,.45); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; color: #FFD700">
+          <span class="gx"><span class="ic i-swirl gh" style="width: 92px; height: 92px"></span><span class="ic i-swirl" style="width: 92px; height: 92px"></span></span>
+          <span class="lbl" style="font-size: 15px; letter-spacing: 0.24em; text-align: center; line-height: 1.4">WARBLE<br>WAY</span>
+          <span class="gx"><span class="ic i-nightsky gh" style="width: 120px; height: 34px; opacity: .55"></span><span class="ic i-nightsky" style="width: 120px; height: 34px; opacity: .55"></span></span>
+        </div>
+      </div>
+      <span style="font-size: 14px; color: #9aa3c7; max-width: 200px; line-height: 1.5">Gold swirl, the same mark as a ruin's goal. Face-down piles always look like this.</span>
+    </div>
+
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 16px; max-width: 760px">
+      <h2 class="lbl" style="margin: 0; font-size: 15px; color: #9aa3c7">HOW A CARD READS</h2>
+      <ol style="margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 12px; font-size: 17px; line-height: 1.5; color: #d6d3e8">
+        <li><b style="color: #ece8dc">Band:</b> the kind of card, its icon and colour, and the playing-card code on the right.</li>
+        <li><b style="color: #ece8dc">Picture:</b> one icon per card, in the kind's colour, inside a dashed scanner ring. Recruits show the race portrait where your drawings exist.</li>
+        <li><b style="color: #ece8dc">Name:</b> what you met. Hazard names are my suggestions from the icons; rename freely.</li>
+        <li><b style="color: #ece8dc">Face:</b> exactly the numbers the table printed. Two-way cards (hazards, jobs) give each way its own line.</li>
+      </ol>
+      <p style="margin: 6px 0 0; font-size: 15px; line-height: 1.55; color: #9aa3c7">The five kind colours also differ in lightness, and each has its own icon and word, so colour is never the only clue. Switch the stock from the Tweaks panel to see the whole deck in another colour.</p>
+    </div>
+  </section>
+
+  <sc-for list="{{ rows }}" as="row" hint-placeholder-count="5">
+    <section style="display: flex; flex-direction: column; gap: 16px">
+      <div style="display: flex; align-items: baseline; gap: 16px">
+        <span style="{{ row.headStyle }}">{{ row.label }}</span>
+        <span style="font-size: 15px; color: #9aa3c7">{{ row.note }}</span>
+      </div>
+      <div style="display: flex; gap: 14px">
+        <sc-for list="{{ row.cards }}" as="c" hint-placeholder-count="13">
+          <div style="{{ c.cardStyle }}">
+            <div style="{{ c.bandStyle }}"><span style="display: flex; align-items: center; gap: 6px"><span class="gx"><span class="ic {{ c.typeIcon }} gh" style="width: 15px; height: 15px"></span><span class="ic {{ c.typeIcon }}" style="width: 15px; height: 15px"></span></span><span class="lbl" style="font-size: 10px">{{ c.typeName }}</span></span><span class="num" style="font-size: 12px">{{ c.code }}</span></div>
+            <div style="height: 98px; display: flex; align-items: center; justify-content: center">
+              <div style="{{ c.ringStyle }}">
+                <sc-if value="{{ c.artImg }}" hint-placeholder-val="{{ false }}"><span class="gxi"><img class="ga gh" src="{{ c.artImg }}" alt="" aria-hidden="true" style="width: 84px; height: 84px; border-radius: 50%; object-fit: cover"><img class="ga" src="{{ c.artImg }}" alt="{{ c.title }}" style="width: 84px; height: 84px; border-radius: 50%; object-fit: cover"></span></sc-if>
+                <sc-if value="{{ c.artIcon }}" hint-placeholder-val="{{ true }}"><span class="gx"><span class="ic {{ c.artIcon }} gh" style="{{ c.artStyle }}"></span><span class="ic {{ c.artIcon }}" style="{{ c.artStyle }}"></span></span></sc-if>
+              </div>
+            </div>
+            <div style="padding: 0 12px; display: flex; flex-direction: column; gap: 1px"><span style="{{ c.titleStyle }}">{{ c.title }}</span><span style="{{ c.subStyle }}">{{ c.sub }}</span></div>
+            <div style="flex: 1; padding: 8px 12px 10px; display: flex; flex-direction: column; justify-content: flex-end">
+              <sc-if value="{{ c.isRecruit }}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 8px">
+                  <span style="display: flex; flex-direction: column"><span style="{{ c.smallStyle }}">need</span><span class="num" style="font-size: 26px; line-height: 1">{{ c.min }}</span></span>
+                  <span style="display: flex; flex-direction: column; gap: 4px; align-items: flex-end">
+                    <sc-for list="{{ c.chips }}" as="ch" hint-placeholder-count="1"><span class="num" style="{{ c.chipStyle }}">{{ ch }}</span></sc-for>
+                  </span>
+                </div>
+              </sc-if>
+              <sc-if value="{{ c.isPirate }}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; flex-direction: column; gap: 6px">
+                  <span style="display: flex; align-items: baseline; gap: 6px"><span class="num" style="font-size: 26px; line-height: 1">{{ c.big }}</span><span style="{{ c.smallStyle }}">space attack</span></span>
+                  <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 2px; text-align: center">
+                    <sc-for list="{{ c.stats }}" as="st" hint-placeholder-count="5"><span style="display: flex; flex-direction: column"><span class="num" style="font-size: 13px">{{ st.v }}</span><span style="{{ c.tinyStyle }}">{{ st.k }}</span></span></sc-for>
+                  </div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ c.isRuin }}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; align-items: flex-end; justify-content: space-between">
+                  <span style="display: flex; flex-direction: column"><span style="{{ c.smallStyle }}">depth</span><span class="num" style="font-size: 26px; line-height: 1">{{ c.depth }}</span></span>
+                  <span style="display: flex; gap: 4px"><sc-for list="{{ c.pips }}" as="p" hint-placeholder-count="3"><span style="{{ p.style }}"></span></sc-for></span>
+                </div>
+              </sc-if>
+              <sc-for list="{{ c.options }}" as="op" hint-placeholder-count="0">
+                <div style="{{ op.rowStyle }}"><span class="num" style="font-size: 15px">{{ op.head }}</span><span style="display: flex; align-items: center; gap: 5px; font-size: 11px"><sc-if value="{{ op.icon }}" hint-placeholder-val="{{ false }}"><span class="gx"><span class="ic {{ op.icon }} gh" style="width: 13px; height: 13px"></span><span class="ic {{ op.icon }}" style="width: 13px; height: 13px"></span></span></sc-if>{{ op.tail }}</span></div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+  </sc-for>
+
+  <p style="margin: 0; font-size: 13px; color: #9aa3c7">Icons by Lorc, Delapouite and other contributors at game-icons.net, CC BY 3.0. Recruit portraits are your own drawings.</p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"stock":{"editor":"enum","options":["hull","kraft","nebula","patina"],"default":"hull"},"$preview":{"width":2900,"height":2900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var STOCKS = {
+      hull: { name: 'Hull navy', hex: '#1F2650', bg: '#1f2650', ink: '#ece8dc', muted: '#aab1d3', line: '#3d4880', dark: true, note: '· recommended' },
+      kraft: { name: 'Kraft', hex: '#D4BF98', bg: '#d4bf98', ink: '#2a2116', muted: '#56462e', line: '#a8936b', dark: false, note: '' },
+      nebula: { name: 'Nebula lilac', hex: '#C4C0E4', bg: '#c4c0e4', ink: '#1c1a33', muted: '#433f68', line: '#948ec2', dark: false, note: '' },
+      patina: { name: 'Patina', hex: '#A9CBC3', bg: '#a9cbc3', ink: '#142624', muted: '#334c48', line: '#7ba39a', dark: false, note: '' }
+    };
+    var TYPES = {
+      recruit: { name: 'RECRUIT', icon: 'i-being', bright: '#4cc9b0', deep: '#1c6f61', count: '13 · ♥' },
+      pirate: { name: 'PIRATES', icon: 'i-skull', bright: '#f07070', deep: '#a3242c', count: '8 · ♦2–9' },
+      ruin: { name: 'RUIN', icon: 'i-silo', bright: '#f2b544', deep: '#7f5300', count: '5 · ♦10–A' },
+      hazard: { name: 'HAZARD', icon: 'i-meteorimpact', bright: '#ad90f7', deep: '#563aa8', count: '13 · ♠' },
+      mission: { name: 'JOB', icon: 'i-satcom', bright: '#6eaaff', deep: '#1f5397', count: '13 · ♣' }
+    };
+    var FAIL = {
+      ship: { icon: 'i-crack', text: 'ship damage' },
+      cash: { icon: 'i-credits', text: '−100c' },
+      crew: { icon: 'i-convince', text: 'crew unrest' },
+      death: { icon: 'i-disintegrate', text: 'death check' }
+    };
+    var TOKENS = { Hexapod: 'assets/portraits/hexapod.jpg', Grull: 'assets/portraits/grull.jpg', Human: 'assets/portraits/human.jpg', Kralkin: 'assets/portraits/kralkin.jpg' };
+    var STAND = { Kralkin: 'i-suit', Human: 'i-helmet' };
+
+    function build(d, s) {
+      var t = TYPES[d.kind];
+      var tone = s.dark ? t.bright : t.deep;
+      var c = {
+        cardStyle: 'width: 200px; height: 290px; flex: none; box-sizing: border-box; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; background: ' + s.bg + '; color: ' + s.ink + '; border: 2px solid ' + t.bright + '; box-shadow: 0 10px 24px rgba(0,0,0,.35);',
+        bandStyle: 'height: 30px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; background: ' + t.bright + '; color: #10142a;',
+        typeIcon: t.icon, typeName: t.name, code: d.code,
+        ringStyle: 'width: 90px; height: 90px; box-sizing: border-box; border-radius: 50%; border: 1.5px dashed ' + s.line + '; display: flex; align-items: center; justify-content: center; color: ' + tone + ';',
+        artIcon: d.art || '', artImg: d.img || '',
+        artStyle: 'width: 64px; height: 64px;',
+        title: d.title, sub: d.sub,
+        titleStyle: "font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 18px; line-height: 1.15; color: " + s.ink + ';',
+        subStyle: 'font-size: 11px; line-height: 1.3; color: ' + s.muted + ';',
+        smallStyle: 'font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: ' + s.muted + ';',
+        tinyStyle: 'font-size: 9px; color: ' + s.muted + ';',
+        chipStyle: 'font-size: 12px; padding: 2px 7px; border-radius: 6px; border: 1.5px solid ' + tone + '; color: ' + tone + ';',
+        isRecruit: d.kind === 'recruit', isPirate: d.kind === 'pirate', isRuin: d.kind === 'ruin',
+        min: d.min || '', chips: d.chips || [], big: d.big || '', stats: d.stats || [], depth: d.depth || '', pips: [], options: []
+      };
+      if (d.kind === 'ruin') {
+        for (var i = 1; i <= 3; i++) {
+          c.pips.push({ style: 'width: 14px; height: 22px; border-radius: 3px; box-sizing: border-box; ' + (i <= d.depth ? 'background: ' + tone + ';' : 'border: 1.5px solid ' + s.line + ';') });
+        }
+      }
+      (d.options || []).forEach(function (o, idx) {
+        c.options.push({
+          head: o.head, tail: o.tail, icon: o.icon || '',
+          rowStyle: 'display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 6px 0; border-top: 1px solid ' + s.line + ';'
+        });
+      });
+      return c;
+    }
+
+    function hazard(code, name, art, a, b) {
+      return { kind: 'hazard', code: '♠ ' + code, title: name, sub: 'Pick a way through · 1 XP', art: art,
+        options: [
+          { head: a[0] + ' ' + a[1], tail: FAIL[a[2]].text, icon: FAIL[a[2]].icon },
+          { head: b[0] + ' ' + b[1], tail: FAIL[b[2]].text, icon: FAIL[b[2]].icon }
+        ] };
+    }
+    function job(code, art, title, blurb, a, b) {
+      return { kind: 'mission', code: '♣ ' + code, title: title, sub: blurb, art: art,
+        options: [
+          { head: a[1] + ' ' + a[2], tail: 'dist ' + a[0] + ' · ' + a[3] + 'c · ' + a[4] + ' XP' },
+          { head: b[1] + ' ' + b[2], tail: 'dist ' + b[0] + ' · ' + b[3] + 'c · ' + b[4] + ' XP' }
+        ] };
+    }
+    function ruinJob(code, dist, depth, credits, xp, title, blurb) {
+      return { kind: 'mission', code: '♣ ' + code, title: title, sub: blurb + ' No ability needed.', art: 'i-conquest',
+        options: [ { head: 'R' + depth, tail: 'dist ' + dist + ' · ' + credits + 'c · ' + xp + ' XP' } ] };
+    }
+    function recruit(code, race, ideal, min, chips, name, who) {
+      return { kind: 'recruit', code: '♥ ' + code, title: name, sub: who + ' · idealizes ' + ideal, img: TOKENS[race] || '', art: TOKENS[race] ? '' : STAND[race], min: min, chips: chips };
+    }
+    function pirate(code, art, sp, gr, cap, spd, hnd, hack, special) {
+      return { kind: 'pirate', code: '♦ ' + code, title: 'Pirates', sub: special || 'Fight, flee, hack or slip past', art: art, big: sp,
+        stats: [ { k: 'ground', v: gr }, { k: 'crew', v: cap }, { k: 'speed', v: spd }, { k: 'handl.', v: hnd }, { k: 'hack', v: hack } ] };
+    }
+    function ruin(code, depth, name, blurb) {
+      return { kind: 'ruin', code: '♦ ' + code, title: name, sub: blurb + ' Enter, or fly on.', art: 'i-silo', depth: depth };
+    }
+
+    var data = {
+      recruit: [
+        recruit('A', 'Hexapod', 'Smarts', 13, ['+3 PIL'], 'C0FFEE', 'Hexapod pod pilot'),
+        recruit('2', 'Grull', 'Finesse', 12, ['+2 MEC', '+1 DIP'], 'Flint', 'Grull of Shale\'s brood'),
+        recruit('3', 'Grull', 'Finesse', 13, ['+3 HAK'], 'Mica', 'Grull of Pyrite\'s brood'),
+        recruit('4', 'Kralkin', 'Moxie', 13, ['+3 SWA'], 'Kakaaw', 'Kralkin duelist'),
+        recruit('5', 'Kralkin', 'Moxie', 12, ['+2 DIP', '+1 ARM'], 'Pii', 'Kralkin court envoy'),
+        recruit('6', 'Kralkin', 'Moxie', 12, ['+2 ARM', '+1 GUN'], 'Gronk', 'Kralkin fleet gunner'),
+        recruit('7', 'Human', 'Brawn', 13, ['+3 DEM'], 'Aaliyah', 'Human, ex-TanakaRodriguez'),
+        recruit('8', 'Hexapod', 'Smarts', 13, ['+3 SNE'], 'FACADE', 'Hexapod pod, hard to spot'),
+        recruit('9', 'Human', 'Brawn', 13, ['+3 ARM'], 'Muhammad', 'Human, ex-UHM trooper'),
+        recruit('10', 'Hexapod', 'Smarts', 12, ['+2 SNE', '+1 DIP'], 'DEC0DE', 'Hexapod pod translator'),
+        recruit('J', 'Kralkin', 'Moxie', 13, ['+3 MEC'], 'Tweet', 'Kralkin station mechanic'),
+        recruit('Q', 'Grull', 'Finesse', 12, ['+2 RES', '+1 MEC'], 'Obsidian', 'Grull of Pumice\'s brood'),
+        recruit('K', 'Human', 'Brawn', 12, ['+2 ACT', '+1 SWA'], 'Katie', 'Megaship stage star')
+      ],
+      pirate: [
+        pirate('2', 'i-ufo', '+7', '+5', '7', '+2', '4', '15', 'The monster of the lanes'),
+        pirate('3', 'i-scout', '+3', '+1', '3', '+0', '2', '12', ''),
+        pirate('4', 'i-starfighter', '+5', '+2', '5', '+0', '0', '13', 'Space combat advantage'),
+        pirate('5', 'i-interceptor', '+3', '+1', '3', '+2', '0', '12', ''),
+        pirate('6', 'i-shuttle', '+3', '+1', '4', '+0', '0', '12', ''),
+        pirate('7', 'i-strafe', '+5', '+2', '5', '+2', '0', '13', ''),
+        pirate('8', 'i-lunar', '+3', '+1', '3', '+0', '0', '12', '−2 enemy space combat bonus'),
+        pirate('9', 'i-rocket2', '+3', '+1', '4', '+1', '0', '12', '')
+      ],
+      ruin: [
+        ruin('10', 1, 'The Picked Shell', 'Diggers stripped it bare years ago. Mostly.'),
+        ruin('J', 2, 'Hollow Aerie', 'Kralkin perches, built for wings older than Arraak.'),
+        ruin('Q', 3, 'Providence Zero', 'A Megaship hull, millions of years old. Humans left Earth 120 years ago.'),
+        ruin('K', 2, 'The Hive Engine', 'Grull-carved halls full of machines no Grull could build.'),
+        ruin('A', 3, 'The Quiet Spire', 'Its guns still work. Its makers do not.')
+      ],
+      hazard: [
+        hazard('A', 'Meteor shower', 'i-meteorimpact', ['PIL', 10, 'ship'], ['HAK', 15, 'cash']),
+        hazard('2', 'Asteroid field', 'i-asteroid', ['SNE', 10, 'ship'], ['RES', 15, 'cash']),
+        hazard('3', 'Gravity snare', 'i-blackhole', ['RES', 10, 'cash'], ['SWA', 15, 'death']),
+        hazard('4', 'Hull mites', 'i-bug', ['ACT', 10, 'crew'], ['RES', 15, 'cash']),
+        hazard('5', 'Mine field', 'i-spiky', ['GUN', 10, 'ship'], ['MEC', 15, 'cash']),
+        hazard('6', 'Wormhole', 'i-vortex', ['PIL', 10, 'ship'], ['DIP', 15, 'crew']),
+        hazard('7', 'Plasma bubbles', 'i-bubble', ['RES', 10, 'cash'], ['GUN', 15, 'ship']),
+        hazard('8', 'Dark eclipse', 'i-eclipse', ['SNE', 10, 'ship'], ['LEA', 15, 'crew']),
+        hazard('9', 'Planet breakup', 'i-explplanet', ['ARM', 10, 'death'], ['HAK', 15, 'cash']),
+        hazard('10', 'Ion bolt', 'i-bolt', ['SNE', 10, 'ship'], ['LEA', 15, 'crew']),
+        hazard('J', 'Rogue moon', 'i-evilmoon', ['ACT', 10, 'crew'], ['PIL', 15, 'ship']),
+        hazard('Q', 'Solar flare', 'i-rays', ['DIP', 10, 'crew'], ['DEM', 15, 'death']),
+        hazard('K', 'Spore pods', 'i-egg', ['MEC', 10, 'cash'], ['ACT', 15, 'crew'])
+      ],
+      mission: [
+        job('2', 'i-satcom', 'Channel clash', 'Two Kralkin relays claim one channel. Broker a deal, or slip into their code.', [4, 'DIP', 10, 200, 1], [8, 'HAK', 15, 400, 2]),
+        job('3', 'i-radar', 'Gone quiet', 'A Grull survey crew went silent. Rally a search, or cut through what found them.', [4, 'LEA', 10, 200, 1], [8, 'SWA', 14, 400, 2]),
+        job('4', 'i-beam', 'Inspection day', 'The tractor beam is broken and the inspector is early. Stall, or fix it fast.', [4, 'ACT', 10, 200, 1], [8, 'MEC', 15, 400, 2]),
+        job('5', 'i-observ', 'Night shift', 'An FFFFFF observatory\'s crew walked out. Run the night shift, or finish the study.', [6, 'LEA', 15, 300, 1], [12, 'RES', 15, 600, 3]),
+        job('6', 'i-defsat', 'Trigger-happy', 'An old UHM defense sat shoots at anything. Hack its targeting, or shoot back.', [6, 'HAK', 15, 300, 1], [12, 'GUN', 14, 600, 3]),
+        job('7', 'i-curiosity', 'Runaway rover', '800800\'s prototype rover fell off a moon cliff. Find where, or fly in after it.', [4, 'RES', 10, 250, 1], [8, 'PIL', 15, 400, 2]),
+        job('8', 'i-ringed', 'Ring run', 'Aarak wants spores from a gas giant\'s rings. Thread the ice, or grow them in a lab.', [4, 'PIL', 10, 250, 1], [8, 'RES', 15, 400, 2]),
+        job('9', 'i-orbrays', 'Hot cargo', 'Ruin tech in a crate, humming louder by the hour. Shield it, or bluff past customs.', [4, 'MEC', 10, 250, 1], [8, 'ACT', 15, 400, 2]),
+        job('10', 'i-starcycle', 'Gala escort', 'Bring a Grull envoy to a Kralkin gala. Keep the peace, or keep the guards in line.', [6, 'DIP', 15, 300, 1], [12, 'LEA', 15, 700, 3]),
+        ruinJob('J', 8, 1, '1,400', 2, 'Digger\'s tip', 'A drunk digger sold you coordinates to a shallow ruin. Probably real.'),
+        ruinJob('Q', 12, 2, '1,600', 3, 'Salvage rights', 'WinchesterZhang wants ancient guns out before its rivals get there.'),
+        ruinJob('K', 16, 3, '1,800', 4, 'The deep dig', 'Three maps down, something still keeps the lights on. No one has said what.'),
+        ruinJob('A', 10, 3, '1,500', 3, 'Kralkin-built?', 'Kralkin-built ruins, older than Kralkin flight. The court wants answers.')
+      ]
+    };
+
+    var key = STOCKS[this.props.stock] ? this.props.stock : 'hull';
+    var s = STOCKS[key];
+    var NOTES = {
+      recruit: 'Someone adrift, by name. Roll to bring them aboard, or fly on.',
+      pirate: 'A fight you cannot ignore. The big number is their space attack.',
+      ruin: 'Ruins found in space. Depth is how many maps deep it goes.',
+      hazard: 'Two ways through. Pick the line someone aboard can carry.',
+      mission: 'A job with two ways to do it. J to A are ruin expeditions.'
+    };
+    var LABELS = { recruit: 'Recruits', pirate: 'Pirates', ruin: 'Ruins', hazard: 'Hazards', mission: 'Jobs' };
+    var rows = ['recruit', 'pirate', 'ruin', 'hazard', 'mission'].map(function (k) {
+      return {
+        label: LABELS[k], note: NOTES[k],
+        headStyle: "font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 30px; color: " + TYPES[k].bright + ';',
+        cards: data[k].map(function (d) { return build(d, s); })
+      };
+    });
+    var legend = ['recruit', 'pirate', 'ruin', 'hazard', 'mission'].map(function (k) {
+      var t = TYPES[k];
+      return { icon: t.icon, label: t.name, count: t.count,
+        chipStyle: 'display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-radius: 999px; background: ' + t.bright + '; color: #10142a;' };
+    });
+    var compare = ['hull', 'kraft', 'nebula', 'patina'].map(function (k) {
+      var st = STOCKS[k];
+      return { name: st.name, hex: st.hex, note: st.note, card: build(data.hazard[0], st),
+        labelStyle: "font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 18px; color: " + (k === key ? '#FFD700' : '#ece8dc') + ';' };
+    });
+    return { rows: rows, legend: legend, compare: compare };
+  }
+}
+</script>
+</body>
+</html>

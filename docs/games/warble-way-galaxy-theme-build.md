@@ -115,8 +115,9 @@ Portrait files are in `assets/portraits/` (256 × 256): `human`, `kralkin`,
 `spore-titan`; metal `sentry-drone`, `loader-mech`, `spider-bot`; starry
 `pirate-captain`, `pirate-boarder`, `pirate-gunner`. Recruits use their race's
 portrait for now. The large pencil-and-ink race pictures in `assets/sketches/`
-are for the setup screen and race panels. The images must be confirmed for
-licence before commit (see `ATTRIBUTIONS.md`).
+are for the setup screen and race panels. The images in `assets/portraits/`,
+`assets/sketches/` and `assets/holograms/` were remade with Apache 2.0 models
+(see `ATTRIBUTIONS.md`).
 
 ## 4. Travel cards
 
@@ -236,13 +237,10 @@ ghost is `#ff4f7b` at 55% on `steps(1)`, 2.7 s, the icon 3.4 s reversed.
 The skills icon was found to be a solid square (its file had no alpha) and
 was fixed in the working folder too; see the design README.
 
-**Blocked: the portraits.** Every image in `assets/portraits/` and
-`assets/sketches/` was made with Qwen Image 2.1, whose licence is research
-only. They cannot be committed, which also keeps the whole design folder out
-of git today. The owner's own drawings in `docs/games/warble-way-galaxy/races/`
-are his to use; the way through is to regenerate the 17 tokens and 4 sketches
-from them with Qwen Image Edit 2511 (Apache 2.0, installed), using the same
-instruction as before, then commit the folder.
+**Unblocked 2026-11-04: the portraits.** The 17 tokens, 4 sketches and 4
+holograms were regenerated with Qwen-Image-2512 and Qwen-Image-Edit-2511 (both
+Apache 2.0), with no Qwen Image 2.1 image as input, so the design folder can be
+committed. The older parts of its README describe the earlier images.
 
 **Decided 2026-11-03: the names live in the engine.** Item 4's names and
 blurbs, the habitat missions, shop items and cantina beings (appendix A) are
