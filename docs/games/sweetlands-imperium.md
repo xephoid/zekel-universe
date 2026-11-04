@@ -179,7 +179,7 @@ Each faction has three units: one **Leader** (claims the castle, gathers influen
 
 Only the first four factions are available in 2–4 player games. A 5-player game is always all four plus the Nomads.
 
-Faction art (see reference images): Milkshake is a duchess in a peach-and-cream ball gown holding a giant sundae; Fudge is a stout knight in dark armor with a castle-turret helmet and an orange sash; Jellybean is a small princess in a pink dress among green glowing jellybean plants; Cheesecake is a tall, thin, mustached old vizier in a brown coat and yellow vest holding cake on a plate; Quiche is a hooded, armored queen with a golden crown standing in a red-rock desert. Each art page also carries two small black-and-white icons — the faction's regional treat and its random treat (milkshake + ice cream cone, fudge cube + chocolate bar, jellybean + gummy bear, cheesecake slice + cupcake/cream puff, quiche + tomato).
+Faction art (`docs/design/assets/sweet-*.jpg`): Milkshake is a duchess in a peach-and-cream ball gown holding a giant sundae; Fudge is a stout knight in fudge-square armor with a closed castle-turret helmet that hides his face, an orange sash and a chocolate sword; Jellybean is a small princess in a pink dress among green plants that grow candy; Cheesecake is a tall, thin, mustached old vizier in a brown coat and yellow vest holding cake on a plate; Quiche is not candy: a tomato-red queen in vegetable armor with a lettuce cape, a golden crown and a cheese sword. Each faction also has two small one-color icons (`docs/design/assets/treat-*.png`): its regional treat and its random treat (milkshake + ice cream cone, fudge cube + chocolate bar, jellybean + gummy bear, cheesecake slice + cupcake/cream puff, quiche + tomato).
 
 ---
 
@@ -499,11 +499,6 @@ All copied to `docs/games/sweetlands-imperium/`.
 |---|---|
 | `board-full.png` | The printed board, cropped and hi-res: 80 colored squares on graph paper, four regions round an empty center, road arrows, dotted "?" slots. |
 | `page08-board.png` | Rulebook page 8 — the same board in page context with the "Faction art" heading below. |
-| `page09-milkshake.png` | Arch Duchess of Milkshake character art; below it the milkshake and ice-cream-cone treat icons. |
-| `page10-fudge.png` | General Fudge character art (armored knight, turret helmet); below it the fudge cube and chocolate bar icons. |
-| `page11-jellybean.png` | Princess Jellybean character art (pink dress, glowing jellybean plants); below it the jellybean and gummy bear icons. |
-| `page12-cheesecake.png` | Grand Vizier Cheesecake character art (tall mustached vizier with cake); below it the cheesecake slice and cupcake/cream puff icons. |
-| `page13-quiche.png` | Deposed Queen Quiche character art (hooded queen in a red desert); below it the quiche and tomato icons. |
 | `page01-components.png` | Rulebook page 1 — component list and setup steps (note the card counts here are superseded by the code). |
 | `page02-turn.png` | Rulebook page 2 — the turn structure and color actions as originally written. |
 | `page06-color-key.png` | Rulebook page 6 — the six colors with their action names printed in color, plus the faction color assignments (yellow 1, brown 2, purple 3, white 4, black 5). |
