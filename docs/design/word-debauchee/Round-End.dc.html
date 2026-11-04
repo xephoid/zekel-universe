@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Word Debauchee, round and game end</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.panel{background:#fff;border:1px solid #e0d6c3;border-radius:12px;padding:20px;box-shadow:0 6px 18px rgba(40,30,10,.08);min-width:0}
+.lead{font-size:14px;font-weight:600;color:#655c4d}
+.word{font:700 44px 'Bricolage Grotesque',sans-serif;letter-spacing:.02em;margin:2px 0 6px}
+.list{font-size:15px;color:#655c4d;margin-bottom:14px;line-height:1.45}
+.list b{color:#1f4d3a;font-weight:600;text-decoration:underline}
+.pay{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-top:1px solid #e0d6c3;font-size:15px}
+.mono{font-family:'IBM Plex Mono',monospace;font-weight:500}
+.btn{min-height:44px;padding:0 16px;border-radius:8px;border:1px solid #e0762b;background:#e0762b;color:#1c1a17;font:600 15px 'IBM Plex Sans',sans-serif;cursor:pointer}
+.btn.plain{background:#fff;border-color:#c9bda6}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th{font-size:12px;font-weight:600;color:#655c4d;text-align:right;padding:6px 8px}
+th:first-child,td:first-child{text-align:left}
+td{padding:7px 8px;border-top:1px solid #e0d6c3;text-align:right}
+</style>
+</helmet>
+<div style="width: 1100px; height: 960px; box-sizing: border-box; background: #f7f1e6; color: #1c1a17; font-family: 'IBM Plex Sans', sans-serif; padding: 40px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: auto 1fr; gap: 24px; align-content: start">
+
+<div class="panel">
+<div class="lead">Ben cracked it with MERRY. The word was</div>
+<div class="word">HAPPY</div>
+<div class="list">glad · <b>merry</b> · jolly · joyful · cheerful · content · pleased · upbeat</div>
+<div class="pay"><span>MERRY is 5 letters, less 2 laid down</span><span class="mono">pays 3</span></div>
+<div class="pay"><span>You</span><span class="mono">+3 = 7</span></div>
+<div class="pay"><span>Ben</span><span class="mono">+3 = 6</span></div>
+<div class="pay"><span>Cat</span><span class="mono">+3 = 5</span></div>
+<div class="pay"><span>Ann, the debauchee</span><span class="mono">+0 = 5</span></div>
+<div style="margin-top: 16px"><button class="btn">Next round: you're the debauchee</button></div>
+</div>
+
+<div class="panel">
+<div class="lead">Stumped. The last letter is down. The word was</div>
+<div class="word">HAPPY</div>
+<div class="list">glad · merry · jolly · joyful · cheerful · content · pleased · upbeat</div>
+<div class="pay"><span>Five letters, all to the debauchee</span><span class="mono">pays 5</span></div>
+<div class="pay"><span>Ann, the debauchee</span><span class="mono">+5 = 10</span></div>
+<div class="pay"><span>You</span><span class="mono">+0 = 4</span></div>
+<div class="pay"><span>Ben</span><span class="mono">+0 = 3</span></div>
+<div class="pay"><span>Cat</span><span class="mono">+0 = 2</span></div>
+<div style="margin-top: 16px"><button class="btn">Next round: you're the debauchee</button></div>
+</div>
+
+<div class="panel" style="grid-column: 1 / -1">
+<div class="lead">Eight rounds played</div>
+<div style="font: 700 36px 'Bricolage Grotesque', sans-serif; margin: 2px 0 14px">You and Ben share the win, 19 each</div>
+<table>
+<thead><tr><th>Word</th><th>Cracked with</th><th>Debauchee</th><th>You</th><th>Ben</th><th>Cat</th><th>Ann</th></tr></thead>
+<tbody>
+<tr><td>HAPPY</td><td>MERRY</td><td>Ann</td><td class="mono">+3</td><td class="mono">+3</td><td class="mono">+3</td><td class="mono">0</td></tr>
+<tr><td>[the other 7 rounds]</td><td></td><td></td><td class="mono">+16</td><td class="mono">+16</td><td class="mono">+11</td><td class="mono">+14</td></tr>
+<tr><td style="font-weight: 600">Total</td><td></td><td></td><td class="mono" style="font-weight: 600">19</td><td class="mono" style="font-weight: 600">19</td><td class="mono">14</td><td class="mono">14</td></tr>
+</tbody>
+</table>
+<div style="display: flex; gap: 8px; margin-top: 16px"><button class="btn">Play again</button><button class="btn plain">Back to the game page</button></div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1100,"height":960}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
