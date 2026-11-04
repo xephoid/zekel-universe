@@ -162,3 +162,55 @@
   .ww-gx > .ww-ic { animation: none !important; }
   .ww-gx > .ww-gh { transform: none; opacity: 0; }
 }
+
+/* ---------- holograms: a line drawing as a gold or red projection ----------
+   The portraits are black line art on off-white. Gold (`.ww-ga`, crew and
+   recruits): grayscale, inverted, contrast 1.45, sepia, saturate 3,
+   hue-rotate 8°, on #170d02, under a scanline mask (2 px solid, 1 px at
+   55%). Red (`.ww-ga-red`, attackers and pirates): saturate 5, hue-rotate
+   −38°, on #1a0405. Copied from Ruin.dc.html's .ga / .ga-red / .gxi. Two
+   stacked copies make the glitch (holo.tsx): the ghost hue-shifted to
+   magenta under gold or cyan under red at 60%, 3 px to the right, the main
+   copy screened over it, both jumping on steps(1) like the icons. Reduced
+   motion stops the jumps and tucks the ghost away. Not scoped to the table
+   shell, like the icons. */
+.ww-ga, .ww-ga-red {
+  -webkit-mask-image: repeating-linear-gradient(0deg, #000 0 2px, rgba(0, 0, 0, .55) 2px 3px);
+  mask-image: repeating-linear-gradient(0deg, #000 0 2px, rgba(0, 0, 0, .55) 2px 3px);
+}
+.ww-ga { filter: grayscale(1) invert(1) contrast(1.45) sepia(1) saturate(3) hue-rotate(8deg) brightness(1.08); background: #170d02; }
+.ww-ga-red { filter: grayscale(1) invert(1) contrast(1.5) sepia(1) saturate(5) hue-rotate(-38deg) brightness(1.05); background: #1a0405; }
+.ww-gxi { display: inline-grid; flex: none; vertical-align: middle; position: relative; }
+.ww-gxi > img { grid-area: 1 / 1; display: block; }
+.ww-gxi > .ww-gh { opacity: .6; transform: translate(3px, 0); animation: ww-gxjit 2.9s steps(1) infinite; }
+.ww-gxi > .ww-ga.ww-gh { filter: grayscale(1) invert(1) contrast(1.45) sepia(1) saturate(5) hue-rotate(290deg) brightness(1.05); }
+.ww-gxi > .ww-ga-red.ww-gh { filter: grayscale(1) invert(1) contrast(1.45) sepia(1) saturate(5) hue-rotate(150deg) brightness(1.05); }
+.ww-gxi > img:not(.ww-gh) { mix-blend-mode: screen; animation: ww-gxjit 3.7s steps(1) infinite reverse; }
+.ww-gxi:nth-child(2n) > .ww-gh { animation-duration: 3.3s; }
+.ww-gxi:nth-child(3n) > .ww-gh { animation-duration: 2.4s; }
+[data-motion='reduced'] .ww-gxi > img { animation: none; }
+[data-motion='reduced'] .ww-gxi > .ww-gh { transform: none; opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .ww-gxi > img { animation: none !important; }
+  .ww-gxi > .ww-gh { transform: none; opacity: 0; }
+}
+
+/* The primitives draw one picture, not two, so on the table a card's art
+   and a tableau's portrait get the gold treatment and the jump without a
+   ghost: a crew card's race token in a ring at the top of the face, the
+   captain's beside the sheet's title. Attackers' pictures (red) come with
+   the ruin screen. */
+.ww-theme :is(.zk-card-art, .zk-portrait, .zk-card-row-art, .zk-card-face-pic) {
+  filter: grayscale(1) invert(1) contrast(1.45) sepia(1) saturate(3) hue-rotate(8deg) brightness(1.08); background: #170d02;
+  -webkit-mask-image: repeating-linear-gradient(0deg, #000 0 2px, rgba(0, 0, 0, .55) 2px 3px);
+  mask-image: repeating-linear-gradient(0deg, #000 0 2px, rgba(0, 0, 0, .55) 2px 3px);
+  animation: ww-gxjit 3.7s steps(1) infinite reverse;
+}
+.ww-theme .zk-card-face:not(.layout-portrait) > .zk-card-art { width: 56px; height: 56px; border-radius: 50%; align-self: center; border: 2px solid var(--ww-edge, var(--ww-gold)); box-sizing: border-box; }
+.ww-theme .zk-zone-small .zk-card-face:not(.layout-portrait) > .zk-card-art { width: 40px; height: 40px; }
+/* The tableau paints the ring in the owner's accent inline; the captain's is gold. */
+.ww-theme .zk-portrait { border-color: var(--ww-gold) !important; }
+[data-motion='reduced'] .ww-theme :is(.zk-card-art, .zk-portrait, .zk-card-row-art, .zk-card-face-pic) { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  .ww-theme :is(.zk-card-art, .zk-portrait, .zk-card-row-art, .zk-card-face-pic) { animation: none !important; }
+}

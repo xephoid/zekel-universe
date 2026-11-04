@@ -298,6 +298,10 @@ describe('warble-way-galaxy glue', () => {
     expect(ids(plan.bench)).toEqual(['ww:crew', 'ww:items']);
     expect(ids(plan.side)).toEqual(['ww:character', 'ww:season', 'ww:ship']);
     expect(ids(plan.board)).toEqual(['ww:travel-draw', 'ww:travel-discard', 'ww:journey', 'ww:ruin', 'ww:habitat']);
+    // Item 3: the captain and each crew member wear their race's portrait; an unknown race gets none.
+    expect((plan.side[0]!.data as { artUrl?: string }).artUrl).toBe('/art/warble-way/portraits/human.jpg');
+    const crew = plan.bench[0]!.data as { cards: { artUrl?: string; label: string }[] };
+    expect(crew.cards[0]).toMatchObject({ label: 'Bolt', artUrl: '/art/warble-way/portraits/kralkin.jpg' });
     // Crew capacity comes from the ship, level progress from xp_to_next_level.
     expect((plan.bench[0]!.data as CardZoneData).label).toBe('Crew (1/3) +2 unnamed');
     const stats = (plan.side[0]!.data as { stats: Array<{ label: string; value: unknown; max?: number }> }).stats;

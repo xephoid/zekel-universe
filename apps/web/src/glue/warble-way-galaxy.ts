@@ -10,6 +10,7 @@ import type { GameReferenceResponse } from '@universe/shared';
 import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, SelectEvent, SetupAnswers, SetupField, SetupSeat, TablePlan, Zone } from './types';
 import { asArr, asNum, asStr, isObj, shapeHas, words } from './types';
 import { answerNumber, answerText } from './forms';
+import { faceUrl } from './ww/faces';
 import './ww/ww.css';
 
 /** The twelve abilities as the reference data prints them: "SWA (Swashbuckling)". */
@@ -65,12 +66,14 @@ const PALETTE: Record<string, string> = {
 function crewCard(c: unknown, i: number): CardData {
   if (!isObj(c)) return { id: `ww:crew:${i}`, label: 'crew', colorKey: 'crew' };
   const anger = asNum(c['anger_tokens']);
+  const art = faceUrl(asStr(c['race']));
   return {
     id: `ww:crew:${asStr(c['name'], String(i))}`,
     label: asStr(c['name'], 'crew'),
     subtitle: asStr(c['race']) || undefined,
     badges: anger > 0 ? [`anger ×${anger}`] : [],
     colorKey: 'crew',
+    ...(art ? { artUrl: art } : {}),
   };
 }
 
@@ -132,6 +135,7 @@ export const warbleWayGlue: GlueModule = {
       const abilities = isObj(char['abilities']) ? char['abilities'] : {};
       const xp = asNum(char['xp']);
       const toNext = asNum(char['xp_to_next_level']);
+      const face = faceUrl(asStr(char['race']));
       const stats: NonNullable<TableauData['stats']> = [
         { label: 'Level', value: asNum(char['level'], 1) },
         { label: 'XP to next level', value: xp, max: toNext > 0 ? xp + toNext : undefined },
@@ -145,7 +149,7 @@ export const warbleWayGlue: GlueModule = {
       ];
       side.push({
         kind: 'tableau', id: 'ww:character',
-        data: { label: asStr(char['name'], 'You'), owner: 'character', active: true, stats },
+        data: { label: asStr(char['name'], 'You'), owner: 'character', active: true, stats, ...(face ? { artUrl: face } : {}) },
       });
       // The finish lines, as the engine spells them out.
       const endingStats = Object.entries(endings).map(([k, v]) => ({ label: words(k), value: asStr(v, String(v)) }));

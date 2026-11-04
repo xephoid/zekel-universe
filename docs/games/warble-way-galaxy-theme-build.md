@@ -11,8 +11,8 @@ screens for player decisions that have none yet, and adds flavour names. It
 moves no rule. Where a board and the engine disagree, the engine wins; note it
 here and tell the owner.
 
-Items 0, 1 and 2 are done (2026-11-02 and 2026-11-03; item 0's fixes are in
-the design README under "Rendered and fixed"). Nothing from item 3 on has
+Items 0 to 3 are done (2026-11-02 to 2026-11-04; item 0's fixes are in
+the design README under "Rendered and fixed"). Nothing from item 4 on has
 been built yet.
 
 ## 0. Render and check the boards first
@@ -213,7 +213,7 @@ Before each application commit, run the change-mode checks in
 |---|---|---|---|
 | 1 | 1 · hook and tokens | `apps/web/src/glue/ww/ww.css` (every rule under `.table-shell.ww-theme`, the tokens above, then Universe's `--bg`, `--fg`, `--accent`, `--lit`, `--border`, `--card-back`, `--font-display` redefined, dark in both site modes like `cn.css`); `themeFor` in `apps/web/src/glue/warble-way-galaxy.ts` returning `ww-theme` for a Warble Way view; Kalam 400 and 700 self-hosted in `apps/web/public/fonts/` and declared in `apps/web/src/fonts.css`; a bullet in `ATTRIBUTIONS.md` (count goes to twelve); a `themeFor` case in `apps/web/src/tests/glue.test.ts`. | The existing table turns hull navy on starlight and nothing else in Universe changes. |
 | 2 | 2 · icons | The 59 game-icons files copied to `apps/web/public/art/warble-way/icons/`; `apps/web/src/glue/ww/icons.tsx` with the class-to-file map from item 2 and an `<Icon name>` that draws the two stacked mask copies; the `.gx` glitch rules and `gxjit` keyframes in `ww.css`, stopped under `[data-motion='reduced']` and the media query as `cn.css` does. | Every fixed meaning in item 2 renders from one component. |
-| 3 | 3 · holograms | `.ga`, `.ga-red` and `.gxi` rules in `ww.css` on `.zk-card-art` and the sheet's tokens, copied from `Ruin.dc.html`; `apps/web/src/glue/ww/faces.ts` mapping race and attacker names to `/art/warble-way/portraits/<id>.jpg` like `cn/faces.ts`. **Blocked on the portrait licence** (see below): until new tokens exist the map returns no image and the ring shows the race's initial. | Gold crew, red attackers, both glitching; nothing committed under the wrong licence. |
+| 3 | 3 · holograms | `.ga`, `.ga-red` and `.gxi` rules in `ww.css` on `.zk-card-art` and the sheet's tokens, copied from `Ruin.dc.html`; `apps/web/src/glue/ww/faces.ts` mapping race and attacker names to `/art/warble-way/portraits/<id>.jpg` like `cn/faces.ts`. Was blocked on the portrait licence until the tokens were regenerated (see below). | Gold crew, red attackers, both glitching; nothing committed under the wrong licence. |
 | 4 | 4 · travel cards | `apps/web/src/glue/ww/TravelCard.tsx`, the 200 × 290 face with the five bottom blocks from `Cards.dc.html`, fed by card code; the names and blurbs from the engine's reference data (decided below). | The whole deck draws from codes alone, matching `Cards.dc.html`. |
 | 5 | 5 · the tables | `apps/web/src/glue/ww/WwScreen.tsx`, a game-drawn screen like `sl/SlScreen.tsx` and `ngg/`, with one part per board: sheet, space, encounter, pirate, habitat and its overlays, ruin setup, ruin, setup and level up; `phone` from `Phone.dc.html`. Built in that order, each against its board. | Every screen in item 5 plays from the engine's own moves. |
 | 6 | 6 · decisions | Walk the item 6 table against `get_legal_moves` on a live game. Any choice the engine does not expose becomes an engine PR (branch, test) and Universe reads it; nothing is defaulted on the Universe side. | Every row names the move it sends. |
@@ -236,6 +236,25 @@ the theme for comparing with `Main`. Checked there: all 59 masks load, the
 ghost is `#ff4f7b` at 55% on `steps(1)`, 2.7 s, the icon 3.4 s reversed.
 The skills icon was found to be a solid square (its file had no alpha) and
 was fixed in the working folder too; see the design README.
+
+**Step 3 done 2026-11-04** on the same branch: the 17 tokens served from
+`apps/web/public/art/warble-way/portraits/` (re-encoded with their metadata
+stripped, 340 KB in all); `faces.ts` with the race ids, the red shirt and the
+twelve attackers by terrain, and `faceUrl` that finds a file by the engine's id
+or the printed name and nothing for a stranger; `holo.tsx` with `<Hologram>`,
+the two stacked copies (ghost under, main screened over, gold or red); the
+`.ww-ga` / `.ww-ga-red` / `.ww-gxi` rules in `ww.css` copied from `Ruin`, still
+under reduced motion with the ghost hidden. On today's table, which the
+primitives draw with one picture, the captain's race token sits beside the
+sheet's title and each crew card wears its race token in a ring at the top of
+the face, both gold with the scanlines and the jump but no ghost; the ghost
+comes wherever the game draws its own markup (item 5). The engine gives a ruin
+attacker only its numbers, so which of the twelve red tokens it shows is decided
+with the ruin screen in item 5 (the terrain may need publishing). `/dev/ww`
+now draws the five gold tokens at the card's ring size, the twelve red ones at
+the ruin's, and a crew card and row from the primitives. Checked there and on a
+live game: every file loads from the app's own origin, the filters, mask,
+blend and timings match the board, no console errors.
 
 **Unblocked 2026-11-04: the portraits.** The 17 tokens, 4 sketches and 4
 holograms were regenerated with Qwen-Image-2512 and Qwen-Image-Edit-2511 (both

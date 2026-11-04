@@ -50,7 +50,8 @@ upscaler was used; record any that are added later here.
 
 The Warble Way Galaxy tokens, sketches and holograms in
 `docs/design/warble-way-galaxy/assets/` (`portraits/`, `sketches/`,
-`holograms/`) were generated in ComfyUI with **Qwen-Image-2512** and
+`holograms/`; the app serves the portraits from
+`apps/web/public/art/warble-way/portraits/`) were generated in ComfyUI with **Qwen-Image-2512** and
 **Qwen-Image-Edit-2511**, both under the **Apache 2.0** license, from text
 prompts and from each other. Images made purely by a model are probably not
 protected by copyright, so this project claims none in them beyond any
