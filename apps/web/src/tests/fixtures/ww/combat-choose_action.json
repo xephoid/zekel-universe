@@ -6,6 +6,8 @@
   "pending": {
    "kind": "space_combat_action"
   },
+  "roll_facts": null,
+  "last_roll": null,
   "character": {
    "name": "Bot Pilot",
    "race": "human",
@@ -49,6 +51,7 @@
   },
   "crew": [],
   "unnamed_crew": 0,
+  "unnamed_crew_cap": 0,
   "season_endings": {
    "conquest": "clear the depth-3 ruin beyond Habitat #3",
    "fortune": "700/6000c banked while at a habitat",
@@ -63,7 +66,8 @@
    "handling": 0,
    "armor": 0,
    "damage": "pristine",
-   "parts": []
+   "parts": [],
+   "hits_to_lost": 4
   },
   "items": [],
   "bulkheads_spent": false,
@@ -263,22 +267,111 @@
    "description": "Try to run: 3d6 + handling (+PIL) vs 10 + the pirate's space bonus. Fail = 1 ship damage, then escape anyway.",
    "move": {
     "type": "attempt_escape"
+   },
+   "preview": {
+    "roll": {
+     "reason": "escape",
+     "name": "Escape",
+     "carrier": "you",
+     "dice": 3,
+     "parts": [
+      {
+       "label": "PIL +4 (you)",
+       "bonus": 4,
+       "kind": "score",
+       "ability": "PIL",
+       "who": "you"
+      }
+     ],
+     "bonus": 4,
+     "on_pass": "A clean getaway. The encounter ends.",
+     "on_fail": "The Harness Runner takes one damage, to Used. Then you get away all the same.",
+     "notes": [],
+     "target": 15,
+     "dice_need": 11,
+     "chance": 0.5,
+     "subject": "the pirates"
+    }
    }
   },
   {
    "move_id": "fight-round",
-   "description": "Exchange fire: 4d6 pairing (WR §12).",
+   "description": "Exchange fire: 4d6 pairing.",
    "move": {
     "type": "fight_round"
+   },
+   "preview": {
+    "roll": {
+     "reason": "space_combat",
+     "name": "Exchange of fire",
+     "dice": 4,
+     "parts": [],
+     "bonus": 0,
+     "on_pass": "Their ship is disabled: board it or fly on. A disabled ship does not count toward Bounty.",
+     "on_fail": "Flying Ace lets you roll the exchange again, once. Otherwise: The Harness Runner takes one damage, to Used.",
+     "notes": [
+      "A tie is rolled again."
+     ],
+     "pairing": {
+      "you_take": "lower",
+      "why": "These pirates have space combat advantage of their own, which cancels yours: you take the lower pair.",
+      "your_add": 0,
+      "their_add": 5,
+      "their_name": "the pirates",
+      "rider_dice": 0,
+      "win": 0,
+      "tie": 0,
+      "lose": 1
+     },
+     "chance": 0,
+     "subject": "the pirates"
+    }
    }
   },
   {
    "move_id": "redline",
-   "description": "Redline (A20, once per encounter): 3d6 + MEC vs 12. Success: +2 to YOUR exchange totals this combat; failure: they attack unopposed.",
+   "description": "Redline (once per encounter): 3d6 + MEC vs 12. Success: +2 to YOUR exchange totals this combat; failure: they attack unopposed.",
    "move": {
     "type": "redline"
+   },
+   "preview": {
+    "roll": {
+     "reason": "redline",
+     "name": "Redline",
+     "carrier": "you",
+     "dice": 3,
+     "parts": [
+      {
+       "label": "MEC +2 (you)",
+       "bonus": 2,
+       "kind": "score",
+       "ability": "MEC",
+       "who": "you"
+      }
+     ],
+     "bonus": 2,
+     "on_pass": "+2 to your total in every exchange for the rest of this fight.",
+     "on_fail": "They attack unopposed: The Harness Runner takes one damage, to Used. The fight goes on, and the redline is spent.",
+     "notes": [],
+     "target": 12,
+     "dice_need": 10,
+     "chance": 0.625
+    }
    }
   }
  ],
- "unavailable": []
+ "unavailable": [
+  {
+   "moveType": "attempt_hack",
+   "reason": "Needs Hacking (HAK) aboard."
+  },
+  {
+   "moveType": "open_fire",
+   "reason": "Needs Gunslinging (GUN) aboard."
+  },
+  {
+   "moveType": "attempt_intimidate",
+   "reason": "Needs Demolitions (DEM) aboard."
+  }
+ ]
 }

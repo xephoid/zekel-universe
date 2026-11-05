@@ -6,6 +6,8 @@
   "pending": {
    "kind": "ruin_turn"
   },
+  "roll_facts": null,
+  "last_roll": null,
   "character": {
    "name": "Bot Pilot",
    "race": "human",
@@ -50,6 +52,7 @@
   "crew": [
    {
     "name": "Hexapod (SNE+2 DIP+1)",
+    "title": "DEC0DE",
     "race": "hexapod",
     "idealizes": "smarts",
     "abilities": {
@@ -68,6 +71,7 @@
    }
   ],
   "unnamed_crew": 1,
+  "unnamed_crew_cap": 1,
   "season_endings": {
    "conquest": "clear the depth-3 ruin beyond Habitat #3",
    "fortune": "1800/6000c banked while at a habitat",
@@ -82,7 +86,8 @@
    "handling": 0,
    "armor": 0,
    "damage": "pristine",
-   "parts": []
+   "parts": [],
+   "hits_to_lost": 4
   },
   "items": [],
   "bulkheads_spent": false,
@@ -224,7 +229,17 @@
      "ended": true,
      "is_character": true,
      "unnamed": false,
-     "has_attacked": false
+     "has_attacked": false,
+     "title": "Bot Pilot",
+     "move_allowance": 3,
+     "moves_left": 3,
+     "reach": [],
+     "attack": {
+      "ability": "SWA",
+      "bonus": 0,
+      "range": 1,
+      "advantage": false
+     }
     },
     {
      "name": "Hexapod (SNE+2 DIP+1)",
@@ -234,7 +249,17 @@
      "ended": false,
      "is_character": false,
      "unnamed": false,
-     "has_attacked": false
+     "has_attacked": false,
+     "title": "DEC0DE",
+     "move_allowance": 5,
+     "moves_left": 0,
+     "reach": [],
+     "attack": {
+      "ability": "SWA",
+      "bonus": 0,
+      "range": 1,
+      "advantage": false
+     }
     },
     {
      "name": "Red Shirt 1",
@@ -244,7 +269,21 @@
      "ended": false,
      "is_character": false,
      "unnamed": true,
-     "has_attacked": false
+     "has_attacked": false,
+     "title": "Red Shirt 1",
+     "move_allowance": 3,
+     "moves_left": 3,
+     "reach": [
+      "r9c7",
+      "r8c7",
+      "r7c7"
+     ],
+     "attack": {
+      "ability": "SWA",
+      "bonus": 1,
+      "range": 1,
+      "advantage": true
+     }
     }
    ],
    "attackers": [
@@ -253,6 +292,7 @@
      "atk": 5,
      "move": 3,
      "range": 1,
+     "xp": 5,
      "cell": "r1c9",
      "defeated": false
     },
@@ -261,6 +301,7 @@
      "atk": 5,
      "move": 3,
      "range": 1,
+     "xp": 5,
      "cell": "r3c7",
      "defeated": false
     },
@@ -269,10 +310,12 @@
      "atk": 5,
      "move": 3,
      "range": 1,
+     "xp": 5,
      "cell": "r9c1",
      "defeated": false
     }
    ],
+   "goal_cell": "r1c1",
    "attacker_turn_index": null,
    "spots_spent": []
   },
@@ -314,7 +357,7 @@
  "legalMoves": [
   {
    "move_id": "move-Hexapod (SNE+2 DIP+1)",
-   "description": "Move Hexapod (SNE+2 DIP+1) (at r6c6) — FILL IN the destination cell like \"r5c3\"; no diagonals; walls, pits and tokens block.",
+   "description": "Move DEC0DE (at r6c6): choose a square; no diagonals; walls, pits and tokens block.",
    "move": {
     "type": "move_being",
     "being": "Hexapod (SNE+2 DIP+1)",
@@ -323,15 +366,53 @@
   },
   {
    "move_id": "collect-Hexapod (SNE+2 DIP+1)",
-   "description": "Hexapod (SNE+2 DIP+1) opens the adjacent item cache (◆).",
+   "description": "DEC0DE opens the adjacent item cache (◆).",
    "move": {
     "type": "collect_item",
     "being": "Hexapod (SNE+2 DIP+1)"
+   },
+   "preview": {
+    "roll": {
+     "reason": "item_d6",
+     "name": "Open the cache",
+     "dice": 1,
+     "parts": [],
+     "bonus": 0,
+     "on_pass": "Whatever the die names is yours. Opening the cache counts toward Plunder, full or empty, and the spot is spent.",
+     "on_fail": "",
+     "notes": [],
+     "table": [
+      {
+       "face": 1,
+       "result": "Empty."
+      },
+      {
+       "face": 2,
+       "result": "Consumable DEM +4: One use: +4 to one Demolitions roll, declared before the dice."
+      },
+      {
+       "face": 3,
+       "result": "Consumable DIP +4: One use: +4 to one Diplomacy roll, declared before the dice."
+      },
+      {
+       "face": 4,
+       "result": "Ship Part Capacity +2: Ship capacity +2. How many can be aboard, the captain included. Red shirts do not take a berth."
+      },
+      {
+       "face": 5,
+       "result": "Weapon DEM +4: +4 Demolitions for whoever wears it."
+      },
+      {
+       "face": 6,
+       "result": "Armor SNE +4: +4 Sneaking for whoever wears it."
+      }
+     ]
+    }
    }
   },
   {
    "move_id": "end-Hexapod (SNE+2 DIP+1)",
-   "description": "Hexapod (SNE+2 DIP+1) ends their turn.",
+   "description": "DEC0DE ends their turn.",
    "move": {
     "type": "end_being_turn",
     "being": "Hexapod (SNE+2 DIP+1)"
@@ -339,7 +420,7 @@
   },
   {
    "move_id": "move-Red Shirt 1",
-   "description": "Move Red Shirt 1 (at r9c8) — FILL IN the destination cell like \"r5c3\"; no diagonals; walls, pits and tokens block.",
+   "description": "Move Red Shirt 1 (at r9c8): choose a square; no diagonals; walls, pits and tokens block.",
    "move": {
     "type": "move_being",
     "being": "Red Shirt 1",

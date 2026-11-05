@@ -17,6 +17,30 @@
    "declared_items": [],
    "context": {}
   },
+  "roll_facts": {
+   "reason": "volley",
+   "name": "Opening volley",
+   "carrier": "Kralkin (GUN+2 SWA+2)",
+   "dice": 3,
+   "parts": [
+    {
+     "label": "GUN +2 (Kralkin (GUN+2 SWA+2))",
+     "bonus": 2,
+     "kind": "score",
+     "ability": "GUN",
+     "who": "Kralkin (GUN+2 SWA+2)"
+    }
+   ],
+   "bonus": 2,
+   "on_pass": "−2 to the pirates' total in every exchange for the rest of this fight.",
+   "on_fail": "They attack unopposed: The Harness Runner takes one damage, to Hobbled. The fight goes on, and the volley is spent.",
+   "notes": [],
+   "target": 12,
+   "dice_need": 10,
+   "chance": 0.625,
+   "subject": "the pirates"
+  },
+  "last_roll": null,
   "character": {
    "name": "Bot Pilot",
    "race": "human",
@@ -61,6 +85,7 @@
   "crew": [
    {
     "name": "Human (ACT+2 SWA+1)",
+    "title": "Katie",
     "race": "human",
     "idealizes": "brawn",
     "abilities": {
@@ -79,6 +104,7 @@
    },
    {
     "name": "Kralkin (GUN+2 SWA+2)",
+    "title": "Kralkin (GUN+2 SWA+2)",
     "race": "kralkin",
     "idealizes": "moxie",
     "abilities": {
@@ -97,6 +123,7 @@
    }
   ],
   "unnamed_crew": 0,
+  "unnamed_crew_cap": 0,
   "season_endings": {
    "conquest": "clear the depth-3 ruin beyond Habitat #3",
    "fortune": "200/6000c banked while at a habitat",
@@ -111,7 +138,8 @@
    "handling": 0,
    "armor": 0,
    "damage": "damaged",
-   "parts": []
+   "parts": [],
+   "hits_to_lost": 2
   },
   "items": [],
   "bulkheads_spent": false,

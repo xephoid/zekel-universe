@@ -18,6 +18,56 @@
     "death_source": "boarding"
    }
   },
+  "roll_facts": {
+   "reason": "death_check",
+   "name": "Death check",
+   "dice": 3,
+   "parts": [],
+   "bonus": 0,
+   "on_pass": "You live, unharmed.",
+   "on_fail": "You live, wounded: −1 to every score until the next habitat. A failed death check while wounded kills you.",
+   "notes": [],
+   "target": 9,
+   "dice_need": 9,
+   "chance": 0.7407
+  },
+  "last_roll": {
+   "reason": "ground_combat",
+   "ground": "boarding",
+   "dice": [
+    3,
+    6,
+    5,
+    6
+   ],
+   "parts": [
+    {
+     "label": "SWA +0 (you)",
+     "bonus": 0,
+     "kind": "score",
+     "ability": "SWA",
+     "who": "you"
+    }
+   ],
+   "bonus": 0,
+   "total": 9,
+   "target": null,
+   "outcome": "lose",
+   "pairs": {
+    "yours": [
+     6,
+     3
+    ],
+    "theirs": [
+     6,
+     5
+    ],
+    "rider": [],
+    "your_total": 9,
+    "their_total": 12,
+    "their_name": "the pirates"
+   }
+  },
   "character": {
    "name": "Bot Pilot",
    "race": "human",
@@ -61,6 +111,7 @@
   },
   "crew": [],
   "unnamed_crew": 0,
+  "unnamed_crew_cap": 0,
   "season_endings": {
    "conquest": "clear the depth-3 ruin beyond Habitat #3",
    "fortune": "200/6000c banked while at a habitat",
@@ -75,7 +126,8 @@
    "handling": 0,
    "armor": 0,
    "damage": "damaged",
-   "parts": []
+   "parts": [],
+   "hits_to_lost": 2
   },
   "items": [],
   "bulkheads_spent": false,

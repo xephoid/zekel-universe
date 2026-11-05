@@ -6,6 +6,8 @@
   "pending": {
    "kind": "card_draw"
   },
+  "roll_facts": null,
+  "last_roll": null,
   "character": {
    "name": "Bot Pilot",
    "race": "human",
@@ -49,6 +51,7 @@
   },
   "crew": [],
   "unnamed_crew": 0,
+  "unnamed_crew_cap": 0,
   "season_endings": {
    "conquest": "clear the depth-3 ruin beyond Habitat #3",
    "fortune": "200/6000c banked while at a habitat",
@@ -63,7 +66,8 @@
    "handling": 0,
    "armor": 0,
    "damage": "used",
-   "parts": []
+   "parts": [],
+   "hits_to_lost": 3
   },
   "items": [],
   "bulkheads_spent": false,

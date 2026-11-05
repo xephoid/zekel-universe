@@ -6,6 +6,8 @@
   "pending": {
    "kind": "ruin_turn"
   },
+  "roll_facts": null,
+  "last_roll": null,
   "character": {
    "name": "Bot Pilot",
    "race": "human",
@@ -50,6 +52,7 @@
   "crew": [
    {
     "name": "Human (ACT+2 SWA+1)",
+    "title": "Katie",
     "race": "human",
     "idealizes": "brawn",
     "abilities": {
@@ -68,6 +71,7 @@
    },
    {
     "name": "Kralkin (GUN+2 SWA+2)",
+    "title": "Kralkin (GUN+2 SWA+2)",
     "race": "kralkin",
     "idealizes": "moxie",
     "abilities": {
@@ -86,6 +90,7 @@
    }
   ],
   "unnamed_crew": 0,
+  "unnamed_crew_cap": 0,
   "season_endings": {
    "conquest": "clear the depth-3 ruin beyond Habitat #3",
    "fortune": "200/6000c banked while at a habitat",
@@ -100,7 +105,8 @@
    "handling": 0,
    "armor": 0,
    "damage": "hobbled",
-   "parts": []
+   "parts": [],
+   "hits_to_lost": 1
   },
   "items": [],
   "bulkheads_spent": false,
@@ -249,7 +255,17 @@
      "ended": true,
      "is_character": true,
      "unnamed": false,
-     "has_attacked": false
+     "has_attacked": false,
+     "title": "Bot Pilot",
+     "move_allowance": 3,
+     "moves_left": 3,
+     "reach": [],
+     "attack": {
+      "ability": "SWA",
+      "bonus": 0,
+      "range": 1,
+      "advantage": false
+     }
     },
     {
      "name": "Human (ACT+2 SWA+1)",
@@ -259,7 +275,17 @@
      "ended": true,
      "is_character": false,
      "unnamed": false,
-     "has_attacked": false
+     "has_attacked": false,
+     "title": "Katie",
+     "move_allowance": 3,
+     "moves_left": 0,
+     "reach": [],
+     "attack": {
+      "ability": "SWA",
+      "bonus": 1,
+      "range": 1,
+      "advantage": true
+     }
     },
     {
      "name": "Kralkin (GUN+2 SWA+2)",
@@ -269,7 +295,17 @@
      "ended": false,
      "is_character": false,
      "unnamed": false,
-     "has_attacked": false
+     "has_attacked": false,
+     "title": "Kralkin (GUN+2 SWA+2)",
+     "move_allowance": 3,
+     "moves_left": 0,
+     "reach": [],
+     "attack": {
+      "ability": "SWA",
+      "bonus": 2,
+      "range": 4,
+      "advantage": true
+     }
     }
    ],
    "attackers": [
@@ -278,6 +314,7 @@
      "atk": 5,
      "move": 3,
      "range": 1,
+     "xp": 5,
      "cell": "r1c9",
      "defeated": false
     },
@@ -286,6 +323,7 @@
      "atk": 3,
      "move": 3,
      "range": 1,
+     "xp": 3,
      "cell": "r3c3",
      "defeated": false
     },
@@ -294,10 +332,12 @@
      "atk": 3,
      "move": 3,
      "range": 1,
+     "xp": 3,
      "cell": "r4c7",
      "defeated": false
     }
    ],
+   "goal_cell": "r1c1",
    "attacker_turn_index": null,
    "spots_spent": []
   },
@@ -329,7 +369,7 @@
  "legalMoves": [
   {
    "move_id": "move-Kralkin (GUN+2 SWA+2)",
-   "description": "Move Kralkin (GUN+2 SWA+2) (at r7c3) — FILL IN the destination cell like \"r5c3\"; no diagonals; walls, pits and tokens block.",
+   "description": "Move Kralkin (GUN+2 SWA+2) (at r7c3): choose a square; no diagonals; walls, pits and tokens block.",
    "move": {
     "type": "move_being",
     "being": "Kralkin (GUN+2 SWA+2)",
@@ -343,6 +383,42 @@
     "type": "attack",
     "being": "Kralkin (GUN+2 SWA+2)",
     "target": "A2"
+   },
+   "preview": {
+    "roll": {
+     "reason": "ground_combat",
+     "name": "Attack",
+     "carrier": "Kralkin (GUN+2 SWA+2)",
+     "dice": 4,
+     "parts": [
+      {
+       "label": "SWA +2 (Kralkin (GUN+2 SWA+2))",
+       "bonus": 2,
+       "kind": "score",
+       "ability": "SWA",
+       "who": "Kralkin (GUN+2 SWA+2)"
+      }
+     ],
+     "bonus": 2,
+     "on_pass": "A2 falls: +3 XP, and it counts toward Bounty.",
+     "on_fail": "A2 holds. Nothing else happens to Kralkin (GUN+2 SWA+2).",
+     "notes": [
+      "A tie is rolled again."
+     ],
+     "pairing": {
+      "you_take": "higher",
+      "why": "Kralkin (GUN+2 SWA+2) has Swashbuckling, which gives ground combat advantage: the higher pair.",
+      "your_add": 2,
+      "their_add": 3,
+      "their_name": "A2",
+      "rider_dice": 0,
+      "win": 0.3395,
+      "tie": 0.4012,
+      "lose": 0.2593
+     },
+     "chance": 0.567,
+     "subject": "A2"
+    }
    }
   },
   {
@@ -351,6 +427,9 @@
    "move": {
     "type": "end_being_turn",
     "being": "Kralkin (GUN+2 SWA+2)"
+   },
+   "preview": {
+    "then": "The last to act: the attackers move next."
    }
   }
  ],

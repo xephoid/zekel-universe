@@ -5,7 +5,7 @@
 // the caption, the log and the numbered menu stay the table's. Every move
 // the screen sends is one the engine listed.
 
-import { useMemo, useState, type ReactNode } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import type { GameScreenProps } from '../types';
 import { asStr } from '../types';
@@ -13,8 +13,9 @@ import { readTable, type WwTable } from './read';
 import { Credits, CrewPanel, DamagePlates, GalaxyStrip, JourneyPanel, Lbl, Num, Sheet, ShipPanel, legWords, missionTitles } from './ui';
 import { Icon } from './icons';
 import { SpacePart, type PartProps } from './parts/SpacePart';
-import { EncounterCard, EncounterPart, isEncounterPending } from './parts/EncounterPart';
-import { AboardPanel, PirateCard, PiratePart, PirateSteps, isPirateMoment } from './parts/PiratePart';
+import { EncounterPart, isEncounterPending } from './parts/EncounterPart';
+import { PiratePart, PirateSteps, isPirateMoment } from './parts/PiratePart';
+import { LastRollDice } from './parts/Facts';
 import { HabitatPart } from './parts/HabitatPart';
 import { RuinRoundPart, RuinSetupPart } from './parts/RuinPart';
 import { DeparturePeek, LevelUp, ReleaseCrew } from './parts/Overlays';
@@ -39,9 +40,14 @@ export function modeOf(table: WwTable): Mode {
 const ruinHasBoard = (table: WwTable) => !!table.ruin && table.ruin.party.length + table.ruin.attackers.length > 0;
 
 export function WwScreen(props: GameScreenProps) {
-  const { input, yourTurn, busy, interactive, onMove, onForm, onDraw, sideSlot, phone } = props;
+  const { input, yourTurn, busy, interactive, onMove, onForm, onDraw, sideSlot, phone, caption } = props;
   const table = useMemo(() => readTable(input.view, input.reference), [input.view, input.reference]);
   const [tab, setTab] = useState<'now' | 'sheet' | 'ship' | 'journey'>('now');
+  // A new moment starts at the top of the board, where its heading is. (A
+  // layout effect, so a roll panel that then brings itself into view still can.)
+  const root = useRef<HTMLDivElement | null>(null);
+  const where = table ? `${modeOf(table)}:${table.pending?.kind ?? ''}:${asStr(table.pending?.['reason'])}:${table.combat?.stage ?? ''}` : '';
+  useLayoutEffect(() => { root.current?.closest('.table-board')?.scrollTo?.({ top: 0 }); }, [where]);
   if (!table) return null;
   const pressable = interactive && yourTurn && !busy;
   const part: PartProps = { table, input, pressable, onMove, onForm, onDraw: interactive ? onDraw : undefined, phone, sideOut: !!sideSlot };
@@ -50,11 +56,20 @@ export function WwScreen(props: GameScreenProps) {
   const overlay = p?.kind === 'level_up' ? <LevelUp {...part} /> : p?.kind === 'release_crew' ? <ReleaseCrew {...part} /> : p?.kind === 'res_discard' ? <DeparturePeek {...part} /> : null;
   const right = (node: JSX.Element): JSX.Element => (sideSlot ? createPortal(<div className="ww-right">{node}</div>, sideSlot) : <aside className="ww-right">{node}</aside>);
   const sideOut = !!sideSlot;
+  // What just happened, on the board: the last roll read back with its dice,
+  // and the engine's sentence for the last move. The row is always there, so
+  // a roll landing never moves the board under the pointer.
+  const last = (
+    <div className="ww-last">
+      {table.lastRoll && <LastRollDice last={table.lastRoll} seq={input.seq} />}
+      {caption}
+    </div>
+  );
 
   if (phone) {
     const leg = table.journey.find((l) => l.current);
     return (
-      <div className="ww-screen ww-phone">
+      <div className="ww-screen ww-phone" ref={root}>
         <div className="ww-phone-strip">
           <div className="ww-row between">
             <Credits me={table.me} />
@@ -63,9 +78,10 @@ export function WwScreen(props: GameScreenProps) {
           </div>
           {table.ship && <div className="ww-row" style={{ gap: 10 }}><span className="ww-dim"><Icon name="ship" size={18} /></span><div style={{ flex: 1 }}><DamagePlates ship={table.ship} height={18} /></div><Lbl style={{ fontSize: 11, color: '#f2b544' }}>{table.ship.damage.toUpperCase()}</Lbl></div>}
         </div>
+        {tab === 'now' && last}
         {tab === 'now' && <PhoneNow mode={mode} part={part} table={table} />}
         {tab === 'sheet' && <Sheet table={table} reference={input.reference} />}
-        {tab === 'ship' && <><ShipPanel table={table} /><CrewPanel table={table} /></>}
+        {tab === 'ship' && <><ShipPanel table={table} input={input} /><CrewPanel table={table} input={input} /></>}
         {tab === 'journey' && <><JourneyPanel table={table} reference={input.reference} /><div className="ww-panel"><GalaxyStrip table={table} reference={input.reference} /></div></>}
         {tab === 'now' && yourTurn && <div className="ww-menu"><MoveList input={input} pressable={pressable} onMove={onMove} /></div>}
         <nav className="ww-phone-tabs" aria-label="Sections">
@@ -89,21 +105,19 @@ export function WwScreen(props: GameScreenProps) {
     left = null; gridClass = 'ww-grid no-left';
     main = mode === 'ruin' ? <RuinRoundPart {...part} right={right} /> : <RuinSetupPart {...part} right={right} />;
   } else {
-    if (mode === 'encounter') { left = <EncounterCard table={table} />; gridClass = 'ww-grid card-left'; }
-    if (mode === 'pirate') { left = <aside className="ww-left"><PirateCard table={table} /></aside>; gridClass = 'ww-grid card-left'; steps = <PirateSteps table={table} />; }
+    // The sheet stays on the left through every card and every fight: the
+    // scores a choice turns on are on screen while it is made.
+    if (mode === 'pirate') steps = <PirateSteps table={table} />;
     main = mode === 'encounter' ? <EncounterPart {...part} /> : mode === 'pirate' ? <PiratePart {...part} /> : mode === 'over' ? <GameOver table={table} /> : <SpacePart {...part} />;
-    rightNode = right(
-      mode === 'pirate'
-        ? <AboardPanel table={table} />
-        : <><JourneyPanel table={table} reference={input.reference} /><ShipPanel table={table} /><CrewPanel table={table} /></>,
-    );
+    rightNode = right(<><JourneyPanel table={table} reference={input.reference} /><ShipPanel table={table} input={input} /><CrewPanel table={table} input={input} /></>);
   }
   return (
-    <div className="ww-screen" data-mode={mode}>
+    <div className="ww-screen" data-mode={mode} ref={root}>
       <div className="ww-strip">
         {steps ?? <GalaxyStrip table={table} reference={input.reference} />}
         <Credits me={table.me} />
       </div>
+      {last}
       <div className={`${gridClass}${!sideOut && mode !== 'ruin' && mode !== 'ruin-setup' ? ' with-right' : ''}`}>
         {left}
         {main}
@@ -115,13 +129,17 @@ export function WwScreen(props: GameScreenProps) {
   );
 }
 
-/** The numbered list of every listed move, always open, under the screen:
- *  the table's own menu closes beside a screen, and the words are the
- *  engine's. The browser spec and a reader who prefers words use it. */
+/** The numbered list of every listed move, under the screen and open until
+ *  the reader folds it: the table's own menu closes beside a screen, and the
+ *  words are the engine's. The board keeps its own height, so the list never
+ *  sits over it; the table scrolls to reach it. */
+let listFolded = false;
 function MoveList({ input, pressable, onMove }: { input: PartProps['input']; pressable: boolean; onMove: PartProps['onMove'] }) {
+  // Folded stays folded: the choice outlives the view that was on screen when it was made.
+  const [folded, setFolded] = useState(listFolded);
   if (input.legalMoves.length === 0) return null;
   return (
-    <details className="move-menu" open>
+    <details className="move-menu" open={!folded} onToggle={(e) => { const f = !(e.currentTarget as HTMLDetailsElement).open; listFolded = f; setFolded(f); }}>
       <summary>Moves ({input.legalMoves.length}) · in the engine's words</summary>
       <ol>
         {input.legalMoves.map((m, i) => (
@@ -137,8 +155,8 @@ function PhoneNow({ mode, part, table }: { mode: Mode; part: PartProps; table: W
   if (mode === 'habitat') return <HabitatPart {...part} right={inline} />;
   if (mode === 'ruin') return <RuinRoundPart {...part} right={inline} />;
   if (mode === 'ruin-setup') return <RuinSetupPart {...part} right={inline} />;
-  if (mode === 'encounter') return <><EncounterCard table={table} /><EncounterPart {...part} /></>;
-  if (mode === 'pirate') return <><PirateSteps table={table} /><PirateCard table={table} /><PiratePart {...part} /></>;
+  if (mode === 'encounter') return <EncounterPart {...part} />;
+  if (mode === 'pirate') return <><PirateSteps table={table} /><PiratePart {...part} /></>;
   if (mode === 'over') return <GameOver table={table} />;
   return <SpacePart {...part} />;
 }

@@ -7,6 +7,8 @@
    "kind": "space_mission_offer",
    "card_id": "2C"
   },
+  "roll_facts": null,
+  "last_roll": null,
   "character": {
    "name": "Bot Pilot",
    "race": "human",
@@ -50,6 +52,7 @@
   },
   "crew": [],
   "unnamed_crew": 0,
+  "unnamed_crew_cap": 0,
   "season_endings": {
    "conquest": "clear the depth-3 ruin beyond Habitat #3",
    "fortune": "200/6000c banked while at a habitat",
@@ -64,7 +67,8 @@
    "handling": 0,
    "armor": 0,
    "damage": "used",
-   "parts": []
+   "parts": [],
+   "hits_to_lost": 3
   },
   "items": [],
   "bulkheads_spent": false,
@@ -215,5 +219,16 @@
    }
   }
  ],
- "unavailable": []
+ "unavailable": [
+  {
+   "moveType": "accept_mission",
+   "item": "option-1",
+   "reason": "Nobody aboard has Diplomacy (DIP), and no item you hold gives it."
+  },
+  {
+   "moveType": "accept_mission",
+   "item": "option-2",
+   "reason": "Nobody aboard has Hacking (HAK), and no item you hold gives it."
+  }
+ ]
 }

@@ -18,6 +18,30 @@
     "mission_id": "club-9-1"
    }
   },
+  "roll_facts": {
+   "reason": "mission_check",
+   "name": "Mission",
+   "carrier": "you",
+   "dice": 3,
+   "parts": [
+    {
+     "label": "MEC +2 (you)",
+     "bonus": 2,
+     "kind": "score",
+     "ability": "MEC",
+     "who": "you"
+    }
+   ],
+   "bonus": 2,
+   "on_pass": "250c and 1 XP. Time planetside also repairs the ship one level. The trip back is still to fly.",
+   "on_fail": "No credits and no XP. The trip back is still to fly.",
+   "notes": [],
+   "target": 10,
+   "dice_need": 8,
+   "chance": 0.838,
+   "subject": "Hot cargo"
+  },
+  "last_roll": null,
   "character": {
    "name": "Bot Pilot",
    "race": "human",
@@ -61,6 +85,7 @@
   },
   "crew": [],
   "unnamed_crew": 0,
+  "unnamed_crew_cap": 0,
   "season_endings": {
    "conquest": "clear the depth-3 ruin beyond Habitat #3",
    "fortune": "500/6000c banked while at a habitat",
@@ -75,7 +100,8 @@
    "handling": 0,
    "armor": 0,
    "damage": "hobbled",
-   "parts": []
+   "parts": [],
+   "hits_to_lost": 1
   },
   "items": [],
   "bulkheads_spent": false,

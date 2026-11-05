@@ -16,6 +16,41 @@
    "declared_items": [],
    "context": {}
   },
+  "roll_facts": {
+   "reason": "ground_combat",
+   "name": "Boarding",
+   "carrier": "you",
+   "dice": 4,
+   "parts": [
+    {
+     "label": "SWA +0 (you)",
+     "bonus": 0,
+     "kind": "score",
+     "ability": "SWA",
+     "who": "you"
+    }
+   ],
+   "bonus": 0,
+   "on_pass": "Their ship is captured: take it or keep yours. Dread +1. It counts toward Bounty.",
+   "on_fail": "A death check follows: 3 dice, 9 or more and you live. Failing it leaves you wounded, −1 to every score until the next habitat; a failure while wounded kills you. The ship stays disabled.",
+   "notes": [
+    "A tie is rolled again."
+   ],
+   "pairing": {
+    "you_take": "lower",
+    "why": "No Swashbuckling aboard, no Sniper and no armor that gives ground combat advantage: you take the lower pair.",
+    "your_add": 0,
+    "their_add": 1,
+    "their_name": "the pirates",
+    "rider_dice": 0,
+    "win": 0,
+    "tie": 0,
+    "lose": 1
+   },
+   "chance": 0,
+   "subject": "the pirates"
+  },
+  "last_roll": null,
   "character": {
    "name": "Bot Pilot",
    "race": "human",
@@ -59,6 +94,7 @@
   },
   "crew": [],
   "unnamed_crew": 0,
+  "unnamed_crew_cap": 0,
   "season_endings": {
    "conquest": "clear the depth-3 ruin beyond Habitat #3",
    "fortune": "200/6000c banked while at a habitat",
@@ -73,7 +109,8 @@
    "handling": 0,
    "armor": 0,
    "damage": "damaged",
-   "parts": []
+   "parts": [],
+   "hits_to_lost": 2
   },
   "items": [],
   "bulkheads_spent": false,

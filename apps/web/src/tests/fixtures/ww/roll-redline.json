@@ -16,6 +16,29 @@
    "declared_items": [],
    "context": {}
   },
+  "roll_facts": {
+   "reason": "redline",
+   "name": "Redline",
+   "carrier": "you",
+   "dice": 3,
+   "parts": [
+    {
+     "label": "MEC +2 (you)",
+     "bonus": 2,
+     "kind": "score",
+     "ability": "MEC",
+     "who": "you"
+    }
+   ],
+   "bonus": 2,
+   "on_pass": "+2 to your total in every exchange for the rest of this fight.",
+   "on_fail": "They attack unopposed: The Harness Runner takes one damage, to Damaged. The fight goes on, and the redline is spent.",
+   "notes": [],
+   "target": 12,
+   "dice_need": 10,
+   "chance": 0.625
+  },
+  "last_roll": null,
   "character": {
    "name": "Bot Pilot",
    "race": "human",
@@ -59,6 +82,7 @@
   },
   "crew": [],
   "unnamed_crew": 0,
+  "unnamed_crew_cap": 0,
   "season_endings": {
    "conquest": "clear the depth-3 ruin beyond Habitat #3",
    "fortune": "700/6000c banked while at a habitat",
@@ -73,7 +97,8 @@
    "handling": 0,
    "armor": 0,
    "damage": "used",
-   "parts": []
+   "parts": [],
+   "hits_to_lost": 3
   },
   "items": [],
   "bulkheads_spent": false,

@@ -6,6 +6,8 @@
   "pending": {
    "kind": "release_crew"
   },
+  "roll_facts": null,
+  "last_roll": null,
   "character": {
    "name": "Bot Pilot",
    "race": "human",
@@ -50,6 +52,7 @@
   "crew": [
    {
     "name": "Human (ACT+2 SWA+1)",
+    "title": "Katie",
     "race": "human",
     "idealizes": "brawn",
     "abilities": {
@@ -68,6 +71,7 @@
    },
    {
     "name": "Kralkin (GUN+2 SWA+2)",
+    "title": "Kralkin (GUN+2 SWA+2)",
     "race": "kralkin",
     "idealizes": "moxie",
     "abilities": {
@@ -86,6 +90,7 @@
    },
    {
     "name": "Grull (HAK+3)",
+    "title": "Mica",
     "race": "grull",
     "idealizes": "finesse",
     "abilities": {
@@ -103,6 +108,7 @@
    }
   ],
   "unnamed_crew": 0,
+  "unnamed_crew_cap": 0,
   "season_endings": {
    "conquest": "clear the depth-3 ruin beyond Habitat #3",
    "fortune": "850/6000c banked while at a habitat",
@@ -117,7 +123,8 @@
    "handling": 2,
    "armor": 0,
    "damage": "hobbled",
-   "parts": []
+   "parts": [],
+   "hits_to_lost": 1
   },
   "items": [],
   "bulkheads_spent": false,
@@ -268,10 +275,13 @@
  "legalMoves": [
   {
    "move_id": "release-Human (ACT+2 SWA+1)",
-   "description": "Release Human (ACT+2 SWA+1) (they take their equipped gear).",
+   "description": "Release Katie (they take their equipped gear).",
    "move": {
     "type": "release_crew",
     "crew_name": "Human (ACT+2 SWA+1)"
+   },
+   "preview": {
+    "then": "Katie leaves for good and takes the weapon and armor they wear."
    }
   },
   {
@@ -280,14 +290,20 @@
    "move": {
     "type": "release_crew",
     "crew_name": "Kralkin (GUN+2 SWA+2)"
+   },
+   "preview": {
+    "then": "Kralkin (GUN+2 SWA+2) leaves for good and takes the weapon and armor they wear."
    }
   },
   {
    "move_id": "release-Grull (HAK+3)",
-   "description": "Release Grull (HAK+3) (they take their equipped gear).",
+   "description": "Release Mica (they take their equipped gear).",
    "move": {
     "type": "release_crew",
     "crew_name": "Grull (HAK+3)"
+   },
+   "preview": {
+    "then": "Mica leaves for good and takes the weapon and armor they wear."
    }
   }
  ],

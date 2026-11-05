@@ -7,6 +7,8 @@
    "kind": "evade_offer",
    "card_id": "7D"
   },
+  "roll_facts": null,
+  "last_roll": null,
   "character": {
    "name": "Bot Pilot",
    "race": "human",
@@ -51,6 +53,7 @@
   "crew": [
    {
     "name": "Hexapod (SNE+2 DIP+1)",
+    "title": "DEC0DE",
     "race": "hexapod",
     "idealizes": "smarts",
     "abilities": {
@@ -69,6 +72,7 @@
    }
   ],
   "unnamed_crew": 0,
+  "unnamed_crew_cap": 1,
   "season_endings": {
    "conquest": "clear the depth-3 ruin beyond Habitat #3",
    "fortune": "200/6000c banked while at a habitat",
@@ -83,7 +87,8 @@
    "handling": 0,
    "armor": 0,
    "damage": "used",
-   "parts": []
+   "parts": [],
+   "hits_to_lost": 3
   },
   "items": [],
   "bulkheads_spent": false,
@@ -230,9 +235,34 @@
  "legalMoves": [
   {
    "move_id": "attempt-evade",
-   "description": "RUN SILENT (A5): 3d6 + SNE vs 12 (10 + their speed). Success: no encounter; failure: they merely spot you (the normal fight).",
+   "description": "RUN SILENT: 3d6 + SNE vs 12 (10 + their speed). Success: no encounter; failure: they merely spot you (the normal fight).",
    "move": {
     "type": "attempt_evade"
+   },
+   "preview": {
+    "roll": {
+     "reason": "evade",
+     "name": "Run silent",
+     "carrier": "DEC0DE",
+     "dice": 3,
+     "parts": [
+      {
+       "label": "SNE +2 (Hexapod (SNE+2 DIP+1))",
+       "bonus": 2,
+       "kind": "score",
+       "ability": "SNE",
+       "who": "Hexapod (SNE+2 DIP+1)"
+      }
+     ],
+     "bonus": 2,
+     "on_pass": "They never see you. No encounter.",
+     "on_fail": "They spot you, and the fight starts as it would have.",
+     "notes": [],
+     "target": 12,
+     "dice_need": 10,
+     "chance": 0.625,
+     "subject": "the pirates"
+    }
    }
   },
   {

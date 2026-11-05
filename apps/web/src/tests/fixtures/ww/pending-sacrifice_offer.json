@@ -9,6 +9,28 @@
    "hazard_option": 2,
    "carrier_who": "self"
   },
+  "roll_facts": null,
+  "last_roll": {
+   "reason": "hazard_check",
+   "dice": [
+    3,
+    4,
+    3
+   ],
+   "parts": [
+    {
+     "label": "PIL +4 (you)",
+     "bonus": 4,
+     "kind": "score",
+     "ability": "PIL",
+     "who": "you"
+    }
+   ],
+   "bonus": 4,
+   "total": 14,
+   "target": 15,
+   "outcome": "fail"
+  },
   "character": {
    "name": "Bot Pilot",
    "race": "human",
@@ -53,6 +75,7 @@
   "crew": [
    {
     "name": "Hexapod (SNE+2 DIP+1)",
+    "title": "DEC0DE",
     "race": "hexapod",
     "idealizes": "smarts",
     "abilities": {
@@ -71,6 +94,7 @@
    },
    {
     "name": "Kralkin (MEC+3)",
+    "title": "Tweet",
     "race": "kralkin",
     "idealizes": "moxie",
     "abilities": {
@@ -88,6 +112,7 @@
    }
   ],
   "unnamed_crew": 1,
+  "unnamed_crew_cap": 1,
   "season_endings": {
    "conquest": "clear the depth-3 ruin beyond Habitat #3",
    "fortune": "1050/6000c banked while at a habitat",
@@ -102,7 +127,8 @@
    "handling": 0,
    "armor": 0,
    "damage": "pristine",
-   "parts": []
+   "parts": [],
+   "hits_to_lost": 4
   },
   "items": [],
   "bulkheads_spent": false,
@@ -294,9 +320,12 @@
  "legalMoves": [
   {
    "move_id": "sacrifice-unnamed",
-   "description": "Spend one unnamed crew hand (1 aboard): they die and the failed hazard counts as SURVIVED (amendment A14a).",
+   "description": "Spend one unnamed crew hand (1 aboard): they die and the failed hazard counts as SURVIVED.",
    "move": {
     "type": "sacrifice_unnamed"
+   },
+   "preview": {
+    "then": "One red shirt is lost, leaving 0. The hazard counts as survived: +1 XP."
    }
   },
   {
@@ -304,6 +333,9 @@
    "description": "Let the consequence land as rolled.",
    "move": {
     "type": "decline_sacrifice"
+   },
+   "preview": {
+    "then": "The Harness Runner takes one damage, to Used. +1 XP for surviving."
    }
   }
  ],

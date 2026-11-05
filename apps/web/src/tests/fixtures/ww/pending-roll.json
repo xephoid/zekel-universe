@@ -19,6 +19,30 @@
     "hazard_option": 2
    }
   },
+  "roll_facts": {
+   "reason": "hazard_check",
+   "name": "Hazard",
+   "carrier": "you",
+   "dice": 3,
+   "parts": [
+    {
+     "label": "RES +1 (you)",
+     "bonus": 1,
+     "kind": "score",
+     "ability": "RES",
+     "who": "you"
+    }
+   ],
+   "bonus": 1,
+   "on_pass": "Nothing happens. +1 XP for surviving.",
+   "on_fail": "Lose 100 credits, to 100c. +1 XP for surviving.",
+   "notes": [],
+   "target": 15,
+   "dice_need": 14,
+   "chance": 0.162,
+   "subject": "Hull mites"
+  },
+  "last_roll": null,
   "character": {
    "name": "Bot Pilot",
    "race": "human",
@@ -62,6 +86,7 @@
   },
   "crew": [],
   "unnamed_crew": 0,
+  "unnamed_crew_cap": 0,
   "season_endings": {
    "conquest": "clear the depth-3 ruin beyond Habitat #3",
    "fortune": "200/6000c banked while at a habitat",
@@ -76,7 +101,8 @@
    "handling": 0,
    "armor": 0,
    "damage": "used",
-   "parts": []
+   "parts": [],
+   "hits_to_lost": 3
   },
   "items": [],
   "bulkheads_spent": false,

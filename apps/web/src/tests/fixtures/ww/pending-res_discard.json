@@ -7,6 +7,8 @@
    "kind": "res_discard",
    "peek_count": 1
   },
+  "roll_facts": null,
+  "last_roll": null,
   "character": {
    "name": "Bot Pilot",
    "race": "human",
@@ -50,6 +52,7 @@
   },
   "crew": [],
   "unnamed_crew": 0,
+  "unnamed_crew_cap": 0,
   "season_endings": {
    "conquest": "clear the depth-3 ruin beyond Habitat #3",
    "fortune": "200/6000c banked while at a habitat",
@@ -64,7 +67,8 @@
    "handling": 0,
    "armor": 0,
    "damage": "used",
-   "parts": []
+   "parts": [],
+   "hits_to_lost": 3
   },
   "items": [],
   "bulkheads_spent": false,
@@ -216,7 +220,7 @@
   },
   {
    "move_id": "skip-res-peek",
-   "description": "Decline the peek — the deck stays unread and nothing is discarded (the peek is optional, WR §4).",
+   "description": "Decline the peek — the deck stays unread and nothing is discarded (the peek is optional).",
    "move": {
     "type": "skip_res_peek"
    }

@@ -17,6 +17,30 @@
    "declared_items": [],
    "context": {}
   },
+  "roll_facts": {
+   "reason": "hack",
+   "name": "Hack",
+   "carrier": "Mica",
+   "dice": 3,
+   "parts": [
+    {
+     "label": "HAK +3 (Grull (HAK+3))",
+     "bonus": 3,
+     "kind": "score",
+     "ability": "HAK",
+     "who": "Grull (HAK+3)"
+    }
+   ],
+   "bonus": 3,
+   "on_pass": "Their ship is disabled: board it or fly on. Hackers Delight pays +200c.",
+   "on_fail": "They attack unopposed: The Harness Runner takes one damage, to Used. The fight goes on.",
+   "notes": [],
+   "target": 13,
+   "dice_need": 10,
+   "chance": 0.625,
+   "subject": "the pirates"
+  },
+  "last_roll": null,
   "character": {
    "name": "Bot Pilot",
    "race": "human",
@@ -61,6 +85,7 @@
   "crew": [
    {
     "name": "Grull (RES+2 MEC+1)",
+    "title": "Obsidian",
     "race": "grull",
     "idealizes": "finesse",
     "abilities": {
@@ -79,6 +104,7 @@
    },
    {
     "name": "Grull (HAK+3)",
+    "title": "Mica",
     "race": "grull",
     "idealizes": "finesse",
     "abilities": {
@@ -96,6 +122,7 @@
    }
   ],
   "unnamed_crew": 1,
+  "unnamed_crew_cap": 0,
   "season_endings": {
    "conquest": "clear the depth-3 ruin beyond Habitat #3",
    "fortune": "1650/6000c banked while at a habitat",
@@ -110,14 +137,19 @@
    "handling": 0,
    "armor": 0,
    "damage": "pristine",
-   "parts": []
+   "parts": [],
+   "hits_to_lost": 4
   },
   "items": [
    {
     "id": "h1-s1",
     "name": "Consumable +1 Any",
     "type": "consumable",
-    "consumed": false
+    "consumed": false,
+    "title": "Sustenance Cube",
+    "effect": "One use: +1 to any one roll that adds a score, declared before the dice.",
+    "worn_by": null,
+    "fitted": false
    }
   ],
   "bulkheads_spent": false,
@@ -303,10 +335,40 @@
   },
   {
    "move_id": "use-item-h1-s1",
-   "description": "Declare Consumable +1 Any for this roll (+1; consumed when the dice are reported).",
+   "description": "Declare Sustenance Cube for this roll (+1; consumed when the dice are reported).",
    "move": {
     "type": "use_item",
     "item_name": "Consumable +1 Any"
+   },
+   "preview": {
+    "roll": {
+     "reason": "hack",
+     "name": "Hack",
+     "carrier": "Mica",
+     "dice": 3,
+     "parts": [
+      {
+       "label": "HAK +3 (Grull (HAK+3))",
+       "bonus": 3,
+       "kind": "score",
+       "ability": "HAK",
+       "who": "Grull (HAK+3)"
+      },
+      {
+       "label": "Consumable +1 Any +1",
+       "bonus": 1,
+       "kind": "item"
+      }
+     ],
+     "bonus": 4,
+     "on_pass": "Their ship is disabled: board it or fly on. Hackers Delight pays +200c.",
+     "on_fail": "They attack unopposed: The Harness Runner takes one damage, to Used. The fight goes on.",
+     "notes": [],
+     "target": 13,
+     "dice_need": 9,
+     "chance": 0.7407,
+     "subject": "the pirates"
+    }
    }
   }
  ],

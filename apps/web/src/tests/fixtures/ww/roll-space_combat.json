@@ -16,6 +16,41 @@
    "declared_items": [],
    "context": {}
   },
+  "roll_facts": {
+   "reason": "space_combat",
+   "name": "Exchange of fire",
+   "carrier": "you",
+   "dice": 4,
+   "parts": [
+    {
+     "label": "PIL +3 (you)",
+     "bonus": 3,
+     "kind": "score",
+     "ability": "PIL",
+     "who": "you"
+    }
+   ],
+   "bonus": 3,
+   "on_pass": "Their ship is disabled: board it or fly on. A disabled ship does not count toward Bounty.",
+   "on_fail": "Flying Ace lets you roll the exchange again, once. Otherwise: The Harness Runner takes one damage, to Hobbled.",
+   "notes": [
+    "A tie is rolled again."
+   ],
+   "pairing": {
+    "you_take": "higher",
+    "why": "Piloting aboard gives you space combat advantage: you take the higher pair.",
+    "your_add": 3,
+    "their_add": 3,
+    "their_name": "the pirates",
+    "rider_dice": 0,
+    "win": 0.7407,
+    "tie": 0.2593,
+    "lose": 0
+   },
+   "chance": 1,
+   "subject": "the pirates"
+  },
+  "last_roll": null,
   "character": {
    "name": "Bot Pilot",
    "race": "human",
@@ -59,6 +94,7 @@
   },
   "crew": [],
   "unnamed_crew": 0,
+  "unnamed_crew_cap": 0,
   "season_endings": {
    "conquest": "clear the depth-3 ruin beyond Habitat #3",
    "fortune": "200/6000c banked while at a habitat",
@@ -73,7 +109,8 @@
    "handling": 0,
    "armor": 0,
    "damage": "damaged",
-   "parts": []
+   "parts": [],
+   "hits_to_lost": 2
   },
   "items": [],
   "bulkheads_spent": false,

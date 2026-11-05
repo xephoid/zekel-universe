@@ -6,6 +6,8 @@
   "pending": {
    "kind": "ruin_turn"
   },
+  "roll_facts": null,
+  "last_roll": null,
   "character": {
    "name": "Bot Pilot",
    "race": "human",
@@ -49,6 +51,7 @@
   },
   "crew": [],
   "unnamed_crew": 0,
+  "unnamed_crew_cap": 0,
   "season_endings": {
    "conquest": "clear the depth-3 ruin beyond Habitat #3",
    "fortune": "100/6000c banked while at a habitat",
@@ -63,7 +66,8 @@
    "handling": 0,
    "armor": 0,
    "damage": "used",
-   "parts": []
+   "parts": [],
+   "hits_to_lost": 3
   },
   "items": [],
   "bulkheads_spent": false,
@@ -210,7 +214,17 @@
      "ended": false,
      "is_character": true,
      "unnamed": false,
-     "has_attacked": false
+     "has_attacked": false,
+     "title": "Bot Pilot",
+     "move_allowance": 3,
+     "moves_left": 0,
+     "reach": [],
+     "attack": {
+      "ability": "SWA",
+      "bonus": 0,
+      "range": 1,
+      "advantage": false
+     }
     }
    ],
    "attackers": [
@@ -219,6 +233,7 @@
      "atk": 5,
      "move": 3,
      "range": 1,
+     "xp": 5,
      "cell": "r4c9",
      "defeated": false
     },
@@ -227,6 +242,7 @@
      "atk": 3,
      "move": 3,
      "range": 1,
+     "xp": 3,
      "cell": "r6c3",
      "defeated": false
     },
@@ -235,10 +251,12 @@
      "atk": 3,
      "move": 3,
      "range": 1,
+     "xp": 3,
      "cell": "r4c4",
      "defeated": false
     }
    ],
+   "goal_cell": "r1c1",
    "attacker_turn_index": null,
    "spots_spent": []
   },
@@ -269,7 +287,7 @@
  "legalMoves": [
   {
    "move_id": "move-Bot Pilot",
-   "description": "Move Bot Pilot (at r3c1) — FILL IN the destination cell like \"r5c3\"; no diagonals; walls, pits and tokens block.",
+   "description": "Move Bot Pilot (at r3c1): choose a square; no diagonals; walls, pits and tokens block.",
    "move": {
     "type": "move_being",
     "being": "Bot Pilot",
@@ -282,6 +300,44 @@
    "move": {
     "type": "recruit_at",
     "being": "Bot Pilot"
+   },
+   "preview": {
+    "roll": {
+     "reason": "being_d6",
+     "name": "Approach the figure",
+     "dice": 1,
+     "parts": [],
+     "bonus": 0,
+     "on_pass": "If someone is there, the recruit roll follows at once. Either way the spot is spent.",
+     "on_fail": "",
+     "notes": [],
+     "table": [
+      {
+       "face": 1,
+       "result": "A decoy: nobody is there."
+      },
+      {
+       "face": 2,
+       "result": "Kralkin (SWA +2 ACT +2, min roll 13), idealizes moxie."
+      },
+      {
+       "face": 3,
+       "result": "Human (DEM +3 LEA +2, min roll 14), idealizes brawn."
+      },
+      {
+       "face": 4,
+       "result": "Human (DIP +3 HAK +2, min roll 13), idealizes smarts."
+      },
+      {
+       "face": 5,
+       "result": "Grull (GUN +3 LEA +2, min roll 14), idealizes finesse."
+      },
+      {
+       "face": 6,
+       "result": "Kralkin (GUN +2 SWA +2, min roll 13), idealizes moxie."
+      }
+     ]
+    }
    }
   },
   {
@@ -290,6 +346,9 @@
    "move": {
     "type": "end_being_turn",
     "being": "Bot Pilot"
+   },
+   "preview": {
+    "then": "The last to act: the attackers move next."
    }
   }
  ],

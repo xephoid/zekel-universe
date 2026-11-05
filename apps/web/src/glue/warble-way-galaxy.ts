@@ -9,6 +9,7 @@ import type { CardData, GridData, TableauData } from '@universe/primitives';
 import type { GameReferenceResponse } from '@universe/shared';
 import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, SelectEvent, SetupAnswers, SetupField, SetupSeat, TablePlan, Zone } from './types';
 import { asArr, asNum, asStr, isObj, shapeHas, words } from './types';
+import { abilityWords, words as factWords } from './ww/facts';
 import { answerNumber, answerText } from './forms';
 import { GLYPH, KIND, travelCard } from './ww/cards';
 import { faceUrl } from './ww/faces';
@@ -39,7 +40,7 @@ function archetypeOptions(reference: GameReferenceResponse | null): Array<{ name
   return isObj(rd)
     ? asArr(rd['archetypes']).flatMap((a) => {
       if (!isObj(a) || typeof a['name'] !== 'string') return [];
-      const scores = isObj(a['scores']) ? Object.entries(a['scores']).map(([k, v]) => `${k} ${asNum(v)}`).join(' / ') : '';
+      const scores = isObj(a['scores']) ? Object.entries(a['scores']).map(([k, v]) => `${abilityWords(reference, k)?.name ?? k} ${asNum(v)}`).join(' / ') : '';
       return [{ name: a['name'], label: `${a['name']} ${asStr(a['stars'])} ${asStr(a['difficulty'])} — ${scores}` }];
     })
     : [];
@@ -121,6 +122,9 @@ export const warbleWayGlue: GlueModule = {
    *  zones stay the engine debug client's shape. */
   Screen: WwScreen,
   phone: true,
+  // The last move's sentence sits on the board, beside the dice it rolled,
+  // not at the foot of the side column where a result is easy to miss.
+  placesCaption: true,
 
   /** The hologram logbook theme (docs/design/warble-way-galaxy): the table's
    *  own look, for the captain's seat and for a watcher, once the view is
@@ -307,20 +311,27 @@ export const warbleWayGlue: GlueModule = {
     const races = raceOptions(reference);
     const abilities = abilityOptions(reference);
     const archetypes = archetypeOptions(reference);
+    const ct = factWords(reference, 'creation_text');
     if (races.length === 0 || abilities.length === 0) return [];
     const fields: SetupField[] = [
       { kind: 'text', key: 'character_name', label: 'Your character\'s name', maxLength: 40 },
-      { kind: 'choice', key: 'race', label: 'Race', options: races.map((r) => ({ value: r, label: words(r) })) },
+      { kind: 'choice', key: 'race', label: 'Race', ...(ct['race'] ? { help: ct['race'] } : {}), options: races.map((r) => ({ value: r, label: words(r) })) },
       { kind: 'text', key: 'ship_name', label: 'Your ship\'s name', maxLength: 40 },
       {
         kind: 'choice', key: 'method', label: 'Ability scores',
-        help: 'Recommended: one score 3, one 2, one 1. Or an archetype card, a pre-built spread with a printed difficulty.',
-        options: [{ value: 'recommended', label: 'Choose the scores' }, ...(archetypes.length ? [{ value: 'archetype', label: 'An archetype card' }] : [])],
+        help: ct['scores'] ?? 'One score 3, one 2, one 1; or spread 6 points with none above 3; or an archetype card.',
+        options: [{ value: 'recommended', label: 'One 3, one 2, one 1' }, { value: 'distribute', label: 'Spread 6 points' }, ...(archetypes.length ? [{ value: 'archetype', label: 'An archetype card' }] : [])],
       },
     ];
-    for (const a of abilities) fields.push({ kind: 'number', key: `score.${a.code}`, label: `${a.name} (${a.code}, ${words(a.stat)})`, min: 0, max: 3 });
-    if (archetypes.length) fields.push({ kind: 'choice', key: 'archetype_name', label: 'Archetype card', options: archetypes.map((a) => ({ value: a.name, label: a.label })) });
-    fields.push({ kind: 'choice', key: 'disposition', label: 'Disposition (a roleplay hint, never a rule)', options: [
+    // Each ability says what it does, in the engine's words, where its score
+    // is chosen. A box left empty is an ability left at nothing.
+    for (const a of abilities) {
+      const w = abilityWords(reference, a.code);
+      const help = w?.basic ? `${w.basic}${w.advanced ? ` At a natural 3, ${w.advanced.name}: ${w.advanced.what}` : ''}` : undefined;
+      fields.push({ kind: 'number', key: `score.${a.code}`, label: `${a.name} (${a.code}, ${words(a.stat)})`, ...(help ? { help } : {}), min: 0, max: 3, optional: true });
+    }
+    if (archetypes.length) fields.push({ kind: 'choice', key: 'archetype_name', label: 'Archetype card', ...(ct['archetype'] ? { help: ct['archetype'] } : {}), options: archetypes.map((a) => ({ value: a.name, label: a.label })) });
+    fields.push({ kind: 'choice', key: 'disposition', label: 'Disposition', help: ct['disposition'] ?? 'A roleplay hint, never a rule.', options: [
       { value: 'none', label: 'No hint' }, { value: 'brash', label: 'Brash' }, { value: 'risk_averse', label: 'Risk-averse' },
     ] });
     return fields;
@@ -359,7 +370,7 @@ export const warbleWayGlue: GlueModule = {
     if (move.move['type'] === 'setup_encounter') {
       const view = isObj(input.view) ? input.view : {};
       const crew = asArr(view['crew']).filter(isObj).map((c) => asStr(c['name'])).filter(Boolean);
-      const starts = (/start_location \(([^)]+)\)/.exec(move.description ?? '')?.[1] ?? '').split(/\s+or\s+/).map((x) => x.trim()).filter(Boolean);
+      const starts = (/start[_ ]location \(([^)]+)\)/.exec(move.description ?? '')?.[1] ?? '').split(/\s+or\s+/).map((x) => x.trim()).filter(Boolean);
       const spots = (/exactly 3 of: ([^)—]+)/.exec(move.description ?? '')?.[1] ?? '').split(',').map((x) => x.trim()).filter(Boolean);
       return {
         title: 'Set up the ruin', help: move.description, template: move, submitLabel: 'Enter',
@@ -442,6 +453,10 @@ export const warbleWayGlue: GlueModule = {
   },
 
   diceFor(event) {
+    // An engine that reads the last roll back in its view has the screen
+    // draw the dice, in their pairs, beside the result; the table's own row
+    // of dice is for an engine that does not.
+    if (isObj(event.view) && 'last_roll' in event.view) return null;
     const m = event.engineMove;
     const dice = m && Array.isArray(m['dice']) ? m['dice'] : null;
     if (dice) return dice.map((d) => asNum(d)).filter((n) => n > 0);

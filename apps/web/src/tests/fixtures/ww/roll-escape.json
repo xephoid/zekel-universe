@@ -16,6 +16,30 @@
    "declared_items": [],
    "context": {}
   },
+  "roll_facts": {
+   "reason": "escape",
+   "name": "Escape",
+   "carrier": "you",
+   "dice": 3,
+   "parts": [
+    {
+     "label": "PIL +4 (you)",
+     "bonus": 4,
+     "kind": "score",
+     "ability": "PIL",
+     "who": "you"
+    }
+   ],
+   "bonus": 4,
+   "on_pass": "A clean getaway. The encounter ends.",
+   "on_fail": "The Harness Runner takes one damage, to Used. Then you get away all the same.",
+   "notes": [],
+   "target": 15,
+   "dice_need": 11,
+   "chance": 0.5,
+   "subject": "the pirates"
+  },
+  "last_roll": null,
   "character": {
    "name": "Bot Pilot",
    "race": "human",
@@ -59,6 +83,7 @@
   },
   "crew": [],
   "unnamed_crew": 0,
+  "unnamed_crew_cap": 0,
   "season_endings": {
    "conquest": "clear the depth-3 ruin beyond Habitat #3",
    "fortune": "700/6000c banked while at a habitat",
@@ -73,7 +98,8 @@
    "handling": 0,
    "armor": 0,
    "damage": "pristine",
-   "parts": []
+   "parts": [],
+   "hits_to_lost": 4
   },
   "items": [],
   "bulkheads_spent": false,

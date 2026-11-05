@@ -4,6 +4,8 @@
  "view": {
   "phase": "at_habitat",
   "pending": null,
+  "roll_facts": null,
+  "last_roll": null,
   "character": {
    "name": "Bot Pilot",
    "race": "human",
@@ -47,6 +49,7 @@
   },
   "crew": [],
   "unnamed_crew": 0,
+  "unnamed_crew_cap": 0,
   "season_endings": {
    "conquest": "clear the depth-3 ruin beyond Habitat #3",
    "fortune": "200/6000c banked while at a habitat",
@@ -61,7 +64,8 @@
    "handling": 0,
    "armor": 0,
    "damage": "used",
-   "parts": []
+   "parts": [],
+   "hits_to_lost": 3
   },
   "items": [],
   "bulkheads_spent": false,
@@ -184,50 +188,151 @@
  "legalMoves": [
   {
    "move_id": "buy-h1-s1",
-   "description": "Buy Consumable +1 Any for 200c (you have 200c).",
+   "description": "Buy Sustenance Cube (Consumable +1 Any) for 200c (you have 200c).",
    "move": {
     "type": "buy_item",
     "item_name": "Consumable +1 Any"
+   },
+   "preview": {
+    "then": "One use: +1 to any one roll that adds a score, declared before the dice."
    }
   },
   {
    "move_id": "recruit-h1-c1",
-   "description": "Attempt to recruit the Human (PIL +1, min roll 11) at the cantina.",
+   "description": "Attempt to recruit Wang, the Human (PIL +1, min roll 11), at the cantina.",
    "move": {
     "type": "attempt_recruit",
     "recruit_name": "h1-c1"
+   },
+   "preview": {
+    "roll": {
+     "reason": "recruit",
+     "name": "Recruit",
+     "dice": 3,
+     "parts": [],
+     "bonus": 0,
+     "on_pass": "Wang joins the crew.",
+     "on_fail": "Wang is marked: no second try at this cantina, ever.",
+     "notes": [],
+     "target": 11,
+     "dice_need": 11,
+     "chance": 0.5,
+     "subject": "Wang"
+    }
    }
   },
   {
    "move_id": "recruit-h1-c2",
-   "description": "Attempt to recruit the Kralkin (PIL +1, min roll 11) at the cantina.",
+   "description": "Attempt to recruit Chirp, the Kralkin (PIL +1, min roll 11), at the cantina.",
    "move": {
     "type": "attempt_recruit",
     "recruit_name": "h1-c2"
+   },
+   "preview": {
+    "roll": {
+     "reason": "recruit",
+     "name": "Recruit",
+     "dice": 3,
+     "parts": [],
+     "bonus": 0,
+     "on_pass": "Chirp joins the crew.",
+     "on_fail": "Chirp is marked: no second try at this cantina, ever.",
+     "notes": [],
+     "target": 11,
+     "dice_need": 11,
+     "chance": 0.5,
+     "subject": "Chirp"
+    }
    }
   },
   {
    "move_id": "recruit-h1-c3",
-   "description": "Attempt to recruit the Hexapod (HAK +1, min roll 11) at the cantina.",
+   "description": "Attempt to recruit 7EE700, the Hexapod (HAK +1, min roll 11), at the cantina.",
    "move": {
     "type": "attempt_recruit",
     "recruit_name": "h1-c3"
+   },
+   "preview": {
+    "roll": {
+     "reason": "recruit",
+     "name": "Recruit",
+     "carrier": "you",
+     "dice": 3,
+     "parts": [
+      {
+       "label": "MEC +2 (you)",
+       "bonus": 2,
+       "kind": "score",
+       "ability": "MEC",
+       "who": "you"
+      }
+     ],
+     "bonus": 2,
+     "on_pass": "7EE700 joins the crew.",
+     "on_fail": "7EE700 is marked: no second try at this cantina, ever.",
+     "notes": [],
+     "target": 11,
+     "dice_need": 9,
+     "chance": 0.7407,
+     "subject": "7EE700"
+    }
    }
   },
   {
    "move_id": "recruit-h1-c4",
-   "description": "Attempt to recruit the Grull (DIP +1, min roll 11) at the cantina.",
+   "description": "Attempt to recruit Slate, the Grull (DIP +1, min roll 11), at the cantina.",
    "move": {
     "type": "attempt_recruit",
     "recruit_name": "h1-c4"
+   },
+   "preview": {
+    "roll": {
+     "reason": "recruit",
+     "name": "Recruit",
+     "carrier": "you",
+     "dice": 3,
+     "parts": [
+      {
+       "label": "PIL +3 (you)",
+       "bonus": 3,
+       "kind": "score",
+       "ability": "PIL",
+       "who": "you"
+      }
+     ],
+     "bonus": 3,
+     "on_pass": "Slate joins the crew.",
+     "on_fail": "Slate is marked: no second try at this cantina, ever.",
+     "notes": [],
+     "target": 11,
+     "dice_need": 8,
+     "chance": 0.838,
+     "subject": "Slate"
+    }
    }
   },
   {
    "move_id": "recruit-h1-c5",
-   "description": "Attempt to recruit the Human (ACT +1, min roll 11) at the cantina.",
+   "description": "Attempt to recruit Michael, the Human (ACT +1, min roll 11), at the cantina.",
    "move": {
     "type": "attempt_recruit",
     "recruit_name": "h1-c5"
+   },
+   "preview": {
+    "roll": {
+     "reason": "recruit",
+     "name": "Recruit",
+     "dice": 3,
+     "parts": [],
+     "bonus": 0,
+     "on_pass": "Michael joins the crew.",
+     "on_fail": "Michael is marked: no second try at this cantina, ever.",
+     "notes": [],
+     "target": 11,
+     "dice_need": 11,
+     "chance": 0.5,
+     "subject": "Michael"
+    }
    }
   },
   {
@@ -235,32 +340,163 @@
    "description": "Pay 150c: the yard raises the Harness Runner one damage level (currently used; repeatable). Credits: 200.",
    "move": {
     "type": "pay_repair"
+   },
+   "preview": {
+    "then": "The Harness Runner goes up one damage level, to Pristine. You may pay again."
    }
   },
   {
    "move_id": "take-mission-h1-m1",
-   "description": "Take the RES 10 mission (distance 3, RES 10, 300c, 1 XP).",
+   "description": "Hydroponics Mold: Take the RES 10 mission (distance 3, RES 10, 300c, 1 XP).",
    "move": {
     "type": "take_mission",
     "mission_name": "h1-m1"
+   },
+   "preview": {
+    "check": {
+     "reason": "mission_check",
+     "name": "Mission",
+     "carrier": "you",
+     "dice": 3,
+     "parts": [
+      {
+       "label": "RES +1 (you)",
+       "bonus": 1,
+       "kind": "score",
+       "ability": "RES",
+       "who": "you"
+      }
+     ],
+     "bonus": 1,
+     "on_pass": "300c and 1 XP. Time planetside also repairs the ship one level. The trip back is still to fly.",
+     "on_fail": "No credits and no XP. The trip back is still to fly.",
+     "notes": [],
+     "target": 10,
+     "dice_need": 9,
+     "chance": 0.7407,
+     "subject": "Hydroponics Mold"
+    },
+    "then": "You leave Xaxalon 4 at once: 3 cards out, the check, then 3 cards back. A mission can be tried once."
    }
   },
   {
    "move_id": "take-mission-h1-m3",
-   "description": "Take the MEC 10 mission (distance 3, MEC 10, 300c, 1 XP).",
+   "description": "The Leaky Recycler: Take the MEC 10 mission (distance 3, MEC 10, 300c, 1 XP).",
    "move": {
     "type": "take_mission",
     "mission_name": "h1-m3"
+   },
+   "preview": {
+    "check": {
+     "reason": "mission_check",
+     "name": "Mission",
+     "carrier": "you",
+     "dice": 3,
+     "parts": [
+      {
+       "label": "MEC +2 (you)",
+       "bonus": 2,
+       "kind": "score",
+       "ability": "MEC",
+       "who": "you"
+      }
+     ],
+     "bonus": 2,
+     "on_pass": "300c and 1 XP. Time planetside also repairs the ship one level. The trip back is still to fly.",
+     "on_fail": "No credits and no XP. The trip back is still to fly.",
+     "notes": [],
+     "target": 10,
+     "dice_need": 8,
+     "chance": 0.838,
+     "subject": "The Leaky Recycler"
+    },
+    "then": "You leave Xaxalon 4 at once: 3 cards out, the check, then 3 cards back. A mission can be tried once."
    }
   },
   {
    "move_id": "take-mission-h1-m4",
-   "description": "Take the R1 RUINS mission (distance 4, R1 ruin, 600c, 1 XP) — travel there, then delve to depth 1.",
+   "description": "Dustbowl Ruin: Take the R1 RUINS mission (distance 4, R1 ruin, 600c, 1 XP) — travel there, then delve to depth 1.",
    "move": {
     "type": "take_mission",
     "mission_name": "h1-m4"
+   },
+   "preview": {
+    "then": "You leave Xaxalon 4 at once: 4 cards out, the ruin to depth 1, then 4 cards back. A mission can be tried once."
    }
   }
  ],
- "unavailable": []
+ "unavailable": [
+  {
+   "moveType": "buy_item",
+   "item": "h1-s2",
+   "reason": "Costs 300c; you have 200c."
+  },
+  {
+   "moveType": "buy_item",
+   "item": "h1-s3",
+   "reason": "Costs 400c; you have 200c."
+  },
+  {
+   "moveType": "buy_item",
+   "item": "h1-s4",
+   "reason": "Costs 400c; you have 200c."
+  },
+  {
+   "moveType": "buy_item",
+   "item": "h1-s5",
+   "reason": "Costs 700c; you have 200c."
+  },
+  {
+   "moveType": "take_mission",
+   "item": "h1-m2",
+   "reason": "Nobody aboard has Diplomacy (DIP), and no item you hold gives it."
+  },
+  {
+   "moveType": "take_mission",
+   "item": "h1-m5",
+   "reason": "Nobody aboard has Swashbuckling (SWA), and no item you hold gives it."
+  },
+  {
+   "moveType": "take_mission",
+   "item": "h1-m6",
+   "reason": "Nobody aboard has Armor (ARM), and no item you hold gives it."
+  },
+  {
+   "moveType": "take_mission",
+   "item": "h1-m7",
+   "reason": "Nobody aboard has Acting (ACT), and no item you hold gives it."
+  },
+  {
+   "moveType": "attempt_repair",
+   "reason": "There is one repair roll each time you arrive from a trip, and none is owed now."
+  },
+  {
+   "moveType": "attempt_reduce_unrest",
+   "reason": "There is one unrest roll each time you arrive from a trip, and none is owed now."
+  },
+  {
+   "moveType": "recruit_unnamed",
+   "reason": "Needs Diplomacy (DIP) aboard."
+  },
+  {
+   "moveType": "fabricate_part",
+   "reason": "Needs a natural Mechanics 3 aboard; a score raised by an item does not count."
+  },
+  {
+   "moveType": "upgrade_item",
+   "reason": "Needs a natural Mechanics 3 aboard; a score raised by an item does not count."
+  },
+  {
+   "moveType": "equip_item",
+   "reason": "You hold no weapon or armor."
+  },
+  {
+   "moveType": "release_crew",
+   "reason": "You have no crew."
+  },
+  {
+   "moveType": "depart_for_next_habitat",
+   "reason": "Xaxalon 4 lets you move on once 4 of its missions have been tried, pass or fail. You have tried 0."
+  }
+ ]
 }

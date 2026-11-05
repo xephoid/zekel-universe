@@ -8,6 +8,8 @@
    "card_id": "KD",
    "max_depth": 2
   },
+  "roll_facts": null,
+  "last_roll": null,
   "character": {
    "name": "Bot Pilot",
    "race": "human",
@@ -51,6 +53,7 @@
   },
   "crew": [],
   "unnamed_crew": 0,
+  "unnamed_crew_cap": 0,
   "season_endings": {
    "conquest": "clear the depth-3 ruin beyond Habitat #3",
    "fortune": "100/6000c banked while at a habitat",
@@ -65,7 +68,8 @@
    "handling": 0,
    "armor": 0,
    "damage": "damaged",
-   "parts": []
+   "parts": [],
+   "hits_to_lost": 2
   },
   "items": [],
   "bulkheads_spent": false,
@@ -216,6 +220,9 @@
    "move": {
     "type": "enter_ruin",
     "depth": 1
+   },
+   "preview": {
+    "then": "Next you choose who goes in, the start square, the threat level and where the three attackers stand. Stepping on the goal of the last level ends the visit at once."
    }
   },
   {
@@ -224,6 +231,9 @@
    "move": {
     "type": "enter_ruin",
     "depth": 2
+   },
+   "preview": {
+    "then": "Next you choose who goes in, the start square, the threat level and where the three attackers stand. Stepping on the goal of the last level ends the visit at once."
    }
   },
   {

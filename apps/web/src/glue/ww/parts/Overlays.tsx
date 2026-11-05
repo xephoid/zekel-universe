@@ -6,6 +6,7 @@
 
 import type { LegalMove } from '../../types';
 import { asNum, asStr } from '../../types';
+import { abilityWords, previewOf } from '../facts';
 import { statGroups, type WwTable } from '../read';
 import { TravelCard } from '../TravelCard';
 import { travelCard } from '../cards';
@@ -27,7 +28,7 @@ export function LevelUp({ table, input, pressable, onMove }: PartProps) {
           <div className="ww-col" style={{ gap: 6 }}>
             <Lbl style={{ color: '#FFD700' }}>{me.xp} XP REACHED</Lbl>
             <h1 className="ww-h1" style={{ fontSize: 36 }}>{next % 2 === 0 ? 'Add +1 to one ability, or open a new one' : 'Add +1 to one ability'}</h1>
-            <span className="ww-lede">Odd levels raise an ability you already have. Even levels may instead open a new one at 1. A natural 3 is the only way to an advanced skill; items do not count.</span>
+            <span className="ww-lede">Each choice below says what the ability does. A natural 3 in one gives its advanced skill; a score raised by an item does not count.</span>
           </div>
         </div>
         <div className="ww-lv-grid">
@@ -38,10 +39,14 @@ export function LevelUp({ table, input, pressable, onMove }: PartProps) {
                 const v = by[a.code]?.natural ?? 0;
                 const m = moves.find((x) => asStr(x.move['ability']) === a.code);
                 const opens = (m?.move_id ?? '').startsWith('level-up-open');
+                const w = abilityWords(input.reference, a.code);
+                const then = previewOf(m)?.then;
                 return (
                   <button key={a.code} type="button" className="ww-lv-cell" disabled={!pressable || !m} onClick={() => m && onMove(m)} aria-label={`${a.name}${m ? (opens ? ', open at 1' : `, ${v} to ${v + 1}`) : ', not available'}`}>
                     <span className="ww-lv-head"><span>{a.code}</span><Num style={{ fontSize: 15 }}>{m ? (opens ? '0 → 1' : `${v} → ${v + 1}`) : String(v)}</Num></span>
-                    <span className="ww-lv-note">{a.name}{m && !opens && v + 1 === 3 ? ' · unlocks the advanced skill' : opens ? ' · opens at even levels' : v === 0 ? ' · opens at even levels' : ''}</span>
+                    <span className="ww-lv-note"><b>{a.name}.</b> {w?.basic ?? then ?? ''}</span>
+                    {m && !opens && v + 1 === 3 && w?.advanced && <span className="ww-lv-note adv">Gives {w.advanced.name}: {w.advanced.what}</span>}
+                    {!m && <span className="ww-lv-note">{v === 0 ? 'A new ability can be opened only on reaching an even level.' : ''}</span>}
                   </button>
                 );
               })}

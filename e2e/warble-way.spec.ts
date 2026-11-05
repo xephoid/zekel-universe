@@ -1,7 +1,8 @@
 // M4: Warble Way Galaxy, the solo game. Character creation is a form the
 // player fills in (the engine's skeleton is never sent as listed), then the
 // season runs on the Roll and Draw buttons: every die and every travel card
-// waits for a press, and a roll shows its dice on the table.
+// waits for a press, and a roll shows its dice on the table. At a habitat a
+// first tap on a row only opens what the move leads to; one button sends it.
 // Needs the full stack (engine + server on BASE_URL).
 
 import { test, expect, type Page } from '@playwright/test';
@@ -44,14 +45,12 @@ test('Warble Way: the character is the player\'s to create, and dice and cards w
   await page.getByLabel("Your character's name").fill('Zara');
   await page.getByRole('group', { name: 'Race' }).getByRole('radio', { name: 'Grull' }).check();
   await page.getByLabel("Your ship's name").fill('Wandering Star');
-  await page.getByRole('group', { name: 'Ability scores' }).getByRole('radio', { name: 'Choose the scores' }).check();
+  await page.getByRole('group', { name: 'Ability scores' }).getByRole('radio', { name: 'One 3, one 2, one 1' }).check();
   await expect(start).toBeDisabled(); // scores still empty
+  // Three scores are the player's to place; an ability left blank is a zero.
   await page.getByLabel(/Swashbuckling/).fill('3');
   await page.getByLabel(/Hacking/).fill('2');
   await page.getByLabel(/Sneaking/).fill('1');
-  for (const other of ['Armor', 'Demolitions', 'Research', 'Mechanics', 'Piloting', 'Gunslinging', 'Leadership', 'Diplomacy', 'Acting']) {
-    await page.getByLabel(new RegExp(other)).fill('0');
-  }
   await page.getByRole('group', { name: /Disposition/ }).getByRole('radio', { name: 'Brash' }).check();
   await expect(start).toBeEnabled();
   await start.click();
@@ -65,8 +64,18 @@ test('Warble Way: the character is the player\'s to create, and dice and cards w
 
   // Take a mission to launch into space, then draw and roll only by pressing.
   await expect(page.locator('.turn-pill')).toHaveText(/^Your move/, { timeout: 30_000 });
-  // A plain check mission (not the ruins one, whose setup is a longer form).
-  expect(await tryRow(page, rows.filter({ hasText: /^Take the [A-Z]{3} \d+ mission/ }).first())).toBe(true);
+  // A plain check mission the captain can attempt (a row with a chance on it;
+  // not the ruins one, whose setup is a longer form). The first tap sends
+  // nothing: it opens the choice, which says the mission leaves the habitat.
+  const opening = await log(page).textContent();
+  const mission = page.getByRole('region', { name: 'Missions' }).locator('button.ww-mrow:not(.idle):not(.done)').filter({ has: page.locator('.ww-chance') }).first();
+  await mission.click();
+  const choice = page.locator('.ww-choice');
+  await expect(choice).toBeVisible();
+  await expect(choice.locator('.ww-chance').first()).toBeVisible();
+  expect(await log(page).textContent()).toBe(opening);
+  await choice.getByRole('button', { name: 'TAKE IT AND LEAVE' }).click();
+  await expect(log(page)).not.toHaveText(opening ?? '', { timeout: 30_000 });
 
   let draws = 0;
   let rolls = 0;
@@ -82,7 +91,8 @@ test('Warble Way: the character is the player\'s to create, and dice and cards w
     if (await pressIfOffered(page, 'Roll')) {
       rolls += 1;
       await expect(log(page)).not.toHaveText(before ?? '', { timeout: 30_000 });
-      await expect(page.locator('.zk-die').first()).toBeVisible();
+      // The dice are read back on the board, with how the roll went.
+      await expect(page.getByRole('status', { name: 'The last roll' }).locator('.zk-die').first()).toBeVisible();
       continue;
     }
     // No randomness pending: a chooser or form that opened, else the plainest
@@ -99,7 +109,7 @@ test('Warble Way: the character is the player\'s to create, and dice and cards w
       }
       continue;
     }
-    const prefer = [/^Decline/i, /^Skip/i, /^Leave/i, /^Continue|^End/i, /^Depart/i, /^Take the .* mission/i, /^Evade|^Flee/i];
+    const prefer = [/^Decline/i, /^Pass the ruins/i, /^Leave/i, /^Continue|^End/i, /^Depart/i, /Take the [A-Z]{3} \d+ mission/, /^Evade|^Flee/i];
     let done = false;
     for (const re of prefer) {
       const row = rows.filter({ hasText: re }).first();

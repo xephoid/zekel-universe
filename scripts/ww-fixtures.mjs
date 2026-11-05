@@ -47,6 +47,7 @@ function keysFor(s, legal) {
       if (legal.some((m) => m.move.type === 'attack')) keys.push('ruin-attack');
       if (legal.some((m) => m.move.type === 'collect_item')) keys.push('ruin-cache');
       if (legal.some((m) => m.move.type === 'recruit_at')) keys.push('ruin-being');
+      if (legal.some((m) => m.move.type === 'convert_attacker')) keys.push('ruin-surrender');
     }
     if (g.pending.kind === 'ruin_setup') keys.push(`ruin-setup-R${g.pending.level}`);
     if (g.pending.kind === 'boarding_decision') keys.push(`boarding-${g.pending.stage}`);

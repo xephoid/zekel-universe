@@ -8,10 +8,14 @@
 import type { GameReferenceResponse, LegalMove } from '@universe/shared';
 import { asArr, asNum, asStr, isObj } from '../types';
 import { travelCard, type TravelCardFace } from './cards';
+import { readLastRoll, readRollFacts, type LastRoll, type RollFacts } from './facts';
 
 export interface Ability { code: string; name: string; stat: string; natural: number; effective: number }
 export interface Being {
+  /** the label the engine's moves address this being by */
   name: string;
+  /** the name to show: the one on their row or card when the engine has one, else the label */
+  title: string;
   race: string;
   /** the captain, as opposed to a crew member */
   captain: boolean;
@@ -23,8 +27,8 @@ export interface Being {
 export interface Captain extends Being {
   level: number; xp: number; xpToNext: number; credits: number; wounded: boolean; dread: number;
 }
-export interface Ship { name: string; capacity: number; speed: number; handling: number; armor: number; damage: string; parts: string[] }
-export interface Item { id: string; name: string; type: string; consumed: boolean }
+export interface Ship { name: string; capacity: number; speed: number; handling: number; armor: number; damage: string; parts: string[]; /** hits until the ship is destroyed, that one included; absent when the engine does not say */ hitsToLost?: number }
+export interface Item { id: string; name: string; /** the shop's name for it, else the printed label */ title: string; type: string; consumed: boolean; /** what it does, in the engine's line */ effect: string; /** the label of the being wearing it */ wornBy: string | null; /** a ship part, fitted */ fitted: boolean }
 export interface Leg { position: string; purpose: string; kind: string; missionId?: string; cardsRemaining: number; current: boolean }
 export interface HabitatRow { index: number; name: string; title: string; meta: string; status: string; id?: string }
 export interface Habitat {
@@ -39,7 +43,13 @@ export interface Combat {
   card: string; rank: string; stage: string; rerollUsed: boolean; volleyUsed: boolean; redlineUsed: boolean; survivorsUsed: boolean;
   pirateDebuff: number; playerBuff: number; face: TravelCardFace | null;
 }
-export interface RuinToken { name: string; cell: string; moved: number; acted: boolean; ended: boolean; captain: boolean; unnamed: boolean }
+export interface RuinAttack { ability: string; bonus: number; range: number; advantage: boolean }
+export interface RuinToken {
+  name: string; title: string; cell: string; moved: number; acted: boolean; ended: boolean; captain: boolean; unnamed: boolean;
+  /** from the engine, when it says: movement this round, squares it can end on, how it attacks */
+  moveAllowance?: number; movesLeft?: number; reach: string[]; attack?: RuinAttack;
+}
+export interface RuinCandidate { name: string; title: string; kind: string; moveAllowance: number; attack: RuinAttack }
 export interface RuinAttacker { id: string; atk: number; move: number; range: number; xp?: number; cell: string; defeated: boolean; index: number }
 export interface Ruin {
   map: string; level: number; targetDepth: number; purpose: string; status: string;
@@ -48,6 +58,9 @@ export interface Ruin {
   rows: string[];
   party: RuinToken[]; attackers: RuinAttacker[]; spent: string[];
   attackerTurn: number | null;
+  goalCell: string | null;
+  /** before setup: how each being who could go in would move and fight */
+  candidates: RuinCandidate[];
 }
 export interface Pending { kind: string; [k: string]: unknown }
 
@@ -57,6 +70,12 @@ export interface WwTable {
   me: Captain | null;
   crew: Being[];
   unnamed: number;
+  /** the most red shirts the crew can hold; null when the engine does not say */
+  unnamedCap: number | null;
+  /** the open roll, worked out by the engine */
+  rollFacts: RollFacts | null;
+  /** the roll the last move resolved */
+  lastRoll: LastRoll | null;
   ship: Ship | null;
   items: Item[];
   endings: Record<string, string>;
@@ -92,7 +111,7 @@ function abilitiesOf(v: unknown): Ability[] {
 
 function being(v: Record<string, unknown>, captain: boolean): Being {
   return {
-    name: asStr(v['name']), race: asStr(v['race']), captain,
+    name: asStr(v['name']), title: asStr(v['title'], asStr(v['name'])), race: asStr(v['race']), captain,
     abilities: abilitiesOf(v['abilities']),
     skills: asArr(v['skills']).map((s) => asStr(s)),
     anger: asNum(v['anger_tokens']),
@@ -149,6 +168,8 @@ function readHabitat(v: Record<string, unknown>, reference: GameReferenceRespons
   };
 }
 
+const readAttack = (a: unknown): RuinAttack => (isObj(a) ? { ability: asStr(a['ability']), bonus: asNum(a['bonus']), range: asNum(a['range']), advantage: a['advantage'] === true } : { ability: '', bonus: 0, range: 1, advantage: false });
+
 function readRuin(v: Record<string, unknown>, reference: GameReferenceResponse | null): Ruin {
   const rd = reference?.referenceData;
   const maps = isObj(rd) && isObj(rd['ruins']) && isObj(rd['ruins']['maps']) ? rd['ruins']['maps'] : {};
@@ -158,10 +179,17 @@ function readRuin(v: Record<string, unknown>, reference: GameReferenceResponse |
   return {
     map, level: asNum(v['level'], 1), targetDepth: asNum(v['target_depth'], 1), purpose: asStr(v['purpose']), status: asStr(v['status']),
     round: asNum(v['round']), threat: asNum(v['threat_level']), startCell: asStr(v['start_cell']), rows: grid,
-    party: asArr(v['party']).filter(isObj).map((t) => ({ name: asStr(t['name']), cell: asStr(t['cell']), moved: asNum(t['moved']), acted: t['acted'] === true, ended: t['ended'] === true, captain: t['is_character'] === true, unnamed: t['unnamed'] === true })),
+    party: asArr(v['party']).filter(isObj).map((t) => ({
+      name: asStr(t['name']), title: asStr(t['title'], asStr(t['name'])), cell: asStr(t['cell']), moved: asNum(t['moved']), acted: t['acted'] === true, ended: t['ended'] === true, captain: t['is_character'] === true, unnamed: t['unnamed'] === true,
+      ...(typeof t['move_allowance'] === 'number' ? { moveAllowance: t['move_allowance'] } : {}), ...(typeof t['moves_left'] === 'number' ? { movesLeft: t['moves_left'] } : {}),
+      reach: asArr(t['reach']).map((c) => asStr(c)),
+      ...(isObj(t['attack']) ? { attack: readAttack(t['attack']) } : {}),
+    })),
     attackers: asArr(v['attackers']).filter(isObj).map((a, i) => ({ id: asStr(a['id']), atk: asNum(a['atk']), move: asNum(a['move']), range: asNum(a['range']), ...(typeof a['xp'] === 'number' ? { xp: a['xp'] } : {}), cell: asStr(a['cell']), defeated: a['defeated'] === true, index: i })),
     spent: asArr(v['spots_spent']).map((c) => asStr(c)),
     attackerTurn: typeof v['attacker_turn_index'] === 'number' ? v['attacker_turn_index'] : null,
+    goalCell: typeof v['goal_cell'] === 'string' ? v['goal_cell'] : null,
+    candidates: asArr(v['candidates']).filter(isObj).map((c) => ({ name: asStr(c['name']), title: asStr(c['title'], asStr(c['name'])), kind: asStr(c['kind']), moveAllowance: asNum(c['move_allowance']), attack: readAttack(c['attack']) })),
   };
 }
 
@@ -172,7 +200,8 @@ export function liveCardId(view: Record<string, unknown>): string | null {
     for (const k of ['card_id', 'hazard_card_id', 'evade_card_id']) if (typeof p[k] === 'string') return p[k] as string;
     const ctx = isObj(p['context']) ? p['context'] : {};
     for (const k of ['hazard_card_id', 'evade_card_id']) if (typeof ctx[k] === 'string') return ctx[k] as string;
-    if (asStr(ctx['recruit_source']) === 'space' && typeof ctx['recruit_id'] === 'string') return ctx['recruit_id'] as string;
+    // The roll names the recruit ("heart-8"); its card is the same rank of hearts.
+    if (asStr(ctx['recruit_source']) === 'space' && typeof ctx['recruit_id'] === 'string') return `${(ctx['recruit_id'] as string).replace(/^heart-/, '')}H`;
   }
   const sc = isObj(view['space_combat']) ? view['space_combat'] : null;
   if (sc) return asStr(sc['pirate']).replace('♦', '') + 'D';
@@ -202,8 +231,11 @@ export function readTable(view: unknown, reference: GameReferenceResponse | null
     me,
     crew: asArr(view['crew']).filter(isObj).map((c) => being(c, false)),
     unnamed: asNum(view['unnamed_crew']),
-    ship: sh ? { name: asStr(sh['name']), capacity: asNum(sh['capacity']), speed: asNum(sh['speed']), handling: asNum(sh['handling']), armor: asNum(sh['armor']), damage: asStr(sh['damage']), parts: asArr(sh['parts']).map((p) => asStr(p)) } : null,
-    items: asArr(view['items']).filter(isObj).map((i) => ({ id: asStr(i['id']), name: asStr(i['name']), type: asStr(i['type']), consumed: i['consumed'] === true })),
+    unnamedCap: typeof view['unnamed_crew_cap'] === 'number' ? view['unnamed_crew_cap'] : null,
+    rollFacts: readRollFacts(view['roll_facts']),
+    lastRoll: readLastRoll(view['last_roll']),
+    ship: sh ? { name: asStr(sh['name']), capacity: asNum(sh['capacity']), speed: asNum(sh['speed']), handling: asNum(sh['handling']), armor: asNum(sh['armor']), damage: asStr(sh['damage']), parts: asArr(sh['parts']).map((p) => asStr(p)), ...(typeof sh['hits_to_lost'] === 'number' ? { hitsToLost: sh['hits_to_lost'] } : {}) } : null,
+    items: asArr(view['items']).filter(isObj).map((i) => ({ id: asStr(i['id']), name: asStr(i['name']), title: asStr(i['title'], asStr(i['name'])), type: asStr(i['type']), consumed: i['consumed'] === true, effect: asStr(i['effect']), wornBy: typeof i['worn_by'] === 'string' ? i['worn_by'] : null, fitted: i['fitted'] === true })),
     endings: isObj(view['season_endings']) ? Object.fromEntries(Object.entries(view['season_endings']).map(([k, x]) => [k, asStr(x)])) : {},
     habitat: isObj(view['habitat']) ? readHabitat(view['habitat'], reference) : null,
     journey: journey.map((l) => ({ position: asStr(l['position']), purpose: asStr(l['purpose']), kind: asStr(l['kind']), ...(typeof l['mission_id'] === 'string' ? { missionId: l['mission_id'] } : {}), cardsRemaining: asNum(l['cards_remaining']), current: asStr(l['position']) === 'current' })),

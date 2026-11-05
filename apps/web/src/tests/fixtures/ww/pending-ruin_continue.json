@@ -8,6 +8,8 @@
    "next_level": 2,
    "is_mission": true
   },
+  "roll_facts": null,
+  "last_roll": null,
   "character": {
    "name": "Bot Pilot",
    "race": "human",
@@ -52,6 +54,7 @@
   "crew": [
    {
     "name": "Hexapod (SNE+2 DIP+1)",
+    "title": "DEC0DE",
     "race": "hexapod",
     "idealizes": "smarts",
     "abilities": {
@@ -70,6 +73,7 @@
    }
   ],
   "unnamed_crew": 1,
+  "unnamed_crew_cap": 1,
   "season_endings": {
    "conquest": "clear the depth-3 ruin beyond Habitat #3",
    "fortune": "1800/6000c banked while at a habitat",
@@ -84,7 +88,8 @@
    "handling": 0,
    "armor": 0,
    "damage": "pristine",
-   "parts": []
+   "parts": [],
+   "hits_to_lost": 4
   },
   "items": [],
   "bulkheads_spent": false,
@@ -195,6 +200,45 @@
    "target_depth": 3,
    "purpose": "finale",
    "legend": ". floor · # wall (blocks sight) · ~ pit (shoot across) · S start · G goal · I item spot · B being spot · A attacker spot",
+   "goal_cell": "r1c1",
+   "candidates": [
+    {
+     "name": "Bot Pilot",
+     "title": "Bot Pilot",
+     "kind": "captain",
+     "move_allowance": 3,
+     "attack": {
+      "ability": "SWA",
+      "bonus": 0,
+      "range": 1,
+      "advantage": false
+     }
+    },
+    {
+     "name": "Hexapod (SNE+2 DIP+1)",
+     "title": "DEC0DE",
+     "kind": "crew",
+     "move_allowance": 5,
+     "attack": {
+      "ability": "SWA",
+      "bonus": 0,
+      "range": 1,
+      "advantage": false
+     }
+    },
+    {
+     "name": "Red Shirt",
+     "title": "Red shirt",
+     "kind": "red_shirt",
+     "move_allowance": 3,
+     "attack": {
+      "ability": "SWA",
+      "bonus": 1,
+      "range": 1,
+      "advantage": true
+     }
+    }
+   ],
    "status": "awaiting setup_encounter"
   },
   "travel_deck": {

@@ -20,6 +20,31 @@
     "cell": "r4c1"
    }
   },
+  "roll_facts": {
+   "reason": "recruit",
+   "name": "Recruit",
+   "dice": 3,
+   "parts": [],
+   "bonus": 0,
+   "on_pass": "Human (DEM +3 LEA +2, min roll 14) joins the crew and stands on the map, acting from your next round.",
+   "on_fail": "Human (DEM +3 LEA +2, min roll 14) slips away, and the spot is spent.",
+   "notes": [],
+   "target": 14,
+   "dice_need": 14,
+   "chance": 0.162,
+   "subject": "Human (DEM +3 LEA +2, min roll 14)"
+  },
+  "last_roll": {
+   "reason": "being_d6",
+   "dice": [
+    3
+   ],
+   "parts": [],
+   "bonus": 0,
+   "total": 3,
+   "target": null,
+   "outcome": "none"
+  },
   "character": {
    "name": "Bot Pilot",
    "race": "human",
@@ -63,6 +88,7 @@
   },
   "crew": [],
   "unnamed_crew": 0,
+  "unnamed_crew_cap": 0,
   "season_endings": {
    "conquest": "clear the depth-3 ruin beyond Habitat #3",
    "fortune": "100/6000c banked while at a habitat",
@@ -77,7 +103,8 @@
    "handling": 0,
    "armor": 0,
    "damage": "used",
-   "parts": []
+   "parts": [],
+   "hits_to_lost": 3
   },
   "items": [],
   "bulkheads_spent": false,
@@ -224,7 +251,17 @@
      "ended": false,
      "is_character": true,
      "unnamed": false,
-     "has_attacked": false
+     "has_attacked": false,
+     "title": "Bot Pilot",
+     "move_allowance": 3,
+     "moves_left": 0,
+     "reach": [],
+     "attack": {
+      "ability": "SWA",
+      "bonus": 0,
+      "range": 1,
+      "advantage": false
+     }
     }
    ],
    "attackers": [
@@ -233,6 +270,7 @@
      "atk": 5,
      "move": 3,
      "range": 1,
+     "xp": 5,
      "cell": "r4c9",
      "defeated": false
     },
@@ -241,6 +279,7 @@
      "atk": 3,
      "move": 3,
      "range": 1,
+     "xp": 3,
      "cell": "r6c3",
      "defeated": false
     },
@@ -249,10 +288,12 @@
      "atk": 3,
      "move": 3,
      "range": 1,
+     "xp": 3,
      "cell": "r4c4",
      "defeated": false
     }
    ],
+   "goal_cell": "r1c1",
    "attacker_turn_index": null,
    "spots_spent": [
     "r4c1"

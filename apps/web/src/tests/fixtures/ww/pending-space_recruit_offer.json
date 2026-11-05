@@ -7,6 +7,8 @@
    "kind": "space_recruit_offer",
    "card_id": "KH"
   },
+  "roll_facts": null,
+  "last_roll": null,
   "character": {
    "name": "Bot Pilot",
    "race": "human",
@@ -50,6 +52,7 @@
   },
   "crew": [],
   "unnamed_crew": 0,
+  "unnamed_crew_cap": 0,
   "season_endings": {
    "conquest": "clear the depth-3 ruin beyond Habitat #3",
    "fortune": "700/6000c banked while at a habitat",
@@ -64,7 +67,8 @@
    "handling": 0,
    "armor": 0,
    "damage": "pristine",
-   "parts": []
+   "parts": [],
+   "hits_to_lost": 4
   },
   "items": [],
   "bulkheads_spent": false,
@@ -210,6 +214,22 @@
    "move": {
     "type": "attempt_recruit",
     "recruit_name": "KH"
+   },
+   "preview": {
+    "roll": {
+     "reason": "recruit",
+     "name": "Recruit",
+     "dice": 3,
+     "parts": [],
+     "bonus": 0,
+     "on_pass": "Katie joins the crew.",
+     "on_fail": "Katie drifts on. A recruit met in space is never marked.",
+     "notes": [],
+     "target": 12,
+     "dice_need": 12,
+     "chance": 0.375,
+     "subject": "Katie"
+    }
    }
   },
   {

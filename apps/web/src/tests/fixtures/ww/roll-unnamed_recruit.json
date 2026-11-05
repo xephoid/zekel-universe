@@ -19,6 +19,29 @@
     "unnamed_source": "survivors"
    }
   },
+  "roll_facts": {
+   "reason": "unnamed_recruit",
+   "name": "Talk the survivors aboard",
+   "carrier": "DEC0DE",
+   "dice": 3,
+   "parts": [
+    {
+     "label": "DIP +1 (Hexapod (SNE+2 DIP+1))",
+     "bonus": 1,
+     "kind": "score",
+     "ability": "DIP",
+     "who": "Hexapod (SNE+2 DIP+1)"
+    }
+   ],
+   "bonus": 1,
+   "on_pass": "One red shirt signs on, 1 of 1.",
+   "on_fail": "Nobody signs on. The survivors can be asked once per victory.",
+   "notes": [],
+   "target": 12,
+   "dice_need": 11,
+   "chance": 0.5
+  },
+  "last_roll": null,
   "character": {
    "name": "Bot Pilot",
    "race": "human",
@@ -63,6 +86,7 @@
   "crew": [
    {
     "name": "Hexapod (SNE+2 DIP+1)",
+    "title": "DEC0DE",
     "race": "hexapod",
     "idealizes": "smarts",
     "abilities": {
@@ -81,6 +105,7 @@
    }
   ],
   "unnamed_crew": 0,
+  "unnamed_crew_cap": 1,
   "season_endings": {
    "conquest": "clear the depth-3 ruin beyond Habitat #3",
    "fortune": "200/6000c banked while at a habitat",
@@ -95,7 +120,8 @@
    "handling": 0,
    "armor": 0,
    "damage": "used",
-   "parts": []
+   "parts": [],
+   "hits_to_lost": 3
   },
   "items": [],
   "bulkheads_spent": false,

@@ -204,7 +204,8 @@ step square by square on the ruin map; a captured ship swaps in with a flicker.
 Each step is one commit on a branch, checked in the browser against its board,
 with `pnpm --filter @universe/web test` and `e2e/warble-way.spec.ts` green. The
 spec's selectors stay (`.turn-pill`, `.log li`, `.toast`, `.move-menu ol
-button`, `.zk-tableau`, `.zk-die`, `.chooser button`, the dialog's Close).
+button`, `.zk-die`, `.chooser button`, the dialog's Close; since step 5 the
+sheet and ship panel in place of `.zk-tableau`).
 Before each application commit, run the change-mode checks in
 `security-check-playbook.md`.
 
@@ -313,11 +314,74 @@ Draw buttons keep those names for a reader, and the numbered move list
 under the screen is always open, in the engine's words, since the table's
 own menu closes beside a screen.
 
-What waits for item 6: the engine lists no grey reasons for Warble Way (no
-`describeMoveGates`), so an unlisted fight action says "not offered" rather
-than "needs SNE"; reachable ruin squares are not marked, since the engine
-answers a move rather than listing destinations; the last exchange's dice
-show in the table's own dice row, not bracketed into pairs on the board.
+What waited for item 6 when step 5 landed, all three since done in the
+playthrough fixes below: the engine listed no grey reasons for Warble Way;
+reachable ruin squares were not marked; the last exchange's dice showed in the
+table's own dice row, not in their pairs on the board.
+
+**Played through 2026-11-05, and what it changed.** One game was played from
+setup to a ruin through the screen alone, each move decided only from what
+was on screen. It turned up 27 gaps of four kinds: parts of the board hidden
+or wrong, taps that did more than they said, numbers a decision turns on that
+were not shown, and results, context and names that were missing. The fixes
+are on the same branch, with the engine side as
+[xephoid/zekel-games#10](https://github.com/xephoid/zekel-games/pull/10)
+(branch `claude/ww-screen-facts`). Universe works without that engine
+change (the roll panel falls back to the pending roll's own numbers, a shut
+way says nothing), and shows the rest once it is live.
+
+What the engine now publishes for a seat that plays on a screen, each with a
+test in the Warble Way package:
+
+- On every listed move, a `preview`: the roll it opens (dice, what is added
+  and whose, the number to reach, the exact chance, what passing and failing
+  each do), a check it turns on, what else it sets off (`then`), and for a
+  hazard who may carry it. The chance of a four-dice pairing is counted over
+  every roll through the engine's own scoring, and tested against real
+  resolutions dice by dice.
+- In the view: `roll_facts` for the pending roll; `last_roll` (the dice, in
+  their pairs for a pairing, the sum, the number, how it went); a crew
+  member's and an item's name as the cards and shelves name them, an item's
+  effect and who wears it; `hits_to_lost` on the ship; the red shirt limit;
+  in a ruin each being's movement, squares it can reach, and its attack, the
+  goal square, and before setup who may go in.
+- Grey reasons (`describeMoveGates`), for a whole kind of move or one row.
+- In the reference data, the printed words for each ability and its advanced
+  skill, the ship's numbers, the counters, character creation, the endings
+  and losses, hazards, the death check and ruins.
+- Sentences without rule citations or move ids, and with the names on the
+  cards. A seat at a physical table still gets the engine's own sentences.
+
+What the screen does with it:
+
+- **A first tap at a habitat never acts.** A mission, shop or cantina row, a
+  visit action and departing each open a panel that says what the move leads
+  to (a mission leaves the habitat), with one button that sends it.
+- **Ways are boxes** with the chance, what winning and losing do, and, when
+  the engine does not list one, the engine's reason. Capture's two buttons
+  have equal weight. A hazard's price is on its option, and who carries it is
+  the player's pick by name.
+- **The roll panel** names the roll, shows the chance large, what is added,
+  and both outcomes; a consumable shows the chance it would make. It scrolls
+  into view when it appears.
+- **The last roll stays on the board**, pinned at the top with its dice (a
+  pairing in its two pairs) and the engine's sentence, so a result is never
+  missed below the fold. Each new moment starts at the top of the board.
+- **The sheet stays beside every card and fight**, lists everything held and
+  who wears it, and opens the printed words for abilities, skills, the ship,
+  the goal and the losses. Setup explains each choice in the engine's words,
+  and an ability left blank is a zero.
+- **In a ruin** the red shirts are a counter, attackers are placed one by one
+  by their ids, reachable squares are marked and only they take a tap,
+  stepping on the goal asks first, and a round's result holds for a moment
+  before the next being acts.
+- The numbered move list no longer covers the board and stays folded once
+  folded.
+
+`ww-screen.test.tsx` checks these on 50 recaptured moments, and four moments
+from the engine before the change are kept in `fixtures/ww-plain/` to check
+the fallback. `e2e/warble-way.spec.ts` now takes its first mission through
+the row and its confirm button, and checks that the first tap sent nothing.
 
 **Unblocked 2026-11-04: the portraits.** The 17 tokens, 4 sketches and 4
 holograms were regenerated with Qwen-Image-2512 and Qwen-Image-Edit-2511 (both

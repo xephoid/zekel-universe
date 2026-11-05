@@ -6,6 +6,43 @@
   "pending": {
    "kind": "space_combat_action"
   },
+  "roll_facts": null,
+  "last_roll": {
+   "reason": "space_combat",
+   "dice": [
+    1,
+    1,
+    1,
+    1
+   ],
+   "parts": [
+    {
+     "label": "PIL +3 (you)",
+     "bonus": 3,
+     "kind": "score",
+     "ability": "PIL",
+     "who": "you"
+    }
+   ],
+   "bonus": 3,
+   "total": 5,
+   "target": null,
+   "outcome": "lose",
+   "pairs": {
+    "yours": [
+     1,
+     1
+    ],
+    "theirs": [
+     1,
+     1
+    ],
+    "rider": [],
+    "your_total": 5,
+    "their_total": 7,
+    "their_name": "the pirates"
+   }
+  },
   "character": {
    "name": "Bot Pilot",
    "race": "human",
@@ -49,6 +86,7 @@
   },
   "crew": [],
   "unnamed_crew": 0,
+  "unnamed_crew_cap": 0,
   "season_endings": {
    "conquest": "clear the depth-3 ruin beyond Habitat #3",
    "fortune": "700/6000c banked while at a habitat",
@@ -63,7 +101,8 @@
    "handling": 0,
    "armor": 0,
    "damage": "damaged",
-   "parts": []
+   "parts": [],
+   "hits_to_lost": 2
   },
   "items": [],
   "bulkheads_spent": false,
@@ -227,6 +266,42 @@
    "description": "Flying Ace: reroll the space-combat 4d6 (once per combat).",
    "move": {
     "type": "use_reroll"
+   },
+   "preview": {
+    "roll": {
+     "reason": "space_combat",
+     "name": "Exchange of fire",
+     "carrier": "you",
+     "dice": 4,
+     "parts": [
+      {
+       "label": "PIL +3 (you)",
+       "bonus": 3,
+       "kind": "score",
+       "ability": "PIL",
+       "who": "you"
+      }
+     ],
+     "bonus": 3,
+     "on_pass": "Their ship is disabled: board it or fly on. A disabled ship does not count toward Bounty.",
+     "on_fail": "The Harness Runner takes one damage, to Hobbled. The fight goes on.",
+     "notes": [
+      "A tie is rolled again."
+     ],
+     "pairing": {
+      "you_take": "higher",
+      "why": "Piloting aboard gives you space combat advantage: you take the higher pair.",
+      "your_add": 3,
+      "their_add": 5,
+      "their_name": "the pirates",
+      "rider_dice": 0,
+      "win": 0.1296,
+      "tie": 0.2099,
+      "lose": 0.6605
+     },
+     "chance": 0.1641,
+     "subject": "the pirates"
+    }
    }
   },
   {
@@ -234,6 +309,9 @@
    "description": "Accept the lost exchange — the ship takes one damage.",
    "move": {
     "type": "accept_result"
+   },
+   "preview": {
+    "then": "The Harness Runner takes one damage, to Hobbled. The fight goes on."
    }
   }
  ],

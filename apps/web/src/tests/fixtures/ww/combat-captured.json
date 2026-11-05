@@ -7,6 +7,44 @@
    "kind": "boarding_decision",
    "stage": "take_or_abandon"
   },
+  "roll_facts": null,
+  "last_roll": {
+   "reason": "ground_combat",
+   "ground": "boarding",
+   "dice": [
+    6,
+    1,
+    3,
+    6
+   ],
+   "parts": [
+    {
+     "label": "SWA +2 (Kralkin (GUN+2 SWA+2))",
+     "bonus": 2,
+     "kind": "score",
+     "ability": "SWA",
+     "who": "Kralkin (GUN+2 SWA+2)"
+    }
+   ],
+   "bonus": 2,
+   "total": 11,
+   "target": null,
+   "outcome": "win",
+   "pairs": {
+    "yours": [
+     6,
+     3
+    ],
+    "theirs": [
+     6,
+     1
+    ],
+    "rider": [],
+    "your_total": 11,
+    "their_total": 8,
+    "their_name": "the pirates"
+   }
+  },
   "character": {
    "name": "Bot Pilot",
    "race": "human",
@@ -51,6 +89,7 @@
   "crew": [
    {
     "name": "Human (ACT+2 SWA+1)",
+    "title": "Katie",
     "race": "human",
     "idealizes": "brawn",
     "abilities": {
@@ -69,6 +108,7 @@
    },
    {
     "name": "Kralkin (GUN+2 SWA+2)",
+    "title": "Kralkin (GUN+2 SWA+2)",
     "race": "kralkin",
     "idealizes": "moxie",
     "abilities": {
@@ -87,6 +127,7 @@
    }
   ],
   "unnamed_crew": 0,
+  "unnamed_crew_cap": 0,
   "season_endings": {
    "conquest": "clear the depth-3 ruin beyond Habitat #3",
    "fortune": "200/6000c banked while at a habitat",
@@ -101,7 +142,8 @@
    "handling": 0,
    "armor": 0,
    "damage": "damaged",
-   "parts": []
+   "parts": [],
+   "hits_to_lost": 2
   },
   "items": [],
   "bulkheads_spent": false,
@@ -270,6 +312,9 @@
    "description": "Take the captured ship as your own (it arrives Hobbled; your old ship and its parts are abandoned).",
    "move": {
     "type": "take_ship"
+   },
+   "preview": {
+    "then": "Their ship becomes yours as it is, Hobbled and with no parts. Your own ship and every part fitted to it are left behind."
    }
   },
   {
@@ -280,5 +325,10 @@
    }
   }
  ],
- "unavailable": []
+ "unavailable": [
+  {
+   "moveType": "recruit_survivors",
+   "reason": "Needs Diplomacy (DIP) aboard."
+  }
+ ]
 }

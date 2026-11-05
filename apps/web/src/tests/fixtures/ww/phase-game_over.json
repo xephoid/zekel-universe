@@ -4,6 +4,28 @@
  "view": {
   "phase": "game_over",
   "pending": null,
+  "roll_facts": null,
+  "last_roll": {
+   "reason": "redline",
+   "dice": [
+    3,
+    5,
+    1
+   ],
+   "parts": [
+    {
+     "label": "MEC +2 (you)",
+     "bonus": 2,
+     "kind": "score",
+     "ability": "MEC",
+     "who": "you"
+    }
+   ],
+   "bonus": 2,
+   "total": 11,
+   "target": 12,
+   "outcome": "fail"
+  },
   "character": {
    "name": "Bot Pilot",
    "race": "human",
@@ -47,6 +69,7 @@
   },
   "crew": [],
   "unnamed_crew": 0,
+  "unnamed_crew_cap": 0,
   "season_endings": {
    "conquest": "clear the depth-3 ruin beyond Habitat #3",
    "fortune": "700/6000c banked while at a habitat",
@@ -61,7 +84,8 @@
    "handling": 0,
    "armor": 0,
    "damage": "hobbled",
-   "parts": []
+   "parts": [],
+   "hits_to_lost": 1
   },
   "items": [],
   "bulkheads_spent": false,
