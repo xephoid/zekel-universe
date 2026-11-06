@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Warble Way Galaxy hologram treatments</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;600&amp;display=swap">
+<style>
+body{margin:0;background:#0d1124}
+.void{background-color:#0d1124;background-image:radial-gradient(rgba(232,228,216,.16) 1px,transparent 1.4px);background-size:24px 24px}
+.holo{position:relative;overflow:hidden;flex:none;background:#03141c;box-shadow:0 0 0 1.5px rgba(110,240,255,.55),0 0 20px rgba(110,240,255,.35)}
+.holo img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;mix-blend-mode:screen}
+.holo .main{filter:grayscale(1) invert(1) contrast(1.45) sepia(1) saturate(4) hue-rotate(150deg) brightness(1.08)}
+.holo .ghost{display:none}
+.holo .scan{position:absolute;left:0;top:0;right:0;bottom:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(2,10,16,.5) 0 1px,transparent 1px 3px);animation:holoscan 5s linear infinite}
+.holo .emit{display:none}
+.holo .specks{display:none}
+@keyframes holoscan{to{background-position:0 60px}}
+@keyframes holoflick{0%,100%{opacity:.75}44%{opacity:.75}45%{opacity:.35}46%{opacity:.75}78%{opacity:.6}79%{opacity:.8}}
+@keyframes holojit{0%,100%{transform:translate(0,0)}18%{transform:translate(-4px,0)}19%{transform:translate(3px,0)}20%{transform:translate(0,0)}66%{transform:translate(2px,0)}67%{transform:translate(0,0)}}
+@keyframes holobob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.holo-gold{background:#170d02;box-shadow:0 0 0 1.5px rgba(255,205,100,.6),0 0 20px rgba(255,190,70,.35)}
+.holo-gold .main{filter:grayscale(1) invert(1) contrast(1.45) sepia(1) saturate(3) hue-rotate(8deg) brightness(1.08)}
+.holo-gold .scan{background:repeating-linear-gradient(0deg,rgba(16,8,0,.5) 0 1px,transparent 1px 3px)}
+.holo-glitch .ghost{display:block;filter:grayscale(1) invert(1) contrast(1.45) sepia(1) saturate(6) hue-rotate(290deg);opacity:.6;transform:translate(4px,0);animation:holojit 2.7s steps(1) infinite}
+.holo-glitch .main{animation:holojit 3.3s steps(1) infinite reverse}
+.holo-projector{background:transparent;box-shadow:none;overflow:visible}
+.holo-projector .main{animation:holobob 4s ease-in-out infinite;-webkit-mask-image:linear-gradient(to bottom,#000 50%,transparent 90%);mask-image:linear-gradient(to bottom,#000 50%,transparent 90%)}
+.holo-projector .scan{-webkit-mask-image:linear-gradient(to bottom,#000 50%,transparent 90%);mask-image:linear-gradient(to bottom,#000 50%,transparent 90%)}
+.holo-projector .emit{display:block;position:absolute;left:18%;right:18%;bottom:-4%;height:12%;border-radius:50%;background:radial-gradient(closest-side,rgba(170,250,255,.95),rgba(110,240,255,.35) 60%,transparent);box-shadow:0 0 18px rgba(110,240,255,.5)}
+.holo-faint{box-shadow:0 0 0 1px rgba(110,240,255,.3),0 0 14px rgba(110,240,255,.2)}
+.holo-faint .main{animation:holoflick 3.6s infinite}
+.holo-faint .specks{display:block;position:absolute;left:0;top:0;right:0;bottom:0;pointer-events:none;background-image:radial-gradient(1px 1px at 12% 22%,rgba(190,250,255,.8) 99%,transparent),radial-gradient(1px 1px at 72% 18%,rgba(190,250,255,.7) 99%,transparent),radial-gradient(1.5px 1.5px at 38% 64%,rgba(190,250,255,.6) 99%,transparent),radial-gradient(1px 1px at 84% 76%,rgba(190,250,255,.8) 99%,transparent),radial-gradient(1px 1px at 54% 40%,rgba(190,250,255,.5) 99%,transparent),radial-gradient(1px 1px at 22% 86%,rgba(190,250,255,.7) 99%,transparent)}
+</style>
+</helmet>
+<div class="void" style="width: 1440px; min-height: 2140px; box-sizing: border-box; padding: 64px 70px; color: #e8e4d8; font-family: 'IBM Plex Sans', system-ui, sans-serif; display: flex; flex-direction: column; gap: 40px">
+  <header style="display: flex; flex-direction: column; gap: 12px; max-width: 1000px">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 14px; letter-spacing: 0.18em; color: #6ef0ff">PORTRAITS AS HOLOGRAMS · SIX WAYS</div>
+    <h1 style="margin: 0; font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 64px; line-height: 1; color: #ece8dc">Hologram treatments</h1>
+    <p style="margin: 0; font-size: 18px; line-height: 1.55; color: #b9bdd4">The first five rows are effects the app would apply on top of your sketch portraits, so one drawing serves both looks and nothing has to be redrawn. They move: scanlines crawl, the glitch jumps, the faint signal flickers, the projected figure bobs. The last row was generated in ComfyUI as true hologram art from the same sketches.</p>
+  </header>
+
+  <sc-for list="{{ treatments }}" as="t" hint-placeholder-count="5">
+    <section style="display: grid; grid-template-columns: 300px minmax(0, 1fr) 220px; gap: 32px; align-items: center; padding: 28px; border-radius: 18px; background: #121836; border: 1px solid #262e57">
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <span style="{{ t.titleStyle }}">{{ t.name }}</span>
+        <span style="font-size: 14px; line-height: 1.5; color: #9aa3c7">{{ t.note }}</span>
+      </div>
+      <div style="display: flex; gap: 22px; align-items: center">
+        <sc-for list="{{ races }}" as="r" hint-placeholder-count="4">
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 10px">
+            <div class="holo {{ t.cls }}" style="width: 120px; height: 120px; border-radius: 50%">
+              <img class="main" src="{{ r.face }}" alt="{{ r.name }}">
+              <img class="ghost" src="{{ r.face }}" alt="">
+              <span class="scan"></span>
+              <span class="specks"></span>
+              <span class="emit"></span>
+            </div>
+            <span style="font-size: 12px; color: #9aa3c7">{{ r.name }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div class="holo {{ t.cls }}" style="width: 220px; height: 260px; border-radius: 14px">
+        <img class="main" src="{{ t.full }}" alt="Full figure">
+        <img class="ghost" src="{{ t.full }}" alt="">
+        <span class="scan"></span>
+        <span class="specks"></span>
+        <span class="emit"></span>
+      </div>
+    </section>
+  </sc-for>
+
+  <section style="display: flex; flex-direction: column; gap: 18px; padding: 28px; border-radius: 18px; background: #121836; border: 1px solid #262e57">
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <span style="font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 24px; color: #6ef0ff">Generated holograms</span>
+      <span style="font-size: 14px; color: #9aa3c7">Made in ComfyUI from your sketches: the same characters redrawn as glowing projections over a brass emitter.</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px">
+      <sc-for list="{{ generated }}" as="g" hint-placeholder-count="4">
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <img src="{{ g.src }}" alt="{{ g.name }} hologram" style="width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; box-shadow: 0 0 0 1px #263064">
+          <span style="font-size: 12px; color: #9aa3c7">{{ g.name }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2600}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var B = '';
+    var races = [
+      { name: 'Human', face: 'assets/portraits/human.jpg' },
+      { name: 'Grull', face: 'assets/portraits/grull.jpg' },
+      { name: 'Hexapod', face: 'assets/portraits/hexapod.jpg' },
+      { name: 'Kralkin', face: 'assets/portraits/kralkin.jpg' }
+    ];
+    var T = [
+      ['holo-cyan', 'Blue projection', '#6ef0ff', 'The classic: the sketch inverted to glowing cyan lines, with fine scanlines crawling over it. Reads instantly as a comms hologram.', 'assets/sketches/human.jpg'],
+      ['holo-gold', 'Gold archive', '#ffc860', 'The same projection in FFD700 gold, for records and logs: the captain, crew files, the habitat cantina.', 'assets/sketches/kralkin.jpg'],
+      ['holo-glitch', 'Glitch signal', '#ff7ae0', 'A magenta ghost image slips off the cyan one and both jump now and then. Good for pirates hailing you, or a weak signal.', 'assets/sketches/grull.jpg'],
+      ['holo-projector', 'Projected figure', '#9cf6ff', 'No frame: the figure floats over the table and fades out toward a glowing emitter, bobbing slightly. Best for the big portrait of whoever you are talking to.', 'assets/sketches/hexapod.jpg'],
+      ['holo-faint', 'Faint signal', '#8fd8e6', 'Dim, flickering and specked, as if barely holding. Good for recruits adrift, beings in ruins, or someone who just left the crew.', 'assets/sketches/human.jpg']
+    ];
+    var treatments = T.map(function (x) {
+      return { cls: x[0], name: x[1], note: x[3], full: B + x[4],
+        titleStyle: "font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 24px; color: " + x[2] + ';' };
+    });
+    var generated = [
+      { name: 'Human', src: 'assets/holograms/human.jpg' },
+      { name: 'Grull', src: 'assets/holograms/grull.jpg' },
+      { name: 'Hexapod', src: 'assets/holograms/hexapod.jpg' },
+      { name: 'Kralkin', src: 'assets/holograms/kralkin.jpg' }
+    ];
+    return { treatments: treatments, races: races, generated: generated };
+  }
+}
+</script>
+</body>
+</html>
