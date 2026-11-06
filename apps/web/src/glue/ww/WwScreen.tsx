@@ -54,17 +54,17 @@ export function WwScreen(props: GameScreenProps) {
   const mode = modeOf(table);
   const p = table.pending;
   const overlay = p?.kind === 'level_up' ? <LevelUp {...part} /> : p?.kind === 'release_crew' ? <ReleaseCrew {...part} /> : p?.kind === 'res_discard' ? <DeparturePeek {...part} /> : null;
-  const right = (node: JSX.Element): JSX.Element => (sideSlot ? createPortal(<div className="ww-right">{node}</div>, sideSlot) : <aside className="ww-right">{node}</aside>);
+  // The last move's sentence and the playback speed lead the right column,
+  // above the screen's own panels.
+  const right = (node: JSX.Element): JSX.Element => (sideSlot ? createPortal(<div className="ww-right">{caption}{node}</div>, sideSlot) : <aside className="ww-right">{caption}{node}</aside>);
   const sideOut = !!sideSlot;
-  // What just happened, on the board: the last roll read back with its dice,
-  // and the engine's sentence for the last move. The row is always there, so
-  // a roll landing never moves the board under the pointer.
-  const last = (
-    <div className="ww-last">
-      {table.lastRoll && <LastRollDice last={table.lastRoll} seq={input.seq} />}
-      {caption}
-    </div>
-  );
+  // The last roll read back with its dice, pinned to the top of the board
+  // while there is one. A phone has no right column, so the last move's
+  // sentence sits in the same row there.
+  const dice = table.lastRoll ? <LastRollDice last={table.lastRoll} seq={input.seq} /> : null;
+  const last = phone
+    ? (dice || caption ? <div className="ww-last">{dice}{caption}</div> : null)
+    : dice ? <div className="ww-last">{dice}</div> : null;
 
   if (phone) {
     const leg = table.journey.find((l) => l.current);

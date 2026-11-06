@@ -178,9 +178,21 @@ describe('Warble Way Galaxy screen', () => {
     // An engine that does not read the roll back still gets the table's dice.
     expect(g.diceFor!({ engineMove: null, summary: 'the server rolled 5, 4, 2.', view: load('habitat-1', PLAIN).view })).toEqual([5, 4, 2]);
     cleanup();
-    // The sentence the table hands the screen sits in the same row.
-    const c = draw('habitat-1', { caption: <div className="caption-card">Docked.</div> });
-    expect(c.container.querySelector('.ww-last .caption-card')).not.toBeNull();
+    // The sentence the table hands the screen leads the right column, at a
+    // habitat and in space alike; with no roll to read back, no row is drawn.
+    for (const name of ['habitat-1', 'pending-card_draw']) {
+      const c = draw(name, { caption: <div className="caption-card">Docked.</div> });
+      expect(c.container.querySelector('.ww-right')!.firstElementChild!.className).toBe('caption-card');
+      expect(c.container.querySelector('.ww-last .caption-card')).toBeNull();
+      cleanup();
+    }
+    expect(draw('habitat-1').container.querySelector('.ww-last')).toBeNull();
+    cleanup();
+    // A phone has no right column: the sentence stays at the top of Now, and
+    // the section bar is the last thing on the screen.
+    const p = draw('habitat-1', { caption: <div className="caption-card">Docked.</div>, phone: true });
+    expect(p.container.querySelector('.ww-last .caption-card')).not.toBeNull();
+    expect(p.container.querySelector('.ww-phone')!.lastElementChild!.className).toBe('ww-phone-tabs');
   });
 
   it('a hazard nobody can face says there is no roll and what each choice costs; where several could carry it, each is offered by name', () => {

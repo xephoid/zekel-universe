@@ -365,8 +365,13 @@ What the screen does with it:
   and both outcomes; a consumable shows the chance it would make. It scrolls
   into view when it appears.
 - **The last roll stays on the board**, pinned at the top with its dice (a
-  pairing in its two pairs) and the engine's sentence, so a result is never
-  missed below the fold. Each new moment starts at the top of the board.
+  pairing in its two pairs) while there is one, so a result is never missed
+  below the fold. Each new moment starts at the top of the board.
+- **The last move and the playback speed lead the right column** (decided
+  2026-11-06), above the journey, ship and crew panels. A phone has no right
+  column, so there they stay at the top of Now.
+- **On a phone the section bar** (Now, Sheet, Ship, Journey) is always at the
+  very bottom of the screen, however short the section (decided 2026-11-06).
 - **The sheet stays beside every card and fight**, lists everything held and
   who wears it, and opens the printed words for abilities, skills, the ship,
   the goal and the losses. Setup explains each choice in the engine's words,
