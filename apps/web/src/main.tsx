@@ -42,6 +42,7 @@ const router = createBrowserRouter([
     ? [
         { path: '/dev/ngg', lazy: () => import('./pages/DevNgg').then((m) => ({ Component: m.DevNggPage })) },
         { path: '/dev/ao', lazy: () => import('./pages/DevAo').then((m) => ({ Component: m.DevAoPage })) },
+        { path: '/dev/ww', lazy: () => import('./pages/DevWw').then((m) => ({ Component: m.DevWwPage })) },
       ]
     : []),
   { path: '*', element: <NotFoundPage /> },

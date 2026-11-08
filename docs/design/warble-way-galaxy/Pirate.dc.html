@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Warble Way Galaxy pirate fight</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;600&amp;family=Kalam:wght@400;700&amp;display=swap">
+<style>
+body{margin:0;background:#0d1124}
+a{color:#FFD700}a:hover{color:#fff1a8}
+.void{background-color:#0d1124;background-image:radial-gradient(rgba(232,228,216,.16) 1px,transparent 1.4px);background-size:24px 24px}
+.ic{display:inline-block;flex:none;background-color:currentColor;-webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center}
+.lbl{font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:12px;letter-spacing:.16em}
+.num{font-family:'IBM Plex Mono',monospace;font-weight:600}
+.ga{filter:grayscale(1) invert(1) contrast(1.45) sepia(1) saturate(3) hue-rotate(8deg) brightness(1.08);background:#170d02;-webkit-mask-image:repeating-linear-gradient(0deg,#000 0 2px,rgba(0,0,0,.55) 2px 3px);mask-image:repeating-linear-gradient(0deg,#000 0 2px,rgba(0,0,0,.55) 2px 3px)}
+.gx{display:inline-grid;flex:none;vertical-align:middle}
+.gx>.ic{grid-area:1/1}
+.gx>.gh{background-color:#ff4f7b!important;opacity:.55;transform:translate(2px,0);animation:gxjit 2.7s steps(1) infinite}
+.gx>.ic:not(.gh){animation:gxjit 3.4s steps(1) infinite reverse}
+.gx:nth-child(2n)>.gh{animation-duration:3.1s}.gx:nth-child(3n)>.gh{animation-duration:2.3s}
+@keyframes gxjit{0%,100%{transform:translate(0,0)}18%{transform:translate(-2px,0)}19%{transform:translate(2px,0)}20%{transform:translate(0,0)}66%{transform:translate(2px,0)}67%{transform:translate(0,0)}}
+.gxi{display:inline-grid;flex:none;vertical-align:middle;position:relative}
+.gxi>img{grid-area:1/1}
+.gxi>.gh{opacity:.6;transform:translate(3px,0);animation:gxjit 2.9s steps(1) infinite}
+.gxi>.ga.gh{filter:grayscale(1) invert(1) contrast(1.45) sepia(1) saturate(5) hue-rotate(290deg) brightness(1.05)}
+.gxi>.ga-red.gh{filter:grayscale(1) invert(1) contrast(1.45) sepia(1) saturate(5) hue-rotate(150deg) brightness(1.05)}
+.gxi>img:not(.gh){mix-blend-mode:screen;animation:gxjit 3.7s steps(1) infinite reverse}
+.gxi:nth-child(2n)>.gh{animation-duration:3.3s}.gxi:nth-child(3n)>.gh{animation-duration:2.4s}
+
+.i-swirl{-webkit-mask-image:url(assets/icons/star-swirl.png);mask-image:url(assets/icons/star-swirl.png)}
+.i-ship{-webkit-mask-image:url(assets/icons/spaceship.png);mask-image:url(assets/icons/spaceship.png)}
+.i-credits{-webkit-mask-image:url(assets/icons/credits-currency.png);mask-image:url(assets/icons/credits-currency.png)}
+.i-rocket{-webkit-mask-image:url(assets/icons/rocket-flight.png);mask-image:url(assets/icons/rocket-flight.png)}
+.i-starfighter{-webkit-mask-image:url(assets/icons/starfighter.svg);mask-image:url(assets/icons/starfighter.svg)}
+.i-strafe{-webkit-mask-image:url(assets/icons/strafe.svg);mask-image:url(assets/icons/strafe.svg)}
+.i-satcom{-webkit-mask-image:url(assets/icons/satellite-communication.svg);mask-image:url(assets/icons/satellite-communication.svg)}
+.i-gun{-webkit-mask-image:url(assets/icons/bolter-gun.png);mask-image:url(assets/icons/bolter-gun.png)}
+.i-bolt{-webkit-mask-image:url(assets/icons/hypersonic-bolt.svg);mask-image:url(assets/icons/hypersonic-bolt.svg)}
+.i-pirate{-webkit-mask-image:url(assets/icons/pirate-flag.png);mask-image:url(assets/icons/pirate-flag.png)}
+.i-suit{-webkit-mask-image:url(assets/icons/space-suit.svg);mask-image:url(assets/icons/space-suit.svg)}
+.i-convince{-webkit-mask-image:url(assets/icons/convince.png);mask-image:url(assets/icons/convince.png)}
+.i-crack{-webkit-mask-image:url(assets/icons/cracked-glass.png);mask-image:url(assets/icons/cracked-glass.png)}
+.i-rays{-webkit-mask-image:url(assets/icons/explosion-rays.svg);mask-image:url(assets/icons/explosion-rays.svg)}
+.i-eclipse{-webkit-mask-image:url(assets/icons/eclipse.svg);mask-image:url(assets/icons/eclipse.svg)}
+.i-skull{-webkit-mask-image:url(assets/icons/skull-crossed-bones.png);mask-image:url(assets/icons/skull-crossed-bones.png)}
+.i-drink{-webkit-mask-image:url(assets/icons/drink-me.png);mask-image:url(assets/icons/drink-me.png)}
+.i-armor{-webkit-mask-image:url(assets/icons/metal-scales.png);mask-image:url(assets/icons/metal-scales.png)}
+.ga-red{filter:grayscale(1) invert(1) contrast(1.5) sepia(1) saturate(5) hue-rotate(-38deg) brightness(1.05);background:#1a0405;-webkit-mask-image:repeating-linear-gradient(0deg,#000 0 2px,rgba(0,0,0,.55) 2px 3px);mask-image:repeating-linear-gradient(0deg,#000 0 2px,rgba(0,0,0,.55) 2px 3px)}
+.act{display:grid;grid-template-columns:40px minmax(0,1fr);gap:4px 12px;align-items:start;box-sizing:border-box;padding:12px 14px;border-radius:14px;border:1.5px solid #4f5a94;background:#283063;color:#ece8dc;text-align:left;cursor:pointer;min-height:96px}
+.act.sel{border:3px solid #FFD700;background:#3a3520}
+.act.off{background:transparent;border:1.5px dashed #3d4880;color:#7f88b5;cursor:default}
+.act.used{background:transparent;border:1.5px solid #3d4880;color:#9aa3c7}
+.an{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:18px;line-height:1.1}
+.ach{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:12px;color:#c9cfee}
+.off .ach{color:#6d7499}
+.aw{font-size:12px;line-height:1.35;color:#aab1d3;grid-column:2}
+.die{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:20px}
+.step{display:flex;align-items:center;gap:8px;font-size:13px}
+.stat{display:flex;flex-direction:column;align-items:center;gap:1px}
+
+</style>
+</helmet>
+<div class="void" style="width: 1440px; height: 900px; box-sizing: border-box; color: #e8e4d8; font-family: 'IBM Plex Sans', system-ui, sans-serif; display: flex; flex-direction: column">
+
+  <header style="height: 72px; flex: none; box-sizing: border-box; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border-bottom: 1px solid #262e57; background: rgba(13,17,36,.86)">
+    <div style="display: flex; align-items: center; gap: 12px; width: 300px">
+      <span class="gx"><span class="ic i-swirl gh" style="width: 28px; height: 28px; color: #FFD700"></span><span class="ic i-swirl" style="width: 28px; height: 28px; color: #FFD700"></span></span>
+      <span style="font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 20px">Warble Way Galaxy</span>
+    </div>
+    <nav aria-label="Fight steps" style="display: flex; align-items: center; gap: 10px">
+      <sc-for list="{{ steps }}" as="st" hint-placeholder-count="4">
+        <span style="{{ st.lineStyle }}"></span>
+        <span class="step" style="{{ st.style }}"><span style="{{ st.dotStyle }}">{{ st.n }}</span>{{ st.name }}</span>
+      </sc-for>
+    </nav>
+    <div style="display: flex; align-items: center; gap: 16px; width: 300px; justify-content: flex-end">
+      <span style="display: flex; align-items: center; gap: 8px; color: #FFD700"><span class="gx"><span class="ic i-credits gh" style="width: 22px; height: 22px"></span><span class="ic i-credits" style="width: 22px; height: 22px"></span></span><span class="num" style="font-size: 22px">1,240c</span></span>
+      <button aria-label="Menu" style="width: 44px; height: 44px; border-radius: 10px; border: 1px solid #343d6b; background: #1a2042; color: #e8e4d8; font-size: 20px; cursor: pointer">☰</button>
+    </div>
+  </header>
+
+  <div style="flex: 1; min-height: 0; box-sizing: border-box; padding: 20px 24px; display: grid; grid-template-columns: 300px minmax(0, 1fr) 320px; gap: 20px">
+
+    <aside aria-label="The pirates" style="display: flex; flex-direction: column; gap: 14px; min-width: 0">
+      <div style="border-radius: 16px; overflow: hidden; background: #1f2650; border: 2px solid #f07070; box-shadow: 0 0 24px rgba(240,112,112,.25); display: flex; flex-direction: column">
+        <div style="height: 34px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; background: #f07070; color: #10142a"><span style="display: flex; align-items: center; gap: 6px" class="lbl"><span class="gx"><span class="ic i-skull gh" style="width: 16px; height: 16px"></span><span class="ic i-skull" style="width: 16px; height: 16px"></span></span>PIRATES</span><span class="num" style="font-size: 14px">♦ 7</span></div>
+        <div style="position: relative; height: 170px; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at 50% 55%, rgba(240,112,112,.18), transparent 65%)">
+          <span class="gx" style="{{ shipStyle }}"><span class="ic i-strafe gh" style="width: 120px; height: 120px"></span><span class="ic i-strafe" style="width: 120px; height: 120px"></span></span>
+          <span style="position: absolute; right: 16px; bottom: 12px" class="gxi"><img class="ga-red gh" src="assets/portraits/pirate-captain.jpg" alt="" aria-hidden="true" style="width: 64px; height: 64px; box-sizing: border-box; border-radius: 50%; object-fit: cover; border: 3px solid #f07070"><img class="ga-red" src="assets/portraits/pirate-captain.jpg" alt="Pirate captain" style="width: 64px; height: 64px; box-sizing: border-box; border-radius: 50%; object-fit: cover; border: 3px solid #f07070"></span>
+          <sc-if value="{{ disabled }}" hint-placeholder-val="{{ false }}"><span class="stamp" style="position: absolute; left: 16px; top: 14px; font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: .12em; padding: 4px 9px; border-radius: 6px; transform: rotate(-6deg); border: 2px solid #6fd08a; color: #6fd08a">DISABLED</span></sc-if>
+        </div>
+        <div style="padding: 0 14px 14px; display: flex; flex-direction: column; gap: 10px">
+          <div style="display: flex; flex-direction: column"><span style="font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 24px">Pirate strafer</span><span style="font-size: 13px; color: #aab1d3">Fast and mean. Will not let you pass.</span></div>
+          <div style="display: flex; align-items: baseline; gap: 8px"><span class="num" style="font-size: 40px; line-height: 1; color: #ff9da1">+5</span><span class="lbl" style="font-size: 11px; color: #aab1d3">SPACE ATTACK</span></div>
+          <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; padding-top: 10px; border-top: 1px solid #3d4880">
+            <span class="stat"><span class="num" style="font-size: 16px">+2</span><span style="font-size: 10px; color: #aab1d3">ground</span></span>
+            <span class="stat"><span class="num" style="font-size: 16px">5</span><span style="font-size: 10px; color: #aab1d3">crew</span></span>
+            <span class="stat"><span class="num" style="font-size: 16px">+2</span><span style="font-size: 10px; color: #aab1d3">speed</span></span>
+            <span class="stat"><span class="num" style="font-size: 16px">0</span><span style="font-size: 10px; color: #aab1d3">handl.</span></span>
+            <span class="stat"><span class="num" style="font-size: 16px">13</span><span style="font-size: 10px; color: #aab1d3">hack</span></span>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px">
+            <sc-for list="{{ buffs }}" as="bf" hint-placeholder-count="2"><span style="{{ bf.style }}">{{ bf.text }}</span></sc-for>
+          </div>
+        </div>
+      </div>
+      <div style="border-radius: 14px; background: #1a2042; border: 1px solid #343d6b; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px">
+        <span class="lbl" style="font-size: 11px; color: #b9bdd4">LOG</span>
+        <sc-for list="{{ log }}" as="lg" hint-placeholder-count="3"><span style="font-size: 12px; line-height: 1.4; color: #aab1d3">{{ lg }}</span></sc-for>
+      </div>
+    </aside>
+
+    <main style="background: #1f2650; border-radius: 18px; padding: 22px 24px; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.35); min-width: 0">
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <span class="lbl" style="color: #ff9da1">{{ kicker }}</span>
+        <h1 style="margin: 0; font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 34px; line-height: 1.05">{{ title }}</h1>
+        <span style="font-size: 14px; color: #aab1d3">{{ lede }}</span>
+      </div>
+
+      <sc-if value="{{ showExchange }}" hint-placeholder-val="{{ true }}">
+        <section aria-label="Last exchange" style="border-radius: 14px; background: #1a2042; border: 1px solid #343d6b; padding: 12px 16px; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 18px; align-items: center">
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <span class="lbl" style="font-size: 10px; color: #aab1d3">ROUND 1 · 4D6</span>
+            <div style="display: flex; gap: 6px">
+              <span class="die" style="background: #FFD700; color: #1d1d20">5</span><span class="die" style="background: #3a3f6e; color: #ffb0b0; border: 1.5px solid #f07070">3</span><span class="die" style="background: #3a3f6e; color: #ffb0b0; border: 1.5px solid #f07070">2</span><span class="die" style="background: #FFD700; color: #1d1d20">1</span>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 4px; font-size: 13px">
+            <span><b style="color: #FFD700">You</b> · high + low <span class="num">5+1 = 6</span>, + Piloting <span class="num">3</span> = <b class="num" style="font-size: 16px">9</b></span>
+            <span><b style="color: #ff9da1">Pirates</b> · middle pair <span class="num">3+2 = 5</span>, + attack <span class="num">5</span> − armor <span class="num">0</span> = <b class="num" style="font-size: 16px">10</b></span>
+          </div>
+          <span style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px"><span style="font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 16px; color: #ff7a7f">HIT</span><span style="font-size: 12px; color: #aab1d3">Used → Damaged</span></span>
+        </section>
+      </sc-if>
+
+      <div style="{{ gridStyle }}">
+        <sc-for list="{{ actions }}" as="a" hint-placeholder-count="6">
+          <div class="act {{ a.cls }}" role="button">
+            <span class="gx" style="grid-row: span 3; color: {{ a.color }}"><span class="ic {{ a.icon }} gh" style="width: 36px; height: 36px"></span><span class="ic {{ a.icon }}" style="width: 36px; height: 36px"></span></span>
+            <span style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 8px"><span class="an">{{ a.name }}</span><span style="{{ a.tagStyle }}">{{ a.tag }}</span></span>
+            <span class="ach">{{ a.check }}</span>
+            <span class="aw">{{ a.what }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ showBoard }}" hint-placeholder-val="{{ false }}">
+        <section style="border-radius: 14px; background: #1a2042; border: 1px solid #343d6b; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+          <div style="display: flex; justify-content: space-between; align-items: baseline"><span class="lbl" style="font-size: 11px; color: #b9bdd4">WHO LEADS THE BOARDING?</span><span style="font-size: 12px; color: #9aa3c7">their score carries the fight, and they make the death check if it goes wrong</span></div>
+          <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px">
+            <sc-for list="{{ boarders }}" as="b" hint-placeholder-count="4">
+              <div role="button" style="{{ b.style }}">
+                <span class="gxi"><img class="ga gh" src="{{ b.img }}" alt="" aria-hidden="true" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover"><img class="ga" src="{{ b.img }}" alt="{{ b.name }}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover"></span>
+                <span style="display: flex; flex-direction: column; min-width: 0"><span style="font-weight: 600; font-size: 14px">{{ b.name }}</span><span style="font-size: 11px; color: #aab1d3">{{ b.note }}</span></span>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{ showShips }}" hint-placeholder-val="{{ false }}">
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px">
+          <sc-for list="{{ ships }}" as="sh" hint-placeholder-count="2">
+            <div style="{{ sh.style }}">
+              <div style="display: flex; align-items: center; gap: 12px"><span class="gx" style="color: {{ sh.color }}"><span class="ic {{ sh.icon }} gh" style="width: 40px; height: 40px"></span><span class="ic {{ sh.icon }}" style="width: 40px; height: 40px"></span></span><span style="display: flex; flex-direction: column"><span class="an">{{ sh.name }}</span><span style="font-size: 12px; color: #aab1d3">{{ sh.sub }}</span></span></div>
+              <div style="display: flex; flex-direction: column; gap: 5px">
+                <sc-for list="{{ sh.rows }}" as="r" hint-placeholder-count="6"><div style="display: flex; justify-content: space-between; gap: 8px; padding: 5px 0; border-top: 1px solid #3d4880; font-size: 13px"><span style="color: #aab1d3">{{ r.k }}</span><span class="num" style="{{ r.style }}">{{ r.v }}</span></div></sc-for>
+              </div>
+              <button style="{{ sh.btnStyle }}">{{ sh.btn }}</button>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <p style="margin: auto 0 0; font-size: 12px; line-height: 1.5; color: #9aa3c7">{{ foot }}</p>
+    </main>
+
+    <aside aria-label="Your side" style="display: flex; flex-direction: column; gap: 14px; min-width: 0">
+      <section style="background: #1a2042; border: 1px solid #343d6b; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+        <div style="display: flex; justify-content: space-between; align-items: center">
+          <span style="display: flex; align-items: center; gap: 10px"><span class="gx"><span class="ic i-ship gh" style="width: 22px; height: 22px; color: #FFD700"></span><span class="ic i-ship" style="width: 22px; height: 22px; color: #FFD700"></span></span><span style="font-family: 'Kalam', cursive; font-weight: 700; font-size: 19px">The Warbler</span></span>
+          <span class="num" style="font-size: 13px; color: #aab1d3">armor 0 · handl. 0</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px"><span title="Ship lost" style="width: 24px; height: 24px; flex: none; box-sizing: border-box; border-radius: 50%; border: 1.5px dashed #f07070; display: flex; align-items: center; justify-content: center; color: #ff7a7f"><span class="gx"><span class="ic i-rays gh" style="width: 14px; height: 14px"></span><span class="ic i-rays" style="width: 14px; height: 14px"></span></span></span><div style="flex: 1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3px"><span style="display: flex; filter: drop-shadow(0 0 6px rgba(242,181,68,.6))"><span style="flex: 1; height: 22px; background: #f2b544; clip-path: polygon(14% 0, 100% 0, 86% 50%, 100% 100%, 14% 100%, 0 50%)"></span></span><span style="display: flex; filter: drop-shadow(0 0 6px rgba(242,181,68,.6))"><span style="flex: 1; height: 22px; background: #f2b544; clip-path: polygon(14% 0, 100% 0, 86% 50%, 100% 100%, 14% 100%, 0 50%)"></span></span><span style="height: 22px; background: #262e5c; clip-path: polygon(14% 0, 100% 0, 86% 50%, 100% 100%, 14% 100%, 0 50%)"></span><span style="height: 22px; background: #262e5c; clip-path: polygon(14% 0, 100% 0, 86% 50%, 100% 100%, 14% 100%, 0 50%)"></span></div></div>
+        <span style="font-size: 12px; color: #aab1d3"><b style="font-family: 'Chakra Petch', sans-serif; letter-spacing: .1em; color: #f2b544">DAMAGED</b> · 2 more hits and the ship is lost</span>
+      </section>
+
+      <section style="background: #1a2042; border: 1px solid #343d6b; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+        <span class="lbl" style="font-size: 11px; color: #b9bdd4">ABOARD · BEST SCORES</span>
+        <sc-for list="{{ crew }}" as="c" hint-placeholder-count="3">
+          <div style="display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 10px; align-items: center">
+            <span class="gxi"><img class="ga gh" src="{{ c.img }}" alt="" aria-hidden="true" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover"><img class="ga" src="{{ c.img }}" alt="{{ c.name }}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover"></span>
+            <span style="display: flex; flex-direction: column"><span style="font-weight: 600; font-size: 14px">{{ c.name }}</span><span class="num" style="font-size: 11px; color: #aab1d3">{{ c.scores }}</span></span>
+          </div>
+        </sc-for>
+        <div style="display: flex; gap: 8px">
+          <span style="flex: 1; display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border-radius: 10px; border: 1px solid rgba(240,112,112,.45); color: #ff9da1; font-size: 12px"><span class="lbl" style="font-size: 10px">RED SHIRTS</span><span class="num">1/1</span></span>
+          <span style="flex: 1; display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border-radius: 10px; border: 1px solid rgba(224,112,208,.45); color: #f0a0e4; font-size: 12px"><span class="lbl" style="font-size: 10px">DREAD</span><span class="num">1/3</span></span>
+        </div>
+      </section>
+
+      <section style="margin-top: auto; background: #1a2042; border: 1.5px solid #FFD700; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+        <span class="lbl" style="color: #FFD700">{{ roll.head }}</span>
+        <span style="font-size: 15px; line-height: 1.45">{{ roll.text }}</span>
+        <span style="font-size: 12px; color: #aab1d3">{{ roll.odds }}</span>
+        <button style="height: 54px; border-radius: 14px; border: none; background: #FFD700; color: #1d1d20; font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 19px; letter-spacing: 0.06em; cursor: pointer">{{ roll.btn }}</button>
+      </section>
+    </aside>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900},"phase":{"editor":"enum","options":["Approach","Round result","Exchange","Board or leave","Capture"],"default":"Approach"}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var B = '';
+    var P = ['Approach', 'Exchange', 'Board or leave', 'Capture'];
+    var ALL = ['Approach', 'Round result', 'Exchange', 'Board or leave', 'Capture'];
+    var phase = ALL.indexOf(this.props.phase) >= 0 ? this.props.phase : 'Exchange';
+    var at = P.indexOf(phase === 'Round result' ? 'Exchange' : phase);
+    var steps = P.map(function (n, i) {
+      var cur = i === at, done = i < at;
+      return { n: done ? '✓' : String(i + 1), name: n,
+        lineStyle: i === 0 ? 'display: none;' : 'width: 36px; height: 0; border-top: 2px dotted ' + (i <= at ? '#FFD700' : '#4a5384') + ';',
+        style: cur ? 'color: #e8e4d8; font-weight: 600;' : 'color: ' + (done ? '#c9b25a' : '#7f88b5') + ';',
+        dotStyle: 'width: 22px; height: 22px; box-sizing: border-box; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: IBM Plex Mono, monospace; font-size: 11px; font-weight: 600; ' + (cur ? 'background: #FFD700; color: #1d1d20;' : done ? 'background: #4a4120; color: #FFD700;' : 'border: 1.5px solid #4a5384;') };
+    });
+    var COL = { gold: '#FFD700', red: '#ff9da1', dim: '#6d7499', teal: '#4cc9b0' };
+    function A(o) {
+      var cls = o.state || '';
+      var tagCol = o.state === 'off' ? '#6d7499' : o.state === 'used' ? '#6fd08a' : o.state === 'sel' ? '#FFD700' : '#aab1d3';
+      return { name: o.name, icon: o.icon, check: o.check, what: o.what, tag: o.tag || '', cls: cls,
+        color: o.state === 'off' ? '#56609a' : (o.color || '#FFD700'),
+        tagStyle: 'font-size: 11px; font-weight: 600; letter-spacing: .04em; color: ' + tagCol + '; white-space: nowrap;' };
+    }
+    var V = {};
+    if (phase === 'Approach') {
+      V = { kicker: '♦ 7 DRAWN · A FIGHT YOU CANNOT IGNORE', title: 'A pirate strafer drops out of the dark',
+        lede: 'Before the shooting starts, a crew with Sneaking can try to slip past.', showExchange: false, showShips: false, disabled: false,
+        actions: [
+          A({ name: 'Run silent', icon: 'i-eclipse', check: '3d6 + SNE vs 12', tag: 'needs SNE', state: 'off', what: 'No one aboard has Sneaking. Success would skip the fight; failure just starts it.' }),
+          A({ name: 'Engage', icon: 'i-starfighter', check: 'start round 1', tag: 'chosen', state: 'sel', what: 'Open the fight. Each round you choose: fight, escape, hack, open fire, redline or intimidate.' })
+        ],
+        gridStyle: 'display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px',
+        roll: { head: 'NO ROLL YET', text: 'Engage to open round 1.', odds: 'Run silent would be 3d6 + SNE vs 10 + their speed 2.', btn: 'ENGAGE' },
+        foot: 'Pirates cannot be ignored. Running silent is the only way to avoid the fight before it starts, and it needs SNE aboard.',
+        log: ['♦7 drawn on the way out to Channel clash.', 'No SNE aboard: running silent is not possible.'], buffs: [] };
+    } else if (phase === 'Round result') {
+      V = { kicker: 'ROUND 1 · THE DICE ARE IN', title: 'You lost the exchange by 1',
+        lede: 'Before the hit lands, Flying Ace lets you reroll one space-combat exchange per fight.', showExchange: true, showShips: false, disabled: false,
+        actions: [
+          A({ name: 'Take the hit', icon: 'i-crack', check: 'Used → Damaged', tag: 'chosen', state: 'sel', color: '#ff9da1', what: 'Keep the reroll for a worse moment. The ship drops one step and round 2 begins.' }),
+          A({ name: 'Reroll · Flying Ace', icon: 'i-starfighter', check: 'once per fight · natural PIL 3', tag: '1 left', what: 'Roll all four dice again. The new result stands, even if it is worse.' })
+        ],
+        gridStyle: 'display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px',
+        roll: { head: 'YOUR CALL', text: 'A 1-point loss is a cheap hit to take. A reroll could also save you on a worse round later.', odds: 'Only natural scores of 3 give advanced skills like Flying Ace.', btn: 'TAKE THE HIT' },
+        foot: 'Rerolls are offered right after an exchange you lose, before the damage is applied.',
+        log: ['♦7 drawn. Engaged.', 'Round 1: you 9, them 10.'],
+        buffs: [{ text: 'open fire · not tried' }, { text: 'redline · not tried' }] };
+    } else if (phase === 'Exchange') {
+      V = { kicker: 'ROUND 2 · CHOOSE ONE', title: 'They hit you. What now?',
+        lede: 'Fight is the default. The others are gambles: each failed one gives them a free hit.', showExchange: true, showShips: false, disabled: false,
+        actions: [
+          A({ name: 'Fight', icon: 'i-starfighter', check: '4d6 pairing · advantage', tag: 'chosen', state: 'sel', what: 'You take the higher pair + Piloting 3. Win: they are disabled. Lose: one damage step.' }),
+          A({ name: 'Escape', icon: 'i-rocket', check: '3d6 + handl. 0 + PIL 3 vs 15', tag: 'you', what: 'Get away. Even a failed escape gets away, after one damage step.' }),
+          A({ name: 'Hack', icon: 'i-satcom', check: '3d6 + HAK 1 vs 13', tag: '7EE700', what: 'Crash their systems. Success disables them without a fight.', color: '#4cc9b0' }),
+          A({ name: 'Open fire', icon: 'i-gun', check: 'once · 3d6 + GUN 1 vs 12', tag: 'you', what: 'Success: −2 to their totals for the rest of the fight. Fail: a free hit on you.' }),
+          A({ name: 'Redline', icon: 'i-bolt', check: 'once · 3d6 + MEC 1 vs 12', tag: 'you', what: 'Push the engines. Success: +2 to your totals this fight. Fail: a free hit on you.' }),
+          A({ name: 'Intimidate', icon: 'i-pirate', check: '3d6 + DEM + Dread 1 vs 15', tag: 'needs DEM', state: 'off', what: 'Stand down or burn. Success: they break off. No one aboard has Demolitions.' })
+        ],
+        gridStyle: 'display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px',
+        roll: { head: 'ROLL 4 DICE · FIGHT', text: 'You take the higher pair and add Piloting +3. They take the other pair and add +5.', odds: 'Flying Ace reroll: kept for later (1 left).', btn: 'ROLL' },
+        foot: 'The best score aboard always carries the roll. Open fire and redline can each be tried once per fight. A tie is rerolled.',
+        log: ['♦7 drawn. Engaged.', 'Round 1: you 9, them 10. Hit, ship now Damaged.'],
+        buffs: [{ text: 'open fire · not tried' }, { text: 'redline · not tried' }] };
+    } else if (phase === 'Board or leave') {
+      V = { kicker: 'ROUND 2 WON · THEY ARE DISABLED', title: 'Their engines are dark',
+        lede: 'Board them to take the ship, or fly on. You can also try to talk survivors into joining.', showExchange: false, showShips: false, disabled: true,
+        actions: [
+          A({ name: 'Board', icon: 'i-suit', check: 'ground 4d6 · SWA 2 adv. vs +2', tag: 'chosen', state: 'sel', what: 'Win: capture the ship, Dread +1, counts toward Bounty. Lose: whoever boarded makes a death check.' }),
+          A({ name: 'Leave', icon: 'i-rocket', check: 'no roll', tag: 'safe', what: 'Fly on. The card goes to the discard and the leg continues.' }),
+          A({ name: 'Talk survivors', icon: 'i-convince', check: 'once · 3d6 + DIP 1 vs 12', tag: 'red shirts full', state: 'off', what: 'Signs one red shirt. Your cap is your best DIP (1), and you already have 1.' })
+        ],
+        gridStyle: 'display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px',
+        roll: { head: 'ROLL 4 DICE · BOARDING', text: 'You take the higher pair and add Swashbuckling +2. They add their ground attack +2.', odds: 'Red shirts only act on ruin maps, so they cannot board.', btn: 'BOARD' },
+        foot: 'Disabling, intimidating and hacking do not count toward the Bounty ending. Only a won boarding does.',
+        log: ['Round 1: hit, ship now Damaged.', 'Round 2: you 12, them 8. Disabled.'],
+        buffs: [{ text: 'disabled' }] };
+    } else {
+      V = { kicker: 'BOARDING WON · DREAD +1', title: 'Take their ship, or keep yours?',
+        lede: 'A captured ship arrives Hobbled and has no parts. Switching leaves your installed parts behind.', showExchange: false, showShips: true, disabled: true,
+        actions: [], gridStyle: 'display: none;',
+        roll: { head: 'NO ROLL', text: 'This choice is free. Your crew moves with you either way.', odds: 'Capacity must fit everyone aboard, or someone has to go.', btn: 'CONFIRM' },
+        foot: 'Keeping yours scraps the strafer. Taking it gives you speed now, at the cost of a long repair bill.',
+        log: ['Round 2: disabled.', 'Boarded: you 11, them 7. Ship captured. Dread 2/3.'],
+        buffs: [{ text: 'captured' }] };
+    }
+    V.showBoard = phase === 'Board or leave';
+    var BS = 'display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 12px; cursor: pointer; ';
+    V.boarders = [
+      ['Ressa Vane', 'assets/portraits/grull.jpg', 'SWA 2 · advantage', true],
+      ['7EE700', 'assets/portraits/hexapod.jpg', 'no Brawn · no advantage'],
+      ['Slate', 'assets/portraits/grull.jpg', 'no Brawn · no advantage'],
+      ['Red shirt', 'assets/portraits/redshirt.jpg', 'cannot board']
+    ].map(function (b, i) { return { name: b[0], img: b[1], note: b[2], style: BS + (b[3] ? 'border: 3px solid #FFD700; background: #3a3520;' : i === 3 ? 'border: 1.5px dashed #3d4880; opacity: .5; cursor: default;' : 'border: 1.5px solid #4f5a94; background: #283063;') }; });
+    var BUFF = 'font-size: 11px; padding: 3px 8px; border-radius: 999px; border: 1px solid #f07070; color: #ff9da1;';
+    V.buffs = V.buffs.map(function (b) { return { text: b.text, style: BUFF }; });
+    var ROWS = function (a) { return a.map(function (r) { return { k: r[0], v: r[1], style: 'font-size: 13px; color: ' + (r[2] || '#ece8dc') + ';' }; }); };
+    var SH = 'display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: 14px; box-sizing: border-box; ';
+    V.ships = [
+      { name: 'The Warbler', sub: 'yours · keep', icon: 'i-ship', color: '#FFD700', style: SH + 'background: #283063; border: 1.5px solid #4f5a94;',
+        rows: ROWS([['Capacity', '5 (3 + bunk pod)'], ['Speed', '1 (patched thruster)'], ['Handling', '0'], ['Armor', '0'], ['Damage', 'Damaged', '#f2b544'], ['Parts', '2 installed']]),
+        btn: 'KEEP THE WARBLER', btnStyle: 'height: 48px; border-radius: 12px; border: 1.5px solid #FFD700; background: transparent; color: #FFD700; font-family: Chakra Petch, sans-serif; font-weight: 700; font-size: 15px; letter-spacing: .06em; cursor: pointer;' },
+      { name: 'Pirate strafer', sub: 'captured · take', icon: 'i-strafe', color: '#ff9da1', style: SH + 'background: #3a3520; border: 3px solid #FFD700;',
+        rows: ROWS([['Capacity', '5'], ['Speed', '2', '#6fd08a'], ['Handling', '0'], ['Armor', '0'], ['Damage', 'Hobbled', '#ff7a7f'], ['Parts', 'none (yours stay behind)', '#ff9da1']]),
+        btn: 'TAKE THE STRAFER', btnStyle: 'height: 48px; border-radius: 12px; border: none; background: #FFD700; color: #1d1d20; font-family: Chakra Petch, sans-serif; font-weight: 700; font-size: 15px; letter-spacing: .06em; cursor: pointer;' }
+    ];
+    V.crew = [
+      { name: 'Ressa Vane (you)', img: 'assets/portraits/grull.jpg', scores: 'PIL 3 · SWA 2 · MEC 1 · GUN 0+1 · LEA 1' },
+      { name: '7EE700', img: 'assets/portraits/hexapod.jpg', scores: 'HAK 1' },
+      { name: 'Slate', img: 'assets/portraits/grull.jpg', scores: 'DIP 1' }
+    ];
+    V.steps = steps;
+    V.shipStyle = V.disabled ? 'color: #8a5a5f; opacity: .7;' : 'color: #ff9da1; filter: drop-shadow(0 0 12px rgba(240,112,112,.6));';
+    return V;
+  }
+}
+</script>
+</body>
+</html>

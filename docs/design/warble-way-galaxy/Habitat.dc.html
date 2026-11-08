@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Warble Way Galaxy docked at Xaxalon 4</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;600&amp;family=Kalam:wght@400;700&amp;display=swap">
+<style>
+body{margin:0;background:#0d1124}
+a{color:#FFD700}a:hover{color:#fff1a8}
+.void{background-color:#0d1124;background-image:radial-gradient(rgba(232,228,216,.16) 1px,transparent 1.4px);background-size:24px 24px}
+.ic{display:inline-block;flex:none;background-color:currentColor;-webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center}
+.i-ship{-webkit-mask-image:url(assets/icons/spaceship.png);mask-image:url(assets/icons/spaceship.png)}
+.i-swirl{-webkit-mask-image:url(assets/icons/star-swirl.png);mask-image:url(assets/icons/star-swirl.png)}
+.i-gun{-webkit-mask-image:url(assets/icons/bolter-gun.png);mask-image:url(assets/icons/bolter-gun.png)}
+.i-crack{-webkit-mask-image:url(assets/icons/cracked-glass.png);mask-image:url(assets/icons/cracked-glass.png)}
+.i-credits{-webkit-mask-image:url(assets/icons/credits-currency.png);mask-image:url(assets/icons/credits-currency.png)}
+.i-talk{-webkit-mask-image:url(assets/icons/discussion.png);mask-image:url(assets/icons/discussion.png)}
+.i-drink{-webkit-mask-image:url(assets/icons/drink-me.png);mask-image:url(assets/icons/drink-me.png)}
+.i-idcard{-webkit-mask-image:url(assets/icons/id-card.png);mask-image:url(assets/icons/id-card.png)}
+.i-armor{-webkit-mask-image:url(assets/icons/metal-scales.png);mask-image:url(assets/icons/metal-scales.png)}
+.i-tag{-webkit-mask-image:url(assets/icons/price-tag.png);mask-image:url(assets/icons/price-tag.png)}
+.i-rocket{-webkit-mask-image:url(assets/icons/rocket-flight.png);mask-image:url(assets/icons/rocket-flight.png)}
+.i-silo{-webkit-mask-image:url(assets/icons/round-silo.png);mask-image:url(assets/icons/round-silo.png)}
+.i-convince{-webkit-mask-image:url(assets/icons/convince.png);mask-image:url(assets/icons/convince.png)}
+.i-chest{-webkit-mask-image:url(assets/icons/locked-chest.png);mask-image:url(assets/icons/locked-chest.png)}
+.i-rays{-webkit-mask-image:url(assets/icons/explosion-rays.svg);mask-image:url(assets/icons/explosion-rays.svg)}
+.i-suit{-webkit-mask-image:url(assets/icons/space-suit.svg);mask-image:url(assets/icons/space-suit.svg)}
+.i-pirate{-webkit-mask-image:url(assets/icons/pirate-flag.png);mask-image:url(assets/icons/pirate-flag.png)}
+.lbl{font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:12px;letter-spacing:.16em}
+.num{font-family:'IBM Plex Mono',monospace;font-weight:600}
+.row{display:grid;align-items:center;gap:8px;min-height:44px;box-sizing:border-box;padding:6px 10px;border-radius:10px;border:1.5px solid #4f5a94;background:#283063;font:inherit;color:#ece8dc;text-align:left;cursor:pointer;width:100%}
+.done{background:transparent;border:1.5px dashed #3d4880;color:#8f98c2;cursor:default}
+.stamp{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:11px;letter-spacing:.12em;padding:3px 7px;border-radius:5px;transform:rotate(-6deg);text-align:center}
+.ga{filter:grayscale(1) invert(1) contrast(1.45) sepia(1) saturate(3) hue-rotate(8deg) brightness(1.08);background:#170d02;-webkit-mask-image:repeating-linear-gradient(0deg,#000 0 2px,rgba(0,0,0,.55) 2px 3px);mask-image:repeating-linear-gradient(0deg,#000 0 2px,rgba(0,0,0,.55) 2px 3px)}
+.gx{display:inline-grid;flex:none;vertical-align:middle}
+.gx>.ic{grid-area:1/1}
+.gx>.gh{background-color:#ff4f7b!important;opacity:.55;transform:translate(2px,0);animation:gxjit 2.7s steps(1) infinite}
+.gx>.ic:not(.gh){animation:gxjit 3.4s steps(1) infinite reverse}
+.gx:nth-child(2n)>.gh{animation-duration:3.1s}.gx:nth-child(3n)>.gh{animation-duration:2.3s}
+@keyframes gxjit{0%,100%{transform:translate(0,0)}18%{transform:translate(-2px,0)}19%{transform:translate(2px,0)}20%{transform:translate(0,0)}66%{transform:translate(2px,0)}67%{transform:translate(0,0)}}
+.gxi{display:inline-grid;flex:none;vertical-align:middle;position:relative}
+.gxi>img{grid-area:1/1}
+.gxi>.gh{opacity:.6;transform:translate(3px,0);animation:gxjit 2.9s steps(1) infinite}
+.gxi>.ga.gh{filter:grayscale(1) invert(1) contrast(1.45) sepia(1) saturate(5) hue-rotate(290deg) brightness(1.05)}
+.gxi>.ga-red.gh{filter:grayscale(1) invert(1) contrast(1.45) sepia(1) saturate(5) hue-rotate(150deg) brightness(1.05)}
+.gxi>img:not(.gh){mix-blend-mode:screen;animation:gxjit 3.7s steps(1) infinite reverse}
+.gxi:nth-child(2n)>.gh{animation-duration:3.3s}.gxi:nth-child(3n)>.gh{animation-duration:2.4s}
+.i-ringed{-webkit-mask-image:url(assets/icons/ringed-planet.svg);mask-image:url(assets/icons/ringed-planet.svg)}
+.mrow{display:grid;align-items:center;gap:10px;min-height:48px;box-sizing:border-box;padding:4px 10px;border-radius:10px;border:1.5px solid #4f5a94;background:#283063;color:#ece8dc;text-align:left;cursor:pointer;width:100%}
+.mrow.done{background:transparent;border:1.5px dashed #3d4880;color:#8f98c2;cursor:default}
+.mrow.sel{border:3px solid #FFD700;background:#3a3520}
+.nm{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:15px;line-height:1.15}
+.meta{font-size:12px;color:#aab1d3;line-height:1.3}
+.done .meta{color:#6d7499}
+.chip{display:flex;flex-direction:column;align-items:center;justify-content:center;width:46px;height:38px;box-sizing:border-box;border-radius:8px;border:1.5px solid #6b76ad;background:#1a2042}
+.done .chip{border-color:#3d4880;background:transparent}
+.mid{display:flex;flex-direction:column;gap:2px;min-width:0}
+.i-skills{-webkit-mask-image:url(assets/icons/skills.png);mask-image:url(assets/icons/skills.png)}
+.i-being{-webkit-mask-image:url(assets/icons/being-icon.png);mask-image:url(assets/icons/being-icon.png)}
+.ov{position:absolute;inset:0;background:rgba(6,9,24,.72);display:flex;align-items:center;justify-content:center;z-index:5}
+.modal{width:760px;box-sizing:border-box;border-radius:20px;background:#1f2650;border:1.5px solid #FFD700;box-shadow:0 20px 60px rgba(0,0,0,.6);padding:24px 26px;display:flex;flex-direction:column;gap:16px}
+.slot{display:flex;align-items:center;gap:8px;min-height:44px;box-sizing:border-box;padding:6px 10px;border-radius:10px;font-size:13px;white-space:pre-line;line-height:1.25}
+</style>
+</helmet>
+<div class="void" style="width: 1440px; height: 900px; box-sizing: border-box; color: #e8e4d8; font-family: 'IBM Plex Sans', system-ui, sans-serif; display: flex; flex-direction: column">
+
+  <header style="height: 72px; flex: none; box-sizing: border-box; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border-bottom: 1px solid #262e57; background: rgba(13,17,36,.86)">
+    <div style="display: flex; align-items: center; gap: 12px; width: 300px">
+      <span class="gx"><span class="ic i-swirl gh" style="width: 28px; height: 28px; color: #FFD700"></span><span class="ic i-swirl" style="width: 28px; height: 28px; color: #FFD700"></span></span>
+      <span style="font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 20px">Warble Way Galaxy</span>
+    </div>
+    <nav aria-label="Galaxy" style="display: flex; align-items: center; gap: 10px; font-size: 13px">
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="3">
+        <span style="{{ n.lineStyle }}"></span>
+        <span style="{{ n.style }}"><span style="{{ n.dotStyle }}"></span>{{ n.name }}</span>
+      </sc-for>
+      <span style="width: 30px; height: 0; border-top: 2px dotted #4a5384"></span>
+      <span style="color: #9aa3c7">R3</span>
+    </nav>
+    <div style="display: flex; align-items: center; gap: 16px; width: 300px; justify-content: flex-end">
+      <span style="display: flex; align-items: center; gap: 8px; color: #FFD700"><span class="gx"><span class="ic i-credits gh" style="width: 22px; height: 22px"></span><span class="ic i-credits" style="width: 22px; height: 22px"></span></span><span class="num" style="font-size: 22px">{{ H.credits }}</span></span>
+      <button aria-label="Menu" style="width: 44px; height: 44px; border-radius: 10px; border: 1px solid #343d6b; background: #1a2042; color: #e8e4d8; font-size: 20px; cursor: pointer">☰</button>
+    </div>
+  </header>
+
+  <div style="position: relative; flex: 1; min-height: 0; box-sizing: border-box; padding: 20px 24px; display: grid; grid-template-columns: minmax(0, 1fr) 336px; gap: 20px">
+
+    <main style="background: #1f2650; color: #ece8dc; border-radius: 18px; padding: 24px 26px; display: flex; flex-direction: column; gap: 18px; box-shadow: 0 10px 30px rgba(0,0,0,.35); min-width: 0">
+      <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; border-bottom: 2px solid #6b76ad; padding-bottom: 16px">
+        <div style="display: flex; gap: 18px; align-items: center">
+          <span class="gx"><span class="ic i-ringed gh" style="width: 60px; height: 60px"></span><span class="ic i-ringed" style="width: 60px; height: 60px"></span></span>
+          <div style="display: flex; flex-direction: column; gap: 2px">
+            <span class="lbl" style="color: #FFD700">{{ H.num }}</span>
+            <h1 style="margin: 0; font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 44px; line-height: 1">{{ H.name }}</h1>
+            <span style="font-size: 14px; color: #aab1d3">{{ H.blurb }}</span>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex: none">
+          <span class="lbl" style="color: #aab1d3">TO NEXT HABITAT</span>
+          <span style="font-size: 14px">{{ H.next }}</span>
+          <sc-if value="{{ H.showPips }}" hint-placeholder-val="{{ true }}"><span style="display: flex; gap: 5px; align-items: center"><span style="width: 22px; height: 8px; border-radius: 4px; background: #FFD700"></span><span style="width: 22px; height: 8px; border-radius: 4px; background: #FFD700"></span><span style="width: 22px; height: 8px; border-radius: 4px; background: #FFD700"></span><span style="width: 22px; height: 8px; box-sizing: border-box; border-radius: 4px; border: 1.5px solid #8f98c2"></span><span class="num" style="font-size: 13px; margin-left: 6px">3 of 4</span></span></sc-if>
+        </div>
+      </div>
+
+      <div style="flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr) minmax(0, 1fr); gap: 20px">
+        <section style="display: flex; flex-direction: column; gap: 5px; min-width: 0">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 3px"><span class="gx"><span class="ic i-idcard gh" style="width: 22px; height: 22px"></span><span class="ic i-idcard" style="width: 22px; height: 22px"></span></span><span style="font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 20px">Missions</span><span style="font-size: 12px; color: #aab1d3; margin-left: auto">ability · need</span></div>
+          <sc-for list="{{ H.missions }}" as="m" hint-placeholder-count="7">
+            <div class="mrow {{ m.cls }}" role="button" style="grid-template-columns: 46px minmax(0, 1fr) auto">
+              <span class="chip"><span class="lbl" style="font-size: 11px; letter-spacing: .08em">{{ m.ab }}</span><sc-if value="{{ m.ruin }}" hint-placeholder-val="{{ false }}"><span class="gx"><span class="ic i-chest gh" style="width: 14px; height: 14px"></span><span class="ic i-chest" style="width: 14px; height: 14px"></span></span></sc-if><sc-if value="{{ m.needShow }}" hint-placeholder-val="{{ true }}"><span class="num" style="font-size: 14px; line-height: 1">{{ m.need }}</span></sc-if></span>
+              <span class="mid"><span class="nm">{{ m.name }}</span><span class="meta">{{ m.meta }}</span></span>
+              <span style="display: flex; flex-direction: column; align-items: flex-end; gap: 3px">
+                <sc-if value="{{ m.stamp }}" hint-placeholder-val="{{ false }}"><span class="stamp" style="{{ m.stampStyle }}">{{ m.stamp }}</span></sc-if>
+                <sc-if value="{{ m.note }}" hint-placeholder-val="{{ false }}"><span style="{{ m.noteStyle }}">{{ m.note }}</span></sc-if>
+              </span>
+            </div>
+          </sc-for>
+        </section>
+
+        <section style="display: flex; flex-direction: column; gap: 5px; min-width: 0">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 3px"><span class="gx"><span class="ic i-tag gh" style="width: 22px; height: 22px"></span><span class="ic i-tag" style="width: 22px; height: 22px"></span></span><span style="font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 20px">Shop</span><span style="font-size: 12px; color: #aab1d3; margin-left: auto">each sells once</span></div>
+          <sc-for list="{{ H.shop }}" as="s" hint-placeholder-count="6">
+            <div class="mrow {{ s.cls }}" role="button" style="grid-template-columns: 26px minmax(0, 1fr) auto">
+              <span class="gx"><span class="ic {{ s.icon }} gh" style="width: 22px; height: 22px"></span><span class="ic {{ s.icon }}" style="width: 22px; height: 22px"></span></span>
+              <span class="mid"><span class="nm">{{ s.name }}</span><span class="meta">{{ s.meta }}</span></span>
+              <span style="display: flex; flex-direction: column; align-items: flex-end; gap: 3px"><span class="num" style="font-size: 14px">{{ s.price }}</span><sc-if value="{{ s.stamp }}" hint-placeholder-val="{{ false }}"><span class="stamp" style="border: 2px solid #aab1d3; color: #aab1d3">{{ s.stamp }}</span></sc-if></span>
+            </div>
+          </sc-for>
+        </section>
+
+        <section style="display: flex; flex-direction: column; gap: 5px; min-width: 0">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 3px"><span class="gx"><span class="ic i-talk gh" style="width: 22px; height: 22px"></span><span class="ic i-talk" style="width: 22px; height: 22px"></span></span><span style="font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 20px">Cantina</span><span style="font-size: 12px; color: #aab1d3; margin-left: auto">roll vs need</span></div>
+          <sc-for list="{{ H.cantina }}" as="b" hint-placeholder-count="6">
+            <div class="mrow {{ b.cls }}" role="button" style="grid-template-columns: 38px minmax(0, 1fr) auto">
+              <span class="gxi"><img class="ga gh" src="{{ b.img }}" alt="" aria-hidden="true" style="{{ b.imgStyle }}"><img class="ga" src="{{ b.img }}" alt="{{ b.name }}" style="{{ b.imgStyle }}"></span>
+              <span class="mid"><span class="nm">{{ b.name }}</span><span class="meta">{{ b.meta }}</span></span>
+              <span style="display: flex; flex-direction: column; align-items: flex-end; gap: 3px"><span class="num" style="font-size: 13px; text-align: right; white-space: pre-line; line-height: 1.25">{{ b.ab }}</span><sc-if value="{{ b.stamp }}" hint-placeholder-val="{{ false }}"><span class="stamp" style="{{ b.stampStyle }}">{{ b.stamp }}</span></sc-if></span>
+            </div>
+          </sc-for>
+        </section>
+      </div>
+    </main>
+
+    <sc-if value="{{ ov.on }}" hint-placeholder-val="{{ false }}">
+    <div class="ov">
+      <div class="modal">
+        <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 20px">
+          <div style="display: flex; flex-direction: column; gap: 4px"><span class="lbl" style="color: #FFD700">{{ ov.kicker }}</span><span style="font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 30px; line-height: 1.05">{{ ov.title }}</span><span style="font-size: 14px; color: #aab1d3">{{ ov.lede }}</span></div>
+          <button aria-label="Close" style="width: 40px; height: 40px; flex: none; border-radius: 10px; border: 1px solid #4f5a94; background: transparent; color: #aab1d3; font-size: 18px; cursor: pointer">✕</button>
+        </div>
+
+        <sc-if value="{{ ov.equip }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <sc-for list="{{ ov.beings }}" as="b" hint-placeholder-count="3">
+              <div style="display: grid; grid-template-columns: 200px minmax(0, 1fr) minmax(0, 1fr); gap: 10px; align-items: center">
+                <span style="display: flex; align-items: center; gap: 10px"><span class="gxi"><img class="ga gh" src="{{ b.img }}" alt="" aria-hidden="true" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover"><img class="ga" src="{{ b.img }}" alt="{{ b.name }}" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover"></span><span style="font-weight: 600">{{ b.name }}</span></span>
+                <span class="slot" style="{{ b.wStyle }}"><span class="gx"><span class="ic i-gun gh" style="width: 18px; height: 18px"></span><span class="ic i-gun" style="width: 18px; height: 18px"></span></span>{{ b.weapon }}</span>
+                <span class="slot" style="{{ b.aStyle }}"><span class="gx"><span class="ic i-armor gh" style="width: 18px; height: 18px"></span><span class="ic i-armor" style="width: 18px; height: 18px"></span></span>{{ b.armor }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; border: 1.5px solid #FFD700; background: #3a3520"><span class="lbl" style="font-size: 11px; color: #FFD700">HOLDING</span><span style="flex: 1">Salvaged Riot Plate · Armor · Combat Advantage</span><span style="font-size: 12px; color: #d9d2a8">tap an armor slot to put it on</span></div>
+        </sc-if>
+
+        <sc-if value="{{ ov.release }}" hint-placeholder-val="{{ false }}">
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+            <sc-for list="{{ ov.crew }}" as="c" hint-placeholder-count="2">
+              <div style="{{ c.style }}">
+                <span class="gxi"><img class="ga gh" src="{{ c.img }}" alt="" aria-hidden="true" style="width: 52px; height: 52px; border-radius: 50%; object-fit: cover"><img class="ga" src="{{ c.img }}" alt="{{ c.name }}" style="width: 52px; height: 52px; border-radius: 50%; object-fit: cover"></span>
+                <span style="flex: 1; display: flex; flex-direction: column"><span style="font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 18px">{{ c.name }}</span><span style="font-size: 12px; color: #aab1d3">{{ c.note }}</span></span>
+                <span style="{{ c.btnStyle }}">{{ c.btn }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ ov.tinker }}" hint-placeholder-val="{{ false }}">
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+            <div style="display: flex; flex-direction: column; gap: 6px; padding: 14px; border-radius: 14px; border: 1.5px dashed #3d4880; color: #8f98c2"><span style="font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 18px">Tinker · 200c</span><span style="font-size: 13px">Turn a weapon or armor into an MK-II, worth +1 more.</span></div>
+            <div style="display: flex; flex-direction: column; gap: 6px; padding: 14px; border-radius: 14px; border: 1.5px dashed #3d4880; color: #8f98c2"><span style="font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 18px">Fabricate · 400c</span><span style="font-size: 13px">Build a +1 speed, handling or armor part for the ship. Once per visit.</span></div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; border: 1.5px solid #f07070; background: rgba(240,112,112,.08)"><span class="lbl" style="font-size: 11px; color: #ff9da1">LOCKED</span><span style="flex: 1; font-size: 13px">Needs a natural MEC 3 aboard. Your best is MEC 1, and items do not count. Raising MEC at level up, or a recruit like 5EA1ED at FFD700 Base, would open it.</span></div>
+        </sc-if>
+
+        <sc-if value="{{ ov.peek }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; gap: 22px; align-items: center">
+            <div style="width: 150px; height: 214px; flex: none; box-sizing: border-box; border-radius: 12px; overflow: hidden; background: #1f2650; border: 2px solid #ad90f7; display: flex; flex-direction: column">
+              <div style="height: 24px; display: flex; align-items: center; justify-content: space-between; padding: 0 8px; background: #ad90f7; color: #10142a"><span class="lbl" style="font-size: 9px">HAZARD</span><span class="num" style="font-size: 11px">♠ Q</span></div>
+              <div style="flex: 1; display: flex; align-items: center; justify-content: center; color: #ad90f7"><span class="gx"><span class="ic i-rays gh" style="width: 56px; height: 56px"></span><span class="ic i-rays" style="width: 56px; height: 56px"></span></span></div>
+              <div style="padding: 0 10px 10px; display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 16px">Solar flare</span><span class="num" style="font-size: 11px; display: flex; justify-content: space-between; gap: 6px"><span>DIP 10</span><span style="color: #aab1d3">crew unrest</span></span><span class="num" style="font-size: 11px; display: flex; justify-content: space-between; gap: 6px"><span>DEM 15</span><span style="color: #aab1d3">death check</span></span></div>
+            </div>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 10px">
+              <span style="font-size: 14px; line-height: 1.5; color: #c9cfee">This is the top card of your travel deck. Slate's DIP 1 lets you look at 1 card. You could carry this one with Slate's DIP, needing 9 on 3 dice, but a failure angers the whole crew.</span>
+              <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+                <span style="height: 52px; border-radius: 12px; background: #FFD700; color: #1d1d20; display: flex; align-items: center; justify-content: center; font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 16px; letter-spacing: .05em; cursor: pointer">DISCARD IT</span>
+                <span style="height: 52px; border-radius: 12px; border: 1.5px solid #FFD700; color: #FFD700; display: flex; align-items: center; justify-content: center; font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 16px; letter-spacing: .05em; cursor: pointer">LEAVE IT ON TOP</span>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <span style="font-size: 12px; line-height: 1.5; color: #9aa3c7">{{ ov.foot }}</span>
+      </div>
+    </div>
+    </sc-if>
+
+    <aside style="display: flex; flex-direction: column; gap: 16px; min-width: 0">
+      <section aria-label="This visit" style="background: #1a2042; border: 1px solid #343d6b; border-radius: 16px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px">
+        <span class="lbl" style="color: #b9bdd4">THIS VISIT</span>
+        <button style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 8px 12px; border-radius: 12px; border: 1.5px solid #FFD700; background: transparent; color: #e8e4d8; font: inherit; text-align: left; cursor: pointer"><span class="gx"><span class="ic i-crack gh" style="width: 22px; height: 22px; color: #FFD700"></span><span class="ic i-crack" style="width: 22px; height: 22px; color: #FFD700"></span></span><span style="flex: 1; display: flex; flex-direction: column"><span style="font-weight: 600">Repair roll</span><span style="font-size: 12px; color: #9aa3c7">3d6 + MEC 1, need 10 · once</span></span></button>
+        <button style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 8px 12px; border-radius: 12px; border: 1.5px solid #4a5384; background: transparent; color: #e8e4d8; font: inherit; text-align: left; cursor: pointer"><span class="gx"><span class="ic i-credits gh" style="width: 22px; height: 22px; color: #b9bdd4"></span><span class="ic i-credits" style="width: 22px; height: 22px; color: #b9bdd4"></span></span><span style="flex: 1; display: flex; flex-direction: column"><span style="font-weight: 600">Pay for repair</span><span style="font-size: 12px; color: #9aa3c7">150c a step</span></span></button>
+        <button style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 8px 12px; border-radius: 12px; border: 1.5px solid #4a5384; background: transparent; color: #e8e4d8; font: inherit; text-align: left; cursor: pointer"><span class="gx"><span class="ic i-convince gh" style="width: 22px; height: 22px; color: #b9bdd4"></span><span class="ic i-convince" style="width: 22px; height: 22px; color: #b9bdd4"></span></span><span style="flex: 1; display: flex; flex-direction: column"><span style="font-weight: 600">Ease unrest</span><span style="font-size: 12px; color: #9aa3c7">3d6 + LEA 1, need 12 · once</span></span></button>
+        <button style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 8px 12px; border-radius: 12px; border: 1.5px solid #4a5384; background: transparent; color: #e8e4d8; font: inherit; text-align: left; cursor: pointer"><span class="gx"><span class="ic i-talk gh" style="width: 22px; height: 22px; color: #b9bdd4"></span><span class="ic i-talk" style="width: 22px; height: 22px; color: #b9bdd4"></span></span><span style="flex: 1; display: flex; flex-direction: column"><span style="font-weight: 600">Work the docks</span><span style="font-size: 12px; color: #9aa3c7">3d6 + DIP 1, need 12 · once here</span></span></button>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px"><span style="min-height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 10px; border: 1.5px solid #4a5384; font-size: 13px; font-weight: 600; cursor: pointer">Equip</span><span style="min-height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 10px; border: 1.5px solid #4a5384; font-size: 13px; font-weight: 600; cursor: pointer">Release</span><span style="min-height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 10px; border: 1.5px dashed #343d6b; color: #6d7499; font-size: 13px; cursor: pointer">Tinker · locked</span></div>
+      </section>
+
+      <section aria-label="Ship and crew" style="background: #1a2042; border: 1px solid #343d6b; border-radius: 16px; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; justify-content: space-between; align-items: center">
+          <span style="display: flex; align-items: center; gap: 10px"><span class="gx"><span class="ic i-ship gh" style="width: 22px; height: 22px; color: #FFD700"></span><span class="ic i-ship" style="width: 22px; height: 22px; color: #FFD700"></span></span><span style="font-family: 'Kalam', cursive; font-weight: 700; font-size: 19px">The Warbler</span></span>
+          <span class="num" style="font-size: 14px">3/5 aboard</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 7px"><div style="display: flex; align-items: center; gap: 6px"><span title="Ship lost" style="width: 26px; height: 26px; flex: none; box-sizing: border-box; border-radius: 50%; border: 1.5px dashed #f07070; display: flex; align-items: center; justify-content: center; color: #ff7a7f"><span class="gx"><span class="ic i-rays gh" style="width: 15px; height: 15px"></span><span class="ic i-rays" style="width: 15px; height: 15px"></span></span></span><div style="flex: 1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3px"><span style="display: flex; filter: drop-shadow(0 0 6px rgba(242,181,68,.6))"><span style="flex: 1; height: 26px; background: #f2b544; clip-path: polygon(14% 0, 100% 0, 86% 50%, 100% 100%, 14% 100%, 0 50%)"></span></span><span style="display: flex; filter: drop-shadow(0 0 6px rgba(242,181,68,.6))"><span style="flex: 1; height: 26px; background: #f2b544; clip-path: polygon(14% 0, 100% 0, 86% 50%, 100% 100%, 14% 100%, 0 50%)"></span></span><span style="height: 26px; background: #262e5c; clip-path: polygon(14% 0, 100% 0, 86% 50%, 100% 100%, 14% 100%, 0 50%); display: flex; align-items: center; justify-content: center; color: #56609a"><span class="gx"><span class="ic i-crack gh" style="width: 11px; height: 11px"></span><span class="ic i-crack" style="width: 11px; height: 11px"></span></span></span><span style="height: 26px; background: #262e5c; clip-path: polygon(14% 0, 100% 0, 86% 50%, 100% 100%, 14% 100%, 0 50%); display: flex; align-items: center; justify-content: center; color: #56609a"><span class="gx"><span class="ic i-crack gh" style="width: 11px; height: 11px"></span><span class="ic i-crack" style="width: 11px; height: 11px"></span></span></span></div></div><div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px"><span><span style="font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: .12em; color: #f2b544">DAMAGED</span><span style="font-size: 12px; color: #9aa3c7"> · 2 hits from lost</span></span><span class="num" style="font-size: 11px; color: #6d7499">P · U · <b style="color: #f2b544">D</b> · H</span></div></div>
+        <div style="display: flex; gap: 10px; align-items: center">
+          <span class="gxi"><img class="ga gh" src="assets/portraits/grull.jpg" alt="" aria-hidden="true" style="object-fit: cover; width: 44px; height: 44px; border-radius: 50%; border: 2px solid #FFD700"><img class="ga" src="assets/portraits/grull.jpg" alt="You, Grull" style="object-fit: cover; width: 44px; height: 44px; border-radius: 50%; border: 2px solid #FFD700"></span>
+          <span class="gxi"><img class="ga gh" src="assets/portraits/hexapod.jpg" alt="" aria-hidden="true" style="object-fit: cover; width: 44px; height: 44px; border-radius: 50%; border: 2px solid #e8b64a"><img class="ga" src="assets/portraits/hexapod.jpg" alt="7EE700, Hexapod" style="object-fit: cover; width: 44px; height: 44px; border-radius: 50%; border: 2px solid #e8b64a"></span>
+          <span class="gxi"><img class="ga gh" src="assets/portraits/grull.jpg" alt="" aria-hidden="true" style="width: 44px; height: 44px; border-radius: 50%; border: 2px solid #e8b64a; object-fit: cover"><img class="ga" src="assets/portraits/grull.jpg" alt="Slate, Grull" style="width: 44px; height: 44px; border-radius: 50%; border: 2px solid #e8b64a; object-fit: cover"></span>
+          <span style="width: 44px; height: 44px; box-sizing: border-box; border-radius: 50%; border: 1.5px dashed #4a5384"></span>
+          <span style="width: 44px; height: 44px; box-sizing: border-box; border-radius: 50%; border: 1.5px dashed #4a5384"></span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+          <div style="border-radius: 12px; border: 1.5px solid rgba(240,112,112,.45); background: rgba(240,112,112,.07); padding: 10px 12px; display: flex; flex-direction: column; gap: 7px">
+            <div style="display: flex; justify-content: space-between; align-items: baseline"><span class="lbl" style="font-size: 10px; color: #ff9da1">RED SHIRTS</span><span class="num" style="font-size: 14px">1<span style="color: #9aa3c7">/1</span></span></div>
+            <div style="display: flex; gap: 5px; align-items: center"><span class="gxi"><img class="ga gh" src="assets/portraits/redshirt.jpg" alt="" aria-hidden="true" style="width: 18px; height: 18px; box-sizing: border-box; border-radius: 50%; object-fit: cover; border: 2px solid #e8b64a; box-shadow: 0 0 6px rgba(240,112,112,.6)"><img class="ga" src="assets/portraits/redshirt.jpg" alt="Red shirt" style="width: 18px; height: 18px; box-sizing: border-box; border-radius: 50%; object-fit: cover; border: 2px solid #e8b64a; box-shadow: 0 0 6px rgba(240,112,112,.6)"></span></div>
+            <span style="font-size: 10px; line-height: 1.35; color: #9aa3c7">Work the docks for one more; cap is best DIP.</span>
+          </div>
+          <div style="border-radius: 12px; border: 1.5px solid rgba(224,112,208,.45); background: rgba(224,112,208,.07); padding: 10px 12px; display: flex; flex-direction: column; gap: 7px">
+            <div style="display: flex; justify-content: space-between; align-items: baseline"><span class="lbl" style="font-size: 10px; color: #f0a0e4">DREAD</span><span class="num" style="font-size: 14px">1<span style="color: #9aa3c7">/3</span></span></div>
+            <div style="display: flex; gap: 5px; align-items: center"><span class="gx" style="filter: drop-shadow(0 0 5px rgba(224,112,208,.6))"><span class="ic i-pirate gh" style="width: 18px; height: 18px; color: #e070d0"></span><span class="ic i-pirate" style="width: 18px; height: 18px; color: #e070d0"></span></span><span class="gx"><span class="ic i-pirate gh" style="width: 18px; height: 18px; color: #3d3a5e"></span><span class="ic i-pirate" style="width: 18px; height: 18px; color: #3d3a5e"></span></span><span class="gx"><span class="ic i-pirate gh" style="width: 18px; height: 18px; color: #3d3a5e"></span><span class="ic i-pirate" style="width: 18px; height: 18px; color: #3d3a5e"></span></span></div>
+            <span style="font-size: 10px; line-height: 1.35; color: #9aa3c7">+1 to intimidate per point.</span>
+          </div>
+        </div>
+      </section>
+
+      <div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px">
+        <button style="height: 56px; border-radius: 14px; border: none; background: #FFD700; color: #1d1d20; font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: 0.06em; cursor: pointer">{{ H.go }}</button>
+        <button disabled="" style="height: 52px; border-radius: 14px; border: 1.5px solid #343d6b; background: transparent; color: #6d7499; font-family: 'Chakra Petch', sans-serif; font-weight: 600; font-size: 15px; letter-spacing: 0.06em">{{ H.depart }}</button>
+      </div>
+    </aside>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900},"habitat":{"editor":"enum","options":["Xaxalon 4","Kookookachaa","FFD700 Base"],"default":"Xaxalon 4"},"overlay":{"editor":"enum","options":["none","Equip gear","Release crew","Tinker and fabricate","Departure peek"],"default":"none"}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var B = '';
+    var FACE = { Human: 'assets/portraits/human.jpg', Kralkin: 'assets/portraits/kralkin.jpg', Hexapod: 'assets/portraits/hexapod.jpg', Grull: 'assets/portraits/grull.jpg' };
+    var IDEAL = { Human: 'Brawn', Kralkin: 'Moxie', Hexapod: 'Smarts', Grull: 'Finesse' };
+    var STAMP = { PASSED: '#6fd08a', FAILED: '#ff7a7f', MARKED: '#ff7a7f', ABOARD: '#FFD700', SOLD: '#aab1d3' };
+    function stampStyle(t) { return 'border: 2px solid ' + STAMP[t] + '; color: ' + STAMP[t] + ';'; }
+    // mission: [name, dist, ability, need, credits, xp, stamp, note, sel]
+    function mis(a) {
+      var ruin = /^R\d$/.test(a[2]);
+      var noteCol = a[8] ? '#FFD700' : '#8f98c2';
+      return { name: a[0], ab: a[2], need: a[3], needShow: !ruin, ruin: ruin,
+        meta: a[1] + ' away · ' + a[4] + 'c · ' + a[5] + ' XP' + (ruin ? ' · no roll' : ''),
+        cls: a[6] ? 'done' : (a[8] ? 'sel' : ''), stamp: a[6] || '', stampStyle: a[6] ? stampStyle(a[6]) : '',
+        note: a[7] || '', noteStyle: 'font-size: 12px; font-weight: 600; color: ' + noteCol + ';' };
+    }
+    // shop: [name, type, effect, price, icon, sold]
+    function item(a) { return { name: a[0], meta: a[1] + ' · ' + a[2], price: a[3] + 'c', icon: a[4], cls: a[5] ? 'done' : '', stamp: a[5] ? 'SOLD' : '' }; }
+    // cantina: [name, race, need, abilities, stamp]
+    function being(a) {
+      return { name: a[0], img: FACE[a[1]], ab: a[3].replace(/ \+/g, '\n+'), meta: a[1] + ' · ' + IDEAL[a[1]] + ' · need ' + a[2],
+        cls: a[4] ? 'done' : '', stamp: a[4] || '', stampStyle: a[4] ? stampStyle(a[4]) : '',
+        imgStyle: 'width: 36px; height: 36px; border-radius: 50%; object-fit: cover;' + (a[4] ? ' opacity: .5;' : '') };
+    }
+    var HAB = {
+      'Xaxalon 4': {
+        num: 'HABITAT #1', blurb: 'A salvage-built human outpost with a lively cantina.', credits: '340c',
+        next: 'Complete 4 missions, then fly 6 one way', showPips: true,
+        go: 'TAKE CANTINA BOUNCER', depart: 'DEPART · AFTER 1 MORE MISSION',
+        missions: [
+          ['Hydroponics Mold', 3, 'RES', 10, 300, 1, 'PASSED'],
+          ['Scrapyard Squabble', 3, 'DIP', 10, 300, 1, 'FAILED'],
+          ['The Leaky Recycler', 3, 'MEC', 10, 300, 1, 'PASSED'],
+          ['Dustbowl Ruin', 4, 'R1', '', 600, 1, '', 'ruin'],
+          ['Cantina Bouncer', 4, 'SWA', 10, 300, 1, '', 'you +2', true],
+          ['Scrap Convoy Escort', 4, 'ARM', 10, 300, 1, '', 'no one'],
+          ['The Fake Inspector', 6, 'ACT', 12, 400, 1, '', 'no one']
+        ],
+        shop: [
+          ['Sustenance Cube', 'Consumable', '+1 Any', 200, 'i-drink', true],
+          ['WinchesterZhang Plinker', 'Weapon', '+1 GUN', 300, 'i-gun', true],
+          ['Salvaged Riot Plate', 'Armor', 'Combat Advantage', 400, 'i-armor', false],
+          ['Patched Thruster', 'Ship part', '+1 Speed', 400, 'i-rocket', true],
+          ['Bolt-on Bunk Pod', 'Ship part', '+2 Capacity', 700, 'i-ship', true]
+        ],
+        cantina: [
+          ['Wang', 'Human', 11, '+1 PIL', ''],
+          ['Chirp', 'Kralkin', 11, '+1 PIL', 'MARKED'],
+          ['7EE700', 'Hexapod', 11, '+1 HAK', 'ABOARD'],
+          ['Slate', 'Grull', 11, '+1 DIP', 'ABOARD'],
+          ['Michael', 'Human', 11, '+1 ACT', '']
+        ]
+      },
+      'Kookookachaa': {
+        num: 'HABITAT #2', blurb: 'A Kralkin sky-platform on the rim of an asteroid field. Loud, proud and well armed.', credits: '1,180c',
+        next: 'Fly 12 one way to FFD700 Base', showPips: false,
+        go: 'PICK A MISSION', depart: 'DEPART · FLY 12 TO FFD700 BASE',
+        missions: [
+          ['The Belt Run', 5, 'PIL', 11, 400, 2],
+          ["Bounty on Krazz's Crew", 5, 'GUN', 12, 500, 2],
+          ['Into the Royal Aviary', 5, 'SNE', 11, 400, 2],
+          ['Crack the Court Ledger', 6, 'HAK', 12, 500, 2],
+          ['Lead the Wing Drill', 6, 'LEA', 12, 500, 2],
+          ['The Feathered Vault', 7, 'R2', '', '1,000', 4, '', 'ruin']
+        ],
+        shop: [
+          ['Roost Module', 'Ship part', '+3 Capacity', '1,200', 'i-ship'],
+          ['Talon-grip Stabilizers', 'Ship part', '+2 Handling', 600, 'i-rocket'],
+          ['Imperial Targeting Array', 'Ship part', 'Space Combat Advantage', 600, 'i-ship'],
+          ['Updraft Engine', 'Ship part', '+2 Speed', 800, 'i-rocket'],
+          ['Raptor Rifle', 'Weapon', '+2 GUN', 600, 'i-gun'],
+          ['Quiet-Feather Cloak', 'Armor', '+2 SNE', 400, 'i-armor']
+        ],
+        cantina: [
+          ['Arrak', 'Kralkin', 11, '+1 HAK'],
+          ['Basalt', 'Grull', 12, '+2 PIL'],
+          ['Zhang', 'Human', 11, '+1 SWA +1 DIP'],
+          ['Trill', 'Kralkin', 12, '+2 HAK'],
+          ['Kraa', 'Kralkin', 11, '+1 GUN']
+        ]
+      },
+      'FFD700 Base': {
+        num: 'HABITAT #3', blurb: 'A Hexapod pod-base under Kralkin guard. The last stop before the deep ruins.', credits: '2,650c',
+        next: 'Enter R3. Clearing it wins the game', showPips: false,
+        go: 'PICK A MISSION', depart: 'ENTER R3',
+        missions: [
+          ['Spore Census', 7, 'RES', 13, 600, 3],
+          ['Six Minds, One Deal', 7, 'DIP', 14, 700, 4],
+          ['Walker Overhaul', 8, 'MEC', 14, 700, 4],
+          ['The FFFFFF Leak', 8, 'SNE', 14, 700, 4],
+          ['Hold the Airlock', 8, 'ARM', 15, 750, 4],
+          ['The Gold Run', 9, 'PIL', 18, '1,500', 5]
+        ],
+        shop: [
+          ['Aarak Adrenal Spray', 'Consumable', '+3 SWA', 600, 'i-drink'],
+          ['Aarak Focus Tabs', 'Consumable', '+3 RES', 600, 'i-drink'],
+          ['Ruin-forged Plate', 'Armor', '+3 ARM', 800, 'i-armor'],
+          ['Ruin Lance', 'Weapon', '+3 GUN', 800, 'i-gun'],
+          ['Hex-weave Hull Plating', 'Ship part', 'Armor +2', '1,000', 'i-ship'],
+          ['Pod Habitat Ring', 'Ship part', 'Capacity +3', '1,500', 'i-ship']
+        ],
+        cantina: [
+          ['Galena', 'Grull', 14, '+3 SNE +1 PIL'],
+          ['Coo', 'Kralkin', 14, '+3 DIP +1 ARM'],
+          ['ACCE55', 'Hexapod', 13, '+3 HAK'],
+          ['Diego', 'Human', 14, '+3 SWA +1 GUN'],
+          ['5EA1ED', 'Hexapod', 13, '+3 MEC'],
+          ['Priya', 'Human', 14, '+3 LEA +1 DEM']
+        ]
+      }
+    };
+    var names = ['Xaxalon 4', 'Kookookachaa', 'FFD700 Base'];
+    var key = HAB[this.props.habitat] ? this.props.habitat : 'Xaxalon 4';
+    var h = HAB[key];
+    var at = names.indexOf(key);
+    var H = { num: h.num, name: key, blurb: h.blurb, credits: h.credits, next: h.next, showPips: h.showPips, go: h.go, depart: h.depart,
+      missions: h.missions.map(mis), shop: h.shop.map(item), cantina: h.cantina.map(being) };
+    var widths = [0, 120, 70];
+    var nav = names.map(function (n, i) {
+      var cur = i === at, past = i < at;
+      return { name: '#' + (i + 1) + ' ' + n,
+        lineStyle: i === 0 ? 'display: none;' : 'width: ' + widths[i] + 'px; height: 0; border-top: 2px dotted ' + (i <= at ? '#FFD700' : '#4a5384') + ';',
+        style: 'display: flex; align-items: center; gap: 8px; ' + (cur ? 'color: #e8e4d8; font-weight: 600;' : 'color: #9aa3c7;'),
+        dotStyle: 'width: 12px; height: 12px; box-sizing: border-box; border-radius: 50%; ' + (cur ? 'background: #FFD700;' : past ? 'background: #8f7a2a;' : 'border: 2px solid #4a5384;') };
+    });
+    var O = this.props.overlay || 'none';
+    var SL = function (on) { return on ? 'border: 1.5px solid #6b76ad; background: #283063;' : 'border: 1.5px dashed #4f5a94; color: #8f98c2;'; };
+    var ov = { on: O !== 'none', equip: O === 'Equip gear', release: O === 'Release crew', tinker: O === 'Tinker and fabricate', peek: O === 'Departure peek' };
+    if (ov.equip) { ov.kicker = 'EQUIP GEAR'; ov.title = 'Who wears what?'; ov.lede = 'Every being wears at most one weapon and one armor. You can change gear while docked.';
+      ov.beings = [['Ressa Vane', 'assets/portraits/grull.jpg', 'WinchesterZhang Plinker · +1 GUN', ''], ['7EE700', 'assets/portraits/hexapod.jpg', '', ''], ['Slate', 'assets/portraits/grull.jpg', '', '']].map(function (b, i) {
+        return { name: b[0], img: b[1], weapon: b[2] ? b[2].replace(' · ', '\n') : 'no weapon', armor: b[3] || (i === 0 ? 'drop the Riot Plate here' : 'no armor'), wStyle: SL(!!b[2]), aStyle: i === 0 ? 'border: 2px dashed #FFD700; color: #FFD700; background: rgba(255,215,0,.06);' : SL(false) }; });
+      ov.foot = 'Consumables are not worn: anyone aboard can use one, declared before the roll. Crew who walk out at 3 anger take their weapon and armor with them.'; }
+    if (ov.release) { ov.kicker = 'RELEASE CREW'; ov.title = 'Let someone go?'; ov.lede = 'They leave the ship here. Over capacity, you must release someone before you can depart.';
+      ov.crew = [['7EE700', 'assets/portraits/hexapod.jpg', 'Hexapod · HAK 1 · no anger'], ['Slate', 'assets/portraits/grull.jpg', 'Grull · DIP 1 · anger 1']].map(function (c) {
+        return { name: c[0], img: c[1], note: c[2], btn: 'RELEASE', style: 'display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 14px; border: 1.5px solid #4f5a94; background: #283063;',
+          btnStyle: 'padding: 8px 14px; border-radius: 10px; border: 1.5px solid #f07070; color: #ff9da1; font-family: Chakra Petch, sans-serif; font-weight: 700; font-size: 13px; letter-spacing: .06em; cursor: pointer;' }; });
+      ov.foot = 'You are 3 of 5 aboard, so no one has to go. The captain can never be released.'; }
+    if (ov.tinker) { ov.kicker = 'TINKER AND FABRICATE'; ov.title = 'The workshop is closed to you'; ov.lede = 'Both need a skilled mechanic aboard.'; ov.foot = 'Once unlocked, these sit in This visit next to repair and docks work.'; }
+    if (ov.peek) { ov.kicker = 'BEFORE YOU LEAVE · RESEARCH OR DIPLOMACY PEEK'; ov.title = 'Peek at the top card'; ov.lede = 'Look at as many cards as your best RES or DIP aboard, and discard one of them if you like.'; ov.foot = 'You can also skip the peek. It happens once, as you depart on a mission or to the next habitat.'; }
+    return { H: H, nav: nav, ov: ov };
+  }
+}
+</script>
+</body>
+</html>
