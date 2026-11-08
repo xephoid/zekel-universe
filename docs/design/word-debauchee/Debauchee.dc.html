@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Word Debauchee, debauchee</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.wd{--bg:#f7f1e6;--surface:#fff;--surface2:#efe7d8;--text:#1c1a17;--muted:#655c4d;--line:#e0d6c3;--line2:#c9bda6;--brand:#1f4d3a;--brandtext:#f7f1e6;--action:#e0762b;--actionhover:#c9662a;--actiontext:#1c1a17;--glow:#e6efe9;--youbg:#fbe3d2;--youtext:#7a3a12;--aibg:#dde9e1;--aitext:#1f4d3a;--dangerbg:#fbe0dd;--danger:#b3261e;min-height:100vh;box-sizing:border-box;background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wd.dark{--bg:#1a221c;--surface:#232e26;--surface2:#2c3930;--text:#f3ead9;--muted:#b9ae9b;--line:#3a4a3f;--line2:#4c5f52;--brand:#9bb08a;--brandtext:#1a221c;--action:#ff8a3d;--actionhover:#ff9d5c;--actiontext:#1a221c;--glow:#2f4034;--youbg:#5a3218;--youtext:#fbe3d2;--aibg:#2f4034;--aitext:#dde9e1;--dangerbg:#4a221e;--danger:#ff7b6b}
+.col{max-width:560px;margin:0 auto;padding:12px 16px 24px;display:flex;flex-direction:column;gap:16px}
+.lab{font-size:12px;font-weight:600;color:var(--muted)}
+.mono{font-family:'IBM Plex Mono',monospace}
+.big{font:700 22px 'Bricolage Grotesque',sans-serif}
+.tile{box-sizing:border-box;width:44px;height:48px;display:inline-flex;align-items:center;justify-content:center;background:var(--surface);color:var(--text);border:1px solid var(--line);border-bottom:3px solid var(--line2);border-radius:6px;font:700 24px 'Bricolage Grotesque',sans-serif;padding:0;flex:none}
+.tile.lay{background:var(--brand);color:var(--brandtext);border-color:var(--brand);border-bottom-color:rgba(0,0,0,.35)}
+button.tile{cursor:pointer;width:56px;height:60px;font-size:30px;background:var(--youbg);color:var(--youtext);border-color:var(--youtext)}
+button.tile:hover{background:var(--action);color:var(--actiontext)}
+.btn{min-height:44px;padding:0 16px;border-radius:8px;border:1px solid var(--line2);background:var(--surface);color:var(--text);font:600 15px 'IBM Plex Sans',sans-serif;cursor:pointer}
+.btn:hover{background:var(--surface2)}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.go{background:var(--action);border-color:var(--action);color:var(--actiontext)}
+.btn.go:hover{background:var(--actionhover)}
+.btn.quiet{border-color:transparent;background:transparent;color:var(--muted);font-weight:500;padding:0 8px}
+.btn.quiet:hover{color:var(--text);background:transparent;text-decoration:underline}
+.seat{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:8px;font-size:14px;font-weight:500;background:var(--aibg);color:var(--aitext)}
+.seat.you{background:var(--youbg);color:var(--youtext)}
+.seat.now{box-shadow:0 0 0 2px var(--action)}
+.clue{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;min-width:0}
+.pick{width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-bottom:3px solid var(--line2);border-radius:8px;padding:12px;color:var(--text);cursor:pointer;font-family:inherit}
+.pick:hover{background:var(--glow)}
+.pick.on{background:var(--glow);border-color:var(--brand)}
+.pick.off{opacity:.65;border-style:dashed;border-bottom-width:1px}
+.secret{background:var(--youbg);color:var(--youtext);border-radius:12px;padding:14px 16px}
+.row{display:flex;align-items:center;gap:0;min-height:52px}
+.row .tile{margin-right:12px}
+.tag{font:500 12px 'IBM Plex Mono',monospace;color:var(--muted);margin-left:auto;padding-left:10px;white-space:nowrap}
+.tag.no{color:var(--danger)}
+.field{min-height:44px;box-sizing:border-box;padding:0 12px;border:1px solid var(--line2);border-radius:8px;background:var(--surface);color:var(--text);font:400 15px 'IBM Plex Sans',sans-serif;min-width:0;flex:1}
+.err{background:var(--dangerbg);color:var(--danger);font-size:14px;padding:8px 12px;border-radius:8px}
+.wordcard{background:var(--surface);border:1px solid var(--line);border-bottom:3px solid var(--line2);border-radius:12px;padding:0;min-height:112px;font:700 22px 'Bricolage Grotesque',sans-serif;color:var(--text);cursor:pointer;animation:deal .32s ease-out backwards}
+.wordcard:hover{background:var(--glow);transform:translateY(-2px)}
+.wordcard:nth-child(2){animation-delay:.06s}
+.wordcard:nth-child(3){animation-delay:.12s}
+@keyframes deal{from{transform:translateY(-70px) rotate(-3deg);box-shadow:0 16px 24px rgba(40,30,10,.25)}to{transform:none}}
+@media (prefers-reduced-motion:reduce){.wordcard{animation:none}}
+</style>
+</helmet>
+<div class="wd {{themeClass}}">
+<div class="col">
+
+<div style="display: flex; align-items: center; gap: 12px">
+<h1 style="margin: 0; font: 700 24px 'Bricolage Grotesque', sans-serif; letter-spacing: -0.01em">Word Debauchee</h1>
+<span class="lab">Round 6 of 8</span>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{seats}}" as="s" hint-placeholder-count="4">
+<div class="seat {{s.cls}}"><span>{{s.name}}</span><span class="lab" style="color: inherit">{{s.role}}</span><span class="mono">{{s.score}}</span></div>
+</sc-for>
+</div>
+
+<sc-if value="{{isWord}}" hint-placeholder-val="{{ true }}">
+<div>
+<h2 class="big" style="margin: 8px 0 4px">Keep one word</h2>
+<div style="font-size: 15px; color: var(--muted); margin-bottom: 14px">Only you can see these. Pick one you know well enough to answer for.</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+<sc-for list="{{words}}" as="w" hint-placeholder-count="3">
+<button class="wordcard" onClick="{{w.pick}}">{{w.word}}</button>
+</sc-for>
+</div>
+<div style="margin-top: 12px"><button class="btn quiet" disabled="{{noRedraw}}" onClick="{{redraw}}">Know none of them? Draw three more</button></div>
+</div>
+</sc-if>
+
+<sc-if value="{{hasWord}}" hint-placeholder-val="{{ false }}">
+<div class="secret">
+<div style="display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap">
+<span style="font: 700 32px 'Bricolage Grotesque', sans-serif; letter-spacing: 0.02em">HAPPY</span>
+<span class="lab" style="color: inherit">Only you can see this</span>
+</div>
+<div class="mono" style="font-size: 12px; margin-top: 4px">5 letters · 1 vowel · 4 consonants · 2 syllables · adjective · Feelings · grade 1 · ●○○</div>
+<div style="font-size: 14px; margin-top: 8px">glad · merry · jolly · joyful · cheerful · content · pleased · upbeat</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isClues}}" hint-placeholder-val="{{ false }}">
+<div>
+<h2 class="big" style="margin: 0 0 4px">Play three clues</h2>
+<div style="font-size: 15px; color: var(--muted); margin-bottom: 14px">Tap the one to hide. It goes back under its deck and nobody sees it.</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<sc-for list="{{hand}}" as="c" hint-placeholder-count="4">
+<button class="pick {{c.cls}}" onClick="{{c.pick}}" aria-pressed="{{c.buried}}">
+<div class="lab">{{c.kind}}</div>
+<div style="font-size: 15px; font-weight: 600; margin-top: 2px">{{c.name}}</div>
+<div class="big" style="margin-top: 2px">{{c.answer}}</div>
+<div class="lab" style="margin-top: 4px; font-weight: 500">{{c.state}}</div>
+</button>
+</sc-for>
+</div>
+<div style="margin-top: 14px"><button class="btn go" disabled="{{noneBuried}}" onClick="{{playThree}}">Play these three</button></div>
+</div>
+</sc-if>
+
+<sc-if value="{{isAnswer}}" hint-placeholder-val="{{ false }}">
+<div>
+<h2 class="big" style="margin: 0 0 4px">Opposite: say it your way</h2>
+<div style="font-size: 15px; color: var(--muted); margin-bottom: 14px">A word that means the opposite of HAPPY. It can't be on your list.</div>
+<div style="display: flex; gap: 8px; margin-bottom: 8px">
+<label class="lab" style="position: absolute; left: -9999px" for="own">Your answer</label>
+<input id="own" class="field" placeholder="Your answer" value="{{own}}" onChange="{{onOwn}}" onInput="{{onOwn}}">
+<button class="btn go" onClick="{{answerOwn}}">Say this</button>
+</div>
+<sc-if value="{{hasErr}}" hint-placeholder-val="{{ false }}"><div class="err" role="alert">{{err}}</div></sc-if>
+<button class="btn" style="margin-top: 8px" onClick="{{answerCard}}">Use the card's answer: sad</button>
+</div>
+</sc-if>
+
+<sc-if value="{{showTable}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 16px">
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{played}}" as="c" hint-placeholder-count="3">
+<div class="clue"><div class="lab">{{c.name}}</div><div class="big" style="margin-top: 2px">{{c.answer}}</div></div>
+</sc-for>
+</div>
+<section aria-label="Letters you have laid down" style="display: flex; align-items: center; gap: 12px; min-height: 52px">
+<div style="display: flex; gap: 4px; flex-wrap: wrap">
+<sc-for list="{{revealed}}" as="r" hint-placeholder-count="1"><div class="tile lay" data-fresh="{{r.fresh}}">{{r.ch}}</div></sc-for>
+</div>
+<div style="margin-left: auto; text-align: right; flex: none; font-size: 15px; font-weight: 600">A word pays its length − {{revealedCount}}</div>
+</section>
+<section aria-label="Build area" style="display: flex; flex-direction: column; gap: 4px; min-height: 176px; background: var(--surface2); border-radius: 12px; padding: 8px">
+<sc-for list="{{rows}}" as="row" hint-placeholder-count="2">
+<div class="row">
+<div style="display: flex; gap: 4px">
+<sc-for list="{{row.cells}}" as="ch" hint-placeholder-count="4"><div class="tile" style="margin: 0">{{ch}}</div></sc-for>
+</div>
+<span class="tag {{row.tagCls}}">{{row.tag}}</span>
+</div>
+</sc-for>
+</section>
+<sc-if value="{{isWatch}}" hint-placeholder-val="{{ false }}">
+<div style="min-height: 110px">
+<div aria-live="polite" style="font-size: 15px; font-weight: 500">{{caption}}</div>
+<div style="font-size: 14px; color: var(--muted); margin-top: 4px">Say nothing. You can smirk.</div>
+</div>
+</sc-if>
+<sc-if value="{{isReveal}}" hint-placeholder-val="{{ false }}">
+<div style="min-height: 110px">
+<h2 class="big" style="margin: 0 0 4px">Lay down one letter</h2>
+<div style="font-size: 15px; color: var(--muted); margin-bottom: 10px">{{caption}} You choose which. Nobody learns where it goes.</div>
+<div style="display: flex; gap: 8px; flex-wrap: wrap">
+<sc-for list="{{left}}" as="l" hint-placeholder-count="4">
+<button class="tile" data-source="{{l.ch}}" onClick="{{l.pick}}" aria-label="Lay down {{l.ch}}">{{l.ch}}</button>
+</sc-for>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{isEnd}}" hint-placeholder-val="{{ false }}">
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 20px">
+<div class="big">Stumped. You score 5.</div>
+<div style="font-size: 15px; color: var(--muted); margin: 4px 0 12px">Your last letter is down, so the guessers get nothing.</div>
+<button class="btn go" onClick="{{again}}">Play this round again</button>
+</div>
+</sc-if>
+</div>
+</sc-if>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"$preview":{"width":1100,"height":960}}'>
+class Component extends DCLogic {
+  state = this.fresh();
+
+  fresh() {
+    return {
+      step: 'word', redraws: 0, buried: null, own: '', err: '', opposite: null,
+      revealed: [], rows: [{ t: 'GLEE', no: true }], lap: 0, caption: '', freshReveal: false,
+    };
+  }
+
+  componentWillUnmount() { clearTimeout(this.timer); }
+
+  componentDidUpdate() {
+    const from = this.flyFrom;
+    if (!from) return;
+    this.flyFrom = null;
+    try {
+      const el = document.querySelector('[data-fresh="1"]');
+      if (!el) return;
+      const to = el.getBoundingClientRect();
+      const zoom = to.width / (el.offsetWidth || to.width) || 1;
+      const dx = (from.left - to.left) / zoom;
+      const dy = (from.top - to.top) / zoom;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300 }); return; }
+      el.animate([
+        { transform: 'translate(' + dx + 'px,' + dy + 'px)' },
+        { transform: 'translate(' + dx * 0.5 + 'px,' + (dy * 0.5 - 16) + 'px) scale(1.08)', boxShadow: '0 14px 22px rgba(40,30,10,.3)', offset: 0.55 },
+        { transform: 'none' },
+      ], { duration: 340, easing: 'ease-out' });
+    } catch (e) {}
+  }
+
+  watch() {
+    const lap = this.state.lap;
+    this.setState({ step: 'watch', caption: 'The guessers are building.' });
+    clearTimeout(this.timer);
+    let i = 0;
+    const tick = () => {
+      if (i >= 3) {
+        this.setState({ step: 'reveal', caption: 'The turn came back round, so a reveal is owed.' });
+        return;
+      }
+      const name = ['Ben', 'Cat', 'Dev'][i];
+      const letter = ['R', 'T', 'O', 'S', 'N', 'U', 'L', 'D', 'I'][(lap * 3 + i) % 9];
+      const rows = this.state.rows.map((r) => Object.assign({}, r));
+      if (i === 0) rows.push({ t: letter });
+      else rows[rows.length - 1].t += letter;
+      this.setState({ rows, caption: name + ' placed ' + letter + '.' });
+      i += 1;
+      this.timer = setTimeout(tick, 900);
+    };
+    this.timer = setTimeout(tick, 700);
+  }
+
+  renderVals() {
+    const s = this.state;
+    const seats = [
+      { name: 'You', role: 'debauchee', cls: 'you', score: 5 },
+      { name: 'Ben', role: 'AI', cls: s.step === 'watch' ? 'now' : '', score: 3 },
+      { name: 'Cat', role: 'AI', cls: '', score: 2 },
+      { name: 'Dev', role: 'AI', cls: '', score: 4 },
+    ];
+    const batch = s.redraws === 0 ? ['HAPPY', 'VILLAGE', 'STROLL'] : ['ANGRY', 'HAPPY', 'BRAVE'];
+    const hand = [
+      { id: 'letters', kind: 'Number clue', name: 'Letters', answer: '5' },
+      { id: 'shortest', kind: 'Number clue', name: 'Shortest synonym', answer: '4' },
+      { id: 'type', kind: 'Word clue', name: 'Type', answer: 'adjective' },
+      { id: 'opposite', kind: 'Word clue', name: 'Opposite', answer: 'sad' },
+    ];
+    const letters = ['A', 'H', 'P', 'Y'];
+    const counts = { A: 1, H: 1, P: 2, Y: 1 };
+    s.revealed.forEach((l) => { counts[l] -= 1; });
+    const oppositeAnswer = s.opposite || '';
+    const playedList = hand.filter((c) => c.id !== s.buried).map((c) => ({ name: c.name, answer: c.id === 'opposite' ? oppositeAnswer : c.answer }));
+    const list = ['glad', 'merry', 'jolly', 'joyful', 'cheerful', 'content', 'pleased', 'upbeat'];
+    const toTable = () => {
+      this.watch();
+    };
+    return {
+      themeClass: this.props.dark ? 'dark' : '',
+      seats,
+      isWord: s.step === 'word',
+      hasWord: s.step !== 'word',
+      words: batch.map((word) => ({ word, pick: () => this.setState({ step: 'clues' }) })),
+      noRedraw: s.redraws > 0,
+      redraw: () => this.setState({ redraws: 1 }),
+      isClues: s.step === 'clues',
+      hand: hand.map((c) => ({
+        kind: c.kind, name: c.name, answer: c.answer,
+        buried: s.buried === c.id,
+        cls: s.buried === c.id ? 'off' : (s.buried ? 'on' : ''),
+        state: s.buried === c.id ? 'Hidden' : (s.buried ? 'Will be played' : ''),
+        pick: () => this.setState({ buried: s.buried === c.id ? null : c.id }),
+      })),
+      noneBuried: !s.buried,
+      playThree: () => {
+        if (s.buried === 'opposite') { this.setState({ step: 'watch' }, toTable); return; }
+        this.setState({ step: 'answer' });
+      },
+      isAnswer: s.step === 'answer',
+      own: s.own,
+      onOwn: (e) => this.setState({ own: e.target.value, err: '' }),
+      hasErr: !!s.err,
+      err: s.err,
+      answerOwn: () => {
+        const w = s.own.trim().toLowerCase();
+        if (!w) return;
+        if (list.indexOf(w) !== -1) { this.setState({ err: w + ' is on your list, so it would give the game away. Try another.' }); return; }
+        this.setState({ opposite: w, step: 'watch' }, toTable);
+      },
+      answerCard: () => this.setState({ opposite: 'sad', step: 'watch' }, toTable),
+      showTable: s.step === 'watch' || s.step === 'reveal' || s.step === 'end',
+      played: playedList,
+      revealed: s.revealed.map((ch, i) => ({ ch, fresh: s.freshReveal && i === s.revealed.length - 1 ? '1' : '0' })),
+      revealedCount: s.revealed.length,
+      rows: s.rows.map((r) => ({ cells: r.t.split(''), tag: r.no ? 'no' : '', tagCls: r.no ? 'no' : '' })),
+      isWatch: s.step === 'watch',
+      isReveal: s.step === 'reveal',
+      isEnd: s.step === 'end',
+      caption: s.caption,
+      left: letters.filter((l) => counts[l] > 0).map((ch) => ({
+        ch,
+        pick: () => {
+          try {
+            const el = document.querySelector('[data-source="' + ch + '"]');
+            this.flyFrom = el ? el.getBoundingClientRect() : null;
+          } catch (e) { this.flyFrom = null; }
+          const revealed = s.revealed.concat([ch]);
+          if (revealed.length === 5) { this.setState({ revealed, freshReveal: true, step: 'end' }); return; }
+          this.setState({ revealed, freshReveal: true, lap: s.lap + 1 }, toTable);
+        },
+      })),
+      again: () => { clearTimeout(this.timer); this.setState(this.fresh()); },
+    };
+  }
+}
+</script>
+</body>
+</html>
