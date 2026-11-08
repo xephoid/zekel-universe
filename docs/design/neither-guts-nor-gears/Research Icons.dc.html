@@ -133,7 +133,7 @@ a{color:var(--brand)}a:hover{color:var(--action)}
         </div>
         <span style="{{ s.open }}"></span>
       </div>
-      <span style="{{ s.note }}">A chassis under a plate, with a chevron for the +1. The robots have exactly one research, so this mark has to carry the whole idea alone.</span>
+      <span style="{{ s.note }}">A chassis under a plate, with a chevron for the +1. For a long time this was the robots&rsquo; only research, so this mark has to carry the whole idea alone.</span>
     </div>
 
     <!-- Battle strategy card -->
@@ -150,12 +150,72 @@ a{color:var(--brand)}a:hover{color:var(--action)}
       </div>
       <span style="{{ s.note }}">A card whose face is dashed, because you draw it without seeing it. A Research action can buy one instead, so it belongs on this sheet without being research.</span>
     </div>
+    <!-- Haste -->
+    <div style="{{ s.card }}">
+      <div style="{{ s.head }}">
+        <span style="{{ s.tile }}">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 11.5h15l-1.6 6.2a3 3 0 0 1-2.9 2.3H9a3 3 0 0 1-2.9-2.3Z"></path><path d="M8.7 4.4s1.82 2.03 1.82 3.22a1.82 1.82 0 0 1-3.64 0C6.88 6.43 8.7 4.4 8.7 4.4Z"></path><path d="M15.3 4.4s1.82 2.03 1.82 3.22a1.82 1.82 0 0 1-3.64 0C13.48 6.43 15.3 4.4 15.3 4.4Z"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Haste</span>
+          <span style="{{ s.kind }}">WIZARD &middot; SURFS TAKE TWO</span>
+        </div>
+        <span style="{{ s.open }}"></span>
+      </div>
+      <span style="{{ s.note }}">The Surf mark with a second drop over the same bowl. One allocation, two resources &mdash; and the only difference from the unit&rsquo;s own mark is the drop that was added, which is exactly what the research does.</span>
+    </div>
+
+    <!-- Advance Research Station -->
+    <div style="{{ s.cardAlt }}">
+      <div style="{{ s.head }}">
+        <span style="{{ s.tileAlt }}">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.2 20.4h15.6M6.8 20.4v-8.8h10.4v8.8"></path><path d="M12 11.6V6.4M9.9 6.4h4.2"></path><path d="M9.4 13.4h5.2v6.2H9.4Z"></path><path d="M12 15.2v2.6M10.7 16.5h2.6"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Advance Research Station</span>
+          <span style="{{ s.kind }}">BUILDING, NOT RESEARCH &middot; ROBOT</span>
+        </div>
+        <span style="{{ s.open }}"></span>
+      </div>
+      <span style="{{ s.note }}">The third masted station. Diplomatic puts two delegations in the block and Defense puts a barred wall; this one puts a card with a plus on it, because what it opens is more action cards.</span>
+    </div>
+
+    <!-- Collector Optimizations -->
+    <div style="{{ s.cardAlt }}">
+      <div style="{{ s.head }}">
+        <span style="{{ s.tileAlt }}">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.2 4.6h9.6L21.6 12l-4.8 7.4H7.2L2.4 12Z"></path><path d="M6.5 12a2.1 2.1 0 1 0 4.2 0 2.1 2.1 0 1 0-4.2 0Z"></path><path d="M13.3 12a2.1 2.1 0 1 0 4.2 0 2.1 2.1 0 1 0-4.2 0Z"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Collector Optimizations</span>
+          <span style="{{ s.kind }}">ROBOT &middot; TWO ON ONE HEX</span>
+        </div>
+        <span style="{{ s.open }}"></span>
+      </div>
+      <span style="{{ s.note }}">The hex is drawn because the rule is about the hex, and the two dots are the ones the Collector mark already uses. It overturns one-to-a-tile, so the tile had to be in the mark.</span>
+    </div>
+
+    <!-- Core Integration -->
+    <div style="{{ s.cardAlt }}">
+      <div style="{{ s.head }}">
+        <span style="{{ s.tileAlt }}">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6.4 16.9 9.3v5.8L12 18l-4.9-2.9V9.3Z"></path><path d="M10.1 12a1.9 1.9 0 1 0 3.8 0 1.9 1.9 0 1 0-3.8 0Z"></path><path d="M12 2.2v3M10.4 3.8 12 5.4l1.6-1.6"></path></svg>
+        </span>
+        <div style="{{ s.meta }}">
+          <span style="{{ s.name }}">Core Integration</span>
+          <span style="{{ s.kind }}">ROBOT &middot; CORES COME FREE</span>
+        </div>
+        <span style="{{ s.open }}"></span>
+      </div>
+      <span style="{{ s.note }}">The Core mark at nine tenths with an arrow dropping into it. The core seats itself and arrives with the platform instead of being bought, so the mark is the core and the motion, not a price.</span>
+    </div>
+
   </div>
 
   <div style="{{ s.foot }}">
     <div style="display:flex;flex-direction:column;gap:3px;flex-grow:1;min-width:0">
-      <span style="{{ s.footStrong }}">Three marks quote a unit on purpose.</span>
-      <span style="{{ s.footText }}">Mana Shield is the Cleric&rsquo;s shield gone dashed. Dehance is the Enchantress upside down. Invisible borrows the spy&rsquo;s dashes. A player who knows the roster can read the research without being taught it twice, and the ones that quote nothing &mdash; Ice Blast, Fiery Explosion &mdash; are the two that change how a whole battle resolves.</span>
+      <span style="{{ s.footStrong }}">Six marks quote something else on purpose.</span>
+      <span style="{{ s.footText }}">Mana Shield is the Cleric&rsquo;s shield gone dashed. Dehance is the Enchantress upside down. Invisible borrows the spy&rsquo;s dashes. A player who knows the roster can read the research without being taught it twice, Haste is the Surf with one more drop, Collector Optimizations is the Collector’s dots twice over a tile, and Core Integration is the Core with somewhere to fall. A player who knows the roster can read the research without being taught it twice, and the ones that quote nothing &mdash; Ice Blast, Fiery Explosion &mdash; are the two that change how a whole battle resolves.</span>
     </div>
     <div style="width:1px;align-self:stretch;background:var(--line);flex-shrink:0"></div>
     <div style="display:flex;gap:18px;align-items:center;flex-shrink:0">
@@ -216,7 +276,7 @@ class Component extends DCLogic{
   };
 
   return {
-   rootStyle:{...T,width:'1440px',height:'620px',boxSizing:'border-box',display:'flex',
+   rootStyle:{...T,width:'1440px',height:'760px',boxSizing:'border-box',display:'flex',
      flexDirection:'column',gap:'18px',padding:'32px 40px',background:'var(--bg)',
      fontFamily:"'IBM Plex Sans',sans-serif",borderRadius:'12px',overflow:'hidden'},
    s:s

@@ -59,9 +59,13 @@ The two without a screen are deliberate: an allied initiative tie is a state on
 the activation ladder, and declining a queued action is a control on Choice
 Planning. Both are noted rather than built.
 
-**Three things are known-wrong and unfixed**, all in
-`DESIGN-ALIGNMENT.md` §3 with the engine code that proves it. They are canvas
-bugs, not engine bugs. None of them block starting.
+**Nine things are known-wrong and unfixed.** Three are in
+`DESIGN-ALIGNMENT.md` §3 with the engine code that proves it. The other six are
+in `CHANGE-2026-09-26.md` §3 — rulings #101 to #106 landed in the engine and six
+boards still describe the game as it was before them, including one
+(`Overlay Choice.dc.html`) whose whole premise no longer exists. Read that file
+before trusting a number on any board. They are canvas bugs, not engine bugs,
+and none of them block starting.
 
 **One thing blocks nearly everything**: pendings publish a single English
 sentence and no structured payload, and a shut option's reason exists only as a
