@@ -126,6 +126,45 @@ write('pending-extra_selection-shut', fx.extraSelection().s);
   console.log('action-move_battle-elara');
 }
 
+// A robot's Research action with the Advanced Research Station up: the Extra
+// action cards at the robot's price (the wizard's share their names).
+{
+  const s = fx.base2p();
+  const g = s.gameState;
+  const { unavailableMoves } = await import(pathToFileURL(resolve('src/core/moveGates.ts')).href);
+  const rob = g.players.find((p: { playerId: string }) => p.playerId === 'rob');
+  rob.buildings.push('Advanced Research Station');
+  g.pending = null;
+  g.phase = 'action';
+  g.activeAction = { ownerId: 'rob', cardKind: 'research', slotId: 'research:base' };
+  g.actionStack = [g.activeAction];
+  g.activePlayerId = 'rob';
+  writeFileSync(join(outDir, 'action-research-robot-extra.json'), JSON.stringify({
+    key: 'action-research', players: 2, viewer: 'rob',
+    view: game.getPlayerView(s, 'rob'), legalMoves: game.getLegalMoves(s, 'rob'),
+    unavailable: unavailableMoves(game.describeMoveGates(s, 'rob'), game.getLegalMoves(s, 'rob'))
+      .map((u: { move_type: string; item?: string; reason: string }) => ({ moveType: u.move_type, ...(u.item !== undefined ? { item: u.item } : {}), reason: u.reason })),
+    watcher: 'wiz', watcherView: game.getPlayerView(s, 'wiz'), watcherLegalMoves: game.getLegalMoves(s, 'wiz'),
+  }, null, 1));
+  console.log('action-research-robot-extra');
+}
+
+// A robot with Metal Platforms and a Spinner on the map: the view gives the
+// Spinner's DEF now (an engine from zekel #134 on), one over the printed.
+{
+  const s = fx.base2p();
+  const g = s.gameState;
+  const rob = g.players.find((p: { playerId: string }) => p.playerId === 'rob');
+  rob.research.push('metal-platforms');
+  fx.placeUnit(g, 'rob', '0,2', 'spinner');
+  writeFileSync(join(outDir, 'map-metal-platforms.json'), JSON.stringify({
+    key: 'map', players: 2, viewer: 'wiz',
+    view: game.getPlayerView(s, 'wiz'), legalMoves: game.getLegalMoves(s, 'wiz'),
+    watcher: 'rob', watcherView: game.getPlayerView(s, 'rob'), watcherLegalMoves: game.getLegalMoves(s, 'rob'),
+  }, null, 1));
+  console.log('map-metal-platforms');
+}
+
 // Each human picks their own faction: the second human's turn, one taken.
 {
   let s = game.createSession([

@@ -95,6 +95,8 @@ a.card:hover, button.card:hover { box-shadow: var(--shadow-card-hover); }
 .gpcover.small .initial { font-size: 44px; }
 .gpcover.tile .initial { font-size: 34px; }
 .gpcover .tag { font: 500 11px var(--font-mono); opacity: 0.7; }
+/* real cover art: a square image cropped from the center to each frame */
+img.gpcover, img.gpcover.small, .game-hero-left img.gpcover.large, .shelf-card img.gpcover { display: block; padding: 0; object-fit: cover; object-position: center; }
 .featured-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .newest-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 @media (max-width: 1100px) { .newest-grid { grid-template-columns: repeat(2, 1fr); } .two-col, .two-col.wide-side { grid-template-columns: 1fr; } }

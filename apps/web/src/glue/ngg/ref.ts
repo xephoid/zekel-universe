@@ -150,8 +150,11 @@ export function heroById(ref: NggRef | null, id: string): RefHero | null {
   return ref?.heroes.find((h) => h.id === id) ?? null;
 }
 
-export function researchByName(ref: NggRef | null, name: string): RefResearch | null {
-  return ref?.research.find((r) => r.name === name) ?? null;
+/** A research by name. The wizard and robot lists share some names (the
+ *  Extra action cards) at different prices, so pass the buyer's species. */
+export function researchByName(ref: NggRef | null, name: string, species?: string | null): RefResearch | null {
+  const named = ref?.research.filter((r) => r.name === name) ?? [];
+  return named.find((r) => r.species === species) ?? named[0] ?? null;
 }
 
 export function treatyByName(ref: NggRef | null, name: string): RefTreaty | null {

@@ -47,6 +47,18 @@ const esc = (x: string) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 const press = (name: RegExp | string) => fireEvent.click(screen.getAllByRole('button', { name })[0]!);
 
+describe("NGnG research prices follow the buyer's species", () => {
+  it("a robot's Extra action cards cost oil, not the wizard's ether (the two share names)", () => {
+    const f = ALL_NGG['action-research-robot-extra']!;
+    draw(f, { unavailable: (f as unknown as { unavailable: UnavailableMove[] }).unavailable });
+    const row = [...document.querySelectorAll('.ngg-option')].find((el) => el.textContent?.includes('Extra Build Card'))!;
+    expect(row).toBeTruthy();
+    const priced = [...row.querySelectorAll('.ngg-res')].map((el) => el.getAttribute('title'));
+    expect(priced).toContain('1 oil');
+    expect(priced.some((t) => t?.includes('ether'))).toBe(false);
+  });
+});
+
 describe('NGnG build composer', () => {
   it('walks choose → pay and sends the listed move only on commit', () => {
     const { item } = paidItem(BUILD as Fixture);

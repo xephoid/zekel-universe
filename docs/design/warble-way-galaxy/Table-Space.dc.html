@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Warble Way Galaxy table in space</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;600&amp;family=Kalam:wght@400;700&amp;display=swap">
+<style>
+body{margin:0;background:#0d1124}
+a{color:#FFD700}a:hover{color:#fff1a8}
+.void{background-color:#0d1124;background-image:radial-gradient(rgba(232,228,216,.16) 1px,transparent 1.4px);background-size:24px 24px}
+.ic{display:inline-block;flex:none;background-color:currentColor;-webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center}
+.i-ship{-webkit-mask-image:url(assets/icons/spaceship.png);mask-image:url(assets/icons/spaceship.png)}
+.i-swirl{-webkit-mask-image:url(assets/icons/star-swirl.png);mask-image:url(assets/icons/star-swirl.png)}
+.i-being{-webkit-mask-image:url(assets/icons/being-icon.png);mask-image:url(assets/icons/being-icon.png)}
+.i-gun{-webkit-mask-image:url(assets/icons/bolter-gun.png);mask-image:url(assets/icons/bolter-gun.png)}
+.i-meteor{-webkit-mask-image:url(assets/icons/burning-meteor.png);mask-image:url(assets/icons/burning-meteor.png)}
+.i-crack{-webkit-mask-image:url(assets/icons/cracked-glass.png);mask-image:url(assets/icons/cracked-glass.png)}
+.i-credits{-webkit-mask-image:url(assets/icons/credits-currency.png);mask-image:url(assets/icons/credits-currency.png)}
+.i-drink{-webkit-mask-image:url(assets/icons/drink-me.png);mask-image:url(assets/icons/drink-me.png)}
+.i-idcard{-webkit-mask-image:url(assets/icons/id-card.png);mask-image:url(assets/icons/id-card.png)}
+.i-armor{-webkit-mask-image:url(assets/icons/metal-scales.png);mask-image:url(assets/icons/metal-scales.png)}
+.i-rocket{-webkit-mask-image:url(assets/icons/rocket-flight.png);mask-image:url(assets/icons/rocket-flight.png)}
+.i-silo{-webkit-mask-image:url(assets/icons/round-silo.png);mask-image:url(assets/icons/round-silo.png)}
+.i-skills{-webkit-mask-image:url(assets/icons/skills.png);mask-image:url(assets/icons/skills.png)}
+.i-world{-webkit-mask-image:url(assets/icons/world.png);mask-image:url(assets/icons/world.png)}
+.i-meteorimpact{-webkit-mask-image:url(assets/icons/meteor-impact.svg);mask-image:url(assets/icons/meteor-impact.svg)}
+.i-helmet{-webkit-mask-image:url(assets/icons/astronaut-helmet.svg);mask-image:url(assets/icons/astronaut-helmet.svg)}
+.i-rays{-webkit-mask-image:url(assets/icons/explosion-rays.svg);mask-image:url(assets/icons/explosion-rays.svg)}
+.i-suit{-webkit-mask-image:url(assets/icons/space-suit.svg);mask-image:url(assets/icons/space-suit.svg)}
+.i-pirate{-webkit-mask-image:url(assets/icons/pirate-flag.png);mask-image:url(assets/icons/pirate-flag.png)}
+.lbl{font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:12px;letter-spacing:.16em}
+.num{font-family:'IBM Plex Mono',monospace;font-weight:600}
+.ga{filter:grayscale(1) invert(1) contrast(1.45) sepia(1) saturate(3) hue-rotate(8deg) brightness(1.08);background:#170d02;-webkit-mask-image:repeating-linear-gradient(0deg,#000 0 2px,rgba(0,0,0,.55) 2px 3px);mask-image:repeating-linear-gradient(0deg,#000 0 2px,rgba(0,0,0,.55) 2px 3px)}
+.gx{display:inline-grid;flex:none;vertical-align:middle}
+.gx>.ic{grid-area:1/1}
+.gx>.gh{background-color:#ff4f7b!important;opacity:.55;transform:translate(2px,0);animation:gxjit 2.7s steps(1) infinite}
+.gx>.ic:not(.gh){animation:gxjit 3.4s steps(1) infinite reverse}
+.gx:nth-child(2n)>.gh{animation-duration:3.1s}.gx:nth-child(3n)>.gh{animation-duration:2.3s}
+@keyframes gxjit{0%,100%{transform:translate(0,0)}18%{transform:translate(-2px,0)}19%{transform:translate(2px,0)}20%{transform:translate(0,0)}66%{transform:translate(2px,0)}67%{transform:translate(0,0)}}
+.gxi{display:inline-grid;flex:none;vertical-align:middle;position:relative}
+.gxi>img{grid-area:1/1}
+.gxi>.gh{opacity:.6;transform:translate(3px,0);animation:gxjit 2.9s steps(1) infinite}
+.gxi>.ga.gh{filter:grayscale(1) invert(1) contrast(1.45) sepia(1) saturate(5) hue-rotate(290deg) brightness(1.05)}
+.gxi>.ga-red.gh{filter:grayscale(1) invert(1) contrast(1.45) sepia(1) saturate(5) hue-rotate(150deg) brightness(1.05)}
+.gxi>img:not(.gh){mix-blend-mode:screen;animation:gxjit 3.7s steps(1) infinite reverse}
+.gxi:nth-child(2n)>.gh{animation-duration:3.3s}.gxi:nth-child(3n)>.gh{animation-duration:2.4s}
+.i-ringed{-webkit-mask-image:url(assets/icons/ringed-planet.svg);mask-image:url(assets/icons/ringed-planet.svg)}
+</style>
+</helmet>
+<div class="void" style="width: 1440px; height: 900px; box-sizing: border-box; color: #e8e4d8; font-family: 'IBM Plex Sans', system-ui, sans-serif; display: flex; flex-direction: column">
+
+  <header style="height: 72px; flex: none; box-sizing: border-box; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border-bottom: 1px solid #262e57; background: rgba(13,17,36,.86)">
+    <div style="display: flex; align-items: center; gap: 12px; width: 300px">
+      <span class="gx"><span class="ic i-swirl gh" style="width: 28px; height: 28px; color: #FFD700"></span><span class="ic i-swirl" style="width: 28px; height: 28px; color: #FFD700"></span></span>
+      <span style="font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 20px">Warble Way Galaxy</span>
+    </div>
+    <nav aria-label="Galaxy" style="display: flex; align-items: center; gap: 10px; font-size: 13px">
+      <span style="display: flex; align-items: center; gap: 8px; color: #9aa3c7"><span style="width: 12px; height: 12px; border-radius: 50%; background: #6d7499"></span>#1 Xaxalon 4</span>
+      <span style="width: 54px; height: 2px; background: #FFD700"></span>
+      <span class="gx"><span class="ic i-ship gh" style="width: 22px; height: 22px; color: #FFD700"></span><span class="ic i-ship" style="width: 22px; height: 22px; color: #FFD700"></span></span>
+      <span style="width: 90px; height: 0; border-top: 2px dotted #4a5384"></span>
+      <span style="display: flex; align-items: center; gap: 8px; color: #e8e4d8; font-weight: 600"><span style="width: 12px; height: 12px; box-sizing: border-box; border-radius: 50%; border: 2px solid #FFD700"></span>#2 Kookookachaa</span>
+      <span style="width: 70px; height: 0; border-top: 2px dotted #4a5384"></span>
+      <span style="display: flex; align-items: center; gap: 8px; color: #9aa3c7"><span style="width: 12px; height: 12px; box-sizing: border-box; border-radius: 50%; border: 2px solid #4a5384"></span>#3 FFD700 Base</span>
+      <span style="width: 30px; height: 0; border-top: 2px dotted #4a5384"></span>
+      <span style="color: #9aa3c7">R3</span>
+    </nav>
+    <div style="display: flex; align-items: center; gap: 16px; width: 300px; justify-content: flex-end">
+      <span style="display: flex; align-items: center; gap: 8px; color: #FFD700"><span class="gx"><span class="ic i-credits gh" style="width: 22px; height: 22px"></span><span class="ic i-credits" style="width: 22px; height: 22px"></span></span><span class="num" style="font-size: 22px">1,240c</span></span>
+      <button aria-label="Menu" style="width: 44px; height: 44px; border-radius: 10px; border: 1px solid #343d6b; background: #1a2042; color: #e8e4d8; font-size: 20px; cursor: pointer">☰</button>
+    </div>
+  </header>
+
+  <div style="flex: 1; min-height: 0; box-sizing: border-box; padding: 20px 24px; display: grid; grid-template-columns: 344px minmax(0, 1fr) 336px; gap: 20px">
+
+    <section aria-label="Captain's sheet" style="background: #1f2650; color: #ece8dc; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.35)">
+      <div style="display: flex; gap: 14px; align-items: center">
+        <span class="gxi"><img class="ga gh" src="assets/portraits/grull.jpg" alt="" aria-hidden="true" style="object-fit: cover; width: 64px; height: 64px; border-radius: 50%; border: 3px solid #e8b64a"><img class="ga" src="assets/portraits/grull.jpg" alt="Grull token" style="object-fit: cover; width: 64px; height: 64px; border-radius: 50%; border: 3px solid #e8b64a"></span>
+        <div style="display: flex; flex-direction: column; gap: 2px; flex: 1">
+          <span style="font-family: 'Kalam', cursive; font-weight: 700; font-size: 26px; line-height: 1.1; color: #a9c4ff">Ressa Vane</span>
+          <span style="font-size: 13px; color: #aab1d3">Grull · Privateer ★★</span>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; border: 2px solid #6b76ad; border-radius: 10px; padding: 4px 10px"><span class="lbl" style="font-size: 10px">LEVEL</span><span class="num" style="font-size: 24px; line-height: 1">2</span></div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <div style="display: flex; justify-content: space-between; font-size: 12px"><span class="lbl" style="color: #aab1d3">XP</span><span class="num">8 / 12 · 4 to level 3</span></div>
+        <div style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 3px">
+          <span style="height: 10px; border-radius: 2px; background: #FFD700"></span><span style="height: 10px; border-radius: 2px; background: #FFD700"></span><span style="height: 10px; border-radius: 2px; background: #FFD700"></span><span style="height: 10px; border-radius: 2px; background: #FFD700"></span><span style="height: 10px; border-radius: 2px; background: #FFD700"></span><span style="height: 10px; border-radius: 2px; background: #FFD700"></span><span style="height: 10px; border-radius: 2px; background: #FFD700"></span><span style="height: 10px; border-radius: 2px; background: #FFD700"></span><span style="height: 10px; box-sizing: border-box; border-radius: 2px; border: 1px solid #4f5a94"></span><span style="height: 10px; box-sizing: border-box; border-radius: 2px; border: 1px solid #4f5a94"></span><span style="height: 10px; box-sizing: border-box; border-radius: 2px; border: 1px solid #4f5a94"></span><span style="height: 10px; box-sizing: border-box; border-radius: 2px; border: 1px solid #4f5a94"></span>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1.5px solid #6b76ad; border-radius: 10px; overflow: hidden">
+        <div style="display: flex; flex-direction: column; border-right: 1px solid #3d4880">
+          <span class="lbl" style="font-size: 10px; text-align: center; padding: 6px 0; background: #313d78; color: #f3f0e8">BRAWN</span>
+          <div style="display: flex; justify-content: space-between; padding: 6px 8px; font-size: 13px"><span class="lbl" style="font-size: 12px">SWA</span><span class="num">2</span></div>
+          <div style="display: flex; justify-content: space-between; padding: 6px 8px; font-size: 13px; color: #8f98c2"><span class="lbl" style="font-size: 12px">ARM</span><span class="num">0</span></div>
+          <div style="display: flex; justify-content: space-between; padding: 6px 8px; font-size: 13px; color: #8f98c2"><span class="lbl" style="font-size: 12px">DEM</span><span class="num">0</span></div>
+        </div>
+        <div style="display: flex; flex-direction: column; border-right: 1px solid #3d4880">
+          <span class="lbl" style="font-size: 10px; text-align: center; padding: 6px 0; background: #313d78; color: #f3f0e8">SMARTS</span>
+          <div style="display: flex; justify-content: space-between; padding: 6px 8px; font-size: 13px; color: #8f98c2"><span class="lbl" style="font-size: 12px">HAK</span><span class="num">0</span></div>
+          <div style="display: flex; justify-content: space-between; padding: 6px 8px; font-size: 13px; color: #8f98c2"><span class="lbl" style="font-size: 12px">RES</span><span class="num">0</span></div>
+          <div style="display: flex; justify-content: space-between; padding: 6px 8px; font-size: 13px"><span class="lbl" style="font-size: 12px">MEC</span><span class="num">1</span></div>
+        </div>
+        <div style="display: flex; flex-direction: column; border-right: 1px solid #3d4880">
+          <span class="lbl" style="font-size: 10px; text-align: center; padding: 6px 0; background: #313d78; color: #f3f0e8">FINESSE</span>
+          <div style="display: flex; justify-content: space-between; padding: 6px 8px; font-size: 13px; background: #4a4320"><span class="lbl" style="font-size: 12px">PIL</span><span class="num">3</span></div>
+          <div style="display: flex; justify-content: space-between; padding: 6px 8px; font-size: 13px"><span class="lbl" style="font-size: 12px">GUN</span><span class="num" style="white-space: nowrap">0<span style="color: #FFD700">+1</span></span></div>
+          <div style="display: flex; justify-content: space-between; padding: 6px 8px; font-size: 13px; color: #8f98c2"><span class="lbl" style="font-size: 12px">SNE</span><span class="num">0</span></div>
+        </div>
+        <div style="display: flex; flex-direction: column">
+          <span class="lbl" style="font-size: 10px; text-align: center; padding: 6px 0; background: #313d78; color: #f3f0e8">MOXIE</span>
+          <div style="display: flex; justify-content: space-between; padding: 6px 8px; font-size: 13px"><span class="lbl" style="font-size: 12px">LEA</span><span class="num">1</span></div>
+          <div style="display: flex; justify-content: space-between; padding: 6px 8px; font-size: 13px; color: #8f98c2"><span class="lbl" style="font-size: 12px">DIP</span><span class="num">0</span></div>
+          <div style="display: flex; justify-content: space-between; padding: 6px 8px; font-size: 13px; color: #8f98c2"><span class="lbl" style="font-size: 12px">ACT</span><span class="num">0</span></div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <span class="lbl" style="color: #aab1d3">SKILLS</span>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px; font-size: 12px">
+          <span style="padding: 4px 9px; border-radius: 999px; background: #FFD700; color: #10142a">Flying Ace · PIL 3</span>
+          <span style="padding: 4px 9px; border-radius: 999px; border: 1px solid #6b76ad">Space combat advantage</span>
+          <span style="padding: 4px 9px; border-radius: 999px; border: 1px solid #6b76ad">Ground combat advantage</span>
+          <span style="padding: 4px 9px; border-radius: 999px; border: 1px solid #6b76ad">Repair roll</span>
+          <span style="padding: 4px 9px; border-radius: 999px; border: 1px solid #6b76ad">Calm crew</span>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <span class="lbl" style="color: #aab1d3">INVENTORY</span>
+        <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px">
+          <div style="height: 64px; border-radius: 8px; border: 1.5px solid #6b76ad; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px"><span class="gx"><span class="ic i-gun gh" style="width: 24px; height: 24px"></span><span class="ic i-gun" style="width: 24px; height: 24px"></span></span><span class="num" style="font-size: 10px">+1 GUN</span></div>
+          <div style="height: 64px; box-sizing: border-box; border-radius: 8px; border: 1.5px dashed #4f5a94; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: #8f98c2"><span class="gx"><span class="ic i-armor gh" style="width: 22px; height: 22px"></span><span class="ic i-armor" style="width: 22px; height: 22px"></span></span><span style="font-size: 10px">armor</span></div>
+          <div style="height: 64px; border-radius: 8px; border: 1.5px solid #6b76ad; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px"><span class="gx"><span class="ic i-drink gh" style="width: 24px; height: 24px"></span><span class="ic i-drink" style="width: 24px; height: 24px"></span></span><span class="num" style="font-size: 10px">+1 Any</span></div>
+          <div style="height: 64px; box-sizing: border-box; border-radius: 8px; border: 1.5px dashed #4f5a94"></div>
+          <div style="height: 64px; box-sizing: border-box; border-radius: 8px; border: 1.5px dashed #4f5a94"></div>
+        </div>
+      </div>
+
+      <div style="margin-top: auto; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; border-top: 1px solid #3d4880; padding-top: 12px; text-align: center">
+        <div style="display: flex; flex-direction: column; gap: 2px"><span class="lbl" style="font-size: 9px; letter-spacing: .1em">CONQUEST</span><span class="num" style="font-size: 12px">R3</span></div>
+        <div style="display: flex; flex-direction: column; gap: 2px"><span class="lbl" style="font-size: 9px; letter-spacing: .1em">FORTUNE</span><span class="num" style="font-size: 12px">1.2k/6k</span></div>
+        <div style="display: flex; flex-direction: column; gap: 2px"><span class="lbl" style="font-size: 9px; letter-spacing: .1em">LEGEND</span><span class="num" style="font-size: 12px">L2/5</span></div>
+        <div style="display: flex; flex-direction: column; gap: 2px"><span class="lbl" style="font-size: 9px; letter-spacing: .1em">PLUNDER</span><span class="num" style="font-size: 12px">1/6</span></div>
+        <div style="display: flex; flex-direction: column; gap: 2px"><span class="lbl" style="font-size: 9px; letter-spacing: .1em">BOUNTY</span><span class="num" style="font-size: 12px">2/8</span></div>
+      </div>
+    </section>
+
+    <main style="display: flex; flex-direction: column; gap: 18px; min-width: 0">
+      <div style="display: flex; gap: 22px; align-items: flex-start; justify-content: center; padding-top: 6px">
+        <div style="display: flex; flex-direction: column; gap: 22px; align-items: center">
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 8px">
+            <div style="position: relative; width: 104px; height: 148px">
+              <div style="position: absolute; left: 6px; top: 6px; width: 104px; height: 148px; border-radius: 10px; background: #141a38; border: 1.5px solid #4a5384"></div>
+              <div style="position: absolute; left: 3px; top: 3px; width: 104px; height: 148px; border-radius: 10px; background: #161d3e; border: 1.5px solid #4a5384"></div>
+              <div style="position: absolute; left: 0; top: 0; width: 104px; height: 148px; box-sizing: border-box; border-radius: 10px; background: #1a2042; border: 2px solid #FFD700; display: flex; align-items: center; justify-content: center; color: #FFD700"><span class="gx"><span class="ic i-swirl gh" style="width: 48px; height: 48px"></span><span class="ic i-swirl" style="width: 48px; height: 48px"></span></span></div>
+            </div>
+            <span style="font-size: 13px; color: #b9bdd4">Travel deck · <span class="num">31</span></span>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 8px">
+            <div style="width: 104px; height: 148px; box-sizing: border-box; border-radius: 10px; overflow: hidden; background: #1f2650; border: 2px solid #4cc9b0; display: flex; flex-direction: column; transform: rotate(-4deg); opacity: .85">
+              <div style="height: 20px; display: flex; align-items: center; justify-content: space-between; padding: 0 6px; background: #4cc9b0; color: #10142a; font-family: 'Chakra Petch', sans-serif; font-weight: 600; font-size: 8px; letter-spacing: 0.12em"><span>RECRUIT</span><span class="num" style="font-size: 9px">♥ 9</span></div>
+              <div style="flex: 1; display: flex; align-items: center; justify-content: center"><span class="gxi"><img class="ga gh" src="assets/portraits/human.jpg" alt="" aria-hidden="true" style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid #4cc9b0"><img class="ga" src="assets/portraits/human.jpg" alt="Human recruit" style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid #4cc9b0"></span></div>
+              <div style="padding: 0 8px 8px; display: flex; flex-direction: column; gap: 1px"><span style="font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 13px; color: #ece8dc">Muhammad</span><span style="font-size: 9px; color: #aab1d3">Human · +3 ARM</span></div>
+            </div>
+            <span style="font-size: 13px; color: #b9bdd4">Discard · <span class="num">20</span></span>
+          </div>
+        </div>
+
+        <div style="width: 228px; height: 322px; flex: none; box-sizing: border-box; border-radius: 16px; overflow: hidden; background: #1f2650; color: #ece8dc; border: 2px solid #ad90f7; display: flex; flex-direction: column; box-shadow: 0 0 0 4px rgba(173,144,247,.25), 0 18px 40px rgba(0,0,0,.45)">
+          <div style="height: 34px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; background: #ad90f7; color: #10142a">
+            <span style="display: flex; align-items: center; gap: 7px"><span class="gx"><span class="ic i-meteorimpact gh" style="width: 17px; height: 17px"></span><span class="ic i-meteorimpact" style="width: 17px; height: 17px"></span></span><span class="lbl" style="font-size: 11px">HAZARD</span></span>
+            <span class="num" style="font-size: 13px">♠ A</span>
+          </div>
+          <div style="height: 112px; display: flex; align-items: center; justify-content: center">
+            <div style="width: 100px; height: 100px; box-sizing: border-box; border-radius: 50%; border: 1.5px dashed #3d4880; display: flex; align-items: center; justify-content: center; color: #ad90f7"><span class="gx"><span class="ic i-meteorimpact gh" style="width: 72px; height: 72px"></span><span class="ic i-meteorimpact" style="width: 72px; height: 72px"></span></span></div>
+          </div>
+          <div style="padding: 0 14px; display: flex; flex-direction: column; gap: 2px">
+            <span style="font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 21px; line-height: 1.1">Meteor shower</span>
+            <span style="font-size: 12px; color: #aab1d3">Pick a way through · 1 XP</span>
+          </div>
+          <div style="flex: 1; padding: 8px 14px 12px; display: flex; flex-direction: column; justify-content: flex-end">
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 7px 0; border-top: 1px solid #3d4880"><span class="num" style="font-size: 17px">PIL 10</span><span style="display: flex; align-items: center; gap: 5px; font-size: 12px"><span class="gx"><span class="ic i-crack gh" style="width: 14px; height: 14px"></span><span class="ic i-crack" style="width: 14px; height: 14px"></span></span>ship damage</span></div>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 7px 0; border-top: 1px solid #3d4880"><span class="num" style="font-size: 17px">HAK 15</span><span style="display: flex; align-items: center; gap: 5px; font-size: 12px"><span class="gx"><span class="ic i-credits gh" style="width: 14px; height: 14px"></span><span class="ic i-credits" style="width: 14px; height: 14px"></span></span>−100c</span></div>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 12px; width: 268px">
+          <span class="lbl" style="color: #9aa3c7">CHOOSE A WAY THROUGH</span>
+          <button style="text-align: left; cursor: pointer; font: inherit; color: #ece8dc; background: #1f2650; border: 3px solid #FFD700; border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px">
+            <span style="display: flex; justify-content: space-between; align-items: baseline"><span class="lbl" style="font-size: 11px; color: #aab1d3">OPTION 1 · CHOSEN</span><span style="font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 26px">PIL 10</span></span>
+            <span style="font-size: 13px">If it fails: <b>ship damage, one step</b></span>
+            <span style="font-size: 13px; color: #aab1d3">Carried by you · Piloting +3</span>
+          </button>
+          <button style="text-align: left; cursor: pointer; font: inherit; color: #e8e4d8; background: #1a2042; border: 1.5px solid #4a5384; border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px">
+            <span style="display: flex; justify-content: space-between; align-items: baseline"><span class="lbl" style="font-size: 11px; color: #9aa3c7">OPTION 2</span><span style="font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 26px">HAK 15</span></span>
+            <span style="font-size: 13px">If it fails: <b>lose 100c</b></span>
+            <span style="font-size: 13px; color: #9aa3c7">Carried by 7EE700 · Hacking +1</span>
+          </button>
+          <span style="font-size: 12px; line-height: 1.45; color: #9aa3c7">Both abilities are aboard, so the choice is yours. The best score aboard carries it.</span>
+        </div>
+      </div>
+
+      <section aria-label="Roll" style="margin-top: auto; background: #1a2042; border: 1.5px solid #343d6b; border-radius: 16px; padding: 20px 22px; display: flex; flex-direction: column; gap: 16px">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 20px">
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <span class="lbl" style="color: #FFD700">ROLL 3 DICE</span>
+            <span style="font-size: 20px; line-height: 1.35">Hazard, option 1. You need <b class="num" style="color: #FFD700">10</b> or more, adding your own Piloting <b class="num">+3</b>.</span>
+            <span style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #ff9da1"><img class="ga" src="assets/portraits/redshirt.jpg" alt="" style="width: 18px; height: 18px; border-radius: 50%; object-fit: cover">If it fails, you may spend your red shirt (1 left) to count it as survived.</span>
+          </div>
+          <label style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; border: 1.5px dashed #6d7499; font-size: 14px; cursor: pointer; flex: none">
+            <input type="checkbox" style="width: 20px; height: 20px; accent-color: #FFD700">
+            <span class="gx"><span class="ic i-drink gh" style="width: 22px; height: 22px; color: #FFD700"></span><span class="ic i-drink" style="width: 22px; height: 22px; color: #FFD700"></span></span>
+            <span>Use <b>+1 Any</b> on this roll</span>
+          </label>
+        </div>
+        <div style="display: flex; align-items: center; gap: 22px">
+          <div style="display: flex; gap: 10px">
+            <span style="width: 56px; height: 56px; box-sizing: border-box; border-radius: 12px; border: 2px dashed #4a5384"></span>
+            <span style="width: 56px; height: 56px; box-sizing: border-box; border-radius: 12px; border: 2px dashed #4a5384"></span>
+            <span style="width: 56px; height: 56px; box-sizing: border-box; border-radius: 12px; border: 2px dashed #4a5384"></span>
+          </div>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 6px">
+            <div style="position: relative; height: 14px; border-radius: 7px; background: #3a1e2b; overflow: hidden">
+              <div style="position: absolute; left: 26.7%; right: 0; top: 0; bottom: 0; background: #2f3c25"></div>
+              <div style="position: absolute; left: 26.7%; top: 0; bottom: 0; width: 3px; background: #FFD700"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 12px; color: #9aa3c7"><span class="num">3+3</span><span>pass from <b class="num" style="color: #FFD700">10</b> · the dice need 7</span><span class="num">18+3</span></div>
+          </div>
+          <button style="height: 56px; padding: 0 34px; border-radius: 14px; border: none; background: #FFD700; color: #1d1d20; font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 22px; letter-spacing: 0.06em; cursor: pointer">ROLL</button>
+        </div>
+      </section>
+    </main>
+
+    <aside style="display: flex; flex-direction: column; gap: 12px; min-width: 0">
+      <section aria-label="Journey" style="background: #1a2042; border: 1px solid #343d6b; border-radius: 16px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px">
+        <div style="display: flex; justify-content: space-between; align-items: center"><span class="lbl" style="color: #b9bdd4">JOURNEY</span><span class="gx"><span class="ic i-rocket gh" style="width: 20px; height: 20px; color: #b9bdd4"></span><span class="ic i-rocket" style="width: 20px; height: 20px; color: #b9bdd4"></span></span></div>
+        <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; background: #FFD700; color: #1d1d20">
+          <span class="gx"><span class="ic i-idcard gh" style="width: 20px; height: 20px"></span><span class="ic i-idcard" style="width: 20px; height: 20px"></span></span>
+          <span style="flex: 1; font-size: 13px; font-weight: 600">Out · ♣2 Channel clash, DIP 10</span>
+          <span class="num" style="font-size: 14px">2 / 3</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; border: 1px solid #4a5384">
+          <span class="gx"><span class="ic i-idcard gh" style="width: 20px; height: 20px; color: #9aa3c7"></span><span class="ic i-idcard" style="width: 20px; height: 20px; color: #9aa3c7"></span></span>
+          <span style="flex: 1; font-size: 13px">Back · ♣2 Channel clash</span>
+          <span class="num" style="font-size: 14px; color: #b9bdd4">3 / 3</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; border: 1px dashed #4a5384; color: #9aa3c7">
+          <span class="gx"><span class="ic i-ringed gh" style="width: 20px; height: 20px"></span><span class="ic i-ringed" style="width: 20px; height: 20px"></span></span>
+          <span style="flex: 1; font-size: 13px">Paused · to Kookookachaa</span>
+          <span class="num" style="font-size: 14px">4 / 5</span>
+        </div>
+      </section>
+
+      <section aria-label="Ship" style="background: #1a2042; border: 1px solid #343d6b; border-radius: 16px; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; justify-content: space-between; align-items: center">
+          <span style="display: flex; align-items: center; gap: 10px"><span class="gx"><span class="ic i-ship gh" style="width: 24px; height: 24px; color: #FFD700"></span><span class="ic i-ship" style="width: 24px; height: 24px; color: #FFD700"></span></span><span style="font-family: 'Kalam', cursive; font-weight: 700; font-size: 20px">The Warbler</span></span>
+          <span class="lbl" style="color: #b9bdd4">SHIP</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 7px"><div style="display: flex; align-items: center; gap: 6px"><span title="Ship lost" style="width: 26px; height: 26px; flex: none; box-sizing: border-box; border-radius: 50%; border: 1.5px dashed #f07070; display: flex; align-items: center; justify-content: center; color: #ff7a7f"><span class="gx"><span class="ic i-rays gh" style="width: 15px; height: 15px"></span><span class="ic i-rays" style="width: 15px; height: 15px"></span></span></span><div style="flex: 1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3px"><span style="display: flex; filter: drop-shadow(0 0 6px rgba(242,181,68,.6))"><span style="flex: 1; height: 26px; background: #f2b544; clip-path: polygon(14% 0, 100% 0, 86% 50%, 100% 100%, 14% 100%, 0 50%)"></span></span><span style="display: flex; filter: drop-shadow(0 0 6px rgba(242,181,68,.6))"><span style="flex: 1; height: 26px; background: #f2b544; clip-path: polygon(14% 0, 100% 0, 86% 50%, 100% 100%, 14% 100%, 0 50%)"></span></span><span style="height: 26px; background: #262e5c; clip-path: polygon(14% 0, 100% 0, 86% 50%, 100% 100%, 14% 100%, 0 50%); display: flex; align-items: center; justify-content: center; color: #56609a"><span class="gx"><span class="ic i-crack gh" style="width: 11px; height: 11px"></span><span class="ic i-crack" style="width: 11px; height: 11px"></span></span></span><span style="height: 26px; background: #262e5c; clip-path: polygon(14% 0, 100% 0, 86% 50%, 100% 100%, 14% 100%, 0 50%); display: flex; align-items: center; justify-content: center; color: #56609a"><span class="gx"><span class="ic i-crack gh" style="width: 11px; height: 11px"></span><span class="ic i-crack" style="width: 11px; height: 11px"></span></span></span></div></div><div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px"><span><span style="font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: .12em; color: #f2b544">DAMAGED</span><span style="font-size: 12px; color: #9aa3c7"> · 2 hits from lost</span></span><span class="num" style="font-size: 11px; color: #6d7499">P · U · <b style="color: #f2b544">D</b> · H</span></div></div>
+        <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; text-align: center">
+          <div style="display: flex; flex-direction: column; gap: 2px"><span class="num" style="font-size: 18px">1</span><span style="font-size: 11px; color: #9aa3c7">Speed</span></div>
+          <div style="display: flex; flex-direction: column; gap: 2px"><span class="num" style="font-size: 18px">3/5</span><span style="font-size: 11px; color: #9aa3c7">Aboard</span></div>
+          <div style="display: flex; flex-direction: column; gap: 2px"><span class="num" style="font-size: 18px; color: #6d7499">0</span><span style="font-size: 11px; color: #9aa3c7">Handling</span></div>
+          <div style="display: flex; flex-direction: column; gap: 2px"><span class="num" style="font-size: 18px; color: #6d7499">0</span><span style="font-size: 11px; color: #9aa3c7">Armor</span></div>
+        </div>
+        <div style="display: flex; gap: 6px; font-size: 12px"><span style="padding: 3px 8px; border-radius: 6px; border: 1px solid #4a5384">+1 Speed</span><span style="padding: 3px 8px; border-radius: 6px; border: 1px solid #4a5384">+2 Capacity</span></div>
+      </section>
+
+      <section aria-label="Crew" style="flex: 1; background: #1a2042; border: 1px solid #343d6b; border-radius: 16px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px">
+        <div style="display: flex; justify-content: space-between; align-items: center"><span class="lbl" style="color: #b9bdd4">CREW</span><span style="font-size: 12px; color: #9aa3c7">2 open berths</span></div>
+        <div style="display: flex; gap: 12px; align-items: center; padding: 10px; border-radius: 12px; background: #1f2650; color: #ece8dc">
+          <span class="gxi"><img class="ga gh" src="assets/portraits/hexapod.jpg" alt="" aria-hidden="true" style="object-fit: cover; width: 52px; height: 52px; border-radius: 50%; border: 2px solid #e8b64a"><img class="ga" src="assets/portraits/hexapod.jpg" alt="Hexapod token" style="object-fit: cover; width: 52px; height: 52px; border-radius: 50%; border: 2px solid #e8b64a"></span>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+            <span style="font-family: 'Kalam', cursive; font-weight: 700; font-size: 17px; color: #a9c4ff; line-height: 1.1">7EE700</span>
+            <span class="num" style="font-size: 12px">Hexapod · HAK+1</span>
+          </div>
+          <span aria-label="Anger 0 of 3" style="display: flex; gap: 3px"><span style="width: 10px; height: 10px; box-sizing: border-box; border-radius: 50%; border: 1.5px solid #8f98c2"></span><span style="width: 10px; height: 10px; box-sizing: border-box; border-radius: 50%; border: 1.5px solid #8f98c2"></span><span style="width: 10px; height: 10px; box-sizing: border-box; border-radius: 50%; border: 1.5px solid #8f98c2"></span></span>
+        </div>
+        <div style="display: flex; gap: 12px; align-items: center; padding: 10px; border-radius: 12px; background: #1f2650; color: #ece8dc">
+          <span class="gxi"><img class="ga gh" src="assets/portraits/grull.jpg" alt="" aria-hidden="true" style="width: 52px; height: 52px; border-radius: 50%; border: 2px solid #e8b64a; object-fit: cover"><img class="ga" src="assets/portraits/grull.jpg" alt="Grull token" style="width: 52px; height: 52px; border-radius: 50%; border: 2px solid #e8b64a; object-fit: cover"></span>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+            <span style="font-family: 'Kalam', cursive; font-weight: 700; font-size: 17px; color: #a9c4ff; line-height: 1.1">Slate</span>
+            <span class="num" style="font-size: 12px">Grull · DIP+1</span>
+          </div>
+          <span aria-label="Anger 1 of 3" style="display: flex; gap: 3px"><span style="width: 10px; height: 10px; border-radius: 50%; background: #b3232a"></span><span style="width: 10px; height: 10px; box-sizing: border-box; border-radius: 50%; border: 1.5px solid #8f98c2"></span><span style="width: 10px; height: 10px; box-sizing: border-box; border-radius: 50%; border: 1.5px solid #8f98c2"></span></span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+          <div style="border-radius: 12px; border: 1.5px solid rgba(240,112,112,.45); background: rgba(240,112,112,.07); padding: 10px 12px; display: flex; flex-direction: column; gap: 7px">
+            <div style="display: flex; justify-content: space-between; align-items: baseline"><span class="lbl" style="font-size: 10px; color: #ff9da1">RED SHIRTS</span><span class="num" style="font-size: 14px">1<span style="color: #9aa3c7">/1</span></span></div>
+            <div style="display: flex; gap: 5px; align-items: center"><span class="gxi"><img class="ga gh" src="assets/portraits/redshirt.jpg" alt="" aria-hidden="true" style="width: 22px; height: 22px; box-sizing: border-box; border-radius: 50%; object-fit: cover; border: 2px solid #e8b64a; box-shadow: 0 0 6px rgba(240,112,112,.6)"><img class="ga" src="assets/portraits/redshirt.jpg" alt="Red shirt" style="width: 22px; height: 22px; box-sizing: border-box; border-radius: 50%; object-fit: cover; border: 2px solid #e8b64a; box-shadow: 0 0 6px rgba(240,112,112,.6)"></span></div>
+            <span style="font-size: 10.5px; line-height: 1.35; color: #9aa3c7">Spend one to survive a failed hazard.</span>
+          </div>
+          <div style="border-radius: 12px; border: 1.5px solid rgba(224,112,208,.45); background: rgba(224,112,208,.07); padding: 10px 12px; display: flex; flex-direction: column; gap: 7px">
+            <div style="display: flex; justify-content: space-between; align-items: baseline"><span class="lbl" style="font-size: 10px; color: #f0a0e4">DREAD</span><span class="num" style="font-size: 14px">1<span style="color: #9aa3c7">/3</span></span></div>
+            <div style="display: flex; gap: 5px; align-items: center"><span class="gx" style="filter: drop-shadow(0 0 5px rgba(224,112,208,.6))"><span class="ic i-pirate gh" style="width: 22px; height: 22px; color: #e070d0"></span><span class="ic i-pirate" style="width: 22px; height: 22px; color: #e070d0"></span></span><span class="gx"><span class="ic i-pirate gh" style="width: 22px; height: 22px; color: #3d3a5e"></span><span class="ic i-pirate" style="width: 22px; height: 22px; color: #3d3a5e"></span></span><span class="gx"><span class="ic i-pirate gh" style="width: 22px; height: 22px; color: #3d3a5e"></span><span class="ic i-pirate" style="width: 22px; height: 22px; color: #3d3a5e"></span></span></div>
+            <span style="font-size: 10.5px; line-height: 1.35; color: #9aa3c7">+1 to intimidate per point.</span>
+          </div>
+        </div>
+      </section>
+    </aside>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

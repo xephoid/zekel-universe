@@ -52,6 +52,12 @@ export interface EventRow {
  * move, gets null and reads what happened from the summary, the log and its
  * own view.
  */
+/** An event as the table's history: what happened (summary, log lines,
+ *  undo marks), without the seat's view, moves, briefing or own raw move. */
+export function historyEvent(e: TableEventWire): TableEventWire {
+  return { ...e, engineMove: null, view: null, legalMoves: [], unavailable: [], moveMenu: null, briefing: null };
+}
+
 export function toWireEvent(event: EventRow, seatPosition: number | null): TableEventWire {
   const payload = seatPosition === null ? undefined : event.payloads[String(seatPosition)];
   return {

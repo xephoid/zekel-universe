@@ -72,6 +72,9 @@ describe('REST', () => {
     const ff = games.games[0]!;
     expect(ff.designerName).toBe('Zekel Games');
     expect(ff.minPlayers).toBe(2);
+    expect(ff.coverImage).toBe('/art/covers/fractured-fist.webp');
+    expect(ff.coverFocus).toBeNull();
+    expect(games.games[1]!.coverImage).toBeNull();
     const one = (await app.fastify.inject({ method: 'GET', url: '/api/games/fractured-fist' })).json<GameResponse>();
     expect(one.game.name).toBe('Fractured Fist');
     expect((await app.fastify.inject({ method: 'GET', url: '/api/games/nope' })).statusCode).toBe(404);
@@ -109,13 +112,23 @@ describe('REST', () => {
     expect(events.events[0]!.view).toMatchObject({ player: 'p1' });
     expect(events.events[0]!.legalMoves.length).toBeGreaterThan(0);
 
-    // Someone else cannot read the feed.
+    // The history for the log: the same events, without views or moves.
+    const history = (await app.fastify.inject({ method: 'GET', url: `/api/tables/${tableId}/events?after=0&history=1`, headers: { cookie } })).json<TableEventsResponse>();
+    expect(history.events.map((e) => e.seq)).toEqual(events.events.map((e) => e.seq));
+    expect(history.events[0]!.summary).toBe(events.events[0]!.summary);
+    expect(history.events[0]!.view).toBeNull();
+    expect(history.events[0]!.legalMoves).toEqual([]);
+    expect(history.events[0]!.briefing).toBeNull();
+
+    // Someone else cannot read the feed, or its history.
     const other = await guest();
     expect((await app.fastify.inject({ method: 'GET', url: `/api/tables/${tableId}/events`, headers: { cookie: other } })).statusCode).toBe(403);
+    expect((await app.fastify.inject({ method: 'GET', url: `/api/tables/${tableId}/events?history=1`, headers: { cookie: other } })).statusCode).toBe(403);
 
     const mine = (await app.fastify.inject({ method: 'GET', url: '/api/my-tables', headers: { cookie } })).json<MyTablesResponse>();
     expect(mine.tables.map((t) => t.id)).toEqual([tableId]);
     expect(mine.tables[0]!.waitingOnMe).toBe(true);
+    expect(mine.tables[0]!.gameCoverImage).toBe('/art/covers/fractured-fist.webp');
   });
 
   it('a guest cannot host a friends table but a signed-in user can', async () => {

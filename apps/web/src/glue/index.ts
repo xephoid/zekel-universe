@@ -25,3 +25,7 @@ export function glueFor(gameId: string): GlueModule | null {
 }
 
 export { fracturedFistGlue, warbleWayGlue, sweetlandsGlue, cybernoirGlue, nggGlue, adventurerOlympicsGlue };
+
+// Warble Way Galaxy's dev page also shows the theme's icons, holograms and
+// travel cards on their own; it reaches them through here.
+export * as warbleWayGallery from './ww/gallery';

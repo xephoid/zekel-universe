@@ -208,7 +208,11 @@ export type SetupField =
       noun?: string;
     }
   | { key: string; label: string; help?: string; kind: 'text'; placeholder?: string; maxLength?: number }
-  | { key: string; label: string; help?: string; kind: 'number'; min?: number; max?: number };
+  | {
+      key: string; label: string; help?: string; kind: 'number'; min?: number; max?: number;
+      /** May be left empty, which answers nothing for it (a score not taken). */
+      optional?: boolean;
+    };
 
 /** A seat as the setup screen has it: who sits there, before the table exists. */
 export interface SetupSeat {

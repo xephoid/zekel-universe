@@ -9,7 +9,12 @@ import type { CardData, GridData, TableauData } from '@zekel/primitives';
 import type { GameReferenceResponse } from '@zekel/wire-types';
 import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, SelectEvent, SetupAnswers, SetupField, SetupSeat, TablePlan, Zone } from '@zekel/glue-kit';
 import { asArr, asNum, asStr, isObj, shapeHas, words } from '@zekel/glue-kit';
+import { abilityWords, words as factWords } from './ww/facts';
 import { answerNumber, answerText } from '@zekel/glue-kit';
+import { GLYPH, KIND, travelCard } from './ww/cards';
+import { faceUrl } from './ww/faces';
+import { WwScreen } from './ww/WwScreen';
+import './ww/ww.css';
 
 /** The twelve abilities as the reference data prints them: "SWA (Swashbuckling)". */
 function abilityOptions(reference: GameReferenceResponse | null): Array<{ code: string; name: string; stat: string }> {
@@ -35,10 +40,17 @@ function archetypeOptions(reference: GameReferenceResponse | null): Array<{ name
   return isObj(rd)
     ? asArr(rd['archetypes']).flatMap((a) => {
       if (!isObj(a) || typeof a['name'] !== 'string') return [];
-      const scores = isObj(a['scores']) ? Object.entries(a['scores']).map(([k, v]) => `${k} ${asNum(v)}`).join(' / ') : '';
+      const scores = isObj(a['scores']) ? Object.entries(a['scores']).map(([k, v]) => `${abilityWords(reference, k)?.name ?? k} ${asNum(v)}`).join(' / ') : '';
       return [{ name: a['name'], label: `${a['name']} ${asStr(a['stars'])} ${asStr(a['difficulty'])} — ${scores}` }];
     })
     : [];
+}
+
+/** A Warble Way view: it has a phase and at least one of the captain's
+ *  character, the ship or the travel deck (zekel views.ts getView). */
+function isWarbleWayView(view: unknown): view is Record<string, unknown> {
+  if (!shapeHas(view, 'phase')) return false;
+  return 'travel_deck' in view || 'character' in view || 'ship' in view;
 }
 
 const PALETTE: Record<string, string> = {
@@ -52,17 +64,25 @@ const PALETTE: Record<string, string> = {
   party: '#3E7C4F',
   attacker: '#b4452f',
   item: '#c9a227',
+  // The travel cards' kinds (Cards.dc.html).
+  recruit: '#4cc9b0',
+  pirate: '#f07070',
+  ruin: '#f2b544',
+  hazard: '#ad90f7',
+  job: '#6eaaff',
 };
 
 function crewCard(c: unknown, i: number): CardData {
   if (!isObj(c)) return { id: `ww:crew:${i}`, label: 'crew', colorKey: 'crew' };
   const anger = asNum(c['anger_tokens']);
+  const art = faceUrl(asStr(c['race']));
   return {
     id: `ww:crew:${asStr(c['name'], String(i))}`,
     label: asStr(c['name'], 'crew'),
     subtitle: asStr(c['race']) || undefined,
     badges: anger > 0 ? [`anger ×${anger}`] : [],
     colorKey: 'crew',
+    ...(art ? { artUrl: art } : {}),
   };
 }
 
@@ -97,11 +117,25 @@ function ruinGrid(ruin: Record<string, unknown>): Zone | null {
 export const warbleWayGlue: GlueModule = {
   gameId: 'warble-way-galaxy',
   title: 'Warble Way Galaxy',
+  /** The hologram logbook table (docs/design/warble-way-galaxy) draws its
+   *  own screen, one part per board, and has a phone layout. The plan's
+   *  zones stay the engine debug client's shape. */
+  Screen: WwScreen,
+  phone: true,
+  // The last move's sentence sits on the board, beside the dice it rolled,
+  // not at the foot of the side column where a result is easy to miss.
+  placesCaption: true,
+
+  /** The hologram logbook theme (docs/design/warble-way-galaxy): the table's
+   *  own look, for the captain's seat and for a watcher, once the view is
+   *  this game's. */
+  themeFor(input: GlueInput): string | null {
+    return isWarbleWayView(input.view) ? 'ww-theme' : null;
+  },
 
   plan(input: GlueInput): TablePlan | null {
     const { view } = input;
-    if (!shapeHas(view, 'phase')) return null;
-    if (!('travel_deck' in view) && !('character' in view) && !('ship' in view)) return null;
+    if (!isWarbleWayView(view)) return null;
 
     const char = isObj(view['character']) ? view['character'] : null;
     const ship = isObj(view['ship']) ? view['ship'] : null;
@@ -118,6 +152,7 @@ export const warbleWayGlue: GlueModule = {
       const abilities = isObj(char['abilities']) ? char['abilities'] : {};
       const xp = asNum(char['xp']);
       const toNext = asNum(char['xp_to_next_level']);
+      const face = faceUrl(asStr(char['race']));
       const stats: NonNullable<TableauData['stats']> = [
         { label: 'Level', value: asNum(char['level'], 1) },
         { label: 'XP to next level', value: xp, max: toNext > 0 ? xp + toNext : undefined },
@@ -131,7 +166,7 @@ export const warbleWayGlue: GlueModule = {
       ];
       side.push({
         kind: 'tableau', id: 'ww:character',
-        data: { label: asStr(char['name'], 'You'), owner: 'character', active: true, stats },
+        data: { label: asStr(char['name'], 'You'), owner: 'character', active: true, stats, ...(face ? { artUrl: face } : {}) },
       });
       // The finish lines, as the engine spells them out.
       const endingStats = Object.entries(endings).map(([k, v]) => ({ label: words(k), value: asStr(v, String(v)) }));
@@ -192,7 +227,13 @@ export const warbleWayGlue: GlueModule = {
         kind: 'card-zone', id: 'ww:travel-discard', arriveFrom: 'ww:travel-draw',
         data: {
           label: 'Discard', mode: 'pile',
-          cards: discard.map((c, i) => ({ id: `ww:travel:${i}:${c}`, label: c, colorKey: 'ship' })),
+          // Each discard shows its name and kind when the reference carries them (item 4).
+          cards: discard.map((c, i) => {
+            const face = travelCard(c, input.reference);
+            return face
+              ? { id: `ww:travel:${i}:${c}`, label: face.title, subtitle: `${GLYPH[face.suit]} ${face.rank} · ${KIND[face.kind].word}`, colorKey: face.kind }
+              : { id: `ww:travel:${i}:${c}`, label: c, colorKey: 'ship' };
+          }),
         },
       });
     }
@@ -228,7 +269,9 @@ export const warbleWayGlue: GlueModule = {
       });
     }
     const status = `${words(asStr(view['phase']))}${isObj(view['pending']) ? ` · ${words(asStr((view['pending'] as Record<string, unknown>)['kind']))}` : ''}`;
-    return { board, bench, side, palette: PALETTE, title: 'Warble Way Galaxy', status };
+    // The table draws a plan's side zones even beside a screen, and the
+    // screen draws its own sheet, ship and crew: the side rides with the board.
+    return { board: [...board, ...side], bench, side: [], palette: PALETTE, title: 'Warble Way Galaxy', status };
   },
 
   litParts(input: GlueInput): string[] {
@@ -268,20 +311,27 @@ export const warbleWayGlue: GlueModule = {
     const races = raceOptions(reference);
     const abilities = abilityOptions(reference);
     const archetypes = archetypeOptions(reference);
+    const ct = factWords(reference, 'creation_text');
     if (races.length === 0 || abilities.length === 0) return [];
     const fields: SetupField[] = [
       { kind: 'text', key: 'character_name', label: 'Your character\'s name', maxLength: 40 },
-      { kind: 'choice', key: 'race', label: 'Race', options: races.map((r) => ({ value: r, label: words(r) })) },
+      { kind: 'choice', key: 'race', label: 'Race', ...(ct['race'] ? { help: ct['race'] } : {}), options: races.map((r) => ({ value: r, label: words(r) })) },
       { kind: 'text', key: 'ship_name', label: 'Your ship\'s name', maxLength: 40 },
       {
         kind: 'choice', key: 'method', label: 'Ability scores',
-        help: 'Recommended: one score 3, one 2, one 1. Or an archetype card, a pre-built spread with a printed difficulty.',
-        options: [{ value: 'recommended', label: 'Choose the scores' }, ...(archetypes.length ? [{ value: 'archetype', label: 'An archetype card' }] : [])],
+        help: ct['scores'] ?? 'One score 3, one 2, one 1; or spread 6 points with none above 3; or an archetype card.',
+        options: [{ value: 'recommended', label: 'One 3, one 2, one 1' }, { value: 'distribute', label: 'Spread 6 points' }, ...(archetypes.length ? [{ value: 'archetype', label: 'An archetype card' }] : [])],
       },
     ];
-    for (const a of abilities) fields.push({ kind: 'number', key: `score.${a.code}`, label: `${a.name} (${a.code}, ${words(a.stat)})`, min: 0, max: 3 });
-    if (archetypes.length) fields.push({ kind: 'choice', key: 'archetype_name', label: 'Archetype card', options: archetypes.map((a) => ({ value: a.name, label: a.label })) });
-    fields.push({ kind: 'choice', key: 'disposition', label: 'Disposition (a roleplay hint, never a rule)', options: [
+    // Each ability says what it does, in the engine's words, where its score
+    // is chosen. A box left empty is an ability left at nothing.
+    for (const a of abilities) {
+      const w = abilityWords(reference, a.code);
+      const help = w?.basic ? `${w.basic}${w.advanced ? ` At a natural 3, ${w.advanced.name}: ${w.advanced.what}` : ''}` : undefined;
+      fields.push({ kind: 'number', key: `score.${a.code}`, label: `${a.name} (${a.code}, ${words(a.stat)})`, ...(help ? { help } : {}), min: 0, max: 3, optional: true });
+    }
+    if (archetypes.length) fields.push({ kind: 'choice', key: 'archetype_name', label: 'Archetype card', ...(ct['archetype'] ? { help: ct['archetype'] } : {}), options: archetypes.map((a) => ({ value: a.name, label: a.label })) });
+    fields.push({ kind: 'choice', key: 'disposition', label: 'Disposition', help: ct['disposition'] ?? 'A roleplay hint, never a rule.', options: [
       { value: 'none', label: 'No hint' }, { value: 'brash', label: 'Brash' }, { value: 'risk_averse', label: 'Risk-averse' },
     ] });
     return fields;
@@ -308,6 +358,41 @@ export const warbleWayGlue: GlueModule = {
   /** Character creation: the engine lists two skeletons ("FILL IN the
    *  values the player chose"); each becomes a form with nothing filled in. */
   formFor(move: LegalMove, input: GlueInput): MoveForm | null {
+    // The ruin's two templates (the screen fills them from taps; the menu
+    // asks the same questions in words).
+    if (move.move['type'] === 'move_being') {
+      return {
+        title: `Move ${asStr(move.move['being'])}`, help: move.description, template: move, editableKeys: ['to'], submitLabel: 'Move',
+        fields: [{ kind: 'text', key: 'to', label: 'Destination square (row and column, like r5c3)', maxLength: 6 }],
+        build(answers) { const to = (answerText(answers, 'to') ?? '').trim().toLowerCase(); return /^r\d+c\d+$/.test(to) ? { ...move.move, to } : null; },
+      };
+    }
+    if (move.move['type'] === 'setup_encounter') {
+      const view = isObj(input.view) ? input.view : {};
+      const crew = asArr(view['crew']).filter(isObj).map((c) => asStr(c['name'])).filter(Boolean);
+      const starts = (/start[_ ]location \(([^)]+)\)/.exec(move.description ?? '')?.[1] ?? '').split(/\s+or\s+/).map((x) => x.trim()).filter(Boolean);
+      const spots = (/exactly 3 of: ([^)—]+)/.exec(move.description ?? '')?.[1] ?? '').split(',').map((x) => x.trim()).filter(Boolean);
+      return {
+        title: 'Set up the ruin', help: move.description, template: move, submitLabel: 'Enter',
+        editableKeys: ['crew_names', 'include_character', 'start_location', 'threat_level', 'attacker_placements'],
+        fields: [
+          { kind: 'choice', key: 'include_character', label: 'Does the captain go in?', options: [{ value: 'yes', label: 'Yes' }, { value: 'no', label: 'No, stays aboard' }] },
+          ...(crew.length ? [{ kind: 'multi' as const, key: 'crew_names', label: 'Crew who go in', options: crew.map((c) => ({ value: c, label: c })), pick: crew.length }] : []),
+          { kind: 'choice', key: 'start_location', label: 'Start spot', options: starts.map((x) => ({ value: x, label: x })) },
+          { kind: 'choice', key: 'threat_level', label: 'Threat level', options: [1, 2, 3].map((n) => ({ value: String(n), label: `Threat ${n}` })) },
+          { kind: 'multi', key: 'attacker_placements', label: 'Three attacker spots', options: spots.map((x) => ({ value: x, label: x })), pick: 3 },
+        ],
+        build(answers) {
+          const inc = answerText(answers, 'include_character');
+          const names = Array.isArray(answers['crew_names']) ? (answers['crew_names'] as unknown[]).map((x) => asStr(x)).filter(Boolean) : [];
+          const start = answerText(answers, 'start_location');
+          const threat = answerNumber(answers, 'threat_level');
+          const placed = Array.isArray(answers['attacker_placements']) ? (answers['attacker_placements'] as unknown[]).map((x) => asStr(x)).filter(Boolean) : [];
+          if (!inc || !start || threat === null || placed.length !== 3 || (inc === 'no' && names.length === 0)) return null;
+          return { ...move.move, include_character: inc === 'yes', crew_names: names, start_location: start, threat_level: threat, attacker_placements: placed };
+        },
+      };
+    }
     if (move.move['type'] !== 'create_character') return null;
     const method = asStr(move.move['method']);
     const races = raceOptions(input.reference);
@@ -368,6 +453,10 @@ export const warbleWayGlue: GlueModule = {
   },
 
   diceFor(event) {
+    // An engine that reads the last roll back in its view has the screen
+    // draw the dice, in their pairs, beside the result; the table's own row
+    // of dice is for an engine that does not.
+    if (isObj(event.view) && 'last_roll' in event.view) return null;
     const m = event.engineMove;
     const dice = m && Array.isArray(m['dice']) ? m['dice'] : null;
     if (dice) return dice.map((d) => asNum(d)).filter((n) => n > 0);

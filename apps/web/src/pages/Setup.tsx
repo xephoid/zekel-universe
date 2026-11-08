@@ -29,7 +29,7 @@ function answered(f: SetupField, v: string | string[] | undefined): boolean {
   if (f.kind === 'multi') return Array.isArray(v) && v.length === f.pick;
   if (f.kind === 'choice') return typeof v === 'string' && v !== '';
   if (f.kind === 'text') return typeof v === 'string' && v.trim() !== '';
-  if (typeof v !== 'string' || v.trim() === '') return false;
+  if (typeof v !== 'string' || v.trim() === '') return f.optional === true;
   const n = Number(v);
   return Number.isFinite(n) && (f.min === undefined || n >= f.min) && (f.max === undefined || n <= f.max);
 }
@@ -73,7 +73,7 @@ export function SetupPage() {
   // field that is not in play is neither shown nor required.
   const method = answers['method'];
   const inPlay = (f: SetupField) =>
-    !(f.key.startsWith('score.') && method !== 'recommended') && !(f.key === 'archetype_name' && method !== 'archetype');
+    !(f.key.startsWith('score.') && method !== 'recommended' && method !== 'distribute') && !(f.key === 'archetype_name' && method !== 'archetype');
   const shown = fields.filter(inPlay);
   const fieldsAnswered = shown.every((f) => answered(f, answers[f.key]));
   const modeAnswered = aiOnly || mode !== '';
@@ -147,7 +147,7 @@ export function SetupPage() {
               <h3>Seats</h3>
               <div className="stepper" aria-label="Player count">
                 <button type="button" onClick={() => canRemoveSeat && setSeats(seats.slice(0, -1))} disabled={!canRemoveSeat} aria-label="Fewer players">−</button>
-                <span>{seats.length + 1} players</span>
+                <span>{seats.length + 1} {seats.length === 0 ? 'player' : 'players'}</span>
                 <button type="button" onClick={() => canAddSeat && setSeats([...seats, { kind: 'ai', level: 'medium' }])} disabled={!canAddSeat} aria-label="More players">+</button>
               </div>
             </div>
@@ -245,7 +245,7 @@ export function SetupPage() {
             {game && <Cover game={game} size="tile" />}
             <div>
               <div className="card-title" style={{ fontSize: 16 }}>{game?.name ?? '…'}</div>
-              <div className="muted small">{seats.length + 1} players · {aiOnly ? 'against the AI' : mode === 'turns' ? 'by turns' : mode === 'live' ? 'live' : 'with friends'}</div>
+              <div className="muted small">{seats.length + 1} {seats.length === 0 ? 'player' : 'players'} · {seats.length === 0 ? 'solo' : aiOnly ? 'against the AI' : mode === 'turns' ? 'by turns' : mode === 'live' ? 'live' : 'with friends'}</div>
             </div>
           </div>
           {grouped.map((f) => {

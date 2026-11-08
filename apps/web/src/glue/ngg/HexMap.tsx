@@ -75,6 +75,12 @@ interface Inspect { coord: string; pieces: InspectPiece[] }
 type InspectPiece = NggPiece | { kind: 'base'; owner: string };
 
 /** A piece's name as a hover line: what it is and whose it is. */
+/** A unit's DEF: the engine's number now, with the printed one beside it when they differ. */
+function defText(live: number | null, printed: number | null): string {
+  if (live === null || printed === null || live === printed) return String(live ?? printed ?? '—');
+  return `${live} (printed ${printed})`;
+}
+
 function pieceTitle(v: NggView, refs: NggRef | null, p: InspectPiece): string {
   const faction = v.players.find((x) => x.id === p.owner)?.faction ?? p.owner;
   if (p.kind === 'base') return `${faction} base`;
@@ -85,7 +91,7 @@ function pieceTitle(v: NggView, refs: NggRef | null, p: InspectPiece): string {
     return `${label} · ${faction}${p.resource ? ` · collecting ${p.resource}` : ''}`;
   }
   const u = refs?.units.find((x) => x.name === p.name);
-  const stats = u && u.init !== null ? ` · Init ${u.init} DMG ${u.dmg ?? '—'} DEF ${u.def ?? '—'}` : '';
+  const stats = u && u.init !== null ? ` · Init ${u.init} DMG ${u.dmg ?? '—'} DEF ${defText(p.def, u.def)}` : '';
   return `${p.name} · ${faction}${stats}${p.core === 'CORELESS' ? ' · no Core' : ''}`;
 }
 
@@ -112,6 +118,7 @@ function PieceDetails({ v, refs, inspect, onClose }: { v: NggView; refs: NggRef 
         {inspect.pieces.map((p, i) => {
           const faction = v.players.find((x) => x.id === p.owner)?.faction ?? null;
           const unit = p.kind === 'unit' ? refs?.units.find((x) => x.name === p.name) ?? null : null;
+          const liveDef = p.kind === 'unit' ? p.def : null;
           const hero = p.kind === 'hero' ? refs?.heroes.find((x) => x.name === p.name) ?? null : null;
           const name = pieceTitle(v, refs, p).split(' · ')[0];
           return (
@@ -119,8 +126,11 @@ function PieceDetails({ v, refs, inspect, onClose }: { v: NggView; refs: NggRef 
               <span className="ngg-piece-details-name"><b>{name}</b><i>{faction ?? p.owner}</i></span>
               {unit && unit.init !== null && (
                 <span className="ngg-statline">
-                  <span><i>INIT</i>{unit.init}</span><span><i>DMG</i>{unit.dmg ?? '—'}</span><span><i>DEF</i>{unit.def ?? '—'}</span>
+                  <span><i>INIT</i>{unit.init}</span><span><i>DMG</i>{unit.dmg ?? '—'}</span><span><i>DEF</i>{liveDef ?? unit.def ?? '—'}</span>
                 </span>
+              )}
+              {unit && liveDef !== null && unit.def !== null && liveDef !== unit.def && (
+                <span className="ngg-piece-details-note">DEF {liveDef}: printed {unit.def}, {liveDef > unit.def ? 'raised' : 'lowered'} by research.</span>
               )}
               {p.kind === 'hero' && p.stats && <span className="ngg-piece-details-stats">{p.stats}</span>}
               {p.kind === 'unit' && p.core === 'CORELESS' && <span className="ngg-piece-details-note">No Core: it cannot act until one is fitted.</span>}

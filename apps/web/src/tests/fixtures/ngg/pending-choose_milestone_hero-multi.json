@@ -20,9 +20,7 @@
      "base_owner": "p4",
      "units": [],
      "heroes": [],
-     "collectors": [
-      "water-collector-1 (p3)"
-     ]
+     "collectors": []
     },
     {
      "coord": "-2,6",
@@ -72,7 +70,9 @@
      "base_owner": "p3",
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "water-collector-1 (p3)"
+     ]
     },
     {
      "coord": "-1,3",
@@ -360,6 +360,14 @@
   "resolving_action": null,
   "treaties": [
    {
+    "treaty": "Shared Resources",
+    "partners": [
+     "p4",
+     "p1"
+    ],
+    "culture_income": 4
+   },
+   {
     "treaty": "Open Borders",
     "partners": [
      "p4",
@@ -368,18 +376,10 @@
     "culture_income": 5
    },
    {
-    "treaty": "Shared Resources",
-    "partners": [
-     "p4",
-     "p3"
-    ],
-    "culture_income": 4
-   },
-   {
     "treaty": "Peace",
     "partners": [
      "p4",
-     "p1"
+     "p3"
     ],
     "culture_income": 3
    },
@@ -387,17 +387,17 @@
     "treaty": "Shared Resources",
     "partners": [
      "p2",
-     "p1"
+     "p3"
     ],
     "culture_income": 4
    },
    {
-    "treaty": "Culture Treaty",
+    "treaty": "Peace",
     "partners": [
      "p2",
-     "p3"
+     "p1"
     ],
-    "culture_income": 1
+    "culture_income": 3
    }
   ],
   "battle": null,
@@ -416,13 +416,13 @@
     "leader_alive": true
    },
    "p2": {
-    "culture": 10,
+    "culture": 12,
     "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p3": {
-    "culture": 6,
+    "culture": 8,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
@@ -443,7 +443,7 @@
     "species": "robot",
     "culture": 8,
     "culture_target": 140,
-    "economic_collectors": 20,
+    "economic_collectors": 16,
     "next_milestones": [
      21,
      42,
@@ -479,7 +479,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 1,
-    "cores_supply": 19,
+    "cores_supply": 15,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -567,7 +567,7 @@
      "water": 1
     },
     "unit_limits": {
-     "Core": 24,
+     "Core": 20,
      "Water collector": 10,
      "Wood collector": 8,
      "Ore collector": 7,
@@ -586,9 +586,9 @@
     "kind": "ai",
     "faction": "The Schism",
     "species": "wizard",
-    "culture": 10,
+    "culture": 12,
     "culture_target": 140,
-    "economic_collectors": 20,
+    "economic_collectors": 16,
     "next_milestones": [
      21,
      42,
@@ -624,7 +624,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 24,
+    "cores_supply": 20,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -711,7 +711,7 @@
     "bank": {},
     "paired_core_cost": null,
     "unit_limits": {
-     "Surf": 20,
+     "Surf": 16,
      "Subject": 10,
      "Evoker": 5,
      "Illusionist": 5,
@@ -725,11 +725,10 @@
     "kind": "ai",
     "faction": "The Ledger",
     "species": "robot",
-    "culture": 6,
+    "culture": 8,
     "culture_target": 140,
-    "economic_collectors": 20,
+    "economic_collectors": 16,
     "next_milestones": [
-     7,
      21,
      42,
      70,
@@ -762,7 +761,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 1,
-    "cores_supply": 19,
+    "cores_supply": 15,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -816,7 +815,7 @@
      {
       "collector": "water-collector-1",
       "type": "Water collector",
-      "placed_at": "-2,4",
+      "placed_at": "-2,12",
       "core": "allocated"
      },
      {
@@ -841,7 +840,7 @@
     "committed_collectors": [
      {
       "collector": "water-collector-1",
-      "coord": "-2,4",
+      "coord": "-2,12",
       "resource": "water"
      }
     ],
@@ -850,7 +849,7 @@
      "water": 1
     },
     "unit_limits": {
-     "Core": 24,
+     "Core": 20,
      "Water collector": 10,
      "Wood collector": 8,
      "Ore collector": 7,
@@ -871,7 +870,7 @@
     "species": "wizard",
     "culture": 12,
     "culture_target": 140,
-    "economic_collectors": 20,
+    "economic_collectors": 16,
     "next_milestones": [
      21,
      42,
@@ -907,7 +906,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 24,
+    "cores_supply": 20,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -1009,7 +1008,7 @@
     "bank": {},
     "paired_core_cost": null,
     "unit_limits": {
-     "Surf": 20,
+     "Surf": 16,
      "Subject": 10,
      "Evoker": 5,
      "Illusionist": 5,
@@ -1155,9 +1154,7 @@
      "base_owner": "p4",
      "units": [],
      "heroes": [],
-     "collectors": [
-      "water-collector-1 (p3)"
-     ]
+     "collectors": []
     },
     {
      "coord": "-2,6",
@@ -1207,7 +1204,9 @@
      "base_owner": "p3",
      "units": [],
      "heroes": [],
-     "collectors": []
+     "collectors": [
+      "water-collector-1 (p3)"
+     ]
     },
     {
      "coord": "-1,3",
@@ -1495,6 +1494,14 @@
   "resolving_action": null,
   "treaties": [
    {
+    "treaty": "Shared Resources",
+    "partners": [
+     "p4",
+     "p1"
+    ],
+    "culture_income": 4
+   },
+   {
     "treaty": "Open Borders",
     "partners": [
      "p4",
@@ -1503,18 +1510,10 @@
     "culture_income": 5
    },
    {
-    "treaty": "Shared Resources",
-    "partners": [
-     "p4",
-     "p3"
-    ],
-    "culture_income": 4
-   },
-   {
     "treaty": "Peace",
     "partners": [
      "p4",
-     "p1"
+     "p3"
     ],
     "culture_income": 3
    },
@@ -1522,17 +1521,17 @@
     "treaty": "Shared Resources",
     "partners": [
      "p2",
-     "p1"
+     "p3"
     ],
     "culture_income": 4
    },
    {
-    "treaty": "Culture Treaty",
+    "treaty": "Peace",
     "partners": [
      "p2",
-     "p3"
+     "p1"
     ],
-    "culture_income": 1
+    "culture_income": 3
    }
   ],
   "battle": null,
@@ -1551,13 +1550,13 @@
     "leader_alive": true
    },
    "p2": {
-    "culture": 10,
+    "culture": 12,
     "tech": 3,
     "leader_kills": 0,
     "leader_alive": true
    },
    "p3": {
-    "culture": 6,
+    "culture": 8,
     "tech": 4,
     "leader_kills": 0,
     "leader_alive": true
@@ -1578,7 +1577,7 @@
     "species": "robot",
     "culture": 8,
     "culture_target": 140,
-    "economic_collectors": 20,
+    "economic_collectors": 16,
     "next_milestones": [
      21,
      42,
@@ -1614,7 +1613,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 1,
-    "cores_supply": 19,
+    "cores_supply": 15,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -1702,7 +1701,7 @@
      "water": 1
     },
     "unit_limits": {
-     "Core": 24,
+     "Core": 20,
      "Water collector": 10,
      "Wood collector": 8,
      "Ore collector": 7,
@@ -1721,9 +1720,9 @@
     "kind": "ai",
     "faction": "The Schism",
     "species": "wizard",
-    "culture": 10,
+    "culture": 12,
     "culture_target": 140,
-    "economic_collectors": 20,
+    "economic_collectors": 16,
     "next_milestones": [
      21,
      42,
@@ -1759,7 +1758,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 24,
+    "cores_supply": 20,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -1846,7 +1845,7 @@
     "bank": {},
     "paired_core_cost": null,
     "unit_limits": {
-     "Surf": 20,
+     "Surf": 16,
      "Subject": 10,
      "Evoker": 5,
      "Illusionist": 5,
@@ -1860,11 +1859,10 @@
     "kind": "ai",
     "faction": "The Ledger",
     "species": "robot",
-    "culture": 6,
+    "culture": 8,
     "culture_target": 140,
-    "economic_collectors": 20,
+    "economic_collectors": 16,
     "next_milestones": [
-     7,
      21,
      42,
      70,
@@ -1897,7 +1895,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 1,
-    "cores_supply": 19,
+    "cores_supply": 15,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -1951,7 +1949,7 @@
      {
       "collector": "water-collector-1",
       "type": "Water collector",
-      "placed_at": "-2,4",
+      "placed_at": "-2,12",
       "core": "allocated"
      },
      {
@@ -1976,7 +1974,7 @@
     "committed_collectors": [
      {
       "collector": "water-collector-1",
-      "coord": "-2,4",
+      "coord": "-2,12",
       "resource": "water"
      }
     ],
@@ -1985,7 +1983,7 @@
      "water": 1
     },
     "unit_limits": {
-     "Core": 24,
+     "Core": 20,
      "Water collector": 10,
      "Wood collector": 8,
      "Ore collector": 7,
@@ -2006,7 +2004,7 @@
     "species": "wizard",
     "culture": 12,
     "culture_target": 140,
-    "economic_collectors": 20,
+    "economic_collectors": 16,
     "next_milestones": [
      21,
      42,
@@ -2042,7 +2040,7 @@
     "leader_alive": true,
     "subjects": 0,
     "cores_reserve": 0,
-    "cores_supply": 24,
+    "cores_supply": 20,
     "action_cards": {
      "build": 1,
      "moveBattle": 1,
@@ -2144,7 +2142,7 @@
     "bank": {},
     "paired_core_cost": null,
     "unit_limits": {
-     "Surf": 20,
+     "Surf": 16,
      "Subject": 10,
      "Evoker": 5,
      "Illusionist": 5,

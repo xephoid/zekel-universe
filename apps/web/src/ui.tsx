@@ -42,10 +42,14 @@ export function Avatar({ name, size = 32, color, className, style }: {
   );
 }
 
-/** Flat placeholder cover from the canvas: one colored field, giant initial,
- *  and the honest label until real art arrives. */
+/** The game's cover art, or the flat placeholder from the canvas (one
+ *  colored field, giant initial, and the honest label) for a game without
+ *  art. The art's alt is empty on purpose: every place a cover appears
+ *  names the game right beside it, often inside the same link. */
 export function Cover({ game, size = 'large' }: { game: GameCatalogEntry; size?: 'large' | 'small' | 'tile' }) {
-  if (game.coverImage) return <img src={game.coverImage} alt="" className={`gpcover ${size}`} />;
+  if (game.coverImage) {
+    return <img src={game.coverImage} alt="" className={`gpcover ${size}`} style={game.coverFocus ? { objectPosition: game.coverFocus } : undefined} />;
+  }
   const hue = hashHue(game.engineGameId);
   return (
     <div className={`gpcover ${size}`} style={{ background: `hsl(${hue}, 46%, 52%)` }}>

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Word Debauchee, setup</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+h2{margin:0 0 8px;font:700 18px 'Bricolage Grotesque',sans-serif}
+.help{font-size:14px;color:#655c4d;line-height:1.4}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.opt{min-height:44px;padding:0 14px;border-radius:8px;border:1px solid #c9bda6;background:#fff;color:#1c1a17;font:500 15px 'IBM Plex Sans',sans-serif;cursor:pointer}
+.opt.on{background:#e6efe9;border-color:#1f4d3a;font-weight:600}
+.opt:disabled{opacity:.5;cursor:default}
+.check{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid #e0d6c3;cursor:pointer}
+.check input{width:20px;height:20px;margin:2px 0 0;accent-color:#1f4d3a;flex:none}
+.check b{font-weight:600;font-size:15px}
+.go{min-height:52px;width:100%;border-radius:8px;border:1px solid #e0762b;background:#e0762b;color:#1c1a17;font:600 17px 'IBM Plex Sans',sans-serif;cursor:pointer}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #f7f1e6; color: #1c1a17; font-family: 'IBM Plex Sans', sans-serif">
+<div style="max-width: 560px; margin: 0 auto; padding: 24px 16px; display: flex; flex-direction: column; gap: 24px">
+
+<div>
+<h1 style="margin: 0 0 6px; font: 700 32px 'Bricolage Grotesque', sans-serif; letter-spacing: -0.01em">Word Debauchee</h1>
+<div style="font-size: 16px; line-height: 1.45">One player knows a secret word and gives three stingy clues. Everyone else races to spell a word that means the same.</div>
+</div>
+
+<section>
+<h2>Who's playing</h2>
+<div class="seg" style="align-items: center">
+<span class="opt on" style="display: inline-flex; align-items: center; background: #fbe3d2; color: #7a3a12; border-color: transparent">You</span>
+<button class="opt">Ben · AI medium</button>
+<button class="opt">Cat · AI easy</button>
+<button class="opt">Dev · AI hard</button>
+<button class="opt" style="border-style: dashed">Add a seat</button>
+</div>
+<div class="help" style="margin-top: 8px">2 to 8 players. With four, everyone is the debauchee twice, so 8 rounds.</div>
+</section>
+
+<section>
+<h2>Who goes first</h2>
+<div class="help" style="margin-bottom: 8px">Whoever most recently got away with something is the first debauchee.</div>
+<div class="seg">
+<button class="opt on">You</button>
+<button class="opt">Ben</button>
+<button class="opt">Cat</button>
+<button class="opt">Dev</button>
+</div>
+</section>
+
+<section>
+<h2>When a letter comes down</h2>
+<div class="seg">
+<button class="opt on">Every lap of the table</button>
+<button class="opt">Every 30 seconds</button>
+</div>
+</section>
+
+<section>
+<h2>Variants</h2>
+<label class="check"><input type="checkbox"><span><b>Bribe</b><br><span class="help">On Reveal!, take a clue instead of a letter. It costs the same as a letter.</span></span></label>
+<label class="check"><input type="checkbox"><span><b>Open hand</b><br><span class="help">Kinder for new players. The debauchee picks any three clues, at least one a number clue.</span></span></label>
+<label class="check"><input type="checkbox"><span><b>The House</b><br><span class="help">The AI is the debauchee every round and the people play as one team against it.</span></span></label>
+<label class="check" style="border-bottom: 1px solid #e0d6c3"><input type="checkbox" disabled><span><b>Use your own tiles</b><br><span class="help">For people around one real table with a 144-tile set. Not with AI guessers, who need tiles on screen.</span></span></label>
+</section>
+
+<button class="go">Start</button>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1100,"height":960}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

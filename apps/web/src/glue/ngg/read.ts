@@ -26,6 +26,9 @@ export interface NggPiece {
   resource: string | null;
   /** heroes: the printed stat line */
   stats: string | null;
+  /** units: the engine's DEF now, out of battle (the printed DEF plus any
+   *  research raising it); null from an older engine or a statless piece */
+  def: number | null;
 }
 
 export interface NggTile {
@@ -83,7 +86,7 @@ export interface NggPlayer {
   spyRecruitments: number;
   /** spies recruited and not publicly revealed or spent; null from an older engine */
   unrevealedSpies: number | null;
-  units: Array<{ id: string; type: string; coord: string; core: 'allocated' | 'CORELESS' | null }>;
+  units: Array<{ id: string; type: string; coord: string; core: 'allocated' | 'CORELESS' | null; def: number | null }>;
   heroes: Array<{ name: string; coord: string | null; leader: boolean; dead: boolean; stats: string | null }>;
   bases: string[];
   collectors: Array<{ id: string; coord: string; resource: string | null }>;
@@ -255,6 +258,7 @@ function readPlayer(p: Record<string, unknown>): NggPlayer {
       type: asStr(u['type']),
       coord: asStr(u['coord']),
       core: u['core'] === 'allocated' || u['core'] === 'CORELESS' ? u['core'] : null,
+      def: typeof u['def'] === 'number' ? u['def'] : null,
     })),
     heroes: asArr(p['heroes']).filter(isObj).map((h) => ({
       name: asStr(h['hero']),
@@ -387,13 +391,13 @@ export function readView(view: unknown): NggView | null {
   for (const p of players) {
     for (const h of p.heroes) {
       if (h.dead) continue;
-      put(h.coord, { kind: 'hero', owner: p.id, name: h.name, id: null, leader: h.leader, core: null, resource: null, stats: h.stats });
+      put(h.coord, { kind: 'hero', owner: p.id, name: h.name, id: null, leader: h.leader, core: null, resource: null, stats: h.stats, def: null });
     }
     for (const u of p.units) {
-      put(u.coord, { kind: 'unit', owner: p.id, name: u.type, id: u.id, leader: false, core: u.core, resource: null, stats: null });
+      put(u.coord, { kind: 'unit', owner: p.id, name: u.type, id: u.id, leader: false, core: u.core, resource: null, stats: null, def: u.def });
     }
     for (const c of p.collectors) {
-      put(c.coord, { kind: 'collector', owner: p.id, name: c.id, id: c.id, leader: false, core: null, resource: c.resource, stats: null });
+      put(c.coord, { kind: 'collector', owner: p.id, name: c.id, id: c.id, leader: false, core: null, resource: c.resource, stats: null, def: null });
     }
   }
 
