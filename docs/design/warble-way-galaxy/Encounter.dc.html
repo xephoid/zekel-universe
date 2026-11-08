@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Warble Way Galaxy space encounters</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;600&amp;family=Kalam:wght@400;700&amp;display=swap">
+<style>
+body{margin:0;background:#0d1124}
+a{color:#FFD700}a:hover{color:#fff1a8}
+.void{background-color:#0d1124;background-image:radial-gradient(rgba(232,228,216,.16) 1px,transparent 1.4px);background-size:24px 24px}
+.ic{display:inline-block;flex:none;background-color:currentColor;-webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center}
+.lbl{font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:12px;letter-spacing:.16em}
+.num{font-family:'IBM Plex Mono',monospace;font-weight:600}
+.ga{filter:grayscale(1) invert(1) contrast(1.45) sepia(1) saturate(3) hue-rotate(8deg) brightness(1.08);background:#170d02;-webkit-mask-image:repeating-linear-gradient(0deg,#000 0 2px,rgba(0,0,0,.55) 2px 3px);mask-image:repeating-linear-gradient(0deg,#000 0 2px,rgba(0,0,0,.55) 2px 3px)}
+.gx{display:inline-grid;flex:none;vertical-align:middle}
+.gx>.ic{grid-area:1/1}
+.gx>.gh{background-color:#ff4f7b!important;opacity:.55;transform:translate(2px,0);animation:gxjit 2.7s steps(1) infinite}
+.gx>.ic:not(.gh){animation:gxjit 3.4s steps(1) infinite reverse}
+.gx:nth-child(2n)>.gh{animation-duration:3.1s}.gx:nth-child(3n)>.gh{animation-duration:2.3s}
+@keyframes gxjit{0%,100%{transform:translate(0,0)}18%{transform:translate(-2px,0)}19%{transform:translate(2px,0)}20%{transform:translate(0,0)}66%{transform:translate(2px,0)}67%{transform:translate(0,0)}}
+.gxi{display:inline-grid;flex:none;vertical-align:middle;position:relative}
+.gxi>img{grid-area:1/1}
+.gxi>.gh{opacity:.6;transform:translate(3px,0);animation:gxjit 2.9s steps(1) infinite}
+.gxi>.ga.gh{filter:grayscale(1) invert(1) contrast(1.45) sepia(1) saturate(5) hue-rotate(290deg) brightness(1.05)}
+.gxi>.ga-red.gh{filter:grayscale(1) invert(1) contrast(1.45) sepia(1) saturate(5) hue-rotate(150deg) brightness(1.05)}
+.gxi>img:not(.gh){mix-blend-mode:screen;animation:gxjit 3.7s steps(1) infinite reverse}
+.gxi:nth-child(2n)>.gh{animation-duration:3.3s}.gxi:nth-child(3n)>.gh{animation-duration:2.4s}
+
+.ga-red{filter:grayscale(1) invert(1) contrast(1.5) sepia(1) saturate(5) hue-rotate(-38deg) brightness(1.05);background:#1a0405;-webkit-mask-image:repeating-linear-gradient(0deg,#000 0 2px,rgba(0,0,0,.55) 2px 3px);mask-image:repeating-linear-gradient(0deg,#000 0 2px,rgba(0,0,0,.55) 2px 3px)}
+.act{display:grid;grid-template-columns:40px minmax(0,1fr);gap:4px 12px;align-items:start;box-sizing:border-box;padding:12px 14px;border-radius:14px;border:1.5px solid #4f5a94;background:#283063;color:#ece8dc;text-align:left;cursor:pointer;min-height:96px}
+.act.sel{border:3px solid #FFD700;background:#3a3520}
+.act.off{background:transparent;border:1.5px dashed #3d4880;color:#7f88b5;cursor:default}
+.act.used{background:transparent;border:1.5px solid #3d4880;color:#9aa3c7}
+.an{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:18px;line-height:1.1}
+.ach{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:12px;color:#c9cfee}
+.off .ach{color:#6d7499}
+.aw{font-size:12px;line-height:1.35;color:#aab1d3;grid-column:2}
+.die{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:20px}
+.step{display:flex;align-items:center;gap:8px;font-size:13px}
+.stat{display:flex;flex-direction:column;align-items:center;gap:1px}
+
+
+.i-swirl{-webkit-mask-image:url(assets/icons/star-swirl.png);mask-image:url(assets/icons/star-swirl.png)}
+.i-credits{-webkit-mask-image:url(assets/icons/credits-currency.png);mask-image:url(assets/icons/credits-currency.png)}
+.i-ship{-webkit-mask-image:url(assets/icons/spaceship.png);mask-image:url(assets/icons/spaceship.png)}
+.i-being{-webkit-mask-image:url(assets/icons/being-icon.png);mask-image:url(assets/icons/being-icon.png)}
+.i-satcom{-webkit-mask-image:url(assets/icons/satellite-communication.svg);mask-image:url(assets/icons/satellite-communication.svg)}
+.i-silo{-webkit-mask-image:url(assets/icons/round-silo.png);mask-image:url(assets/icons/round-silo.png)}
+.i-conquest{-webkit-mask-image:url(assets/icons/planet-conquest.svg);mask-image:url(assets/icons/planet-conquest.svg)}
+.i-rocket{-webkit-mask-image:url(assets/icons/rocket-flight.png);mask-image:url(assets/icons/rocket-flight.png)}
+.i-idcard{-webkit-mask-image:url(assets/icons/id-card.png);mask-image:url(assets/icons/id-card.png)}
+.i-crack{-webkit-mask-image:url(assets/icons/cracked-glass.png);mask-image:url(assets/icons/cracked-glass.png)}
+.i-rays{-webkit-mask-image:url(assets/icons/explosion-rays.svg);mask-image:url(assets/icons/explosion-rays.svg)}
+.i-chest{-webkit-mask-image:url(assets/icons/locked-chest.png);mask-image:url(assets/icons/locked-chest.png)}
+.i-skull{-webkit-mask-image:url(assets/icons/skull-crossed-bones.png);mask-image:url(assets/icons/skull-crossed-bones.png)}
+.i-convince{-webkit-mask-image:url(assets/icons/convince.png);mask-image:url(assets/icons/convince.png)}
+.leg{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;font-size:13px}
+.pip{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:20px;cursor:pointer}
+
+</style>
+</helmet>
+<div class="void" style="width: 1440px; height: 900px; box-sizing: border-box; color: #e8e4d8; font-family: 'IBM Plex Sans', system-ui, sans-serif; display: flex; flex-direction: column">
+
+  <header style="height: 72px; flex: none; box-sizing: border-box; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border-bottom: 1px solid #262e57; background: rgba(13,17,36,.86)">
+    <div style="display: flex; align-items: center; gap: 12px; width: 300px">
+      <span class="gx"><span class="ic i-swirl gh" style="width: 28px; height: 28px; color: #FFD700"></span><span class="ic i-swirl" style="width: 28px; height: 28px; color: #FFD700"></span></span>
+      <span style="font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 20px">Warble Way Galaxy</span>
+    </div>
+    <span style="display: flex; align-items: center; gap: 10px; font-size: 13px"><span class="gx"><span class="ic i-rocket gh" style="width: 20px; height: 20px; color: #FFD700"></span><span class="ic i-rocket" style="width: 20px; height: 20px; color: #FFD700"></span></span><span class="lbl" style="color: #aab1d3">ON THE WAY TO KOOKOOKACHAA</span><span class="num" style="color: #ece8dc">card 4 of 5</span></span>
+    <div style="display: flex; align-items: center; gap: 8px; width: 300px; justify-content: flex-end; color: #FFD700"><span class="gx"><span class="ic i-credits gh" style="width: 22px; height: 22px"></span><span class="ic i-credits" style="width: 22px; height: 22px"></span></span><span class="num" style="font-size: 22px">1,240c</span></div>
+  </header>
+
+  <div style="flex: 1; min-height: 0; box-sizing: border-box; padding: 20px 24px; display: grid; grid-template-columns: 300px minmax(0, 1fr) 320px; gap: 20px">
+
+    <aside aria-label="The card" style="display: flex; flex-direction: column; gap: 14px; align-items: center; min-width: 0">
+      <div style="{{ card.style }}">
+        <div style="{{ card.bandStyle }}"><span class="lbl" style="display: flex; align-items: center; gap: 6px"><span class="gx"><span class="ic {{ card.kindIcon }} gh" style="width: 16px; height: 16px"></span><span class="ic {{ card.kindIcon }}" style="width: 16px; height: 16px"></span></span>{{ card.kind }}</span><span class="num" style="font-size: 15px">{{ card.code }}</span></div>
+        <div style="height: 150px; display: flex; align-items: center; justify-content: center">
+          <div style="{{ card.ringStyle }}">
+            <sc-if value="{{ card.img }}" hint-placeholder-val="{{ false }}"><span class="gxi"><img class="ga gh" src="{{ card.img }}" alt="" aria-hidden="true" style="width: 118px; height: 118px; border-radius: 50%; object-fit: cover"><img class="ga" src="{{ card.img }}" alt="{{ card.title }}" style="width: 118px; height: 118px; border-radius: 50%; object-fit: cover"></span></sc-if>
+            <sc-if value="{{ card.art }}" hint-placeholder-val="{{ true }}"><span class="gx"><span class="ic {{ card.art }} gh" style="width: 86px; height: 86px"></span><span class="ic {{ card.art }}" style="width: 86px; height: 86px"></span></span></sc-if>
+          </div>
+        </div>
+        <div style="padding: 0 16px; display: flex; flex-direction: column; gap: 3px"><span style="font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 26px; line-height: 1.1">{{ card.title }}</span><span style="font-size: 13px; line-height: 1.35; color: #aab1d3">{{ card.sub }}</span></div>
+        <div style="flex: 1; padding: 10px 16px 14px; display: flex; flex-direction: column; justify-content: flex-end">
+          <sc-for list="{{ card.rows }}" as="r" hint-placeholder-count="2"><div style="{{ card.rowStyle }}"><span class="num" style="font-size: 16px">{{ r.k }}</span><span style="font-size: 12px; text-align: right">{{ r.v }}</span></div></sc-for>
+        </div>
+      </div>
+      <span style="font-size: 12px; color: #9aa3c7; text-align: center">{{ card.foot }}</span>
+    </aside>
+
+    <main style="background: #1f2650; border-radius: 18px; padding: 22px 24px; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.35); min-width: 0">
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <span class="lbl" style="{{ kickerStyle }}">{{ kicker }}</span>
+        <h1 style="margin: 0; font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 34px; line-height: 1.05">{{ title }}</h1>
+        <span style="font-size: 14px; color: #aab1d3">{{ lede }}</span>
+      </div>
+
+      <div style="{{ gridStyle }}">
+        <sc-for list="{{ actions }}" as="a" hint-placeholder-count="3">
+          <div class="act {{ a.cls }}" role="button">
+            <span class="gx" style="grid-row: span 3; color: {{ a.color }}"><span class="ic {{ a.icon }} gh" style="width: 36px; height: 36px"></span><span class="ic {{ a.icon }}" style="width: 36px; height: 36px"></span></span>
+            <span style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 8px"><span class="an">{{ a.name }}</span><span style="{{ a.tagStyle }}">{{ a.tag }}</span></span>
+            <span class="ach">{{ a.check }}</span>
+            <span class="aw">{{ a.what }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ showDepth }}" hint-placeholder-val="{{ false }}">
+        <section style="border-radius: 14px; background: #1a2042; border: 1px solid #343d6b; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+          <span class="lbl" style="font-size: 11px; color: #b9bdd4">HOW DEEP WILL YOU GO?</span>
+          <div style="display: flex; gap: 12px; align-items: center">
+            <sc-for list="{{ depths }}" as="d" hint-placeholder-count="3"><span style="display: flex; flex-direction: column; align-items: center; gap: 4px"><span class="pip" style="{{ d.style }}">{{ d.n }}</span><span style="font-size: 11px; color: #aab1d3">{{ d.label }}</span></span></sc-for>
+            <span style="flex: 1; font-size: 13px; line-height: 1.45; color: #c9cfee; margin-left: 10px">Every visit starts on map R1. Reach the goal to drop to R2. Stop at the depth you picked; going deeper means more caches and tougher attackers. You pick the party and threat level next.</span>
+          </div>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{ showStack }}" hint-placeholder-val="{{ false }}">
+        <section style="border-radius: 14px; background: #1a2042; border: 1px solid #343d6b; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px">
+          <span class="lbl" style="font-size: 11px; color: #b9bdd4">{{ stackHead }}</span>
+          <sc-for list="{{ stack }}" as="l" hint-placeholder-count="3"><div class="leg" style="{{ l.style }}"><span class="gx" style="color: {{ l.color }}"><span class="ic {{ l.icon }} gh" style="width: 18px; height: 18px"></span><span class="ic {{ l.icon }}" style="width: 18px; height: 18px"></span></span><span style="flex: 1">{{ l.name }}</span><span class="num">{{ l.n }}</span></div></sc-for>
+          <span style="font-size: 12px; color: #9aa3c7">Cards each way = distance − speed 1. The paused leg picks up where it stopped once the job is done, win or lose.</span>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{ showOdds }}" hint-placeholder-val="{{ false }}">
+        <section style="border-radius: 14px; background: #1a2042; border: 1px solid #343d6b; padding: 14px 16px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px">
+          <sc-for list="{{ odds }}" as="o" hint-placeholder-count="3"><div style="display: flex; flex-direction: column; gap: 3px"><span class="lbl" style="font-size: 10px; color: #aab1d3">{{ o.k }}</span><span style="font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 20px; color: {{ o.color }}">{{ o.v }}</span><span style="font-size: 12px; color: #9aa3c7">{{ o.note }}</span></div></sc-for>
+        </section>
+      </sc-if>
+
+      <p style="margin: auto 0 0; font-size: 12px; line-height: 1.5; color: #9aa3c7">{{ foot }}</p>
+    </main>
+
+    <aside aria-label="Your side" style="display: flex; flex-direction: column; gap: 14px; min-width: 0">
+      <section style="background: #1a2042; border: 1px solid #343d6b; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+        <div style="display: flex; justify-content: space-between; align-items: center">
+          <span style="display: flex; align-items: center; gap: 10px"><span class="gx"><span class="ic i-ship gh" style="width: 22px; height: 22px; color: #FFD700"></span><span class="ic i-ship" style="width: 22px; height: 22px; color: #FFD700"></span></span><span style="font-family: 'Kalam', cursive; font-weight: 700; font-size: 19px">The Warbler</span></span>
+          <span class="num" style="font-size: 13px; color: #aab1d3">{{ aboard }}</span>
+        </div>
+        <span style="font-size: 12px; color: #aab1d3"><b style="font-family: 'Chakra Petch', sans-serif; letter-spacing: .1em; color: #f2b544">DAMAGED</b> · speed 1 · 2 hits from lost</span>
+      </section>
+      <section style="background: #1a2042; border: 1px solid #343d6b; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+        <span class="lbl" style="font-size: 11px; color: #b9bdd4">ABOARD · BEST SCORES</span>
+        <sc-for list="{{ crew }}" as="c" hint-placeholder-count="3">
+          <div style="display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 10px; align-items: center">
+            <span class="gxi"><img class="ga gh" src="{{ c.img }}" alt="" aria-hidden="true" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover"><img class="ga" src="{{ c.img }}" alt="{{ c.name }}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover"></span>
+            <span style="display: flex; flex-direction: column"><span style="font-weight: 600; font-size: 14px">{{ c.name }}</span><span class="num" style="font-size: 11px; color: #aab1d3">{{ c.scores }}</span></span>
+          </div>
+        </sc-for>
+      </section>
+      <section style="margin-top: auto; background: #1a2042; border: 1.5px solid #FFD700; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+        <span class="lbl" style="color: #FFD700">{{ roll.head }}</span>
+        <span style="font-size: 15px; line-height: 1.45">{{ roll.text }}</span>
+        <sc-if value="{{ roll.cons }}" hint-placeholder-val="{{ false }}"><label style="display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 0 12px; border-radius: 12px; border: 1.5px dashed #6d7499; font-size: 13px"><input type="checkbox" style="width: 18px; height: 18px; accent-color: #FFD700">Use <b>+1 Any</b> on this roll</label></sc-if>
+        <button style="height: 54px; border-radius: 14px; border: none; background: #FFD700; color: #1d1d20; font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: 0.06em; cursor: pointer">{{ roll.btn }}</button>
+      </section>
+    </aside>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900},"card":{"editor":"enum","options":["♥ Recruit adrift","♣ Job offer","♣ Ruin expedition","♦ Ruin found"],"default":"♥ Recruit adrift"}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var B = '';
+    var C = ['♥ Recruit adrift', '♣ Job offer', '♣ Ruin expedition', '♦ Ruin found'];
+    var pick = C.indexOf(this.props.card) >= 0 ? this.props.card : C[0];
+    function A(o) {
+      var tagCol = o.state === 'off' ? '#6d7499' : o.state === 'sel' ? '#FFD700' : '#aab1d3';
+      return { name: o.name, icon: o.icon, check: o.check, what: o.what, tag: o.tag || '', cls: o.state || '',
+        color: o.state === 'off' ? '#56609a' : (o.color || '#FFD700'),
+        tagStyle: 'font-size: 11px; font-weight: 600; color: ' + tagCol + '; white-space: nowrap;' };
+    }
+    function CARD(kind, bright, icon, code, title, sub, rows, img, art, foot) {
+      return { kind: kind, kindIcon: icon, code: code, title: title, sub: sub, img: img || '', art: art || '', foot: foot,
+        rows: rows.map(function (r) { return { k: r[0], v: r[1] }; }),
+        style: 'width: 270px; height: 420px; box-sizing: border-box; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; background: #1f2650; color: #ece8dc; border: 2px solid ' + bright + '; box-shadow: 0 0 26px ' + bright + '44;',
+        bandStyle: 'height: 34px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; background: ' + bright + '; color: #10142a;',
+        ringStyle: 'width: 130px; height: 130px; box-sizing: border-box; border-radius: 50%; border: 1.5px dashed #3d4880; display: flex; align-items: center; justify-content: center; color: ' + bright + ';',
+        rowStyle: 'display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 7px 0; border-top: 1px solid #3d4880;' };
+    }
+    var GRID2 = 'display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px';
+    var GRID3 = 'display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px';
+    var LEG = function (a) { return a.map(function (l) { return { name: l[0], n: l[1], icon: l[2], color: l[3] || '#FFD700',
+      style: l[4] ? 'background: #3a3520; border: 1.5px solid #FFD700;' : 'background: #283063; border: 1px solid #4f5a94; color: #c9cfee;' }; }); };
+    var V;
+    if (pick === C[0]) {
+      V = { card: CARD('RECRUIT', '#4cc9b0', 'i-being', '♥ A', 'C0FFEE', 'Hexapod pod pilot · idealizes Smarts', [['need 13', '+3 PIL']], 'assets/portraits/hexapod.jpg', '', 'Fail and they drift on. A ♥ card never marks anyone.'),
+        kicker: 'SOMEONE ADRIFT', kickerStyle: 'color: #4cc9b0;', title: 'C0FFEE is hailing you', lede: 'A Hexapod pod in a drifting walker. Bring them aboard, or fly on.',
+        actions: [
+          A({ name: 'Try to recruit', icon: 'i-convince', check: '3d6 + Smarts 1 vs 13', tag: 'chosen', state: 'sel', color: '#4cc9b0', what: 'Your best Smarts score aboard is 7EE700\'s HAK 1. Leadership gives +1 XP on success.' }),
+          A({ name: 'Fly on', icon: 'i-rocket', check: 'no roll', tag: 'safe', what: 'They drift on. The card goes to the discard and the leg continues.' })
+        ], gridStyle: GRID2,
+        showOdds: true, odds: [
+          { k: 'YOU NEED', v: '12 on 3 dice', color: '#f2b544', note: 'about 3 in 8' },
+          { k: 'ROOM ABOARD', v: '3 of 5', color: '#6fd08a', note: 'space for one more' },
+          { k: 'IF THEY JOIN', v: '+3 PIL', color: '#4cc9b0', note: 'and +1 XP for Leadership' }
+        ],
+        foot: 'Acting would add a die here, because Hexapods and Kralkin respond to it. No one aboard has ACT.',
+        roll: { head: 'ROLL 3 DICE · RECRUIT', text: 'You need 13 or more, adding 7EE700\'s Hacking +1 (best Smarts aboard).', cons: true, btn: 'ROLL' }, aboard: '3/5 aboard' };
+    } else if (pick === C[1]) {
+      V = { card: CARD('JOB', '#6eaaff', 'i-satcom', '♣ 2', 'Channel clash', 'Two Kralkin relays claim one channel. Broker a deal, or slip into their code.', [['DIP 10', 'dist 4 · 200c · 1 XP'], ['HAK 15', 'dist 8 · 400c · 2 XP']], '', 'i-satcom', 'Taking a job here stacks it on top of your current trip.'),
+        kicker: 'A JOB IN THE MIDDLE OF NOWHERE', kickerStyle: 'color: #6eaaff;', title: 'Take Channel clash?', lede: 'Pick one way to do it, or decline. You can only pick a way someone aboard has the ability for.',
+        actions: [
+          A({ name: 'Broker a deal', icon: 'i-convince', check: 'DIP 10 · Slate +1', tag: 'chosen', state: 'sel', color: '#6eaaff', what: '4 away, so 3 cards out and 3 back. Pays 200c and 1 XP.' }),
+          A({ name: 'Slip into their code', icon: 'i-satcom', check: 'HAK 15 · 7EE700 +1', tag: '7EE700', color: '#6eaaff', what: '8 away, so 7 out and 7 back. Pays 400c and 2 XP. Needs 14 on 3 dice, about 1 in 6.' }),
+          A({ name: 'Decline', icon: 'i-rocket', check: 'no roll', tag: 'safe', what: 'The card goes to the discard and the trip continues.' })
+        ], gridStyle: GRID3,
+        showStack: true, stackHead: 'YOUR JOURNEY IF YOU BROKER A DEAL', stack: LEG([
+          ['Out · ♣2 Channel clash, DIP 10', '0 / 3', 'i-idcard', '#FFD700', true],
+          ['Back · ♣2 Channel clash', '0 / 3', 'i-idcard', '#aab1d3'],
+          ['Paused · to Kookookachaa', '4 / 5', 'i-rocket', '#aab1d3']
+        ]),
+        foot: 'The roll happens at the end of the outbound leg, not now. You can still fail it, but the trip back is dealt either way.',
+        roll: { head: 'NO ROLL YET', text: 'Accepting deals 3 cards out and 3 back on top of your trip. The DIP 10 roll comes when you arrive.', cons: false, btn: 'ACCEPT' }, aboard: '3/5 aboard' };
+    } else if (pick === C[2]) {
+      V = { card: CARD('JOB', '#6eaaff', 'i-satcom', '♣ J', "Digger's tip", 'A drunk digger sold you coordinates to a shallow ruin. Probably real. No ability needed.', [['R1', 'dist 8 · 1,400c · 2 XP']], '', 'i-conquest', 'Ruin expeditions have one option and no roll to accept.'),
+        kicker: 'A RUIN EXPEDITION', kickerStyle: 'color: #6eaaff;', title: "Follow the digger's tip?", lede: 'No ability needed. Clear one map of a ruin at the far end, then fly back.',
+        actions: [
+          A({ name: 'Accept', icon: 'i-conquest', check: 'R1 · depth 1', tag: 'chosen', state: 'sel', color: '#6eaaff', what: '8 away, so 7 cards out and 7 back. Pays 1,400c and 2 XP when you clear the map.' }),
+          A({ name: 'Decline', icon: 'i-rocket', check: 'no roll', tag: 'safe', what: 'The card goes to the discard and the trip continues.' })
+        ], gridStyle: GRID2,
+        showStack: true, stackHead: 'YOUR JOURNEY IF YOU ACCEPT', stack: LEG([
+          ['Out · ♣J Digger\'s tip', '0 / 7', 'i-idcard', '#FFD700', true],
+          ['Ruin · R1, depth 1', 'map', 'i-silo', '#f2b544'],
+          ['Back · ♣J Digger\'s tip', '0 / 7', 'i-idcard', '#aab1d3'],
+          ['Paused · to Kookookachaa', '4 / 5', 'i-rocket', '#aab1d3']
+        ]),
+        foot: 'Seven cards each way is a long trip with a Damaged ship. Each card can be a pirate.',
+        roll: { head: 'NO ROLL', text: 'Accepting deals 7 cards out and 7 back. You set up the ruin when you arrive.', cons: false, btn: 'ACCEPT' }, aboard: '3/5 aboard' };
+    } else {
+      V = { card: CARD('RUIN', '#f2b544', 'i-silo', '♦ J', 'Hollow Aerie', 'Kralkin perches, built for wings older than Arraak. Enter, or fly on.', [['depth 2', 'up to 2 maps']], '', 'i-silo', 'Found ruins pay in caches, beings and XP, not credits.'),
+        kicker: 'RUINS ON THE SCANNER', kickerStyle: 'color: #f2b544;', title: 'Enter the Hollow Aerie?', lede: 'Entering is optional. If you go in, choose how many maps deep you will try.',
+        actions: [
+          A({ name: 'Enter', icon: 'i-silo', check: 'choose depth 1 or 2', tag: 'chosen', state: 'sel', color: '#f2b544', what: 'Set up the party, start spot and threat level on the next screen.' }),
+          A({ name: 'Fly on', icon: 'i-rocket', check: 'no roll', tag: 'safe', what: 'Leave it behind. The card goes to the discard.' })
+        ], gridStyle: GRID2,
+        showDepth: true, depths: [
+          { n: '1', label: 'R1 only', style: 'border: 1.5px solid #6b76ad; background: #283063; color: #ece8dc;' },
+          { n: '2', label: 'R1 then R2', style: 'background: #f2b544; color: #1d1d20;' },
+          { n: '3', label: 'not on this card', style: 'border: 1.5px dashed #3d4880; color: #4f5a94; cursor: default;' }
+        ],
+        foot: 'Every ruin visit starts at R1. You can step off through the start at any time to leave early.',
+        roll: { head: 'NO ROLL', text: 'Entering opens ruin setup at depth 2: who goes in, where they start, and the threat level.', cons: false, btn: 'ENTER AT DEPTH 2' }, aboard: '3/5 aboard' };
+    }
+    V.showDepth = !!V.showDepth; V.showStack = !!V.showStack; V.showOdds = !!V.showOdds;
+    V.crew = [
+      { name: 'Ressa Vane (you)', img: 'assets/portraits/grull.jpg', scores: 'PIL 3 · SWA 2 · MEC 1 · GUN 0+1 · LEA 1' },
+      { name: '7EE700', img: 'assets/portraits/hexapod.jpg', scores: 'HAK 1' },
+      { name: 'Slate', img: 'assets/portraits/grull.jpg', scores: 'DIP 1' }
+    ];
+    return V;
+  }
+}
+</script>
+</body>
+</html>

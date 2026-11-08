@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Warble Way Galaxy ruin terrains</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;600&amp;display=swap">
+<style>
+body{margin:0;background:#0d1124}
+a{color:#FFD700}a:hover{color:#fff1a8}
+.void{background-color:#0d1124;background-image:radial-gradient(rgba(232,228,216,.16) 1px,transparent 1.4px);background-size:24px 24px}
+.ic{display:inline-block;flex:none;background-color:currentColor;-webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center}
+.i-swirl{-webkit-mask-image:url(assets/icons/star-swirl.png);mask-image:url(assets/icons/star-swirl.png)}
+.i-skull{-webkit-mask-image:url(assets/icons/skull-crossed-bones.png);mask-image:url(assets/icons/skull-crossed-bones.png)}
+.i-chest{-webkit-mask-image:url(assets/icons/locked-chest.png);mask-image:url(assets/icons/locked-chest.png)}
+.i-being{-webkit-mask-image:url(assets/icons/being-icon.png);mask-image:url(assets/icons/being-icon.png)}
+.i-alien{-webkit-mask-image:url(assets/icons/alien-skull.png);mask-image:url(assets/icons/alien-skull.png)}
+.i-suit{-webkit-mask-image:url(assets/icons/space-suit.svg);mask-image:url(assets/icons/space-suit.svg)}
+.lbl{font-family:'Chakra Petch',sans-serif;font-weight:600;letter-spacing:.16em}
+.num{font-family:'IBM Plex Mono',monospace;font-weight:600}
+.ga{filter:grayscale(1) invert(1) contrast(1.45) sepia(1) saturate(3) hue-rotate(8deg) brightness(1.08);background:#170d02;-webkit-mask-image:repeating-linear-gradient(0deg,#000 0 2px,rgba(0,0,0,.55) 2px 3px);mask-image:repeating-linear-gradient(0deg,#000 0 2px,rgba(0,0,0,.55) 2px 3px)}
+.ga-red{filter:grayscale(1) invert(1) contrast(1.5) sepia(1) saturate(5) hue-rotate(-38deg) brightness(1.05);background:#1a0405;-webkit-mask-image:repeating-linear-gradient(0deg,#000 0 2px,rgba(0,0,0,.55) 2px 3px);mask-image:repeating-linear-gradient(0deg,#000 0 2px,rgba(0,0,0,.55) 2px 3px)}
+.gx{display:inline-grid;flex:none;vertical-align:middle}
+.gx>.ic{grid-area:1/1}
+.gx>.gh{background-color:#ff4f7b!important;opacity:.55;transform:translate(2px,0);animation:gxjit 2.7s steps(1) infinite}
+.gx>.ic:not(.gh){animation:gxjit 3.4s steps(1) infinite reverse}
+.gx:nth-child(2n)>.gh{animation-duration:3.1s}.gx:nth-child(3n)>.gh{animation-duration:2.3s}
+@keyframes gxjit{0%,100%{transform:translate(0,0)}18%{transform:translate(-2px,0)}19%{transform:translate(2px,0)}20%{transform:translate(0,0)}66%{transform:translate(2px,0)}67%{transform:translate(0,0)}}
+.gxi{display:inline-grid;flex:none;vertical-align:middle;position:relative}
+.gxi>img{grid-area:1/1}
+.gxi>.gh{opacity:.6;transform:translate(3px,0);animation:gxjit 2.9s steps(1) infinite}
+.gxi>.ga.gh{filter:grayscale(1) invert(1) contrast(1.45) sepia(1) saturate(5) hue-rotate(290deg) brightness(1.05)}
+.gxi>.ga-red.gh{filter:grayscale(1) invert(1) contrast(1.45) sepia(1) saturate(5) hue-rotate(150deg) brightness(1.05)}
+.gxi>img:not(.gh){mix-blend-mode:screen;animation:gxjit 3.7s steps(1) infinite reverse}
+.gxi:nth-child(2n)>.gh{animation-duration:3.3s}.gxi:nth-child(3n)>.gh{animation-duration:2.4s}
+</style>
+</helmet>
+<div class="void" style="width: 1440px; min-height: 1660px; box-sizing: border-box; padding: 64px 70px; color: #e8e4d8; font-family: 'IBM Plex Sans', system-ui, sans-serif; display: flex; flex-direction: column; gap: 44px">
+  <header style="display: flex; flex-direction: column; gap: 12px; max-width: 980px">
+    <div class="num" style="font-size: 14px; letter-spacing: 0.18em; color: #FFD700">RUIN MAPS · FOUR TERRAINS · SAME RULES</div>
+    <h1 style="margin: 0; font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 64px; line-height: 1; color: #ece8dc">Ruin terrains</h1>
+    <p style="margin: 0; font-size: 18px; line-height: 1.55; color: #b9bdd4">The same R1 layout dressed four ways. Only the look changes: walls still block, floor is still floor, and the goal, caches, beings, start spots and every token look the same in all four, so a player never has to relearn the map. Each ruin rolls its terrain at random when the party enters, so the same map can feel new.</p>
+  </header>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 44px 48px">
+    <sc-for list="{{ maps }}" as="m" hint-placeholder-count="4">
+      <section style="display: flex; flex-direction: column; gap: 14px">
+        <div style="display: flex; align-items: baseline; gap: 12px">
+          <span style="{{ m.titleStyle }}">{{ m.T.name }}</span>
+          <span class="num" style="font-size: 12px; color: #9aa3c7">terrain: {{ m.T.key }}</span>
+        </div>
+        <span style="font-size: 14px; line-height: 1.5; color: #9aa3c7; min-height: 42px">{{ m.T.note }}</span>
+        <div style="{{ m.mapStyle }}">
+          <span style="{{ m.corner.tl }}"></span>
+          <span style="{{ m.corner.tr }}"></span>
+          <span style="{{ m.corner.bl }}"></span>
+          <span style="{{ m.corner.br }}"></span>
+          <span class="lbl" style="{{ m.labelStyle }}">R1 · {{ m.T.label }}</span>
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <div style="display: grid; grid-template-columns: 14px repeat(9, 60px); gap: 4px; height: 13px">
+              <span></span>
+              <sc-for list="{{ cols }}" as="n" hint-placeholder-count="9"><span class="num" style="{{ m.numStyleTop }}">{{ n }}</span></sc-for>
+            </div>
+            <div style="display: flex; gap: 4px">
+              <div style="display: grid; grid-template-rows: repeat(9, 60px); gap: 4px; width: 14px">
+                <sc-for list="{{ cols }}" as="n" hint-placeholder-count="9"><span class="num" style="{{ m.numStyleSide }}">{{ n }}</span></sc-for>
+              </div>
+              <div style="position: relative">
+                <div style="display: grid; grid-template-columns: repeat(9, 60px); grid-auto-rows: 60px; gap: 4px">
+                  <sc-for list="{{ m.cells }}" as="c" hint-placeholder-count="81">
+                    <div style="{{ c.style }}">
+                      <sc-if value="{{ c.icon }}" hint-placeholder-val="{{ false }}"><span class="gx"><span class="{{ c.icon }} gh" style="{{ c.iconStyle }}"></span><span class="{{ c.icon }}" style="{{ c.iconStyle }}"></span></span></sc-if>
+                      <sc-if value="{{ c.img }}" hint-placeholder-val="{{ false }}"><span class="gxi"><img class="ga gh" src="{{ c.img }}" alt="" aria-hidden="true" style="{{ c.imgStyle }}"><img class="ga" src="{{ c.img }}" alt="{{ c.alt }}" style="{{ c.imgStyle }}"></span></sc-if>
+                      <sc-if value="{{ c.rs }}" hint-placeholder-val="{{ false }}"><span class="gxi"><img class="ga gh" src="assets/portraits/redshirt.jpg" alt="" aria-hidden="true" style="{{ c.rsStyle }}"><img class="ga" src="assets/portraits/redshirt.jpg" alt="Red shirt" style="{{ c.rsStyle }}"></span></sc-if>
+                  <sc-if value="{{ c.foe }}" hint-placeholder-val="{{ false }}"><span style="{{ c.foeStyle }}"><span class="gxi" style="width: 100%; height: 100%"><img class="ga-red gh" src="{{ c.foeImg }}" alt="" aria-hidden="true" style="{{ c.foeImgStyle }}"><img class="ga-red" src="{{ c.foeImg }}" alt="{{ c.foeName }}" style="{{ c.foeImgStyle }}"></span><span style="{{ c.badgeStyle }}">{{ c.foe }} {{ c.atk }}</span></span></sc-if>
+                      <sc-if value="{{ c.dest }}" hint-placeholder-val="{{ false }}"><span class="num" style="width: 28px; height: 28px; box-sizing: border-box; border-radius: 50%; border: 2px solid #FFD700; background: rgba(6,9,24,.8); color: #FFD700; display: flex; align-items: center; justify-content: center; font-size: 12px; box-shadow: 0 0 12px rgba(255,215,0,.5)">3</span></sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+                <svg aria-hidden="true" width="572" height="572" viewBox="0 0 572 572" style="position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible">
+                  <circle cx="30" cy="30" r="56" fill="none" stroke="rgba(255,215,0,.22)" stroke-width="1" stroke-dasharray="2 6"></circle>
+                  <circle cx="30" cy="30" r="96" fill="none" stroke="rgba(255,215,0,.14)" stroke-width="1" stroke-dasharray="2 8"></circle>
+                  <circle cx="30" cy="30" r="140" fill="none" stroke="rgba(255,215,0,.08)" stroke-width="1" stroke-dasharray="2 10"></circle>
+                  <polyline points="94,414 94,350 158,286 158,222" fill="none" stroke="#FFD700" stroke-width="2.5" stroke-dasharray="1 8" stroke-linecap="round"></polyline>
+                  <line x1="158" y1="222" x2="158" y2="172" stroke="#f07070" stroke-width="2" stroke-dasharray="5 5"></line>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    function speckle(n, seed, w, h, colors, sizes, soft) {
+      var out = [], s = seed;
+      function rnd() { s = (s * 9301 + 49297) % 233280; return s / 233280; }
+      for (var i = 0; i < n; i++) {
+        var x = Math.round(rnd() * w), y = Math.round(rnd() * h);
+        var sz = sizes[Math.floor(rnd() * sizes.length)], col = colors[Math.floor(rnd() * colors.length)];
+        out.push('radial-gradient(' + sz + 'px ' + sz + 'px at ' + x + 'px ' + y + 'px, ' + col + (soft ? ', transparent)' : ' 99%, transparent)'));
+      }
+      return out.join(', ');
+    }
+    function terrains(w, h) {
+      var ROCK = ['14px 6px 18px 8px', '6px 16px 8px 14px', '18px 10px 6px 16px', '8px 18px 14px 6px'];
+      var BOULDER = ['42% 30% 46% 34%', '30% 44% 34% 46%', '46% 36% 30% 42%', '34% 46% 42% 30%'];
+      var BLOB = ['46% 38% 44% 40%', '38% 46% 40% 44%', '44% 40% 38% 46%', '40% 44% 46% 38%'];
+      return {
+        starry: {
+          key: 'starry', name: 'Derelict in open space', label: 'DERELICT SCAN', accent: '#6eaaff', num: '#5d6aa8', edge: '#263064',
+          note: 'Open space. The floor is a faint scan grid you can see stars through; walls are drifting wreckage.',
+          section: 'background-color: #060918; background-image: ' + speckle(70, 7, w, h, ['rgba(236,232,220,.35)', 'rgba(236,232,220,.6)', 'rgba(236,232,220,.9)'], [1, 1, 1.5, 2], false) + ', radial-gradient(420px 300px at 75% 30%, rgba(120,90,200,.16), transparent 70%), radial-gradient(360px 260px at 20% 85%, rgba(60,140,200,.12), transparent 70%);',
+          floor: function () { return 'border-radius: 6px; background: rgba(110,170,255,.05); box-shadow: inset 0 0 0 1px rgba(110,170,255,.2);'; },
+          wall: function (i) { return 'border-radius: ' + ROCK[i % 4] + '; background-color: #2b2944; background-image: radial-gradient(10px 8px at 30% 35%, rgba(0,0,0,.35), transparent), radial-gradient(7px 6px at 68% 70%, rgba(0,0,0,.3), transparent); box-shadow: inset 2px 3px 0 rgba(173,144,247,.22), inset -3px -4px 0 rgba(0,0,0,.45), 0 4px 10px rgba(0,0,0,.5);'; },
+          tile: '6px'
+        },
+        rocky: {
+          key: 'rocky', name: 'Asteroid cavern', label: 'CAVERN SCAN', accent: '#f2b544', num: '#8a7a64', edge: '#3a3128',
+          note: 'Plain rock. Dusty stone slabs underfoot and heavy boulders for walls; warm and quiet.',
+          section: 'background-color: #17130f; background-image: ' + speckle(160, 11, w, h, ['rgba(0,0,0,.45)', 'rgba(255,235,200,.08)', 'rgba(255,235,200,.14)'], [1.5, 2, 3], false) + ', radial-gradient(380px 280px at 30% 25%, rgba(242,181,68,.08), transparent 70%);',
+          floor: function () { return 'border-radius: 4px; background-color: #3a3128; background-image: radial-gradient(9px 6px at 30% 40%, rgba(0,0,0,.22), transparent), radial-gradient(6px 4px at 72% 66%, rgba(255,235,200,.06), transparent); box-shadow: inset 0 1px 0 rgba(255,235,200,.09), inset 0 -3px 0 rgba(0,0,0,.35);'; },
+          wall: function (i) { return 'border-radius: ' + BOULDER[i % 4] + '; background-color: #6d6052; background-image: radial-gradient(11px 8px at 32% 38%, rgba(0,0,0,.3), transparent), radial-gradient(7px 6px at 70% 68%, rgba(0,0,0,.28), transparent), radial-gradient(5px 4px at 62% 26%, rgba(255,235,200,.15), transparent); box-shadow: inset 3px 4px 0 rgba(255,230,190,.18), inset -4px -5px 0 rgba(0,0,0,.45), 0 5px 10px rgba(0,0,0,.6);'; },
+          tile: '4px'
+        },
+        alien: {
+          key: 'alien', name: 'Xeno hive', label: 'HIVE SCAN', accent: '#e070d0', num: '#7d5a8a', edge: '#3a1f45',
+          note: 'Living ruin. Soft, glowing floor cells and swollen chitin pods for walls.',
+          section: 'background-color: #0c0816; background-image: ' + speckle(46, 23, w, h, ['rgba(76,201,176,.55)', 'rgba(224,112,208,.5)', 'rgba(173,144,247,.45)'], [3, 4, 6], true) + ', radial-gradient(400px 300px at 80% 20%, rgba(224,112,208,.14), transparent 70%), radial-gradient(380px 300px at 15% 80%, rgba(76,201,176,.12), transparent 70%);',
+          floor: function (i) { return 'border-radius: ' + BLOB[i % 4] + '; background: rgba(76,201,176,.07); box-shadow: inset 0 0 0 1px rgba(76,201,176,.35), inset 0 0 14px rgba(76,201,176,.14);'; },
+          wall: function (i) { return 'border-radius: 50%; background-color: #4a1f52; background-image: radial-gradient(circle at 35% 30%, rgba(255,160,240,.38), transparent 45%), radial-gradient(circle at 65% 72%, rgba(0,0,0,.4), transparent 55%); box-shadow: 0 0 14px rgba(224,112,208,.35), inset 0 0 0 2px rgba(224,112,208,.45);'; },
+          tile: '45%'
+        },
+        metal: {
+          key: 'metal', name: 'Station hulk', label: 'HULK SCAN', accent: '#7fd8ff', num: '#5f6b85', edge: '#2a3242',
+          note: 'Metal. Riveted deck plates on a service grid; bulkheads carry faded hazard stripes.',
+          section: 'background-color: #0f131b; background-image: repeating-linear-gradient(0deg, rgba(170,177,211,.05) 0 1px, transparent 1px 20px), repeating-linear-gradient(90deg, rgba(170,177,211,.05) 0 1px, transparent 1px 20px);',
+          floor: function () { return 'border-radius: 3px; background-color: #252c3a; background-image: radial-gradient(2px 2px at 8px 8px, #5c6780 99%, transparent), radial-gradient(2px 2px at calc(100% - 8px) 8px, #5c6780 99%, transparent), radial-gradient(2px 2px at 8px calc(100% - 8px), #5c6780 99%, transparent), radial-gradient(2px 2px at calc(100% - 8px) calc(100% - 8px), #5c6780 99%, transparent); box-shadow: inset 0 0 0 1px #3a4458, inset 0 1px 0 rgba(255,255,255,.06);'; },
+          wall: function () { return 'border-radius: 3px; background-color: #4a5468; background-image: repeating-linear-gradient(135deg, rgba(242,181,68,.28) 0 6px, rgba(16,20,42,.35) 6px 12px); box-shadow: inset 0 2px 0 rgba(255,255,255,.22), inset 0 -3px 0 rgba(0,0,0,.45), inset 0 0 0 1px #6b7690, 0 3px 8px rgba(0,0,0,.5);'; },
+          tile: '3px'
+        }
+      };
+    }
+    function buildMap(T, tok) {
+      var walls = ['2,2','2,5','2,8','3,2','4,2','5,2','5,5','5,6','5,7','5,8','8,2','8,5','8,8'];
+      var marks = { '1,1': 'goal', '1,2': 'skull', '1,4': 'being', '1,9': 'skull', '2,1': 'skull', '3,3': 'skull', '3,5': 'chest', '4,1': 'being', '4,7': 'skull', '5,1': 'skull', '6,6': 'chest', '6,8': 'being', '9,1': 'start', '9,5': 'chest', '9,9': 'start' };
+      var ICON = { goal: ['i-swirl', '#FFD700', 0.54], skull: ['i-skull', '#d0656c', 0.36], being: ['i-being', '#4cc9b0', 0.43], chest: ['i-chest', '#f2b544', 0.43], start: ['i-alien', T.accent, 0.38] };
+      var crew = '0 0 12px ' + T.accent;
+      var party = {
+        '7,2': { img: 'assets/portraits/grull.jpg', alt: 'Ressa Vane', ring: '#FFD700', glow: '0 0 16px rgba(255,215,0,.6)' },
+        '7,3': { img: 'assets/portraits/hexapod.jpg', alt: '7EE700', ring: T.accent, glow: crew },
+        '6,1': { img: 'assets/portraits/grull.jpg', alt: 'Slate', ring: T.accent, glow: crew },
+        '8,1': { rs: true }
+      };
+      var ATT = { rocky: [['Gravel crab', 'assets/portraits/gravel-crab.jpg'], ['Rock mite', 'assets/portraits/rock-mite.jpg'], ['Burrow beetle', 'assets/portraits/burrow-beetle.jpg']], alien: [['Leviathan', 'assets/portraits/leviathan.jpg'], ['Hive brute', 'assets/portraits/hive-brute.jpg'], ['Spore titan', 'assets/portraits/spore-titan.jpg']], metal: [['Loader mech', 'assets/portraits/loader-mech.jpg'], ['Sentry drone', 'assets/portraits/sentry-drone.jpg'], ['Spider-bot', 'assets/portraits/spider-bot.jpg']], starry: [['Pirate captain', 'assets/portraits/pirate-captain.jpg'], ['Pirate boarder', 'assets/portraits/pirate-boarder.jpg'], ['Pirate gunner', 'assets/portraits/pirate-gunner.jpg']] };
+      var roster = ATT[T.key] || ATT.starry;
+      var foes = { '4,7': ['a1', '+5', roster[0]], '3,3': ['a3', '+3', roster[2]], '2,1': ['a2', '+3', roster[1]] };
+      var dest = '4,3', target = '3,3';
+      var base = 'position: relative; box-sizing: border-box; display: flex; align-items: center; justify-content: center;';
+      var cells = [];
+      for (var r = 1; r <= 9; r++) {
+        for (var c = 1; c <= 9; c++) {
+          var k = r + ',' + c, i = r * 3 + c;
+          var wall = walls.indexOf(k) >= 0;
+          var reach = !wall && !party[k] && !foes[k] && Math.max(Math.abs(r - 7), Math.abs(c - 2)) <= 3 && !(c === 1 && r <= 5);
+          var style;
+          if (wall) style = base + ' ' + T.wall(i);
+          else if (marks[k] === 'goal') style = base + ' border-radius: 50%; background: rgba(255,215,0,.08); box-shadow: inset 0 0 0 2px #FFD700, 0 0 26px rgba(255,215,0,.45);';
+          else if (k === target) style = base + ' ' + T.floor(i) + ' box-shadow: inset 0 0 0 2px #f07070; background: rgba(240,112,112,.12);';
+          else if (reach) style = base + ' ' + T.floor(i) + ' box-shadow: inset 0 0 0 1.5px rgba(255,215,0,.75), inset 0 0 14px rgba(255,215,0,.12);';
+          else style = base + ' ' + T.floor(i);
+          var cell = { style: style, icon: '', iconStyle: '', img: '', alt: '', imgStyle: '', foe: '', atk: '', dest: k === dest, foeStyle: '', foeImg: '', foeName: '', foeImgStyle: '', badgeStyle: '', destStyle: '', rs: false, rsStyle: '', rsIcon: '' };
+          if (foes[k]) { var fs = Math.round(tok * 0.7); cell.foe = foes[k][0]; cell.atk = foes[k][1]; cell.foeName = foes[k][2][0]; cell.foeImg = foes[k][2][1]; cell.foeStyle = 'position: relative; width: ' + fs + 'px; height: ' + fs + 'px; display: flex;'; cell.foeImgStyle = 'width: 100%; height: 100%; box-sizing: border-box; border-radius: 50%; object-fit: cover; border: 3px solid #f07070; box-shadow: 0 0 0 4px rgba(240,112,112,.18), 0 0 16px rgba(240,112,112,.7);'; cell.badgeStyle = 'position: absolute; right: -8px; bottom: -6px; font-family: \'Chakra Petch\', sans-serif; font-weight: 700; font-size: ' + Math.max(10, Math.round(fs * 0.2)) + 'px; padding: 1px 5px; border-radius: 6px; background: #c43a43; color: #fff; border: 1.5px solid #060918;'; }
+          else if (party[k] && party[k].rs) { var rz = Math.round(tok * 0.7); cell.rs = true; cell.rsStyle = 'width: ' + rz + 'px; height: ' + rz + 'px; box-sizing: border-box; border-radius: 50%; object-fit: cover; border: 3px solid #f07070; box-shadow: 0 0 10px rgba(240,112,112,.5);'; }
+          else if (party[k]) { cell.img = party[k].img; cell.alt = party[k].alt; cell.imgStyle = 'width: ' + Math.round(tok * 0.7) + 'px; height: ' + Math.round(tok * 0.7) + 'px; box-sizing: border-box; border-radius: 50%; object-fit: cover; border: 3px solid ' + party[k].ring + '; box-shadow: ' + party[k].glow + ';'; }
+          else if (marks[k] && k !== dest) { var m = ICON[marks[k]]; var sz = Math.round(tok * m[2]); cell.icon = 'ic ' + m[0]; cell.iconStyle = 'width: ' + sz + 'px; height: ' + sz + 'px; color: ' + m[1] + '; filter: drop-shadow(0 0 6px ' + m[1] + ');'; }
+          cells.push(cell);
+        }
+      }
+      return cells;
+    }
+    function corners(T) {
+      var b = '3px solid ' + T.accent + ';';
+      var s = 'position: absolute; width: 26px; height: 26px; ';
+      return {
+        tl: s + 'left: -1px; top: -1px; border-left: ' + b + ' border-top: ' + b + ' border-top-left-radius: 20px;',
+        tr: s + 'right: -1px; top: -1px; border-right: ' + b + ' border-top: ' + b + ' border-top-right-radius: 20px;',
+        bl: s + 'left: -1px; bottom: -1px; border-left: ' + b + ' border-bottom: ' + b + ' border-bottom-left-radius: 20px;',
+        br: s + 'right: -1px; bottom: -1px; border-right: ' + b + ' border-bottom: ' + b + ' border-bottom-right-radius: 20px;'
+      };
+    }
+    var all = terrains(626, 640);
+    var maps = ['starry', 'rocky', 'alien', 'metal'].map(function (key) {
+      var T = all[key];
+      return {
+        T: T, cells: buildMap(T, 60), corner: corners(T),
+        titleStyle: "font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 28px; color: " + T.accent + ';',
+        mapStyle: 'position: relative; align-self: start; padding: 30px 18px 18px 14px; border-radius: 20px; border: 1px solid ' + T.edge + '; ' + T.section,
+        labelStyle: 'position: absolute; top: 9px; left: 34px; font-size: 11px; color: ' + T.accent + ';',
+        numStyleTop: 'text-align: center; font-size: 10px; font-weight: 400; color: ' + T.num + ';',
+        numStyleSide: 'display: flex; align-items: center; font-size: 10px; font-weight: 400; color: ' + T.num + ';'
+      };
+    });
+    return { maps: maps, cols: [1, 2, 3, 4, 5, 6, 7, 8, 9] };
+  }
+}
+</script>
+</body>
+</html>
