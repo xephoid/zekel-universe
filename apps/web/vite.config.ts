@@ -21,10 +21,14 @@ const target = `http://127.0.0.1:${serverPort}`;
 export default defineConfig({
   plugins: [react()],
   server: {
-    host: true, // bind all interfaces so the ngrok tunnel (universe-zekel.ngrok.app) can reach it
+    // This machine only. A tunnel runs here and forwards to 127.0.0.1:5173, so
+    // it does not need the dev server open to the network; VITE_HOST opens it
+    // on purpose. The dev server is not hardened (security review F25).
+    host: process.env.VITE_HOST || '127.0.0.1',
     port: 5173,
     strictPort: true,
-    allowedHosts: (process.env.VITE_ALLOWED_HOSTS ?? 'zekel.ngrok.app,universe-zekel.ngrok.app').split(',').map((h) => h.trim()).filter(Boolean),
+    // Extra host names to answer to (a tunnel's), comma-separated. None by default.
+    allowedHosts: (process.env.VITE_ALLOWED_HOSTS ?? '').split(',').map((h) => h.trim()).filter(Boolean),
     proxy: {
       '/api': target,
       '/socket.io': { target, ws: true },
