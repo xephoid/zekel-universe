@@ -25,6 +25,26 @@ export interface ServerConfig {
   turnNudgeSweepMs: number;
   /** Guest accounts one client address may create in 15 minutes. */
   guestsPerIp: number;
+  /** A request header the hosting platform writes with the client's
+   *  address (Render: cf-connecting-ip). Null: use the socket's peer. */
+  clientIpHeader: string | null;
+}
+
+/** Headers a caller can write or append to themselves; never trusted for a
+ *  client address (SEC-16-F13). */
+const SPOOFABLE_IP_HEADERS = new Set(['x-forwarded-for', 'forwarded', 'x-real-ip']);
+
+/** CLIENT_IP_HEADER: empty, or one plain header name, lower-cased. */
+export function parseClientIpHeader(raw: string | undefined): string | null {
+  const name = (raw ?? '').trim().toLowerCase();
+  if (name === '') return null;
+  if (!/^[a-z0-9][a-z0-9-]{0,63}$/.test(name)) {
+    throw new Error(`CLIENT_IP_HEADER must be one plain header name such as cf-connecting-ip, got ${JSON.stringify(raw)}`);
+  }
+  if (SPOOFABLE_IP_HEADERS.has(name)) {
+    throw new Error(`CLIENT_IP_HEADER cannot be ${name}: callers can write it themselves.`);
+  }
+  return name;
 }
 
 // A 32-byte key used only when SECRET_KEY is unset in development.
@@ -68,11 +88,26 @@ function nonNegative(raw: string | undefined, fallback: number): number {
   return n;
 }
 
+/** ENGINE_HOSTPORT, a private network address such as `zekel-engine:8787`
+ *  (what a Render Blueprint can hand over), becomes the engine's MCP URL.
+ *  ENGINE_URL, when set, wins. */
+export function engineUrlFrom(env: NodeJS.ProcessEnv): string | null {
+  if (env.ENGINE_URL) return env.ENGINE_URL;
+  const hostport = (env.ENGINE_HOSTPORT ?? '').trim();
+  if (hostport === '') return null;
+  if (!/^[A-Za-z0-9.-]+:[0-9]{1,5}$/.test(hostport)) {
+    throw new Error(`ENGINE_HOSTPORT must be host:port, got ${JSON.stringify(env.ENGINE_HOSTPORT)}`);
+  }
+  return `http://${hostport}/mcp`;
+}
+
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): ServerConfig {
   const isProduction = env.NODE_ENV === 'production';
+  const engineUrl = engineUrlFrom(env);
   if (isProduction) {
-    const missing = ['SECRET_KEY', 'ENGINE_TOKEN', 'ENGINE_URL', 'APP_ORIGIN', 'DATABASE_URL']
+    const missing = ['SECRET_KEY', 'ENGINE_TOKEN', 'APP_ORIGIN', 'DATABASE_URL']
       .filter((k) => !env[k]);
+    if (!engineUrl) missing.splice(2, 0, 'ENGINE_URL');
     if (missing.length > 0) {
       throw new Error(`Refusing to start in production without: ${missing.join(', ')}`);
     }
@@ -88,7 +123,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ServerConfig {
     : [`http://localhost:${port}`, `http://127.0.0.1:${port}`, 'http://localhost:5173', 'http://127.0.0.1:5173'];
   return {
     port,
-    engineUrl: env.ENGINE_URL ?? 'http://localhost:8787/mcp',
+    engineUrl: engineUrl ?? 'http://localhost:8787/mcp',
     engineToken: env.ENGINE_TOKEN ?? '',
     secretKey: env.SECRET_KEY ?? DEV_SECRET_KEY,
     databaseUrl: env.DATABASE_URL ?? 'sqlite:./dev.db',
@@ -100,5 +135,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ServerConfig {
     turnNudgeDelayMs: nonNegative(env.TURN_NUDGE_DELAY_MS, 10 * 60 * 1000),
     turnNudgeSweepMs: nonNegative(env.TURN_NUDGE_SWEEP_MS, 60 * 1000),
     guestsPerIp: nonNegative(env.GUESTS_PER_IP, 30),
+    clientIpHeader: parseClientIpHeader(env.CLIENT_IP_HEADER),
   };
 }

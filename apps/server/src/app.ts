@@ -6,9 +6,10 @@ import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest }
 import fastifyCookie from '@fastify/cookie';
 import fastifyStatic from '@fastify/static';
 import { existsSync } from 'node:fs';
+import { isIP } from 'node:net';
 import path from 'node:path';
 import type { Server as SocketServer, Socket } from 'socket.io';
-import type { Kysely } from 'kysely';
+import { sql, type Kysely } from 'kysely';
 import type {
   CreateTableRequest, CreateTableResponse, FriendsResponse, GameCatalogEntry, GameReferenceResponse, GameResponse,
   GamesResponse, InvitesResponse, JoinTableAck, JoinTableMessage, MeResponse, MoveAck, MoveMessage, MyTablesResponse, QueryAck, QueryMessage,
@@ -29,6 +30,7 @@ import { isHostOf, TableError, TableService, type SeatRecord, type TableRecord }
 import { Realtime, MoveError } from './realtime.js';
 import { historyEvent, ownsSeat, toWireEvent } from './events.js';
 import { originAllowed } from './sockets.js';
+import { parseClientIpHeader } from './config.js';
 
 export const AUTH_COOKIE = 'universe_auth';
 export const GUEST_COOKIE = 'universe_guest';
@@ -54,6 +56,10 @@ export interface BuildAppOptions {
   logger?: boolean;
   /** abuse limits, lowered in tests */
   limits?: { guestsPerIp?: number; tablesPerPrincipal?: number; lookupsPerUser?: number; linksPerIp?: number };
+  /** A header the hosting platform writes with the client's address, such
+   *  as cf-connecting-ip on Render; it keys the per-client limits. Unset:
+   *  the socket's peer address. X-Forwarded-For is never read. */
+  clientIpHeader?: string | null;
   /** By-turns email nudges: how long a player must be away and up before
    *  the email goes, and how often the server looks (0 disables the timer). */
   turnNudge?: { delayMs: number; sweepMs: number };
@@ -133,6 +139,26 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
   const guestLimiter = new RateLimiter(opts.limits?.guestsPerIp ?? 30, 15 * 60 * 1000);
   const tableLimiter = new RateLimiter(opts.limits?.tablesPerPrincipal ?? 30, 60 * 60 * 1000);
   const referenceCache = new Map<string, GameReferenceResponse>();
+
+  // The client address behind the per-client limits (SEC-16-F13). Behind
+  // Render, every request's peer is the platform's proxy, so all visitors
+  // would share one budget. Render's edge (Cloudflare) writes
+  // CF-Connecting-IP on every request and overwrites a caller's copy, so
+  // when configured that header names the client. A missing, repeated or
+  // malformed value falls back to the peer address; it never gives a
+  // caller a budget of their choosing beyond the one address they claim
+  // in a header the platform has already replaced.
+  const clientIpHeader = parseClientIpHeader(opts.clientIpHeader ?? undefined);
+  function clientIp(req: FastifyRequest): string {
+    if (clientIpHeader) {
+      const value = req.headers[clientIpHeader];
+      if (typeof value === 'string') {
+        const ip = value.trim();
+        if (isIP(ip) !== 0) return ip;
+      }
+    }
+    return req.ip;
+  }
 
   // ---- identity helpers ------------------------------------------------
 
@@ -286,6 +312,19 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     app.get('/api/test/outbox', async () => ({ mails: m.sent }));
   }
 
+  // A health check for the hosting platform: the process is up and the
+  // database answers. It does not ask the engine (a slow engine must not
+  // get the web service restarted) and says nothing else.
+  app.get('/healthz', async (_req, reply) => {
+    reply.header('Cache-Control', 'no-store');
+    try {
+      await sql`select 1`.execute(db);
+      return { ok: true };
+    } catch {
+      return reply.code(503).send({ ok: false });
+    }
+  });
+
   // ---- people ------------------------------------------------------------
 
   app.post('/api/guests', async (req, reply) => {
@@ -298,7 +337,7 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     if (existing?.kind === 'user') {
       return reply.code(409).send({ error: 'already_signed_in' });
     }
-    if (!guestLimiter.allow(`ip:${req.ip}`)) {
+    if (!guestLimiter.allow(`ip:${clientIp(req)}`)) {
       return reply.code(429).send({ error: 'too_many_requests', message: 'Try again in a few minutes.' });
     }
     const body = (req.body ?? {}) as { displayName?: string };
@@ -357,7 +396,7 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return reply.code(400).send({ error: 'email_required' });
     }
-    if (!linkLimiter.allow(`email:${email}`) || !linkIpLimiter.allow(`ip:${req.ip}`)) {
+    if (!linkLimiter.allow(`email:${email}`) || !linkIpLimiter.allow(`ip:${clientIp(req)}`)) {
       return reply.code(429).send({ error: 'too_many_requests', message: 'Try again in a few minutes.' });
     }
     await sweepExpired(db);

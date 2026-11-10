@@ -58,6 +58,15 @@ describe('config', () => {
     expect(c.isProduction).toBe(true);
     expect(c.allowedOrigins).toEqual(['https://play.example']);
   });
+  it('takes the engine as a private host:port when no ENGINE_URL is set (render.yaml)', () => {
+    const base = { NODE_ENV: 'production', SECRET_KEY: 's', ENGINE_TOKEN: 't', APP_ORIGIN: 'https://play.example', DATABASE_URL: 'postgres://x' };
+    expect(() => loadConfig(base)).toThrow(/ENGINE_URL/);
+    expect(loadConfig({ ...base, ENGINE_HOSTPORT: 'zekel-engine:8787' }).engineUrl).toBe('http://zekel-engine:8787/mcp');
+    expect(loadConfig({ ...base, ENGINE_HOSTPORT: 'zekel-engine:8787', ENGINE_URL: 'http://e/mcp' }).engineUrl).toBe('http://e/mcp');
+    for (const bad of ['zekel-engine', 'http://zekel-engine:8787', 'a:1/x', 'a b:1']) {
+      expect(() => loadConfig({ ...base, ENGINE_HOSTPORT: bad }), bad).toThrow(/ENGINE_HOSTPORT/);
+    }
+  });
 });
 
 describe('dotenv', () => {
