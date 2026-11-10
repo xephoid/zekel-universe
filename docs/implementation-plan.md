@@ -1393,3 +1393,69 @@ The design canvas is `docs/design/sweetlands-candy/`; what to build is
   phone; dark mode. And an engine defect the panel cannot fix: when Red can
   capture, the engine picks the target itself (zekel `choices.ts`,
   "capture-target"), so the player is not asked which piece to take.
+
+## 20. Word Debauchee (decided 2026-11-09)
+
+The design canvas is `docs/design/word-debauchee/` (start with its README). The
+rules are the `@zekel/word-debauchee` package in zekel-games; the engine has
+listed it since zekel #144 (merged 2026-11-09).
+
+- **DECIDED: a game-drawn screen, one centered column.** `WdScreen`
+  (`apps/web/src/glue/wd/`) draws the seats, the clues, the letters laid down,
+  the build area, the action row and the pool as a keyboard, in the brief's
+  own look. There is no theme class and nothing in the side column; the
+  table keeps its top bar, the caption, the log and playback. `plan()` still
+  gives the title and the status line.
+- **One screen per role, picked from the view.** The debauchee's seat gets
+  the secret panel and its decisions (keep a word or draw three more, hide
+  one clue, answer a judgment clue, lay down a letter); the guessers get the
+  build area and the keyboard. Who is who comes from `round.debauchee`.
+- **What Universe offers at setup.** The server always holds the tiles
+  (`tiles: "server"`): players are in different places, and the engine needs
+  it for AI guessers anyway. Letters come down every lap (`timer: "laps"`).
+  The 30-second sand timer is not offered yet: under it the engine waits for
+  someone to report `timer_out`, and the screen may only send a move a person
+  pressed. The variants are Bribe, Open hand and, only when there is an AI
+  seat, The House. The host names the first debauchee on the setup page when
+  every seat is known; with a friend still to join, the table asks, as the
+  engine's setup phase does. The number of rounds is the engine's.
+- **Not offered: reporting a word said out loud.** Universe has no voice or
+  chat at the table yet, so there is nothing to report. The burned words the
+  view carries are still drawn under the build area.
+- **Placing and moving.** A key picks a letter, a gap or "New row" picks
+  where, and nothing is sent until Place or Move. A tile at the end of a row
+  or in a new row is a listed move as it stands. A tile in the middle of a
+  row, a move, and "Place and Check!" complete a listed move with the fields
+  the engine's own moves name (`index`, `to_row`, `to_index`, `check`),
+  through the table's form path, so agency holds. "Check!" is only ever sent
+  with the tile that completes the row: the engine lists a later `check` to
+  the player who just moved, but the table gives legal moves only to the seat
+  whose turn it is.
+- **No sum worked out here.** The engine publishes the scoring rule as a
+  sentence, not a number, so the screen shows "A word pays its length − N"
+  with N the view's `reveals_for_scoring`, and does not print what each row
+  would pay. The canvas's per-row "pays 2" waits for the engine to publish it
+  (see below).
+- **Round end.** The engine starts the next round at once, so the result of
+  the round just played (`last_round`: the word, who cracked it and with
+  which word, each seat's payout) sits at the top of the screen until the
+  next round's building starts. The game end is the table's end panel, with
+  the per-round history on the screen behind it.
+- **Motion.** A tile flies from its key to its spot, a returned tile flies
+  back to its key, a letter the debauchee lays down flies from the pool to
+  the row of letters, clue cards are dealt in, and the result card turns up.
+  Under reduced motion each becomes the table's fade.
+- **What the engine still needs to publish** (requests for zekel-games):
+  what a row would pay if checked now (or the minimum payout as a number in
+  the reference data), and the finished word's synonym list in `last_round`,
+  which the canvas shows on the result card.
+- **Still open:** the sand timer, the phone pass (the column already fits a
+  phone, but the keys and gaps are under 44 px), dark mode, and whether
+  Universe ever offers "use your own tiles". And answers to a judgment clue:
+  Register takes only "formal", "everyday" or "slang", but the screen offers a
+  free-text field and the engine refuses anything else with a notice. Buttons
+  need the engine to list the allowed answers; reading them out of its prompt
+  text would copy a rule.
+- **Acceptance check.** A guest game against three AI seats at 1440 × 900,
+  played through at least one round as a guesser and one as the debauchee,
+  with the list of what each decision shows written down before the commit.
