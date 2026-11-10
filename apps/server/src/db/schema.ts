@@ -33,6 +33,9 @@ export interface GuestsTable {
   display_name: string;
   created_at: string;
   upgraded_to_user_id: string | null;
+  /** When the guest token stops working. Null on rows from before schema
+   *  6, which expire GUEST_TTL_MS after created_at. */
+  expires_at: string | null;
 }
 
 /** Pending passwordless sign-in links. Consumed on first use, expire fast. */
@@ -42,6 +45,9 @@ export interface SignInLinksTable {
   email: string;
   created_at: string;
   expires_at: string;
+  /** sha256 of the nonce cookie set in the browser that asked for the
+   *  link; completion must present the same nonce. */
+  nonce_hash: string | null;
 }
 
 export interface FriendshipsTable {

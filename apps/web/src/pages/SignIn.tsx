@@ -44,7 +44,7 @@ export function SignInPage() {
           </div>
           {session.signedIn && <p>You are signed in as <strong>{session.displayName}</strong>. <Link to="/profile">Profile</Link></p>}
           {sent ? (
-            <p>Link sent to <strong>{email}</strong>. Check your inbox; the link works once and expires in 15 minutes.</p>
+            <p>Link sent to <strong>{email}</strong>. Open it in this browser: it works once, only here, and expires in 15 minutes.</p>
           ) : (
             <form onSubmit={(e) => { e.preventDefault(); void send(); }} className="stack" style={{ gap: 10 }}>
               <label htmlFor="email" className="label" style={{ fontSize: 13, fontWeight: 600 }}>Email</label>
@@ -62,6 +62,21 @@ export function SignInPage() {
   );
 }
 
+/** The one exchange in flight, so a second run of the effect (React's
+ *  development double run) waits on it instead of posting the token again. */
+let exchange: Promise<unknown> | null = null;
+
+/** What the landing page says when the server refuses the link. The link
+ *  works once, and only in the browser that asked for it (the server checks
+ *  a cookie set when the link was asked for); a refusal never signs this
+ *  browser in or moves its guest games. */
+export function signInFailureMessage(e: unknown): string {
+  if (e instanceof ApiRequestError && e.status === 401) {
+    return 'This sign-in link is invalid or has expired. A link works once, and only in the browser where you asked for it. Ask for a new one here.';
+  }
+  return (e as Error).message;
+}
+
 /** The landing page of the emailed link: the token rides in the URL
  *  fragment, which browsers never send to any server, and is posted here. */
 export function SignInCompletePage() {
@@ -72,17 +87,27 @@ export function SignInCompletePage() {
   useEffect(() => {
     const hash = window.location.hash.replace(/^#/, '');
     const token = new URLSearchParams(hash).get('token');
-    if (!token) { setErr('This link is missing its token.'); return; }
-    api.completeSignIn(token)
+    if (token) {
+      // Take the token out of the address bar and the history entry.
+      window.history.replaceState(window.history.state, '', window.location.pathname + window.location.search);
+      const mine: Promise<unknown> = api.completeSignIn(token).finally(() => {
+        if (exchange === mine) exchange = null;
+      });
+      exchange = mine;
+    }
+    const pending = exchange;
+    if (!pending) { setErr('This link is missing its token.'); return; }
+    let live = true;
+    pending
       .then(async () => {
+        if (!live) return;
         await session.refresh();
         let next = '/';
         try { next = sessionStorage.getItem('universe:signin:next') ?? '/'; } catch { /* ignore */ }
         nav(next.startsWith('/') ? next : '/', { replace: true });
       })
-      .catch((e) => setErr(e instanceof ApiRequestError && e.status === 401
-        ? 'This sign-in link is invalid or has expired. Ask for a new one.'
-        : (e as Error).message));
+      .catch((e) => { if (live) setErr(signInFailureMessage(e)); });
+    return () => { live = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

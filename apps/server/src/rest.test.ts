@@ -163,6 +163,7 @@ describe('REST', () => {
       method: 'POST', url: '/api/auth/email/link', headers: { origin: ORIGIN, cookie }, payload: { email: 'Player@Example.com' },
     });
     expect(link.statusCode).toBe(200);
+    const nonce = cookieOf(link, 'universe_signin');
     expect(mailer.sent).toHaveLength(1);
     const url = /https?:\/\/\S+/.exec(mailer.sent[0]!.text)![0];
     expect(url.startsWith(`${ORIGIN}/signin/complete#token=`)).toBe(true);
@@ -170,11 +171,11 @@ describe('REST', () => {
 
     const bad = await app.fastify.inject({ method: 'POST', url: '/api/auth/email/complete', headers: { origin: ORIGIN }, payload: { token: 'nope' } });
     expect(bad.statusCode).toBe(401);
-    const done = await app.fastify.inject({ method: 'POST', url: '/api/auth/email/complete', headers: { origin: ORIGIN, cookie }, payload: { token } });
+    const done = await app.fastify.inject({ method: 'POST', url: '/api/auth/email/complete', headers: { origin: ORIGIN, cookie: `${cookie}; ${nonce}` }, payload: { token } });
     expect(done.statusCode).toBe(200);
     const auth = cookieOf(done, 'universe_auth');
-    // one use only
-    expect((await app.fastify.inject({ method: 'POST', url: '/api/auth/email/complete', headers: { origin: ORIGIN }, payload: { token } })).statusCode).toBe(401);
+    // one use only, even from the browser that asked
+    expect((await app.fastify.inject({ method: 'POST', url: '/api/auth/email/complete', headers: { origin: ORIGIN, cookie: nonce }, payload: { token } })).statusCode).toBe(401);
 
     const me = (await app.fastify.inject({ method: 'GET', url: '/api/me', headers: { cookie: auth } })).json<MeResponse>();
     expect(me.user?.displayName).toBe('player');
@@ -187,10 +188,10 @@ describe('REST', () => {
     expect(rows[0]!.host_user_id).toBe(me.user!.id);
 
     // Signing in again with the same address finds the same user.
-    await app.fastify.inject({ method: 'POST', url: '/api/auth/email/link', headers: { origin: ORIGIN }, payload: { email: 'player@example.com' } });
+    const link2 = await app.fastify.inject({ method: 'POST', url: '/api/auth/email/link', headers: { origin: ORIGIN }, payload: { email: 'player@example.com' } });
     const url2 = /https?:\/\/\S+/.exec(mailer.sent[1]!.text)![0];
     const token2 = decodeURIComponent(url2.split('#token=')[1]!);
-    const done2 = await app.fastify.inject({ method: 'POST', url: '/api/auth/email/complete', headers: { origin: ORIGIN }, payload: { token: token2 } });
+    const done2 = await app.fastify.inject({ method: 'POST', url: '/api/auth/email/complete', headers: { origin: ORIGIN, cookie: cookieOf(link2, 'universe_signin') }, payload: { token: token2 } });
     expect(done2.json()).toMatchObject({ userId: me.user!.id });
 
     const out = await app.fastify.inject({ method: 'POST', url: '/api/auth/signout', headers: { origin: ORIGIN, cookie: auth } });
@@ -200,10 +201,10 @@ describe('REST', () => {
   });
 
   async function signIn(email: string): Promise<string> {
-    await app.fastify.inject({ method: 'POST', url: '/api/auth/email/link', headers: { origin: ORIGIN }, payload: { email } });
+    const link = await app.fastify.inject({ method: 'POST', url: '/api/auth/email/link', headers: { origin: ORIGIN }, payload: { email } });
     const url = /https?:\/\/\S+/.exec(mailer.sent[mailer.sent.length - 1]!.text)![0];
     const token = decodeURIComponent(url.split('#token=')[1]!);
-    const done = await app.fastify.inject({ method: 'POST', url: '/api/auth/email/complete', headers: { origin: ORIGIN }, payload: { token } });
+    const done = await app.fastify.inject({ method: 'POST', url: '/api/auth/email/complete', headers: { origin: ORIGIN, cookie: cookieOf(link, 'universe_signin') }, payload: { token } });
     expect(done.statusCode).toBe(200);
     return cookieOf(done, 'universe_auth');
   }

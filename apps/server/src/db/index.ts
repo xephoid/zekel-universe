@@ -23,7 +23,7 @@ export interface DatabaseClient {
 }
 
 /** Bump when the DDL below changes in a way an existing database cannot absorb. */
-export const SCHEMA_VERSION = 5;
+export const SCHEMA_VERSION = 6;
 
 export function parseDatabaseUrl(url: string): { dialect: DatabaseDialect; target: string } {
   const trimmed = url.trim();
@@ -75,7 +75,8 @@ const TABLES: string[] = [
     token_hash text NOT NULL,
     display_name text NOT NULL,
     created_at text NOT NULL,
-    upgraded_to_user_id text REFERENCES users(id)
+    upgraded_to_user_id text REFERENCES users(id),
+    expires_at text
   )`,
   `CREATE UNIQUE INDEX IF NOT EXISTS guests_token ON guests(token_hash)`,
   `CREATE TABLE IF NOT EXISTS sign_in_links (
@@ -83,7 +84,8 @@ const TABLES: string[] = [
     token_hash text NOT NULL,
     email text NOT NULL,
     created_at text NOT NULL,
-    expires_at text NOT NULL
+    expires_at text NOT NULL,
+    nonce_hash text
   )`,
   `CREATE UNIQUE INDEX IF NOT EXISTS sign_in_links_token ON sign_in_links(token_hash)`,
   `CREATE TABLE IF NOT EXISTS friendships (
@@ -201,6 +203,9 @@ const MIGRATIONS: Record<number, MigrationStep[]> = {
   3: ['ALTER TABLE notifications ADD COLUMN emailed_at text'],
   4: ['ALTER TABLE tables ADD COLUMN setup_moves text'],
   5: [addColumn('table_events', 'log_entries', "text NOT NULL DEFAULT '[]'")],
+  // Guest tokens get a server-side expiry; sign-in links remember the
+  // browser that asked for them (SEC-04-F12, SEC-03-F11).
+  6: [addColumn('guests', 'expires_at', 'text'), addColumn('sign_in_links', 'nonce_hash', 'text')],
 };
 
 async function migrate(db: Kysely<DB>): Promise<void> {

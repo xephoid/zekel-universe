@@ -19,7 +19,10 @@ import { EngineError } from '@universe/engine-client';
 import type { DB } from './db/schema.js';
 import { parseJson } from './db/index.js';
 import { newId, newToken, hashToken, now, type Principal } from './identity.js';
-import { consumeSignInLink, issueSignInLink, RateLimiter, SESSION_TTL_MS, sweepExpired } from './auth.js';
+import {
+  consumeSignInLink, GUEST_TTL_MS, guestExpiresAt, isWellFormedNonce, issueSignInLink, LINK_TTL_MS, RateLimiter,
+  SESSION_TTL_MS, sweepExpired,
+} from './auth.js';
 import type { Mailer } from './email.js';
 import type { EngineService } from './engine.js';
 import { isHostOf, TableError, TableService, type SeatRecord, type TableRecord } from './tables/service.js';
@@ -29,7 +32,11 @@ import { originAllowed } from './sockets.js';
 
 export const AUTH_COOKIE = 'universe_auth';
 export const GUEST_COOKIE = 'universe_guest';
-const GUEST_COOKIE_MAX_AGE_S = 60 * 60 * 24 * 365;
+/** The sign-in nonce: set when a browser asks for a link, required when the
+ *  link is opened (SEC-03-F11). Over HTTPS it carries the `__Host-` prefix,
+ *  so a sibling subdomain cannot plant one. */
+export const SIGNIN_COOKIE = 'universe_signin';
+const GUEST_COOKIE_MAX_AGE_S = Math.floor(GUEST_TTL_MS / 1000);
 
 import { DESIGNERS, ZEKEL_GAMES, ZEKEL_UPDATES } from './storefront.js';
 
@@ -50,6 +57,10 @@ export interface BuildAppOptions {
   /** By-turns email nudges: how long a player must be away and up before
    *  the email goes, and how often the server looks (0 disables the timer). */
   turnNudge?: { delayMs: number; sweepMs: number };
+  /** How often open sockets have their session or guest token checked
+   *  again, so one that only listens still stops after sign-out or expiry
+   *  (0 disables the timer; every message is checked regardless). */
+  socketRecheckMs?: number;
   /** Test-only: expose the ConsoleMailer's outbox at /api/test/outbox.
    *  Must never be set in production (index.ts enforces). */
   testOutbox?: boolean;
@@ -70,6 +81,21 @@ export interface UniverseApp {
   refreshCatalog(): Promise<number>;
   /** Send the by-turns email nudges that are due (also done on a timer). */
   sendDueNudges(): Promise<number>;
+  /** Check every open socket's credential again and disconnect the ones that
+   *  no longer work; returns how many were cut (also done on a timer). */
+  recheckSockets(): Promise<number>;
+}
+
+/** What a request or socket authenticated with, kept so it can be checked
+ *  again later: the session's token hash, or the guest's id. */
+type Credential =
+  | { kind: 'session'; tokenHash: string; expiresAt: number }
+  | { kind: 'guest'; guestId: string; expiresAt: number };
+
+/** The Socket.IO room every socket of one credential joins, so sign-out
+ *  and guest upgrade can disconnect them all. */
+function credentialRoom(c: { kind: 'session'; tokenHash: string } | { kind: 'guest'; guestId: string }): string {
+  return c.kind === 'session' ? `cred:session:${c.tokenHash}` : `cred:guest:${c.guestId}`;
 }
 
 class HttpError extends Error {
@@ -110,27 +136,72 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
 
   // ---- identity helpers ------------------------------------------------
 
-  async function principalFromCookies(cookieHeader: string | undefined): Promise<Principal | null> {
+  async function authenticate(cookieHeader: string | undefined): Promise<{ principal: Principal; credential: Credential } | null> {
     if (!cookieHeader) return null;
     const cookies = fastifyCookie.parse(cookieHeader);
     const authToken = cookies[AUTH_COOKIE];
     if (authToken) {
+      const tokenHash = hashToken(authToken);
       const session = await db.selectFrom('auth_sessions').select(['user_id', 'expires_at'])
-        .where('token_hash', '=', hashToken(authToken)).executeTakeFirst();
-      if (session && new Date(session.expires_at).getTime() > Date.now()) {
-        return { kind: 'user', userId: session.user_id };
+        .where('token_hash', '=', tokenHash).executeTakeFirst();
+      const expiresAt = session ? new Date(session.expires_at).getTime() : 0;
+      if (session && expiresAt > Date.now()) {
+        return { principal: { kind: 'user', userId: session.user_id }, credential: { kind: 'session', tokenHash, expiresAt } };
       }
     }
     const guestToken = cookies[GUEST_COOKIE];
     if (guestToken) {
-      const guest = await db.selectFrom('guests').select(['id', 'upgraded_to_user_id'])
+      const guest = await db.selectFrom('guests').select(['id', 'upgraded_to_user_id', 'created_at', 'expires_at'])
         .where('token_hash', '=', hashToken(guestToken)).executeTakeFirst();
       // An upgraded guest's token is spent: its seats moved to the user, and
       // the token itself never acts as the user (that is the auth cookie's
-      // job, and signing out must end it).
-      if (guest && !guest.upgraded_to_user_id) return { kind: 'guest', guestId: guest.id };
+      // job, and signing out must end it). A guest token also expires on
+      // the server, not only in the browser.
+      const expiresAt = guest ? guestExpiresAt(guest) : 0;
+      if (guest && !guest.upgraded_to_user_id && expiresAt > Date.now()) {
+        return { principal: { kind: 'guest', guestId: guest.id }, credential: { kind: 'guest', guestId: guest.id, expiresAt } };
+      }
     }
     return null;
+  }
+
+  async function principalFromCookies(cookieHeader: string | undefined): Promise<Principal | null> {
+    return (await authenticate(cookieHeader))?.principal ?? null;
+  }
+
+  /** Does a credential read when a socket opened still work? Returns its
+   *  current expiry, or null when it has been signed out, upgraded or has
+   *  expired. */
+  async function credentialExpiry(c: Credential): Promise<number | null> {
+    const at = Date.now();
+    if (c.expiresAt <= at) return null;
+    if (c.kind === 'session') {
+      const row = await db.selectFrom('auth_sessions').select('expires_at')
+        .where('token_hash', '=', c.tokenHash).executeTakeFirst();
+      const expiresAt = row ? new Date(row.expires_at).getTime() : 0;
+      return expiresAt > at ? expiresAt : null;
+    }
+    const row = await db.selectFrom('guests').select(['upgraded_to_user_id', 'created_at', 'expires_at'])
+      .where('id', '=', c.guestId).executeTakeFirst();
+    if (!row || row.upgraded_to_user_id) return null;
+    const expiresAt = guestExpiresAt(row);
+    return expiresAt > at ? expiresAt : null;
+  }
+
+  /** Disconnect every socket of these credentials once the reply has gone,
+   *  so the browser holds its new cookies before it reconnects. The
+   *  credentials are already dead in the database, so a socket message in
+   *  between is refused anyway. */
+  function disconnectAfterReply(reply: FastifyReply, rooms: string[]): void {
+    if (!io || rooms.length === 0) return;
+    let done = false;
+    const cut = () => {
+      if (done) return;
+      done = true;
+      io!.in(rooms).disconnectSockets(true);
+    };
+    reply.raw.once('finish', cut);
+    reply.raw.once('close', cut);
   }
 
   function principalOf(req: FastifyRequest): Promise<Principal | null> {
@@ -236,6 +307,7 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     const displayName = body.displayName?.trim().slice(0, 40) || `Guest ${id.slice(0, 6)}`;
     await db.insertInto('guests').values({
       id, token_hash: hashToken(token), display_name: displayName, created_at: now(), upgraded_to_user_id: null,
+      expires_at: new Date(Date.now() + GUEST_TTL_MS).toISOString(),
     }).execute();
     reply.setCookie(GUEST_COOKIE, token, { ...cookieOptions, maxAge: GUEST_COOKIE_MAX_AGE_S });
     return { guest: { id, displayName, upgradedToUserId: null } };
@@ -274,7 +346,11 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
 
   // Passwordless email sign-in: ask for a link, then exchange it. The token
   // travels in the URL fragment, which browsers never send to the server, and
-  // the landing page posts it in a body.
+  // the landing page posts it in a body. Asking also sets the sign-in nonce
+  // cookie, and only a browser holding it can exchange the link (F11).
+  const signinCookieName = opts.secureCookies ? `__Host-${SIGNIN_COOKIE}` : SIGNIN_COOKIE;
+  const signinCookieOptions = { ...cookieOptions, path: '/' };
+
   app.post('/api/auth/email/link', async (req, reply) => {
     const body = (req.body ?? {}) as { email?: string };
     const email = body.email?.trim().toLowerCase();
@@ -285,7 +361,11 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
       return reply.code(429).send({ error: 'too_many_requests', message: 'Try again in a few minutes.' });
     }
     await sweepExpired(db);
-    const token = await issueSignInLink(db, email);
+    // One nonce per browser: asking twice keeps the first link working.
+    const held = req.cookies[signinCookieName];
+    const nonce = isWellFormedNonce(held) ? held : newToken();
+    const token = await issueSignInLink(db, email, nonce);
+    reply.setCookie(signinCookieName, nonce, { ...signinCookieOptions, maxAge: Math.floor(LINK_TTL_MS / 1000) });
     const url = `${opts.appOrigin}/signin/complete#token=${encodeURIComponent(token)}`;
     await opts.mailer.send({
       to: email,
@@ -296,10 +376,23 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
   });
 
   app.post('/api/auth/email/complete', async (req, reply) => {
-    const body = (req.body ?? {}) as { token?: string };
-    const token = body.token ?? '';
-    const email = token ? await consumeSignInLink(db, token) : null;
+    const body = (req.body ?? {}) as { token?: unknown };
+    const token = typeof body.token === 'string' ? body.token : '';
+    // A browser that never asked for a link is refused before the token is
+    // looked at: it is not consumed, and nothing about this browser (its
+    // guest seats above all) changes.
+    const nonce = req.cookies[signinCookieName];
+    if (!isWellFormedNonce(nonce)) {
+      return reply.code(401).send({
+        error: 'sign_in_wrong_browser',
+        message: 'Open the sign-in link in the browser where you asked for it.',
+      });
+    }
+    const email = token ? await consumeSignInLink(db, token, nonce) : null;
     if (!email) return reply.code(401).send({ error: 'invalid_or_expired_token' });
+    // The nonce is spent: this browser's other pending links go with it.
+    await db.deleteFrom('sign_in_links').where('nonce_hash', '=', hashToken(nonce)).execute();
+    reply.clearCookie(signinCookieName, { path: '/' });
 
     // Find or create the user behind this email identity.
     const identity = await db.selectFrom('identities').select('user_id')
@@ -318,12 +411,14 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     }
 
     // A guest cookie on this request keeps its seats, its tables and its
-    // notifications: everything moves to the user.
+    // notifications: everything moves to the user. The guest's open sockets
+    // are cut, so they reconnect as the user.
     const guestToken = req.cookies[GUEST_COOKIE];
     if (guestToken) {
-      const guest = await db.selectFrom('guests').select(['id', 'upgraded_to_user_id'])
+      const guest = await db.selectFrom('guests').select(['id', 'upgraded_to_user_id', 'created_at', 'expires_at'])
         .where('token_hash', '=', hashToken(guestToken)).executeTakeFirst();
-      if (guest && !guest.upgraded_to_user_id) {
+      if (guest && !guest.upgraded_to_user_id && guestExpiresAt(guest) > Date.now()) {
+        disconnectAfterReply(reply, [credentialRoom({ kind: 'guest', guestId: guest.id })]);
         await db.updateTable('guests').set({ upgraded_to_user_id: userId }).where('id', '=', guest.id).execute();
         await db.updateTable('seats').set({ user_id: userId, guest_id: null }).where('guest_id', '=', guest.id).execute();
         await db.updateTable('tables').set({ host_user_id: userId, host_guest_id: null }).where('host_guest_id', '=', guest.id).execute();
@@ -341,10 +436,31 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
   });
 
   app.post('/api/auth/signout', async (req, reply) => {
+    // Sign-out ends the session in the database and cuts every socket that
+    // opened with it (SEC-04-F12).
+    const rooms: string[] = [];
     const token = req.cookies[AUTH_COOKIE];
-    if (token) await db.deleteFrom('auth_sessions').where('token_hash', '=', hashToken(token)).execute();
+    if (token) {
+      const tokenHash = hashToken(token);
+      await db.deleteFrom('auth_sessions').where('token_hash', '=', tokenHash).execute();
+      rooms.push(credentialRoom({ kind: 'session', tokenHash }));
+    }
+    // The guest cookie that was upgraded into this account is spent too. A
+    // guest cookie that was not upgraded is ended on the server as well: the
+    // browser is told to forget it, so nobody should still be using it.
+    const guestToken = req.cookies[GUEST_COOKIE];
+    if (guestToken) {
+      const guest = await db.selectFrom('guests').select(['id', 'upgraded_to_user_id'])
+        .where('token_hash', '=', hashToken(guestToken)).executeTakeFirst();
+      if (guest) {
+        if (!guest.upgraded_to_user_id) {
+          await db.updateTable('guests').set({ expires_at: now() }).where('id', '=', guest.id).execute();
+        }
+        rooms.push(credentialRoom({ kind: 'guest', guestId: guest.id }));
+      }
+    }
+    disconnectAfterReply(reply, rooms);
     reply.clearCookie(AUTH_COOKIE, { path: '/' });
-    // The guest cookie that was upgraded into this account is spent too.
     reply.clearCookie(GUEST_COOKIE, { path: '/' });
     return { ok: true };
   });
@@ -926,6 +1042,31 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
   const io: SocketServer | null = opts.io ?? null;
   if (io) wireSockets(io);
 
+  async function recheckSockets(): Promise<number> {
+    if (!io) return 0;
+    let cut = 0;
+    for (const socket of [...io.sockets.sockets.values()]) {
+      const credential = socket.data.credential as Credential | undefined;
+      const expiresAt = credential ? await credentialExpiry(credential) : null;
+      if (expiresAt === null) {
+        socket.disconnect(true);
+        cut++;
+      } else {
+        credential!.expiresAt = expiresAt;
+      }
+    }
+    return cut;
+  }
+  // A socket that only listens sends nothing to be checked, so a timer
+  // checks every open socket too; this bounds how long a signed-out or
+  // expired one can keep receiving its seat's view.
+  const recheckMs = opts.socketRecheckMs ?? 60 * 1000;
+  if (io && recheckMs > 0) {
+    const timer = setInterval(() => { recheckSockets().catch((err) => app.log.error(err)); }, recheckMs);
+    timer.unref?.();
+    app.addHook('onClose', async () => { clearInterval(timer); });
+  }
+
   function wireSockets(server: SocketServer): void {
     // Each socket remembers, per table, which seat it owns there. A socket
     // subscribed to two tables never has one table's seat used for the other.
@@ -941,6 +1082,13 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
       for (const socketId of room) {
         const socket = server.sockets.sockets.get(socketId);
         if (!socket) continue;
+        // A credential past its expiry gets no more views; the timer and the
+        // next message catch the ones revoked before their time.
+        const credential = socket.data.credential as Credential | undefined;
+        if (!credential || credential.expiresAt <= Date.now()) {
+          socket.disconnect(true);
+          continue;
+        }
         const seat = seatsOf(socket).get(tableId);
         if (seat === undefined) continue; // not seated here: nothing to send
         socket.emit(SOCKET_EVENTS.tableEvent, toWireEvent(event, seat));
@@ -948,15 +1096,41 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     });
 
     server.use((socket, next) => {
-      void principalFromCookies(socket.handshake.headers.cookie).then((p) => {
-        if (!p) return next(new Error('unauthorized'));
-        socket.data.principal = p;
+      void authenticate(socket.handshake.headers.cookie).then((a) => {
+        if (!a) return next(new Error('unauthorized'));
+        socket.data.principal = a.principal;
+        socket.data.credential = a.credential;
         next();
       }).catch((err: Error) => next(err));
     });
 
     server.on('connection', (socket: Socket) => {
       const principal = socket.data.principal as Principal;
+      const credential = socket.data.credential as Credential;
+      // Sign-out and guest upgrade disconnect every socket in this room.
+      void socket.join(credentialRoom(credential));
+
+      // Every message checks the credential again: the cookie read at the
+      // handshake may have been signed out, upgraded or expired since
+      // (SEC-04-F12). A refused message is answered and the socket closed.
+      socket.use((packet, next) => {
+        const refuse = (error: string, reason: string) => {
+          const ack = packet[packet.length - 1];
+          if (typeof ack === 'function') (ack as (r: unknown) => void)({ error, reason, message: reason });
+        };
+        credentialExpiry(credential).then((expiresAt) => {
+          if (expiresAt !== null) {
+            credential.expiresAt = expiresAt;
+            return next();
+          }
+          refuse('unauthorized', 'Your session has ended. Sign in again.');
+          socket.disconnect(true);
+        }, (err: unknown) => {
+          // Fail closed: an unchecked message never reaches a handler.
+          app.log.error(err);
+          refuse('internal', 'Something went wrong on the server.');
+        });
+      });
 
       socket.on(SOCKET_EVENTS.joinTable, async (msg: Partial<JoinTableMessage>, ack?: (r: JoinTableAck) => void) => {
         const respond = ack ?? (() => {});
@@ -1086,5 +1260,5 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     });
   }
 
-  return { fastify: app, io, tableService, realtime, principalFromCookies, refreshCatalog, sendDueNudges };
+  return { fastify: app, io, tableService, realtime, principalFromCookies, refreshCatalog, sendDueNudges, recheckSockets };
 }
