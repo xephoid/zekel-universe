@@ -75,6 +75,30 @@ export interface GamesTable {
   description: string;
   rules_url: string | null;
   visibility: string; // 'public' | 'unlisted'
+  /** the designer's profile (designers.slug); null for a game with none */
+  designer_slug?: string | null;
+  /** CSS object-position a frame cropping the square cover keeps ("50% 18%") */
+  cover_focus?: string | null;
+  screenshots?: string; // JSON string[] of image paths (/art/... or /media/...)
+  /** place among the featured games, lowest first; null when not featured */
+  featured_rank?: number | null;
+}
+
+export interface DesignersTable {
+  slug: string;
+  name: string;
+  bio: string;
+  avatar_image: string | null;
+}
+
+/** Images uploaded on the admin page, served at /media/<id>. */
+export interface MediaTable {
+  id: string;
+  content_type: string; // image/png | image/jpeg | image/webp
+  data: string; // base64
+  byte_size: number;
+  uploaded_by: string; // users.id
+  created_at: string;
 }
 
 export interface GameUpdatesTable {
@@ -83,6 +107,9 @@ export interface GameUpdatesTable {
   title: string;
   body: string;
   posted_at: string;
+  /** set when an admin removes the update; the row stays so the seed
+   *  never brings it back */
+  deleted_at?: string | null;
 }
 
 export interface TablesTable {
@@ -168,6 +195,8 @@ export interface DB {
   friendships: FriendshipsTable;
   games: GamesTable;
   game_updates: GameUpdatesTable;
+  designers: DesignersTable;
+  media: MediaTable;
   tables: TablesTable;
   seats: SeatsTable;
   invites: InvitesTable;

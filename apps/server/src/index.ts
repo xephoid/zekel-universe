@@ -35,6 +35,7 @@ async function main(): Promise<void> {
     turnNudge: { delayMs: config.turnNudgeDelayMs, sweepMs: config.turnNudgeSweepMs },
     limits: { guestsPerIp: config.guestsPerIp },
     clientIpHeader: config.clientIpHeader,
+    adminEmails: config.adminEmails,
   });
 
   await app.fastify.ready();
