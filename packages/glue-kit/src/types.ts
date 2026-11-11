@@ -386,8 +386,10 @@ export interface GlueModule {
    * event lands, so the board still shows the state the moment resolves.
    */
   momentFor?(input: MomentInput): Moment | null;
-  /** Draws the moment momentFor returned, over the board. A glue with a
-   *  momentFor has one of these too; the table draws nothing of its own. */
+  /** Draws the moment momentFor returned, over the board, and calls onDone
+   *  when it is over. A glue with a momentFor has one of these too; the
+   *  table draws nothing of its own, and without this it never asks
+   *  momentFor: the event lands at once. */
   Moment?: ComponentType<MomentProps>;
   /**
    * The game's own setup choices, from the engine's options schema and

@@ -169,9 +169,10 @@ export function TablePage() {
   // A moment plays before its event lands: the queue holds the event, the
   // glue reads the moment (a strike) from the view on screen and the one
   // arriving, the glue's own overlay plays it, and only then does the board
-  // change underneath.
+  // change underneath. Only the glue's overlay can say the moment is over,
+  // so a glue with no overlay gets no gate: its events land as they arrive.
   useEffect(() => {
-    if (!glue?.momentFor) { playback.setGate(null); return; }
+    if (!glue?.momentFor || !glue.Moment) { playback.setGate(null); return; }
     playback.setGate(async (next, cur) => {
       const m = glue.momentFor!({ before: cur?.view ?? null, after: next.view, summary: next.summary, engineMove: next.engineMove, playerId: next.playerId, reference: t.reference });
       if (!m) return;
