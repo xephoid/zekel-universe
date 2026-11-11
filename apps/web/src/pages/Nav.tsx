@@ -38,6 +38,7 @@ export function Nav() {
         <Link to="/" className={onHome && !params.get('q') ? 'current' : undefined}>Browse</Link>
         <Link to="/tables" className={location.pathname === '/tables' ? 'current' : undefined}>My tables{waiting > 0 && <span className="count" aria-label={`${waiting} waiting on you`}>{waiting}</span>}</Link>
         <Link to="/designers" className={location.pathname.startsWith('/designers') ? 'current' : undefined}>Designers</Link>
+        {me?.isAdmin && <Link to="/admin" className={location.pathname.startsWith('/admin') ? 'current' : undefined}>Admin</Link>}
       </div>
       <form onSubmit={submit} className="search-form" style={{ display: 'contents' }}>
         <input

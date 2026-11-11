@@ -3,7 +3,8 @@
 
 import type {
   ApiError, CreateTableRequest, CreateTableResponse, FriendsResponse, GameReferenceResponse, GameResponse, GamesResponse,
-  InvitesResponse, MeResponse, MyTablesResponse, TableEventsResponse, TableResponse, UpdatesResponse, DesignerResponse, WatchResponse } from '@universe/shared';
+  InvitesResponse, MeResponse, MyTablesResponse, TableEventsResponse, TableResponse, UpdatesResponse, DesignerResponse, DesignersResponse, WatchResponse,
+  AdminContentResponse, AdminDesignerEdit, AdminGameEdit, AdminMediaResponse, AdminMediaUpload, AdminUpdateEdit } from '@universe/shared';
 
 export class ApiRequestError extends Error {
   constructor(public status: number, public code: string, message: string) {
@@ -47,6 +48,7 @@ export const api = {
   updates: (limit = 20) => req<UpdatesResponse>(`/api/updates?limit=${limit}`),
   gameUpdates: (id: string) => req<UpdatesResponse>(`/api/games/${encodeURIComponent(id)}/updates`),
   designer: (slug: string) => req<DesignerResponse>(`/api/designers/${encodeURIComponent(slug)}`),
+  designers: () => req<DesignersResponse>('/api/designers'),
   watch: (id: string) => req<WatchResponse>(`/api/tables/${encodeURIComponent(id)}/watch`),
 
   myTables: () => req<MyTablesResponse>('/api/my-tables'),
@@ -67,6 +69,20 @@ export const api = {
   acceptFriendRequest: (id: string) => post<{ ok: true }>(`/api/friends/requests/${encodeURIComponent(id)}/accept`),
   deleteFriendRequest: (id: string) => req<{ ok: true }>(`/api/friends/requests/${encodeURIComponent(id)}`, { method: 'DELETE' }),
   unfriend: (userId: string) => req<{ ok: true }>(`/api/friends/${encodeURIComponent(userId)}`, { method: 'DELETE' }),
+
+  admin: {
+    content: () => req<AdminContentResponse>('/api/admin/content'),
+    saveGame: (id: string, body: AdminGameEdit) =>
+      req<{ ok: true }>(`/api/admin/games/${encodeURIComponent(id)}`, { method: 'PUT', body: JSON.stringify(body) }),
+    createDesigner: (body: AdminDesignerEdit) => post<{ ok: true; slug: string }>('/api/admin/designers', body),
+    saveDesigner: (slug: string, body: AdminDesignerEdit) =>
+      req<{ ok: true }>(`/api/admin/designers/${encodeURIComponent(slug)}`, { method: 'PUT', body: JSON.stringify(body) }),
+    createUpdate: (body: AdminUpdateEdit) => post<{ ok: true; id: string }>('/api/admin/updates', body),
+    saveUpdate: (id: string, body: AdminUpdateEdit) =>
+      req<{ ok: true }>(`/api/admin/updates/${encodeURIComponent(id)}`, { method: 'PUT', body: JSON.stringify(body) }),
+    removeUpdate: (id: string) => req<{ ok: true }>(`/api/admin/updates/${encodeURIComponent(id)}`, { method: 'DELETE' }),
+    uploadImage: (body: AdminMediaUpload) => post<AdminMediaResponse>('/api/admin/media', body),
+  },
 
   invites: () => req<InvitesResponse>('/api/invites'),
   tableInvites: (id: string) => req<InvitesResponse>(`/api/tables/${encodeURIComponent(id)}/invites`),

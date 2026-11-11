@@ -36,6 +36,8 @@ const router = createBrowserRouter([
   { path: '/signin', element: <SignInPage /> },
   { path: '/signin/complete', element: <SignInCompletePage /> },
   { path: '/gallery', element: <GalleryPage /> },
+  // The admin page loads on its own: players never download it.
+  { path: '/admin', lazy: () => import('./pages/Admin').then((m) => ({ Component: m.AdminPage })) },
   // Development only: captured NGnG views, drawn without a game. Loaded
   // lazily inside the dev-only branch, so a production build drops the page
   // and every captured view with it.

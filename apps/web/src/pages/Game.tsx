@@ -37,9 +37,19 @@ export function GamePage() {
         <div className="game-hero">
           <div className="game-hero-left">
             <Cover game={game} size="large" />
-            <div className="shots" aria-label="Screenshots">
-              {[1, 2, 3, 4].map((n) => <div key={n}>screenshot {n}</div>)}
-            </div>
+            {game.screenshots.length > 0 ? (
+              <div className="shots" aria-label="Screenshots">
+                {game.screenshots.map((src, i) => (
+                  <a key={src + i} href={src} target="_blank" rel="noreferrer" className="shot">
+                    <img src={src} alt={`${game.name}, screenshot ${i + 1}`} />
+                  </a>
+                ))}
+              </div>
+            ) : (
+              <div className="shots" aria-label="Screenshots">
+                {[1, 2, 3, 4].map((n) => <div key={n}>screenshot {n}</div>)}
+              </div>
+            )}
           </div>
           <div className="game-hero-right">
             <div>

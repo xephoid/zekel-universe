@@ -246,6 +246,11 @@ label.option-card { position: relative; padding-right: 40px; }
 .game-hero-left .gpcover.large .initial { font-size: 120px; letter-spacing: -0.04em; }
 .shots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
 .shots div { aspect-ratio: 4 / 3; border-radius: 6px; background: var(--chip); border: 1px solid var(--line); display: grid; place-items: center; font: 500 10px var(--font-mono); color: var(--fg-muted); }
+.shots .shot { aspect-ratio: 4 / 3; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); background: var(--chip); display: block; }
+.shots .shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* the admin page: a list on the left, the form for the picked row on the right */
+.admin-split { display: grid; grid-template-columns: 260px 1fr; gap: 28px; align-items: start; }
+@media (max-width: 800px) { .admin-split { grid-template-columns: 1fr; } }
 .game-hero-right { display: flex; flex-direction: column; gap: 18px; }
 .game-hero-right h1 { font-size: 44px; }
 .game-hero-right .byline { font-size: 15px; color: var(--fg-muted); margin-top: 8px; }

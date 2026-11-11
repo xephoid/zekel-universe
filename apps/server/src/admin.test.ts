@@ -95,6 +95,35 @@ describe('admin', () => {
     expect(content.updates.length).toBeGreaterThan(0);
   });
 
+  it('a refused write changes no row (R2)', async () => {
+    const snapshot = async () => JSON.stringify(await Promise.all([
+      db.selectFrom('games').selectAll().orderBy('engine_game_id').execute(),
+      db.selectFrom('designers').selectAll().orderBy('slug').execute(),
+      db.selectFrom('game_updates').selectAll().orderBy('id').execute(),
+      db.selectFrom('media').select('id').execute(),
+    ]));
+    const before = await snapshot();
+    const someone = await signIn('someone@example.com');
+    const boss = await signIn(ADMIN);
+    const updateId = (await db.selectFrom('game_updates').select('id').executeTakeFirstOrThrow()).id;
+    const writes: Array<['POST' | 'PUT' | 'DELETE', string, unknown]> = [
+      ['PUT', '/api/admin/games/fractured-fist', ffEdit({ name: 'Changed' })],
+      ['POST', '/api/admin/designers', { slug: 'new-one', name: 'N', bio: '', avatarImage: null }],
+      ['PUT', '/api/admin/designers/zekel-games', { name: 'Changed', bio: '', avatarImage: null }],
+      ['POST', '/api/admin/updates', { gameId: 'fractured-fist', title: 'x', body: 'y' }],
+      ['PUT', `/api/admin/updates/${updateId}`, { gameId: 'fractured-fist', title: 'x', body: 'y' }],
+      ['DELETE', `/api/admin/updates/${updateId}`, undefined],
+      ['POST', '/api/admin/media', { contentType: 'image/png', data: PNG }],
+    ];
+    for (const [method, url, payload] of writes) {
+      expect((await send(method, url, undefined, payload)).statusCode, `${method} ${url} anonymous`).toBe(401);
+      expect((await send(method, url, someone, payload)).statusCode, `${method} ${url} non-admin`).toBe(403);
+      const foreign = await app.fastify.inject({ method, url, headers: { origin: 'https://evil.example', cookie: boss }, ...(payload ? { payload: payload as object } : {}) });
+      expect(foreign.statusCode, `${method} ${url} foreign origin`).toBe(403);
+    }
+    expect(await snapshot()).toBe(before);
+  });
+
   it('refuses an edit from another origin', async () => {
     const boss = await signIn(ADMIN);
     const res = await app.fastify.inject({
