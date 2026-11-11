@@ -975,4 +975,116 @@ describe('sign-in binding and socket revocation', () => {
       expect(await move(s, tableId)).toMatchObject({ ok: true });
     });
   }
+
+  // ---- fourth review: the check right before the engine call, and acks ----
+
+  /** Hold the next host-token read: the last await before an engine call. */
+  function holdHostToken(): { reached: Promise<void>; open: () => void } {
+    const hostToken = app.tableService.hostToken.bind(app.tableService);
+    let open!: () => void;
+    let hit!: () => void;
+    const wait = new Promise<void>((r) => { open = r; });
+    const reached = new Promise<void>((r) => { hit = r; });
+    let armed = true;
+    app.tableService.hostToken = async (id: string) => {
+      const token = await hostToken(id);
+      if (armed) { armed = false; hit(); await wait; }
+      return token;
+    };
+    return { reached, open };
+  }
+
+  it('a move past its queue check, held before its engine call when sign-out begins, never reaches the engine', async () => {
+    const auth = await signIn('p@example.com');
+    const tableId = await aiTable(auth);
+    const s = await seated(auth, tableId);
+    const sent = serverSends(s);
+    const gap = holdHostToken();
+    const acks: MoveAck[] = [];
+    s.emit('move', { tableId, seat: 0, move: { type: 'pass', marker: 'gap' } }, (a: MoveAck) => acks.push(a));
+    await gap.reached;
+
+    const held = inject.pauseAfter('delete:auth_sessions');
+    const cut = disconnected(s);
+    const out = post('/api/auth/signout', auth);
+    await held.reached;
+    gap.open();
+    held.open();
+    expect((await out).statusCode).toBe(200);
+    expect(await cut).toBe('io server disconnect');
+
+    expect(engine.applied.some((a) => a.move['marker'] === 'gap')).toBe(false);
+    const rows = await db.selectFrom('table_events').selectAll().where('table_id', '=', tableId).execute();
+    expect(JSON.stringify(rows)).not.toContain('gap');
+    expect(sent).toHaveLength(0);
+    expect(acks.every((a) => !('ok' in a))).toBe(true);
+  });
+
+  it('an undo past its queue check, held before its engine call when sign-out begins, never reaches the engine', async () => {
+    const auth = await signIn('p@example.com');
+    const tableId = await aiTable(auth);
+    const s = await seated(auth, tableId);
+    expect(await move(s, tableId)).toMatchObject({ ok: true }); // something to take back
+    const eventsBefore = (await db.selectFrom('table_events').select('id').where('table_id', '=', tableId).execute()).length;
+    const undo = engine.undo.bind(engine);
+    let undoCalls = 0;
+    engine.undo = async (...args: Parameters<FakeEngine['undo']>) => { undoCalls++; return undo(...args); };
+
+    const gap = holdHostToken();
+    const acks: unknown[] = [];
+    s.emit('undo', { tableId }, (a: unknown) => acks.push(a));
+    await gap.reached;
+    const held = inject.pauseAfter('delete:auth_sessions');
+    const cut = disconnected(s);
+    const out = post('/api/auth/signout', auth);
+    await held.reached;
+    gap.open();
+    held.open();
+    expect((await out).statusCode).toBe(200);
+    expect(await cut).toBe('io server disconnect');
+
+    expect(undoCalls).toBe(0);
+    expect((await db.selectFrom('table_events').select('id').where('table_id', '=', tableId).execute()).length).toBe(eventsBefore);
+    expect(acks.every((a) => !(a as { ok?: boolean }).ok)).toBe(true);
+  });
+
+  it("an engine rejection already in flight when sign-out begins sends no legal moves to the revoked socket", async () => {
+    const auth = await signIn('p@example.com');
+    const tableId = await aiTable(auth);
+    const s = await seated(auth, tableId);
+
+    // Hold the illegal move inside the engine (the accepted case: it was
+    // already there when revocation began), then let it reject.
+    const applyMove = engine.applyMove.bind(engine);
+    let release!: () => void;
+    let inEngine!: () => void;
+    const reached = new Promise<void>((r) => { inEngine = r; });
+    const gateOpen = new Promise<void>((r) => { release = r; });
+    engine.applyMove = async (...args: Parameters<FakeEngine['applyMove']>) => {
+      inEngine();
+      await gateOpen;
+      return applyMove(...args);
+    };
+    const ack = new Promise<MoveAck>((r) => s.emit('move', { tableId, seat: 0, move: { type: 'illegal' } }, r));
+    await reached;
+
+    const held = inject.pauseAfter('delete:auth_sessions');
+    const out = post('/api/auth/signout', auth);
+    await held.reached; // the reply is still open: the socket is marked, not cut
+    expect(s.connected).toBe(true);
+    release();
+    const got = await ack;
+    expect(got).toMatchObject({ error: 'unauthorized' });
+    expect(JSON.stringify(got)).not.toMatch(/legal|lesson/i);
+    held.open();
+    expect((await out).statusCode).toBe(200);
+
+    // Positive control: a working session's rejection still explains itself.
+    const auth2 = await signIn('q@example.com');
+    const table2 = await aiTable(auth2);
+    const s2 = await seated(auth2, table2);
+    const ok = await new Promise<MoveAck>((r) => s2.emit('move', { tableId: table2, seat: 0, move: { type: 'illegal' } }, r));
+    expect(ok).toMatchObject({ error: expect.any(String) });
+    expect((ok as { legalMoves?: unknown[] }).legalMoves?.length ?? 0).toBeGreaterThan(0);
+  });
 });

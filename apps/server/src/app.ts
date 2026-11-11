@@ -113,6 +113,8 @@ function linkProof(token: string): string {
   return hashToken(`signin-link:${token}`);
 }
 
+const ENDED = 'Your session has ended. Sign in again.';
+
 /** A socket message dropped because its socket never passed its check. */
 class Refused extends Error {}
 
@@ -1297,7 +1299,10 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
 
       /** For an action waiting in its table's queue: asked when it reaches
        *  the front, so a sign-out while it waited stops it. */
-      const allowed = async (): Promise<boolean> => usable() && (await stillValid());
+      const allowed = {
+        check: async (): Promise<boolean> => usable() && (await stillValid()),
+        now: usable,
+      };
 
       /** Is this socket's credential still good right now? Updates the
        *  cached expiry; cuts the socket and returns false when not. */
@@ -1411,8 +1416,12 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
             return respond({ error: 'bad_request' });
           }
           const result = await realtime.handleMove(principal, msg.tableId, msg.seat, msg.move, allowed);
+          if (!usable()) return respond({ error: 'unauthorized', reason: ENDED });
           respond({ ok: true, lastSeq: result.lastSeq });
         } catch (err) {
+          // An answer from the engine (a rejection with this seat's legal
+          // moves, its reasons) never goes to a socket revoked meanwhile.
+          if (!usable()) return respond({ error: 'unauthorized', reason: ENDED });
           if (err instanceof MoveError) {
             respond({ error: err.code, reason: err.reason ?? err.message, lesson: err.lesson, legalMoves: err.legalMoves });
           } else {
@@ -1446,9 +1455,10 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
           const answer = await realtime.handleQuery(principal, msg.tableId, msg.seat, msg.name, args as Record<string, unknown>);
           // The answer is about this seat's private choices: none goes to a
           // socket revoked while the engine was asked.
-          if (!usable()) return respond({ error: 'unauthorized', reason: 'Your session has ended. Sign in again.' });
+          if (!usable()) return respond({ error: 'unauthorized', reason: ENDED });
           respond({ ok: true, answer });
         } catch (err) {
+          if (!usable()) return respond({ error: 'unauthorized', reason: ENDED });
           if (err instanceof MoveError) respond({ error: err.code, reason: err.reason ?? err.message });
           else {
             app.log.error(err);
@@ -1462,8 +1472,10 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
         try {
           if (!msg?.tableId) return respond({ error: 'bad_request' });
           const result = await realtime.handleUndo(principal, msg.tableId, allowed);
+          if (!usable()) return respond({ error: 'unauthorized', message: ENDED });
           respond({ ok: true, seq: result.seq });
         } catch (err) {
+          if (!usable()) return respond({ error: 'unauthorized', message: ENDED });
           if (err instanceof MoveError) respond({ error: err.code, message: err.message });
           else {
             app.log.error(err);
