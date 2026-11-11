@@ -153,10 +153,14 @@ Postgres tables, named for what they hold.
   `upgraded_to_user_id` nullable. A guest who signs in keeps their seats.
 - **friendships** — requester, addressee, status (pending, accepted), created.
 - **games** — the catalog as shown to players: engine game id, name, designer
-  name, player count, play time, tags, cover image, description, rules link,
-  visibility. Refreshed from the engine's list on startup; the extra fields
-  live here.
-- **game_updates** — designer posts per game: game id, title, body, posted.
+  (by slug), player count, play time, tags, cover image and its focus,
+  screenshots, place among the featured, description, rules link, visibility.
+  The engine's list adds new games on startup and keeps the player counts and
+  AI support current; everything else is edited on the admin page (§21).
+- **designers** — slug, name, bio, portrait.
+- **game_updates** — designer posts per game: game id, title, body, posted,
+  removed (an admin's remove hides the row and keeps it).
+- **media** — images uploaded on the admin page, served at `/media/<id>`.
 - **tables** — id, game id, host (user id), mode (live, turns), status (lobby,
   playing, finished), engine session id, encrypted host token, created,
   finished.
@@ -1492,3 +1496,37 @@ listed it since zekel #144 (merged 2026-11-09).
 - **Acceptance check.** A guest game against three AI seats at 1440 × 900,
   played through at least one round as a guesser and one as the debauchee,
   with the list of what each decision shows written down before the commit.
+
+## 21. The admin page (decided 2026-10-16, built 2026-11-11)
+
+A small internal page at `/admin` edits the storefront's database rows. The
+choice between a headless CMS, a custom admin and plain row edits went to
+plain row edits for launch; a CMS is the later step if designers ever edit
+their own pages.
+
+- **Who gets in.** A signed-in account whose sign-in email is listed in the
+  server's `ADMIN_EMAILS` (comma-separated, set in the host's config). Empty
+  means nobody. The server checks on every `/api/admin/*` request; the page
+  only shows an Admin link in the navigation to those accounts.
+- **What it edits.** A game's name, blurb, play time, tags, cover, cover
+  focus, screenshots (in order, at most eight), designer, place among the
+  featured, and public or unlisted. Designers' names, bios and portraits, and
+  new designers. The updates that show on home and on each game's page:
+  post, edit, remove.
+- **What it does not edit.** Player counts and AI support come from the engine
+  on every startup. No rule is ever edited here.
+- **The database is the source.** The copy in `apps/server/src/storefront.ts`
+  fills a row only when the row is new. An edit survives a restart and a
+  deploy. A removed update keeps its row, marked removed, so the seed never
+  posts it again.
+- **Images.** Uploaded from the page (PNG, JPEG or WebP, at most 1 MB, checked
+  against the file's first bytes) and kept in the database, served at
+  `/media/<id>`. An image field also takes a path under `/art/`. Links to
+  other sites are refused: the page's security policy allows same-site
+  images only, and the host's disk does not survive a deploy.
+- **Featured.** Home shows the games with a featured place, lowest first.
+  With none set it falls back to the first two games that have a designer.
+- **News** is the designers' updates; there is no separate news table.
+- **Every edit is logged** with the admin's account id and what changed.
+- **Still open:** cleaning up uploaded images nothing points at any more, and
+  the phone pass (the navigation bar is too wide at phone width on every page).
