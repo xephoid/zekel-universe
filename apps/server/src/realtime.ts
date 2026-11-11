@@ -20,6 +20,17 @@ import type { Mailer } from './email.js';
 import { seatOwnedBy, type SeatRecord, type TableService } from './tables/service.js';
 
 /** A move the table refused, with the code the browser branches on. */
+/** Is the sign-in behind a queued action still good? Asked when the action
+ *  reaches the front of its table's queue, not only when it arrived: a
+ *  sign-out while it waited must stop it. */
+export type StillAllowed = () => Promise<boolean>;
+
+async function requireAllowed(allowed: StillAllowed | undefined): Promise<void> {
+  if (allowed && !(await allowed())) {
+    throw new MoveError('unauthorized', 'Your session has ended. Sign in again.', 'Your session has ended. Sign in again.');
+  }
+}
+
 export class MoveError extends Error {
   constructor(
     public readonly code: string,
@@ -343,8 +354,12 @@ export class Realtime {
     tableId: string,
     seatPosition: number,
     move: Record<string, unknown>,
+    allowed?: StillAllowed,
   ): Promise<{ lastSeq: number }> {
-    return this.serialized(tableId, () => this.applyHumanMove(principal, tableId, seatPosition, move));
+    return this.serialized(tableId, async () => {
+      await requireAllowed(allowed);
+      return this.applyHumanMove(principal, tableId, seatPosition, move);
+    });
   }
 
   /**
@@ -696,8 +711,11 @@ export class Realtime {
    * the AI moves after it as one unit; the browsers rewind to the restored
    * views.
    */
-  handleUndo(principal: Principal, tableId: string): Promise<{ seq: number }> {
-    return this.serialized(tableId, () => this.applyUndo(principal, tableId));
+  handleUndo(principal: Principal, tableId: string, allowed?: StillAllowed): Promise<{ seq: number }> {
+    return this.serialized(tableId, async () => {
+      await requireAllowed(allowed);
+      return this.applyUndo(principal, tableId);
+    });
   }
 
   private async applyUndo(principal: Principal, tableId: string): Promise<{ seq: number }> {

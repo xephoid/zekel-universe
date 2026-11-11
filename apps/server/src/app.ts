@@ -21,7 +21,7 @@ import type { DB } from './db/schema.js';
 import { parseJson } from './db/index.js';
 import { newId, newToken, hashToken, now, type Principal } from './identity.js';
 import {
-  consumeSignInLink, GUEST_TTL_MS, guestExpiresAt, isWellFormedNonce, issueSignInLink, LINK_TTL_MS, RateLimiter,
+  consumeSignInLink, peekSignInLink, GUEST_TTL_MS, guestExpiresAt, isWellFormedNonce, issueSignInLink, LINK_TTL_MS, RateLimiter,
   SESSION_TTL_MS, sweepExpired,
 } from './auth.js';
 import type { Mailer } from './email.js';
@@ -90,6 +90,9 @@ export interface UniverseApp {
   /** Check every open socket's credential again and disconnect the ones that
    *  no longer work; returns how many were cut (also done on a timer). */
   recheckSockets(): Promise<number>;
+  /** How many credential rooms are being revoked right now (each is
+   *  removed once its request's work and reply have both finished). */
+  revocationsInProgress(): number;
 }
 
 /** What a request or socket authenticated with, kept so it can be checked
@@ -235,35 +238,54 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     return !credential || revoking.has(credentialRoom(credential));
   }
 
-  /** Revoke these credentials' sockets. Call it before the database change:
-   *  from this moment their sockets get no broadcast and pass no check.
-   *  They are disconnected once the reply has gone, so the browser holds its
-   *  new cookies before it reconnects; the returned function disconnects
-   *  them at once instead (for a request that fails part way). Either way,
-   *  it happens once. */
-  function revokeSockets(reply: FastifyReply, rooms: string[]): () => void {
-    if (rooms.length === 0) return () => {};
-    for (const room of rooms) {
-      revoking.set(room, (revoking.get(room) ?? 0) + 1);
-      for (const id of io?.sockets.adapter.rooms.get(room) ?? []) {
-        const socket = io!.sockets.sockets.get(id);
-        if (socket) socket.data.revoked = true;
-      }
-    }
-    let done = false;
-    const cut = () => {
-      if (done) return;
-      done = true;
-      io?.in(rooms).disconnectSockets(true);
+  /** A revocation in progress: credential rooms whose sockets get no
+   *  broadcast and pass no check from the moment they are added. */
+  interface Revocation {
+    /** Revoke this credential room's sockets from now on. */
+    add(room: string): void;
+    /** The database work has finished, well or badly. Call it in a
+     *  `finally`; the sockets are cut once this and the reply have both
+     *  happened. */
+    settled(): void;
+  }
+
+  /** Start revoking before the database change. The mark stays until the
+   *  database work has settled AND the reply has gone (or the client went
+   *  away): a client that drops the request early cannot end it while the
+   *  write is still pending, and a socket that connects meanwhile is refused
+   *  by its own check. Then every socket still in those rooms is cut, so the
+   *  browser holds its new cookies before it reconnects, and the mark is
+   *  removed. */
+  function beginRevocation(reply: FastifyReply): Revocation {
+    const rooms: string[] = [];
+    let workDone = false;
+    let replyDone = false;
+    let finished = false;
+    const finish = () => {
+      if (finished || !workDone || !replyDone) return;
+      finished = true;
+      if (rooms.length > 0) io?.in(rooms).disconnectSockets(true);
       for (const room of rooms) {
         const n = (revoking.get(room) ?? 1) - 1;
         if (n > 0) revoking.set(room, n);
         else revoking.delete(room);
       }
     };
-    reply.raw.once('finish', cut);
-    reply.raw.once('close', cut);
-    return cut;
+    const onReply = () => { replyDone = true; finish(); };
+    reply.raw.once('finish', onReply);
+    reply.raw.once('close', onReply);
+    return {
+      add(room) {
+        if (finished || rooms.includes(room)) return;
+        rooms.push(room);
+        revoking.set(room, (revoking.get(room) ?? 0) + 1);
+        for (const id of io?.sockets.adapter.rooms.get(room) ?? []) {
+          const socket = io!.sockets.sockets.get(id);
+          if (socket) socket.data.revoked = true;
+        }
+      },
+      settled() { workDone = true; finish(); },
+    };
   }
 
   function principalOf(req: FastifyRequest): Promise<Principal | null> {
@@ -463,74 +485,90 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
         message: 'Open the sign-in link in the browser where you asked for it.',
       });
     }
-    const email = token ? await consumeSignInLink(db, token, nonce) : null;
+    // Refused links are decided by a read, before anything is marked or
+    // written: a refusal changes nothing and leaves every socket alone.
+    const email = token ? await peekSignInLink(db, token, nonce) : null;
     if (!email) return reply.code(401).send({ error: 'invalid_or_expired_token' });
-    // The nonce is spent: this browser's other pending links go with it.
-    await db.deleteFrom('sign_in_links').where('nonce_hash', '=', hashToken(nonce)).execute();
-    reply.clearCookie(signinCookieName, { path: '/' });
-
-    // Find or create the user behind this email identity.
-    const identity = await db.selectFrom('identities').select('user_id')
-      .where('provider', '=', 'email').where('provider_subject', '=', email).executeTakeFirst();
-    let userId: string;
-    if (identity) {
-      userId = identity.user_id;
-    } else {
-      userId = newId();
-      await db.insertInto('users').values({
-        id: userId, display_name: email.split('@')[0] ?? 'Player', avatar_url: null, bio: null, created_at: now(),
-      }).execute();
-      await db.insertInto('identities').values({
-        id: newId(), user_id: userId, provider: 'email', provider_subject: email,
-      }).execute();
-    }
 
     // The session this browser was signed in with, if any, ends here: the
     // new cookie replaces it, and a socket still holding it (in this tab or
     // another of this browser) must not go on acting as that account. Only
     // the session in this request is ended; it moves nothing to the new
-    // account. Its sockets are cut, so they reconnect with the new cookie.
-    const rooms: string[] = [];
-    const oldAuth = req.cookies[AUTH_COOKIE];
-    const oldHash = oldAuth ? hashToken(oldAuth) : null;
-    if (oldHash) rooms.push(credentialRoom({ kind: 'session', tokenHash: oldHash }));
-
-    // A guest cookie on this request keeps its seats, its tables and its
-    // notifications: everything moves to the user. The guest's open sockets
-    // are cut, so they reconnect as the user.
-    const guestToken = req.cookies[GUEST_COOKIE];
-    const guest = guestToken
-      ? await db.selectFrom('guests').select(['id', 'upgraded_to_user_id', 'created_at', 'expires_at'])
-        .where('token_hash', '=', hashToken(guestToken)).executeTakeFirst()
-      : undefined;
-    const upgrading = guest && !guest.upgraded_to_user_id && guestExpiresAt(guest) > Date.now() ? guest : null;
-    if (upgrading) rooms.push(credentialRoom({ kind: 'guest', guestId: upgrading.id }));
-
-    // From here the old credentials' sockets hear nothing more, and are cut
-    // even if a step below fails.
-    const cutNow = revokeSockets(reply, rooms);
+    // account. Its sockets are revoked from now, and cut at the end.
+    const revocation = beginRevocation(reply);
+    let outcome: { userId: string; sessionToken: string } | null;
     try {
-      if (oldHash) await db.deleteFrom('auth_sessions').where('token_hash', '=', oldHash).execute();
-      if (upgrading) {
-        await db.updateTable('guests').set({ upgraded_to_user_id: userId }).where('id', '=', upgrading.id).execute();
-        await db.updateTable('seats').set({ user_id: userId, guest_id: null }).where('guest_id', '=', upgrading.id).execute();
-        await db.updateTable('tables').set({ host_user_id: userId, host_guest_id: null }).where('host_guest_id', '=', upgrading.id).execute();
-        await db.updateTable('notifications').set({ user_id: userId, guest_id: null }).where('guest_id', '=', upgrading.id).execute();
-      }
+      const oldAuth = req.cookies[AUTH_COOKIE];
+      const oldHash = oldAuth ? hashToken(oldAuth) : null;
+      if (oldHash) revocation.add(credentialRoom({ kind: 'session', tokenHash: oldHash }));
 
-      // The session remembers which link made it, so a browser whose answer
-      // was lost can ask whether this link signed it in (link-status below).
-      const sessionToken = newToken();
-      await db.insertInto('auth_sessions').values({
-        id: newId(), user_id: userId, token_hash: hashToken(sessionToken), created_at: now(),
-        expires_at: new Date(Date.now() + SESSION_TTL_MS).toISOString(), link_hash: linkProof(token),
-      }).execute();
-      reply.setCookie(AUTH_COOKIE, sessionToken, { ...cookieOptions, maxAge: Math.floor(SESSION_TTL_MS / 1000) });
-      return { ok: true, userId };
-    } catch (err) {
-      cutNow();
-      throw err;
+      // A guest cookie on this request keeps its seats, its tables and its
+      // notifications: everything moves to the user. The guest's sockets
+      // are revoked too, so they reconnect as the user.
+      const guestToken = req.cookies[GUEST_COOKIE];
+      const guest = guestToken
+        ? await db.selectFrom('guests').select(['id', 'upgraded_to_user_id', 'created_at', 'expires_at'])
+          .where('token_hash', '=', hashToken(guestToken)).executeTakeFirst()
+        : undefined;
+      const upgrading = guest && !guest.upgraded_to_user_id && guestExpiresAt(guest) > Date.now() ? guest : null;
+      if (upgrading) revocation.add(credentialRoom({ kind: 'guest', guestId: upgrading.id }));
+
+      // One transaction: using the link up, the account, ending the old
+      // session, the guest's transfer and the new session all happen or
+      // none does. A failure leaves the link usable, the guest and the old
+      // session as they were, so trying again finishes the job.
+      outcome = await db.transaction().execute(async (trx) => {
+        const consumed = await consumeSignInLink(trx, token, nonce);
+        if (!consumed) return null; // used or expired since the read above
+        // The nonce is spent: this browser's other pending links go with it.
+        await trx.deleteFrom('sign_in_links').where('nonce_hash', '=', hashToken(nonce)).execute();
+
+        // Find or create the user behind this email identity.
+        const identity = await trx.selectFrom('identities').select('user_id')
+          .where('provider', '=', 'email').where('provider_subject', '=', consumed).executeTakeFirst();
+        let userId: string;
+        if (identity) {
+          userId = identity.user_id;
+        } else {
+          userId = newId();
+          await trx.insertInto('users').values({
+            id: userId, display_name: consumed.split('@')[0] ?? 'Player', avatar_url: null, bio: null, created_at: now(),
+          }).execute();
+          await trx.insertInto('identities').values({
+            id: newId(), user_id: userId, provider: 'email', provider_subject: consumed,
+          }).execute();
+        }
+
+        if (oldHash) await trx.deleteFrom('auth_sessions').where('token_hash', '=', oldHash).execute();
+        if (upgrading) {
+          // Only a guest still not upgraded moves; a concurrent upgrade won.
+          const marked = await trx.updateTable('guests').set({ upgraded_to_user_id: userId })
+            .where('id', '=', upgrading.id).where('upgraded_to_user_id', 'is', null).executeTakeFirst();
+          if (Number(marked.numUpdatedRows) === 1) {
+            await trx.updateTable('seats').set({ user_id: userId, guest_id: null }).where('guest_id', '=', upgrading.id).execute();
+            await trx.updateTable('tables').set({ host_user_id: userId, host_guest_id: null }).where('host_guest_id', '=', upgrading.id).execute();
+            await trx.updateTable('notifications').set({ user_id: userId, guest_id: null }).where('guest_id', '=', upgrading.id).execute();
+          }
+        }
+
+        // The session remembers which link made it, so a browser whose answer
+        // was lost can ask whether this link signed it in (link-status below).
+        const sessionToken = newToken();
+        await trx.insertInto('auth_sessions').values({
+          id: newId(), user_id: userId, token_hash: hashToken(sessionToken), created_at: now(),
+          expires_at: new Date(Date.now() + SESSION_TTL_MS).toISOString(), link_hash: linkProof(token),
+        }).execute();
+        return { userId, sessionToken };
+      });
+    } finally {
+      revocation.settled();
     }
+    // Cookies change only once everything is written: a failed completion
+    // keeps this browser's nonce, so the same link can be tried again.
+    if (!outcome) return reply.code(401).send({ error: 'invalid_or_expired_token' });
+    reply.clearCookie(signinCookieName, { path: '/' });
+    reply.setCookie(AUTH_COOKIE, outcome.sessionToken, { ...cookieOptions, maxAge: Math.floor(SESSION_TTL_MS / 1000) });
+    return { ok: true, userId: outcome.userId };
   });
 
   // Did this link sign this browser in? Asked by the landing page when the
@@ -553,31 +591,28 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
   app.post('/api/auth/signout', async (req, reply) => {
     // Sign-out ends the session in the database and cuts every socket that
     // opened with it (SEC-04-F12).
+    // The session's sockets are revoked before anything is read or
+    // written, and cut once the work has settled and the reply has gone.
     // The guest cookie that was upgraded into this account is spent too. A
     // guest cookie that was not upgraded is ended on the server as well: the
     // browser is told to forget it, so nobody should still be using it.
-    const rooms: string[] = [];
-    const token = req.cookies[AUTH_COOKIE];
-    const tokenHash = token ? hashToken(token) : null;
-    if (tokenHash) rooms.push(credentialRoom({ kind: 'session', tokenHash }));
-    const guestToken = req.cookies[GUEST_COOKIE];
-    const guest = guestToken
-      ? await db.selectFrom('guests').select(['id', 'upgraded_to_user_id'])
-        .where('token_hash', '=', hashToken(guestToken)).executeTakeFirst()
-      : undefined;
-    if (guest) rooms.push(credentialRoom({ kind: 'guest', guestId: guest.id }));
-
-    // The sockets stop hearing anything before the rows change, and are cut
-    // even if a step below fails.
-    const cutNow = revokeSockets(reply, rooms);
+    const revocation = beginRevocation(reply);
     try {
+      const token = req.cookies[AUTH_COOKIE];
+      const tokenHash = token ? hashToken(token) : null;
+      if (tokenHash) revocation.add(credentialRoom({ kind: 'session', tokenHash }));
+      const guestToken = req.cookies[GUEST_COOKIE];
+      const guest = guestToken
+        ? await db.selectFrom('guests').select(['id', 'upgraded_to_user_id'])
+          .where('token_hash', '=', hashToken(guestToken)).executeTakeFirst()
+        : undefined;
+      if (guest) revocation.add(credentialRoom({ kind: 'guest', guestId: guest.id }));
       if (tokenHash) await db.deleteFrom('auth_sessions').where('token_hash', '=', tokenHash).execute();
       if (guest && !guest.upgraded_to_user_id) {
         await db.updateTable('guests').set({ expires_at: now() }).where('id', '=', guest.id).execute();
       }
-    } catch (err) {
-      cutNow();
-      throw err;
+    } finally {
+      revocation.settled();
     }
     reply.clearCookie(AUTH_COOKIE, { path: '/' });
     reply.clearCookie(GUEST_COOKIE, { path: '/' });
@@ -1256,6 +1291,14 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
         return false;
       });
 
+      /** Nothing known against this socket right now (no database read):
+       *  connected, checked, and not being revoked. */
+      const usable = () => socket.connected && socket.data.verified === true && !isRevoked(socket);
+
+      /** For an action waiting in its table's queue: asked when it reaches
+       *  the front, so a sign-out while it waited stops it. */
+      const allowed = async (): Promise<boolean> => usable() && (await stillValid());
+
       /** Is this socket's credential still good right now? Updates the
        *  cached expiry; cuts the socket and returns false when not. */
       const stillValid = async (): Promise<boolean> => {
@@ -1325,9 +1368,15 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
           }
           seatsOf(socket).set(tableId, mine[0]!.position);
           realtime.markConnected(tableId, principal);
-          // Replay missed events so a reconnecting browser catches up.
+          // Replay missed events so a reconnecting browser catches up. A
+          // revocation that began while they were read stops the replay
+          // before the first view goes out.
           const missed = await realtime.eventsAfter(tableId, Number(msg.lastSeenSeq ?? 0) || 0);
-          for (const e of missed) socket.emit(SOCKET_EVENTS.tableEvent, toWireEvent(e, mine[0]!.position));
+          for (const e of missed) {
+            if (!usable()) { drop(); socket.disconnect(true); return respond({ error: 'unauthorized', message: 'Your session has ended. Sign in again.' }); }
+            socket.emit(SOCKET_EVENTS.tableEvent, toWireEvent(e, mine[0]!.position));
+          }
+          if (!usable()) { drop(); socket.disconnect(true); return respond({ error: 'unauthorized', message: 'Your session has ended. Sign in again.' }); }
           respond({ ok: true, seats: mine.map((s) => s.position), status: table.status as TableStatus });
           // Being here answers this table's notifications; and if a restart
           // left the table between events, the engine's next step is written
@@ -1361,7 +1410,7 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
           if (!msg?.tableId || typeof msg.seat !== 'number' || !msg.move || typeof msg.move !== 'object') {
             return respond({ error: 'bad_request' });
           }
-          const result = await realtime.handleMove(principal, msg.tableId, msg.seat, msg.move);
+          const result = await realtime.handleMove(principal, msg.tableId, msg.seat, msg.move, allowed);
           respond({ ok: true, lastSeq: result.lastSeq });
         } catch (err) {
           if (err instanceof MoveError) {
@@ -1395,6 +1444,9 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
             return respond({ error: 'bad_request' });
           }
           const answer = await realtime.handleQuery(principal, msg.tableId, msg.seat, msg.name, args as Record<string, unknown>);
+          // The answer is about this seat's private choices: none goes to a
+          // socket revoked while the engine was asked.
+          if (!usable()) return respond({ error: 'unauthorized', reason: 'Your session has ended. Sign in again.' });
           respond({ ok: true, answer });
         } catch (err) {
           if (err instanceof MoveError) respond({ error: err.code, reason: err.reason ?? err.message });
@@ -1409,7 +1461,7 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
         const respond = ack ?? (() => {});
         try {
           if (!msg?.tableId) return respond({ error: 'bad_request' });
-          const result = await realtime.handleUndo(principal, msg.tableId);
+          const result = await realtime.handleUndo(principal, msg.tableId, allowed);
           respond({ ok: true, seq: result.seq });
         } catch (err) {
           if (err instanceof MoveError) respond({ error: err.code, message: err.message });
@@ -1446,5 +1498,8 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     });
   }
 
-  return { fastify: app, io, tableService, realtime, principalFromCookies, refreshCatalog, sendDueNudges, recheckSockets };
+  return {
+    fastify: app, io, tableService, realtime, principalFromCookies, refreshCatalog, sendDueNudges, recheckSockets,
+    revocationsInProgress: () => revoking.size,
+  };
 }

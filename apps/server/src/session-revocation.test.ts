@@ -9,7 +9,8 @@
 // Real Socket.IO clients against the app on a loopback port, with the fake
 // engine; every refusal is checked for no engine write and no seat change.
 
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { request as httpRequest, type IncomingMessage, type ServerResponse } from 'node:http';
 import { io as ioClient, type Socket as ClientSocket } from 'socket.io-client';
 import type { Server as SocketServer } from 'socket.io';
 import type { AddressInfo } from 'node:net';
@@ -612,11 +613,17 @@ describe('sign-in binding and socket revocation', () => {
   }
 
   /** Send one of the table's stored events to its room again, as a new
-   *  event would be: the broadcast path with no engine involved. */
+   *  event would be: the broadcast path with no engine involved. Takes a
+   *  prepared sender when the database is busy (inside a held transaction
+   *  SQLite's one connection serves nobody else). */
   async function rebroadcast(tableId: string): Promise<void> {
+    (await broadcaster(tableId))();
+  }
+  async function broadcaster(tableId: string): Promise<() => void> {
     const events = await app.realtime.eventsAfter(tableId, 0);
     expect(events.length).toBeGreaterThan(0);
-    (app.realtime as unknown as { broadcast: (t: string, e: unknown) => void }).broadcast(tableId, events[events.length - 1]);
+    const event = events[events.length - 1];
+    return () => (app.realtime as unknown as { broadcast: (t: string, e: unknown) => void }).broadcast(tableId, event);
   }
 
   it('sign-out held right after its session delete: the socket hears no event, then is cut', async () => {
@@ -641,11 +648,12 @@ describe('sign-in binding and socket revocation', () => {
     const s = await seated(a, tableId);
     const sent = serverSends(s);
     const { token, nonce } = await askForLink('b@example.com', a);
+    const send = await broadcaster(tableId);
     const held = inject.pauseAfter('delete:auth_sessions');
     const cut = disconnected(s);
     const done = post('/api/auth/email/complete', `${a}; ${nonce}`, { token });
     await held.reached;
-    await rebroadcast(tableId);
+    send();
     expect(sent).toHaveLength(0);
     held.open();
     expect((await done).statusCode).toBe(200);
@@ -658,18 +666,19 @@ describe('sign-in binding and socket revocation', () => {
     const s = await seated(g, tableId);
     const sent = serverSends(s);
     const { token, nonce } = await askForLink('up@example.com', g);
+    const send = await broadcaster(tableId);
     const held = inject.pauseAfter('update:seats');
     const cut = disconnected(s);
     const done = post('/api/auth/email/complete', `${g}; ${nonce}`, { token });
     await held.reached;
-    await rebroadcast(tableId);
+    send();
     expect(sent).toHaveLength(0);
     held.open();
     expect((await done).statusCode).toBe(200);
     expect(await cut).toBe('io server disconnect');
   });
 
-  it('an account switch that fails after deleting the old session still cuts the old socket, which hears nothing', async () => {
+  it('an account switch that fails after deleting the old session cuts the old socket, which hears nothing; the rollback keeps A signed in', async () => {
     const a = await signIn('a@example.com');
     const tableId = await aiTable(a);
     const s = await seated(a, tableId);
@@ -683,7 +692,12 @@ describe('sign-in binding and socket revocation', () => {
     expect(await cut).toBe('io server disconnect');
     await rebroadcast(tableId);
     expect(sent).toHaveLength(0);
-    expect(await refused(client(a))).toBe('unauthorized');
+    // The transaction rolled back: A's session is as it was (no lockout),
+    // and the same link still works.
+    expect((await get('/api/me', a)).json<MeResponse>().user).toBeTruthy();
+    const retry = await post('/api/auth/email/complete', `${a}; ${nonce}`, { token });
+    expect(retry.statusCode).toBe(200);
+    expect((await get('/api/me', a)).json<MeResponse>().user).toBeNull();
   });
 
   it('a sign-out that fails part way still cuts the socket, which hears nothing', async () => {
@@ -772,4 +786,193 @@ describe('sign-in binding and socket revocation', () => {
     // It changes nothing.
     expect((await get('/api/me', again)).json<MeResponse>().user?.id).toBe(userId);
   });
+
+  // ---- third review: aborted requests, queued work, atomic upgrade ---------
+
+  /** POST over a real HTTP connection, so the test can drop it mid-request. */
+  function rawPost(url: string, cookie: string): { abort: () => void; closed: Promise<void> } {
+    let closedResolve!: () => void;
+    const closed = new Promise<void>((r) => { closedResolve = r; });
+    const onRequest = (req: IncomingMessage, res: ServerResponse) => {
+      if (req.url === url) {
+        app.fastify.server.off('request', onRequest);
+        res.once('close', () => closedResolve());
+      }
+    };
+    app.fastify.server.on('request', onRequest);
+    const req = httpRequest({
+      host: '127.0.0.1', port, method: 'POST', path: url,
+      headers: { origin: ORIGIN, cookie, 'content-length': '0' },
+    });
+    req.on('error', () => {});
+    req.end();
+    return { abort: () => req.destroy(), closed };
+  }
+
+  it('a sign-out whose client drops the request before the delete: a socket reconnecting meanwhile is refused, and the mark is cleaned up', async () => {
+    const auth = await signIn('p@example.com');
+    const tableId = await aiTable(auth);
+    const g = await guest(); // a second cookie gives sign-out a read before its delete
+    const held = inject.pauseAfter('select:guests');
+    const out = rawPost('/api/auth/signout', `${auth}; ${g}`);
+    await held.reached;
+    out.abort();
+    await out.closed;
+
+    // The session row is still there; a socket reconnecting with it now is
+    // cut by its own check and does nothing.
+    const s = client(auth);
+    const events: TableEventWire[] = [];
+    s.on('table_event', (e: TableEventWire) => events.push(e));
+    const cut = disconnected(s);
+    const acks: unknown[] = [];
+    s.emit('join_table', { tableId }, (a: unknown) => acks.push(a));
+    s.emit('move', { tableId, seat: 0, move: { type: 'pass' } }, (a: unknown) => acks.push(a));
+    const appliedBefore = engine.applied.length;
+    expect(await cut).toBe('io server disconnect');
+    // Still marked: the session (the guest is added once it has been read).
+    expect(app.revocationsInProgress()).toBe(1);
+
+    held.open();
+    await vi.waitFor(() => expect(app.revocationsInProgress()).toBe(0));
+    expect((await get('/api/me', auth)).json<MeResponse>().user).toBeNull();
+    expect(engine.applied.length).toBe(appliedBefore);
+    expect(events).toHaveLength(0);
+    expect(acks.every((a) => !(a as { ok?: boolean }).ok)).toBe(true);
+  });
+
+  it('join_table paused while reading the missed events: a revocation that begins then stops the replay', async () => {
+    const auth = await signIn('p@example.com');
+    const tableId = await aiTable(auth);
+    const s = client(auth);
+    await connected(s);
+    const sent = serverSends(s);
+
+    const eventsAfter = app.realtime.eventsAfter.bind(app.realtime);
+    let release!: () => void;
+    let reachedResolve!: () => void;
+    const reached = new Promise<void>((r) => { reachedResolve = r; });
+    const gateOpen = new Promise<void>((r) => { release = r; });
+    let armed = true;
+    app.realtime.eventsAfter = async (id: string, after: number) => {
+      const rows = await eventsAfter(id, after);
+      if (armed) { armed = false; reachedResolve(); await gateOpen; }
+      return rows;
+    };
+    const acks: JoinTableAck[] = [];
+    s.emit('join_table', { tableId }, (a: JoinTableAck) => acks.push(a));
+    await reached;
+
+    // Sign-out begins (and is held after its delete, before its cut).
+    const held = inject.pauseAfter('delete:auth_sessions');
+    const cut = disconnected(s);
+    const out = post('/api/auth/signout', auth);
+    await held.reached;
+    release();
+    expect(await cut).toBe('io server disconnect');
+    expect(sent).toHaveLength(0);
+    expect(acks.every((a) => !('ok' in a))).toBe(true);
+    held.open();
+    expect((await out).statusCode).toBe(200);
+    expect(app.revocationsInProgress()).toBe(0);
+  });
+
+  it('a move waiting in its table queue when sign-out begins is never applied or written', async () => {
+    const auth = await signIn('p@example.com');
+    const tableId = await aiTable(auth);
+    const otherAuth = await signIn('p@example.com');
+    const mine = await seated(auth, tableId);
+    const other = await seated(otherAuth, tableId);
+
+    // Hold the first move inside the engine, so the table's queue is busy.
+    const applyMove = engine.applyMove.bind(engine);
+    let release!: () => void;
+    let inEngine!: () => void;
+    const engineReached = new Promise<void>((r) => { inEngine = r; });
+    const gateOpen = new Promise<void>((r) => { release = r; });
+    let armed = true;
+    engine.applyMove = async (...args: Parameters<FakeEngine['applyMove']>) => {
+      if (armed) { armed = false; inEngine(); await gateOpen; }
+      return applyMove(...args);
+    };
+    // Know when the second move has passed its socket check and is queued.
+    const handleMove = app.realtime.handleMove.bind(app.realtime);
+    let queuedResolve!: () => void;
+    const queued = new Promise<void>((r) => { queuedResolve = r; });
+    let calls = 0;
+    app.realtime.handleMove = (...args: Parameters<typeof handleMove>) => {
+      const run = handleMove(...args);
+      if (++calls === 2) queuedResolve();
+      return run;
+    };
+
+    const first = new Promise<MoveAck>((r) => other.emit('move', { tableId, seat: 0, move: { type: 'pass', marker: 'first' } }, r));
+    await engineReached;
+    const mineAcks: unknown[] = [];
+    mine.emit('move', { tableId, seat: 0, move: { type: 'pass', marker: 'queued' } }, (a: unknown) => mineAcks.push(a));
+    await queued;
+
+    const held = inject.pauseAfter('delete:auth_sessions');
+    const out = post('/api/auth/signout', auth);
+    await held.reached;
+    release();
+    expect(await first).toMatchObject({ ok: true });
+    // A later move from the other session runs after the queued one.
+    expect(await move(other, tableId)).toMatchObject({ ok: true });
+    held.open();
+    expect((await out).statusCode).toBe(200);
+
+    expect(engine.applied.some((a) => a.move['marker'] === 'queued')).toBe(false);
+    const rows = await db.selectFrom('table_events').selectAll().where('table_id', '=', tableId).execute();
+    expect(JSON.stringify(rows)).not.toContain('queued');
+    expect(mineAcks.every((a) => !(a as { ok?: boolean }).ok)).toBe(true);
+  });
+
+  for (const tag of [
+    'delete:sign_in_links', 'insert:users', 'insert:identities', 'update:guests', 'update:seats',
+    'update:tables', 'update:notifications', 'insert:auth_sessions',
+  ]) {
+    it(`a guest upgrade failing at ${tag} changes nothing, keeps the guest working, and the same link then moves everything`, async () => {
+      const g = await guest();
+      const tableId = await aiTable(g);
+      const guestId = (await get('/api/me', g)).json<MeResponse>().guest!.id;
+      await db.insertInto('notifications').values({
+        id: 'n1', user_id: null, guest_id: guestId, kind: 'your_turn', table_id: tableId, read: 0,
+        created_at: new Date().toISOString(), emailed_at: null,
+      }).execute();
+      const snapshot = async () => ({
+        guest: await db.selectFrom('guests').select(['upgraded_to_user_id', 'expires_at']).where('id', '=', guestId).executeTakeFirstOrThrow(),
+        seats: await seatOwners(tableId),
+        table: await db.selectFrom('tables').select(['host_user_id', 'host_guest_id']).where('id', '=', tableId).executeTakeFirstOrThrow(),
+        notes: await db.selectFrom('notifications').select(['user_id', 'guest_id']).execute(),
+        users: (await db.selectFrom('users').select('id').execute()).length,
+        sessions: (await db.selectFrom('auth_sessions').select('id').execute()).length,
+        links: (await db.selectFrom('sign_in_links').select('id').execute()).length,
+      });
+      const { token, nonce } = await askForLink('up@example.com', g);
+      const before = await snapshot();
+
+      inject.failNext(tag);
+      const failed = await post('/api/auth/email/complete', `${g}; ${nonce}`, { token });
+      expect(failed.statusCode).toBe(500);
+      expect(setCookies(failed)).toEqual([]); // no new session, nonce kept
+      expect(await snapshot()).toEqual(before);
+      expect((await get('/api/me', g)).json<MeResponse>().guest?.id).toBe(guestId);
+      await vi.waitFor(() => expect(app.revocationsInProgress()).toBe(0));
+      const again = await seated(g, tableId); // the guest still plays
+      again.close();
+
+      const ok = await post('/api/auth/email/complete', `${g}; ${nonce}`, { token });
+      expect(ok.statusCode).toBe(200);
+      const userId = ok.json<{ userId: string }>().userId;
+      const auth = cookieOf(ok, 'universe_auth')!;
+      expect((await get('/api/me', auth)).json<MeResponse>().user?.id).toBe(userId);
+      expect((await seatOwners(tableId))[0]).toMatchObject({ user_id: userId, guest_id: null });
+      expect(await db.selectFrom('tables').select(['host_user_id', 'host_guest_id']).where('id', '=', tableId).executeTakeFirstOrThrow())
+        .toEqual({ host_user_id: userId, host_guest_id: null });
+      expect(await db.selectFrom('notifications').select(['user_id', 'guest_id']).execute()).toEqual([{ user_id: userId, guest_id: null }]);
+      const s = await seated(`${auth}; ${g}`, tableId);
+      expect(await move(s, tableId)).toMatchObject({ ok: true });
+    });
+  }
 });

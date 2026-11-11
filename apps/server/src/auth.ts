@@ -47,6 +47,19 @@ export async function issueSignInLink(db: Kysely<DB>, email: string, nonce: stri
   return token;
 }
 
+/** The email a token was issued to, when it is live and was asked for with
+ *  this nonce; null otherwise. Reads only: the token is not used up (the
+ *  completion consumes it inside its transaction, see consumeSignInLink). */
+export async function peekSignInLink(db: Kysely<DB>, token: string, nonce: string): Promise<string | null> {
+  if (!isWellFormedNonce(nonce)) return null;
+  const row = await db.selectFrom('sign_in_links').select(['email', 'expires_at'])
+    .where('token_hash', '=', hashToken(token))
+    .where('nonce_hash', '=', hashToken(nonce))
+    .executeTakeFirst();
+  if (!row || new Date(row.expires_at).getTime() < Date.now()) return null;
+  return row.email;
+}
+
 /** Returns the email a token was issued to, consuming it; null when invalid.
  *  The delete is the check: exactly one concurrent redemption can win. A
  *  token presented with the wrong nonce matches no row, so it is refused
