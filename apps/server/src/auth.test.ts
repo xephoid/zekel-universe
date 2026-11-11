@@ -1,16 +1,31 @@
 import { describe, it, expect } from 'vitest';
 import { createDatabase } from './db/index.js';
 import { consumeSignInLink, issueSignInLink, RateLimiter } from './auth.js';
+import { newToken } from './identity.js';
 import { loadConfig } from './config.js';
 
 describe('sign-in links', () => {
   it('issue then consume once; a second use fails', async () => {
     const database = await createDatabase(':memory:');
     const { db } = database;
-    const token = await issueSignInLink(db, 'a@example.com');
-    expect(await consumeSignInLink(db, token)).toBe('a@example.com');
-    expect(await consumeSignInLink(db, token)).toBeNull();
-    expect(await consumeSignInLink(db, 'garbage')).toBeNull();
+    const nonce = newToken();
+    const token = await issueSignInLink(db, 'a@example.com', nonce);
+    expect(await consumeSignInLink(db, token, nonce)).toBe('a@example.com');
+    expect(await consumeSignInLink(db, token, nonce)).toBeNull();
+    expect(await consumeSignInLink(db, 'garbage', nonce)).toBeNull();
+    await database.close();
+  });
+
+  it('a token with another browser\'s nonce, or none, is refused and left unused (SEC-03-F11)', async () => {
+    const database = await createDatabase(':memory:');
+    const { db } = database;
+    const nonce = newToken();
+    const token = await issueSignInLink(db, 'a@example.com', nonce);
+    expect(await consumeSignInLink(db, token, newToken())).toBeNull();
+    expect(await consumeSignInLink(db, token, '')).toBeNull();
+    expect(await consumeSignInLink(db, token, 'short')).toBeNull();
+    // The asking browser can still use it.
+    expect(await consumeSignInLink(db, token, nonce)).toBe('a@example.com');
     await database.close();
   });
 });
@@ -42,6 +57,15 @@ describe('config', () => {
     });
     expect(c.isProduction).toBe(true);
     expect(c.allowedOrigins).toEqual(['https://play.example']);
+  });
+  it('takes the engine as a private host:port when no ENGINE_URL is set (render.yaml)', () => {
+    const base = { NODE_ENV: 'production', SECRET_KEY: 's', ENGINE_TOKEN: 't', APP_ORIGIN: 'https://play.example', DATABASE_URL: 'postgres://x' };
+    expect(() => loadConfig(base)).toThrow(/ENGINE_URL/);
+    expect(loadConfig({ ...base, ENGINE_HOSTPORT: 'zekel-engine:8787' }).engineUrl).toBe('http://zekel-engine:8787/mcp');
+    expect(loadConfig({ ...base, ENGINE_HOSTPORT: 'zekel-engine:8787', ENGINE_URL: 'http://e/mcp' }).engineUrl).toBe('http://e/mcp');
+    for (const bad of ['zekel-engine', 'http://zekel-engine:8787', 'a:1/x', 'a b:1']) {
+      expect(() => loadConfig({ ...base, ENGINE_HOSTPORT: bad }), bad).toThrow(/ENGINE_HOSTPORT/);
+    }
   });
 });
 

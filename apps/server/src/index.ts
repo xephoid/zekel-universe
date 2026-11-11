@@ -34,6 +34,7 @@ async function main(): Promise<void> {
     testOutbox,
     turnNudge: { delayMs: config.turnNudgeDelayMs, sweepMs: config.turnNudgeSweepMs },
     limits: { guestsPerIp: config.guestsPerIp },
+    clientIpHeader: config.clientIpHeader,
   });
 
   await app.fastify.ready();

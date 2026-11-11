@@ -73,7 +73,8 @@ export function SetupPage() {
   // field that is not in play is neither shown nor required.
   const method = answers['method'];
   const inPlay = (f: SetupField) =>
-    !(f.key.startsWith('score.') && method !== 'recommended' && method !== 'distribute') && !(f.key === 'archetype_name' && method !== 'archetype');
+    !(f.key.startsWith('score.') && method !== 'recommended' && method !== 'distribute') && !(f.key === 'archetype_name' && method !== 'archetype')
+    && (glue?.setupInPlay?.(f, answers) ?? true);
   const shown = fields.filter(inPlay);
   const fieldsAnswered = shown.every((f) => answered(f, answers[f.key]));
   const modeAnswered = aiOnly || mode !== '';

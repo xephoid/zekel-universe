@@ -10,6 +10,7 @@ import { sweetlandsGlue } from './sweetlands-imperium';
 import { cybernoirGlue } from './cybernoir-2127';
 import { nggGlue } from './ngg';
 import { adventurerOlympicsGlue } from './ao';
+import { wordDebaucheeGlue } from './wd';
 
 export const GLUES: Record<string, GlueModule> = {
   'fractured-fist': fracturedFistGlue,
@@ -18,13 +19,14 @@ export const GLUES: Record<string, GlueModule> = {
   'cybernoir-2127': cybernoirGlue,
   'neither-guts-nor-gears': nggGlue,
   'adventurer-olympics': adventurerOlympicsGlue,
+  'word-debauchee': wordDebaucheeGlue,
 };
 
 export function glueFor(gameId: string): GlueModule | null {
   return GLUES[gameId] ?? null;
 }
 
-export { fracturedFistGlue, warbleWayGlue, sweetlandsGlue, cybernoirGlue, nggGlue, adventurerOlympicsGlue };
+export { fracturedFistGlue, warbleWayGlue, sweetlandsGlue, cybernoirGlue, nggGlue, adventurerOlympicsGlue, wordDebaucheeGlue };
 
 // Warble Way Galaxy's dev page also shows the theme's icons, holograms and
 // travel cards on their own; it reaches them through here.

@@ -58,6 +58,13 @@ export const ZEKEL_GAMES: Record<string, { designer: string; description: string
     tags: ['exploration', 'hex map', 'dice'],
     coverImage: '/art/covers/adventurer-olympics.webp',
   },
+  'word-debauchee': {
+    designer: 'zekel-games',
+    description: 'A party word game for two to eight players. One player knows a secret word and gives three stingy clues; everyone else races to spell any word that means the same, one tile a turn, while each letter the debauchee lays down makes the answer pay less.',
+    playTime: '20–40 min',
+    tags: ['word game', 'party', 'deduction'],
+    coverImage: '/art/covers/word-debauchee.svg',
+  },
   'sweetlands-imperium': {
     designer: 'zekel-games',
     description: 'Area control for two to five players on an 80-space candy kingdom: move your leader, knight and ambassador, play Intel, and hold the castle.',
@@ -104,5 +111,12 @@ export const ZEKEL_UPDATES: Array<{ id: string; gameId: string; title: string; b
     title: 'Adventurer Olympics plays in the browser',
     postedAt: '2026-09-30T18:00:00.000Z',
     body: 'Pick an adventurer and a colour and race the AI across a map you build as you go. Glowing hexes show where you can step; every card waits for your press of Draw and every test for your press of Roll. To explore, tap a glowing slot, turn the tile until its icons sit where you want them, and place it.',
+  },
+  {
+    id: 'wd-2026-11-09-browser',
+    gameId: 'word-debauchee',
+    title: 'Word Debauchee plays in the browser',
+    postedAt: '2026-11-09T18:00:00.000Z',
+    body: 'Sit down with up to seven AI players. As a guesser, pick a letter from the pool and a spot in the build area, then press Place, or Place and Check! when the tile finishes a word. As the debauchee, keep a secret word, hide one of four clues, and choose which letter to lay down when the turn comes back round.',
   },
 ];

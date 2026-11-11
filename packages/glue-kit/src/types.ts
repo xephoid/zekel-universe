@@ -395,6 +395,9 @@ export interface GlueModule {
    * who is not here yet are not listed; they stay at the table.
    */
   setupFields(reference: GameReferenceResponse, seats?: SetupSeat[]): SetupField[];
+  /** Whether a field is in play given the answers so far: one that is not is
+   *  neither shown nor required (who goes first, once The House is on). */
+  setupInPlay?(field: SetupField, answers: SetupAnswers): boolean;
   /** The part of the answers that goes to the engine as session options. */
   setupOptions?(answers: SetupAnswers, seats: SetupSeat[]): Record<string, unknown>;
   /**
