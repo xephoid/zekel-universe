@@ -20,6 +20,29 @@ import type { Mailer } from './email.js';
 import { seatOwnedBy, type SeatRecord, type TableService } from './tables/service.js';
 
 /** A move the table refused, with the code the browser branches on. */
+/** Is the sign-in behind a queued action still good? `check` reads the
+ *  database; `now` answers from memory (a revocation in progress shows
+ *  there first). Both are asked when the action reaches the front of its
+ *  table's queue and again right before the engine call; the call follows
+ *  `now` with no await in between, so a revocation that begins before the
+ *  call starts always stops it. */
+export interface StillAllowed {
+  check(): Promise<boolean>;
+  now(): boolean;
+}
+
+const ENDED = 'Your session has ended. Sign in again.';
+
+async function requireAllowed(allowed: StillAllowed | undefined): Promise<void> {
+  if (allowed && !(await allowed.check())) throw new MoveError('unauthorized', ENDED, ENDED);
+}
+
+/** The last check before an engine call; call it in the same synchronous
+ *  step as the call. */
+function requireAllowedNow(allowed: StillAllowed | undefined): void {
+  if (allowed && !allowed.now()) throw new MoveError('unauthorized', ENDED, ENDED);
+}
+
 export class MoveError extends Error {
   constructor(
     public readonly code: string,
@@ -343,8 +366,12 @@ export class Realtime {
     tableId: string,
     seatPosition: number,
     move: Record<string, unknown>,
+    allowed?: StillAllowed,
   ): Promise<{ lastSeq: number }> {
-    return this.serialized(tableId, () => this.applyHumanMove(principal, tableId, seatPosition, move));
+    return this.serialized(tableId, async () => {
+      await requireAllowed(allowed);
+      return this.applyHumanMove(principal, tableId, seatPosition, move, allowed);
+    });
   }
 
   /**
@@ -382,6 +409,7 @@ export class Realtime {
     tableId: string,
     seatPosition: number,
     move: Record<string, unknown>,
+    allowed?: StillAllowed,
   ): Promise<{ lastSeq: number }> {
     const table = await this.tableService.getTable(tableId);
     if (!table) throw new MoveError('no_table', `No table ${tableId}`);
@@ -395,10 +423,15 @@ export class Realtime {
     const token = await this.tableService.hostToken(tableId);
     const playerId = seat.enginePlayerId ?? `p${seatPosition + 1}`;
 
+    // The reads above took time: check again, then call with no await
+    // between the last check and the call.
+    await requireAllowed(allowed);
     let applied: AppliedMove;
     try {
+      requireAllowedNow(allowed);
       applied = await this.engine.applyMove(sessionId, playerId, token, { move } satisfies MoveArg);
     } catch (err) {
+      if (err instanceof MoveError) throw err;
       throw classifyEngineFailure(err);
     }
 
@@ -696,11 +729,14 @@ export class Realtime {
    * the AI moves after it as one unit; the browsers rewind to the restored
    * views.
    */
-  handleUndo(principal: Principal, tableId: string): Promise<{ seq: number }> {
-    return this.serialized(tableId, () => this.applyUndo(principal, tableId));
+  handleUndo(principal: Principal, tableId: string, allowed?: StillAllowed): Promise<{ seq: number }> {
+    return this.serialized(tableId, async () => {
+      await requireAllowed(allowed);
+      return this.applyUndo(principal, tableId, allowed);
+    });
   }
 
-  private async applyUndo(principal: Principal, tableId: string): Promise<{ seq: number }> {
+  private async applyUndo(principal: Principal, tableId: string, allowed?: StillAllowed): Promise<{ seq: number }> {
     const table = await this.tableService.getTable(tableId);
     if (!table) throw new MoveError('no_table', `No table ${tableId}`);
     if (table.status !== 'playing') throw new MoveError('not_playing', 'This table is not in play');
@@ -718,10 +754,13 @@ export class Realtime {
 
     const sessionId = table.engineSessionId!;
     const token = await this.tableService.hostToken(tableId);
+    await requireAllowed(allowed);
     let undone;
     try {
+      requireAllowedNow(allowed);
       undone = await this.engine.undo(sessionId, token);
     } catch (err) {
+      if (err instanceof MoveError) throw err;
       throw classifyEngineFailure(err);
     }
     if (!undone.undone) {

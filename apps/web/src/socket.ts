@@ -25,7 +25,17 @@ export interface TableConnection {
 let shared: Socket | null = null;
 
 function socket(): Socket {
-  if (!shared) shared = io({ withCredentials: true, autoConnect: true });
+  if (!shared) {
+    const s = io({ withCredentials: true, autoConnect: true });
+    // The server closes a socket when the sign-in it opened with ends:
+    // sign-out, expiry, or a guest becoming an account. Try once more after
+    // a moment, so the browser's new cookies decide who the new connection
+    // is; a connection the server refuses stays closed.
+    s.on('disconnect', (reason) => {
+      if (reason === 'io server disconnect') setTimeout(() => { if (!s.connected) s.connect(); }, 500);
+    });
+    shared = s;
+  }
   return shared;
 }
 
@@ -46,6 +56,9 @@ export function connectTable(tableId: string, h: TableSocketHandlers): TableConn
   s.on('connect', onConnect);
   s.on('disconnect', onDisconnect);
   if (s.connected) onConnect();
+  // A connection the server closed or refused earlier (say, before signing
+  // in) does not come back by itself; a table opening asks again.
+  else if (!s.active && typeof s.connect === 'function') s.connect();
   return {
     move: (seat, move) => new Promise<MoveAck>((resolve) => {
       s.timeout(20_000).emit(SOCKET_EVENTS.move, { tableId, seat, move }, (err: Error | null, ack?: MoveAck) => {

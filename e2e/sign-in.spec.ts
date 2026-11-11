@@ -77,3 +77,33 @@ test('a used or bogus sign-in token is rejected with a plain message', async ({ 
   await page.goto(`${baseURL}/signin/complete#token=nonsense`);
   await expect(page.getByText(/invalid or has expired/i)).toBeVisible();
 });
+
+test('a link opened in a browser that did not ask for it is refused and changes nothing there', async ({ page, browser, baseURL }) => {
+  // Someone asks for a link to their own address in their own browser...
+  const email = 'asker@example.com';
+  await page.goto('/signin');
+  await page.getByLabel('Email').fill(email);
+  await page.getByRole('button', { name: 'Email me a sign-in link' }).click();
+  await expect(page.getByText(/Open it in this browser/)).toBeVisible();
+  const link = toBase(await readSignInLink(page.request, email), baseURL!);
+
+  // ...and the link is opened in another browser, which plays as a guest.
+  const other = await browser.newContext();
+  const otherPage = await other.newPage();
+  await otherPage.goto('/');
+  const guestBefore = (await (await otherPage.request.get('/api/me')).json()).guest;
+  expect(guestBefore).toBeTruthy();
+  await otherPage.goto(link);
+  await expect(otherPage.getByText(/only in the browser where you asked for it/i)).toBeVisible();
+  // The token is gone from the address bar, and that browser is still the same guest.
+  expect(new URL(otherPage.url()).hash).toBe('');
+  const meOther = await (await otherPage.request.get('/api/me')).json();
+  expect(meOther.user).toBeNull();
+  expect(meOther.guest?.id).toBe(guestBefore.id);
+  await other.close();
+
+  // The refusal did not use the link up: the asking browser still signs in.
+  await page.goto(link);
+  await expect(page).toHaveURL(/\/$/, { timeout: 20_000 });
+  expect((await (await page.request.get('/api/me')).json()).user).toBeTruthy();
+});

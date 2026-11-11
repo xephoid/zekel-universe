@@ -14,6 +14,7 @@ import { ConsoleMailer } from './email.js';
 import { buildApp, type UniverseApp } from './app.js';
 import { FakeEngine } from './test-engine.js';
 import { consumeSignInLink, issueSignInLink } from './auth.js';
+import { newToken } from './identity.js';
 import { TableService } from './tables/service.js';
 import { Realtime } from './realtime.js';
 
@@ -58,10 +59,12 @@ describe('hardening', () => {
   }
 
   async function signIn(cookie: string | undefined, email: string): Promise<string> {
-    await app.fastify.inject({ method: 'POST', url: '/api/auth/email/link', headers: { origin: ORIGIN, ...(cookie ? { cookie } : {}) }, payload: { email } });
+    const link = await app.fastify.inject({ method: 'POST', url: '/api/auth/email/link', headers: { origin: ORIGIN, ...(cookie ? { cookie } : {}) }, payload: { email } });
+    const nonce = cookieOf(link, 'universe_signin')!;
     const url = /https?:\/\/\S+/.exec(mailer.sent[mailer.sent.length - 1]!.text)![0];
     const token = decodeURIComponent(url.split('#token=')[1]!);
-    const done = await app.fastify.inject({ method: 'POST', url: '/api/auth/email/complete', headers: { origin: ORIGIN, ...(cookie ? { cookie } : {}) }, payload: { token } });
+    const both = cookie ? `${cookie}; ${nonce}` : nonce;
+    const done = await app.fastify.inject({ method: 'POST', url: '/api/auth/email/complete', headers: { origin: ORIGIN, cookie: both }, payload: { token } });
     expect(done.statusCode).toBe(200);
     return cookieOf(done, 'universe_auth')!;
   }
@@ -91,8 +94,9 @@ describe('hardening', () => {
   });
 
   it('a sign-in link redeems exactly once under a race', async () => {
-    const token = await issueSignInLink(db, 'race@example.com');
-    const results = await Promise.all(Array.from({ length: 6 }, () => consumeSignInLink(db, token)));
+    const nonce = newToken();
+    const token = await issueSignInLink(db, 'race@example.com', nonce);
+    const results = await Promise.all(Array.from({ length: 6 }, () => consumeSignInLink(db, token, nonce)));
     expect(results.filter((r) => r === 'race@example.com')).toHaveLength(1);
     expect(results.filter((r) => r === null)).toHaveLength(5);
   });

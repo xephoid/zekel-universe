@@ -37,6 +37,8 @@ export const api = {
   updateMe: (displayName: string, bio?: string) => req<{ ok: true }>('/api/me', { method: 'PATCH', body: JSON.stringify({ displayName, bio }) }),
   signInEmail: (email: string) => post<{ ok: true }>('/api/auth/email/link', { email }),
   completeSignIn: (token: string) => post<{ ok: true; userId: string }>('/api/auth/email/complete', { token }),
+  /** Was this browser's current session made by this sign-in link? Changes nothing. */
+  signInLinkStatus: (token: string) => post<{ signedIn: boolean; userId?: string }>('/api/auth/email/link-status', { token }),
   signOut: () => post<{ ok: true }>('/api/auth/signout'),
 
   games: () => req<GamesResponse>('/api/games'),
