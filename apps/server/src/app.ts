@@ -404,9 +404,11 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     const id = newId();
     const token = newToken();
     const displayName = body.displayName?.trim().slice(0, 40) || `Guest ${id.slice(0, 6)}`;
+    // One clock reading for both times, so the expiry is exactly the lifetime.
+    const createdAt = Date.now();
     await db.insertInto('guests').values({
-      id, token_hash: hashToken(token), display_name: displayName, created_at: now(), upgraded_to_user_id: null,
-      expires_at: new Date(Date.now() + GUEST_TTL_MS).toISOString(),
+      id, token_hash: hashToken(token), display_name: displayName, created_at: new Date(createdAt).toISOString(),
+      upgraded_to_user_id: null, expires_at: new Date(createdAt + GUEST_TTL_MS).toISOString(),
     }).execute();
     reply.setCookie(GUEST_COOKIE, token, { ...cookieOptions, maxAge: GUEST_COOKIE_MAX_AGE_S });
     return { guest: { id, displayName, upgradedToUserId: null } };

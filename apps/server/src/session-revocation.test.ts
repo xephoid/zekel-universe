@@ -518,6 +518,22 @@ describe('sign-in binding and socket revocation', () => {
     expect(await seatOwners(tableId)).toEqual(before);
   });
 
+  it("a new guest's expiry is exactly its lifetime after its creation time, even when the clock moves between reads", async () => {
+    // Every Date.now() read during the request lands 1 ms after the real
+    // clock, so two separate clock reads can never agree. The stored times
+    // must both come from one reading.
+    const real = Date.now.bind(Date);
+    vi.spyOn(Date, 'now').mockImplementation(() => real() + 1);
+    const g = await guest();
+    vi.restoreAllMocks();
+    const row = await db.selectFrom('guests').select(['expires_at', 'created_at']).executeTakeFirstOrThrow();
+    const iso = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+    expect(row.created_at).toMatch(iso);
+    expect(row.expires_at).toMatch(iso);
+    expect(new Date(row.expires_at!).getTime() - new Date(row.created_at).getTime()).toBe(GUEST_TTL_MS);
+    expect((await get('/api/me', g)).json<MeResponse>().guest).toBeTruthy();
+  });
+
   it('a guest row from before the expiry column expires a year after it was made', async () => {
     const g = await guest();
     await db.updateTable('guests').set({ expires_at: null }).execute();
