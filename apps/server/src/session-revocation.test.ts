@@ -203,7 +203,7 @@ describe('sign-in binding and socket revocation', () => {
      *  not just for its first reply. */
     handlers: { event: string; done: Promise<void> }[];
     /** Resolves once `n` runs of the `event` handler have started and all
-     *  of them have settled. */
+     *  of them have finished; rejects if any of them rejected. */
     settled(event: string, n?: number): Promise<void>;
     /** Test-only mutation: extra work run inside a handler's run, after the
      *  real handler, with its arguments (including the reply callback). */
@@ -218,7 +218,7 @@ describe('sign-in binding and socket revocation', () => {
       waitForPacket: (event) => until(() => log.received.includes(event)),
       settled: async (event, n = 1) => {
         await until(() => log.handlers.filter((h) => h.event === event).length >= n);
-        await Promise.allSettled(log.handlers.filter((h) => h.event === event).map((h) => h.done));
+        await Promise.all(log.handlers.filter((h) => h.event === event).map((h) => h.done));
       },
     };
     function until(done: () => boolean): Promise<void> {
@@ -691,6 +691,7 @@ describe('sign-in binding and socket revocation', () => {
     // join was dropped by its check before any handler: no reply at all.
     expect(await move(other, tableId)).toMatchObject({ ok: true });
     expect(events).toHaveLength(0);
+    expect(log.handlers.filter((h) => h.event === 'join_table')).toEqual([]);
     expect(log.attempts.filter((a) => a.event === 'join_table')).toEqual([]);
   });
 
@@ -1193,12 +1194,13 @@ describe('sign-in binding and socket revocation', () => {
     // Wait for the move itself to finish on the server, however it ends.
     expect(actions.count()).toBe(1);
     await actions.settled();
+    // And the socket handler too, before any final check.
+    await log.settled('move');
 
     expect(engine.applied.some((a) => a.move['marker'] === 'gap')).toBe(false);
     const rows = await db.selectFrom('table_events').selectAll().where('table_id', '=', tableId).execute();
     expect(JSON.stringify(rows)).not.toContain('gap');
     expect(sent).toHaveLength(0);
-    await log.settled('move');
     expectOnlyEnded(log, 'move');
   });
 
@@ -1227,10 +1229,10 @@ describe('sign-in binding and socket revocation', () => {
     expect(await cut).toBe('io server disconnect');
     expect(actions.count()).toBe(1);
     await actions.settled();
+    await log.settled('undo');
 
     expect(undoCalls).toBe(0);
     expect((await db.selectFrom('table_events').select('id').where('table_id', '=', tableId).execute()).length).toBe(eventsBefore);
-    await log.settled('undo');
     expectOnlyEnded(log, 'undo');
   });
 
@@ -1299,8 +1301,8 @@ describe('sign-in binding and socket revocation', () => {
     expect(await cut).toBe('io server disconnect');
     expect(actions.count()).toBe(1);
     await actions.settled();
-    expect(engine.applied.some((a) => a.move['marker'] === 'late')).toBe(false);
     await log.settled('move');
+    expect(engine.applied.some((a) => a.move['marker'] === 'late')).toBe(false);
     expectOnlyEnded(log, 'move');
     const rows = await db.selectFrom('table_events').selectAll().where('table_id', '=', tableId).execute();
     expect(JSON.stringify(rows)).not.toContain('late');
@@ -1501,6 +1503,8 @@ describe('sign-in binding and socket revocation', () => {
     await held.reached;
     const got = await new Promise<unknown>((r) => s.emit('move', { tableId, seat: 0, move: { type: 'pass' } }, r));
     log.substitute = null; // restore
+    // This reply came from the socket's own check: no move handler ran.
+    expect(log.handlers.filter((h) => h.event === 'move')).toEqual([]);
     expect(got).toHaveProperty('legalMoves');
     expect(() => expectOnlyEnded(log, 'move')).toThrow();
     held.open();
@@ -1588,5 +1592,93 @@ describe('sign-in binding and socket revocation', () => {
     expect(() => expectOnlyEnded(one({ error: 'move_rejected', reason: ENDED_TEXT }), 'move')).toThrow();
     expectOnlyEnded(one({ error: 'unauthorized', reason: ENDED_TEXT }), 'move');
     expectOnlyEnded(one({ error: 'unauthorized', message: ENDED_TEXT }), 'move');
+  });
+
+  // ---- eighth review: effects after the service settles, handler failures --
+
+  /** A move held at its last read before the engine while sign-out begins,
+   *  released, and run until the service promise has settled (the socket
+   *  is cut by then). The handler may still be working. */
+  async function revokedMoveSettledInService(marker: string, onTable: (tableId: string) => void = () => {}) {
+    const auth = await signIn('p@example.com');
+    const tableId = await aiTable(auth);
+    onTable(tableId);
+    const s = await seated(auth, tableId);
+    const actions = serverActions();
+    const gap = holdHostToken();
+    s.emit('move', { tableId, seat: 0, move: { type: 'pass', marker } }, () => {});
+    await gap.reached;
+    const held = inject.pauseAfter('delete:auth_sessions');
+    const cut = disconnected(s);
+    const out = post('/api/auth/signout', auth);
+    await held.reached;
+    gap.open();
+    held.open();
+    expect((await out).statusCode).toBe(200);
+    expect(await cut).toBe('io server disconnect');
+    expect(actions.count()).toBe(1);
+    await actions.settled();
+    return { tableId };
+  }
+
+  it('a side effect after the service settles is caught by the checks made after the handler wait', async () => {
+    const log = recordAcks();
+    // The mutation: once the real handler is done, wait, then record an
+    // engine call and store an event for the revoked move.
+    let release!: () => void;
+    let heldHit!: () => void;
+    const heldReached = new Promise<void>((r) => { heldHit = r; });
+    const gateOpen = new Promise<void>((r) => { release = r; });
+    let tableForEffect = '';
+    log.afterHandler = async (event) => {
+      if (event !== 'move') return;
+      heldHit();
+      await gateOpen;
+      engine.applied.push({ session: 'mutation', player: 'p1', move: { type: 'pass', marker: 'late-effect' } });
+      await db.insertInto('table_events').values({
+        id: 'mutation-event', table_id: tableForEffect, seq: 999, kind: 'move', actor_seat_position: 0,
+        summary: 'late-effect', engine_move: null, payloads: '{}', next_actor_position: null, game_over: null,
+        rewind_to_seq: null, created_at: new Date().toISOString(), log_entries: '[]',
+      }).execute();
+    };
+    const { tableId } = await revokedMoveSettledInService('late-effect', (id) => { tableForEffect = id; });
+    await heldReached;
+
+    // After the service settled, the early checks pass: nothing yet.
+    expect(engine.applied.some((a) => a.move['marker'] === 'late-effect')).toBe(false);
+    let finished = false;
+    const done = log.settled('move').then(() => { finished = true; });
+    await Promise.resolve();
+    expect(finished).toBe(false);
+    release();
+    await done;
+    log.afterHandler = null; // restore
+    // The checks made after the handler wait see the effect.
+    expect(engine.applied.some((a) => a.move['marker'] === 'late-effect')).toBe(true);
+    const rows = await db.selectFrom('table_events').selectAll().where('table_id', '=', tableId).execute();
+    expect(JSON.stringify(rows)).toContain('late-effect');
+  });
+
+  it('a handler that replies correctly and then fails makes the handler wait fail', async () => {
+    const log = recordAcks();
+    let release!: () => void;
+    let heldHit!: () => void;
+    const heldReached = new Promise<void>((r) => { heldHit = r; });
+    const gateOpen = new Promise<void>((r) => { release = r; });
+    log.afterHandler = async (event) => {
+      if (event !== 'move') return;
+      heldHit();
+      await gateOpen;
+      throw new Error('handler failed after its reply');
+    };
+    await revokedMoveSettledInService('fails-later');
+    await heldReached;
+    // The reply itself is right.
+    expectOnlyEnded(log, 'move');
+    // The wait is attached before the failure, then the failure is released.
+    const waiting = log.settled('move');
+    release();
+    await expect(waiting).rejects.toThrow('handler failed after its reply');
+    log.afterHandler = null; // restore
   });
 });
