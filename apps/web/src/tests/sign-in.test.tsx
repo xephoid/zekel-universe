@@ -79,83 +79,121 @@ describe('the sign-in landing page', () => {
     expect(completes).toEqual([{ token: 'abc123' }]);
   });
 
-  it('no answer from the server: the token is gone from the address bar but kept for Try again, which signs in', async () => {
-    let signedIn = false;
-    let fail = true;
+  /** A fake server that knows which link made this browser's session.
+   *  `complete` scripts each post: 'ok' signs in and answers; 'lost' signs
+   *  in but the answer never arrives; 'offline' never reaches the server;
+   *  'refuse' answers 401. `status` scripts each link-status question the
+   *  same way ('answer' or 'offline'). */
+  function fakeServer(opts: {
+    complete: ('ok' | 'lost' | 'offline' | 'refuse')[];
+    status?: ('answer' | 'offline')[];
+    me?: () => unknown;
+    before?: string | null; // the account signed in before the link, if any
+  }) {
+    const state = { madeBy: null as string | null, user: opts.before ?? null, statusAsks: 0 };
     vi.stubGlobal('fetch', vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
       const url = String(input);
-      if (url === '/api/me') return json(signedIn ? USER('u') : GUEST);
+      if (url === '/api/me') {
+        if (opts.me) return opts.me();
+        return json(state.user ? USER(state.user) : GUEST);
+      }
       if (url === '/api/auth/email/complete') {
-        completes.push(JSON.parse(String(init?.body)));
-        // The phone was offline: the request never reached the server.
-        if (fail) return Promise.reject(new TypeError('Failed to fetch'));
-        signedIn = true;
+        const body = JSON.parse(String(init?.body)) as { token: string };
+        completes.push(body);
+        const step = opts.complete.shift() ?? 'refuse';
+        if (step === 'offline') return Promise.reject(new TypeError('Failed to fetch'));
+        if (step === 'refuse') return json({ error: 'invalid_or_expired_token' }, 401);
+        state.madeBy = body.token;
+        state.user = 'u';
+        if (step === 'lost') return Promise.reject(new TypeError('network connection was lost'));
         return json({ ok: true, userId: 'u' });
+      }
+      if (url === '/api/auth/email/link-status') {
+        state.statusAsks++;
+        const step = opts.status?.shift() ?? 'answer';
+        if (step === 'offline') return Promise.reject(new TypeError('Failed to fetch'));
+        const { token } = JSON.parse(String(init?.body)) as { token: string };
+        return json(state.madeBy === token ? { signedIn: true, userId: 'u' } : { signedIn: false });
       }
       return json({ error: 'not_found' }, 404);
     }));
+    return state;
+  }
+  const home = () => waitFor(() => expect(screen.getByText('home page')).toBeTruthy(), { timeout: 5000 });
+
+  it('no answer from the server: the token is gone from the address bar but kept for Try again, which signs in', async () => {
+    fakeServer({ complete: ['offline', 'ok'] });
     renderComplete();
     expect(await screen.findByText(/could not reach the server/)).toBeTruthy();
     expect(window.location.hash).toBe('');
     expect(window.location.href).not.toContain('abc123');
     expect(screen.queryByText('home page')).toBeNull();
     expect(completes).toEqual([{ token: 'abc123' }]);
-
-    fail = false;
     fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
-    await waitFor(() => expect(screen.getByText('home page')).toBeTruthy(), { timeout: 5000 });
+    await home();
     expect(completes).toEqual([{ token: 'abc123' }, { token: 'abc123' }]);
   });
 
-  it('the answer was lost after the server signed this browser in: the session is checked, and it moves on', async () => {
-    let signedIn = false;
-    vi.stubGlobal('fetch', vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
-      const url = String(input);
-      if (url === '/api/me') return json(signedIn ? USER('u') : GUEST);
-      if (url === '/api/auth/email/complete') {
-        completes.push(JSON.parse(String(init?.body)));
-        signedIn = true; // the server finished and set the cookie...
-        return Promise.reject(new TypeError('network connection was lost')); // ...the answer never arrived
-      }
-      return json({ error: 'not_found' }, 404);
-    }));
+  it('the answer was lost after the server signed this browser in: the server confirms this link made the session', async () => {
+    fakeServer({ complete: ['lost'] });
     renderComplete();
-    await waitFor(() => expect(screen.getByText('home page')).toBeTruthy(), { timeout: 5000 });
+    await home();
     expect(completes).toEqual([{ token: 'abc123' }]);
   });
 
-  it('a lost answer, then Try again refused because the link was used: signed in counts as success', async () => {
-    let signedIn = false;
-    let calls = 0;
-    vi.stubGlobal('fetch', vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
-      const url = String(input);
-      // The first check after the lost answer cannot reach the server either.
-      if (url === '/api/me') return calls === 1 && !signedIn ? Promise.reject(new TypeError('offline')) : json(signedIn ? USER('u') : GUEST);
-      if (url === '/api/auth/email/complete') {
-        completes.push(JSON.parse(String(init?.body)));
-        calls++;
-        if (calls === 1) return Promise.reject(new TypeError('offline'));
-        signedIn = true; // the first post did arrive in the end
-        return json({ error: 'invalid_or_expired_token' }, 401);
-      }
-      return json({ error: 'not_found' }, 404);
-    }));
+  it('same account again (A to A) with the answer lost: confirmed by the link, not by the user id', async () => {
+    // A was signed in before and is signed in after: the ids match.
+    fakeServer({ complete: ['lost'], before: 'u' });
+    renderComplete();
+    await home();
+    expect(completes).toEqual([{ token: 'abc123' }]);
+  });
+
+  it('the new cookie is already there before Try again checks anything: the refused retry still counts as signed in', async () => {
+    // The first post signs in but its answer and the status question are
+    // both lost; by the retry the cookie is there, and the link is spent.
+    const state = fakeServer({ complete: ['lost', 'refuse'], status: ['offline', 'answer'] });
     renderComplete();
     fireEvent.click(await screen.findByRole('button', { name: 'Try again' }));
-    await waitFor(() => expect(screen.getByText('home page')).toBeTruthy(), { timeout: 5000 });
+    await home();
     expect(completes).toHaveLength(2);
+    expect(state.statusAsks).toBe(2);
+  });
+
+  it('A signed in, the first /api/me fails, and B\'s link is refused: a refusal, never a success', async () => {
+    let meCalls = 0;
+    fakeServer({
+      complete: ['refuse'], before: 'a',
+      me: () => (meCalls++ === 0 ? Promise.reject(new TypeError('offline')) : json(USER('a'))),
+    });
+    renderComplete();
+    expect(await screen.findByText(/invalid or has expired/)).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Try again' })).toBeNull();
+    expect(screen.queryByText('home page')).toBeNull();
+    expect(completes).toEqual([{ token: 'abc123' }]);
+  });
+
+  it('a refusal after an unclear try, with the status question also unanswered: says it is unsure and offers Try again', async () => {
+    fakeServer({ complete: ['offline', 'refuse', 'refuse'], status: ['answer', 'offline', 'answer'] });
+    renderComplete();
+    fireEvent.click(await screen.findByRole('button', { name: 'Try again' }));
+    expect(await screen.findByText(/could not check whether an earlier try/)).toBeTruthy();
+    expect(screen.queryByText('home page')).toBeNull();
+    // Asked again and answered: the link made no session, so a plain refusal.
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
+    expect(await screen.findByText(/invalid or has expired/)).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Try again' })).toBeNull();
+  });
+
+  it('a first refusal stays a refusal even when the status question gets no answer', async () => {
+    fakeServer({ complete: ['refuse'], status: ['offline'] });
+    renderComplete();
+    expect(await screen.findByText(/invalid or has expired/)).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Try again' })).toBeNull();
   });
 
   it('a server that answers no for good shows no Try again, and the same account already signed in is not mistaken for success', async () => {
-    vi.stubGlobal('fetch', vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
-      const url = String(input);
-      if (url === '/api/me') return json(USER('a'));
-      if (url === '/api/auth/email/complete') {
-        completes.push(JSON.parse(String(init?.body)));
-        return json({ error: 'invalid_or_expired_token' }, 401);
-      }
-      return json({ error: 'not_found' }, 404);
-    }));
+    fakeServer({ complete: ['refuse'], before: 'a' });
     renderComplete();
     expect(await screen.findByText(/invalid or has expired/)).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Try again' })).toBeNull();

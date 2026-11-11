@@ -74,6 +74,7 @@ export function signInFailureMessage(e: unknown): string {
 }
 
 const RETRY_MESSAGE = 'We could not reach the server to finish signing you in. Check your connection and try again.';
+const UNSURE_MESSAGE = 'The server did not accept this link again, and we could not check whether an earlier try already signed you in. Check your connection and try again.';
 
 type Outcome = { ok: true } | { ok: false; retry: boolean; message: string };
 
@@ -81,36 +82,42 @@ type Outcome = { ok: true } | { ok: false; retry: boolean; message: string };
  *  so a failed exchange can be tried again. Cleared when the exchange
  *  succeeds or the server refuses the link for good. */
 let heldToken: string | null = null;
+/** Whether an earlier try with the held token got no clear answer, so it may
+ *  have signed this browser in. Kept across retries; tied to that token. */
+let heldUnclear = false;
 /** The exchange in flight, keyed by its token: React's development double
  *  run, or a retry clicked twice, waits on it instead of posting again; a
  *  different link never reuses it. */
 let inFlight: { token: string; run: Promise<Outcome> } | null = null;
 
-/** Post the token once. When the answer is lost or unclear (no answer, or a
- *  server error), the request may still have signed this browser in, so the
- *  session is asked before anything is called a failure. */
+/** Ask the server whether this browser's session was made by this link:
+ *  true or false, or null when the question itself got no answer. */
+async function madeByThisLink(token: string): Promise<boolean | null> {
+  try {
+    return (await api.signInLinkStatus(token)).signedIn === true;
+  } catch {
+    return null;
+  }
+}
+
+/** Post the token once. On any failure, ask the server whether this link
+ *  already signed this browser in (an earlier answer may have been lost);
+ *  nothing else, such as who is signed in, counts as evidence. */
 async function attempt(token: string): Promise<Outcome> {
-  // Who this browser is before the exchange; undefined when unknown.
-  let before: string | null | undefined;
-  try { before = (await api.me()).user?.id ?? null; } catch { before = undefined; }
-  const signedInByThis = async (): Promise<boolean> => {
-    try {
-      const me = await api.me();
-      return !!me.user && (before === undefined || me.user.id !== before);
-    } catch {
-      return false;
-    }
-  };
   try {
     await api.completeSignIn(token);
     return { ok: true };
   } catch (e) {
-    // A link already used by an earlier, lost answer is refused now; the
-    // sign-in it made still counts.
-    if (await signedInByThis()) return { ok: true };
-    if (e instanceof ApiRequestError && e.status < 500) {
+    const made = await madeByThisLink(token);
+    if (made === true) return { ok: true };
+    const answered = e instanceof ApiRequestError && e.status < 500;
+    if (answered) {
+      // A refusal is final unless an earlier try may have signed this
+      // browser in and the server could not be asked about it.
+      if (made === null && heldUnclear) return { ok: false, retry: true, message: UNSURE_MESSAGE };
       return { ok: false, retry: false, message: signInFailureMessage(e) };
     }
+    heldUnclear = true;
     return { ok: false, retry: true, message: RETRY_MESSAGE };
   }
 }
@@ -121,7 +128,7 @@ function exchange(token: string): Promise<Outcome> {
     token,
     run: attempt(token).then((outcome) => {
       if (inFlight === entry) inFlight = null;
-      if ((outcome.ok || !outcome.retry) && heldToken === token) heldToken = null;
+      if ((outcome.ok || !outcome.retry) && heldToken === token) { heldToken = null; heldUnclear = false; }
       return outcome;
     }),
   };
@@ -167,6 +174,7 @@ export function SignInCompletePage() {
     if (fromUrl) {
       // Take the token out of the address bar and the history entry.
       window.history.replaceState(window.history.state, '', window.location.pathname + window.location.search);
+      if (heldToken !== fromUrl) heldUnclear = false;
       heldToken = fromUrl;
     }
     if (!heldToken) {

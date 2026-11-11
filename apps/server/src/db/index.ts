@@ -23,7 +23,7 @@ export interface DatabaseClient {
 }
 
 /** Bump when the DDL below changes in a way an existing database cannot absorb. */
-export const SCHEMA_VERSION = 6;
+export const SCHEMA_VERSION = 7;
 
 export function parseDatabaseUrl(url: string): { dialect: DatabaseDialect; target: string } {
   const trimmed = url.trim();
@@ -67,7 +67,8 @@ const TABLES: string[] = [
     user_id text NOT NULL REFERENCES users(id),
     token_hash text NOT NULL,
     created_at text NOT NULL,
-    expires_at text NOT NULL
+    expires_at text NOT NULL,
+    link_hash text
   )`,
   `CREATE UNIQUE INDEX IF NOT EXISTS auth_sessions_token ON auth_sessions(token_hash)`,
   `CREATE TABLE IF NOT EXISTS guests (
@@ -206,6 +207,9 @@ const MIGRATIONS: Record<number, MigrationStep[]> = {
   // Guest tokens get a server-side expiry; sign-in links remember the
   // browser that asked for them (SEC-04-F12, SEC-03-F11).
   6: [addColumn('guests', 'expires_at', 'text'), addColumn('sign_in_links', 'nonce_hash', 'text')],
+  // A session remembers which sign-in link made it, so a browser whose
+  // answer was lost can ask whether that link signed it in.
+  7: [addColumn('auth_sessions', 'link_hash', 'text')],
 };
 
 async function migrate(db: Kysely<DB>): Promise<void> {

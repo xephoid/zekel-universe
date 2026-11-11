@@ -13,7 +13,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { io as ioClient, type Socket as ClientSocket } from 'socket.io-client';
 import type { Server as SocketServer } from 'socket.io';
 import type { AddressInfo } from 'node:net';
-import type { Kysely } from 'kysely';
+import type { Kysely, KyselyPlugin, PluginTransformQueryArgs, PluginTransformResultArgs, QueryResult, RootOperationNode, UnknownRow, QueryId } from 'kysely';
 import type { CreateTableResponse, JoinTableAck, MeResponse, MoveAck, TableEventWire } from '@universe/shared';
 import type { DB } from './db/schema.js';
 import { createDatabase, type DatabaseClient } from './db/index.js';
@@ -24,6 +24,52 @@ import { FakeEngine } from './test-engine.js';
 import { GUEST_TTL_MS } from './auth.js';
 
 const ORIGIN = 'http://localhost:5173';
+
+/** The table a query reads or writes, with its kind ('select', 'delete', ...). */
+function describe_(node: RootOperationNode): string {
+  const name = (t: unknown) => (t as { table?: { identifier?: { name?: string } } } | undefined)?.table?.identifier?.name ?? '?';
+  switch (node.kind) {
+    case 'SelectQueryNode': return `select:${name(node.from?.froms[0])}`;
+    case 'DeleteQueryNode': return `delete:${name(node.from.froms[0])}`;
+    case 'UpdateQueryNode': return `update:${name(node.table)}`;
+    case 'InsertQueryNode': return `insert:${name(node.into)}`;
+    default: return node.kind;
+  }
+}
+
+/** Test-only database hooks: hold the request right after one query has
+ *  run, or make one query fail, chosen by kind and table. Nothing is armed
+ *  unless a test arms it, and each arming fires once. */
+class Injector implements KyselyPlugin {
+  private tags = new WeakMap<QueryId, string>();
+  private pauses = new Map<string, { wait: Promise<void>; hit: () => void }>();
+  private failures = new Set<string>();
+  pauseAfter(tag: string): { reached: Promise<void>; open: () => void } {
+    let open!: () => void;
+    let hit!: () => void;
+    const wait = new Promise<void>((r) => { open = r; });
+    const reached = new Promise<void>((r) => { hit = r; });
+    this.pauses.set(tag, { wait, hit });
+    return { reached, open };
+  }
+  failNext(tag: string): void { this.failures.add(tag); }
+  transformQuery(args: PluginTransformQueryArgs): RootOperationNode {
+    const tag = describe_(args.node);
+    if (this.failures.delete(tag)) throw new Error(`injected failure: ${tag}`);
+    this.tags.set(args.queryId, tag);
+    return args.node;
+  }
+  async transformResult(args: PluginTransformResultArgs): Promise<QueryResult<UnknownRow>> {
+    const tag = this.tags.get(args.queryId);
+    const pause = tag ? this.pauses.get(tag) : undefined;
+    if (pause) {
+      this.pauses.delete(tag!);
+      pause.hit();
+      await pause.wait;
+    }
+    return args.result;
+  }
+}
 
 type Res = { statusCode: number; headers: Record<string, unknown>; json<T = unknown>(): T };
 
@@ -46,11 +92,13 @@ describe('sign-in binding and socket revocation', () => {
   let port: number;
   let sockets: ClientSocket[] = [];
   let io: SocketServer;
+  let inject: Injector;
 
   async function boot(extra: { secureCookies?: boolean } = {}): Promise<void> {
     io = createSocketServer({ allowedOrigins: [ORIGIN] });
+    inject = new Injector();
     app = buildApp({
-      db, engine, mailer, secretKey: 's', appOrigin: ORIGIN, allowedOrigins: [ORIGIN],
+      db: db.withPlugin(inject), engine, mailer, secretKey: 's', appOrigin: ORIGIN, allowedOrigins: [ORIGIN],
       secureCookies: extra.secureCookies ?? false, logger: false, io,
       // The timer is driven by hand through recheckSockets().
       socketRecheckMs: 0,
@@ -546,5 +594,182 @@ describe('sign-in binding and socket revocation', () => {
     expect(await move(other, tableId)).toMatchObject({ ok: true });
     expect(events).toHaveLength(0);
     expect(acks.every((a) => !('ok' in a))).toBe(true);
+  });
+
+  // ---- revocation and failure (PR #18 second review) ------------------------
+
+  /** Every table_event the server sends to this client's socket, recorded
+   *  on the server side, so "nothing was sent" needs no waiting. */
+  function serverSends(s: ClientSocket): unknown[] {
+    const sent: unknown[] = [];
+    const server = io.of('/').sockets.get(s.id!)!;
+    const emit = server.emit.bind(server);
+    server.emit = ((ev: string, ...args: unknown[]) => {
+      if (ev === 'table_event') sent.push(args[0]);
+      return emit(ev, ...args);
+    }) as typeof server.emit;
+    return sent;
+  }
+
+  /** Send one of the table's stored events to its room again, as a new
+   *  event would be: the broadcast path with no engine involved. */
+  async function rebroadcast(tableId: string): Promise<void> {
+    const events = await app.realtime.eventsAfter(tableId, 0);
+    expect(events.length).toBeGreaterThan(0);
+    (app.realtime as unknown as { broadcast: (t: string, e: unknown) => void }).broadcast(tableId, events[events.length - 1]);
+  }
+
+  it('sign-out held right after its session delete: the socket hears no event, then is cut', async () => {
+    const auth = await signIn('p@example.com');
+    const tableId = await aiTable(auth);
+    const s = await seated(auth, tableId);
+    const sent = serverSends(s);
+    const held = inject.pauseAfter('delete:auth_sessions');
+    const cut = disconnected(s);
+    const out = post('/api/auth/signout', auth);
+    await held.reached;
+    await rebroadcast(tableId);
+    expect(sent).toHaveLength(0);
+    held.open();
+    expect((await out).statusCode).toBe(200);
+    expect(await cut).toBe('io server disconnect');
+  });
+
+  it('account switch held right after the old session is deleted: the old socket hears no event, then is cut', async () => {
+    const a = await signIn('a@example.com');
+    const tableId = await aiTable(a);
+    const s = await seated(a, tableId);
+    const sent = serverSends(s);
+    const { token, nonce } = await askForLink('b@example.com', a);
+    const held = inject.pauseAfter('delete:auth_sessions');
+    const cut = disconnected(s);
+    const done = post('/api/auth/email/complete', `${a}; ${nonce}`, { token });
+    await held.reached;
+    await rebroadcast(tableId);
+    expect(sent).toHaveLength(0);
+    held.open();
+    expect((await done).statusCode).toBe(200);
+    expect(await cut).toBe('io server disconnect');
+  });
+
+  it('guest upgrade held part way: the guest socket hears no event, then is cut', async () => {
+    const g = await guest();
+    const tableId = await aiTable(g);
+    const s = await seated(g, tableId);
+    const sent = serverSends(s);
+    const { token, nonce } = await askForLink('up@example.com', g);
+    const held = inject.pauseAfter('update:seats');
+    const cut = disconnected(s);
+    const done = post('/api/auth/email/complete', `${g}; ${nonce}`, { token });
+    await held.reached;
+    await rebroadcast(tableId);
+    expect(sent).toHaveLength(0);
+    held.open();
+    expect((await done).statusCode).toBe(200);
+    expect(await cut).toBe('io server disconnect');
+  });
+
+  it('an account switch that fails after deleting the old session still cuts the old socket, which hears nothing', async () => {
+    const a = await signIn('a@example.com');
+    const tableId = await aiTable(a);
+    const s = await seated(a, tableId);
+    const sent = serverSends(s);
+    const { token, nonce } = await askForLink('b@example.com', a);
+    inject.failNext('insert:auth_sessions');
+    const cut = disconnected(s);
+    const done = await post('/api/auth/email/complete', `${a}; ${nonce}`, { token });
+    expect(done.statusCode).toBe(500);
+    expect(cookieOf(done, 'universe_auth')).toBeNull();
+    expect(await cut).toBe('io server disconnect');
+    await rebroadcast(tableId);
+    expect(sent).toHaveLength(0);
+    expect(await refused(client(a))).toBe('unauthorized');
+  });
+
+  it('a sign-out that fails part way still cuts the socket, which hears nothing', async () => {
+    const g = await guest();
+    const tableId = await aiTable(g);
+    const s = await seated(g, tableId);
+    const sent = serverSends(s);
+    inject.failNext('update:guests');
+    const cut = disconnected(s);
+    expect((await post('/api/auth/signout', g)).statusCode).toBe(500);
+    expect(await cut).toBe('io server disconnect');
+    await rebroadcast(tableId);
+    expect(sent).toHaveLength(0);
+  });
+
+  /** Make the credential check inside join_table (the one after the room
+   *  join) fail with a database error. */
+  function failJoinCheck(): void {
+    const getSeats = app.tableService.getSeats.bind(app.tableService);
+    let armed = true;
+    app.tableService.getSeats = async (id: string) => {
+      const seats = await getSeats(id);
+      if (armed) { armed = false; inject.failNext('select:auth_sessions'); }
+      return seats;
+    };
+  }
+
+  it('a database error in the check after a first join leaves no room, seat or presence, and cuts the socket', async () => {
+    const auth = await signIn('p@example.com');
+    const tableId = await aiTable(auth);
+    const userId = (await get('/api/me', auth)).json<MeResponse>().user!.id;
+    const s = client(auth);
+    await connected(s);
+    const sent = serverSends(s);
+    failJoinCheck();
+    const cut = disconnected(s);
+    expect(await join(s, tableId)).toMatchObject({ error: 'internal' });
+    expect(await cut).toBe('io server disconnect');
+    expect(io.of('/').adapter.rooms.get(`table:${tableId}`)?.size ?? 0).toBe(0);
+    expect(app.realtime.isAnyoneConnected(tableId, { userId, guestId: null })).toBe(false);
+    await rebroadcast(tableId);
+    expect(sent).toHaveLength(0);
+  });
+
+  it('a database error in the check on a repeated join drops the earlier seat too, and cuts the socket', async () => {
+    const auth = await signIn('p@example.com');
+    const tableId = await aiTable(auth);
+    const userId = (await get('/api/me', auth)).json<MeResponse>().user!.id;
+    const s = await seated(auth, tableId);
+    expect(app.realtime.isAnyoneConnected(tableId, { userId, guestId: null })).toBe(true);
+    const sent = serverSends(s);
+    failJoinCheck();
+    const cut = disconnected(s);
+    expect(await join(s, tableId)).toMatchObject({ error: 'internal' });
+    expect(await cut).toBe('io server disconnect');
+    expect(io.of('/').adapter.rooms.get(`table:${tableId}`)?.size ?? 0).toBe(0);
+    expect(app.realtime.isAnyoneConnected(tableId, { userId, guestId: null })).toBe(false);
+    await rebroadcast(tableId);
+    expect(sent).toHaveLength(0);
+  });
+
+  // ---- link status (PR #18 second review, sign-in retry) --------------------
+
+  const linkStatus = (cookie: string | undefined, token: string) =>
+    post('/api/auth/email/link-status', cookie, { token }).then((r) => r.json<{ signedIn: boolean; userId?: string }>());
+
+  it('link-status says yes only for the session that this very link made', async () => {
+    const a = await signIn('a@example.com');
+    const { token, nonce } = await askForLink('a@example.com', a);
+    // Before completion: the browser's session (A) was not made by it.
+    expect(await linkStatus(a, token)).toEqual({ signedIn: false });
+    const done = await post('/api/auth/email/complete', `${a}; ${nonce}`, { token });
+    const again = cookieOf(done, 'universe_auth')!;
+    const userId = done.json<{ userId: string }>().userId;
+    // Same account, new session: the link made it.
+    expect(await linkStatus(again, token)).toEqual({ signedIn: true, userId });
+    // Not for another token, not without the cookie, not for the old session.
+    expect(await linkStatus(again, 'other-token')).toEqual({ signedIn: false });
+    expect(await linkStatus(undefined, token)).toEqual({ signedIn: false });
+    expect(await linkStatus(a, token)).toEqual({ signedIn: false });
+    // The proof is not the link row's own token hash.
+    const row = await db.selectFrom('auth_sessions').select('link_hash').where('user_id', '=', userId)
+      .where('link_hash', 'is not', null).executeTakeFirstOrThrow();
+    const { hashToken } = await import('./identity.js');
+    expect(row.link_hash).not.toBe(hashToken(token));
+    // It changes nothing.
+    expect((await get('/api/me', again)).json<MeResponse>().user?.id).toBe(userId);
   });
 });

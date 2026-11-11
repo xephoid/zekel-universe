@@ -25,6 +25,9 @@ export interface AuthSessionsTable {
   token_hash: string; // sha256 of the cookie token
   created_at: string;
   expires_at: string;
+  /** Proof of the sign-in link that made this session (see linkProof in
+   *  app.ts); null for sessions from before it was recorded. */
+  link_hash?: string | null;
 }
 
 export interface GuestsTable {
