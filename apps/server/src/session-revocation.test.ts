@@ -198,13 +198,28 @@ describe('sign-in binding and socket revocation', () => {
     /** Resolves once the server has received a packet for `event`. */
     waitForPacket(event: string): Promise<void>;
     substitute: ((body: unknown) => unknown) | null;
+    /** Each run of a socket handler, with the promise it returned (and any
+     *  `afterHandler` work), so a test can wait for the handler to finish,
+     *  not just for its first reply. */
+    handlers: { event: string; done: Promise<void> }[];
+    /** Resolves once `n` runs of the `event` handler have started and all
+     *  of them have settled. */
+    settled(event: string, n?: number): Promise<void>;
+    /** Test-only mutation: extra work run inside a handler's run, after the
+     *  real handler, with its arguments (including the reply callback). */
+    afterHandler: ((event: string, args: unknown[]) => Promise<void>) | null;
   }
+  const HANDLED = ['join_table', 'leave_table', 'move', 'query', 'undo'];
   function recordAcks(): AckLog {
     const waiters: (() => void)[] = [];
     const log: AckLog = {
-      attempts: [], received: [], substitute: null,
+      attempts: [], received: [], substitute: null, handlers: [], afterHandler: null,
       waitForAck: (event, n = 1) => until(() => log.attempts.filter((a) => a.event === event).length >= n),
       waitForPacket: (event) => until(() => log.received.includes(event)),
+      settled: async (event, n = 1) => {
+        await until(() => log.handlers.filter((h) => h.event === event).length >= n);
+        await Promise.allSettled(log.handlers.filter((h) => h.event === event).map((h) => h.done));
+      },
     };
     function until(done: () => boolean): Promise<void> {
       return new Promise<void>((resolve) => {
@@ -216,6 +231,22 @@ describe('sign-in binding and socket revocation', () => {
     type Raw = { id: string; connected: boolean; onevent(p: { id?: number; data?: unknown[] }): void; ack(id: number): (...a: unknown[]) => void };
     const instrument = (sock: unknown) => {
       const raw = sock as Raw;
+      // The app's handlers are registered when the socket connects, before
+      // this runs: wrap each one to keep the promise it returns.
+      const emitter = sock as { listeners(e: string): ((...a: unknown[]) => unknown)[]; removeAllListeners(e: string): void; on(e: string, l: (...a: unknown[]) => void): void };
+      for (const ev of HANDLED) {
+        const originals = emitter.listeners(ev);
+        emitter.removeAllListeners(ev);
+        for (const listener of originals) {
+          emitter.on(ev, (...args: unknown[]) => {
+            const done = Promise.resolve(listener.apply(sock, args)).then(async () => {
+              if (log.afterHandler) await log.afterHandler(ev, args);
+            });
+            log.handlers.push({ event: ev, done });
+            notify();
+          });
+        }
+      }
       const onevent = raw.onevent.bind(raw);
       const ack = raw.ack.bind(raw);
       let event = '';
@@ -243,18 +274,46 @@ describe('sign-in binding and socket revocation', () => {
 
   const ENDED_TEXT = 'Your session has ended. Sign in again.';
   /** Exactly `n` attempted replies for `event`, each a bare `unauthorized`
-   *  with the ended text and nothing from the engine. */
-  function expectOnlyEnded(log: AckLog, event: string, n = 1): void {
+   *  carrying the ended text (as `reason` or `message`) and nothing else,
+   *  so nothing from the engine. */
+  function expectOnlyEnded(log: Pick<AckLog, 'attempts'>, event: string, n = 1): void {
     const mine = log.attempts.filter((a) => a.event === event);
     expect(mine).toHaveLength(n);
     for (const { body } of mine) {
       const b = body as Record<string, unknown>;
       expect(b.error).toBe('unauthorized');
+      expect('reason' in b || 'message' in b).toBe(true);
       for (const [k, v] of Object.entries(b)) {
         expect(['error', 'reason', 'message']).toContain(k);
         if (k !== 'error') expect(v).toBe(ENDED_TEXT);
       }
     }
+  }
+
+  /** Every one of these events reached the server. */
+  function expectArrived(log: Pick<AckLog, 'received'>, events: string[]): void {
+    for (const ev of events) expect(log.received).toContain(ev);
+  }
+
+  /** Hold the next credential-room join (the start of a new socket's own
+   *  check), as an asynchronous adapter would. */
+  function holdCredentialJoin(): { reached: Promise<void>; open: () => void } {
+    const adapter = io.of('/').adapter;
+    const addAll = adapter.addAll.bind(adapter);
+    let open!: () => void;
+    let hit!: () => void;
+    const wait = new Promise<void>((r) => { open = r; });
+    const reached = new Promise<void>((r) => { hit = r; });
+    let armed = true;
+    adapter.addAll = (id, rooms) => {
+      if (armed && [...rooms].some((r) => r.startsWith('cred:'))) {
+        armed = false;
+        hit();
+        return wait.then(() => addAll(id, rooms));
+      }
+      return addAll(id, rooms);
+    };
+    return { reached, open };
   }
 
   const join = (s: ClientSocket, tableId: string) =>
@@ -665,7 +724,7 @@ describe('sign-in binding and socket revocation', () => {
     expect(await cut).toBe('io server disconnect');
     g.open();
     // The handler finishes with its reply (attempted after the cut).
-    await log.waitForAck('join_table');
+    await log.settled('join_table');
     expectOnlyEnded(log, 'join_table');
 
     expect(io.of('/').adapter.rooms.get(`table:${tableId}`)?.size ?? 0).toBe(0);
@@ -897,16 +956,26 @@ describe('sign-in binding and socket revocation', () => {
     await out.closed;
 
     // The session row is still there; a socket reconnecting with it now is
-    // cut by its own check and does nothing.
+    // cut by its own check, and the packets it sent meanwhile are dropped.
+    // Its check is held at its room join so the packets are seen arriving
+    // first; a sentinel sent after them proves they all came (one
+    // connection delivers in order).
     const log = recordAcks();
     const actions = serverActions();
+    const check = holdCredentialJoin();
     const s = client(auth);
     const events: TableEventWire[] = [];
     s.on('table_event', (e: TableEventWire) => events.push(e));
     const cut = disconnected(s);
+    await connected(s);
+    await check.reached;
     s.emit('join_table', { tableId }, () => {});
     s.emit('move', { tableId, seat: 0, move: { type: 'pass' } }, () => {});
+    s.emit('test_sentinel');
+    await log.waitForPacket('test_sentinel');
+    expectArrived(log, ['join_table', 'move']);
     const appliedBefore = engine.applied.length;
+    check.open();
     expect(await cut).toBe('io server disconnect');
     // Still marked: the session (the guest is added once it has been read).
     expect(app.revocationsInProgress()).toBe(1);
@@ -916,8 +985,10 @@ describe('sign-in binding and socket revocation', () => {
     expect((await get('/api/me', auth)).json<MeResponse>().user).toBeNull();
     expect(engine.applied.length).toBe(appliedBefore);
     expect(events).toHaveLength(0);
-    // Whatever reached the server was dropped by the socket's own check,
-    // before any handler: no move started, and no reply was attempted.
+    // Both packets reached the server and were dropped by the socket's own
+    // check, before any handler: no handler ran, no move started, and no
+    // reply was attempted.
+    expect(log.handlers).toEqual([]);
     expect(actions.count()).toBe(0);
     expect(log.attempts).toEqual([]);
   });
@@ -951,7 +1022,7 @@ describe('sign-in binding and socket revocation', () => {
     await held.reached;
     release();
     expect(await cut).toBe('io server disconnect');
-    await log.waitForAck('join_table');
+    await log.settled('join_table');
     expectOnlyEnded(log, 'join_table');
     expect(sent).toHaveLength(0);
     held.open();
@@ -1127,7 +1198,7 @@ describe('sign-in binding and socket revocation', () => {
     const rows = await db.selectFrom('table_events').selectAll().where('table_id', '=', tableId).execute();
     expect(JSON.stringify(rows)).not.toContain('gap');
     expect(sent).toHaveLength(0);
-    await log.waitForAck('move');
+    await log.settled('move');
     expectOnlyEnded(log, 'move');
   });
 
@@ -1159,7 +1230,7 @@ describe('sign-in binding and socket revocation', () => {
 
     expect(undoCalls).toBe(0);
     expect((await db.selectFrom('table_events').select('id').where('table_id', '=', tableId).execute()).length).toBe(eventsBefore);
-    await log.waitForAck('undo');
+    await log.settled('undo');
     expectOnlyEnded(log, 'undo');
   });
 
@@ -1229,7 +1300,7 @@ describe('sign-in binding and socket revocation', () => {
     expect(actions.count()).toBe(1);
     await actions.settled();
     expect(engine.applied.some((a) => a.move['marker'] === 'late')).toBe(false);
-    await log.waitForAck('move');
+    await log.settled('move');
     expectOnlyEnded(log, 'move');
     const rows = await db.selectFrom('table_events').selectAll().where('table_id', '=', tableId).execute();
     expect(JSON.stringify(rows)).not.toContain('late');
@@ -1264,7 +1335,7 @@ describe('sign-in binding and socket revocation', () => {
     expect(await cut).toBe('io server disconnect');
     expect(actions.count()).toBe(1);
     await actions.settled();
-    await log.waitForAck('undo');
+    await log.settled('undo');
     expectOnlyEnded(log, 'undo');
     expect(undoCalls).toBe(0);
     expect((await db.selectFrom('table_events').select('id').where('table_id', '=', tableId).execute()).length).toBe(eventsBefore);
@@ -1404,7 +1475,7 @@ describe('sign-in binding and socket revocation', () => {
     read.open();
     expect(await cut).toBe('io server disconnect');
     await actions.settled();
-    await log.waitForAck('move');
+    await log.settled('move');
     log.substitute = null; // restore
     // On the server the cut came first: the reply was attempted on a socket
     // already disconnected.
@@ -1434,5 +1505,88 @@ describe('sign-in binding and socket revocation', () => {
     expect(() => expectOnlyEnded(log, 'move')).toThrow();
     held.open();
     expect((await out).statusCode).toBe(200);
+  });
+
+  // ---- seventh review: handler completion, arrival, the ended text --------
+
+  it('the handler wait covers work after the first reply: a held second reply and side effect are caught', async () => {
+    const auth = await signIn('p@example.com');
+    const tableId = await aiTable(auth);
+    const userId = (await get('/api/me', auth)).json<MeResponse>().user!.id;
+    const s = client(auth);
+    await connected(s);
+    const log = recordAcks();
+    // The mutation: after the real join handler, wait at a gate, then reply
+    // a second time and mark the account present.
+    let release!: () => void;
+    let heldHit!: () => void;
+    const heldReached = new Promise<void>((r) => { heldHit = r; });
+    const gateOpen = new Promise<void>((r) => { release = r; });
+    log.afterHandler = async (event, args) => {
+      if (event !== 'join_table') return;
+      heldHit();
+      await gateOpen;
+      (args[args.length - 1] as (r: unknown) => void)({ ok: true, seats: [0], status: 'playing' });
+      app.realtime.markConnected(tableId, { kind: 'user', userId });
+    };
+    const getSeats = app.tableService.getSeats.bind(app.tableService);
+    const g = gate();
+    let armed = true;
+    app.tableService.getSeats = async (id: string) => {
+      const seats = await getSeats(id);
+      if (armed) { armed = false; g.hit(); await g.wait; }
+      return seats;
+    };
+    const cut = disconnected(s);
+    s.emit('join_table', { tableId }, () => {});
+    await g.reached;
+    expect((await post('/api/auth/signout', auth)).statusCode).toBe(200);
+    expect(await cut).toBe('io server disconnect');
+    g.open();
+
+    // The first reply alone looks right: a check made now would pass.
+    await log.waitForAck('join_table');
+    await heldReached;
+    expectOnlyEnded(log, 'join_table');
+    expect(app.realtime.isAnyoneConnected(tableId, { userId, guestId: null })).toBe(false);
+    // But the handler has not finished, so the wait has not either.
+    let finished = false;
+    const done = log.settled('join_table').then(() => { finished = true; });
+    await Promise.resolve();
+    expect(finished).toBe(false);
+    release();
+    await done;
+    log.afterHandler = null; // restore
+    // After the wait, the second reply and the side effect are seen.
+    expect(() => expectOnlyEnded(log, 'join_table')).toThrow();
+    expect(app.realtime.isAnyoneConnected(tableId, { userId, guestId: null })).toBe(true);
+  });
+
+  it('the arrival check fails when the packets never reach the server', async () => {
+    const auth = await signIn('p@example.com');
+    const log = recordAcks();
+    const check = holdCredentialJoin();
+    const s = client(auth);
+    await connected(s);
+    await check.reached;
+    // The mutation: the join and the move are never sent; only the
+    // sentinel is.
+    s.emit('test_sentinel');
+    await log.waitForPacket('test_sentinel');
+    expect(() => expectArrived(log, ['join_table', 'move'])).toThrow();
+    // Without the arrival check, the zero-reply checks alone would pass.
+    expect(log.handlers).toEqual([]);
+    expect(log.attempts).toEqual([]);
+    check.open();
+  });
+
+  it('the ended-reply check refuses an error with no ended text, or with anything extra', () => {
+    const one = (body: unknown) => ({ attempts: [{ socketId: 's', event: 'move', body, original: body, connected: true }] });
+    expect(() => expectOnlyEnded(one({ error: 'unauthorized' }), 'move')).toThrow();
+    expect(() => expectOnlyEnded(one({ error: 'unauthorized', reason: 'something else' }), 'move')).toThrow();
+    expect(() => expectOnlyEnded(one({ error: 'unauthorized', reason: ENDED_TEXT, legalMoves: [] }), 'move')).toThrow();
+    expect(() => expectOnlyEnded(one({ error: 'move_rejected', reason: ENDED_TEXT }), 'move')).toThrow();
+    expectOnlyEnded(one({ error: 'unauthorized', reason: ENDED_TEXT }), 'move');
+    expectOnlyEnded(one({ error: 'unauthorized', message: ENDED_TEXT }), 'move');
   });
 });
