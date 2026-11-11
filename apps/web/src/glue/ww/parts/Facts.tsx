@@ -4,8 +4,8 @@
 // file only lays them out.
 
 import type { ReactNode } from 'react';
-import { Die } from '@universe/primitives';
-import type { GlueInput } from '../../types';
+import { Die } from '@zekel/primitives';
+import type { GlueInput } from '@zekel/glue-kit';
 import { abilityWords, percent, type LastRoll, type RollFacts, type RollPart } from '../facts';
 import { Lbl, Num } from '../ui';
 

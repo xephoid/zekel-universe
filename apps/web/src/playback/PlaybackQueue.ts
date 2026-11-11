@@ -8,9 +8,9 @@
 // the React hook in usePlaybackQueue.ts wraps it.
 
 import type { TableEventWire } from '@universe/shared';
+import { PACES, type Pace } from '@zekel/glue-kit';
 
-export type Pace = 0.5 | 1 | 2;
-export const PACES: readonly Pace[] = [0.5, 1, 2];
+export { PACES, type Pace };
 
 /** Base dwell per event at 1×; slower on purpose: AI turns are a slideshow. */
 export const BASE_MS = 1600;
@@ -55,6 +55,9 @@ export class PlaybackQueue {
   private gate: Gate | null = null;
   /** true while a gate holds the next event */
   private gating = false;
+  /** counts seeds: a replay that was waiting when the queue was re-seeded
+   *  belongs to the position before, and must not land */
+  private epoch = 0;
   private listeners = new Set<Listener>();
   /** Test hook: deterministic advance without timers. */
   public manual = false;
@@ -92,6 +95,8 @@ export class PlaybackQueue {
    * saved snapshot, or a fresh device that was not watching).
    */
   seed(event: TableEventWire) {
+    this.epoch++;
+    if (this.timer !== null) { clearTimeout(this.timer); this.timer = null; }
     this.state = { ...initial(), applied: [event], view: event.view, current: event, lastSeq: event.seq, tick: this.state.tick + 1 };
     this.queue = [];
     this.emit();
@@ -189,12 +194,14 @@ export class PlaybackQueue {
       tick: this.state.tick + 1,
     };
     this.emit();
+    const epoch = this.epoch;
     const again = async () => {
       if (this.gate) {
         this.gating = true;
         try { await this.gate(current, this.state.current); } finally { this.gating = false; }
       }
-      this.apply(current);
+      // Re-seeded while the gate held it: the replayed event is not this position's.
+      if (epoch === this.epoch) this.apply(current);
       this.schedule();
     };
     if (this.manual) {

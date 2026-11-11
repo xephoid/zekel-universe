@@ -8,9 +8,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import type { GameReferenceResponse, LegalMove, UnavailableMove } from '@universe/shared';
-import { FlipRoot } from '@universe/primitives';
-import type { GlueInput } from '../glue';
-import { NggScreen } from '../glue/ngg/NggScreen';
+import { FlipRoot } from '@zekel/primitives';
+import type { GlueInput } from '@zekel/glue-kit';
+import { nggGlue } from '../glue';
+
+// The game's own screen, through its glue module: the dev page reaches the
+// game the same way the table does.
+const NggScreen = nggGlue.Screen!;
 import { api } from '../api';
 
 interface Fixture {

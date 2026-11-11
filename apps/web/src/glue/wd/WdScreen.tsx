@@ -7,8 +7,8 @@
 // and only because the person pressed something. Plan: implementation-plan §20.
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
-import type { GameScreenProps, LegalMove } from '../types';
-import { asArr, asStr, isObj } from '../types';
+import type { GameScreenProps, LegalMove } from '@zekel/glue-kit';
+import { asArr, asStr, isObj } from '@zekel/glue-kit';
 import {
   KEY_ROWS, find, isTemplate, moveMove, nameOf, placeMove, playMove, readTable, typeOf,
   type RoundResult, type WdTable,

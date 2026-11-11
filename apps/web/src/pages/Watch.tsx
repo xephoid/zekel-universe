@@ -7,10 +7,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import type { GameReferenceResponse, WatchResponse } from '@universe/shared';
-import { FlipRoot, paletteVars, useSystemReducedMotion } from '@universe/primitives';
+import { FlipRoot, paletteVars, useSystemReducedMotion } from '@zekel/primitives';
 import { api, ApiRequestError } from '../api';
-import { glueFor, type GlueInput } from '../glue';
-import { JsonInspector, ZoneRenderer } from '../glue/ZoneRenderer';
+import { glueFor } from '../glue';
+import type { GlueInput } from '@zekel/glue-kit';
+import { JsonInspector, ZoneRenderer } from '@zekel/glue-kit';
 import { Nav } from './Nav';
 import { Wordmark } from '../ui';
 

@@ -8,7 +8,7 @@
 // name: whose unit is up on the activation ladder, and whether it is a hero
 // carrying a spy. They are the engine's own statement of it.
 
-import type { LegalMove } from '../types';
+import type { LegalMove } from '@zekel/glue-kit';
 import { moveType, type NggView } from './read';
 
 export type ScreenKey =

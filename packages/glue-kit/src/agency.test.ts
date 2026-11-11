@@ -3,8 +3,8 @@
 // rendered-table test (table.test.tsx) proves the page obeys it.
 
 import { describe, expect, it } from 'vitest';
-import { classifyMoves, isSubmissionAllowed, submitMove, submissionLog, completesTemplate } from '../glue';
-import type { LegalMove } from '../glue';
+import { classifyMoves, isSubmissionAllowed, submitMove, submissionLog, completesTemplate } from './index';
+import type { LegalMove } from './index';
 
 const two: LegalMove[] = [
   { move_id: 'a', description: 'a', move: { type: 'play_card', card_id: 'attack', hand_index: 0 } },

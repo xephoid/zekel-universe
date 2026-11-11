@@ -8,9 +8,9 @@
 // this module supplies the fallback that reads the blanks off the template
 // itself, and the chooser rule for taps that could mean several moves.
 
-import type { LegalMove, SelectEvent } from './types';
-import type { FormField, GlueInput, GlueModule, MoveForm } from './types';
-import { isObj, words } from './types';
+import type { LegalMove, SelectEvent } from './types.js';
+import type { FormField, GlueInput, GlueModule, MoveForm } from './types.js';
+import { isObj, words } from './types.js';
 
 /** Every move a tap could mean, through the glue's chooser when it has one. */
 export function movesForSelect(glue: GlueModule, sel: SelectEvent, input: GlueInput): LegalMove[] {

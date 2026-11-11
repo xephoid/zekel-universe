@@ -3,8 +3,8 @@
 // template the person completed). Screens never touch raw JSON or the socket.
 
 import type { ReactNode } from 'react';
-import type { UnavailableMove } from '@universe/shared';
-import type { GameScreenProps, LegalMove } from '../types';
+import type { UnavailableMove } from '@zekel/wire-types';
+import type { GameScreenProps, LegalMove } from '@zekel/glue-kit';
 import { labelOf, moveType, playerOf, withViewer, type NggPlayer, type NggView } from './read';
 import { readRef, type NggRef } from './ref';
 import type { Route } from './route';

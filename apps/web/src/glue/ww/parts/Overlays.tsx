@@ -4,8 +4,8 @@
 // move; the peek completes the engine's report_res_discard template with the
 // card the captain chose from the ones the engine revealed.
 
-import type { LegalMove } from '../../types';
-import { asNum, asStr } from '../../types';
+import type { LegalMove } from '@zekel/glue-kit';
+import { asNum, asStr } from '@zekel/glue-kit';
 import { abilityWords, previewOf } from '../facts';
 import { statGroups, type WwTable } from '../read';
 import { TravelCard } from '../TravelCard';

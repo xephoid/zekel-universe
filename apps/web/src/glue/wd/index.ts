@@ -4,10 +4,9 @@
 // the engine's (@zekel/word-debauchee views.ts) and every rule stays there.
 // Plan: docs/implementation-plan.md §20; look: docs/design/word-debauchee/.
 
-import type { GameReferenceResponse } from '@universe/shared';
-import type { FormField, GlueInput, GlueModule, LegalMove, MoveForm, SetupAnswers, SetupField, SetupSeat, TablePlan } from '../types';
-import { asArr, asStr, isObj } from '../types';
-import { answerText } from '../forms';
+import type { GameReferenceResponse } from '@zekel/wire-types';
+import type { FormField, GlueInput, GlueModule, LegalMove, MoveForm, SetupAnswers, SetupField, SetupSeat, TablePlan } from '@zekel/glue-kit';
+import { answerText, asArr, asStr, isObj } from '@zekel/glue-kit';
 import { WdScreen } from './WdScreen';
 import { GAME, isTemplate, readTable, typeOf } from './read';
 

@@ -1,4 +1,9 @@
-import type { GlueModule } from './types';
+// The games this Universe can draw: each game's glue module by engine game
+// id. The rules a glue follows are @zekel/glue-kit; this file is only the
+// list. When the games move to their own packages (zekel-games), this
+// becomes "the game packages installed".
+
+import type { GlueModule } from '@zekel/glue-kit';
 import { fracturedFistGlue } from './fractured-fist';
 import { warbleWayGlue } from './warble-way-galaxy';
 import { sweetlandsGlue } from './sweetlands-imperium';
@@ -22,7 +27,7 @@ export function glueFor(gameId: string): GlueModule | null {
 }
 
 export { fracturedFistGlue, warbleWayGlue, sweetlandsGlue, cybernoirGlue, nggGlue, adventurerOlympicsGlue, wordDebaucheeGlue };
-export type { GlueModule, GameScreenProps, GlueInput, TablePlan, Zone, SetupField, MultiOption, SetupSeat, SetupAnswers, LegalMove, SelectEvent, MoveForm, FormField, PlanStep, PlanPrompt, PromptAction, Moment, MomentInput, StrikeLane } from './types';
-export { classifyMoves, completesTemplate, isSubmissionAllowed, movesEqual, submitMove, submissionLog } from './agency';
-export type { SubmissionTrigger, FormContext } from './agency';
-export { formForMove, movesForSelect, templateForm } from './forms';
+
+// Warble Way Galaxy's dev page also shows the theme's icons, holograms and
+// travel cards on their own; it reaches them through here.
+export * as warbleWayGallery from './ww/gallery';

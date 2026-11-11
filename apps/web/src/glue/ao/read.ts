@@ -4,9 +4,9 @@
 // engine's axial "q,r"; the map primitive draws flat-topped axial hexes, so each key is
 // redrawn at (q + r, -q): a change of drawing axes, not a rule.
 
-import type { CardData, MapNode } from '@universe/primitives';
-import type { GlueInput, LegalMove } from '../types';
-import { asArr, asNum, asStr, isObj } from '../types';
+import type { CardData, MapNode } from '@zekel/primitives';
+import type { GlueInput, LegalMove } from '@zekel/glue-kit';
+import { asArr, asNum, asStr, isObj } from '@zekel/glue-kit';
 import { iconUrl } from './icons';
 
 export const GAME = 'adventurer-olympics';

@@ -9,10 +9,11 @@ import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testi
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import type { MoveAck, TableEventWire } from '@universe/shared';
 import { useFakeSocket } from '../socket';
-import { submissionLog } from '../glue';
+import { submissionLog } from '@zekel/glue-kit';
 import { SessionProvider } from '../session';
 import { TablePage } from '../pages/Table';
 import { ev } from './fixtures';
+import { GLUES } from '../glue';
 
 // ---- a fake socket ---------------------------------------------------------------
 
@@ -225,6 +226,24 @@ describe('the table page and player agency', () => {
     expect(screen.queryByRole('dialog', { name: 'Round 1 · strike' })).toBeNull();
     // The strike can be watched again.
     expect(screen.getByRole('button', { name: 'Replay the strike' })).toBeTruthy();
+  });
+
+  it('a glue that reads a moment but has no overlay to play it does not hold the event back', async () => {
+    const whole = GLUES['fractured-fist']!;
+    GLUES['fractured-fist'] = { ...whole, Moment: undefined };
+    try {
+      renderTable();
+      await screen.findByRole('button', { name: 'Attack' });
+      const struck = { ...VIEW, round: 2, players: { ...VIEW.players, p1: { ...VIEW.players.p1, stamina: 6 } } };
+      await act(async () => {
+        socket.receive('table_event', ev(2, 'End of round 1. Strike: p1 dealt 0, p2 dealt 1.', { kind: 'ai_move', actorSeatPosition: null, view: struck, legalMoves: LEGAL, yourTurn: true, playerId: 'p1', nextActorPosition: 0, engineMove: { type: 'end_turn' } }));
+      });
+      await screen.findAllByText('End of round 1. Strike: p1 dealt 0, p2 dealt 1.', {}, { timeout: 4000 });
+      expect(screen.queryByRole('dialog', { name: 'Round 1 · strike' })).toBeNull();
+      expect(submissionLog).toHaveLength(0);
+    } finally {
+      GLUES['fractured-fist'] = whole;
+    }
   });
 
   it('undo goes through the undo message, never as a move', async () => {

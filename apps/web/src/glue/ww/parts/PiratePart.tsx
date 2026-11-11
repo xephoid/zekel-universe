@@ -4,7 +4,7 @@
 // and losing do. A way the engine does not list is drawn shut with the
 // engine's reason. The captain's sheet stays on the left throughout.
 
-import { asStr } from '../../types';
+import { asStr } from '@zekel/glue-kit';
 import { artFor } from '../cards';
 import { previewOf, reasonFor } from '../facts';
 import { Icon, type IconName } from '../icons';

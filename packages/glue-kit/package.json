@@ -1,0 +1,53 @@
+{
+  "name": "@zekel/glue-kit",
+  "version": "0.1.0",
+  "description": "The rules every zekel game's drawing code follows: the glue module interface, the table plan, player agency, template forms, card identity, the zone renderer, and the table furniture a game's screen may draw.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xephoid/zekel-universe.git",
+    "directory": "packages/glue-kit"
+  },
+  "homepage": "https://github.com/xephoid/zekel-universe#readme",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./css": "./src/glue-kit.css"
+  },
+  "files": [
+    "dist",
+    "src/glue-kit.css",
+    "LICENSE",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsc -p tsconfig.build.json --watch --preserveWatchOutput",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1"
+  },
+  "dependencies": {
+    "@zekel/primitives": "workspace:^",
+    "@zekel/wire-types": "workspace:^"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "react": "^18.3.1",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.8"
+  },
+  "engines": {
+    "node": ">=22.13.0"
+  }
+}

@@ -1,26 +1,14 @@
-// The table's furniture: the top bar controls, the numbered move menu, the
-// rules lessons, the rejection notice, the log, the sheets, and the
-// end-of-game panel.
+// The table's furniture: the action bar, the numbered move menu, the rules
+// lessons, the rejection notice, the log, the card up close, and the
+// end-of-game panel. The sheet, the move form and the pace control, which a
+// game's own screen may draw too, are @zekel/glue-kit.
 
-import { Fragment, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import type { GameOverResult, LegalMove, LogLine, MoveMenu, MoveMenuEntry, RulesBriefing, SeatSummary, TableEventWire } from '@universe/shared';
-import type { MoveForm, PlanPrompt, PlanStep, PromptAction, TablePlan, Zone } from '../glue';
-import { Card, type CardData } from '@universe/primitives';
-import { PACES, type Pace } from '../playback/PlaybackQueue';
+import { Sheet, type PlanPrompt, type PlanStep, type PromptAction, type TablePlan, type Zone } from '@zekel/glue-kit';
+import { Card, type CardData } from '@zekel/primitives';
 import { Avatar } from '../ui';
-
-export function PaceControl({ pace, setPace }: { pace: Pace; setPace: (p: Pace) => void }) {
-  return (
-    <span className="pace" role="group" aria-label="Playback pace">
-      {PACES.map((p) => (
-        <button key={p} className={`btn secondary small${pace === p ? ' active' : ''}`} onClick={() => setPace(p)} aria-pressed={pace === p}>
-          {p}×
-        </button>
-      ))}
-    </span>
-  );
-}
 
 /**
  * The action bar (docs/design/Fractured Fist Table.dc.html): the turn's
@@ -71,80 +59,6 @@ export function MoveChooser({ moves, onPick, onClose, disabled }: {
           </li>
         ))}
       </ol>
-    </Sheet>
-  );
-}
-
-/** A template move's questions. The Send button is live only once every
- *  answer is in; the answers start empty, whatever the template held. */
-export function MoveFormSheet({ form, onSend, onClose, disabled }: {
-  form: MoveForm; onSend: (move: Record<string, unknown>) => void; onClose: () => void; disabled: boolean;
-}) {
-  const [answers, setAnswers] = useState<Record<string, unknown>>({});
-  const built = form.build(answers);
-  const set = (key: string, value: unknown) => setAnswers((a) => ({ ...a, [key]: value }));
-  const toggle = (key: string, value: string, pick: number) => setAnswers((a) => {
-    const cur = Array.isArray(a[key]) ? (a[key] as string[]) : [];
-    if (cur.includes(value)) return { ...a, [key]: cur.filter((x) => x !== value) };
-    if (cur.length >= pick) return a;
-    return { ...a, [key]: [...cur, value] };
-  });
-  return (
-    <Sheet title={form.title} onClose={onClose}>
-      {form.help && <p className="muted form-help">{form.help}</p>}
-      <form className="move-form" onSubmit={(e) => { e.preventDefault(); if (built) onSend(built); }}>
-        {(form.fieldsFor?.(answers) ?? form.fields).map((f) => {
-          if (f.kind === 'text') {
-            return (
-              <label key={f.key} className="field">
-                <span className="label">{f.label}</span>
-                <input type="text" maxLength={f.maxLength} placeholder={f.placeholder} value={typeof answers[f.key] === 'string' ? (answers[f.key] as string) : ''} onChange={(e) => set(f.key, e.target.value)} />
-                {f.help && <span className="muted">{f.help}</span>}
-              </label>
-            );
-          }
-          if (f.kind === 'number') {
-            return (
-              <label key={f.key} className="field">
-                <span className="label">{f.label}</span>
-                <input type="number" min={f.min} max={f.max} value={typeof answers[f.key] === 'string' ? (answers[f.key] as string) : ''} onChange={(e) => set(f.key, e.target.value)} />
-                {f.help && <span className="muted">{f.help}</span>}
-              </label>
-            );
-          }
-          if (f.kind === 'choice') {
-            return (
-              <fieldset key={f.key} className="field">
-                <legend className="label">{f.label}</legend>
-                <div className="radio-row">
-                  {f.options.map((o) => (
-                    <label key={o.value} title={o.hint}>
-                      <input type="radio" name={f.key} aria-label={o.label} checked={answers[f.key] === o.value} onChange={() => set(f.key, o.value)} /> {o.label}
-                    </label>
-                  ))}
-                </div>
-                {f.help && <span className="muted">{f.help}</span>}
-              </fieldset>
-            );
-          }
-          const picked = Array.isArray(answers[f.key]) ? (answers[f.key] as string[]) : [];
-          return (
-            <fieldset key={f.key} className="field">
-              <legend className="label">{f.label} ({picked.length} of {f.pick})</legend>
-              <div className="radio-row">
-                {f.options.map((o) => (
-                  <label key={o.value} title={o.hint}>
-                    <input type="checkbox" aria-label={o.label} checked={picked.includes(o.value)} onChange={() => toggle(f.key, o.value, f.pick)} /> {o.label}
-                  </label>
-                ))}
-              </div>
-              {f.help && <span className="muted">{f.help}</span>}
-            </fieldset>
-          );
-        })}
-        {form.summarize?.(answers) && <p className="form-total">{form.summarize(answers)}</p>}
-        <button className="btn" type="submit" disabled={disabled || !built}>{form.submitLabel ?? 'Send'}</button>
-      </form>
     </Sheet>
   );
 }
@@ -397,70 +311,6 @@ function KeyLog({ lines, currentSeq, me }: { lines: Array<{ line: LogLine; seq: 
           );
         })}
       </ul>
-    </div>
-  );
-}
-
-/**
- * A sheet is a modal dialog, and behaves like one: focus moves into it when
- * it opens, Tab stays inside while it is open, Escape closes it, and focus
- * goes back to whatever opened it. Without the trap, Tab reached the table's
- * own buttons behind the sheet — which on this table means spending action
- * points by accident while a question is still on screen.
- */
-export function Sheet({ title, onClose, children, className, heading }: {
-  title: string; onClose: () => void; children: ReactNode;
-  /** a class beside `sheet`, for a sheet laid out its own way */
-  className?: string;
-  /** drawn in place of the plain title heading (the title still names the dialog) */
-  heading?: ReactNode;
-}) {
-  const box = useRef<HTMLDivElement | null>(null);
-  const opener = useRef<Element | null>(null);
-
-  useEffect(() => {
-    opener.current = document.activeElement;
-    // The first thing worth acting on, else the dialog itself.
-    const first = box.current?.querySelector<HTMLElement>(
-      'input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]):not(.close), [href], [tabindex]:not([tabindex="-1"])',
-    );
-    (first ?? box.current)?.focus();
-    return () => {
-      const back = opener.current;
-      if (back instanceof HTMLElement && document.contains(back)) back.focus();
-    };
-  }, []);
-
-  const onKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'Escape') { e.stopPropagation(); onClose(); return; }
-    if (e.key !== 'Tab') return;
-    const focusable = [...(box.current?.querySelectorAll<HTMLElement>(
-      'input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])',
-    ) ?? [])].filter((el) => el.offsetParent !== null || el === document.activeElement);
-    if (focusable.length === 0) { e.preventDefault(); return; }
-    const first = focusable[0]!;
-    const last = focusable[focusable.length - 1]!;
-    const here = document.activeElement;
-    if (e.shiftKey && (here === first || here === box.current)) { e.preventDefault(); last.focus(); }
-    else if (!e.shiftKey && here === last) { e.preventDefault(); first.focus(); }
-  }, [onClose]);
-
-  return (
-    <div className="sheet-backdrop" onClick={onClose} role="presentation">
-      <div
-        ref={box}
-        className={className ? `sheet ${className}` : 'sheet'}
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-        tabIndex={-1}
-        onKeyDown={onKeyDown}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button className="btn secondary small close" onClick={onClose} aria-label="Close">✕</button>
-        {heading ?? <h2>{title}</h2>}
-        {children}
-      </div>
     </div>
   );
 }

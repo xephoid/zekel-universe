@@ -4,8 +4,8 @@
 // eye.
 
 import { useState } from 'react';
-import { Bag, Card, CardZone, Die, FlipRoot, Grid, Map, Pool, Tableau, Track, paletteVars } from '@universe/primitives';
-import type { CardData } from '@universe/primitives';
+import { Bag, Card, CardZone, Die, FlipRoot, Grid, Map, Pool, Tableau, Track, paletteVars } from '@zekel/primitives';
+import type { CardData } from '@zekel/primitives';
 import { Nav } from './Nav';
 
 const PALETTE = { red: '#d63031', gold: '#c9a227', green: '#3e7c4f', blue: '#3f7cc9', you: '#3E7C4F', them: '#b4452f', wall: '#2b2620', hive: '#7a4a12' };

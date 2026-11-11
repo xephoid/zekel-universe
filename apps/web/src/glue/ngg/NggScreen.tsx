@@ -2,8 +2,8 @@
 // a context. Nothing here decides what to show; route() does, from the state.
 
 import { useMemo, type ComponentType } from 'react';
-import type { GameScreenProps } from '../types';
-import { movesEqual } from '../agency';
+import type { GameScreenProps } from '@zekel/glue-kit';
+import { movesEqual } from '@zekel/glue-kit';
 import { makeCtx, type ScreenCtx } from './ctx';
 import { readView } from './read';
 import { route, type ScreenKey } from './route';

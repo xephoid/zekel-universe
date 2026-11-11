@@ -2,9 +2,9 @@
 // into what the candy table draws. Everything here is a reading of the view or
 // of the engine's reference data; nothing is worked out from the rules.
 
-import type { GameReferenceResponse } from '@universe/shared';
-import type { GlueInput } from '../types';
-import { asArr, asNum, asStr, isObj, words } from '../types';
+import type { GameReferenceResponse } from '@zekel/wire-types';
+import type { GlueInput } from '@zekel/glue-kit';
+import { asArr, asNum, asStr, isObj, words } from '@zekel/glue-kit';
 import type { FactionKey, UnitKey } from './art';
 import type { Region } from './geometry';
 

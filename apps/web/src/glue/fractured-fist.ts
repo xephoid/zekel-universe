@@ -7,13 +7,14 @@
 // moment. The owner chose a game-drawn screen over a new TablePlan field on
 // 2026-09-29.
 
-import type { GameReferenceResponse } from '@universe/shared';
+import type { GameReferenceResponse } from '@zekel/wire-types';
 import type {
-  GlueModule, GlueInput, LegalMove, Moment, MomentInput, SelectEvent, SetupField, TablePlan, Zone, SetupSeat,
-} from './types';
-import { asArr, asNum, asStr, isObj, shapeHas, words } from './types';
+  GlueModule, GlueInput, LegalMove, MomentInput, SelectEvent, SetupField, TablePlan, Zone, SetupSeat,
+} from '@zekel/glue-kit';
+import { asArr, asNum, asStr, isObj, shapeHas, words } from '@zekel/glue-kit';
 import { PALETTE, EFFECT_ORDER, EFFECT_WORDS, artUrlFor, cardDefs, colorKeyFor, effectChips, fightOf, litPartsFor, moveForTap, starterLoadout, type CardDef } from './ff/read';
 import { FfScreen } from './ff/FfScreen';
+import { StrikeOverlay, type StrikeMoment } from './ff/StrikeMoment';
 import './ff/ff.css';
 
 /** A card's colored corner and the color of the cost on it, from the palette. */
@@ -68,7 +69,8 @@ export const fracturedFistGlue: GlueModule = {
    * arriving. What each player queued and what stood in the way come from
    * the view before; what got through is the stamina the engine took off.
    */
-  momentFor(input: MomentInput): Moment | null {
+  Moment: StrikeOverlay,
+  momentFor(input: MomentInput): StrikeMoment | null {
     const { before, after } = input;
     if (!shapeHas(before, 'players', 'round', 'player_order') || !shapeHas(after, 'players', 'round')) return null;
     const struck = asNum(after['round']) > asNum(before['round']) || (asStr(after['phase']) === 'game_over' && asStr(before['phase']) !== 'game_over');

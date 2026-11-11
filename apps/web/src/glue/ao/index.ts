@@ -15,14 +15,14 @@
 // turn the tile, press Place. Those taps change GlueInput.ui only; Place
 // sends the one listed move for that slot and turn.
 
-import type { CardData, TableauData } from '@universe/primitives';
-import type { GameReferenceResponse } from '@universe/shared';
+import type { CardData, TableauData } from '@zekel/primitives';
+import type { GameReferenceResponse } from '@zekel/wire-types';
 import type {
   FormField, GlueInput, GlueModule, LegalMove, MoveForm, PlanPrompt, PromptAction, SelectEvent,
   SetupAnswers, SetupField, SetupSeat, TablePlan, Zone,
-} from '../types';
-import { asArr, asNum, asStr, isObj, shapeHas } from '../types';
-import { answerText } from '../forms';
+} from '@zekel/glue-kit';
+import { asArr, asNum, asStr, isObj, shapeHas } from '@zekel/glue-kit';
+import { answerText } from '@zekel/glue-kit';
 import { iconUrl } from './icons';
 import './ao.css';
 import { AoScreen } from './AoScreen';

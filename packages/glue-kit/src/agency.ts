@@ -15,7 +15,7 @@
 // Nothing else ever submits. The table test renders the page with a fake
 // socket and asserts no submission happens without a simulated tap.
 
-import type { LegalMove } from '@universe/shared';
+import type { LegalMove } from '@zekel/wire-types';
 
 export type SubmissionTrigger = 'tap' | 'resolve_report_button' | 'undo' | 'form' | 'batch';
 

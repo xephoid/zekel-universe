@@ -13,11 +13,11 @@
 // Template moves (assign every seat a faction, pick the Intel to discard,
 // pick a treat slot) become forms; nothing in them is preselected.
 
-import type { CardData, MapNode, TableauData } from '@universe/primitives';
-import type { GameReferenceResponse } from '@universe/shared';
-import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, SelectEvent, SetupAnswers, SetupField, SetupSeat, TablePlan, Zone } from './types';
-import { asArr, asNum, asStr, isObj, shapeHas, words } from './types';
-import { answerList, answerText } from './forms';
+import type { CardData, MapNode, TableauData } from '@zekel/primitives';
+import type { GameReferenceResponse } from '@zekel/wire-types';
+import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, SelectEvent, SetupAnswers, SetupField, SetupSeat, TablePlan, Zone } from '@zekel/glue-kit';
+import { asArr, asNum, asStr, isObj, shapeHas, words } from '@zekel/glue-kit';
+import { answerList, answerText } from '@zekel/glue-kit';
 import { SPACES, REGION_FACTION, SPACE_COLORS, TREATS, BOARD } from './sweetlands-board';
 import { SlScreen } from './sl/SlScreen';
 

@@ -72,15 +72,21 @@ importers:
 
   apps/web:
     dependencies:
-      '@universe/primitives':
-        specifier: workspace:*
-        version: link:../../packages/primitives
       '@universe/shared':
         specifier: workspace:*
         version: link:../../packages/shared
-      '@universe/tokens':
+      '@zekel/glue-kit':
+        specifier: workspace:*
+        version: link:../../packages/glue-kit
+      '@zekel/primitives':
+        specifier: workspace:*
+        version: link:../../packages/primitives
+      '@zekel/tokens':
         specifier: workspace:*
         version: link:../../packages/tokens
+      '@zekel/wire-types':
+        specifier: workspace:*
+        version: link:../../packages/wire-types
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -141,13 +147,32 @@ importers:
         specifier: ^2.1.8
         version: 2.1.9(@types/node@22.20.3)(jsdom@30.0.1)
 
+  packages/glue-kit:
+    dependencies:
+      '@zekel/primitives':
+        specifier: workspace:^
+        version: link:../primitives
+      '@zekel/wire-types':
+        specifier: workspace:^
+        version: link:../wire-types
+    devDependencies:
+      '@types/react':
+        specifier: ^18.3.12
+        version: 18.3.31
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      typescript:
+        specifier: ^5.6.3
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.8
+        version: 2.1.9(@types/node@22.20.3)(jsdom@30.0.1)
+
   packages/primitives:
     dependencies:
-      '@universe/shared':
-        specifier: workspace:*
-        version: link:../shared
-      '@universe/tokens':
-        specifier: workspace:*
+      '@zekel/tokens':
+        specifier: workspace:^
         version: link:../tokens
     devDependencies:
       '@types/react':
@@ -170,6 +195,10 @@ importers:
         version: 2.1.9(@types/node@22.20.3)(jsdom@30.0.1)
 
   packages/shared:
+    dependencies:
+      '@zekel/wire-types':
+        specifier: workspace:*
+        version: link:../wire-types
     devDependencies:
       typescript:
         specifier: ^5.6.3
@@ -179,6 +208,15 @@ importers:
         version: 2.1.9(@types/node@22.20.3)(jsdom@30.0.1)
 
   packages/tokens:
+    devDependencies:
+      typescript:
+        specifier: ^5.6.3
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.8
+        version: 2.1.9(@types/node@22.20.3)(jsdom@30.0.1)
+
+  packages/wire-types:
     devDependencies:
       typescript:
         specifier: ^5.6.3

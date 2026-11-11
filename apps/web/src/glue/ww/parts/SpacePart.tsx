@@ -7,7 +7,7 @@
 // offered by name, because the carrier takes the consequence. The roll
 // panel below rolls the chosen one. Between cards the panel offers the Draw.
 
-import type { GlueInput, LegalMove } from '../../types';
+import type { GlueInput, LegalMove } from '@zekel/glue-kit';
 import { FAIL_TEXT, KIND, travelCard, type Fail } from '../cards';
 import { previewOf, reasonFor } from '../facts';
 import { Icon } from '../icons';

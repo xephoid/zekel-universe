@@ -11,8 +11,8 @@ import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { LegalMove } from '@universe/shared';
-import type { GameScreenProps, GlueInput } from '../glue';
-import { isSubmissionAllowed } from '../glue';
+import type { GameScreenProps, GlueInput } from '@zekel/glue-kit';
+import { isSubmissionAllowed } from '@zekel/glue-kit';
 import { AoScreen, RESULT_MS } from '../glue/ao/AoScreen';
 
 afterEach(cleanup);

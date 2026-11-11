@@ -17,9 +17,9 @@
 
 import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import { CardZone, Track, type SelectEvent, type TrackData } from '@universe/primitives';
-import type { GameScreenProps, LegalMove, PromptAction, Zone } from '../types';
-import { Sheet } from '../../table/parts';
+import { CardZone, Track, type SelectEvent, type TrackData } from '@zekel/primitives';
+import type { GameScreenProps, LegalMove, PromptAction, Zone } from '@zekel/glue-kit';
+import { Sheet } from '@zekel/glue-kit';
 import {
   artUrlFor, buyableCount, cardDefs, colorKeyFor, faceChips, fightOf, litPartsFor, moveForTap, STEP_NAMES, worthOf,
   type CardDef, type Fight, type Fighter,

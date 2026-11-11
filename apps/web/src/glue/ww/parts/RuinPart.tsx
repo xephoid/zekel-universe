@@ -10,8 +10,8 @@
 // the level at once, so that square asks before it sends.
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
-import type { LegalMove } from '../../types';
-import { asArr, asNum, asStr, isObj } from '../../types';
+import type { LegalMove } from '@zekel/glue-kit';
+import { asArr, asNum, asStr, isObj } from '@zekel/glue-kit';
 import { ATTACKERS, faceUrl } from '../faces';
 import { Hologram } from '../holo';
 import { Icon, type IconName } from '../icons';

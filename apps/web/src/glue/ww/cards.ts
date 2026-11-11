@@ -6,8 +6,8 @@
 // here is a rule and no name lives here: a code the reference does not
 // carry draws as a plain card.
 
-import type { GameReferenceResponse } from '@universe/shared';
-import { asArr, asNum, asStr, isObj } from '../types';
+import type { GameReferenceResponse } from '@zekel/wire-types';
+import { asArr, asNum, asStr, isObj } from '@zekel/glue-kit';
 import type { IconName } from './icons';
 
 export type Suit = 'H' | 'D' | 'S' | 'C';

@@ -2,8 +2,8 @@
 // into plain shapes for the screen. Nothing here is a rule: every number is
 // the view's, and every move the screen sends is found among the listed ones.
 
-import type { LegalMove } from '../types';
-import { asArr, asNum, asStr, isObj } from '../types';
+import type { LegalMove } from '@zekel/glue-kit';
+import { asArr, asNum, asStr, isObj } from '@zekel/glue-kit';
 
 export const GAME = 'word-debauchee';
 

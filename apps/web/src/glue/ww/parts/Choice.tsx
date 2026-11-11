@@ -3,7 +3,7 @@
 // a card or a fight puts several ways side by side. A way the engine does
 // not list is drawn shut, with the engine's reason when it gave one.
 
-import type { GlueInput } from '../../types';
+import type { GlueInput } from '@zekel/glue-kit';
 import type { RollFacts } from '../facts';
 import { Icon, type IconName } from '../icons';
 import { Chance, OddsLine, Stakes } from './Facts';

@@ -5,8 +5,8 @@
 // engine says it leads to; a way the engine does not list is drawn shut
 // with the engine's reason.
 
-import type { LegalMove } from '../../types';
-import { asNum, asStr } from '../../types';
+import type { LegalMove } from '@zekel/glue-kit';
+import { asNum, asStr } from '@zekel/glue-kit';
 import { KIND } from '../cards';
 import { previewOf, reasonFor, words } from '../facts';
 import { Icon } from '../icons';

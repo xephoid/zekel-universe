@@ -5,8 +5,8 @@
 
 import { describe, expect, it, afterEach } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { Map as MapPart } from '@universe/primitives';
-import type { MapData, SelectEvent } from '@universe/primitives';
+import { Map as MapPart } from '@zekel/primitives';
+import type { MapData, SelectEvent } from '@zekel/primitives';
 
 afterEach(cleanup);
 

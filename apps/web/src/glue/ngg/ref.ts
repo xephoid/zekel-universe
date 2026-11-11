@@ -3,8 +3,8 @@
 // because it is what is printed on the components. Nothing here is a rule the
 // client evaluates; it is the text and numbers on the cards.
 
-import type { GameReferenceResponse } from '@universe/shared';
-import { asArr, asNum, asStr, isObj } from '../types';
+import type { GameReferenceResponse } from '@zekel/wire-types';
+import { asArr, asNum, asStr, isObj } from '@zekel/glue-kit';
 
 export type Cost = Partial<Record<Resource, number>>;
 export type Resource = 'water' | 'wood' | 'ore' | 'oil' | 'ether';

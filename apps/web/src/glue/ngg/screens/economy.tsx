@@ -11,7 +11,7 @@
 // the listed moves' at_base, and the payment is the one the engine proposes.
 
 import { Fragment, useEffect, useMemo, useState, type ReactNode } from 'react';
-import type { LegalMove } from '../../types';
+import type { LegalMove } from '@zekel/glue-kit';
 import type { ComponentType } from 'react';
 import type { ScreenCtx } from '../ctx';
 import type { ScreenKey } from '../route';

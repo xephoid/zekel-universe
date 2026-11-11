@@ -11,8 +11,8 @@
 // panel says so before the button is pressed.
 
 import { useEffect, useRef, useState } from 'react';
-import type { LegalMove } from '../../types';
-import { asStr } from '../../types';
+import type { LegalMove } from '@zekel/glue-kit';
+import { asStr } from '@zekel/glue-kit';
 import { abilityWords, percent, previewOf, reasonFor, type RollFacts } from '../facts';
 import { Icon, type IconName } from '../icons';
 import { moveById, type WwTable } from '../read';

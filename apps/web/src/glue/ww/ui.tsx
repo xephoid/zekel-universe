@@ -10,8 +10,8 @@ import { Hologram } from './holo';
 import { Icon, type IconName } from './icons';
 import { faceUrl } from './faces';
 import { platesLit, type Being, type Captain, type Leg, type Ship, type WwTable } from './read';
-import type { GameReferenceResponse } from '@universe/shared';
-import type { GlueInput } from '../types';
+import type { GameReferenceResponse } from '@zekel/wire-types';
+import type { GlueInput } from '@zekel/glue-kit';
 import { statGroups } from './read';
 import { abilityWords, deathCheckWords, endingWords, lossWords, words } from './facts';
 

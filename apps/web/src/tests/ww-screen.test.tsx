@@ -13,7 +13,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { GameReferenceResponse, LegalMove, UnavailableMove } from '@universe/shared';
-import type { GameScreenProps, GlueInput } from '../glue/types';
+import type { GameScreenProps, GlueInput } from '@zekel/glue-kit';
 import { WwScreen, modeOf } from '../glue/ww/WwScreen';
 import { readTable } from '../glue/ww/read';
 import { percent, previewOf } from '../glue/ww/facts';

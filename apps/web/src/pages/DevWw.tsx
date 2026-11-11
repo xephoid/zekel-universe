@@ -10,16 +10,18 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import type { GameReferenceResponse, LegalMove, UnavailableMove } from '@universe/shared';
-import { Card, CardZone, FlipRoot } from '@universe/primitives';
-import type { GlueInput } from '../glue';
-import { WwScreen } from '../glue/ww/WwScreen';
+import { Card, CardZone, FlipRoot } from '@zekel/primitives';
+import type { GlueInput } from '@zekel/glue-kit';
+import { warbleWayGlue, warbleWayGallery } from '../glue';
 import { api } from '../api';
-import '../glue/ww/ww.css';
-import { ICON_FILES, Icon, MEANINGS, MeaningIcon, type IconName, type Meaning } from '../glue/ww/icons';
-import { ATTACKERS, RACES, REDSHIRT, faceUrl } from '../glue/ww/faces';
-import { Hologram } from '../glue/ww/holo';
-import { deckIds, travelCard } from '../glue/ww/cards';
-import { TravelCard, TravelCardBack } from '../glue/ww/TravelCard';
+
+// The game's own screen, through its glue module (which also brings the
+// theme's stylesheet): the dev page reaches the game the same way the table
+// does. The gallery below the screen comes through the same door.
+const WwScreen = warbleWayGlue.Screen!;
+const { ICON_FILES, Icon, MEANINGS, MeaningIcon, ATTACKERS, RACES, REDSHIRT, faceUrl, Hologram, deckIds, travelCard, TravelCard, TravelCardBack } = warbleWayGallery;
+type IconName = warbleWayGallery.IconName;
+type Meaning = warbleWayGallery.Meaning;
 
 interface Fixture { key: string; viewer: string; view: unknown; legalMoves: LegalMove[]; unavailable?: UnavailableMove[] }
 const LOADERS = import.meta.glob<Fixture>('../tests/fixtures/ww/*.json', { import: 'default' });

@@ -6,8 +6,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, within } from '@testing-library/react';
 import type { GameReferenceResponse, LegalMove } from '@universe/shared';
-import type { GlueInput } from '../glue';
-import { isSubmissionAllowed } from '../glue/agency';
+import type { GlueInput } from '@zekel/glue-kit';
+import { isSubmissionAllowed } from '@zekel/glue-kit';
 import { NggScreen } from '../glue/ngg/NggScreen';
 import REFERENCE from './fixtures/ngg-reference.json';
 

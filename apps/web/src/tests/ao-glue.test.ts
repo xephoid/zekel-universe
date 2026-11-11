@@ -9,10 +9,11 @@ import { describe, expect, it } from 'vitest';
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { MapData, TableauData } from '@universe/primitives';
+import type { MapData, TableauData } from '@zekel/primitives';
 import type { LegalMove } from '@universe/shared';
-import { GLUES, isSubmissionAllowed } from '../glue';
-import type { GlueInput, PromptAction, Zone } from '../glue';
+import { GLUES } from '../glue';
+import { isSubmissionAllowed } from '@zekel/glue-kit';
+import type { GlueInput, PromptAction, Zone } from '@zekel/glue-kit';
 
 const g = GLUES['adventurer-olympics']!;
 const dir = path.join(path.dirname(fileURLToPath(import.meta.url)), 'fixtures', 'ao');

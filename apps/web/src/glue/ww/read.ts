@@ -5,8 +5,8 @@
 // whole table. A field the view does not carry reads as empty, never as a
 // guess.
 
-import type { GameReferenceResponse, LegalMove } from '@universe/shared';
-import { asArr, asNum, asStr, isObj } from '../types';
+import type { GameReferenceResponse, LegalMove } from '@zekel/wire-types';
+import { asArr, asNum, asStr, isObj } from '@zekel/glue-kit';
 import { travelCard, type TravelCardFace } from './cards';
 import { readLastRoll, readRollFacts, type LastRoll, type RollFacts } from './facts';
 

@@ -5,10 +5,10 @@
 // boroughs come from the engine's reference data; the map lays each borough
 // out as a band and spreads its locations across it.
 
-import type { CardData, MapNode, TableauData } from '@universe/primitives';
-import type { GameReferenceResponse } from '@universe/shared';
-import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, PlanPrompt, PromptAction, SelectEvent, SetupField, TablePlan, Zone, SetupAnswers, SetupSeat } from './types';
-import { asArr, asNum, asStr, isObj, shapeHas, words } from './types';
+import type { CardData, MapNode, TableauData } from '@zekel/primitives';
+import type { GameReferenceResponse } from '@zekel/wire-types';
+import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, PlanPrompt, PromptAction, SelectEvent, SetupField, TablePlan, Zone, SetupAnswers, SetupSeat } from '@zekel/glue-kit';
+import { asArr, asNum, asStr, isObj, shapeHas, words } from '@zekel/glue-kit';
 import { BOROUGH_COLUMNS, LINE_CODES, LINES, STATIONS, columnOf, pct } from './cn/metro';
 import { faceUrl, markUrl } from './cn/faces';
 import './cn/cn.css';

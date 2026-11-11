@@ -74,9 +74,15 @@ apps/
   web/           React + Vite; the browser app
 packages/
   engine-client/ typed wrapper over the engine's tools; the only MCP code
-  shared/        types shared by server and web (tables, seats, events, views)
-  primitives/    the eight board primitives as React components
-  tokens/        design tokens as CSS variables and TypeScript
+  shared/        types shared by server and web (people, tables, events)
+  wire-types/    @zekel/wire-types: the three shapes a game's drawing code
+                 reads (a legal move, an unavailable move, reference data)
+  primitives/    @zekel/primitives: the eight board primitives as React components
+  glue-kit/      @zekel/glue-kit: the rules a game's drawing code follows (the
+                 glue module interface, the table plan, agency, forms, identity)
+                 and the table furniture a game may draw (sheet, move form,
+                 pace), with its own stylesheet
+  tokens/        @zekel/tokens: design tokens as CSS variables and TypeScript
 infra/
   docker-compose.yml   engine + server + web + postgres, one command
 ```
@@ -90,7 +96,34 @@ never sees either.
 
 **apps/web.** React with Vite. Routes for home, game page, table setup, lobby,
 table, profile, sign-in. The table route hosts a game glue module that maps
-the seat's view onto primitives.
+the seat's view onto primitives. The games' glue sits under `src/glue/<game>`
+behind a wall the test `glue-boundary.test.ts` keeps: a glue imports only
+from its own folder, the workspace packages and React, and the rest of the
+app reaches a game only through the list in `glue/index.ts`. The games are
+moving to their own packages in the public zekel-games repository, one
+`@zekel/<game>` package per game with the rules and the drawing code as two
+halves that never import each other.
+
+**packages/glue-kit.** What every glue is written against: `GlueModule`,
+`GlueInput`, `TablePlan`, the setup fields, the agency rules (`submitMove`
+and the five triggers), template forms, card identity across views, and the
+zone renderer. A glue with a moment (Fractured Fist's strike) supplies its own
+overlay component; the kit holds only the moment's key, title and whether the
+game ended. The kit also holds the sheet (the table's one dialog), the move
+form sheet and the pace control, the furniture a game's own screen may draw,
+with their styles (`@zekel/glue-kit/css`). The rest of the table's furniture
+stays in `apps/web/src/table/parts.tsx`.
+
+**Published packages.** Four packages are public on npm under the `@zekel`
+scope so that game authors can write a game's drawing code against them:
+`wire-types`, `tokens`, `primitives` and `glue-kit`, in that dependency
+order. Each has a `LICENSE`, a `README.md`, a `files` list and
+`publishConfig.access: public`. Inside this workspace they link to each other
+with `workspace:^`, which `pnpm publish` rewrites to the released version;
+`npm publish` would ship the link unchanged, so always publish with pnpm.
+The server, the web app, `engine-client` and `shared` stay private under
+`@universe`; `shared` re-exports the three wire types so the apps keep one
+import.
 
 **packages/engine-client.** One class with one method per engine tool.
 Connects with the official MCP client SDK over streamable HTTP with the

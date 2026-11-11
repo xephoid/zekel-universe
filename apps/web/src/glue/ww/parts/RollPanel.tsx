@@ -7,8 +7,8 @@
 // resolve_report; a toggle sends the listed use_item.
 
 import { useEffect, useRef } from 'react';
-import type { GlueInput, LegalMove } from '../../types';
-import { asArr, asNum, asStr, isObj } from '../../types';
+import type { GlueInput, LegalMove } from '@zekel/glue-kit';
+import { asArr, asNum, asStr, isObj } from '@zekel/glue-kit';
 import { previewOf } from '../facts';
 import { Icon } from '../icons';
 import { statGroups, type WwTable } from '../read';

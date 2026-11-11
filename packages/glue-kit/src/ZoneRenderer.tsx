@@ -2,9 +2,9 @@
 // the select callback through. Unknown views render as a JSON inspector.
 
 import type { ReactNode } from 'react';
-import { Bag, CardZone, Grid, Map, Pool, Tableau, Track } from '@universe/primitives';
-import type { SelectEvent } from '@universe/primitives';
-import type { Zone } from './types';
+import { Bag, CardZone, Grid, Map, Pool, Tableau, Track } from '@zekel/primitives';
+import type { SelectEvent } from '@zekel/primitives';
+import type { Zone } from './types.js';
 
 interface Props {
   zone: Zone;

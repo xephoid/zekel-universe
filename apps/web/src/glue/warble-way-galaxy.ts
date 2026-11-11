@@ -5,12 +5,12 @@
 // progress from xp_to_next_level, the season finish lines from
 // season_endings. Nothing here knows a threshold.
 
-import type { CardData, GridData, TableauData } from '@universe/primitives';
-import type { GameReferenceResponse } from '@universe/shared';
-import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, SelectEvent, SetupAnswers, SetupField, SetupSeat, TablePlan, Zone } from './types';
-import { asArr, asNum, asStr, isObj, shapeHas, words } from './types';
+import type { CardData, GridData, TableauData } from '@zekel/primitives';
+import type { GameReferenceResponse } from '@zekel/wire-types';
+import type { FormField, GlueModule, GlueInput, LegalMove, MoveForm, SelectEvent, SetupAnswers, SetupField, SetupSeat, TablePlan, Zone } from '@zekel/glue-kit';
+import { asArr, asNum, asStr, isObj, shapeHas, words } from '@zekel/glue-kit';
 import { abilityWords, words as factWords } from './ww/facts';
-import { answerNumber, answerText } from './forms';
+import { answerNumber, answerText } from '@zekel/glue-kit';
 import { GLYPH, KIND, travelCard } from './ww/cards';
 import { faceUrl } from './ww/faces';
 import { WwScreen } from './ww/WwScreen';

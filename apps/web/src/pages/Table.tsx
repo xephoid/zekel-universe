@@ -10,13 +10,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import type { LegalMove } from '@universe/shared';
-import { Die, FlipRoot, paletteVars, useSystemReducedMotion, type CardData, type SelectEvent } from '@universe/primitives';
-import { glueFor, submitMove, type GlueInput, formForMove, movesForSelect } from '../glue';
-import type { MoveForm, FormContext, Moment, PromptAction } from '../glue';
-import { BoardZones, JsonInspector, ZoneRenderer } from '../glue/ZoneRenderer';
+import { Die, FlipRoot, paletteVars, useSystemReducedMotion, type CardData, type SelectEvent } from '@zekel/primitives';
+import { glueFor } from '../glue';
+import { BoardZones, JsonInspector, MoveFormSheet, PaceControl, Sheet, ZoneRenderer, formForMove, movesForSelect, submitMove } from '@zekel/glue-kit';
+import type { GlueInput, MoveForm, FormContext, Moment, PromptAction } from '@zekel/glue-kit';
 import { useTable } from '../table/useTable';
-import { ActionBar, CaptionWords, CardUpClose, LessonNote, EndPanel, Log, MoveChooser, MoveFormSheet, MoveMenuList, NoticeToast, PaceControl, Sheet, findCard, lessonsOf, type Lesson, type Notice, Notices } from '../table/parts';
-import { StrikeOverlay } from '../table/StrikeMoment';
+import { ActionBar, CaptionWords, CardUpClose, LessonNote, EndPanel, Log, MoveChooser, MoveMenuList, NoticeToast, findCard, lessonsOf, type Lesson, type Notice, Notices } from '../table/parts';
 import { usePhone } from '../table/phone';
 import { api } from '../api';
 import { useSession } from '../session';
@@ -168,10 +167,12 @@ export function TablePage() {
     : null;
 
   // A moment plays before its event lands: the queue holds the event, the
-  // glue reads the strike from the view on screen and the one arriving, the
-  // overlay plays it, and only then does the board change underneath.
+  // glue reads the moment (a strike) from the view on screen and the one
+  // arriving, the glue's own overlay plays it, and only then does the board
+  // change underneath. Only the glue's overlay can say the moment is over,
+  // so a glue with no overlay gets no gate: its events land as they arrive.
   useEffect(() => {
-    if (!glue?.momentFor) { playback.setGate(null); return; }
+    if (!glue?.momentFor || !glue.Moment) { playback.setGate(null); return; }
     playback.setGate(async (next, cur) => {
       const m = glue.momentFor!({ before: cur?.view ?? null, after: next.view, summary: next.summary, engineMove: next.engineMove, playerId: next.playerId, reference: t.reference });
       if (!m) return;
@@ -183,6 +184,9 @@ export function TablePage() {
   const momentDone = useCallback(() => {
     setMoment((cur) => { cur?.resolve(); return null; });
   }, []);
+  // A moment belongs to the table and the game it started on. Leaving either
+  // ends it, so the queue it was holding is free for the next table.
+  useEffect(() => () => { setMoment((cur) => { cur?.resolve(); return null; }); }, [id, glue]);
 
   const send = useCallback(async (trigger: 'tap' | 'resolve_report_button' | 'form' | 'batch', move: Record<string, unknown>, formContext?: FormContext) => {
     if (busy) return;
@@ -454,8 +458,8 @@ export function TablePage() {
       {/* What happened that this seat must acknowledge (a loss, an answer, a spy). */}
       {id && <Notices events={state.applied} me={myPlayerId} storeKey={`zk-notices:${id}`} />}
 
-      {moment && table && (
-        <StrikeOverlay key={`${moment.seq}:${state.tick}`} moment={moment.m} nameFor={nameFor} youPid={myPlayerId} pace={playback.pace} setPace={playback.setPace} onDone={momentDone} reduced={reduced} />
+      {moment && table && glue?.Moment && (
+        <glue.Moment key={`${moment.seq}:${state.tick}`} moment={moment.m} nameFor={nameFor} youPid={myPlayerId} pace={playback.pace} setPace={playback.setPace} onDone={momentDone} reduced={reduced} />
       )}
 
       {chooser && yourTurn && <MoveChooser moves={chooser} onPick={pick} onClose={() => setChooser(null)} disabled={busy} />}

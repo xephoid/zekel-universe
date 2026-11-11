@@ -5,7 +5,7 @@
 
 import { describe, expect, it, afterEach } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
-import { Pool, Track } from '@universe/primitives';
+import { Pool, Track } from '@zekel/primitives';
 
 afterEach(cleanup);
 

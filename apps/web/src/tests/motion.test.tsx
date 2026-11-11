@@ -4,7 +4,7 @@
 
 import { describe, expect, it, afterEach, beforeAll, afterAll, vi } from 'vitest';
 import { cleanup, render } from '@testing-library/react';
-import { FlipRoot } from '@universe/primitives';
+import { FlipRoot } from '@zekel/primitives';
 
 afterEach(cleanup);
 

@@ -1,6 +1,7 @@
 import './fonts.css';
-import '@universe/tokens/css';
-import '@universe/primitives/css';
+import '@zekel/tokens/css';
+import '@zekel/primitives/css';
+import '@zekel/glue-kit/css';
 import './app.css';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';

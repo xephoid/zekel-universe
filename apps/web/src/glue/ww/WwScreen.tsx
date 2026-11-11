@@ -7,8 +7,8 @@
 
 import { useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import type { GameScreenProps } from '../types';
-import { asStr } from '../types';
+import type { GameScreenProps } from '@zekel/glue-kit';
+import { asStr } from '@zekel/glue-kit';
 import { readTable, type WwTable } from './read';
 import { Credits, CrewPanel, DamagePlates, GalaxyStrip, JourneyPanel, Lbl, Num, Sheet, ShipPanel, legWords, missionTitles } from './ui';
 import { Icon } from './icons';

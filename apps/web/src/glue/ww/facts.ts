@@ -4,8 +4,8 @@
 // these; it never works a chance, a reason or a consequence out for itself.
 // A field the engine did not send reads as absent, never as a guess.
 
-import type { GameReferenceResponse, LegalMove, UnavailableMove } from '@universe/shared';
-import { asArr, asNum, asStr, isObj } from '../types';
+import type { GameReferenceResponse, LegalMove, UnavailableMove } from '@zekel/wire-types';
+import { asArr, asNum, asStr, isObj } from '@zekel/glue-kit';
 
 export interface RollPart { label: string; bonus: number; kind: string; ability?: string; who?: string }
 export interface Pairing { youTake: 'higher' | 'lower'; why: string; yourAdd: number; theirAdd: number; theirName: string; riderDice: number; win: number; tie: number; lose: number }
