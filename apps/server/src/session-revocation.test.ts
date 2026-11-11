@@ -121,6 +121,7 @@ describe('sign-in binding and socket revocation', () => {
 
   afterEach(async () => {
     vi.restoreAllMocks();
+    vi.useRealTimers();
     for (const s of sockets) s.close();
     sockets = [];
     await app.fastify.close();
@@ -518,15 +519,29 @@ describe('sign-in binding and socket revocation', () => {
     expect(await seatOwners(tableId)).toEqual(before);
   });
 
-  it("a new guest's expiry is exactly its lifetime after its creation time, even when the clock moves between reads", async () => {
-    // Every Date.now() read during the request lands 1 ms after the real
-    // clock, so two separate clock reads can never agree. The stored times
-    // must both come from one reading.
-    const real = Date.now.bind(Date);
-    vi.spyOn(Date, 'now').mockImplementation(() => real() + 1);
-    const g = await guest();
-    vi.restoreAllMocks();
+  it("a new guest's expiry is exactly its lifetime after its creation time, even when the two clock sources disagree", async () => {
+    // Both clock sources are fixed, at deliberately different values: a bare
+    // `new Date()` reads DATE_AT and `Date.now()` reads NOW_AT. The real
+    // clock is never consulted, so code that took the two stored times from
+    // separate reads (one of each kind) stores them 7 ms off the lifetime,
+    // whatever the wall clock does. Only Date is faked; timers stay real.
+    const DATE_AT = Date.now() - 60_000;
+    const NOW_AT = DATE_AT + 7;
+    let g: string;
+    try {
+      vi.useFakeTimers({ toFake: ['Date'], now: DATE_AT });
+      vi.spyOn(Date, 'now').mockReturnValue(NOW_AT);
+      // The two sources really do disagree while the request runs.
+      expect(new Date().getTime()).toBe(DATE_AT);
+      expect(Date.now()).toBe(NOW_AT);
+      g = await guest();
+    } finally {
+      vi.restoreAllMocks();
+      vi.useRealTimers();
+    }
     const row = await db.selectFrom('guests').select(['expires_at', 'created_at']).executeTakeFirstOrThrow();
+    // The stored creation time came from the controlled clock, not the real one.
+    expect([DATE_AT, NOW_AT].map((t) => new Date(t).toISOString())).toContain(row.created_at);
     const iso = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
     expect(row.created_at).toMatch(iso);
     expect(row.expires_at).toMatch(iso);
