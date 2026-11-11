@@ -22,7 +22,7 @@ import { ConsoleMailer } from './email.js';
 import { buildApp, type UniverseApp } from './app.js';
 import { createSocketServer } from './sockets.js';
 import { FakeEngine } from './test-engine.js';
-import { GUEST_TTL_MS } from './auth.js';
+import { GUEST_TTL_MS, SESSION_TTL_MS } from './auth.js';
 
 const ORIGIN = 'http://localhost:5173';
 
@@ -120,6 +120,7 @@ describe('sign-in binding and socket revocation', () => {
   });
 
   afterEach(async () => {
+    vi.restoreAllMocks();
     for (const s of sockets) s.close();
     sockets = [];
     await app.fastify.close();
@@ -978,6 +979,30 @@ describe('sign-in binding and socket revocation', () => {
 
   // ---- fourth review: the check right before the engine call, and acks ----
 
+  /** The server's own promises for every move and undo it starts from now
+   *  on, so a test can wait for an action to finish, however it ends,
+   *  before asserting what it did not do. */
+  function serverActions(): { settled: () => Promise<void>; count: () => number } {
+    const runs: Promise<unknown>[] = [];
+    const handleMove = app.realtime.handleMove.bind(app.realtime);
+    const handleUndo = app.realtime.handleUndo.bind(app.realtime);
+    app.realtime.handleMove = (...args: Parameters<typeof handleMove>) => { const r = handleMove(...args); runs.push(r); return r; };
+    app.realtime.handleUndo = (...args: Parameters<typeof handleUndo>) => { const r = handleUndo(...args); runs.push(r); return r; };
+    return {
+      settled: async () => { await Promise.allSettled(runs); },
+      count: () => runs.length,
+    };
+  }
+
+  /** Move the server's clock (Date.now) forward without touching timers. */
+  function clock(): { advance: (ms: number) => void; reset: () => void } {
+    const real = Date.now.bind(Date);
+    let offset = 0;
+    vi.spyOn(Date, 'now').mockImplementation(() => real() + offset);
+    return { advance: (ms) => { offset += ms; }, reset: () => { offset = 0; } };
+  }
+  const PAST_SESSION_EXPIRY = SESSION_TTL_MS + 60_000;
+
   /** Hold the next host-token read: the last await before an engine call. */
   function holdHostToken(): { reached: Promise<void>; open: () => void } {
     const hostToken = app.tableService.hostToken.bind(app.tableService);
@@ -999,6 +1024,7 @@ describe('sign-in binding and socket revocation', () => {
     const tableId = await aiTable(auth);
     const s = await seated(auth, tableId);
     const sent = serverSends(s);
+    const actions = serverActions();
     const gap = holdHostToken();
     const acks: MoveAck[] = [];
     s.emit('move', { tableId, seat: 0, move: { type: 'pass', marker: 'gap' } }, (a: MoveAck) => acks.push(a));
@@ -1012,6 +1038,9 @@ describe('sign-in binding and socket revocation', () => {
     held.open();
     expect((await out).statusCode).toBe(200);
     expect(await cut).toBe('io server disconnect');
+    // Wait for the move itself to finish on the server, however it ends.
+    expect(actions.count()).toBe(1);
+    await actions.settled();
 
     expect(engine.applied.some((a) => a.move['marker'] === 'gap')).toBe(false);
     const rows = await db.selectFrom('table_events').selectAll().where('table_id', '=', tableId).execute();
@@ -1030,6 +1059,7 @@ describe('sign-in binding and socket revocation', () => {
     let undoCalls = 0;
     engine.undo = async (...args: Parameters<FakeEngine['undo']>) => { undoCalls++; return undo(...args); };
 
+    const actions = serverActions();
     const gap = holdHostToken();
     const acks: unknown[] = [];
     s.emit('undo', { tableId }, (a: unknown) => acks.push(a));
@@ -1042,6 +1072,8 @@ describe('sign-in binding and socket revocation', () => {
     held.open();
     expect((await out).statusCode).toBe(200);
     expect(await cut).toBe('io server disconnect');
+    expect(actions.count()).toBe(1);
+    await actions.settled();
 
     expect(undoCalls).toBe(0);
     expect((await db.selectFrom('table_events').select('id').where('table_id', '=', tableId).execute()).length).toBe(eventsBefore);
@@ -1086,5 +1118,180 @@ describe('sign-in binding and socket revocation', () => {
     const ok = await new Promise<MoveAck>((r) => s2.emit('move', { tableId: table2, seat: 0, move: { type: 'illegal' } }, r));
     expect(ok).toMatchObject({ error: expect.any(String) });
     expect((ok as { legalMoves?: unknown[] }).legalMoves?.length ?? 0).toBeGreaterThan(0);
+  });
+
+  // ---- fifth review: natural expiry across an action ------------------------
+
+  it('a move whose last credential read returns after the session expired never reaches the engine; a live one does', async () => {
+    const auth = await signIn('p@example.com');
+    const tableId = await aiTable(auth);
+    const s = await seated(auth, tableId);
+    const t = clock();
+    const actions = serverActions();
+    const gap = holdHostToken();
+    const acks: MoveAck[] = [];
+    s.emit('move', { tableId, seat: 0, move: { type: 'pass', marker: 'late' } }, (a: MoveAck) => acks.push(a));
+    await gap.reached;
+    // The next session read is the one right before the engine call: hold
+    // it after it has read the (still valid) row, then let the session expire.
+    const read = inject.pauseAfter('select:auth_sessions');
+    const cut = disconnected(s);
+    gap.open();
+    await read.reached;
+    t.advance(PAST_SESSION_EXPIRY);
+    read.open();
+    // The refused check cuts the socket; wait for that and for the move
+    // itself to finish on the server before asserting what it did not do.
+    expect(await cut).toBe('io server disconnect');
+    expect(actions.count()).toBe(1);
+    await actions.settled();
+    expect(engine.applied.some((a) => a.move['marker'] === 'late')).toBe(false);
+    expect(acks.every((a) => !('ok' in a))).toBe(true);
+    const rows = await db.selectFrom('table_events').selectAll().where('table_id', '=', tableId).execute();
+    expect(JSON.stringify(rows)).not.toContain('late');
+
+    // Positive control: with the clock back, a fresh session moves.
+    t.reset();
+    const live = await seated(await signIn('p@example.com'), tableId);
+    expect(await move(live, tableId)).toMatchObject({ ok: true });
+  });
+
+  it('an undo whose last credential read returns after the session expired never reaches the engine; a live one does', async () => {
+    const auth = await signIn('p@example.com');
+    const tableId = await aiTable(auth);
+    const s = await seated(auth, tableId);
+    expect(await move(s, tableId)).toMatchObject({ ok: true });
+    const eventsBefore = (await db.selectFrom('table_events').select('id').where('table_id', '=', tableId).execute()).length;
+    const undo = engine.undo.bind(engine);
+    let undoCalls = 0;
+    engine.undo = async (...args: Parameters<FakeEngine['undo']>) => { undoCalls++; return undo(...args); };
+    const t = clock();
+    const actions = serverActions();
+    const gap = holdHostToken();
+    const acks: unknown[] = [];
+    s.emit('undo', { tableId }, (a: unknown) => acks.push(a));
+    await gap.reached;
+    const read = inject.pauseAfter('select:auth_sessions');
+    const cut = disconnected(s);
+    gap.open();
+    await read.reached;
+    t.advance(PAST_SESSION_EXPIRY);
+    read.open();
+    expect(await cut).toBe('io server disconnect');
+    expect(actions.count()).toBe(1);
+    await actions.settled();
+    expect(acks.every((a) => !(a as { ok?: boolean }).ok)).toBe(true);
+    expect(undoCalls).toBe(0);
+    expect((await db.selectFrom('table_events').select('id').where('table_id', '=', tableId).execute()).length).toBe(eventsBefore);
+
+    t.reset();
+    const live = await seated(await signIn('p@example.com'), tableId);
+    expect(await new Promise<{ ok?: boolean }>((r) => live.emit('undo', { tableId }, r))).toMatchObject({ ok: true });
+    expect(undoCalls).toBe(1);
+  });
+
+  it('a rejection in flight across expiry sends no legal moves; a live session still gets them', async () => {
+    const auth = await signIn('p@example.com');
+    const tableId = await aiTable(auth);
+    const s = await seated(auth, tableId);
+    const t = clock();
+    const applyMove = engine.applyMove.bind(engine);
+    let release!: () => void;
+    let inEngine!: () => void;
+    const reached = new Promise<void>((r) => { inEngine = r; });
+    const gateOpen = new Promise<void>((r) => { release = r; });
+    let armed = true;
+    engine.applyMove = async (...args: Parameters<FakeEngine['applyMove']>) => {
+      if (armed) { armed = false; inEngine(); await gateOpen; }
+      return applyMove(...args);
+    };
+    const ack = new Promise<MoveAck>((r) => s.emit('move', { tableId, seat: 0, move: { type: 'illegal' } }, r));
+    await reached;
+    const cut = disconnected(s);
+    t.advance(PAST_SESSION_EXPIRY);
+    release();
+    const got = await ack;
+    expect(got).toMatchObject({ error: 'unauthorized' });
+    expect(JSON.stringify(got)).not.toMatch(/legal|lesson|turn order/i);
+    expect(await cut).toBe('io server disconnect');
+
+    t.reset();
+    const live = await seated(await signIn('p@example.com'), tableId);
+    const ok = await new Promise<MoveAck>((r) => live.emit('move', { tableId, seat: 0, move: { type: 'illegal' } }, r));
+    expect((ok as { legalMoves?: unknown[] }).legalMoves?.length ?? 0).toBeGreaterThan(0);
+  });
+
+  it('a query answered across expiry sends no answer; a live session still gets one', async () => {
+    const auth = await signIn('p@example.com');
+    const tableId = await aiTable(auth);
+    const s = await seated(auth, tableId);
+    const t = clock();
+    const queryChoice = engine.queryChoice.bind(engine);
+    let release!: () => void;
+    let inEngine!: () => void;
+    const reached = new Promise<void>((r) => { inEngine = r; });
+    const gateOpen = new Promise<void>((r) => { release = r; });
+    let armed = true;
+    engine.queryChoice = async (...args: Parameters<FakeEngine['queryChoice']>) => {
+      if (armed) { armed = false; inEngine(); await gateOpen; }
+      return queryChoice(...args);
+    };
+    const ask = (sock: ClientSocket) => new Promise<{ ok?: boolean; answer?: unknown; error?: string }>((r) =>
+      sock.emit('query', { tableId, seat: 0, name: 'echo', args: { marker: 'secret-answer' } }, r));
+    const ack = ask(s);
+    await reached;
+    const cut = disconnected(s);
+    t.advance(PAST_SESSION_EXPIRY);
+    release();
+    const got = await ack;
+    expect(got).toMatchObject({ error: 'unauthorized' });
+    expect(got).not.toHaveProperty('answer');
+    expect(JSON.stringify(got)).not.toContain('secret-answer');
+    expect(await cut).toBe('io server disconnect');
+
+    t.reset();
+    const live = await seated(await signIn('p@example.com'), tableId);
+    const ok = await ask(live);
+    expect(ok).toMatchObject({ ok: true });
+    expect(ok).toHaveProperty('answer');
+  });
+
+  it('the periodic recheck compares the expiry with the time after its read', async () => {
+    const auth = await signIn('p@example.com');
+    const tableId = await aiTable(auth);
+    const s = await seated(auth, tableId);
+    const t = clock();
+    const read = inject.pauseAfter('select:auth_sessions');
+    const cut = disconnected(s);
+    const recheck = app.recheckSockets();
+    await read.reached;
+    t.advance(PAST_SESSION_EXPIRY);
+    read.open();
+    expect(await recheck).toBe(1);
+    expect(await cut).toBe('io server disconnect');
+  });
+
+  it('the action wait covers a move released only after its socket was cut', async () => {
+    const auth = await signIn('p@example.com');
+    const tableId = await aiTable(auth);
+    const s = await seated(auth, tableId);
+    const actions = serverActions();
+    const gap = holdHostToken();
+    s.emit('move', { tableId, seat: 0, move: { type: 'pass', marker: 'after-cut' } }, () => {});
+    await gap.reached;
+    const cut = disconnected(s);
+    expect((await post('/api/auth/signout', auth)).statusCode).toBe(200);
+    expect(await cut).toBe('io server disconnect');
+
+    // The move is still held: the wait must not have finished yet.
+    let finished = false;
+    const done = actions.settled().then(() => { finished = true; });
+    await Promise.resolve();
+    expect(actions.count()).toBe(1);
+    expect(finished).toBe(false);
+    gap.open();
+    await done;
+    expect(finished).toBe(true);
+    expect(engine.applied.some((a) => a.move['marker'] === 'after-cut')).toBe(false);
   });
 });

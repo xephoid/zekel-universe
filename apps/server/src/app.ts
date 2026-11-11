@@ -211,21 +211,21 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
 
   /** Does a credential read when a socket opened still work? Returns its
    *  current expiry, or null when it has been signed out, upgraded or has
-   *  expired. */
+   *  expired. The expiry is compared with the time after the read: a read
+   *  that started just before expiry and returned after it says expired. */
   async function credentialExpiry(c: Credential): Promise<number | null> {
-    const at = Date.now();
-    if (c.expiresAt <= at) return null;
+    if (c.expiresAt <= Date.now()) return null;
     if (c.kind === 'session') {
       const row = await db.selectFrom('auth_sessions').select('expires_at')
         .where('token_hash', '=', c.tokenHash).executeTakeFirst();
       const expiresAt = row ? new Date(row.expires_at).getTime() : 0;
-      return expiresAt > at ? expiresAt : null;
+      return expiresAt > Date.now() ? expiresAt : null;
     }
     const row = await db.selectFrom('guests').select(['upgraded_to_user_id', 'created_at', 'expires_at'])
       .where('id', '=', c.guestId).executeTakeFirst();
     if (!row || row.upgraded_to_user_id) return null;
     const expiresAt = guestExpiresAt(row);
-    return expiresAt > at ? expiresAt : null;
+    return expiresAt > Date.now() ? expiresAt : null;
   }
 
   /** Credential rooms whose revocation is in progress, with a count for
@@ -1295,7 +1295,15 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
 
       /** Nothing known against this socket right now (no database read):
        *  connected, checked, and not being revoked. */
-      const usable = () => socket.connected && socket.data.verified === true && !isRevoked(socket);
+      const usable = () => socket.connected && socket.data.verified === true && !isRevoked(socket)
+        && credential.expiresAt > Date.now();
+
+      /** Answer a refused ack. A socket whose credential has expired is cut
+       *  too (a revoked one is cut by its revocation, after the reply). */
+      const refuseEnded = (respond: (r: never) => void, field: 'reason' | 'message') => {
+        respond({ error: 'unauthorized', [field]: ENDED } as never);
+        if (credential.expiresAt <= Date.now()) socket.disconnect(true);
+      };
 
       /** For an action waiting in its table's queue: asked when it reaches
        *  the front, so a sign-out while it waited stops it. */
@@ -1416,12 +1424,12 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
             return respond({ error: 'bad_request' });
           }
           const result = await realtime.handleMove(principal, msg.tableId, msg.seat, msg.move, allowed);
-          if (!usable()) return respond({ error: 'unauthorized', reason: ENDED });
+          if (!usable()) return refuseEnded(respond, 'reason');
           respond({ ok: true, lastSeq: result.lastSeq });
         } catch (err) {
           // An answer from the engine (a rejection with this seat's legal
           // moves, its reasons) never goes to a socket revoked meanwhile.
-          if (!usable()) return respond({ error: 'unauthorized', reason: ENDED });
+          if (!usable()) return refuseEnded(respond, 'reason');
           if (err instanceof MoveError) {
             respond({ error: err.code, reason: err.reason ?? err.message, lesson: err.lesson, legalMoves: err.legalMoves });
           } else {
@@ -1455,10 +1463,10 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
           const answer = await realtime.handleQuery(principal, msg.tableId, msg.seat, msg.name, args as Record<string, unknown>);
           // The answer is about this seat's private choices: none goes to a
           // socket revoked while the engine was asked.
-          if (!usable()) return respond({ error: 'unauthorized', reason: ENDED });
+          if (!usable()) return refuseEnded(respond, 'reason');
           respond({ ok: true, answer });
         } catch (err) {
-          if (!usable()) return respond({ error: 'unauthorized', reason: ENDED });
+          if (!usable()) return refuseEnded(respond, 'reason');
           if (err instanceof MoveError) respond({ error: err.code, reason: err.reason ?? err.message });
           else {
             app.log.error(err);
@@ -1472,10 +1480,10 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
         try {
           if (!msg?.tableId) return respond({ error: 'bad_request' });
           const result = await realtime.handleUndo(principal, msg.tableId, allowed);
-          if (!usable()) return respond({ error: 'unauthorized', message: ENDED });
+          if (!usable()) return refuseEnded(respond, 'message');
           respond({ ok: true, seq: result.seq });
         } catch (err) {
-          if (!usable()) return respond({ error: 'unauthorized', message: ENDED });
+          if (!usable()) return refuseEnded(respond, 'message');
           if (err instanceof MoveError) respond({ error: err.code, message: err.message });
           else {
             app.log.error(err);
