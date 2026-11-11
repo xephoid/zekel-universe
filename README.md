@@ -108,8 +108,9 @@ docker compose -f infra/docker-compose.yml up --build
 The server is a plain Node process (`node apps/server/dist/index.js`) that
 serves the built web app and refuses to start without `SECRET_KEY`,
 `ENGINE_TOKEN`, `ENGINE_URL`, `APP_ORIGIN`, and a Postgres `DATABASE_URL`.
-Set `RESEND_API_KEY` to send sign-in links by email. Staging runs on Render
-from [`render.yaml`](render.yaml); the steps are in
+Set `RESEND_API_KEY` to send sign-in links by email. Staging is the existing
+ngrok deployment. Render is for production only, created at launch from
+[`render.yaml`](render.yaml) once the staging checks pass; the steps are in
 [docs/deploy-render.md](docs/deploy-render.md). The server can also take the
 engine as `ENGINE_HOSTPORT` (host:port) instead of `ENGINE_URL`, and behind
 Render reads the client address from `CLIENT_IP_HEADER=cf-connecting-ip`.
