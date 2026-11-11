@@ -183,6 +183,80 @@ describe('sign-in binding and socket revocation', () => {
     s.once('connect_error', (err) => resolve(err.message));
   });
   const disconnected = (s: ClientSocket) => new Promise<string>((resolve) => s.once('disconnect', (reason) => resolve(reason)));
+  /** Every acknowledgement the server attempts, recorded on the server at
+   *  Socket.IO's own ack function, so a reply sent after the socket was cut
+   *  (and so never received) is still seen. Instruments the sockets open now
+   *  and every socket that connects later. `substitute` lets a test swap
+   *  in a wrong reply, to prove the checks below can fail. */
+  interface AckLog {
+    /** `body` is what was sent; `original` what the handler made (they
+     *  differ only under `substitute`). */
+    attempts: { socketId: string; event: string; body: unknown; original: unknown; connected: boolean }[];
+    received: string[];
+    /** Resolves once `n` acks for `event` have been attempted. */
+    waitForAck(event: string, n?: number): Promise<void>;
+    /** Resolves once the server has received a packet for `event`. */
+    waitForPacket(event: string): Promise<void>;
+    substitute: ((body: unknown) => unknown) | null;
+  }
+  function recordAcks(): AckLog {
+    const waiters: (() => void)[] = [];
+    const log: AckLog = {
+      attempts: [], received: [], substitute: null,
+      waitForAck: (event, n = 1) => until(() => log.attempts.filter((a) => a.event === event).length >= n),
+      waitForPacket: (event) => until(() => log.received.includes(event)),
+    };
+    function until(done: () => boolean): Promise<void> {
+      return new Promise<void>((resolve) => {
+        const check = () => { if (done()) { resolve(); return true; } return false; };
+        if (!check()) waiters.push(() => { check(); });
+      });
+    }
+    const notify = () => { for (const w of [...waiters]) w(); };
+    type Raw = { id: string; connected: boolean; onevent(p: { id?: number; data?: unknown[] }): void; ack(id: number): (...a: unknown[]) => void };
+    const instrument = (sock: unknown) => {
+      const raw = sock as Raw;
+      const onevent = raw.onevent.bind(raw);
+      const ack = raw.ack.bind(raw);
+      let event = '';
+      raw.onevent = (packet) => {
+        event = String(packet.data?.[0] ?? '');
+        log.received.push(event);
+        notify();
+        onevent(packet);
+      };
+      raw.ack = (id) => {
+        const name = event;
+        const send = ack(id);
+        return (...args: unknown[]) => {
+          const body = log.substitute ? log.substitute(args[0]) : args[0];
+          log.attempts.push({ socketId: raw.id, event: name, body, original: args[0], connected: raw.connected });
+          notify();
+          return send(body);
+        };
+      };
+    };
+    for (const sock of io.of('/').sockets.values()) instrument(sock);
+    io.on('connection', instrument);
+    return log;
+  }
+
+  const ENDED_TEXT = 'Your session has ended. Sign in again.';
+  /** Exactly `n` attempted replies for `event`, each a bare `unauthorized`
+   *  with the ended text and nothing from the engine. */
+  function expectOnlyEnded(log: AckLog, event: string, n = 1): void {
+    const mine = log.attempts.filter((a) => a.event === event);
+    expect(mine).toHaveLength(n);
+    for (const { body } of mine) {
+      const b = body as Record<string, unknown>;
+      expect(b.error).toBe('unauthorized');
+      for (const [k, v] of Object.entries(b)) {
+        expect(['error', 'reason', 'message']).toContain(k);
+        if (k !== 'error') expect(v).toBe(ENDED_TEXT);
+      }
+    }
+  }
+
   const join = (s: ClientSocket, tableId: string) =>
     new Promise<JoinTableAck>((r) => s.emit('join_table', { tableId }, r));
   const move = (s: ClientSocket, tableId: string) =>
@@ -539,25 +613,26 @@ describe('sign-in binding and socket revocation', () => {
       return addAll(id, rooms);
     };
 
+    const log = recordAcks();
     const s = client(auth);
     const events: TableEventWire[] = [];
     s.on('table_event', (e: TableEventWire) => events.push(e));
     await connected(s);
     await g.reached;
-    const acks: JoinTableAck[] = [];
-    s.emit('join_table', { tableId }, (a: JoinTableAck) => acks.push(a));
-    // Give a join that skipped the wait the chance to finish first.
-    await new Promise((r) => setTimeout(r, 100));
+    s.emit('join_table', { tableId }, () => {});
+    // The server has the join before the sign-out (a join that skipped the
+    // wait would be handled now).
+    await log.waitForPacket('join_table');
     expect((await post('/api/auth/signout', auth)).statusCode).toBe(200);
     const result = cutWithin(s);
     g.open();
     expect(await result).toBe('cut');
 
-    // The other session plays; the revoked socket heard nothing.
+    // The other session plays; the revoked socket heard nothing, and its
+    // join was dropped by its check before any handler: no reply at all.
     expect(await move(other, tableId)).toMatchObject({ ok: true });
-    await new Promise((r) => setTimeout(r, 50));
     expect(events).toHaveLength(0);
-    expect(acks.every((a) => !('ok' in a))).toBe(true);
+    expect(log.attempts.filter((a) => a.event === 'join_table')).toEqual([]);
   });
 
   it('a sign-out that lands while join_table is reading the seats leaves no subscription behind', async () => {
@@ -582,20 +657,21 @@ describe('sign-in binding and socket revocation', () => {
       if (armed) { armed = false; g.hit(); await g.wait; }
       return seats;
     };
-    const acks: JoinTableAck[] = [];
+    const log = recordAcks();
     const cut = disconnected(s);
-    s.emit('join_table', { tableId }, (a: JoinTableAck) => acks.push(a));
+    s.emit('join_table', { tableId }, () => {});
     await g.reached;
     expect((await post('/api/auth/signout', auth)).statusCode).toBe(200);
     expect(await cut).toBe('io server disconnect');
     g.open();
-    await new Promise((r) => setTimeout(r, 100));
+    // The handler finishes with its reply (attempted after the cut).
+    await log.waitForAck('join_table');
+    expectOnlyEnded(log, 'join_table');
 
     expect(io.of('/').adapter.rooms.get(`table:${tableId}`)?.size ?? 0).toBe(0);
     expect(app.realtime.isAnyoneConnected(tableId, { userId, guestId: null })).toBe(false);
     expect(await move(other, tableId)).toMatchObject({ ok: true });
     expect(events).toHaveLength(0);
-    expect(acks.every((a) => !('ok' in a))).toBe(true);
   });
 
   // ---- revocation and failure (PR #18 second review) ------------------------
@@ -822,13 +898,14 @@ describe('sign-in binding and socket revocation', () => {
 
     // The session row is still there; a socket reconnecting with it now is
     // cut by its own check and does nothing.
+    const log = recordAcks();
+    const actions = serverActions();
     const s = client(auth);
     const events: TableEventWire[] = [];
     s.on('table_event', (e: TableEventWire) => events.push(e));
     const cut = disconnected(s);
-    const acks: unknown[] = [];
-    s.emit('join_table', { tableId }, (a: unknown) => acks.push(a));
-    s.emit('move', { tableId, seat: 0, move: { type: 'pass' } }, (a: unknown) => acks.push(a));
+    s.emit('join_table', { tableId }, () => {});
+    s.emit('move', { tableId, seat: 0, move: { type: 'pass' } }, () => {});
     const appliedBefore = engine.applied.length;
     expect(await cut).toBe('io server disconnect');
     // Still marked: the session (the guest is added once it has been read).
@@ -839,7 +916,10 @@ describe('sign-in binding and socket revocation', () => {
     expect((await get('/api/me', auth)).json<MeResponse>().user).toBeNull();
     expect(engine.applied.length).toBe(appliedBefore);
     expect(events).toHaveLength(0);
-    expect(acks.every((a) => !(a as { ok?: boolean }).ok)).toBe(true);
+    // Whatever reached the server was dropped by the socket's own check,
+    // before any handler: no move started, and no reply was attempted.
+    expect(actions.count()).toBe(0);
+    expect(log.attempts).toEqual([]);
   });
 
   it('join_table paused while reading the missed events: a revocation that begins then stops the replay', async () => {
@@ -860,8 +940,8 @@ describe('sign-in binding and socket revocation', () => {
       if (armed) { armed = false; reachedResolve(); await gateOpen; }
       return rows;
     };
-    const acks: JoinTableAck[] = [];
-    s.emit('join_table', { tableId }, (a: JoinTableAck) => acks.push(a));
+    const log = recordAcks();
+    s.emit('join_table', { tableId }, () => {});
     await reached;
 
     // Sign-out begins (and is held after its delete, before its cut).
@@ -871,8 +951,9 @@ describe('sign-in binding and socket revocation', () => {
     await held.reached;
     release();
     expect(await cut).toBe('io server disconnect');
+    await log.waitForAck('join_table');
+    expectOnlyEnded(log, 'join_table');
     expect(sent).toHaveLength(0);
-    expect(acks.every((a) => !('ok' in a))).toBe(true);
     held.open();
     expect((await out).statusCode).toBe(200);
     expect(app.revocationsInProgress()).toBe(0);
@@ -1025,9 +1106,9 @@ describe('sign-in binding and socket revocation', () => {
     const s = await seated(auth, tableId);
     const sent = serverSends(s);
     const actions = serverActions();
+    const log = recordAcks();
     const gap = holdHostToken();
-    const acks: MoveAck[] = [];
-    s.emit('move', { tableId, seat: 0, move: { type: 'pass', marker: 'gap' } }, (a: MoveAck) => acks.push(a));
+    s.emit('move', { tableId, seat: 0, move: { type: 'pass', marker: 'gap' } }, () => {});
     await gap.reached;
 
     const held = inject.pauseAfter('delete:auth_sessions');
@@ -1046,7 +1127,8 @@ describe('sign-in binding and socket revocation', () => {
     const rows = await db.selectFrom('table_events').selectAll().where('table_id', '=', tableId).execute();
     expect(JSON.stringify(rows)).not.toContain('gap');
     expect(sent).toHaveLength(0);
-    expect(acks.every((a) => !('ok' in a))).toBe(true);
+    await log.waitForAck('move');
+    expectOnlyEnded(log, 'move');
   });
 
   it('an undo past its queue check, held before its engine call when sign-out begins, never reaches the engine', async () => {
@@ -1060,9 +1142,9 @@ describe('sign-in binding and socket revocation', () => {
     engine.undo = async (...args: Parameters<FakeEngine['undo']>) => { undoCalls++; return undo(...args); };
 
     const actions = serverActions();
+    const log = recordAcks();
     const gap = holdHostToken();
-    const acks: unknown[] = [];
-    s.emit('undo', { tableId }, (a: unknown) => acks.push(a));
+    s.emit('undo', { tableId }, () => {});
     await gap.reached;
     const held = inject.pauseAfter('delete:auth_sessions');
     const cut = disconnected(s);
@@ -1077,7 +1159,8 @@ describe('sign-in binding and socket revocation', () => {
 
     expect(undoCalls).toBe(0);
     expect((await db.selectFrom('table_events').select('id').where('table_id', '=', tableId).execute()).length).toBe(eventsBefore);
-    expect(acks.every((a) => !(a as { ok?: boolean }).ok)).toBe(true);
+    await log.waitForAck('undo');
+    expectOnlyEnded(log, 'undo');
   });
 
   it("an engine rejection already in flight when sign-out begins sends no legal moves to the revoked socket", async () => {
@@ -1129,8 +1212,8 @@ describe('sign-in binding and socket revocation', () => {
     const t = clock();
     const actions = serverActions();
     const gap = holdHostToken();
-    const acks: MoveAck[] = [];
-    s.emit('move', { tableId, seat: 0, move: { type: 'pass', marker: 'late' } }, (a: MoveAck) => acks.push(a));
+    const log = recordAcks();
+    s.emit('move', { tableId, seat: 0, move: { type: 'pass', marker: 'late' } }, () => {});
     await gap.reached;
     // The next session read is the one right before the engine call: hold
     // it after it has read the (still valid) row, then let the session expire.
@@ -1146,7 +1229,8 @@ describe('sign-in binding and socket revocation', () => {
     expect(actions.count()).toBe(1);
     await actions.settled();
     expect(engine.applied.some((a) => a.move['marker'] === 'late')).toBe(false);
-    expect(acks.every((a) => !('ok' in a))).toBe(true);
+    await log.waitForAck('move');
+    expectOnlyEnded(log, 'move');
     const rows = await db.selectFrom('table_events').selectAll().where('table_id', '=', tableId).execute();
     expect(JSON.stringify(rows)).not.toContain('late');
 
@@ -1168,8 +1252,8 @@ describe('sign-in binding and socket revocation', () => {
     const t = clock();
     const actions = serverActions();
     const gap = holdHostToken();
-    const acks: unknown[] = [];
-    s.emit('undo', { tableId }, (a: unknown) => acks.push(a));
+    const log = recordAcks();
+    s.emit('undo', { tableId }, () => {});
     await gap.reached;
     const read = inject.pauseAfter('select:auth_sessions');
     const cut = disconnected(s);
@@ -1180,7 +1264,8 @@ describe('sign-in binding and socket revocation', () => {
     expect(await cut).toBe('io server disconnect');
     expect(actions.count()).toBe(1);
     await actions.settled();
-    expect(acks.every((a) => !(a as { ok?: boolean }).ok)).toBe(true);
+    await log.waitForAck('undo');
+    expectOnlyEnded(log, 'undo');
     expect(undoCalls).toBe(0);
     expect((await db.selectFrom('table_events').select('id').where('table_id', '=', tableId).execute()).length).toBe(eventsBefore);
 
@@ -1293,5 +1378,61 @@ describe('sign-in binding and socket revocation', () => {
     await done;
     expect(finished).toBe(true);
     expect(engine.applied.some((a) => a.move['marker'] === 'after-cut')).toBe(false);
+  });
+
+  // ---- the reply checks can fail (test-controlled mutation) ----------------
+
+  it('the reply check fails when a wrong reply is swapped in, even though the socket was cut first and the client saw nothing', async () => {
+    const auth = await signIn('p@example.com');
+    const tableId = await aiTable(auth);
+    const s = await seated(auth, tableId);
+    const t = clock();
+    const actions = serverActions();
+    const log = recordAcks();
+    // The mutation: whatever the handler answers, send a success with legal
+    // moves instead. Production code is untouched.
+    log.substitute = () => ({ ok: true, lastSeq: 1, legalMoves: [{ move: { type: 'pass' } }] });
+    const clientAcks: unknown[] = [];
+    const gap = holdHostToken();
+    s.emit('move', { tableId, seat: 0, move: { type: 'pass', marker: 'mutated' } }, (a: unknown) => clientAcks.push(a));
+    await gap.reached;
+    const read = inject.pauseAfter('select:auth_sessions');
+    const cut = disconnected(s);
+    gap.open();
+    await read.reached;
+    t.advance(PAST_SESSION_EXPIRY);
+    read.open();
+    expect(await cut).toBe('io server disconnect');
+    await actions.settled();
+    await log.waitForAck('move');
+    log.substitute = null; // restore
+    // On the server the cut came first: the reply was attempted on a socket
+    // already disconnected.
+    expect(log.attempts.filter((a) => a.event === 'move').map((a) => a.connected)).toEqual([false]);
+
+    // The client received nothing, so a client-side check would pass; the
+    // server-side check sees the wrong reply and fails.
+    expect(clientAcks).toEqual([]);
+    expect(() => expectOnlyEnded(log, 'move')).toThrow();
+    // And the same check passes on the reply the handler really made.
+    expectOnlyEnded({ ...log, attempts: log.attempts.map((a) => ({ ...a, body: a.original })) }, 'move');
+  });
+
+  it('the reply check also fails for a wrong reply on a connected socket, and requires the reply to arrive', async () => {
+    const auth = await signIn('p@example.com');
+    const tableId = await aiTable(auth);
+    const s = await seated(auth, tableId);
+    const log = recordAcks();
+    log.substitute = (body) => ({ ...(body as object), legalMoves: [{ move: { type: 'pass' } }] });
+    // Revoked but still connected: the sign-out's reply is held open.
+    const held = inject.pauseAfter('delete:auth_sessions');
+    const out = post('/api/auth/signout', auth);
+    await held.reached;
+    const got = await new Promise<unknown>((r) => s.emit('move', { tableId, seat: 0, move: { type: 'pass' } }, r));
+    log.substitute = null; // restore
+    expect(got).toHaveProperty('legalMoves');
+    expect(() => expectOnlyEnded(log, 'move')).toThrow();
+    held.open();
+    expect((await out).statusCode).toBe(200);
   });
 });
