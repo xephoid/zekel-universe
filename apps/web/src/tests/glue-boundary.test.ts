@@ -27,6 +27,9 @@ function walk(dir: string, out: string[] = []): string[] {
   return out;
 }
 
+/** Where a glob pattern stops being a plain path. */
+const WILD = /[*?{[(]/;
+
 /** What a file imports, read from its syntax tree: the modules it names
  *  (static imports and re-exports, import x = require(), import() and
  *  require() of a plain string, import('x') in a type), and how many imports
@@ -47,8 +50,11 @@ function importsIn(text: string, fileName = 'x.tsx'): { specs: string[]; globs: 
       const pattern = str(part);
       if (pattern === null) computed++;
       else if (pattern.startsWith('!')) continue; // takes files away, adds none
-      else if (pattern.startsWith('.')) globs.push(pattern);
-      else computed++; // from the project root or an alias: not followed here
+      else if (!pattern.startsWith('.')) computed++; // from the project root or an alias: not followed here
+      // Vite joins the whole pattern before it looks, so a ".." after a
+      // wildcard climbs out of the folder the pattern seems to start in.
+      else if (WILD.test(pattern) && pattern.slice(pattern.search(WILD)).includes('..')) computed++;
+      else globs.push(pattern);
     }
   };
   const isGlob = (n: ts.Node) => ts.isPropertyAccessExpression(n) && ts.isMetaProperty(n.expression) && n.name.text.startsWith('glob');
@@ -73,9 +79,11 @@ function importsIn(text: string, fileName = 'x.tsx'): { specs: string[]; globs: 
 }
 
 /** The folder a glob pattern starts looking from: everything before its
- *  first wildcard, back to the last slash. */
+ *  first wildcard, back to the last slash. importsIn has already refused a
+ *  pattern that climbs with ".." after that point, so nothing it matches is
+ *  outside this folder. */
 function globBase(file: string, pattern: string): string {
-  const fixed = pattern.slice(0, pattern.search(/[*?{[(]/) === -1 ? pattern.length : pattern.search(/[*?{[(]/));
+  const fixed = WILD.test(pattern) ? pattern.slice(0, pattern.search(WILD)) : pattern;
   return path.resolve(path.dirname(file), fixed.slice(0, fixed.lastIndexOf('/') + 1));
 }
 
@@ -149,6 +157,11 @@ describe('the scanner the wall is checked with', () => {
     expect(importsIn("const a = import.meta.glob(pattern);").computed).toBe(1);
     expect(importsIn("const a = import.meta.glob('/src/glue/**');").computed).toBe(1);
     expect(importsIn("const g = import.meta.glob; g('../glue/**');").computed).toBe(1);
+    // A climb after a wildcard: in glue/ff this reaches glue/wd, from pages/ it reaches a game.
+    expect(importsIn("const a = import.meta.glob('./*/../../wd/*.ts');")).toEqual({ specs: [], globs: [], computed: 1 });
+    expect(importsIn("const a = import.meta.glob('./*/../../glue/ff/*.tsx');").computed).toBe(1);
+    expect(importsIn("const a = import.meta.glob('./{a,../../wd}/*.ts');").computed).toBe(1);
+    expect(importsIn("const a = import.meta.glob('../../tests/fixtures/*.json');").globs).toEqual(['../../tests/fixtures/*.json']);
     const page = path.join(SRC, 'pages', 'Dev.tsx');
     expect(touchesGlue(globBase(page, '../tests/fixtures/ao/*.json'))).toBe(false);
     expect(touchesGlue(globBase(page, '../glue/ff/*.tsx'))).toBe(true);
