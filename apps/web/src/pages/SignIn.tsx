@@ -2,7 +2,7 @@
 // wordmark, the passwordless promise, the email row, and the guest escape
 // hatch. Passwordless by email link only in v0.
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { api, ApiRequestError } from '../api';
 import { useSession } from '../session';
@@ -62,10 +62,6 @@ export function SignInPage() {
   );
 }
 
-/** The one exchange in flight, so a second run of the effect (React's
- *  development double run) waits on it instead of posting the token again. */
-let exchange: Promise<unknown> | null = null;
-
 /** What the landing page says when the server refuses the link. The link
  *  works once, and only in the browser that asked for it (the server checks
  *  a cookie set when the link was asked for); a refusal never signs this
@@ -77,39 +73,113 @@ export function signInFailureMessage(e: unknown): string {
   return (e as Error).message;
 }
 
+const RETRY_MESSAGE = 'We could not reach the server to finish signing you in. Check your connection and try again.';
+
+type Outcome = { ok: true } | { ok: false; retry: boolean; message: string };
+
+/** The link's token, kept in memory only once it is out of the address bar,
+ *  so a failed exchange can be tried again. Cleared when the exchange
+ *  succeeds or the server refuses the link for good. */
+let heldToken: string | null = null;
+/** The exchange in flight, keyed by its token: React's development double
+ *  run, or a retry clicked twice, waits on it instead of posting again; a
+ *  different link never reuses it. */
+let inFlight: { token: string; run: Promise<Outcome> } | null = null;
+
+/** Post the token once. When the answer is lost or unclear (no answer, or a
+ *  server error), the request may still have signed this browser in, so the
+ *  session is asked before anything is called a failure. */
+async function attempt(token: string): Promise<Outcome> {
+  // Who this browser is before the exchange; undefined when unknown.
+  let before: string | null | undefined;
+  try { before = (await api.me()).user?.id ?? null; } catch { before = undefined; }
+  const signedInByThis = async (): Promise<boolean> => {
+    try {
+      const me = await api.me();
+      return !!me.user && (before === undefined || me.user.id !== before);
+    } catch {
+      return false;
+    }
+  };
+  try {
+    await api.completeSignIn(token);
+    return { ok: true };
+  } catch (e) {
+    // A link already used by an earlier, lost answer is refused now; the
+    // sign-in it made still counts.
+    if (await signedInByThis()) return { ok: true };
+    if (e instanceof ApiRequestError && e.status < 500) {
+      return { ok: false, retry: false, message: signInFailureMessage(e) };
+    }
+    return { ok: false, retry: true, message: RETRY_MESSAGE };
+  }
+}
+
+function exchange(token: string): Promise<Outcome> {
+  if (inFlight && inFlight.token === token) return inFlight.run;
+  const entry: { token: string; run: Promise<Outcome> } = {
+    token,
+    run: attempt(token).then((outcome) => {
+      if (inFlight === entry) inFlight = null;
+      if ((outcome.ok || !outcome.retry) && heldToken === token) heldToken = null;
+      return outcome;
+    }),
+  };
+  inFlight = entry;
+  return entry.run;
+}
+
 /** The landing page of the emailed link: the token rides in the URL
- *  fragment, which browsers never send to any server, and is posted here. */
+ *  fragment, which browsers never send to any server, and is posted here.
+ *  It leaves the address bar and the history entry at once; if the post
+ *  fails before the server answers, it stays in memory for a retry. */
 export function SignInCompletePage() {
   const nav = useNavigate();
   const session = useSession();
-  const [err, setErr] = useState<string | null>(null);
+  const [err, setErr] = useState<{ message: string; retry: boolean } | null>(null);
+  const [working, setWorking] = useState(true);
+  // Only the latest run may act: a newer run, or leaving the page, retires
+  // the earlier ones (React's development double run starts two).
+  const latest = useRef(0);
+
+  async function run(token: string) {
+    const mine = ++latest.current;
+    const live = () => latest.current === mine;
+    setErr(null);
+    setWorking(true);
+    const outcome = await exchange(token);
+    if (!live()) return;
+    if (!outcome.ok) {
+      setWorking(false);
+      setErr({ message: outcome.message, retry: outcome.retry });
+      return;
+    }
+    await session.refresh();
+    if (!live()) return;
+    let next = '/';
+    try { next = sessionStorage.getItem('universe:signin:next') ?? '/'; } catch { /* ignore */ }
+    nav(next.startsWith('/') ? next : '/', { replace: true });
+  }
 
   useEffect(() => {
     const hash = window.location.hash.replace(/^#/, '');
-    const token = new URLSearchParams(hash).get('token');
-    if (token) {
+    const fromUrl = new URLSearchParams(hash).get('token');
+    if (fromUrl) {
       // Take the token out of the address bar and the history entry.
       window.history.replaceState(window.history.state, '', window.location.pathname + window.location.search);
-      const mine: Promise<unknown> = api.completeSignIn(token).finally(() => {
-        if (exchange === mine) exchange = null;
-      });
-      exchange = mine;
+      heldToken = fromUrl;
     }
-    const pending = exchange;
-    if (!pending) { setErr('This link is missing its token.'); return; }
-    let live = true;
-    pending
-      .then(async () => {
-        if (!live) return;
-        await session.refresh();
-        let next = '/';
-        try { next = sessionStorage.getItem('universe:signin:next') ?? '/'; } catch { /* ignore */ }
-        nav(next.startsWith('/') ? next : '/', { replace: true });
-      })
-      .catch((e) => { if (live) setErr(signInFailureMessage(e)); });
-    return () => { live = false; };
+    if (!heldToken) {
+      setWorking(false);
+      setErr({ message: 'This link is missing its token.', retry: false });
+      return;
+    }
+    void run(heldToken);
+    return () => { latest.current++; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const retry = () => { if (heldToken) void run(heldToken); };
 
   return (
     <div>
@@ -118,7 +188,12 @@ export function SignInCompletePage() {
         <div className="card modal-card">
           <Wordmark size={28} />
           <h1>Signing you in…</h1>
-          {err && <p className="error">{err} <Link to="/signin">Sign in</Link></p>}
+          {err && (err.retry
+            ? <p className="error">{err.message}</p>
+            : <p className="error">{err.message} <Link to="/signin">Sign in</Link></p>)}
+          {err?.retry && (
+            <button className="btn green" type="button" onClick={retry} disabled={working}>Try again</button>
+          )}
         </div>
       </div>
     </div>

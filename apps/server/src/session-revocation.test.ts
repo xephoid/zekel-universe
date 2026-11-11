@@ -11,9 +11,10 @@
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { io as ioClient, type Socket as ClientSocket } from 'socket.io-client';
+import type { Server as SocketServer } from 'socket.io';
 import type { AddressInfo } from 'node:net';
 import type { Kysely } from 'kysely';
-import type { CreateTableResponse, JoinTableAck, MeResponse, MoveAck } from '@universe/shared';
+import type { CreateTableResponse, JoinTableAck, MeResponse, MoveAck, TableEventWire } from '@universe/shared';
 import type { DB } from './db/schema.js';
 import { createDatabase, type DatabaseClient } from './db/index.js';
 import { ConsoleMailer } from './email.js';
@@ -44,9 +45,10 @@ describe('sign-in binding and socket revocation', () => {
   let engine: FakeEngine;
   let port: number;
   let sockets: ClientSocket[] = [];
+  let io: SocketServer;
 
   async function boot(extra: { secureCookies?: boolean } = {}): Promise<void> {
-    const io = createSocketServer({ allowedOrigins: [ORIGIN] });
+    io = createSocketServer({ allowedOrigins: [ORIGIN] });
     app = buildApp({
       db, engine, mailer, secretKey: 's', appOrigin: ORIGIN, allowedOrigins: [ORIGIN],
       secureCookies: extra.secureCookies ?? false, logger: false, io,
@@ -349,5 +351,200 @@ describe('sign-in binding and socket revocation', () => {
     expect((await post('/api/auth/signout', g)).statusCode).toBe(200);
     expect(await cut).toBe('io server disconnect');
     expect((await get('/api/me', g)).json<MeResponse>().guest).toBeNull();
+  });
+
+  // ---- account switching (PR #18 review, finding 1) -----------------------
+
+  it("signing in as another account ends the old session and cuts its sockets; sign-out then ends the new one (account switch)", async () => {
+    const a = await signIn('a@example.com');
+    const tableA = await aiTable(a);
+    const aSocket = await seated(a, tableA);
+    const aEvents: TableEventWire[] = [];
+    aSocket.on('table_event', (e: TableEventWire) => aEvents.push(e));
+    // A second browser signed in to A is not touched (positive control).
+    const aElsewhere = await signIn('a@example.com');
+    const elsewhere = await seated(aElsewhere, tableA);
+
+    // The same browser completes a link for B: it still sends A's cookie.
+    const { token, nonce } = await askForLink('b@example.com', a);
+    const cut = disconnected(aSocket);
+    const done = await post('/api/auth/email/complete', `${a}; ${nonce}`, { token });
+    expect(done.statusCode).toBe(200);
+    const b = cookieOf(done, 'universe_auth')!;
+    expect(b).not.toBe(a);
+    expect(await cut).toBe('io server disconnect');
+
+    // A's cookie is dead everywhere it was this browser's.
+    expect((await get('/api/me', a)).json<MeResponse>().user).toBeNull();
+    expect(await refused(client(a))).toBe('unauthorized');
+    // A's seat did not move to B, and B cannot join A's table.
+    const bUserId = done.json<{ userId: string }>().userId;
+    expect((await seatOwners(tableA)).every((s) => s.user_id !== bUserId)).toBe(true);
+    const bSocket = client(b);
+    await connected(bSocket);
+    expect(await join(bSocket, tableA)).toMatchObject({ error: 'not_seated' });
+
+    // A's other browser still plays, and the cut socket hears nothing of it.
+    const appliedBefore = engine.applied.length;
+    expect(await move(elsewhere, tableA)).toMatchObject({ ok: true });
+    expect(engine.applied.length).toBe(appliedBefore + 1);
+    expect(aEvents).toHaveLength(0);
+
+    // Sign out of B: B's socket is cut, and A's cookie stays dead.
+    const bCut = disconnected(bSocket);
+    expect((await post('/api/auth/signout', b)).statusCode).toBe(200);
+    expect(await bCut).toBe('io server disconnect');
+    expect((await get('/api/me', b)).json<MeResponse>().user).toBeNull();
+    expect((await get('/api/me', a)).json<MeResponse>().user).toBeNull();
+    expect(await refused(client(a))).toBe('unauthorized');
+    expect(await refused(client(b))).toBe('unauthorized');
+  });
+
+  it('signing in again as the same account replaces the old session; the guest upgrade still carries seats', async () => {
+    const g = await guest();
+    const tableId = await aiTable(g);
+    const first = await signIn('same@example.com', g);
+    const userId = (await get('/api/me', first)).json<MeResponse>().user!.id;
+    expect((await seatOwners(tableId))[0]).toMatchObject({ user_id: userId, guest_id: null });
+    const s = await seated(`${first}; ${g}`, tableId);
+    const cut = disconnected(s);
+    const { token, nonce } = await askForLink('same@example.com', `${first}; ${g}`);
+    const done = await post('/api/auth/email/complete', `${first}; ${g}; ${nonce}`, { token });
+    expect(done.statusCode).toBe(200);
+    expect(await cut).toBe('io server disconnect');
+    const second = cookieOf(done, 'universe_auth')!;
+    expect((await get('/api/me', first)).json<MeResponse>().user).toBeNull();
+    expect((await get('/api/me', second)).json<MeResponse>().user?.id).toBe(userId);
+    expect((await seatOwners(tableId))[0]).toMatchObject({ user_id: userId, guest_id: null });
+  });
+
+  it('a refused completion leaves the signed-in session alone', async () => {
+    const a = await signIn('a@example.com');
+    const s = client(a);
+    await connected(s);
+    // No start cookie: refused before anything changes.
+    const other = await askForLink('b@example.com');
+    expect((await post('/api/auth/email/complete', a, { token: other.token })).statusCode).toBe(401);
+    // A wrong token with this browser's own nonce: refused too.
+    const own = await askForLink('b@example.com', a);
+    expect((await post('/api/auth/email/complete', `${a}; ${own.nonce}`, { token: 'not-a-token' })).statusCode).toBe(401);
+    expect((await get('/api/me', a)).json<MeResponse>().user).toBeTruthy();
+    expect(s.connected).toBe(true);
+  });
+
+  // ---- handshake races (PR #18 review, finding 2) ---------------------------
+
+  /** Resolves with 'cut' when the socket is disconnected by the server, or
+   *  'still connected' if that has not happened within `ms`. */
+  const cutWithin = (s: ClientSocket, ms = 1500) => Promise.race([
+    disconnected(s).then((r) => (r === 'io server disconnect' ? 'cut' : r)),
+    new Promise<string>((r) => setTimeout(() => r('still connected'), ms)),
+  ]);
+
+  function gate(): { wait: Promise<void>; open: () => void; reached: Promise<void>; hit: () => void } {
+    let open!: () => void;
+    let hit!: () => void;
+    const wait = new Promise<void>((r) => { open = r; });
+    const reached = new Promise<void>((r) => { hit = r; });
+    return { wait, open, reached, hit };
+  }
+
+  it('a socket whose credential was read before sign-out is cut as soon as it connects, without sending anything', async () => {
+    const auth = await signIn('p@example.com');
+    // Runs after the app's own middleware, so after its database read.
+    const g = gate();
+    let armed = true;
+    io.use((_socket, next) => {
+      if (!armed) return next();
+      armed = false;
+      g.hit();
+      void g.wait.then(() => next());
+    });
+    const s = client(auth);
+    await g.reached;
+    expect((await post('/api/auth/signout', auth)).statusCode).toBe(200);
+    const result = cutWithin(s);
+    g.open();
+    expect(await result).toBe('cut');
+  });
+
+  it('a socket whose credential room was still being registered at sign-out gets no private event and is cut', async () => {
+    const auth = await signIn('p@example.com');
+    const tableId = await aiTable(auth);
+    const otherAuth = await signIn('p@example.com');
+    const other = await seated(otherAuth, tableId);
+
+    // Make joining a credential room asynchronous and hold it, as a
+    // clustered adapter's would be.
+    const adapter = io.of('/').adapter;
+    const addAll = adapter.addAll.bind(adapter);
+    const g = gate();
+    let armed = true;
+    adapter.addAll = (id, rooms) => {
+      if (armed && [...rooms].some((r) => r.startsWith('cred:'))) {
+        armed = false;
+        g.hit();
+        return g.wait.then(() => addAll(id, rooms));
+      }
+      return addAll(id, rooms);
+    };
+
+    const s = client(auth);
+    const events: TableEventWire[] = [];
+    s.on('table_event', (e: TableEventWire) => events.push(e));
+    await connected(s);
+    await g.reached;
+    const acks: JoinTableAck[] = [];
+    s.emit('join_table', { tableId }, (a: JoinTableAck) => acks.push(a));
+    // Give a join that skipped the wait the chance to finish first.
+    await new Promise((r) => setTimeout(r, 100));
+    expect((await post('/api/auth/signout', auth)).statusCode).toBe(200);
+    const result = cutWithin(s);
+    g.open();
+    expect(await result).toBe('cut');
+
+    // The other session plays; the revoked socket heard nothing.
+    expect(await move(other, tableId)).toMatchObject({ ok: true });
+    await new Promise((r) => setTimeout(r, 50));
+    expect(events).toHaveLength(0);
+    expect(acks.every((a) => !('ok' in a))).toBe(true);
+  });
+
+  it('a sign-out that lands while join_table is reading the seats leaves no subscription behind', async () => {
+    const auth = await signIn('p@example.com');
+    const tableId = await aiTable(auth);
+    const userId = (await get('/api/me', auth)).json<MeResponse>().user!.id;
+    const otherAuth = await signIn('p@example.com');
+    const other = await seated(otherAuth, tableId);
+    // The other socket leaves, so presence below is only the raced one's.
+    other.emit('leave_table', { tableId });
+
+    const s = client(auth);
+    await connected(s);
+    const events: TableEventWire[] = [];
+    s.on('table_event', (e: TableEventWire) => events.push(e));
+
+    const getSeats = app.tableService.getSeats.bind(app.tableService);
+    const g = gate();
+    let armed = true;
+    app.tableService.getSeats = async (id: string) => {
+      const seats = await getSeats(id);
+      if (armed) { armed = false; g.hit(); await g.wait; }
+      return seats;
+    };
+    const acks: JoinTableAck[] = [];
+    const cut = disconnected(s);
+    s.emit('join_table', { tableId }, (a: JoinTableAck) => acks.push(a));
+    await g.reached;
+    expect((await post('/api/auth/signout', auth)).statusCode).toBe(200);
+    expect(await cut).toBe('io server disconnect');
+    g.open();
+    await new Promise((r) => setTimeout(r, 100));
+
+    expect(io.of('/').adapter.rooms.get(`table:${tableId}`)?.size ?? 0).toBe(0);
+    expect(app.realtime.isAnyoneConnected(tableId, { userId, guestId: null })).toBe(false);
+    expect(await move(other, tableId)).toMatchObject({ ok: true });
+    expect(events).toHaveLength(0);
+    expect(acks.every((a) => !('ok' in a))).toBe(true);
   });
 });
