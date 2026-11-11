@@ -1,10 +1,12 @@
 // The four published packages are ES modules that plain Node must be able to
 // import, not only a bundler. Node resolves a relative import only when it
 // names the file, extension included, and TypeScript writes the specifier out
-// as it was written. So every relative import in what ships ends in .js.
+// as it was written. So every relative import in what ships ends in .js and
+// names a file that is there. This reads the source, not the build; the
+// release steps still import the packed package from an empty folder.
 
 import { describe, expect, it } from 'vitest';
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
@@ -30,7 +32,9 @@ describe('what the published packages ship', () => {
         for (const { fileName } of ts.preProcessFile(readFileSync(file, 'utf8'), true, true).importedFiles) {
           if (!fileName.startsWith('.')) continue;
           seen++;
-          if (!/\.(js|json)$/.test(fileName)) bare.push(`${path.relative(PACKAGES, file)} → ${fileName}`);
+          const at = path.resolve(path.dirname(file), fileName);
+          const there = fileName.endsWith('.json') ? existsSync(at) : ['.ts', '.tsx'].some((ext) => existsSync(at.replace(/\.js$/, ext)));
+          if (!/\.(js|json)$/.test(fileName) || !there) bare.push(`${path.relative(PACKAGES, file)} → ${fileName}`);
         }
       }
     }

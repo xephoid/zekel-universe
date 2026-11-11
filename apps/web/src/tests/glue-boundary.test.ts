@@ -5,12 +5,12 @@
 // "Its own folder" is the game's own: one game never imports another's
 // files. The list of games (glue/index.ts) is the web app's and is the one
 // file that may be imported from outside; the rest of the app reaches a game
-// only through it. Imports are read with the compiler's own scanner, so a
+// only through it. Imports are read from each file's syntax tree, so a
 // dynamic import() counts like a static one, and an import() of a path worked
 // out at run time is refused, since nobody can say where it goes.
 
 import { describe, expect, it } from 'vitest';
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { lstatSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
@@ -27,19 +27,74 @@ function walk(dir: string, out: string[] = []): string[] {
   return out;
 }
 
-/** Every module a file names: static imports and re-exports, side-effect
- *  imports, import() and require() of a literal. */
-function specsIn(text: string): string[] {
-  return ts.preProcessFile(text, true, true).importedFiles.map((f) => f.fileName);
+/** What a file imports, read from its syntax tree: the modules it names
+ *  (static imports and re-exports, import x = require(), import() and
+ *  require() of a plain string, import('x') in a type), and how many imports
+ *  it works out at run time (import() or require() of anything else), which
+ *  nobody can follow. Vite's import.meta.glob is read too: its patterns when
+ *  they are plain relative strings, and as worked out at run time when not.
+ *  What this cannot see is code that hides the call itself: require under
+ *  another name, or eval. */
+function importsIn(text: string, fileName = 'x.tsx'): { specs: string[]; globs: string[]; computed: number } {
+  const kind = fileName.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS;
+  const specs: string[] = [];
+  const globs: string[] = [];
+  let computed = 0;
+  const str = (n: ts.Node | undefined) => (n && (ts.isStringLiteral(n) || ts.isNoSubstitutionTemplateLiteral(n)) ? n.text : null);
+  const noteGlob = (n: ts.Node | undefined) => {
+    const parts = n && ts.isArrayLiteralExpression(n) ? [...n.elements] : [n];
+    for (const part of parts) {
+      const pattern = str(part);
+      if (pattern === null) computed++;
+      else if (pattern.startsWith('!')) continue; // takes files away, adds none
+      else if (pattern.startsWith('.')) globs.push(pattern);
+      else computed++; // from the project root or an alias: not followed here
+    }
+  };
+  const isGlob = (n: ts.Node) => ts.isPropertyAccessExpression(n) && ts.isMetaProperty(n.expression) && n.name.text.startsWith('glob');
+  const note = (n: ts.Node | undefined) => {
+    if (n && (ts.isStringLiteral(n) || ts.isNoSubstitutionTemplateLiteral(n))) specs.push(n.text);
+    else computed++;
+  };
+  const visit = (n: ts.Node) => {
+    if (ts.isImportDeclaration(n)) note(n.moduleSpecifier);
+    else if (ts.isExportDeclaration(n)) { if (n.moduleSpecifier) note(n.moduleSpecifier); }
+    else if (ts.isImportEqualsDeclaration(n)) { if (ts.isExternalModuleReference(n.moduleReference)) note(n.moduleReference.expression); }
+    else if (ts.isImportTypeNode(n)) note(ts.isLiteralTypeNode(n.argument) ? n.argument.literal : undefined);
+    else if (ts.isCallExpression(n) && (n.expression.kind === ts.SyntaxKind.ImportKeyword || (ts.isIdentifier(n.expression) && n.expression.text === 'require'))) {
+      note(n.arguments.length === 1 ? n.arguments[0] : undefined);
+    } else if (ts.isCallExpression(n) && isGlob(n.expression)) noteGlob(n.arguments[0]);
+    else if (isGlob(n) && !(ts.isCallExpression(n.parent) && n.parent.expression === n)) computed++; // glob passed around, not called
+    ts.forEachChild(n, visit);
+  };
+  const withParents = ts.createSourceFile(fileName, text, ts.ScriptTarget.Latest, true, kind);
+  visit(withParents);
+  return { specs, globs, computed };
 }
 
-/** import() or require() of something other than a plain string. */
-function computedImportsIn(text: string): number {
-  const code = text.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
-  return [...code.matchAll(/\b(?:import|require)\s*\(\s*(?!['"][^'"]*['"]\s*\))/g)].length;
+/** The folder a glob pattern starts looking from: everything before its
+ *  first wildcard, back to the last slash. */
+function globBase(file: string, pattern: string): string {
+  const fixed = pattern.slice(0, pattern.search(/[*?{[(]/) === -1 ? pattern.length : pattern.search(/[*?{[(]/));
+  return path.resolve(path.dirname(file), fixed.slice(0, fixed.lastIndexOf('/') + 1));
 }
 
-const read = (file: string) => readFileSync(file, 'utf8');
+/** True when a folder is glue/, inside it, or holds it. */
+const touchesGlue = (dir: string) => dir === GLUE || dir.startsWith(GLUE + path.sep) || GLUE.startsWith(dir + path.sep);
+
+const importsOf = (file: string) => importsIn(readFileSync(file, 'utf8'), file);
+
+/** Symbolic links under a folder. A link would let a file sit in one game's
+ *  folder and be another game's, or the app's. */
+function linksUnder(dir: string, out: string[] = []): string[] {
+  for (const name of readdirSync(dir)) {
+    const p = path.join(dir, name);
+    const st = lstatSync(p);
+    if (st.isSymbolicLink()) out.push(p);
+    else if (st.isDirectory()) linksUnder(p, out);
+  }
+  return out;
+}
 
 const ALLOWED_PACKAGES = ['react', 'react-dom', '@zekel/glue-kit', '@zekel/primitives', '@zekel/wire-types', '@zekel/tokens'];
 
@@ -54,12 +109,14 @@ const GAMES: Record<string, string[]> = {
   'word-debauchee': ['wd'],
 };
 
-/** The game a path under glue/ belongs to, 'list' for glue/index.ts, or null
- *  for a path outside glue/ or one no game owns. */
+const LIST = [path.join(GLUE, 'index'), path.join(GLUE, 'index.ts')];
+
+/** The game a path under glue/ belongs to, 'list' for glue/index.ts and
+ *  nothing else, or null for a path outside glue/ or one no game owns. */
 function ownerOf(target: string): string | null {
+  if (LIST.includes(target)) return 'list';
   if (target === GLUE || !target.startsWith(GLUE + path.sep)) return null;
   const first = path.relative(GLUE, target).split(path.sep)[0]!.replace(/\.(ts|tsx)$/, '');
-  if (first === 'index') return 'list';
   for (const [game, parts] of Object.entries(GAMES)) if (parts.includes(first)) return game;
   return null;
 }
@@ -73,15 +130,46 @@ describe('the scanner the wall is checked with', () => {
       "const e = await import('./e');",
       "  const f = () => import(\"./f\");",
       "const g = require('./g');",
+      "import h = require('./h');",
+      "type I = import('./i').I;",
+      "const j = import(`./j`);",
     ].join('\n');
-    expect(specsIn(text)).toEqual(['./a', './b', './c', './d.css', './e', './f', './g']);
-    expect(computedImportsIn(text)).toBe(0);
+    expect(importsIn(text, 'x.ts')).toEqual({ specs: ['./a', './b', './c', './d.css', './e', './f', './g', './h', './i', './j'], globs: [], computed: 0 });
   });
 
   it('counts an import whose path is worked out at run time', () => {
-    expect(computedImportsIn("const m = await import(`../pages/${name}`);")).toBe(1);
-    expect(computedImportsIn("const m = await import(where);\nconst n = require(base + '/x');")).toBe(2);
-    expect(computedImportsIn("// import(where) in a comment\n/* require(x) */")).toBe(0);
+    expect(importsIn("const m = await import(`../pages/${name}`);").computed).toBe(1);
+    expect(importsIn("const m = await import(where);\nconst n = require(base + '/x');").computed).toBe(2);
+    expect(importsIn("// import(where) in a comment\n/* require(x) */\nconst s = 'import(where)';")).toEqual({ specs: [], globs: [], computed: 0 });
+  });
+
+  it('reads a glob\'s patterns, and refuses one it cannot follow', () => {
+    expect(importsIn("const a = import.meta.glob<X>('../tests/fixtures/ao/*.json', { import: 'default' });")).toEqual({ specs: [], globs: ['../tests/fixtures/ao/*.json'], computed: 0 });
+    expect(importsIn("const a = import.meta.glob(['./a/*.ts', '!./a/skip.ts', './b/**']);").globs).toEqual(['./a/*.ts', './b/**']);
+    expect(importsIn("const a = import.meta.glob(pattern);").computed).toBe(1);
+    expect(importsIn("const a = import.meta.glob('/src/glue/**');").computed).toBe(1);
+    expect(importsIn("const g = import.meta.glob; g('../glue/**');").computed).toBe(1);
+    const page = path.join(SRC, 'pages', 'Dev.tsx');
+    expect(touchesGlue(globBase(page, '../tests/fixtures/ao/*.json'))).toBe(false);
+    expect(touchesGlue(globBase(page, '../glue/ff/*.tsx'))).toBe(true);
+    expect(touchesGlue(globBase(page, '../**/*.tsx'))).toBe(true);
+    expect(touchesGlue(globBase(page, '../gl*/x.ts'))).toBe(true);
+  });
+
+  it('is not fooled by comment marks inside strings', () => {
+    expect(importsIn("const a = '/*'; import(where); const b = '*/';").computed).toBe(1);
+    expect(importsIn("const a = '//'; const m = import('./m'); // import('./n')").specs).toEqual(['./m']);
+  });
+
+  it('calls only glue/index.ts the list', () => {
+    expect(ownerOf(path.join(GLUE, 'index.ts'))).toBe('list');
+    expect(ownerOf(path.join(GLUE, 'index'))).toBe('list');
+    expect(ownerOf(path.join(GLUE, 'index', 'rogue.ts'))).toBeNull();
+    expect(ownerOf(path.join(GLUE, 'index.tsx'))).toBeNull();
+    expect(ownerOf(path.join(GLUE, 'wd', 'index.ts'))).toBe('word-debauchee');
+    expect(ownerOf(path.join(GLUE, 'fractured-fist.ts'))).toBe('fractured-fist');
+    expect(ownerOf(path.join(SRC, 'pages', 'Table.tsx'))).toBeNull();
+    expect(ownerOf(GLUE)).toBeNull();
   });
 });
 
@@ -92,6 +180,10 @@ describe('the games\' drawing code stays behind its wall', () => {
     expect(files.length).toBeGreaterThan(20);
   });
 
+  it('has no symbolic links under glue/', () => {
+    expect(linksUnder(GLUE).map((f) => path.relative(SRC, f))).toEqual([]);
+  });
+
   it('knows which game every file under glue/ belongs to', () => {
     expect(files.filter((f) => ownerOf(f) === null).map((f) => path.relative(SRC, f))).toEqual([]);
   });
@@ -100,9 +192,11 @@ describe('the games\' drawing code stays behind its wall', () => {
     const leaks: string[] = [];
     for (const file of files) {
       const me = ownerOf(file);
-      const text = read(file);
-      if (computedImportsIn(text) > 0) leaks.push(`${path.relative(SRC, file)} → an import worked out at run time`);
-      for (const spec of specsIn(text)) {
+      const { specs, globs, computed } = importsOf(file);
+      if (computed > 0) leaks.push(`${path.relative(SRC, file)} → an import worked out at run time`);
+      // A game's glob stays in the game's own folder; the list has none.
+      for (const g of globs) if (me === 'list' || ownerOf(globBase(file, g)) !== me) leaks.push(`${path.relative(SRC, file)} → glob ${g}`);
+      for (const spec of specs) {
         if (spec.startsWith('.')) {
           const owner = ownerOf(path.resolve(path.dirname(file), spec));
           // The list names every game; a game names only itself.
@@ -120,9 +214,10 @@ describe('the games\' drawing code stays behind its wall', () => {
     const outside = walk(SRC).filter((f) => !f.startsWith(GLUE + path.sep) && !f.startsWith(path.join(SRC, 'tests') + path.sep));
     const reaches: string[] = [];
     for (const file of outside) {
-      const text = read(file);
-      if (computedImportsIn(text) > 0) reaches.push(`${path.relative(SRC, file)} → an import worked out at run time`);
-      for (const spec of specsIn(text)) {
+      const { specs, globs, computed } = importsOf(file);
+      if (computed > 0) reaches.push(`${path.relative(SRC, file)} → an import worked out at run time`);
+      for (const g of globs) if (touchesGlue(globBase(file, g))) reaches.push(`${path.relative(SRC, file)} → glob ${g}`);
+      for (const spec of specs) {
         if (!spec.startsWith('.')) continue;
         const target = path.resolve(path.dirname(file), spec);
         if (target.startsWith(GLUE + path.sep) && target !== path.join(GLUE, 'index')) reaches.push(`${path.relative(SRC, file)} → ${spec}`);

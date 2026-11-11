@@ -184,6 +184,9 @@ export function TablePage() {
   const momentDone = useCallback(() => {
     setMoment((cur) => { cur?.resolve(); return null; });
   }, []);
+  // A moment belongs to the table and the game it started on. Leaving either
+  // ends it, so the queue it was holding is free for the next table.
+  useEffect(() => () => { setMoment((cur) => { cur?.resolve(); return null; }); }, [id, glue]);
 
   const send = useCallback(async (trigger: 'tap' | 'resolve_report_button' | 'form' | 'batch', move: Record<string, unknown>, formContext?: FormContext) => {
     if (busy) return;

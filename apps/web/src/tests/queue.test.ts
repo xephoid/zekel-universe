@@ -114,6 +114,52 @@ describe('playback queue', () => {
     expect(q.snapshot.done).toBe(true);
   });
 
+  it('a re-seed while a gate is holding an event drops that event and frees the queue', async () => {
+    vi.useFakeTimers();
+    const q = new PlaybackQueue();
+    let release: () => void = () => {};
+    q.setGate(() => new Promise<void>((r) => { release = r; }));
+    q.push(ev(1, 'a'));
+    await vi.advanceTimersByTimeAsync(0); // the gate is holding a
+    expect(q.snapshot.current).toBeNull();
+    q.seed(ev(10, 'another table'));
+    q.setGate(null);
+    release();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(q.snapshot.current?.summary).toBe('another table');
+    expect(q.snapshot.lastSeq).toBe(10);
+    q.push(ev(11, 'its next move'));
+    await vi.advanceTimersByTimeAsync(BASE_MS);
+    expect(q.snapshot.current?.summary).toBe('its next move');
+  });
+
+  it('a re-seed during a replay does not bring the replayed event back', async () => {
+    vi.useFakeTimers();
+    const q = new PlaybackQueue();
+    q.push(ev(1, 'a'));
+    await vi.advanceTimersByTimeAsync(0);
+    q.push(ev(2, 'b'));
+    await vi.advanceTimersByTimeAsync(BASE_MS);
+    expect(q.snapshot.current?.summary).toBe('b');
+    let release: () => void = () => {};
+    q.setGate(() => new Promise<void>((r) => { release = r; }));
+    q.replayLast();
+    await vi.advanceTimersByTimeAsync(BASE_MS); // the gate is holding the replay of b
+    q.seed(ev(10, 'another table'));
+    release();
+    await vi.advanceTimersByTimeAsync(BASE_MS);
+    expect(q.snapshot.current?.summary).toBe('another table');
+    expect(q.snapshot.lastSeq).toBe(10);
+    // Before its gate, too: the replay's own timer is dropped by the seed.
+    q.setGate(null);
+    q.push(ev(11, 'c'));
+    await vi.advanceTimersByTimeAsync(BASE_MS);
+    q.replayLast();
+    q.seed(ev(20, 'a third table'));
+    await vi.advanceTimersByTimeAsync(BASE_MS * 2);
+    expect(q.snapshot.current?.summary).toBe('a third table');
+  });
+
   it('has no pace that skips to the end: every pace dwells on every event', () => {
     for (const p of PACES) {
       const q = new PlaybackQueue();
