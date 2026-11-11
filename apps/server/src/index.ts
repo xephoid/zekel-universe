@@ -49,7 +49,7 @@ async function main(): Promise<void> {
     app.fastify.log.warn(`catalog refresh skipped (engine unreachable): ${(err as Error).message}`);
   }
 
-  await app.fastify.listen({ port: config.port, host: '0.0.0.0' });
+  await app.fastify.listen({ port: config.port, host: config.host });
 
   const shutdown = async () => {
     await app.fastify.close();

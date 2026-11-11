@@ -71,7 +71,7 @@ pnpm dev                 # builds the packages, then runs the server and the web
 ```
 
 Open http://localhost:5173. The server listens on the `PORT` from `.env`
-(8788 by default) with a local SQLite file, prints sign-in links to its log
+(8788 by default) on 127.0.0.1 only (set `HOST` to change that) with a local SQLite file, prints sign-in links to its log
 instead of emailing them, and the Vite dev server proxies `/api` and the
 socket to it. The primitives gallery is at `/gallery`.
 
