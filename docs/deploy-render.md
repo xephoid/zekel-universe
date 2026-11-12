@@ -48,6 +48,9 @@ while CI is turned off. Deploy by hand from the dashboard.
      update this value after the first deploy if it differs.
    - `RESEND_API_KEY`: the Resend key.
    - `EMAIL_FROM`: an address on the verified domain.
+   - `POSTHOG_KEY`: the PostHog project key (`phc_...`) for site analytics.
+     Leave it empty to keep analytics off. Optional `POSTHOG_HOST` defaults
+     to `https://us.i.posthog.com`.
 3. Apply. Render generates `SECRET_KEY` and the engine's `MCP_BEARER_TOKEN`,
    and copies the token into Universe's `ENGINE_TOKEN`. Nobody needs to see
    either value.
