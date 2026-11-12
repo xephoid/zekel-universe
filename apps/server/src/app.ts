@@ -74,8 +74,14 @@ export interface BuildAppOptions {
   adminEmails?: string[];
   /** Sign-in with Discord and Google through Supabase (T09). `check` turns
    *  the browser's Supabase access token into who signed in, or throws.
+   *  `end` is called once the token has signed a player in.
    *  Unset: those buttons are not offered and the route answers 404. */
-  supabase?: { url: string; publishableKey: string; check: (token: string) => Promise<SupabaseSignIn> } | null;
+  supabase?: {
+    url: string; publishableKey: string;
+    check: (token: string) => Promise<SupabaseSignIn>;
+    /** Ends the Supabase session behind a token that has been used. */
+    end: (token: string) => Promise<void>;
+  } | null;
   /** Test-only: expose the ConsoleMailer's outbox at /api/test/outbox.
    *  Must never be set in production (index.ts enforces). */
   testOutbox?: boolean;
@@ -664,6 +670,14 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     }
     const outcome = await finishSignIn(req, reply, null, (trx) => findOrCreateSupabaseUser(trx, who));
     if (!outcome) return reply.code(401).send({ error: 'sign_in_refused', message: 'That sign-in did not work. Try again.' });
+    // The token has done its job: end its Supabase session so it cannot sign
+    // anyone in again. A failure here does not undo this sign-in; the token
+    // is then refused by the five-minute age limit instead.
+    try {
+      await opts.supabase.end(token);
+    } catch (e) {
+      req.log.warn({ reason: e instanceof SupabaseTokenError ? e.reason : 'error' }, 'supabase session not ended');
+    }
     return { ok: true, userId: outcome.userId };
   });
 

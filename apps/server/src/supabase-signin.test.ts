@@ -14,7 +14,7 @@ import type { DB } from './db/schema.js';
 import { createDatabase, type DatabaseClient } from './db/index.js';
 import { ConsoleMailer } from './email.js';
 import { buildApp, type UniverseApp } from './app.js';
-import { supabaseChecker, supabaseIssuer } from './supabaseAuth.js';
+import { supabaseChecker, supabaseIssuer, supabaseSessionEnder } from './supabaseAuth.js';
 import { parseSupabase } from './config.js';
 import { FakeEngine } from './test-engine.js';
 
@@ -37,6 +37,9 @@ describe('sign-in through Supabase', () => {
   /** Supabase's user records, by the token that asks. */
   let users: Map<string, FakeUser>;
   let lookups: number;
+  /** Tokens whose Supabase session the server ended. */
+  let logouts: string[];
+  let endFails: boolean;
 
   beforeEach(async () => {
     projectKey = await generateKeyPair('ES256');
@@ -44,15 +47,26 @@ describe('sign-in through Supabase', () => {
     const jwk = { ...(await exportJWK(projectKey.publicKey)), kid: 'k1', alg: 'ES256' };
     users = new Map();
     lookups = 0;
+    logouts = [];
+    endFails = false;
     const fetchFn = (async (url: string | URL, init?: RequestInit) => {
-      lookups++;
-      expect(String(url)).toBe(`${PROJECT}/auth/v1/user`);
       const headers = init?.headers as Record<string, string>;
       expect(headers.apikey).toBe(KEY);
-      const user = users.get(headers.authorization!.replace(/^Bearer /, ''));
+      const token = headers.authorization!.replace(/^Bearer /, '');
+      if (String(url) === `${PROJECT}/auth/v1/logout?scope=local`) {
+        expect(init?.method).toBe('POST');
+        if (endFails) return new Response('{}', { status: 500 });
+        logouts.push(token);
+        // Supabase ends the session: the token no longer finds its user.
+        return users.delete(token) ? new Response(null, { status: 204 }) : new Response('{}', { status: 401 });
+      }
+      lookups++;
+      expect(String(url)).toBe(`${PROJECT}/auth/v1/user`);
+      const user = users.get(token);
       return user ? new Response(JSON.stringify(user), { status: 200 }) : new Response('{}', { status: 401 });
     }) as typeof fetch;
     const check = supabaseChecker({ url: PROJECT, publishableKey: KEY, keys: createLocalJWKSet({ keys: [jwk] }), fetchFn });
+    const end = supabaseSessionEnder({ url: PROJECT, publishableKey: KEY, fetchFn });
 
     database = await createDatabase(':memory:');
     db = database.db;
@@ -60,7 +74,7 @@ describe('sign-in through Supabase', () => {
     app = buildApp({
       db, engine: new FakeEngine(), mailer, secretKey: 's', appOrigin: ORIGIN, allowedOrigins: [ORIGIN],
       secureCookies: false, logger: false, adminEmails: [ADMIN],
-      supabase: { url: PROJECT, publishableKey: KEY, check },
+      supabase: { url: PROJECT, publishableKey: KEY, check, end },
     });
     await app.fastify.ready();
   });
@@ -133,6 +147,24 @@ describe('sign-in through Supabase', () => {
     ]);
     const user = await db.selectFrom('users').select('display_name').where('id', '=', res.json().userId).executeTakeFirstOrThrow();
     expect(user.display_name).toBe('Ada from Discord');
+  });
+
+  it('a token that has signed a player in cannot sign anyone in again: the server ends its Supabase session', async () => {
+    const token = await tokenFor(discordUser());
+    expect((await complete(token)).statusCode).toBe(200);
+    expect(logouts).toEqual([token]);
+    const sessions = await db.selectFrom('auth_sessions').select('id').execute();
+    const replay = await complete(token);
+    expect(replay.statusCode).toBe(401);
+    expect(cookieOf(replay, 'universe_auth')).toBeNull();
+    expect(await db.selectFrom('auth_sessions').select('id').execute()).toEqual(sessions);
+  });
+
+  it('when Supabase cannot end its session, the sign-in still stands', async () => {
+    endFails = true;
+    const res = await complete(await tokenFor(discordUser()));
+    expect(res.statusCode).toBe(200);
+    expect(cookieOf(res, 'universe_auth')).toBeTruthy();
   });
 
   it('signing in again reaches the same account, and nothing is recorded twice', async () => {
@@ -265,6 +297,8 @@ describe('sign-in through Supabase, not set up', () => {
       db: database.db, engine: new FakeEngine(), mailer: new ConsoleMailer(), secretKey: 's', appOrigin: ORIGIN,
       allowedOrigins: [ORIGIN], secureCookies: false, logger: false,
     });
+    const csp = String((await app.fastify.inject({ method: 'GET', url: '/signin' })).headers['content-security-policy']);
+    expect(csp).toContain("connect-src 'self' ws: wss:;");
     await app.fastify.ready();
     expect((await app.fastify.inject({ method: 'GET', url: '/api/auth/providers' })).json()).toEqual({ supabase: null });
     const res = await app.fastify.inject({ method: 'POST', url: '/api/auth/supabase/complete', headers: { origin: ORIGIN }, payload: { accessToken: 'x' } });

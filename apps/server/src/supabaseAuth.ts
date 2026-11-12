@@ -125,3 +125,21 @@ function displayNameOf(user: SupabaseUserRecord): string | null {
   }
   return null;
 }
+
+/** Returns a function that ends the Supabase session behind a token
+ *  (POST /auth/v1/logout, this session only). Called once the token has
+ *  signed a player in: Supabase then refuses that token, so it cannot sign
+ *  anyone in a second time, whatever the browser does next. */
+export function supabaseSessionEnder(opts: Pick<SupabaseAuthOptions, 'url' | 'publishableKey' | 'fetchFn'>): (token: string) => Promise<void> {
+  const issuer = supabaseIssuer(opts.url);
+  const fetchFn = opts.fetchFn ?? fetch;
+  return async (token: string) => {
+    const res = await fetchFn(`${issuer}/logout?scope=local`, {
+      method: 'POST',
+      headers: { apikey: opts.publishableKey, authorization: `Bearer ${token}` },
+      signal: AbortSignal.timeout(10_000),
+    });
+    // 204 when ended; 401 or 404 when Supabase had already ended it.
+    if (!res.ok && res.status !== 401 && res.status !== 404) throw new SupabaseTokenError(`logout_status_${res.status}`);
+  };
+}
