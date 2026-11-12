@@ -25,6 +25,10 @@ import {
   SESSION_TTL_MS, sweepExpired,
 } from './auth.js';
 import type { Mailer } from './email.js';
+import {
+  isSignInProvider, isWellFormedVerifier, newPkcePair, SIGN_IN_PROVIDERS, SupabaseTokenError,
+  type SupabaseService, type SupabaseSignIn,
+} from './supabaseAuth.js';
 import type { EngineService } from './engine.js';
 import { isHostOf, TableError, TableService, type SeatRecord, type TableRecord } from './tables/service.js';
 import { Realtime, MoveError } from './realtime.js';
@@ -38,6 +42,11 @@ export const GUEST_COOKIE = 'universe_guest';
  *  link is opened (SEC-03-F11). Over HTTPS it carries the `__Host-` prefix,
  *  so a sibling subdomain cannot plant one. */
 export const SIGNIN_COOKIE = 'universe_signin';
+/** Holds the PKCE secret of a Discord or Google sign-in in progress (T09),
+ *  in the browser that started it; HttpOnly, so page scripts never see it. */
+export const OAUTH_COOKIE = 'universe_oauth';
+/** How long a Discord or Google sign-in may take, start to finish. */
+const OAUTH_TTL_S = 10 * 60;
 const GUEST_COOKIE_MAX_AGE_S = Math.floor(GUEST_TTL_MS / 1000);
 
 import { DESIGNERS, ZEKEL_GAMES, ZEKEL_UPDATES } from './storefront.js';
@@ -71,6 +80,10 @@ export interface BuildAppOptions {
   /** Sign-in emails whose accounts may use the admin page (/api/admin/*).
    *  Empty: nobody can. */
   adminEmails?: string[];
+  /** Sign-in with Discord and Google through Supabase (T09): the server runs
+   *  Supabase's PKCE flow (supabaseAuth.ts). Unset: those buttons are not
+   *  offered and the routes answer 404. */
+  supabase?: SupabaseService | null;
   /** Test-only: expose the ConsoleMailer's outbox at /api/test/outbox.
    *  Must never be set in production (index.ts enforces). */
   testOutbox?: boolean;
@@ -154,6 +167,7 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
   // signs in more than one person.
   const linkLimiter = new RateLimiter(5, 15 * 60 * 1000);
   const linkIpLimiter = new RateLimiter(opts.limits?.linksPerIp ?? 30, 15 * 60 * 1000);
+  const supabaseIpLimiter = new RateLimiter(opts.limits?.linksPerIp ?? 30, 15 * 60 * 1000);
   const guestLimiter = new RateLimiter(opts.limits?.guestsPerIp ?? 30, 15 * 60 * 1000);
   const tableLimiter = new RateLimiter(opts.limits?.tablesPerPrincipal ?? 30, 60 * 60 * 1000);
   const referenceCache = new Map<string, GameReferenceResponse>();
@@ -457,6 +471,124 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
   const signinCookieName = opts.secureCookies ? `__Host-${SIGNIN_COOKIE}` : SIGNIN_COOKIE;
   const signinCookieOptions = { ...cookieOptions, path: '/' };
 
+  /** The account behind an email identity, made if there is none yet. */
+  async function findOrCreateEmailUser(trx: Kysely<DB>, email: string): Promise<string> {
+    const identity = await trx.selectFrom('identities').select('user_id')
+      .where('provider', '=', 'email').where('provider_subject', '=', email).executeTakeFirst();
+    if (identity) return identity.user_id;
+    const userId = newId();
+    await trx.insertInto('users').values({
+      id: userId, display_name: email.split('@')[0] ?? 'Player', avatar_url: null, bio: null, created_at: now(),
+    }).execute();
+    await trx.insertInto('identities').values({
+      id: newId(), user_id: userId, provider: 'email', provider_subject: email,
+    }).execute();
+    return userId;
+  }
+
+  /** The account behind a Supabase sign-in. In order: the account this
+   *  Supabase user already signed in to; else the account that already has
+   *  this email, if Supabase has the email confirmed; else a new one. A
+   *  confirmed email no account holds is recorded as an email identity too,
+   *  so the email link and the admin check (admin.ts) find the account. An
+   *  unconfirmed email is never recorded and never joins an account. */
+  async function findOrCreateSupabaseUser(trx: Kysely<DB>, who: SupabaseSignIn): Promise<string> {
+    const linked = await trx.selectFrom('identities').select('user_id')
+      .where('provider', '=', 'supabase').where('provider_subject', '=', who.subject).executeTakeFirst();
+    const byEmail = who.confirmedEmail
+      ? await trx.selectFrom('identities').select('user_id')
+        .where('provider', '=', 'email').where('provider_subject', '=', who.confirmedEmail).executeTakeFirst()
+      : undefined;
+    let userId = linked?.user_id ?? byEmail?.user_id;
+    if (!userId) {
+      userId = newId();
+      const name = who.displayName ?? who.confirmedEmail?.split('@')[0] ?? 'Player';
+      await trx.insertInto('users').values({
+        id: userId, display_name: name.slice(0, 40), avatar_url: null, bio: null, created_at: now(),
+      }).execute();
+    }
+    if (!linked) {
+      await trx.insertInto('identities').values({
+        id: newId(), user_id: userId, provider: 'supabase', provider_subject: who.subject,
+      }).execute();
+    }
+    if (who.confirmedEmail && !byEmail) {
+      await trx.insertInto('identities').values({
+        id: newId(), user_id: userId, provider: 'email', provider_subject: who.confirmedEmail,
+      }).execute();
+    }
+    return userId;
+  }
+
+  /** The end of every sign-in, whichever way the player proved who they
+   *  are. `claim` runs first inside the transaction and returns the account
+   *  to sign in to, or null to refuse (nothing is then changed). `linkHash`
+   *  records what made the session, for the status questions.
+   *
+   *  The session this browser was signed in with, if any, ends here: the
+   *  new cookie replaces it, and a socket still holding it (in this tab or
+   *  another of this browser) must not go on acting as that account. Only
+   *  the session in this request is ended; it moves nothing to the new
+   *  account. A guest cookie on this request keeps its seats, its tables and
+   *  its notifications: everything moves to the user. Both credentials'
+   *  sockets are revoked from now, and cut at the end, so they reconnect as
+   *  the user. The auth cookie is set only once everything is written. */
+  async function finishSignIn(
+    req: FastifyRequest, reply: FastifyReply, linkHash: string | null,
+    claim: (trx: Kysely<DB>) => Promise<string | null>,
+  ): Promise<{ userId: string } | null> {
+    const revocation = beginRevocation(reply);
+    let outcome: { userId: string; sessionToken: string } | null;
+    try {
+      const oldAuth = req.cookies[AUTH_COOKIE];
+      const oldHash = oldAuth ? hashToken(oldAuth) : null;
+      if (oldHash) revocation.add(credentialRoom({ kind: 'session', tokenHash: oldHash }));
+
+      const guestToken = req.cookies[GUEST_COOKIE];
+      const guest = guestToken
+        ? await db.selectFrom('guests').select(['id', 'upgraded_to_user_id', 'created_at', 'expires_at'])
+          .where('token_hash', '=', hashToken(guestToken)).executeTakeFirst()
+        : undefined;
+      const upgrading = guest && !guest.upgraded_to_user_id && guestExpiresAt(guest) > Date.now() ? guest : null;
+      if (upgrading) revocation.add(credentialRoom({ kind: 'guest', guestId: upgrading.id }));
+
+      // One transaction: the claim, ending the old session, the guest's
+      // transfer and the new session all happen or none does. A failure
+      // leaves everything as it was, so trying again finishes the job.
+      outcome = await db.transaction().execute(async (trx) => {
+        const userId = await claim(trx);
+        if (!userId) return null;
+
+        if (oldHash) await trx.deleteFrom('auth_sessions').where('token_hash', '=', oldHash).execute();
+        if (upgrading) {
+          // Only a guest still not upgraded moves; a concurrent upgrade won.
+          const marked = await trx.updateTable('guests').set({ upgraded_to_user_id: userId })
+            .where('id', '=', upgrading.id).where('upgraded_to_user_id', 'is', null).executeTakeFirst();
+          if (Number(marked.numUpdatedRows) === 1) {
+            await trx.updateTable('seats').set({ user_id: userId, guest_id: null }).where('guest_id', '=', upgrading.id).execute();
+            await trx.updateTable('tables').set({ host_user_id: userId, host_guest_id: null }).where('host_guest_id', '=', upgrading.id).execute();
+            await trx.updateTable('notifications').set({ user_id: userId, guest_id: null }).where('guest_id', '=', upgrading.id).execute();
+          }
+        }
+
+        // The session remembers what made it (the email link, or the
+        // Discord or Google code), so a browser whose answer was lost can
+        // ask whether that sign-in signed it in (the two status routes).
+        const sessionToken = newToken();
+        await trx.insertInto('auth_sessions').values({
+          id: newId(), user_id: userId, token_hash: hashToken(sessionToken), created_at: now(),
+          expires_at: new Date(Date.now() + SESSION_TTL_MS).toISOString(), link_hash: linkHash,
+        }).execute();
+        return { userId, sessionToken };
+      });
+    } finally {
+      revocation.settled();
+    }
+    if (!outcome) return null;
+    reply.setCookie(AUTH_COOKIE, outcome.sessionToken, { ...cookieOptions, maxAge: Math.floor(SESSION_TTL_MS / 1000) });
+    return { userId: outcome.userId };
+  }
+
   app.post('/api/auth/email/link', async (req, reply) => {
     const body = (req.body ?? {}) as { email?: string };
     const email = body.email?.trim().toLowerCase();
@@ -499,85 +631,117 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     const email = token ? await peekSignInLink(db, token, nonce) : null;
     if (!email) return reply.code(401).send({ error: 'invalid_or_expired_token' });
 
-    // The session this browser was signed in with, if any, ends here: the
-    // new cookie replaces it, and a socket still holding it (in this tab or
-    // another of this browser) must not go on acting as that account. Only
-    // the session in this request is ended; it moves nothing to the new
-    // account. Its sockets are revoked from now, and cut at the end.
-    const revocation = beginRevocation(reply);
-    let outcome: { userId: string; sessionToken: string } | null;
-    try {
-      const oldAuth = req.cookies[AUTH_COOKIE];
-      const oldHash = oldAuth ? hashToken(oldAuth) : null;
-      if (oldHash) revocation.add(credentialRoom({ kind: 'session', tokenHash: oldHash }));
-
-      // A guest cookie on this request keeps its seats, its tables and its
-      // notifications: everything moves to the user. The guest's sockets
-      // are revoked too, so they reconnect as the user.
-      const guestToken = req.cookies[GUEST_COOKIE];
-      const guest = guestToken
-        ? await db.selectFrom('guests').select(['id', 'upgraded_to_user_id', 'created_at', 'expires_at'])
-          .where('token_hash', '=', hashToken(guestToken)).executeTakeFirst()
-        : undefined;
-      const upgrading = guest && !guest.upgraded_to_user_id && guestExpiresAt(guest) > Date.now() ? guest : null;
-      if (upgrading) revocation.add(credentialRoom({ kind: 'guest', guestId: upgrading.id }));
-
-      // One transaction: using the link up, the account, ending the old
-      // session, the guest's transfer and the new session all happen or
-      // none does. A failure leaves the link usable, the guest and the old
-      // session as they were, so trying again finishes the job.
-      outcome = await db.transaction().execute(async (trx) => {
-        const consumed = await consumeSignInLink(trx, token, nonce);
-        if (!consumed) return null; // used or expired since the read above
-        // The nonce is spent: this browser's other pending links go with it.
-        await trx.deleteFrom('sign_in_links').where('nonce_hash', '=', hashToken(nonce)).execute();
-
-        // Find or create the user behind this email identity.
-        const identity = await trx.selectFrom('identities').select('user_id')
-          .where('provider', '=', 'email').where('provider_subject', '=', consumed).executeTakeFirst();
-        let userId: string;
-        if (identity) {
-          userId = identity.user_id;
-        } else {
-          userId = newId();
-          await trx.insertInto('users').values({
-            id: userId, display_name: consumed.split('@')[0] ?? 'Player', avatar_url: null, bio: null, created_at: now(),
-          }).execute();
-          await trx.insertInto('identities').values({
-            id: newId(), user_id: userId, provider: 'email', provider_subject: consumed,
-          }).execute();
-        }
-
-        if (oldHash) await trx.deleteFrom('auth_sessions').where('token_hash', '=', oldHash).execute();
-        if (upgrading) {
-          // Only a guest still not upgraded moves; a concurrent upgrade won.
-          const marked = await trx.updateTable('guests').set({ upgraded_to_user_id: userId })
-            .where('id', '=', upgrading.id).where('upgraded_to_user_id', 'is', null).executeTakeFirst();
-          if (Number(marked.numUpdatedRows) === 1) {
-            await trx.updateTable('seats').set({ user_id: userId, guest_id: null }).where('guest_id', '=', upgrading.id).execute();
-            await trx.updateTable('tables').set({ host_user_id: userId, host_guest_id: null }).where('host_guest_id', '=', upgrading.id).execute();
-            await trx.updateTable('notifications').set({ user_id: userId, guest_id: null }).where('guest_id', '=', upgrading.id).execute();
-          }
-        }
-
-        // The session remembers which link made it, so a browser whose answer
-        // was lost can ask whether this link signed it in (link-status below).
-        const sessionToken = newToken();
-        await trx.insertInto('auth_sessions').values({
-          id: newId(), user_id: userId, token_hash: hashToken(sessionToken), created_at: now(),
-          expires_at: new Date(Date.now() + SESSION_TTL_MS).toISOString(), link_hash: linkProof(token),
-        }).execute();
-        return { userId, sessionToken };
-      });
-    } finally {
-      revocation.settled();
-    }
-    // Cookies change only once everything is written: a failed completion
-    // keeps this browser's nonce, so the same link can be tried again.
+    const outcome = await finishSignIn(req, reply, linkProof(token), async (trx) => {
+      const consumed = await consumeSignInLink(trx, token, nonce);
+      if (!consumed) return null; // used or expired since the read above
+      // The nonce is spent: this browser's other pending links go with it.
+      await trx.deleteFrom('sign_in_links').where('nonce_hash', '=', hashToken(nonce)).execute();
+      return findOrCreateEmailUser(trx, consumed);
+    });
+    // A failed completion keeps this browser's nonce, so the same link can
+    // be tried again.
     if (!outcome) return reply.code(401).send({ error: 'invalid_or_expired_token' });
-    reply.clearCookie(signinCookieName, { path: '/' });
-    reply.setCookie(AUTH_COOKIE, outcome.sessionToken, { ...cookieOptions, maxAge: Math.floor(SESSION_TTL_MS / 1000) });
+    reply.clearCookie(signinCookieName, signinCookieOptions);
     return { ok: true, userId: outcome.userId };
+  });
+
+  // Which other ways to sign in this server offers, for the sign-in page.
+  app.get('/api/auth/providers', async () => ({
+    providers: opts.supabase ? [...SIGN_IN_PROVIDERS] : [],
+  }));
+
+  const oauthCookieName = opts.secureCookies ? `__Host-${OAUTH_COOKIE}` : OAUTH_COOKIE;
+  const oauthRefused = (reply: FastifyReply) =>
+    reply.code(401).send({ error: 'sign_in_refused', message: 'That sign-in did not work. Start again.' });
+  const oauthUnavailable = (reply: FastifyReply) =>
+    reply.code(503).send({ error: 'sign_in_unavailable', message: 'Sign-in is not answering. Try again in a moment.' });
+  const oauthLimit = (req: FastifyRequest, reply: FastifyReply) => {
+    if (supabaseIpLimiter.allow(`ip:${clientIp(req)}`)) return false;
+    void reply.code(429).send({ error: 'too_many_requests', message: 'Try again in a few minutes.' });
+    return true;
+  };
+  const codeOf = (body: unknown) => {
+    const c = (body as { code?: unknown } | null)?.code;
+    return typeof c === 'string' && c.length > 0 && c.length <= 512 ? c : null;
+  };
+
+  // A Discord or Google sign-in begins here (T09). This browser gets a new
+  // PKCE secret in an HttpOnly cookie, replacing any earlier one, and the
+  // address of Supabase's authorize page, which carries only the secret's
+  // hash. The cookie is never cleared, only left to expire or replaced: a
+  // secret whose code is spent is useless (Supabase trades a code once), and
+  // keeping it means an older sign-in's late return cannot wipe a newer
+  // one's secret. The email link's own cookie is not touched.
+  app.post('/api/auth/supabase/start', async (req, reply) => {
+    if (!opts.supabase) return reply.code(404).send({ error: 'not_offered' });
+    if (oauthLimit(req, reply)) return reply;
+    const body = (req.body ?? {}) as { provider?: unknown };
+    if (!isSignInProvider(body.provider)) return reply.code(400).send({ error: 'unknown_provider' });
+    const { verifier, challenge } = newPkcePair();
+    reply.setCookie(oauthCookieName, verifier, { ...cookieOptions, path: '/', maxAge: OAUTH_TTL_S });
+    return { url: opts.supabase.authorizeUrl(body.provider, `${opts.appOrigin}/auth/callback`, challenge) };
+  });
+
+  // The end of a Discord or Google sign-in (T09). The page brings Supabase's
+  // one-time code; the server trades it, with this browser's PKCE secret,
+  // for Supabase's access token, checks it (supabaseAuth.ts), and signs the
+  // player in as an email link does (finishSignIn). Refused before anything
+  // changes: a browser with no sign-in in progress, a code Supabase will not
+  // trade (another browser's, used, expired), a token that fails the check.
+  //
+  // Only a trade Supabase did not take (busy or down) can be tried again with
+  // the same code; once traded, any failure means starting again. Sending a
+  // code again is always safe: Supabase refuses a spent one. If an answer is
+  // lost after the sign-in was saved, either its cookie still arrived (the
+  // player is signed in, and the page says it cannot tell and links to the
+  // account), or it did not, and the session it made is useless to anyone
+  // (its cookie value is random) and the player signs in again. The Supabase
+  // session is ended either way and its tokens dropped.
+  app.post('/api/auth/supabase/complete', async (req, reply) => {
+    if (!opts.supabase) return reply.code(404).send({ error: 'not_offered' });
+    if (oauthLimit(req, reply)) return reply;
+    const verifier = req.cookies[oauthCookieName];
+    if (!isWellFormedVerifier(verifier)) {
+      return reply.code(401).send({ error: 'sign_in_wrong_browser', message: 'Start the sign-in again in this browser.' });
+    }
+    const code = codeOf(req.body);
+    if (!code) return oauthRefused(reply);
+    const supabase = opts.supabase;
+    const reason = (e: unknown) => (e instanceof SupabaseTokenError ? e.reason : 'error');
+    let token: string;
+    try {
+      token = await supabase.exchange(code, verifier);
+    } catch (e) {
+      req.log.warn({ reason: reason(e) }, 'supabase sign-in refused at the trade');
+      return e instanceof SupabaseTokenError && !e.final ? oauthUnavailable(reply) : oauthRefused(reply);
+    }
+    try {
+      let who: SupabaseSignIn;
+      try {
+        who = await supabase.check(token);
+      } catch (e) {
+        // The code is spent: whatever went wrong, this sign-in is over.
+        req.log.warn({ reason: reason(e) }, 'supabase sign-in refused at the check');
+        return oauthRefused(reply);
+      }
+      let outcome: { userId: string } | null;
+      try {
+        outcome = await finishSignIn(req, reply, null, (trx) => findOrCreateSupabaseUser(trx, who));
+      } catch (e) {
+        // Nothing was written (one transaction), and the code is spent.
+        req.log.error({ err: e }, 'supabase sign-in failed to save');
+        return reply.code(500).send({ error: 'sign_in_failed', message: 'That sign-in could not be saved. Start again.' });
+      }
+      if (!outcome) return oauthRefused(reply);
+      return { ok: true, userId: outcome.userId };
+    } finally {
+      // Universe's cookie is the only sign-in that counts: end the Supabase
+      // session, which also ends its refresh token. A failure is logged; the
+      // tokens are dropped here either way and were never sent to anyone.
+      await supabase.end(token).catch((e: unknown) => {
+        req.log.warn({ reason: reason(e) }, 'supabase session not ended');
+      });
+    }
   });
 
   // Did this link sign this browser in? Asked by the landing page when the

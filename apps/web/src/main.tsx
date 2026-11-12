@@ -17,7 +17,7 @@ import { SetupPage } from './pages/Setup';
 import { LobbyPage } from './pages/Lobby';
 import { TablePage } from './pages/Table';
 import { ProfilePage } from './pages/Profile';
-import { SignInPage, SignInCompletePage } from './pages/SignIn';
+import { SignInPage, SignInCompletePage, SignInCallbackPage } from './pages/SignIn';
 import { GalleryPage } from './pages/Gallery';
 import { NotFoundPage } from './pages/NotFound';
 
@@ -35,6 +35,7 @@ const router = createBrowserRouter([
   { path: '/profile', element: <ProfilePage /> },
   { path: '/signin', element: <SignInPage /> },
   { path: '/signin/complete', element: <SignInCompletePage /> },
+  { path: '/auth/callback', element: <SignInCallbackPage /> },
   { path: '/gallery', element: <GalleryPage /> },
   // The admin page loads on its own: players never download it.
   { path: '/admin', lazy: () => import('./pages/Admin').then((m) => ({ Component: m.AdminPage })) },
