@@ -101,7 +101,9 @@ Discord and Google are live.
    old session ended.
 3. Done: the two buttons and the `/auth/callback` page, with page tests.
 4. Done: settings, `render.yaml`, `.env.example`, deploy notes.
-5. A security review in `docs/security-reviews/`, then a PR.
+5. Done: security review, `docs/security-reviews/2026-11-12-e03e446-change.md`.
+   It found one problem, fixed: a used token could sign in again for five
+   minutes; the server now ends its Supabase session once it is used.
 
 Then a real sign-in with Discord and with Google on staging. That needs the
 setup above done first.
