@@ -1,6 +1,7 @@
 // Sign-in, as the canvas draws it: a card over the page with the
 // wordmark, the passwordless promise, the email row, and the guest escape
-// hatch. Passwordless by email link only in v0.
+// hatch. Passwordless: Discord or Google through Supabase when the server
+// offers them (T09), and the email link.
 
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
@@ -8,6 +9,7 @@ import { api, ApiRequestError } from '../api';
 import { useSession } from '../session';
 import { Nav } from './Nav';
 import { Wordmark } from '../ui';
+import { finishSignIn, NEXT_KEY, startSignIn, type SignInProvider, type SupabaseConfig } from '../supabaseSignIn';
 
 export function SignInPage() {
   const [email, setEmail] = useState('');
@@ -17,12 +19,32 @@ export function SignInPage() {
   const session = useSession();
   const next = params.get('next') ?? '/';
   const forFriends = /friends=1/.test(next);
+  const [supabase, setSupabase] = useState<SupabaseConfig | null>(null);
+  const [leaving, setLeaving] = useState<SignInProvider | null>(null);
+
+  useEffect(() => {
+    let live = true;
+    api.authProviders().then((r) => { if (live) setSupabase(r.supabase); }).catch(() => undefined);
+    return () => { live = false; };
+  }, []);
+
+  async function go(provider: SignInProvider) {
+    if (!supabase) return;
+    setErr(null);
+    setLeaving(provider);
+    try {
+      await startSignIn(supabase, provider, next);
+    } catch (e) {
+      setLeaving(null);
+      setErr(e instanceof Error ? e.message : String(e));
+    }
+  }
 
   async function send() {
     setErr(null);
     try {
       await api.signInEmail(email);
-      try { sessionStorage.setItem('universe:signin:next', next); } catch { /* ignore */ }
+      try { sessionStorage.setItem(NEXT_KEY, next); } catch { /* ignore */ }
       setSent(true);
     } catch (e) {
       setErr(e instanceof ApiRequestError ? e.message : String(e));
@@ -38,11 +60,21 @@ export function SignInPage() {
           <div>
             <h1>{forFriends ? 'Sign in to play with friends' : 'Sign in'}</h1>
             <p className="muted" style={{ marginTop: 6, lineHeight: 1.5 }}>
-              No password. We email you a link; opening it signs you in{next !== '/' ? ' and brings you straight back' : ''}.
+              No password. {supabase ? 'Use Discord or Google, or we' : 'We'} email you a link; opening it signs you in{next !== '/' ? ' and brings you straight back' : ''}.
               {!session.signedIn && ' The games you played as a guest come with you.'}
             </p>
           </div>
           {session.signedIn && <p>You are signed in as <strong>{session.displayName}</strong>. <Link to="/profile">Profile</Link></p>}
+          {supabase && !sent && (
+            <div className="stack" style={{ gap: 8 }}>
+              <button className="btn" type="button" disabled={leaving !== null} onClick={() => void go('discord')}>
+                {leaving === 'discord' ? 'Going to Discord…' : 'Sign in with Discord'}
+              </button>
+              <button className="btn" type="button" disabled={leaving !== null} onClick={() => void go('google')}>
+                {leaving === 'google' ? 'Going to Google…' : 'Sign in with Google'}
+              </button>
+            </div>
+          )}
           {sent ? (
             <p>Link sent to <strong>{email}</strong>. Open it in this browser: it works once, only here, and expires in 15 minutes.</p>
           ) : (
@@ -164,7 +196,7 @@ export function SignInCompletePage() {
     await session.refresh();
     if (!live()) return;
     let next = '/';
-    try { next = sessionStorage.getItem('universe:signin:next') ?? '/'; } catch { /* ignore */ }
+    try { next = sessionStorage.getItem(NEXT_KEY) ?? '/'; } catch { /* ignore */ }
     nav(next.startsWith('/') ? next : '/', { replace: true });
   }
 
@@ -202,6 +234,62 @@ export function SignInCompletePage() {
           {err?.retry && (
             <button className="btn green" type="button" onClick={retry} disabled={working}>Try again</button>
           )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Where Discord or Google send the player back, through Supabase, with a
+ *  one-time code in the address (`?code=`), or `?error=` when the player
+ *  said no. The code leaves the address bar at once; this browser trades it
+ *  for a token with the secret it kept when the trip began, and the server
+ *  signs the player in. Nothing else in the address is read. */
+export function SignInCallbackPage() {
+  const nav = useNavigate();
+  const session = useSession();
+  const [err, setErr] = useState<string | null>(null);
+
+  // What the address said, read once when the page first draws: React keeps
+  // it through its development double run, after the address bar is cleared.
+  const [{ code, refused }] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return { code: params.get('code'), refused: params.has('error') };
+  });
+
+  useEffect(() => {
+    let live = true;
+    window.history.replaceState(window.history.state, '', window.location.pathname);
+    if (!code) {
+      setErr(refused ? 'Sign-in was cancelled.' : 'This sign-in link is missing its code.');
+      return;
+    }
+    void (async () => {
+      try {
+        const { supabase } = await api.authProviders();
+        if (!supabase) throw new Error('Sign-in with Discord or Google is not offered here.');
+        await finishSignIn(supabase, code);
+        await session.refresh();
+        if (!live) return;
+        let next = '/';
+        try { next = sessionStorage.getItem(NEXT_KEY) ?? '/'; } catch { /* ignore */ }
+        nav(next.startsWith('/') && !next.startsWith('//') ? next : '/', { replace: true });
+      } catch (e) {
+        if (live) setErr(e instanceof ApiRequestError || e instanceof Error ? e.message : String(e));
+      }
+    })();
+    return () => { live = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div>
+      <Nav />
+      <div className="page">
+        <div className="card modal-card">
+          <Wordmark size={28} />
+          <h1>Signing you in…</h1>
+          {err && <p className="error">{err} <Link to="/signin">Sign in</Link></p>}
         </div>
       </div>
     </div>

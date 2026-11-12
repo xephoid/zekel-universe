@@ -41,6 +41,9 @@ export const api = {
   /** Was this browser's current session made by this sign-in link? Changes nothing. */
   signInLinkStatus: (token: string) => post<{ signedIn: boolean; userId?: string }>('/api/auth/email/link-status', { token }),
   signOut: () => post<{ ok: true }>('/api/auth/signout'),
+  /** Other ways to sign in this server offers (Discord and Google, through Supabase). */
+  authProviders: () => req<{ supabase: { url: string; publishableKey: string } | null }>('/api/auth/providers'),
+  completeSupabaseSignIn: (accessToken: string) => post<{ ok: true; userId: string }>('/api/auth/supabase/complete', { accessToken }),
 
   games: () => req<GamesResponse>('/api/games'),
   game: (id: string) => req<GameResponse>(`/api/games/${encodeURIComponent(id)}`),

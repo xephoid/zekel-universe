@@ -242,6 +242,13 @@ describe('sign-in through Supabase', () => {
     });
   });
 
+  it('the page security policy lets the browser reach the Supabase project, and nothing else new', async () => {
+    const res = await app.fastify.inject({ method: 'GET', url: '/signin' });
+    const csp = String(res.headers['content-security-policy']);
+    expect(csp).toContain(`connect-src 'self' ws: wss: ${PROJECT};`);
+    expect(csp).toContain("script-src 'self';");
+  });
+
   it('another site cannot post a token (the Origin check)', async () => {
     const res = await app.fastify.inject({
       method: 'POST', url: '/api/auth/supabase/complete', headers: { origin: 'https://evil.example' },

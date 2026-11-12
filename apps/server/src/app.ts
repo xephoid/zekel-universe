@@ -356,7 +356,7 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     } else {
       reply.header('Content-Security-Policy',
         "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; " +
-        "font-src 'self' data:; connect-src 'self' ws: wss:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
+        `font-src 'self' data:; connect-src 'self' ws: wss:${opts.supabase ? ` ${opts.supabase.url}` : ''}; frame-ancestors 'none'; base-uri 'self'; form-action 'self'`);
     }
   });
 
