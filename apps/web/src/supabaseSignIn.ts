@@ -21,12 +21,14 @@ export async function startSignIn(provider: SignInProvider, next: string): Promi
 }
 
 /** Why a sign-in did not finish, for the player. `retry`: the same code
- *  can be tried again (the server or Supabase did not answer). */
+ *  can be tried again (the server or Supabase did not answer). `unsure`:
+ *  the answer was lost, so the sign-in may have finished anyway (the cookie
+ *  can arrive even when the rest of the answer does not). */
 export class SignInError extends Error {
-  constructor(message: string, readonly retry: boolean) { super(message); }
+  constructor(message: string, readonly retry: boolean, readonly unsure = false) { super(message); }
 }
 
-const UNREACHABLE = 'We could not reach the server to finish signing you in. Check your connection and try again, or start the sign-in again.';
+const UNSURE = 'We could not tell whether the sign-in finished: the answer was lost on the way. See which account you are signed in with, or try again.';
 
 /** The completion in flight, per code: React's development double run waits
  *  on the first rather than sending the code twice. A failure lets the same
@@ -46,7 +48,7 @@ export function finishSignIn(code: string): Promise<void> {
       if (e instanceof ApiRequestError) {
         throw new SignInError(e.message, e.code === 'sign_in_unavailable' || e.code === 'too_many_requests');
       }
-      throw new SignInError(UNREACHABLE, true);
+      throw new SignInError(UNSURE, true, true);
     }
   })();
   const entry = { code, run };

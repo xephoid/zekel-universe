@@ -248,7 +248,7 @@ export function SignInCompletePage() {
  *  in the address is read. Once signed in, the next page loads afresh, so
  *  every part of the app starts again as the new account. */
 export function SignInCallbackPage() {
-  const [err, setErr] = useState<{ message: string; retry: boolean } | null>(null);
+  const [err, setErr] = useState<{ message: string; retry: boolean; unsure: boolean } | null>(null);
   const [working, setWorking] = useState(true);
   // What the address said, read once when the page first draws: React keeps
   // it through its development double run, after the address bar is cleared.
@@ -270,7 +270,11 @@ export function SignInCallbackPage() {
     } catch (e) {
       if (!live.current) return;
       setWorking(false);
-      setErr({ message: e instanceof Error ? e.message : String(e), retry: e instanceof SignInError && e.retry });
+      setErr({
+        message: e instanceof Error ? e.message : String(e),
+        retry: e instanceof SignInError && e.retry,
+        unsure: e instanceof SignInError && e.unsure,
+      });
     }
   }
 
@@ -279,7 +283,7 @@ export function SignInCallbackPage() {
     window.history.replaceState(window.history.state, '', window.location.pathname);
     if (!code) {
       setWorking(false);
-      setErr({ message: refused ? 'Sign-in was cancelled.' : 'This sign-in link is missing its code.', retry: false });
+      setErr({ message: refused ? 'Sign-in was cancelled.' : 'This sign-in link is missing its code.', retry: false, unsure: false });
     } else {
       void run(code);
     }
@@ -297,6 +301,7 @@ export function SignInCallbackPage() {
           {err && (err.retry
             ? <p className="error">{err.message}</p>
             : <p className="error">{err.message} <Link to="/signin">Sign in</Link></p>)}
+          {err?.unsure && <p><a href="/profile">See which account you are signed in with</a></p>}
           {err?.retry && code && (
             <button className="btn green" type="button" onClick={() => void run(code)} disabled={working}>Try again</button>
           )}

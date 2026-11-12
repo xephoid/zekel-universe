@@ -147,6 +147,16 @@ describe('the callback page', () => {
     ]);
   });
 
+  it('when the answer is lost, the page says it cannot tell, links to the account, and offers Try again', async () => {
+    stubServer({ complete: 0 });
+    window.history.replaceState(null, '', '/auth/callback?code=lost-page');
+    renderAt('/auth/callback', <SignInCallbackPage />, '/auth/callback');
+    expect(await screen.findByText(/could not tell whether the sign-in finished/)).toBeTruthy();
+    expect(screen.getByText('See which account you are signed in with').getAttribute('href')).toBe('/profile');
+    expect(screen.getByText('Try again')).toBeTruthy();
+    expect(nav.reloadAt).not.toHaveBeenCalled();
+  });
+
   it('a sign-in that could not be saved says start again, with no Try again', async () => {
     stubServer({ complete: 500 });
     window.history.replaceState(null, '', '/auth/callback?code=c4');
@@ -200,9 +210,9 @@ describe('the trip (supabaseSignIn.ts)', () => {
     expect(completes()).toHaveLength(1);
   });
 
-  it('a lost answer: says the server could not be reached and offers to try again, sending nothing more by itself', async () => {
+  it('a lost answer: says it cannot tell whether the sign-in finished, offers to try again, and sends nothing more by itself', async () => {
     stubServer({ complete: 0 });
-    await expect(finishSignIn('lost')).rejects.toMatchObject({ retry: true, message: expect.stringMatching(/could not reach the server/) });
+    await expect(finishSignIn('lost')).rejects.toMatchObject({ retry: true, unsure: true, message: expect.stringMatching(/could not tell whether the sign-in finished/) });
     expect(completes()).toHaveLength(1);
   });
 

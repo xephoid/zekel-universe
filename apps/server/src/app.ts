@@ -692,9 +692,11 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
   // Only a trade Supabase did not take (busy or down) can be tried again with
   // the same code; once traded, any failure means starting again. Sending a
   // code again is always safe: Supabase refuses a spent one. If an answer is
-  // lost after the sign-in was saved, the session it made is never delivered
-  // and nobody can use it (its cookie value is random); the player signs in
-  // again. The Supabase session is ended either way and its tokens dropped.
+  // lost after the sign-in was saved, either its cookie still arrived (the
+  // player is signed in, and the page says it cannot tell and links to the
+  // account), or it did not, and the session it made is useless to anyone
+  // (its cookie value is random) and the player signs in again. The Supabase
+  // session is ended either way and its tokens dropped.
   app.post('/api/auth/supabase/complete', async (req, reply) => {
     if (!opts.supabase) return reply.code(404).send({ error: 'not_offered' });
     if (oauthLimit(req, reply)) return reply;

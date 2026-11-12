@@ -58,16 +58,19 @@ reaches the browser,** and the browser needs no Supabase library.
    again as the new account. Where it goes is parsed as an address, must be
    a page of this site, and is used as the full checked address
    (`//other.site` and `/\other.site` go home).
-9. **A lost answer means signing in again.** If the server's answer never
-   reaches the page, it says it could not reach the server and offers "Try
-   again", which sends the same code. That is always safe: if the first try
-   never arrived, this one works; if it did, Supabase refuses the spent code
-   and the player starts again, usually one click, since Discord or Google
-   still knows them. Their guest games already moved to their account. The
-   session the lost answer made is useless to anyone: its cookie value is
-   random and was never delivered. Recovering it automatically was tried and
-   dropped: every way of handing it over later opened new ways for it to
-   reach the wrong browser or account (see the security review).
+9. **A lost answer is not recovered automatically.** If the server's answer
+   does not reach the page, the page says it cannot tell whether the sign-in
+   finished, links to the profile page to see which account is signed in,
+   and offers "Try again", which sends the same code. Sending it again is
+   always safe: if the first try never arrived, this one works; if it did,
+   Supabase refuses the spent code. Either the first answer's cookie arrived
+   anyway (the player is signed in), or it did not, and the player starts
+   again, usually one click, since Discord or Google still knows them; their
+   guest games already moved to their account. A session whose cookie never
+   arrived is useless to anyone: its value is random. Recovering it
+   automatically was tried and dropped: every way of handing it over later
+   opened new ways for it to reach the wrong browser or account (see the
+   security review).
 
 Signing keys must be the newer asymmetric kind (the project setting "JWT
 signing keys"): with the old shared secret there are no public keys, and
