@@ -37,5 +37,9 @@ export default defineConfig({
   test: {
     environmentMatchGlobs: [['**/*.test.tsx', 'jsdom']],
     css: false,
+    // An installed game's screen (@zekel/<game>/glue, built to dist/glue/)
+    // imports its own stylesheet, which plain Node cannot load: run those
+    // files through Vite, like our code. The pattern is tested on file paths.
+    server: { deps: { inline: [/[\\/]@zekel[\\/][^\\/]+[\\/]dist[\\/]glue[\\/]/] } },
   },
 });
