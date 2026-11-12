@@ -26,8 +26,7 @@ reaches the browser,** and the browser needs no Supabase library.
    authorize address, which carries only the secret's hash. The page goes
    there. The cookie is never cleared, only left to expire or replaced by a
    newer sign-in: a secret whose code is spent is useless, and keeping it
-   lets a lost answer be recovered (step 9) and stops an older sign-in's late
-   return from spoiling a newer one. Starting a second sign-in does make the
+   stops an older sign-in's late return from spoiling a newer one. Starting a second sign-in does make the
    first one's code useless.
 3. Discord or Google send the player back through Supabase to `/auth/callback`
    with a one-time code. The page clears it from the address bar and sends it
@@ -59,14 +58,16 @@ reaches the browser,** and the browser needs no Supabase library.
    again as the new account. Where it goes is parsed as an address, must be
    a page of this site, and is used as the full checked address
    (`//other.site` and `/\other.site` go home).
-9. **Sending the same code again is safe.** The new session's cookie value is
-   worked out from the code, this browser's secret and the server's key, not
-   drawn at random. So if the answer is lost on the way, the page sends the
-   code once more, and the server, finding that session, hands the same one
-   back without asking Supabase. Nothing is replaced or revoked. Only within
-   ten minutes of the sign-in (and while the secret's cookie lasts, which is
-   ten minutes from the start), and not once the browser has since signed in
-   elsewhere, become a new guest, or signed out.
+9. **A lost answer means signing in again.** If the server's answer never
+   reaches the page, it says it could not reach the server and offers "Try
+   again", which sends the same code. That is always safe: if the first try
+   never arrived, this one works; if it did, Supabase refuses the spent code
+   and the player starts again, usually one click, since Discord or Google
+   still knows them. Their guest games already moved to their account. The
+   session the lost answer made is useless to anyone: its cookie value is
+   random and was never delivered. Recovering it automatically was tried and
+   dropped: every way of handing it over later opened new ways for it to
+   reach the wrong browser or account (see the security review).
 
 Signing keys must be the newer asymmetric kind (the project setting "JWT
 signing keys"): with the old shared secret there are no public keys, and

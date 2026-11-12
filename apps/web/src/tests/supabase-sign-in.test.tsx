@@ -200,15 +200,16 @@ describe('the trip (supabaseSignIn.ts)', () => {
     expect(completes()).toHaveLength(1);
   });
 
-  it('a lost answer: the same code is sent once more, which is safe, and that one signs in', async () => {
-    stubServer({ complete: [0, 200] });
-    await expect(finishSignIn('lost-then-ok')).resolves.toBeUndefined();
-    expect(completes().map((c) => c.body)).toEqual([{ code: 'lost-then-ok' }, { code: 'lost-then-ok' }]);
+  it('a lost answer: says the server could not be reached and offers to try again, sending nothing more by itself', async () => {
+    stubServer({ complete: 0 });
+    await expect(finishSignIn('lost')).rejects.toMatchObject({ retry: true, message: expect.stringMatching(/could not reach the server/) });
+    expect(completes()).toHaveLength(1);
   });
 
-  it('both answers lost: says the server could not be reached, and offers to try again', async () => {
-    stubServer({ complete: 0 });
-    await expect(finishSignIn('lost-twice')).rejects.toMatchObject({ retry: true, message: expect.stringMatching(/could not reach the server/) });
+  it('after a failure the same code can be tried again (the server refuses it if it was spent)', async () => {
+    stubServer({ complete: [0, 200] });
+    await expect(finishSignIn('again')).rejects.toMatchObject({ retry: true });
+    await expect(finishSignIn('again')).resolves.toBeUndefined();
     expect(completes()).toHaveLength(2);
   });
 

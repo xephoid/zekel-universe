@@ -26,31 +26,27 @@ export class SignInError extends Error {
   constructor(message: string, readonly retry: boolean) { super(message); }
 }
 
-const UNREACHABLE = 'We could not reach the server to finish signing you in. Check your connection and try again.';
+const UNREACHABLE = 'We could not reach the server to finish signing you in. Check your connection and try again, or start the sign-in again.';
 
 /** The completion in flight, per code: React's development double run waits
  *  on the first rather than sending the code twice. A failure lets the same
  *  code be tried again. */
 let inFlight: { code: string; run: Promise<void> } | null = null;
 
-/** Hand the code to the server, which signs the player in. Sending it
- *  again is safe (the same browser gets the same session back), so when the
- *  answer is lost on the way, it is sent once more. Throws a SignInError
- *  otherwise; `retry` only when the server or Supabase did not answer, so
- *  the same code may still work. */
+/** Hand the code to the server, which signs the player in. Throws a
+ *  SignInError otherwise; `retry` when the server or Supabase did not
+ *  answer, so the same code may still work. Sending it again is safe: the
+ *  server refuses a code that is spent. */
 export function finishSignIn(code: string): Promise<void> {
   if (inFlight?.code === code) return inFlight.run;
   const run = (async () => {
-    for (let attempt = 0; ; attempt++) {
-      try {
-        await api.completeSupabaseSignIn(code);
-        return;
-      } catch (e) {
-        if (e instanceof ApiRequestError) {
-          throw new SignInError(e.message, e.code === 'sign_in_unavailable' || e.code === 'too_many_requests');
-        }
-        if (attempt >= 1) throw new SignInError(UNREACHABLE, true);
+    try {
+      await api.completeSupabaseSignIn(code);
+    } catch (e) {
+      if (e instanceof ApiRequestError) {
+        throw new SignInError(e.message, e.code === 'sign_in_unavailable' || e.code === 'too_many_requests');
       }
+      throw new SignInError(UNREACHABLE, true);
     }
   })();
   const entry = { code, run };
