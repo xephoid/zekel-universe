@@ -13,6 +13,9 @@ import { createDatabase, type DatabaseClient } from './db/index.js';
 import { ConsoleMailer } from './email.js';
 import { buildApp, type UniverseApp } from './app.js';
 import { parseAdminEmails } from './admin.js';
+import { ZEKEL_GAMES } from './storefront.js';
+import { existsSync } from 'node:fs';
+import path from 'node:path';
 import { FakeEngine } from './test-engine.js';
 
 const ORIGIN = 'http://localhost:5173';
@@ -71,6 +74,19 @@ describe('admin', () => {
       designerSlug: 'zekel-games', featuredRank: null, visibility: 'public', ...over,
     };
   }
+
+  it('the seed names only images the web app has, four screenshots a game', () => {
+    const publicDir = path.resolve(import.meta.dirname, '../../web/public');
+    for (const [id, g] of Object.entries(ZEKEL_GAMES)) {
+      expect(g.screenshots, id).toHaveLength(4);
+      for (const src of [g.coverImage, ...g.screenshots]) expect(existsSync(path.join(publicDir, src)), src).toBe(true);
+    }
+  });
+
+  it('a new game row starts with the seed screenshots', async () => {
+    const g = (await send('GET', '/api/games/fractured-fist')).json<GameResponse>().game;
+    expect(g.screenshots).toEqual(ZEKEL_GAMES['fractured-fist']!.screenshots);
+  });
 
   it('reads ADMIN_EMAILS in lower case, split on commas or spaces', () => {
     expect(parseAdminEmails(' A@x.com, b@y.org  c@z.net,,nonsense ')).toEqual(['a@x.com', 'b@y.org', 'c@z.net']);

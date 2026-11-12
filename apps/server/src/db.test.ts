@@ -126,6 +126,7 @@ describe('schema 8', () => {
       await app.refreshCatalog();
       const after = await upgraded.db.selectFrom('games').selectAll().where('engine_game_id', '=', 'fractured-fist').executeTakeFirstOrThrow();
       expect(after.designer_slug).toBe('zekel-games');
+      expect(JSON.parse(after.screenshots ?? '[]')).toHaveLength(4);
       // The copy already in the row is the row's: the seed does not overwrite it.
       expect(after.description).toBe('Written before.');
       expect(after.name).toBe('FF');

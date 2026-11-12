@@ -937,9 +937,11 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
       if (existing) {
         await db.updateTable('games').set({
           ...shared,
-          // A row from before schema 8 has no designer slug or cover focus
-          // yet; it takes the seed's once.
-          ...(own && existing.designer_slug == null ? { designer_slug: own.designer, cover_focus: own.coverFocus ?? null } : {}),
+          // A row from before schema 8 has no designer slug, cover focus or
+          // screenshots yet; it takes the seed's once.
+          ...(own && existing.designer_slug == null
+            ? { designer_slug: own.designer, cover_focus: own.coverFocus ?? null, screenshots: JSON.stringify(own.screenshots) }
+            : {}),
         }).where('engine_game_id', '=', g.game_id).execute();
       } else {
         await db.insertInto('games').values({
@@ -952,7 +954,7 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
           tags: JSON.stringify(own?.tags ?? []),
           cover_image: own?.coverImage ?? null,
           cover_focus: own?.coverFocus ?? null,
-          screenshots: '[]',
+          screenshots: JSON.stringify(own?.screenshots ?? []),
           featured_rank: null,
           description: own?.description ?? g.description ?? '',
           rules_url: null,

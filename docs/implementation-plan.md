@@ -1519,6 +1519,10 @@ their own pages.
   fills a row only when the row is new. An edit survives a restart and a
   deploy. A removed update keeps its row, marked removed, so the seed never
   posts it again.
+- **Screenshots to start with.** Each Zekel game ships four, taken from real
+  games against the AI at 1440 × 1080 and saved as 1200 × 900 WebP under
+  `apps/web/public/art/screenshots/`. The seed puts them on a new row, and
+  once on a row from before schema 8; after that the admin page owns them.
 - **Images.** Uploaded from the page (PNG, JPEG or WebP, at most 1 MB, checked
   against the file's first bytes) and kept in the database, served at
   `/media/<id>`. An image field also takes a path under `/art/`. Links to
