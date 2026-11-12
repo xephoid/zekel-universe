@@ -8,6 +8,10 @@ import { parseAdminEmails } from './admin.js';
 
 export interface ServerConfig {
   port: number;
+  /** The address the server listens on. 0.0.0.0 in production, where the
+   *  host's router must reach it; 127.0.0.1 otherwise, so a local or review
+   *  server (perhaps with the test outbox on) is not open to the network. */
+  host: string;
   engineUrl: string;
   engineToken: string;
   secretKey: string;
@@ -124,8 +128,10 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ServerConfig {
   const devOrigins = isProduction
     ? []
     : [`http://localhost:${port}`, `http://127.0.0.1:${port}`, 'http://localhost:5173', 'http://127.0.0.1:5173'];
+  const host = (env.HOST ?? '').trim() || (isProduction ? '0.0.0.0' : '127.0.0.1');
   return {
     port,
+    host,
     engineUrl: engineUrl ?? 'http://localhost:8787/mcp',
     engineToken: env.ENGINE_TOKEN ?? '',
     secretKey: env.SECRET_KEY ?? DEV_SECRET_KEY,

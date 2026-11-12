@@ -58,6 +58,15 @@ describe('config', () => {
     expect(c.isProduction).toBe(true);
     expect(c.allowedOrigins).toEqual(['https://play.example']);
   });
+  it('listens on 127.0.0.1 outside production, 0.0.0.0 in production, and HOST wins', () => {
+    const prod = { NODE_ENV: 'production', SECRET_KEY: 's', ENGINE_TOKEN: 't', ENGINE_URL: 'http://e/mcp', APP_ORIGIN: 'https://play.example', DATABASE_URL: 'postgres://x' };
+    expect(loadConfig({}).host).toBe('127.0.0.1');
+    expect(loadConfig({ NODE_ENV: 'development' }).host).toBe('127.0.0.1');
+    expect(loadConfig({ HOST: '' }).host).toBe('127.0.0.1');
+    expect(loadConfig(prod).host).toBe('0.0.0.0');
+    expect(loadConfig({ HOST: '0.0.0.0' }).host).toBe('0.0.0.0');
+    expect(loadConfig({ ...prod, HOST: '10.0.0.5' }).host).toBe('10.0.0.5');
+  });
   it('takes the engine as a private host:port when no ENGINE_URL is set (render.yaml)', () => {
     const base = { NODE_ENV: 'production', SECRET_KEY: 's', ENGINE_TOKEN: 't', APP_ORIGIN: 'https://play.example', DATABASE_URL: 'postgres://x' };
     expect(() => loadConfig(base)).toThrow(/ENGINE_URL/);
