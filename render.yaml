@@ -73,6 +73,10 @@ services:
         sync: false
       - key: SUPABASE_PUBLISHABLE_KEY
         sync: false
+      # Site analytics (PostHog project key, phc_...). Empty: off. The host
+      # defaults to https://us.i.posthog.com.
+      - key: POSTHOG_KEY
+        sync: false
 
   - type: pserv
     name: zekel-engine-production

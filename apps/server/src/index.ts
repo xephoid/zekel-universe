@@ -38,6 +38,7 @@ async function main(): Promise<void> {
     clientIpHeader: config.clientIpHeader,
     adminEmails: config.adminEmails,
     supabase: config.supabase ? supabaseService(config.supabase) : null,
+    analytics: config.analytics,
   });
 
   await app.fastify.ready();

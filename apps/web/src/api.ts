@@ -1,6 +1,7 @@
 // The REST client. Every call is typed by the shared wire contract, so a
 // response shape the server changes fails to compile here.
 
+import { track } from './analytics';
 import type {
   ApiError, CreateTableRequest, CreateTableResponse, FriendsResponse, GameReferenceResponse, GameResponse, GamesResponse,
   InvitesResponse, MeResponse, MyTablesResponse, TableEventsResponse, TableResponse, UpdatesResponse, DesignerResponse, DesignersResponse, WatchResponse,
@@ -32,23 +33,47 @@ async function req<T>(path: string, init?: RequestInit): Promise<T> {
 const post = <T>(path: string, body?: unknown) =>
   req<T>(path, { method: 'POST', body: body === undefined ? undefined : JSON.stringify(body) });
 
+/** Send an app event once a call has succeeded; the answer passes through. */
+async function after<T>(call: Promise<T>, record: (res: T) => void): Promise<T> {
+  const res = await call;
+  record(res);
+  return res;
+}
+
+function createTable(body: CreateTableRequest): Promise<CreateTableResponse> {
+  return after(post<CreateTableResponse>('/api/tables', body), (res) => {
+    const props = {
+      game: body.gameId,
+      mode: body.mode,
+      seats: body.seats.length,
+      ai_seats: body.seats.filter((s) => s.kind === 'ai').length,
+      table_id: res.tableId,
+    };
+    track('table_created', props);
+    // A table with no one to wait for starts at once; a lobby starts later.
+    if (res.status !== 'lobby') track('game_started', props);
+  });
+}
+
 export const api = {
   me: () => req<MeResponse>('/api/me'),
-  createGuest: () => post<{ guest: MeResponse['guest'] }>('/api/guests'),
+  createGuest: () => after(post<{ guest: MeResponse['guest'] }>('/api/guests'), () => track('guest_started')),
   updateMe: (displayName: string, bio?: string) => req<{ ok: true }>('/api/me', { method: 'PATCH', body: JSON.stringify({ displayName, bio }) }),
-  signInEmail: (email: string) => post<{ ok: true }>('/api/auth/email/link', { email }),
-  completeSignIn: (token: string) => post<{ ok: true; userId: string }>('/api/auth/email/complete', { token }),
+  signInEmail: (email: string) => after(post<{ ok: true }>('/api/auth/email/link', { email }), () => track('sign_in_link_requested', { method: 'email' })),
+  completeSignIn: (token: string) => after(post<{ ok: true; userId: string }>('/api/auth/email/complete', { token }), () => track('signed_in', { method: 'email' })),
   /** Was this browser's current session made by this sign-in link? Changes nothing. */
   signInLinkStatus: (token: string) => post<{ signedIn: boolean; userId?: string }>('/api/auth/email/link-status', { token }),
-  signOut: () => post<{ ok: true }>('/api/auth/signout'),
+  signOut: () => after(post<{ ok: true }>('/api/auth/signout'), () => track('signed_out')),
   /** Other ways to sign in this server offers (Discord and Google, through Supabase). */
   authProviders: () => req<{ providers: Array<'discord' | 'google'> }>('/api/auth/providers'),
   /** Start a Discord or Google sign-in: the server keeps its secret in a cookie and answers where to go. */
-  startSupabaseSignIn: (provider: 'discord' | 'google') => post<{ url: string }>('/api/auth/supabase/start', { provider }),
+  startSupabaseSignIn: (provider: 'discord' | 'google') =>
+    after(post<{ url: string }>('/api/auth/supabase/start', { provider }), () => track('sign_in_started', { method: provider })),
   /** Hand the server the one-time code Discord or Google sent back. Safe to
    *  send again from the same browser: a code that already signed it in
    *  gives that same session back. */
-  completeSupabaseSignIn: (code: string) => post<{ ok: true; userId: string }>('/api/auth/supabase/complete', { code }),
+  completeSupabaseSignIn: (code: string) =>
+    after(post<{ ok: true; userId: string }>('/api/auth/supabase/complete', { code }), () => track('signed_in', { method: 'oauth' })),
 
   games: () => req<GamesResponse>('/api/games'),
   game: (id: string) => req<GameResponse>(`/api/games/${encodeURIComponent(id)}`),
@@ -67,13 +92,13 @@ export const api = {
   tableHistory: (id: string) =>
     req<TableEventsResponse>(`/api/tables/${encodeURIComponent(id)}/events?after=0&history=1`),
   deleteTable: (id: string) => req<{ ok: true }>(`/api/tables/${encodeURIComponent(id)}`, { method: 'DELETE' }),
-  createTable: (body: CreateTableRequest) => post<CreateTableResponse>('/api/tables', body),
+  createTable,
   joinTable: (id: string) => post<{ seatPosition: number }>(`/api/tables/${encodeURIComponent(id)}/join`),
   setReady: (id: string, ready: boolean) => post<{ position: number; ready: boolean }>(`/api/tables/${encodeURIComponent(id)}/ready`, { ready }),
-  startTable: (id: string) => post<{ tableId: string; status: string }>(`/api/tables/${encodeURIComponent(id)}/start`),
+  startTable: (id: string) => after(post<{ tableId: string; status: string }>(`/api/tables/${encodeURIComponent(id)}/start`), () => track('game_started', { table_id: id })),
 
   friends: () => req<FriendsResponse>('/api/friends'),
-  sendFriendRequest: (email: string) => post<{ ok: true; accepted: boolean; userId: string }>('/api/friends/requests', { email }),
+  sendFriendRequest: (email: string) => after(post<{ ok: true; accepted: boolean; userId: string }>('/api/friends/requests', { email }), () => track('friend_request_sent')),
   acceptFriendRequest: (id: string) => post<{ ok: true }>(`/api/friends/requests/${encodeURIComponent(id)}/accept`),
   deleteFriendRequest: (id: string) => req<{ ok: true }>(`/api/friends/requests/${encodeURIComponent(id)}`, { method: 'DELETE' }),
   unfriend: (userId: string) => req<{ ok: true }>(`/api/friends/${encodeURIComponent(userId)}`, { method: 'DELETE' }),
@@ -95,8 +120,9 @@ export const api = {
   invites: () => req<InvitesResponse>('/api/invites'),
   tableInvites: (id: string) => req<InvitesResponse>(`/api/tables/${encodeURIComponent(id)}/invites`),
   inviteToTable: (id: string, target: { email: string } | { userId: string }) =>
-    post<{ ok: true; inviteId: string }>(`/api/tables/${encodeURIComponent(id)}/invites`, target),
-  acceptInvite: (id: string) => post<{ ok: true; tableId: string }>(`/api/invites/${encodeURIComponent(id)}/accept`),
+    after(post<{ ok: true; inviteId: string }>(`/api/tables/${encodeURIComponent(id)}/invites`, target),
+      () => track('invite_sent', { table_id: id, to: 'email' in target ? 'email' : 'friend' })),
+  acceptInvite: (id: string) => after(post<{ ok: true; tableId: string }>(`/api/invites/${encodeURIComponent(id)}/accept`), (r) => track('invite_accepted', { table_id: r.tableId })),
   declineInvite: (id: string) => post<{ ok: true }>(`/api/invites/${encodeURIComponent(id)}/decline`),
 };
 

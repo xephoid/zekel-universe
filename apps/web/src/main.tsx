@@ -20,6 +20,7 @@ import { ProfilePage } from './pages/Profile';
 import { SignInPage, SignInCompletePage, SignInCallbackPage } from './pages/SignIn';
 import { GalleryPage } from './pages/Gallery';
 import { NotFoundPage } from './pages/NotFound';
+import { startAnalytics, trackPageview } from './analytics';
 
 const router = createBrowserRouter([
   { path: '/', element: <HomePage /> },
@@ -51,6 +52,18 @@ const router = createBrowserRouter([
     : []),
   { path: '*', element: <NotFoundPage /> },
 ]);
+
+// Analytics: off unless the server says otherwise. One pageview for the
+// first page, then one per route change (the router changes pages without
+// reloading). Only the path counts as a change, not a query or fragment.
+void startAnalytics();
+let lastPath = router.state.location.pathname;
+trackPageview(lastPath);
+router.subscribe((state) => {
+  if (state.location.pathname === lastPath) return;
+  lastPath = state.location.pathname;
+  trackPageview(lastPath);
+});
 
 // The theme follows the OS unless the person picked one in settings.
 try {

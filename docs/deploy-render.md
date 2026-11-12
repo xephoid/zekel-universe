@@ -52,6 +52,9 @@ while CI is turned off. Deploy by hand from the dashboard.
      address and publishable key, for sign-in with Discord and Google. Leave
      both empty to offer only the email link. Setting up the project, the
      Discord app and the Google client: `docs/auth-supabase-plan.md`.
+   - `POSTHOG_KEY`: the PostHog project key (`phc_...`) for site analytics.
+     Leave it empty to keep analytics off. Optional `POSTHOG_HOST` defaults
+     to `https://us.i.posthog.com`.
 3. Apply. Render generates `SECRET_KEY` and the engine's `MCP_BEARER_TOKEN`,
    and copies the token into Universe's `ENGINE_TOKEN`. Nobody needs to see
    either value.
