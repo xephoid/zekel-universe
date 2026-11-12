@@ -26,6 +26,12 @@ export interface Guest {
 }
 
 /** GET /api/me */
+/** GET /api/config: public settings the page reads once at startup. */
+export interface ConfigResponse {
+  /** PostHog site analytics; null when the host has not turned it on. */
+  analytics: { key: string; host: string } | null;
+}
+
 export interface MeResponse {
   user: User | null;
   guest: Guest | null;

@@ -68,7 +68,7 @@ export function PrivacyPolicyPage() {
           <li><strong>Your games.</strong> The tables you join, the moves you make, and the results, so games can be played, resumed, and shown to the other players at the table.</li>
           <li><strong>Friends and invites.</strong> Who you have added as a friend and who you have invited to a table.</li>
           <li><strong>Technical information.</strong> Your IP address and basic request details, used to keep the site running and to limit abuse. Server logs are kept for a short time.</li>
-          <li><strong>Usage information.</strong> We may collect simple, aggregate information about how the site is used, such as which pages are visited, to make the site better.</li>
+          <li><strong>Usage information.</strong> We use PostHog to count which pages are visited and key moments such as starting a game or signing in. Page addresses are sent without their query or fragment. If you are signed in, these events carry your account ID; guests stay anonymous. We do not record clicks or sessions, and we honor your browser's Do Not Track setting.</li>
         </ul>
       </Section>
 
@@ -76,7 +76,8 @@ export function PrivacyPolicyPage() {
         <p>
           We use cookies only to keep you signed in, to remember your guest seat, and to make sign-in links
           work in the browser that asked for them. Your browser also stores small preferences on your device,
-          such as light or dark mode. We do not use advertising cookies.
+          such as light or dark mode, and an analytics ID in local storage (not a cookie). We do not use
+          advertising cookies.
         </p>
       </Section>
 
@@ -93,8 +94,8 @@ export function PrivacyPolicyPage() {
       <Section heading="Who we share it with">
         <p>
           Only the services that help us run the site: our hosting provider, our database, our email
-          provider (to deliver sign-in links and turn reminders), and Supabase (if you sign in with Discord
-          or Google). Each handles your information only to provide its service to us. We may also share
+          provider (to deliver sign-in links and turn reminders), Supabase (if you sign in with Discord
+          or Google), and PostHog (for the usage information above). Each handles your information only to provide its service to us. We may also share
           information if the law requires it.
         </p>
         <p>

@@ -1533,7 +1533,7 @@ their own pages.
 - **News** is the designers' updates; there is no separate news table.
 - **Every edit is logged** with the admin's account id and what changed.
 - **Still open:** cleaning up uploaded images nothing points at any more.
-  The navigation bar at phone width is fixed; see ง22.
+  The navigation bar at phone width is fixed; see ยง22.
 
 ## 22. The site pages on a phone (built 2026-11-11)
 
@@ -1562,3 +1562,38 @@ look. The check is `e2e/pages-phone.spec.ts` at 390 x 844.
 - **Not covered:** `/admin` was not checked on a phone; the `/gallery`
   parts sheet fits across but its parts keep their own sizes. A phone held
   sideways (wider than 640 px) gets the desktop pages.
+
+## 23. Site analytics (decided 2026-10-16 and 2026-11-11, built 2026-11-11)
+
+Launch task T07, first half. Decision D4 (2026-10-16): one PostHog project for
+the whole site, with the game told apart by an event property.
+
+- **Off unless the host turns it on.** `POSTHOG_KEY` (the project key,
+  `phc_...`) in the host's config turns it on; `POSTHOG_HOST` is optional and
+  defaults to `https://us.i.posthog.com`. The server checks both at startup
+  and hands them to the page at `GET /api/config`. With no key the page never
+  downloads PostHog. Local development leaves them empty.
+- **Only what Universe sends by hand** (decided 2026-11-11). No click
+  tracking, page-leave, heatmaps, session recordings, surveys, page
+  performance or error reports, no feature-flag call, and no script from
+  PostHog's servers. The page policy gains the PostHog host in `connect-src`
+  only; `script-src` stays `'self'`.
+- **What is sent.** A pageview per route change. The app's own events:
+  `guest_started`, `sign_in_link_requested` (email), `sign_in_started`
+  (Discord or Google), `signed_in` (email or oauth), `signed_out`,
+  `table_created` and `game_started` (game, mode, seat counts, table id),
+  `game_finished` (the same, counted once by the page that saw the game end),
+  `invite_sent` (to an email or a friend, never the address),
+  `invite_accepted`, `friend_request_sent`. Names and emails never.
+- **Game-specific events wait for T02** (decided 2026-11-11): each game's own
+  events come with its drawing code once that lives in zekel-games.
+- **URLs lose their query and fragment** before an event leaves the browser
+  (the sign-in link's token rides in the fragment), in event and person
+  fields alike.
+- **People.** A signed-in player is known by account id only; a guest stays
+  anonymous (`person_profiles: identified_only`). Signing out starts a fresh
+  anonymous visitor. Do Not Track is respected. PostHog keeps its visitor id
+  in browser storage, not a cookie.
+- **Still open:** a consent notice, if one is wanted, before any tracking
+  beyond this; a same-site path for events so ad blockers do not drop them;
+  the weekly digest (T08) once events have settled.

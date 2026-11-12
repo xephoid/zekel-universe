@@ -21,6 +21,7 @@ import { SignInPage, SignInCompletePage, SignInCallbackPage } from './pages/Sign
 import { GalleryPage } from './pages/Gallery';
 import { NotFoundPage } from './pages/NotFound';
 import { PrivacyPolicyPage, TermsOfServicePage, WithFooter } from './pages/Legal';
+import { startAnalytics, trackPageview } from './analytics';
 
 const router = createBrowserRouter([
   // Every page but the game table carries the site footer.
@@ -61,6 +62,18 @@ const router = createBrowserRouter([
       ]
     : []),
 ]);
+
+// Analytics: off unless the server says otherwise. One pageview for the
+// first page, then one per route change (the router changes pages without
+// reloading). Only the path counts as a change, not a query or fragment.
+void startAnalytics();
+let lastPath = router.state.location.pathname;
+trackPageview(lastPath);
+router.subscribe((state) => {
+  if (state.location.pathname === lastPath) return;
+  lastPath = state.location.pathname;
+  trackPageview(lastPath);
+});
 
 // The theme follows the OS unless the person picked one in settings.
 try {
