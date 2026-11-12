@@ -87,7 +87,7 @@ export function DesignerPage() {
         </div>
         <section>
           <div className="row-head"><h2 style={{ fontSize: 22 }}>Games</h2></div>
-          <div className="shelf newest-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+          <div className="shelf">
             {data.games.map((g) => (
               <Link key={g.engineGameId} to={`/games/${g.engineGameId}`} className="card shelf-card">
                 <Cover game={g} size="small" />

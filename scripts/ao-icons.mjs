@@ -1,16 +1,31 @@
-// Writes apps/web/src/glue/ao/icons.gen.ts from the design canvas's icon
+// Writes Adventurer Olympics' icons.gen.ts from the design canvas's icon
 // component (docs/design/adventurer-olympics/AO-Icon.dc.html), so the table
-// draws exactly the drawings the canvas draws and the two cannot drift.
+// draws exactly the drawings the canvas draws and the two cannot drift. The
+// canvas is here; the screen that uses the file is in zekel-games, so the
+// output goes into a zekel-games checkout. Run from this repo's root:
 //
-//   node scripts/ao-icons.mjs
+//   node scripts/ao-icons.mjs ../zekel-games/packages/adventurer-olympics/src/glue/icons.gen.ts
 //
 // The component's script is run in a sandbox with a stand-in for the canvas
 // runtime's base class; each icon is rendered once, with a sentinel colour
 // where the canvas takes its `tint` prop (a coin's colour, the base under an
 // adventurer), so the table can put the player's colour there.
 
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { resolve, sep } from 'node:path';
 import { runInNewContext } from 'node:vm';
+
+// The game's screen lives in zekel-games now, so the file this writes does
+// too. Say where: the path to icons.gen.ts in a zekel-games checkout.
+const out = process.argv[2];
+if (!out || !out.endsWith('icons.gen.ts')) {
+  console.error('usage: node scripts/ao-icons.mjs <zekel-games>/packages/adventurer-olympics/src/glue/icons.gen.ts');
+  process.exit(1);
+}
+if (resolve(out).startsWith(resolve('apps/web/src/glue') + sep)) {
+  console.error('apps/web/src/glue holds only the list of games; write into the zekel-games checkout.');
+  process.exit(1);
+}
 
 const html = readFileSync('docs/design/adventurer-olympics/AO-Icon.dc.html', 'utf8');
 const script = /<script type="text\/x-dc" data-dc-script data-props='([^']*)'>([\s\S]*?)<\/script>/.exec(html);
@@ -52,6 +67,6 @@ const lines = [
   '};',
   '',
 ];
-mkdirSync('apps/web/src/glue/ao', { recursive: true });
-writeFileSync('apps/web/src/glue/ao/icons.gen.ts', lines.join('\n'));
+writeFileSync(out, lines.join('\n'));
+console.log(`wrote ${out}`);
 console.log(`${Object.keys(icons).length} drawings`);

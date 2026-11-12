@@ -16,6 +16,7 @@ import type { ConfigResponse } from '@universe/shared';
 export type AppEvent =
   | 'guest_started'
   | 'sign_in_link_requested'
+  | 'sign_in_started'
   | 'signed_in'
   | 'signed_out'
   | 'table_created'

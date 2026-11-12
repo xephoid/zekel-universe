@@ -9,6 +9,10 @@ import { parseAnalytics, type AnalyticsConfig } from './analytics.js';
 
 export interface ServerConfig {
   port: number;
+  /** The address the server listens on. 0.0.0.0 in production, where the
+   *  host's router must reach it; 127.0.0.1 otherwise, so a local or review
+   *  server (perhaps with the test outbox on) is not open to the network. */
+  host: string;
   engineUrl: string;
   engineToken: string;
   secretKey: string;
@@ -32,6 +36,9 @@ export interface ServerConfig {
   clientIpHeader: string | null;
   /** Sign-in emails whose accounts may use the admin page; empty: nobody. */
   adminEmails: string[];
+  /** Sign-in with Discord and Google through Supabase (T09): the project's
+   *  address and publishable key, or null when not set up. */
+  supabase: { url: string; publishableKey: string } | null;
   /** PostHog site analytics (POSTHOG_KEY, POSTHOG_HOST); null: off. */
   analytics: AnalyticsConfig | null;
 }
@@ -127,8 +134,10 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ServerConfig {
   const devOrigins = isProduction
     ? []
     : [`http://localhost:${port}`, `http://127.0.0.1:${port}`, 'http://localhost:5173', 'http://127.0.0.1:5173'];
+  const host = (env.HOST ?? '').trim() || (isProduction ? '0.0.0.0' : '127.0.0.1');
   return {
     port,
+    host,
     engineUrl: engineUrl ?? 'http://localhost:8787/mcp',
     engineToken: env.ENGINE_TOKEN ?? '',
     secretKey: env.SECRET_KEY ?? DEV_SECRET_KEY,
@@ -143,6 +152,28 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ServerConfig {
     guestsPerIp: nonNegative(env.GUESTS_PER_IP, 30),
     clientIpHeader: parseClientIpHeader(env.CLIENT_IP_HEADER),
     adminEmails: parseAdminEmails(env.ADMIN_EMAILS),
+    supabase: parseSupabase(env.SUPABASE_URL, env.SUPABASE_PUBLISHABLE_KEY),
     analytics: parseAnalytics(env.POSTHOG_KEY, env.POSTHOG_HOST),
   };
+}
+
+/** SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY: both or neither. The address
+ *  must be https, except a local one (Supabase's own local stack). */
+export function parseSupabase(rawUrl: string | undefined, rawKey: string | undefined): { url: string; publishableKey: string } | null {
+  const url = (rawUrl ?? '').trim().replace(/\/$/, '');
+  const publishableKey = (rawKey ?? '').trim();
+  if (!url && !publishableKey) return null;
+  if (!url || !publishableKey) {
+    throw new Error('SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY must be set together');
+  }
+  let parsed: URL;
+  try { parsed = new URL(url); } catch { throw new Error(`SUPABASE_URL is not an address: ${JSON.stringify(url)}`); }
+  const local = parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1';
+  if (parsed.protocol !== 'https:' && !(local && parsed.protocol === 'http:')) {
+    throw new Error('SUPABASE_URL must be https');
+  }
+  if (parsed.pathname !== '/' || parsed.search || parsed.hash) {
+    throw new Error('SUPABASE_URL must be the project address only, with no path');
+  }
+  return { url: parsed.origin, publishableKey };
 }

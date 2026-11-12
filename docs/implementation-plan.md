@@ -1256,7 +1256,7 @@ registered, with no hidden information.
   engine hex key to flat-top axial is `(q + r, -q)`: a change of drawing
   axes, not a rule.
 - **One icon module**, generated from `AO-Icon.dc.html` by a script, the way
-  `scripts/ngg-icons.mjs` generates the NGnG icons.
+  `scripts/ngg-icons.mjs` generates the NGnG icons (into a zekel-games checkout, where the screen now lives; the script says how).
 - **Exploring is one client stage.** Pick a lit slot, turn the tile, press
   Place: one `explore` move with a slot and a rotation, both always sent.
 
@@ -1532,10 +1532,38 @@ their own pages.
   With none set it falls back to the first two games that have a designer.
 - **News** is the designers' updates; there is no separate news table.
 - **Every edit is logged** with the admin's account id and what changed.
-- **Still open:** cleaning up uploaded images nothing points at any more, and
-  the phone pass (the navigation bar is too wide at phone width on every page).
+- **Still open:** cleaning up uploaded images nothing points at any more.
+  The navigation bar at phone width is fixed; see §22.
 
-## 22. Site analytics (decided 2026-10-16 and 2026-11-11, built 2026-11-11)
+## 22. The site pages on a phone (built 2026-11-11)
+
+The first piece of M6: every page outside a game's table fits 390 px wide.
+The tables are not part of it; each game keeps its own phone layout (only
+Fractured Fist has one) until its turn in M6. The canvas draws no phone
+pages, so the layout below follows the brief's phone rules and the desktop
+look. The check is `e2e/pages-phone.spec.ts` at 390 x 844.
+
+- **One line for "phone": narrower than 640 px**, the same as
+  `table/phone.ts`. All the rules are one block at the end of `app.css`,
+  scoped to the bar and `.page`, so no table screen changes.
+- **The bar takes three rows:** the wordmark and your avatar (or Sign in);
+  Browse, My tables and Designers; then search across the full width. Your
+  name is hidden on screen but kept for screen readers. Nothing goes behind
+  a menu button.
+- **Gutters are 16 px, columns stack:** featured, the designer's games, My
+  tables and the profile's side column go to one column; newest stays two
+  across; setup's option cards go two across; a devlog's date sits above
+  its entry.
+- **A thumb's targets are at least 44 px:** the bar's links, seat and level
+  buttons, the player stepper, small buttons, fields and the back link.
+  Links inside a sentence and the radio inside an option card (the card is
+  the target) are left as they are. Fields use 16 px text so a phone does
+  not zoom in on focus.
+- **Not covered:** `/admin` was not checked on a phone; the `/gallery`
+  parts sheet fits across but its parts keep their own sizes. A phone held
+  sideways (wider than 640 px) gets the desktop pages.
+
+## 23. Site analytics (decided 2026-10-16 and 2026-11-11, built 2026-11-11)
 
 Launch task T07, first half. Decision D4 (2026-10-16): one PostHog project for
 the whole site, with the game told apart by an event property.
@@ -1551,7 +1579,8 @@ the whole site, with the game told apart by an event property.
   PostHog's servers. The page policy gains the PostHog host in `connect-src`
   only; `script-src` stays `'self'`.
 - **What is sent.** A pageview per route change. The app's own events:
-  `guest_started`, `sign_in_link_requested`, `signed_in`, `signed_out`,
+  `guest_started`, `sign_in_link_requested` (email), `sign_in_started`
+  (Discord or Google), `signed_in` (email or oauth), `signed_out`,
   `table_created` and `game_started` (game, mode, seat counts, table id),
   `game_finished` (the same, counted once by the page that saw the game end),
   `invite_sent` (to an email or a friend, never the address),

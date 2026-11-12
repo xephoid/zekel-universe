@@ -601,3 +601,73 @@ label.option-card { position: relative; padding-right: 40px; }
 .menu-sheet .log { max-height: none; }
 .menu-leave { align-self: center; min-height: 44px; display: inline-flex; align-items: center; }
 
+
+/* ---- the site pages on a phone (narrower than 640px, the same line as
+   table/phone.ts). Only the shell bar and .page are touched here; a game's
+   table keeps its own layout. Gutters drop to 16px, columns stack, and
+   anything a thumb presses is at least 44px tall. ---- */
+@media (max-width: 640px) {
+  /* the bar: wordmark and you on the first row, the links on the second,
+     search across the third */
+  .topnav { height: auto; flex-wrap: wrap; gap: 0 12px; padding: 6px 16px 10px; }
+  .topnav .brand { min-height: 44px; align-items: center; }
+  .topnav .who { order: 1; margin-left: auto; min-height: 44px; min-width: 44px; justify-content: center; }
+  .topnav .who + .who.signin { margin-left: 0; }
+  .topnav .who-name { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .topnav .who.signin { padding: 0 4px; }
+  .topnav .links { order: 2; flex: 1 1 100%; gap: 4px; margin: 0 -10px; }
+  .topnav .links a { min-height: 44px; padding: 0 10px; }
+  .topnav .search { order: 3; flex: 1 1 100%; max-width: none; margin: 2px 0 0; height: 44px; font-size: 16px; }
+
+  .page { padding: 20px 16px 40px; }
+  .page h1 { font-size: 30px; overflow-wrap: anywhere; }
+  .page .game-hero-right h1 { font-size: 32px; }
+  .page .two-col, .page.two-col { gap: 28px; }
+  .summary { position: static; }
+
+  /* home */
+  .featured-grid { grid-template-columns: 1fr; }
+  .newest-grid { gap: 12px; }
+  .chip-select { height: 44px; }
+
+  /* game page and devlogs */
+  .game-hero { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .game-hero-left .gpcover.large .initial { font-size: 88px; }
+  .game-actions .btn { flex: 1 1 auto; }
+  .devlog-item { grid-template-columns: 1fr; gap: 4px; }
+
+  /* setup and lobby: a seat's controls drop under its name */
+  .seat-card { flex-wrap: wrap; row-gap: 10px; }
+  .seat-card .grow { flex-basis: calc(100% - 50px); }
+  .seat-card .segmented, .seat-card .pills { margin-left: 50px; }
+  .segmented button, .pill { height: 44px; padding: 0 14px; }
+  .pill { font-size: 13px; }
+  .stepper button { width: 44px; height: 44px; }
+  .option-grid, .option-grid.three, .option-grid.four { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .option-card { padding: 12px 14px; }
+  label.option-card { padding-right: 36px; }
+
+  /* profile and designer */
+  .profile-head { flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+  .profile-head > .avatar { width: 72px !important; height: 72px !important; font-size: 30px !important; }
+  .profile-head > .stack { flex: 1 1 200px; min-width: 0; }
+  .profile-head h1 { font-size: 28px; }
+  .shelf { grid-template-columns: 1fr; gap: 12px; }
+  .shelf-card .gpcover, .shelf-card img.gpcover { width: 96px; height: 96px; align-self: flex-start; margin: 12px 0 12px 12px; border-radius: 8px; }
+  .shelf-card .gpcover .initial { font-size: 36px; }
+
+  /* My tables */
+  .my-tables-grid { grid-template-columns: 1fr; }
+  .my-card { flex-wrap: wrap; }
+  .my-card .my-action { height: 44px; }
+
+  /* buttons and fields a thumb presses */
+  .page .btn.small { min-height: 44px; padding: 0 14px; font-size: 13px; }
+  .page .invite-actions button { min-height: 44px; padding: 0 8px; }
+  .page .crumb { min-height: 44px; display: inline-flex; align-items: center; }
+  .page .field input, .page .field select, .page .input { font-size: 16px; min-height: 44px; }
+  .profile-head .btn { min-height: 44px; }
+
+  /* sign-in */
+  .modal-card { margin: 8px auto; padding: 22px 18px; }
+}

@@ -66,6 +66,13 @@ services:
         sync: false
       - key: EMAIL_FROM
         sync: false
+      # Sign-in with Discord and Google through Supabase (T09). The project
+      # address and its publishable key (public by design); both or neither.
+      # Unset: the sign-in page offers only the email link.
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false
       # Site analytics (PostHog project key, phc_...). Empty: off. The host
       # defaults to https://us.i.posthog.com.
       - key: POSTHOG_KEY

@@ -5,6 +5,7 @@ import { createDatabase } from './db/index.js';
 import { EngineClient } from '@universe/engine-client';
 import { ConsoleMailer, ResendMailer } from './email.js';
 import { buildApp } from './app.js';
+import { supabaseService } from './supabaseAuth.js';
 import { createSocketServer } from './sockets.js';
 
 async function main(): Promise<void> {
@@ -36,6 +37,7 @@ async function main(): Promise<void> {
     limits: { guestsPerIp: config.guestsPerIp },
     clientIpHeader: config.clientIpHeader,
     adminEmails: config.adminEmails,
+    supabase: config.supabase ? supabaseService(config.supabase) : null,
     analytics: config.analytics,
   });
 
@@ -51,7 +53,7 @@ async function main(): Promise<void> {
     app.fastify.log.warn(`catalog refresh skipped (engine unreachable): ${(err as Error).message}`);
   }
 
-  await app.fastify.listen({ port: config.port, host: '0.0.0.0' });
+  await app.fastify.listen({ port: config.port, host: config.host });
 
   const shutdown = async () => {
     await app.fastify.close();

@@ -64,6 +64,16 @@ export const api = {
   /** Was this browser's current session made by this sign-in link? Changes nothing. */
   signInLinkStatus: (token: string) => post<{ signedIn: boolean; userId?: string }>('/api/auth/email/link-status', { token }),
   signOut: () => after(post<{ ok: true }>('/api/auth/signout'), () => track('signed_out')),
+  /** Other ways to sign in this server offers (Discord and Google, through Supabase). */
+  authProviders: () => req<{ providers: Array<'discord' | 'google'> }>('/api/auth/providers'),
+  /** Start a Discord or Google sign-in: the server keeps its secret in a cookie and answers where to go. */
+  startSupabaseSignIn: (provider: 'discord' | 'google') =>
+    after(post<{ url: string }>('/api/auth/supabase/start', { provider }), () => track('sign_in_started', { method: provider })),
+  /** Hand the server the one-time code Discord or Google sent back. Safe to
+   *  send again from the same browser: a code that already signed it in
+   *  gives that same session back. */
+  completeSupabaseSignIn: (code: string) =>
+    after(post<{ ok: true; userId: string }>('/api/auth/supabase/complete', { code }), () => track('signed_in', { method: 'oauth' })),
 
   games: () => req<GamesResponse>('/api/games'),
   game: (id: string) => req<GameResponse>(`/api/games/${encodeURIComponent(id)}`),

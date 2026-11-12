@@ -91,6 +91,8 @@ describe('scrubbing URLs', () => {
   it('drops the query and the fragment', () => {
     expect(stripUrl('https://zekel.games/signin/complete#token=secret')).toBe('https://zekel.games/signin/complete');
     expect(stripUrl('https://zekel.games/games/x/setup?mode=turns')).toBe('https://zekel.games/games/x/setup');
+    // Discord and Google send the one-time code back in the query.
+    expect(stripUrl('https://zekel.games/auth/callback?code=abc123&state=x')).toBe('https://zekel.games/auth/callback');
     expect(stripUrl('not a url')).toBe('not a url');
     expect(stripUrl(3)).toBe(3);
   });

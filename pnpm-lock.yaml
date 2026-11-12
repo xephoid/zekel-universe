@@ -38,6 +38,9 @@ importers:
       fastify:
         specifier: ^5.12.5
         version: 5.12.5
+      jose:
+        specifier: 6.2.12
+        version: 6.2.12
       kysely:
         specifier: ^0.29.6
         version: 0.29.6
@@ -75,15 +78,33 @@ importers:
       '@universe/shared':
         specifier: workspace:*
         version: link:../../packages/shared
+      '@zekel/adventurer-olympics':
+        specifier: ^0.1.3
+        version: 0.1.3(@zekel/game-kit@0.1.0)(@zekel/glue-kit@packages+glue-kit)(@zekel/primitives@packages+primitives)(@zekel/wire-types@packages+wire-types)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@zekel/cybernoir-2127':
+        specifier: ^0.1.3
+        version: 0.1.3(@zekel/game-kit@0.1.0)(@zekel/glue-kit@packages+glue-kit)(@zekel/primitives@packages+primitives)(@zekel/wire-types@packages+wire-types)
+      '@zekel/fractured-fist':
+        specifier: ^0.1.3
+        version: 0.1.3(@zekel/game-kit@0.1.0)(@zekel/glue-kit@packages+glue-kit)(@zekel/primitives@packages+primitives)(@zekel/tokens@packages+tokens)(@zekel/wire-types@packages+wire-types)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@zekel/glue-kit':
         specifier: workspace:*
         version: link:../../packages/glue-kit
+      '@zekel/neither-guts-nor-gears':
+        specifier: ^0.1.4
+        version: 0.1.4(@zekel/game-kit@0.1.0)(@zekel/glue-kit@packages+glue-kit)(@zekel/wire-types@packages+wire-types)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@zekel/primitives':
         specifier: workspace:*
         version: link:../../packages/primitives
+      '@zekel/sweetlands-imperium':
+        specifier: ^0.1.3
+        version: 0.1.3(@zekel/game-kit@0.1.0)(@zekel/glue-kit@packages+glue-kit)(@zekel/primitives@packages+primitives)(@zekel/wire-types@packages+wire-types)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@zekel/tokens':
         specifier: workspace:*
         version: link:../../packages/tokens
+      '@zekel/warble-way-galaxy':
+        specifier: ^0.1.4
+        version: 0.1.4(@zekel/game-kit@0.1.0)(@zekel/glue-kit@packages+glue-kit)(@zekel/primitives@packages+primitives)(@zekel/wire-types@packages+wire-types)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@zekel/wire-types':
         specifier: workspace:*
         version: link:../../packages/wire-types
@@ -992,9 +1013,153 @@ packages:
   '@vitest/utils@2.1.9':
     resolution: {integrity: sha512-v0psaMSkNJ3A2NMrUEHFRzJtDPFn+/VWZ5WxImB21T9fjucJRmS7xCS3ppEnARb9y11OAzaD+P2Ps+b+BGX5iQ==}
 
+  '@zekel/adventurer-olympics@0.1.3':
+    resolution: {integrity: sha512-Is8SO1jYKZy/DLPGXm/CvKy0OFc8RRvJeRsCjV5/+JMFkmPQJnTaBBgg+byJQUHlSh5qmttqmwYtLRjBm64WFg==}
+    engines: {node: '>=22.13.0'}
+    peerDependencies:
+      '@zekel/dev': ^0.1.1
+      '@zekel/game-kit': ^0.1.0
+      '@zekel/glue-kit': ^0.1.0
+      '@zekel/primitives': ^0.1.0
+      '@zekel/wire-types': ^0.1.0
+      react: ^18.3.1
+      react-dom: ^18.3.1
+    peerDependenciesMeta:
+      '@zekel/dev':
+        optional: true
+      '@zekel/glue-kit':
+        optional: true
+      '@zekel/primitives':
+        optional: true
+      '@zekel/wire-types':
+        optional: true
+      react:
+        optional: true
+      react-dom:
+        optional: true
+
+  '@zekel/cybernoir-2127@0.1.3':
+    resolution: {integrity: sha512-or8MO6yi2XSV/xj445cYTaPDJChv1CXR5fB0b0Z37C5vFV9+3QrKePKo8ulLO0cOrfyqhNDFRhX3ABSa3qKoiQ==}
+    engines: {node: '>=22.13.0'}
+    peerDependencies:
+      '@zekel/dev': ^0.1.1
+      '@zekel/game-kit': ^0.1.0
+      '@zekel/glue-kit': ^0.1.0
+      '@zekel/primitives': ^0.1.0
+      '@zekel/wire-types': ^0.1.0
+    peerDependenciesMeta:
+      '@zekel/dev':
+        optional: true
+      '@zekel/glue-kit':
+        optional: true
+      '@zekel/primitives':
+        optional: true
+      '@zekel/wire-types':
+        optional: true
+
+  '@zekel/fractured-fist@0.1.3':
+    resolution: {integrity: sha512-KK54sF2ykoXO70gr9DRowuJf9KWBwLMTpguzS8i2F9Bdop+YQ/jOoIunsoy1WcKJQYb0BwFm+zfCGoEagjzqjQ==}
+    engines: {node: '>=22.13.0'}
+    peerDependencies:
+      '@zekel/dev': ^0.1.1
+      '@zekel/game-kit': ^0.1.0
+      '@zekel/glue-kit': ^0.1.0
+      '@zekel/primitives': ^0.1.0
+      '@zekel/tokens': ^0.1.0
+      '@zekel/wire-types': ^0.1.0
+      react: ^18.3.1
+      react-dom: ^18.3.1
+    peerDependenciesMeta:
+      '@zekel/dev':
+        optional: true
+      '@zekel/glue-kit':
+        optional: true
+      '@zekel/primitives':
+        optional: true
+      '@zekel/tokens':
+        optional: true
+      '@zekel/wire-types':
+        optional: true
+      react:
+        optional: true
+      react-dom:
+        optional: true
+
   '@zekel/game-kit@0.1.0':
     resolution: {integrity: sha512-44b/ifoEuGHqOUd0i+l21pwMDu6XvGQyKzuN4vRxGtNuSZm6nGgaaVSefoFf9QKDRQ3PYEdXNpoQTICWf1U4Lg==}
     engines: {node: '>=22.13.0'}
+
+  '@zekel/neither-guts-nor-gears@0.1.4':
+    resolution: {integrity: sha512-aUz0rbK2l+wEutPij279nvzN1+DSO7M9T3GUWw3WTylv2s9szQDiEc0DI4XULFpmFfFxtHMip0Ltj7rXGZGDyA==}
+    engines: {node: '>=22.13.0'}
+    peerDependencies:
+      '@zekel/dev': ^0.1.1
+      '@zekel/game-kit': ^0.1.0
+      '@zekel/glue-kit': ^0.1.0
+      '@zekel/wire-types': ^0.1.0
+      react: ^18.3.1
+      react-dom: ^18.3.1
+    peerDependenciesMeta:
+      '@zekel/dev':
+        optional: true
+      '@zekel/glue-kit':
+        optional: true
+      '@zekel/wire-types':
+        optional: true
+      react:
+        optional: true
+      react-dom:
+        optional: true
+
+  '@zekel/sweetlands-imperium@0.1.3':
+    resolution: {integrity: sha512-Eo730EnGXYl4UYVQZYJoIsSmRnU/ubOyCk5s3m8nEgJHzgVgPEIkk/dZvL6aSaIaY6vFMSkB/459OTs9UY6t9g==}
+    engines: {node: '>=22.13.0'}
+    peerDependencies:
+      '@zekel/dev': ^0.1.1
+      '@zekel/game-kit': ^0.1.0
+      '@zekel/glue-kit': ^0.1.0
+      '@zekel/primitives': ^0.1.0
+      '@zekel/wire-types': ^0.1.0
+      react: ^18.3.1
+      react-dom: ^18.3.1
+    peerDependenciesMeta:
+      '@zekel/dev':
+        optional: true
+      '@zekel/glue-kit':
+        optional: true
+      '@zekel/primitives':
+        optional: true
+      '@zekel/wire-types':
+        optional: true
+      react:
+        optional: true
+      react-dom:
+        optional: true
+
+  '@zekel/warble-way-galaxy@0.1.4':
+    resolution: {integrity: sha512-wkLF9jMLMK+3OyV4D9BX3iqBAeSmU9J0T8329jdK9RUkRs+98p9ZyMn5ADJecU3Wau83eX5fkjqZ/1ayrgistw==}
+    engines: {node: '>=22.13.0'}
+    peerDependencies:
+      '@zekel/dev': ^0.1.1
+      '@zekel/game-kit': ^0.1.0
+      '@zekel/glue-kit': ^0.1.0
+      '@zekel/primitives': ^0.1.0
+      '@zekel/wire-types': ^0.1.0
+      react: ^18.3.1
+      react-dom: ^18.3.1
+    peerDependenciesMeta:
+      '@zekel/dev':
+        optional: true
+      '@zekel/glue-kit':
+        optional: true
+      '@zekel/primitives':
+        optional: true
+      '@zekel/wire-types':
+        optional: true
+      react:
+        optional: true
+      react-dom:
+        optional: true
 
   '@zekel/word-debauchee@0.1.1':
     resolution: {integrity: sha512-DrYQ4Zo2JFVM4P+cda1EDBbuu61uirYa38RAGVRM+B+Tn/mkhlpZW54aZBkzADz4mVX4tdhc8QeH2JGbpkPc3g==}
@@ -2863,7 +3028,65 @@ snapshots:
       loupe: 3.2.1
       tinyrainbow: 1.2.0
 
+  '@zekel/adventurer-olympics@0.1.3(@zekel/game-kit@0.1.0)(@zekel/glue-kit@packages+glue-kit)(@zekel/primitives@packages+primitives)(@zekel/wire-types@packages+wire-types)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@zekel/game-kit': 0.1.0
+    optionalDependencies:
+      '@zekel/glue-kit': link:packages/glue-kit
+      '@zekel/primitives': link:packages/primitives
+      '@zekel/wire-types': link:packages/wire-types
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+
+  '@zekel/cybernoir-2127@0.1.3(@zekel/game-kit@0.1.0)(@zekel/glue-kit@packages+glue-kit)(@zekel/primitives@packages+primitives)(@zekel/wire-types@packages+wire-types)':
+    dependencies:
+      '@zekel/game-kit': 0.1.0
+    optionalDependencies:
+      '@zekel/glue-kit': link:packages/glue-kit
+      '@zekel/primitives': link:packages/primitives
+      '@zekel/wire-types': link:packages/wire-types
+
+  '@zekel/fractured-fist@0.1.3(@zekel/game-kit@0.1.0)(@zekel/glue-kit@packages+glue-kit)(@zekel/primitives@packages+primitives)(@zekel/tokens@packages+tokens)(@zekel/wire-types@packages+wire-types)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@zekel/game-kit': 0.1.0
+    optionalDependencies:
+      '@zekel/glue-kit': link:packages/glue-kit
+      '@zekel/primitives': link:packages/primitives
+      '@zekel/tokens': link:packages/tokens
+      '@zekel/wire-types': link:packages/wire-types
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+
   '@zekel/game-kit@0.1.0': {}
+
+  '@zekel/neither-guts-nor-gears@0.1.4(@zekel/game-kit@0.1.0)(@zekel/glue-kit@packages+glue-kit)(@zekel/wire-types@packages+wire-types)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@zekel/game-kit': 0.1.0
+    optionalDependencies:
+      '@zekel/glue-kit': link:packages/glue-kit
+      '@zekel/wire-types': link:packages/wire-types
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+
+  '@zekel/sweetlands-imperium@0.1.3(@zekel/game-kit@0.1.0)(@zekel/glue-kit@packages+glue-kit)(@zekel/primitives@packages+primitives)(@zekel/wire-types@packages+wire-types)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@zekel/game-kit': 0.1.0
+    optionalDependencies:
+      '@zekel/glue-kit': link:packages/glue-kit
+      '@zekel/primitives': link:packages/primitives
+      '@zekel/wire-types': link:packages/wire-types
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+
+  '@zekel/warble-way-galaxy@0.1.4(@zekel/game-kit@0.1.0)(@zekel/glue-kit@packages+glue-kit)(@zekel/primitives@packages+primitives)(@zekel/wire-types@packages+wire-types)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@zekel/game-kit': 0.1.0
+    optionalDependencies:
+      '@zekel/glue-kit': link:packages/glue-kit
+      '@zekel/primitives': link:packages/primitives
+      '@zekel/wire-types': link:packages/wire-types
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
 
   '@zekel/word-debauchee@0.1.1(@zekel/game-kit@0.1.0)(@zekel/glue-kit@packages+glue-kit)(@zekel/wire-types@packages+wire-types)(react@18.3.1)':
     dependencies:

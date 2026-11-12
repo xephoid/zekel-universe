@@ -1,6 +1,7 @@
 // Sign-in, as the canvas draws it: a card over the page with the
 // wordmark, the passwordless promise, the email row, and the guest escape
-// hatch. Passwordless by email link only in v0.
+// hatch. Passwordless: Discord or Google through Supabase when the server
+// offers them (T09), and the email link.
 
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
@@ -8,6 +9,10 @@ import { api, ApiRequestError } from '../api';
 import { useSession } from '../session';
 import { Nav } from './Nav';
 import { Wordmark } from '../ui';
+import { finishSignIn, NEXT_KEY, safeNext, SignInError, startSignIn, type SignInProvider } from '../supabaseSignIn';
+import { reloadAt } from '../leave';
+
+const PROVIDER_NAMES: Record<SignInProvider, string> = { discord: 'Discord', google: 'Google' };
 
 export function SignInPage() {
   const [email, setEmail] = useState('');
@@ -17,12 +22,31 @@ export function SignInPage() {
   const session = useSession();
   const next = params.get('next') ?? '/';
   const forFriends = /friends=1/.test(next);
+  const [providers, setProviders] = useState<SignInProvider[]>([]);
+  const [leaving, setLeaving] = useState<SignInProvider | null>(null);
+
+  useEffect(() => {
+    let live = true;
+    api.authProviders().then((r) => { if (live) setProviders(r.providers); }).catch(() => undefined);
+    return () => { live = false; };
+  }, []);
+
+  async function go(provider: SignInProvider) {
+    setErr(null);
+    setLeaving(provider);
+    try {
+      await startSignIn(provider, next);
+    } catch (e) {
+      setLeaving(null);
+      setErr(e instanceof Error ? e.message : String(e));
+    }
+  }
 
   async function send() {
     setErr(null);
     try {
       await api.signInEmail(email);
-      try { sessionStorage.setItem('universe:signin:next', next); } catch { /* ignore */ }
+      try { sessionStorage.setItem(NEXT_KEY, next); } catch { /* ignore */ }
       setSent(true);
     } catch (e) {
       setErr(e instanceof ApiRequestError ? e.message : String(e));
@@ -38,11 +62,20 @@ export function SignInPage() {
           <div>
             <h1>{forFriends ? 'Sign in to play with friends' : 'Sign in'}</h1>
             <p className="muted" style={{ marginTop: 6, lineHeight: 1.5 }}>
-              No password. We email you a link; opening it signs you in{next !== '/' ? ' and brings you straight back' : ''}.
+              No password. {providers.length > 0 ? 'Use Discord or Google, or we' : 'We'} email you a link; opening it signs you in{next !== '/' ? ' and brings you straight back' : ''}.
               {!session.signedIn && ' The games you played as a guest come with you.'}
             </p>
           </div>
           {session.signedIn && <p>You are signed in as <strong>{session.displayName}</strong>. <Link to="/profile">Profile</Link></p>}
+          {providers.length > 0 && !sent && (
+            <div className="stack" style={{ gap: 8 }}>
+              {providers.map((p) => (
+                <button key={p} className="btn" type="button" disabled={leaving !== null} onClick={() => void go(p)}>
+                  {leaving === p ? `Going to ${PROVIDER_NAMES[p]}…` : `Sign in with ${PROVIDER_NAMES[p]}`}
+                </button>
+              ))}
+            </div>
+          )}
           {sent ? (
             <p>Link sent to <strong>{email}</strong>. Open it in this browser: it works once, only here, and expires in 15 minutes.</p>
           ) : (
@@ -164,7 +197,7 @@ export function SignInCompletePage() {
     await session.refresh();
     if (!live()) return;
     let next = '/';
-    try { next = sessionStorage.getItem('universe:signin:next') ?? '/'; } catch { /* ignore */ }
+    try { next = sessionStorage.getItem(NEXT_KEY) ?? '/'; } catch { /* ignore */ }
     nav(next.startsWith('/') ? next : '/', { replace: true });
   }
 
@@ -201,6 +234,76 @@ export function SignInCompletePage() {
             : <p className="error">{err.message} <Link to="/signin">Sign in</Link></p>)}
           {err?.retry && (
             <button className="btn green" type="button" onClick={retry} disabled={working}>Try again</button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Where Discord or Google send the player back, through Supabase, with a
+ *  one-time code in the address (`?code=`), or `?error=` when the player
+ *  said no. The code leaves the address bar at once and goes to the server,
+ *  which trades it with the secret this browser's cookie holds. Nothing else
+ *  in the address is read. Once signed in, the next page loads afresh, so
+ *  every part of the app starts again as the new account. */
+export function SignInCallbackPage() {
+  const [err, setErr] = useState<{ message: string; retry: boolean; unsure: boolean } | null>(null);
+  const [working, setWorking] = useState(true);
+  // What the address said, read once when the page first draws: React keeps
+  // it through its development double run, after the address bar is cleared.
+  const [{ code, refused }] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return { code: params.get('code'), refused: params.has('error') };
+  });
+  const live = useRef(true);
+
+  async function run(c: string) {
+    setErr(null);
+    setWorking(true);
+    try {
+      await finishSignIn(c);
+      if (!live.current) return;
+      let next: string | null = null;
+      try { next = sessionStorage.getItem(NEXT_KEY); } catch { /* ignore */ }
+      reloadAt(safeNext(next));
+    } catch (e) {
+      if (!live.current) return;
+      setWorking(false);
+      setErr({
+        message: e instanceof Error ? e.message : String(e),
+        retry: e instanceof SignInError && e.retry,
+        unsure: e instanceof SignInError && e.unsure,
+      });
+    }
+  }
+
+  useEffect(() => {
+    live.current = true;
+    window.history.replaceState(window.history.state, '', window.location.pathname);
+    if (!code) {
+      setWorking(false);
+      setErr({ message: refused ? 'Sign-in was cancelled.' : 'This sign-in link is missing its code.', retry: false, unsure: false });
+    } else {
+      void run(code);
+    }
+    return () => { live.current = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div>
+      <Nav />
+      <div className="page">
+        <div className="card modal-card">
+          <Wordmark size={28} />
+          <h1>Signing you in…</h1>
+          {err && (err.retry
+            ? <p className="error">{err.message}</p>
+            : <p className="error">{err.message} <Link to="/signin">Sign in</Link></p>)}
+          {err?.unsure && <p><a href="/profile">See which account you are signed in with</a></p>}
+          {err?.retry && code && (
+            <button className="btn green" type="button" onClick={() => void run(code)} disabled={working}>Try again</button>
           )}
         </div>
       </div>

@@ -9,8 +9,12 @@ import { cleanup, render } from '@testing-library/react';
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { ATTACKERS, PORTRAITS, RACES, faceUrl } from '../glue/ww/faces';
-import { Hologram } from '../glue/ww/holo';
+import { warbleWayGallery } from '../glue';
+
+// The screen lives in @zekel/warble-way-galaxy; the pictures it names are
+// served from here. Every portrait is a race, the red shirt or an attacker.
+const { ATTACKERS, RACES, REDSHIRT, faceUrl, Hologram } = warbleWayGallery;
+const PORTRAITS: string[] = [...RACES, REDSHIRT, ...Object.values(ATTACKERS).flat()];
 
 afterEach(cleanup);
 
