@@ -5,6 +5,7 @@
 import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
 import fastifyCookie from '@fastify/cookie';
 import fastifyStatic from '@fastify/static';
+import { createHmac } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { isIP } from 'node:net';
 import path from 'node:path';
@@ -130,10 +131,14 @@ function linkProof(token: string): string {
   return hashToken(`signin-link:${token}`);
 }
 
-/** The same proof for a Discord or Google sign-in (T09): the one-time code
- *  together with the PKCE secret of the browser that started it. */
-function oauthProof(code: string, verifier: string): string {
-  return hashToken(`supabase-code:${code}:${verifier}`);
+/** The session cookie value a Discord or Google sign-in makes (T09): worked
+ *  out from the one-time code, the PKCE secret of the browser that started
+ *  the sign-in, and the server's key, instead of drawn at random. So the
+ *  same browser sending the same code again gets the same session back,
+ *  which is how a lost answer is recovered; nobody without that browser's
+ *  secret can work it out. */
+function oauthSessionToken(secretKey: string, code: string, verifier: string): string {
+  return createHmac('sha256', secretKey).update(`oauth-session:${code}:${verifier}`).digest('base64url');
 }
 
 const ENDED = 'Your session has ended. Sign in again.';
@@ -542,6 +547,9 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
   async function finishSignIn(
     req: FastifyRequest, reply: FastifyReply, linkHash: string | null,
     claim: (trx: Kysely<DB>) => Promise<string | null>,
+    /** The new session's cookie value; random unless the caller needs it
+     *  repeatable (the Discord and Google sign-in). */
+    sessionToken: string = newToken(),
   ): Promise<{ userId: string } | null> {
     const revocation = beginRevocation(reply);
     let outcome: { userId: string; sessionToken: string } | null;
@@ -580,7 +588,6 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
         // The session remembers what made it (the email link, or the
         // Discord or Google code), so a browser whose answer was lost can
         // ask whether that sign-in signed it in (the two status routes).
-        const sessionToken = newToken();
         await trx.insertInto('auth_sessions').values({
           id: newId(), user_id: userId, token_hash: hashToken(sessionToken), created_at: now(),
           expires_at: new Date(Date.now() + SESSION_TTL_MS).toISOString(), link_hash: linkHash,
@@ -676,9 +683,9 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
   // address of Supabase's authorize page, which carries only the secret's
   // hash. The cookie is never cleared, only left to expire or replaced: a
   // secret whose code is spent is useless (Supabase trades a code once), and
-  // keeping it lets a lost answer be recovered (resume, below) and keeps an
-  // older sign-in's late return from wiping a newer one's secret. The email
-  // link's own cookie is not touched.
+  // keeping it lets a lost answer be recovered (below) and keeps an older
+  // sign-in's late return from wiping a newer one's secret. The email link's
+  // own cookie is not touched.
   app.post('/api/auth/supabase/start', async (req, reply) => {
     if (!opts.supabase) return reply.code(404).send({ error: 'not_offered' });
     if (oauthLimit(req, reply)) return reply;
@@ -695,9 +702,18 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
   // player in as an email link does (finishSignIn). Refused before anything
   // changes: a browser with no sign-in in progress, a code Supabase will not
   // trade (another browser's, used, expired), a token that fails the check.
-  // Only a trade Supabase did not take (busy or down) can be tried again with
-  // the same code; once traded, any failure means starting again. The
-  // Supabase session is ended either way and its tokens are dropped.
+  //
+  // Safe to send again. The session's cookie value comes from the code and
+  // this browser's secret (oauthSessionToken), so when this browser sends a
+  // code that already signed it in, it gets that same session back, without
+  // asking Supabase: that is how a lost answer is recovered. Only within
+  // ten minutes of that sign-in, and only when the browser has not since
+  // signed in elsewhere or become a new guest; nothing is replaced or
+  // revoked.
+  //
+  // Only a trade Supabase did not take (busy or down) can be tried again as
+  // new; once traded, any failure means starting again. The Supabase session
+  // is ended either way and its tokens are dropped.
   app.post('/api/auth/supabase/complete', async (req, reply) => {
     if (!opts.supabase) return reply.code(404).send({ error: 'not_offered' });
     if (oauthLimit(req, reply)) return reply;
@@ -707,9 +723,23 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     }
     const code = codeOf(req.body);
     if (!code) return oauthRefused(reply);
+    const sessionToken = oauthSessionToken(opts.secretKey, code, verifier);
+    const setSession = () =>
+      reply.setCookie(AUTH_COOKIE, sessionToken, { ...cookieOptions, maxAge: Math.floor(SESSION_TTL_MS / 1000) });
+
+    // Sent before? Then this browser already signed in with this code.
+    const made = await db.selectFrom('auth_sessions').select(['user_id', 'created_at', 'expires_at'])
+      .where('token_hash', '=', hashToken(sessionToken)).executeTakeFirst();
+    if (made) {
+      const fresh = new Date(made.created_at).getTime() > Date.now() - OAUTH_TTL_S * 1000
+        && new Date(made.expires_at).getTime() > Date.now();
+      if (!fresh || (await signedInSince(req, sessionToken))) return oauthRefused(reply);
+      setSession();
+      return { ok: true, userId: made.user_id };
+    }
+
     const supabase = opts.supabase;
     const reason = (e: unknown) => (e instanceof SupabaseTokenError ? e.reason : 'error');
-
     let token: string;
     try {
       token = await supabase.exchange(code, verifier);
@@ -726,7 +756,14 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
         req.log.warn({ reason: reason(e) }, 'supabase sign-in refused at the check');
         return oauthRefused(reply);
       }
-      const outcome = await finishSignIn(req, reply, oauthProof(code, verifier), (trx) => findOrCreateSupabaseUser(trx, who));
+      let outcome: { userId: string } | null;
+      try {
+        outcome = await finishSignIn(req, reply, null, (trx) => findOrCreateSupabaseUser(trx, who), sessionToken);
+      } catch (e) {
+        // Nothing was written (one transaction), and the code is spent.
+        req.log.error({ err: e }, 'supabase sign-in failed to save');
+        return reply.code(500).send({ error: 'sign_in_failed', message: 'That sign-in could not be saved. Start again.' });
+      }
       if (!outcome) return oauthRefused(reply);
       return { ok: true, userId: outcome.userId };
     } finally {
@@ -739,55 +776,24 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     }
   });
 
-  // When the completion's answer was lost (T09). The code is spent, so the
-  // page asks here with it; the browser's PKCE secret cookie proves it is
-  // the browser that started that sign-in. Yes when this browser already
-  // holds the session that sign-in made. Otherwise, if that sign-in made a
-  // session in the last ten minutes that never reached this browser (its
-  // cookie was lost on the way), that session is replaced by a new one for
-  // this browser: the same account, the same proof, a cookie this time. No
-  // otherwise, and nothing changes.
-  app.post('/api/auth/supabase/resume', async (req, reply) => {
-    if (!opts.supabase) return { signedIn: false };
-    if (oauthLimit(req, reply)) return reply;
-    const verifier = req.cookies[oauthCookieName];
-    const code = codeOf(req.body);
-    if (!isWellFormedVerifier(verifier) || !code) return { signedIn: false };
-    const proof = oauthProof(code, verifier);
-    const live = (s: { expires_at: string } | undefined) => !!s && new Date(s.expires_at).getTime() > Date.now();
-
+  /** Has this browser moved on since the sign-in that made `sessionToken`:
+   *  signed in to some other session, or become a guest not yet upgraded?
+   *  Then a repeat of that sign-in is refused rather than undo either. */
+  async function signedInSince(req: FastifyRequest, sessionToken: string): Promise<boolean> {
     const authToken = req.cookies[AUTH_COOKIE];
-    if (authToken) {
-      const held = await db.selectFrom('auth_sessions').select(['user_id', 'expires_at', 'link_hash'])
+    if (authToken && authToken !== sessionToken) {
+      const other = await db.selectFrom('auth_sessions').select('expires_at')
         .where('token_hash', '=', hashToken(authToken)).executeTakeFirst();
-      if (held && live(held) && held.link_hash === proof) return { signedIn: true, userId: held.user_id };
+      if (other && new Date(other.expires_at).getTime() > Date.now()) return true;
     }
-    const since = new Date(Date.now() - OAUTH_TTL_S * 1000).toISOString();
-    const sessionToken = newToken();
-    // Anything still holding the replaced session is cut (beginRevocation).
-    const revocation = beginRevocation(reply);
-    let resumed: { userId: string } | null;
-    try {
-      resumed = await db.transaction().execute(async (trx) => {
-        const orphan = await trx.selectFrom('auth_sessions').select(['id', 'user_id', 'expires_at', 'token_hash'])
-          .where('link_hash', '=', proof).where('created_at', '>=', since).executeTakeFirst();
-        if (!orphan || !live(orphan)) return null;
-        revocation.add(credentialRoom({ kind: 'session', tokenHash: orphan.token_hash }));
-        const gone = await trx.deleteFrom('auth_sessions').where('id', '=', orphan.id).executeTakeFirst();
-        if (Number(gone.numDeletedRows) !== 1) return null; // another resume won
-        await trx.insertInto('auth_sessions').values({
-          id: newId(), user_id: orphan.user_id, token_hash: hashToken(sessionToken), created_at: now(),
-          expires_at: new Date(Date.now() + SESSION_TTL_MS).toISOString(), link_hash: proof,
-        }).execute();
-        return { userId: orphan.user_id };
-      });
-    } finally {
-      revocation.settled();
+    const guestToken = req.cookies[GUEST_COOKIE];
+    if (guestToken) {
+      const guest = await db.selectFrom('guests').select(['upgraded_to_user_id', 'created_at', 'expires_at'])
+        .where('token_hash', '=', hashToken(guestToken)).executeTakeFirst();
+      if (guest && !guest.upgraded_to_user_id && guestExpiresAt(guest) > Date.now()) return true;
     }
-    if (!resumed) return { signedIn: false };
-    reply.setCookie(AUTH_COOKIE, sessionToken, { ...cookieOptions, maxAge: Math.floor(SESSION_TTL_MS / 1000) });
-    return { signedIn: true, userId: resumed.userId };
-  });
+    return false;
+  }
 
   // Did this link sign this browser in? Asked by the landing page when the
   // completion's answer was lost or refused: the token is spent either way,

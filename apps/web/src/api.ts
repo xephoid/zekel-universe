@@ -45,10 +45,10 @@ export const api = {
   authProviders: () => req<{ providers: Array<'discord' | 'google'> }>('/api/auth/providers'),
   /** Start a Discord or Google sign-in: the server keeps its secret in a cookie and answers where to go. */
   startSupabaseSignIn: (provider: 'discord' | 'google') => post<{ url: string }>('/api/auth/supabase/start', { provider }),
-  /** Hand the server the one-time code Discord or Google sent back. */
+  /** Hand the server the one-time code Discord or Google sent back. Safe to
+   *  send again from the same browser: a code that already signed it in
+   *  gives that same session back. */
   completeSupabaseSignIn: (code: string) => post<{ ok: true; userId: string }>('/api/auth/supabase/complete', { code }),
-  /** After a lost answer: did this code's sign-in sign this browser in? The server hands it over if it did. */
-  resumeSupabaseSignIn: (code: string) => post<{ signedIn: boolean; userId?: string }>('/api/auth/supabase/resume', { code }),
 
   games: () => req<GamesResponse>('/api/games'),
   game: (id: string) => req<GameResponse>(`/api/games/${encodeURIComponent(id)}`),

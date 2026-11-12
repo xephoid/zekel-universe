@@ -27,7 +27,8 @@ reaches the browser,** and the browser needs no Supabase library.
    there. The cookie is never cleared, only left to expire or replaced by a
    newer sign-in: a secret whose code is spent is useless, and keeping it
    lets a lost answer be recovered (step 9) and stops an older sign-in's late
-   return from spoiling a newer one.
+   return from spoiling a newer one. Starting a second sign-in does make the
+   first one's code useless.
 3. Discord or Google send the player back through Supabase to `/auth/callback`
    with a one-time code. The page clears it from the address bar and sends it
    to `POST /api/auth/supabase/complete`. A token in the address bar is never
@@ -37,7 +38,7 @@ reaches the browser,** and the browser needs no Supabase library.
    only with the secret whose hash it was issued for, so a code is useless in
    any other browser. If Supabase is busy or down at this point, the page
    offers "Try again" with the same code; once the code is traded, any
-   failure means starting again.
+   failure, a failure to save included, means starting again.
 5. The server checks the access token anyway: the project's public key (the
    `jose` library, ES256 or RS256 only), issuer
    `https://<project>.supabase.co/auth/v1`, audience `authenticated`, not
@@ -55,14 +56,17 @@ reaches the browser,** and the browser needs no Supabase library.
    session only), which ends its refresh token too, and drops the tokens.
    They were never sent anywhere.
 8. The page then loads the next page afresh, so every part of the app starts
-   again as the new account. Where it goes is parsed as an address and must
-   be a page of this site (`//other.site` and `/\other.site` go home).
-9. If the server's answer is lost, the page asks
-   `POST /api/auth/supabase/resume` with the code. The session remembers the
-   code and the browser's secret; if this browser holds it, the answer is
-   yes. If the sign-in happened but its cookie never arrived, the server
-   replaces that stranded session with one for this browser, within the ten
-   minutes and only for the browser holding the secret.
+   again as the new account. Where it goes is parsed as an address, must be
+   a page of this site, and is used as the full checked address
+   (`//other.site` and `/\other.site` go home).
+9. **Sending the same code again is safe.** The new session's cookie value is
+   worked out from the code, this browser's secret and the server's key, not
+   drawn at random. So if the answer is lost on the way, the page sends the
+   code once more, and the server, finding that session, hands the same one
+   back without asking Supabase. Nothing is replaced or revoked. Only within
+   ten minutes of the sign-in (and while the secret's cookie lasts, which is
+   ten minutes from the start), and not once the browser has since signed in
+   elsewhere, become a new guest, or signed out.
 
 Signing keys must be the newer asymmetric kind (the project setting "JWT
 signing keys"): with the old shared secret there are no public keys, and

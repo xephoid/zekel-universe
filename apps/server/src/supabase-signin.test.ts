@@ -9,7 +9,7 @@
 // email link left alone; a lost answer; and the settings.
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import type { Kysely } from 'kysely';
+import { sql, type Kysely } from 'kysely';
 import { SignJWT, createLocalJWKSet, exportJWK, generateKeyPair, type JWTPayload } from 'jose';
 import type { MeResponse } from '@universe/shared';
 import type { DB } from './db/schema.js';
@@ -313,16 +313,23 @@ describe('sign-in through Supabase', () => {
       expect(exchanges).toBe(0);
     });
 
-    it('twice', async () => {
+    it('twice from the same browser: one sign-in, the same session both times', async () => {
       const { oauth, code } = await viaDiscord(discordUser());
-      expect((await complete(code, oauth)).statusCode).toBe(200);
-      await nothingChanges(() => complete(code, oauth));
+      const a = await complete(code, oauth);
+      const b = await complete(code, oauth);
+      expect([a.statusCode, b.statusCode]).toEqual([200, 200]);
+      expect(cookieOf(b, 'universe_auth')).toBe(cookieOf(a, 'universe_auth'));
+      expect(await db.selectFrom('auth_sessions').select('id').execute()).toHaveLength(1);
+      expect(exchanges).toBe(1);
     });
 
-    it('twice at the same moment: one sign-in', async () => {
+    it('twice at the same moment: one sign-in, and any answer that signs in gives the same session', async () => {
       const { oauth, code } = await viaDiscord(discordUser());
-      const [a, b] = await Promise.all([complete(code, oauth), complete(code, oauth)]);
-      expect([a.statusCode, b.statusCode].sort()).toEqual([200, 401]);
+      const both = await Promise.all([complete(code, oauth), complete(code, oauth)]);
+      const ok = both.filter((r) => r.statusCode === 200);
+      expect(ok.length).toBeGreaterThanOrEqual(1);
+      expect(new Set(ok.map((r) => cookieOf(r, 'universe_auth'))).size).toBe(1);
+      for (const r of both) expect([200, 401]).toContain(r.statusCode);
       expect(await db.selectFrom('auth_sessions').select('id').execute()).toHaveLength(1);
     });
 
@@ -401,52 +408,85 @@ describe('sign-in through Supabase', () => {
     expect(cookieOf(res, 'universe_auth')).toBeTruthy();
   });
 
-  describe('when the answer is lost', () => {
-    const resume = (c: unknown, k?: string) => post('/api/auth/supabase/resume', { code: c }, k);
-
-    it('a browser that got its cookie hears yes, and nothing changes', async () => {
-      const { oauth, code } = await viaDiscord(discordUser());
-      const res = await complete(code, oauth);
-      const cookie = cookieOf(res, 'universe_auth')!;
-      const again = await resume(code, join(oauth, cookie));
-      expect(again.json()).toEqual({ signedIn: true, userId: res.json().userId });
-      expect(cookieOf(again, 'universe_auth')).toBeNull();
-      expect(await db.selectFrom('auth_sessions').select('id').execute()).toHaveLength(1);
-    });
-
-    it('a browser whose cookie never arrived gets the sign-in it made, once, and the stranded session goes', async () => {
+  describe('when the answer is lost, sending the same code again is safe', () => {
+    it('the browser gets the same session back, Supabase is not asked again, and nothing is replaced', async () => {
       const guestRes = await post('/api/guests', { displayName: 'Guest' });
       const guestCookie = cookieOf(guestRes, 'universe_guest')!;
+      const { cookie: oldSession } = await emailSignIn('someone-else@example.com');
       const { oauth, code } = await viaDiscord(discordUser());
-      const lost = await complete(code, join(oauth, guestCookie)); // its answer, cookie included, never arrives
-      const stranded = await db.selectFrom('auth_sessions').select('token_hash').execute();
-      expect(stranded).toHaveLength(1);
+      const browser = join(oauth, guestCookie, oldSession);
+      const lost = await complete(code, browser); // its answer, cookie included, never arrives
+      const sessions = await db.selectFrom('auth_sessions').select('token_hash').execute();
 
-      const res = await resume(code, join(oauth, guestCookie));
-      expect(res.json()).toEqual({ signedIn: true, userId: lost.json().userId });
-      const cookie = cookieOf(res, 'universe_auth')!;
-      expect((await me(cookie)).user?.id).toBe(lost.json().userId);
-      const now = await db.selectFrom('auth_sessions').select('token_hash').execute();
-      expect(now).toHaveLength(1);
-      expect(now[0]!.token_hash).not.toBe(stranded[0]!.token_hash);
-      // Asking again keeps it one session.
-      expect((await resume(code, oauth)).json().signedIn).toBe(true);
-      expect(await db.selectFrom('auth_sessions').select('id').execute()).toHaveLength(1);
+      const again = await complete(code, browser);
+      expect(again.statusCode).toBe(200);
+      expect(again.json().userId).toBe(lost.json().userId);
+      expect(cookieOf(again, 'universe_auth')).toBe(cookieOf(lost, 'universe_auth'));
+      expect(exchanges).toBe(1);
+      expect(await db.selectFrom('auth_sessions').select('token_hash').execute()).toEqual(sessions);
+      expect((await me(cookieOf(again, 'universe_auth')!)).user?.id).toBe(lost.json().userId);
     });
 
-    it('no for anyone else: another browser, no secret, another code, or after ten minutes', async () => {
+    it('many repeats, even at once, give the same session and never extend the ten minutes', async () => {
+      const { oauth, code } = await viaDiscord(discordUser());
+      const first = await complete(code, oauth);
+      const repeats = await Promise.all([complete(code, oauth), complete(code, oauth), complete(code, oauth)]);
+      for (const r of repeats) expect(cookieOf(r, 'universe_auth')).toBe(cookieOf(first, 'universe_auth'));
+      const made = await db.selectFrom('auth_sessions').select(['created_at']).execute();
+      expect(made).toHaveLength(1);
+      await db.updateTable('auth_sessions').set({ created_at: new Date(Date.now() - 11 * 60 * 1000).toISOString() }).execute();
+      const late = await complete(code, oauth);
+      expect(late.statusCode).toBe(401);
+      expect(cookieOf(late, 'universe_auth')).toBeNull();
+    });
+
+    it('no for another browser, no secret, or another code', async () => {
       const { oauth, code } = await viaDiscord(discordUser());
       await complete(code, oauth);
       const other = await viaDiscord(discordUser({ id: 'sb-other' }));
+      const sessions = await db.selectFrom('auth_sessions').select('id').execute();
       for (const [c, k] of [[code, other.oauth], [code, undefined], ['another-code', oauth]] as const) {
-        const res = await resume(c, k);
-        expect(res.json()).toEqual({ signedIn: false });
+        const res = await complete(c, k);
+        expect(res.statusCode).toBe(401);
         expect(cookieOf(res, 'universe_auth')).toBeNull();
       }
-      await db.updateTable('auth_sessions').set({ created_at: new Date(Date.now() - 11 * 60 * 1000).toISOString() }).execute();
-      expect((await resume(code, oauth)).json()).toEqual({ signedIn: false });
-      expect(await db.selectFrom('auth_sessions').select('id').execute()).toHaveLength(1);
+      expect(await db.selectFrom('auth_sessions').select('id').execute()).toEqual(sessions);
     });
+
+    it('no once the browser has signed in elsewhere since, which stays as it is', async () => {
+      const { oauth, code } = await viaDiscord(discordUser());
+      await complete(code, oauth);
+      const { cookie: since } = await emailSignIn('since@example.com');
+      const res = await complete(code, join(oauth, since));
+      expect(res.statusCode).toBe(401);
+      expect(cookieOf(res, 'universe_auth')).toBeNull();
+      expect((await me(since)).user).not.toBeNull();
+    });
+
+    it('no once the browser has become a new guest since', async () => {
+      const { oauth, code } = await viaDiscord(discordUser());
+      await complete(code, oauth);
+      const guest = cookieOf(await post('/api/guests', { displayName: 'Later' }), 'universe_guest')!;
+      expect((await complete(code, join(oauth, guest))).statusCode).toBe(401);
+    });
+
+    it('no after signing out: a sign-in is not brought back', async () => {
+      const { oauth, code } = await viaDiscord(discordUser());
+      const res = await complete(code, oauth);
+      await post('/api/auth/signout', {}, cookieOf(res, 'universe_auth')!);
+      expect((await complete(code, oauth)).statusCode).toBe(401);
+    });
+  });
+
+  it('a failure to save the sign-in after the trade says start again, and saves nothing', async () => {
+    await sql`ALTER TABLE identities RENAME TO identities_away`.execute(db);
+    const res = await signInWith(discordUser());
+    await sql`ALTER TABLE identities_away RENAME TO identities`.execute(db);
+    expect(res.statusCode).toBe(500);
+    expect(res.json().error).toBe('sign_in_failed');
+    expect(cookieOf(res, 'universe_auth')).toBeNull();
+    expect(await db.selectFrom('auth_sessions').select('id').execute()).toEqual([]);
+    expect(logouts).toBe(1);
   });
 
   it('a pending email link survives a Discord sign-in in the same browser, and the other way round', async () => {
@@ -515,7 +555,6 @@ describe('sign-in through Supabase, not set up', () => {
     expect((await app.fastify.inject({ method: 'GET', url: '/api/auth/providers' })).json()).toEqual({ providers: [] });
     expect((await send('/api/auth/supabase/start', { provider: 'discord' })).statusCode).toBe(404);
     expect((await send('/api/auth/supabase/complete', { code: 'x' })).statusCode).toBe(404);
-    expect((await send('/api/auth/supabase/resume', { code: 'x' })).json()).toEqual({ signedIn: false });
     await app.fastify.close();
     await database.close();
   });

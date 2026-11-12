@@ -33,20 +33,24 @@ const UNREACHABLE = 'We could not reach the server to finish signing you in. Che
  *  code be tried again. */
 let inFlight: { code: string; run: Promise<void> } | null = null;
 
-/** Hand the code to the server, which signs the player in. When the answer
- *  is lost or refused, ask the server whether this code signed this browser
- *  in after all; it hands the sign-in over if so (resume). Throws a
- *  SignInError otherwise. */
+/** Hand the code to the server, which signs the player in. Sending it
+ *  again is safe (the same browser gets the same session back), so when the
+ *  answer is lost on the way, it is sent once more. Throws a SignInError
+ *  otherwise; `retry` only when the server or Supabase did not answer, so
+ *  the same code may still work. */
 export function finishSignIn(code: string): Promise<void> {
   if (inFlight?.code === code) return inFlight.run;
   const run = (async () => {
-    try {
-      await api.completeSupabaseSignIn(code);
-    } catch (e) {
-      const made = await api.resumeSupabaseSignIn(code).then((r) => r.signedIn === true, () => false);
-      if (made) return;
-      if (e instanceof ApiRequestError) throw new SignInError(e.message, e.status >= 500 || e.status === 429);
-      throw new SignInError(UNREACHABLE, true);
+    for (let attempt = 0; ; attempt++) {
+      try {
+        await api.completeSupabaseSignIn(code);
+        return;
+      } catch (e) {
+        if (e instanceof ApiRequestError) {
+          throw new SignInError(e.message, e.code === 'sign_in_unavailable' || e.code === 'too_many_requests');
+        }
+        if (attempt >= 1) throw new SignInError(UNREACHABLE, true);
+      }
     }
   })();
   const entry = { code, run };
@@ -62,8 +66,9 @@ export function safeNext(next: string | null): string {
   if (!next) return '/';
   try {
     const url = new URL(next, window.location.origin);
-    if (url.origin !== window.location.origin) return '/';
-    return `${url.pathname}${url.search}${url.hash}`;
+    // The whole checked address, not its path: a path such as `//other.site`
+    // would be read as another site.
+    return url.origin === window.location.origin ? url.href : '/';
   } catch {
     return '/';
   }

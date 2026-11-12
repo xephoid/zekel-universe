@@ -26,20 +26,22 @@ const GUEST = { user: null, guest: { id: 'g', displayName: 'Guest', upgradedToUs
 
 let calls: Array<{ url: string; body: unknown }>;
 
-/** The server. `complete`: the completion's status (0: the answer is lost);
- *  `made`: the status question's answer. */
-function stubServer(opts: { providers?: string[]; complete?: number; made?: boolean } = {}) {
+/** The server. `complete`: the completion's status (0: the answer is lost),
+ *  or one status per try. */
+function stubServer(opts: { providers?: string[]; complete?: number | number[] } = {}) {
+  let tries = 0;
   vi.stubGlobal('fetch', vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
     const url = String(input);
     calls.push({ url, body: init?.body ? JSON.parse(String(init.body)) : undefined });
     if (url === '/api/me') return json(GUEST);
     if (url === '/api/auth/providers') return json({ providers: opts.providers ?? ['discord', 'google'] });
     if (url === '/api/auth/supabase/start') return json({ url: 'https://p.supabase.co/auth/v1/authorize?provider=discord' });
-    if (url === '/api/auth/supabase/resume') return json({ signedIn: opts.made ?? false });
     if (url === '/api/auth/supabase/complete') {
-      const status = opts.complete ?? 200;
+      const plan = opts.complete ?? 200;
+      const status = Array.isArray(plan) ? plan[Math.min(tries++, plan.length - 1)]! : plan;
       if (status === 0) return Promise.reject(new TypeError('network down'));
       if (status === 503) return json({ error: 'sign_in_unavailable', message: 'Sign-in is not answering. Try again in a moment.' }, 503);
+      if (status === 500) return json({ error: 'sign_in_failed', message: 'That sign-in could not be saved. Start again.' }, 500);
       return status === 200 ? json({ ok: true, userId: 'u' }) : json({ error: 'sign_in_refused', message: 'That sign-in did not work. Start again.' }, status);
     }
     return json({ error: 'not_found' }, 404);
@@ -99,7 +101,7 @@ describe('the callback page', () => {
     sessionStorage.setItem('universe:signin:next', '/tables');
     window.history.replaceState(null, '', '/auth/callback?code=one-time&state=x');
     renderAt('/auth/callback', <SignInCallbackPage />, '/auth/callback');
-    await waitFor(() => expect(nav.reloadAt).toHaveBeenCalledWith('/tables'));
+    await waitFor(() => expect(nav.reloadAt).toHaveBeenCalledWith(`${window.location.origin}/tables`));
     // Once, under React's development double run, with the code only.
     expect(completes()).toEqual([{ url: '/api/auth/supabase/complete', body: { code: 'one-time' } }]);
     expect(window.location.search).toBe('');
@@ -145,6 +147,15 @@ describe('the callback page', () => {
     ]);
   });
 
+  it('a sign-in that could not be saved says start again, with no Try again', async () => {
+    stubServer({ complete: 500 });
+    window.history.replaceState(null, '', '/auth/callback?code=c4');
+    renderAt('/auth/callback', <SignInCallbackPage />, '/auth/callback');
+    const msg = await screen.findByText(/could not be saved/);
+    expect(msg.querySelector('a[href="/signin"]')).toBeTruthy();
+    expect(screen.queryByText('Try again')).toBeNull();
+  });
+
   it('a refused sign-in says so, links back to sign-in, and goes nowhere', async () => {
     stubServer({ complete: 401 });
     window.history.replaceState(null, '', '/auth/callback?code=c3');
@@ -156,16 +167,29 @@ describe('the callback page', () => {
 });
 
 describe('where to go after signing in', () => {
-  it('only a page of this site; anything that reads as another site goes home', () => {
-    expect(safeNext('/tables?x=1#y')).toBe('/tables?x=1#y');
+  const origin = window.location.origin;
+  /** Where the browser will really go with what safeNext returns. */
+  const landsOn = (next: string) => new URL(safeNext(next), origin);
+
+  it('a page of this site, as a full address', () => {
+    expect(safeNext('/tables?x=1#y')).toBe(`${origin}/tables?x=1#y`);
     expect(safeNext(null)).toBe('/');
+  });
+
+  it('anything that would leave the site goes home instead', () => {
     // Written with String.raw so each backslash is really in the address.
     const bad = [String.raw`//evil.example/x`, String.raw`/\evil.example`, String.raw`/\/evil.example`,
       String.raw`\\evil.example`, String.raw`\/evil.example`, 'https://evil.example/', 'javascript:alert(1)',
       '  //evil.example', '\t//evil.example'];
     for (const b of bad) expect(safeNext(b), b).toBe('/');
-    // A single backslash is a page of this site, as the browser reads it.
-    expect(safeNext(String.raw`\tables`)).toBe('/tables');
+  });
+
+  it('a path that only looks like another site stays on this one', () => {
+    // These parse as pages of this site; what comes back must not be read
+    // as another site when the browser goes there.
+    for (const b of ['/.//evil.example/x', `${origin}//evil.example/x`, String.raw`\tables`]) {
+      expect(landsOn(b).origin, b).toBe(origin);
+    }
   });
 });
 
@@ -176,21 +200,25 @@ describe('the trip (supabaseSignIn.ts)', () => {
     expect(completes()).toHaveLength(1);
   });
 
-  it('a lost answer, when the server says this code did sign the browser in, is a success', async () => {
-    stubServer({ complete: 0, made: true });
-    await expect(finishSignIn('lost-yes')).resolves.toBeUndefined();
-    expect(calls.find((c) => c.url === '/api/auth/supabase/resume')?.body).toEqual({ code: 'lost-yes' });
+  it('a lost answer: the same code is sent once more, which is safe, and that one signs in', async () => {
+    stubServer({ complete: [0, 200] });
+    await expect(finishSignIn('lost-then-ok')).resolves.toBeUndefined();
+    expect(completes().map((c) => c.body)).toEqual([{ code: 'lost-then-ok' }, { code: 'lost-then-ok' }]);
   });
 
-  it('a lost answer, when the server says it did not, says the server could not be reached', async () => {
-    stubServer({ complete: 0, made: false });
-    await expect(finishSignIn('lost-no')).rejects.toThrow(/could not reach the server/);
+  it('both answers lost: says the server could not be reached, and offers to try again', async () => {
+    stubServer({ complete: 0 });
+    await expect(finishSignIn('lost-twice')).rejects.toMatchObject({ retry: true, message: expect.stringMatching(/could not reach the server/) });
+    expect(completes()).toHaveLength(2);
   });
 
-  it('a refusal is a refusal unless the server says this code signed the browser in', async () => {
-    stubServer({ complete: 401, made: false });
-    await expect(finishSignIn('refused')).rejects.toThrow(/did not work/);
-    stubServer({ complete: 401, made: true });
-    await expect(finishSignIn('refused-but-made')).resolves.toBeUndefined();
+  it('a refusal or a failed save is final; only "not answering" offers to try again', async () => {
+    stubServer({ complete: 401 });
+    await expect(finishSignIn('refused')).rejects.toMatchObject({ retry: false });
+    expect(completes()).toHaveLength(1);
+    stubServer({ complete: 500 });
+    await expect(finishSignIn('not-saved')).rejects.toMatchObject({ retry: false });
+    stubServer({ complete: 503 });
+    await expect(finishSignIn('busy')).rejects.toMatchObject({ retry: true });
   });
 });
