@@ -115,14 +115,11 @@ const isGamePackage = (spec: string) => /^@zekel\/[^/]+(\/|$)/.test(spec) && !DR
 /** The one entry of a game package the web app loads: its screen. */
 const isGameScreen = (spec: string) => isGamePackage(spec) && /^@zekel\/[^/]+\/glue$/.test(spec);
 
-/** Each game's files under glue/: its folder, and its top-level files. */
-const GAMES: Record<string, string[]> = {
-  'fractured-fist': ['ff', 'fractured-fist'],
-  'sweetlands-imperium': ['sl', 'sweetlands-imperium', 'sweetlands-board'],
-  'warble-way-galaxy': ['ww', 'warble-way-galaxy'],
-  'neither-guts-nor-gears': ['ngg'],
-  'adventurer-olympics': ['ao'],
-};
+/** Games whose screens still live under glue/, by engine id, with their
+ *  folder and top-level files. None do: every game is an installed package.
+ *  A screen written here before it has a package of its own goes in this
+ *  map, and the rules below hold it to its own files. */
+const GAMES: Record<string, string[]> = {};
 
 const LIST = [path.join(GLUE, 'index'), path.join(GLUE, 'index.ts')];
 
@@ -198,8 +195,9 @@ describe('the scanner the wall is checked with', () => {
     expect(ownerOf(path.join(GLUE, 'index'))).toBe('list');
     expect(ownerOf(path.join(GLUE, 'index', 'rogue.ts'))).toBeNull();
     expect(ownerOf(path.join(GLUE, 'index.tsx'))).toBeNull();
-    expect(ownerOf(path.join(GLUE, 'ao', 'index.ts'))).toBe('adventurer-olympics');
-    expect(ownerOf(path.join(GLUE, 'fractured-fist.ts'))).toBe('fractured-fist');
+    // No game lives under glue/ now, so nothing else there has an owner.
+    expect(ownerOf(path.join(GLUE, 'ao', 'index.ts'))).toBeNull();
+    expect(ownerOf(path.join(GLUE, 'fractured-fist.ts'))).toBeNull();
     expect(ownerOf(path.join(SRC, 'pages', 'Table.tsx'))).toBeNull();
     expect(ownerOf(GLUE)).toBeNull();
   });
@@ -208,8 +206,16 @@ describe('the scanner the wall is checked with', () => {
 describe('the games\' drawing code stays behind its wall', () => {
   const files = walk(GLUE);
 
-  it('finds the glue', () => {
-    expect(files.length).toBeGreaterThan(20);
+  it('finds the list, and nothing else under glue/', () => {
+    expect(files.map((f) => path.relative(GLUE, f))).toEqual(['index.ts']);
+  });
+
+  it('the list names all seven games, each by its package\'s screen entry', () => {
+    const { specs } = importsOf(path.join(GLUE, 'index.ts'));
+    expect(specs.filter(isGameScreen).sort()).toEqual([
+      '@zekel/adventurer-olympics/glue', '@zekel/cybernoir-2127/glue', '@zekel/fractured-fist/glue', '@zekel/neither-guts-nor-gears/glue',
+      '@zekel/sweetlands-imperium/glue', '@zekel/warble-way-galaxy/glue', '@zekel/warble-way-galaxy/glue', '@zekel/word-debauchee/glue',
+    ]);
   });
 
   it('has no symbolic links under glue/', () => {
