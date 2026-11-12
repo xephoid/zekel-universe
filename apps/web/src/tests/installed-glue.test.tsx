@@ -20,6 +20,23 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const captured = JSON.parse(readFileSync(path.join(here, 'fixtures', 'installed', 'word-debauchee-build-rows.json'), 'utf8')) as { viewer: string; view: unknown; legalMoves: LegalMove[] };
 
 describe('an installed game', () => {
+  it('every game is in the list under its engine id, with what a glue must have', () => {
+    const ids = ['adventurer-olympics', 'cybernoir-2127', 'fractured-fist', 'neither-guts-nor-gears', 'sweetlands-imperium', 'warble-way-galaxy', 'word-debauchee'];
+    expect(Object.keys(GLUES).sort()).toEqual(ids);
+    for (const id of ids) {
+      const glue = glueFor(id)!;
+      expect(typeof glue.setupFields, id).toBe('function');
+      expect(typeof glue.resolveReportMove, id).toBe('function');
+      expect(typeof glue.plan, id).toBe('function');
+      // A view no game knows is refused, not drawn wrong.
+      expect(glue.plan({ view: { nonsense: true }, previous: null, legalMoves: [], playerId: null, reference: null, seq: 1, engineMove: null, actorPlayerId: null, memory: new Map() }), id).toBeNull();
+    }
+    // The four that draw their own table screen bring it.
+    for (const id of ['adventurer-olympics', 'fractured-fist', 'neither-guts-nor-gears', 'sweetlands-imperium', 'warble-way-galaxy', 'word-debauchee']) {
+      expect(glueFor(id)!.Screen, id).toBeTypeOf('function');
+    }
+  });
+
   it('is in the list under its engine id, with what a glue must have', () => {
     const glue = glueFor('word-debauchee');
     expect(glue).toBe(GLUES['word-debauchee']);

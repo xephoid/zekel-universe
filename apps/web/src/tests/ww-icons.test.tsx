@@ -10,7 +10,11 @@ import { cleanup, render } from '@testing-library/react';
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { ICON_FILES, Icon, MEANINGS, MeaningIcon, iconUrl } from '../glue/ww/icons';
+import { warbleWayGallery } from '../glue';
+
+// The screen lives in @zekel/warble-way-galaxy; the pictures it names are
+// served from here.
+const { ICON_FILES, Icon, MEANINGS, MeaningIcon } = warbleWayGallery;
 
 afterEach(cleanup);
 
@@ -28,7 +32,7 @@ describe('Warble Way Galaxy icons', () => {
     for (const [meaning, name] of Object.entries(MEANINGS)) expect(ICON_FILES[name], meaning).toBeDefined();
     expect(MEANINGS.habitat).toBe('ringed');
     expect(MEANINGS.pirate).toBe(MEANINGS.attacker);
-    expect(iconUrl('skull')).toBe('/art/warble-way/icons/skull-crossed-bones.png');
+    expect(ICON_FILES.skull).toBe('skull-crossed-bones.png');
   });
   it('draws the ghost under the icon, both masked with the shape, at the asked size', () => {
     const { container } = render(<Icon name="silo" size={52} label="Ruin" />);
