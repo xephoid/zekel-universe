@@ -24,7 +24,10 @@ reaches the browser,** and the browser needs no Supabase library.
    secret, keeps it in this browser in an HttpOnly cookie (`universe_oauth`,
    ten minutes; page scripts cannot read it), and answers with Supabase's
    authorize address, which carries only the secret's hash. The page goes
-   there.
+   there. The cookie is never cleared, only left to expire or replaced by a
+   newer sign-in: a secret whose code is spent is useless, and keeping it
+   lets a lost answer be recovered (step 9) and stops an older sign-in's late
+   return from spoiling a newer one.
 3. Discord or Google send the player back through Supabase to `/auth/callback`
    with a one-time code. The page clears it from the address bar and sends it
    to `POST /api/auth/supabase/complete`. A token in the address bar is never
@@ -32,7 +35,9 @@ reaches the browser,** and the browser needs no Supabase library.
 4. The server trades the code and the cookie's secret for Supabase's tokens
    (`POST /auth/v1/token?grant_type=pkce`). Supabase accepts a code once, and
    only with the secret whose hash it was issued for, so a code is useless in
-   any other browser.
+   any other browser. If Supabase is busy or down at this point, the page
+   offers "Try again" with the same code; once the code is traded, any
+   failure means starting again.
 5. The server checks the access token anyway: the project's public key (the
    `jose` library, ES256 or RS256 only), issuer
    `https://<project>.supabase.co/auth/v1`, audience `authenticated`, not
@@ -50,12 +55,14 @@ reaches the browser,** and the browser needs no Supabase library.
    session only), which ends its refresh token too, and drops the tokens.
    They were never sent anywhere.
 8. The page then loads the next page afresh, so every part of the app starts
-   again as the new account.
+   again as the new account. Where it goes is parsed as an address and must
+   be a page of this site (`//other.site` and `/\other.site` go home).
 9. If the server's answer is lost, the page asks
-   `POST /api/auth/supabase/status` whether this browser's session was made by
-   that code, as the email link's landing page does. If the cookie itself was
-   lost on the way, there is no session to find, and the player clicks the
-   button again.
+   `POST /api/auth/supabase/resume` with the code. The session remembers the
+   code and the browser's secret; if this browser holds it, the answer is
+   yes. If the sign-in happened but its cookie never arrived, the server
+   replaces that stranded session with one for this browser, within the ten
+   minutes and only for the browser holding the secret.
 
 Signing keys must be the newer asymmetric kind (the project setting "JWT
 signing keys"): with the old shared secret there are no public keys, and

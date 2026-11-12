@@ -130,10 +130,10 @@ function linkProof(token: string): string {
   return hashToken(`signin-link:${token}`);
 }
 
-/** The same proof for a Discord or Google sign-in: which one-time code
- *  made this Universe session (T09). */
-function oauthCodeProof(code: string): string {
-  return hashToken(`supabase-code:${code}`);
+/** The same proof for a Discord or Google sign-in (T09): the one-time code
+ *  together with the PKCE secret of the browser that started it. */
+function oauthProof(code: string, verifier: string): string {
+  return hashToken(`supabase-code:${code}:${verifier}`);
 }
 
 const ENDED = 'Your session has ended. Sign in again.';
@@ -647,7 +647,7 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     // A failed completion keeps this browser's nonce, so the same link can
     // be tried again.
     if (!outcome) return reply.code(401).send({ error: 'invalid_or_expired_token' });
-    reply.clearCookie(signinCookieName, { path: '/' });
+    reply.clearCookie(signinCookieName, signinCookieOptions);
     return { ok: true, userId: outcome.userId };
   });
 
@@ -658,17 +658,30 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
 
   const oauthCookieName = opts.secureCookies ? `__Host-${OAUTH_COOKIE}` : OAUTH_COOKIE;
   const oauthRefused = (reply: FastifyReply) =>
-    reply.code(401).send({ error: 'sign_in_refused', message: 'That sign-in did not work. Try again.' });
+    reply.code(401).send({ error: 'sign_in_refused', message: 'That sign-in did not work. Start again.' });
+  const oauthUnavailable = (reply: FastifyReply) =>
+    reply.code(503).send({ error: 'sign_in_unavailable', message: 'Sign-in is not answering. Try again in a moment.' });
+  const oauthLimit = (req: FastifyRequest, reply: FastifyReply) => {
+    if (supabaseIpLimiter.allow(`ip:${clientIp(req)}`)) return false;
+    void reply.code(429).send({ error: 'too_many_requests', message: 'Try again in a few minutes.' });
+    return true;
+  };
+  const codeOf = (body: unknown) => {
+    const c = (body as { code?: unknown } | null)?.code;
+    return typeof c === 'string' && c.length > 0 && c.length <= 512 ? c : null;
+  };
 
   // A Discord or Google sign-in begins here (T09). This browser gets a new
   // PKCE secret in an HttpOnly cookie, replacing any earlier one, and the
   // address of Supabase's authorize page, which carries only the secret's
-  // hash. The email link's own cookie is not touched.
+  // hash. The cookie is never cleared, only left to expire or replaced: a
+  // secret whose code is spent is useless (Supabase trades a code once), and
+  // keeping it lets a lost answer be recovered (resume, below) and keeps an
+  // older sign-in's late return from wiping a newer one's secret. The email
+  // link's own cookie is not touched.
   app.post('/api/auth/supabase/start', async (req, reply) => {
     if (!opts.supabase) return reply.code(404).send({ error: 'not_offered' });
-    if (!supabaseIpLimiter.allow(`ip:${clientIp(req)}`)) {
-      return reply.code(429).send({ error: 'too_many_requests', message: 'Try again in a few minutes.' });
-    }
+    if (oauthLimit(req, reply)) return reply;
     const body = (req.body ?? {}) as { provider?: unknown };
     if (!isSignInProvider(body.provider)) return reply.code(400).send({ error: 'unknown_provider' });
     const { verifier, challenge } = newPkcePair();
@@ -681,72 +694,99 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
   // for Supabase's access token, checks it (supabaseAuth.ts), and signs the
   // player in as an email link does (finishSignIn). Refused before anything
   // changes: a browser with no sign-in in progress, a code Supabase will not
-  // trade (wrong browser, used, expired), a token that fails the check. The
+  // trade (another browser's, used, expired), a token that fails the check.
+  // Only a trade Supabase did not take (busy or down) can be tried again with
+  // the same code; once traded, any failure means starting again. The
   // Supabase session is ended either way and its tokens are dropped.
   app.post('/api/auth/supabase/complete', async (req, reply) => {
     if (!opts.supabase) return reply.code(404).send({ error: 'not_offered' });
-    if (!supabaseIpLimiter.allow(`ip:${clientIp(req)}`)) {
-      return reply.code(429).send({ error: 'too_many_requests', message: 'Try again in a few minutes.' });
-    }
+    if (oauthLimit(req, reply)) return reply;
     const verifier = req.cookies[oauthCookieName];
     if (!isWellFormedVerifier(verifier)) {
       return reply.code(401).send({ error: 'sign_in_wrong_browser', message: 'Start the sign-in again in this browser.' });
     }
-    const body = (req.body ?? {}) as { code?: unknown };
-    const code = typeof body.code === 'string' && body.code.length > 0 && body.code.length <= 512 ? body.code : null;
+    const code = codeOf(req.body);
     if (!code) return oauthRefused(reply);
     const supabase = opts.supabase;
-    const refusedFor = (e: unknown, what: string) => {
-      const final = !(e instanceof SupabaseTokenError) || e.final;
-      req.log.warn({ reason: e instanceof SupabaseTokenError ? e.reason : 'error' }, `supabase sign-in refused (${what})`);
-      // A spent code ends this sign-in; one Supabase could not answer may be
-      // tried again, so the secret stays.
-      if (final) reply.clearCookie(oauthCookieName, { path: '/' });
-      return final ? oauthRefused(reply)
-        : reply.code(503).send({ error: 'sign_in_unavailable', message: 'Sign-in is not answering. Try again in a moment.' });
-    };
+    const reason = (e: unknown) => (e instanceof SupabaseTokenError ? e.reason : 'error');
 
     let token: string;
     try {
       token = await supabase.exchange(code, verifier);
     } catch (e) {
-      return refusedFor(e, 'exchange');
+      req.log.warn({ reason: reason(e) }, 'supabase sign-in refused at the trade');
+      return e instanceof SupabaseTokenError && !e.final ? oauthUnavailable(reply) : oauthRefused(reply);
     }
     try {
       let who: SupabaseSignIn;
       try {
         who = await supabase.check(token);
       } catch (e) {
-        return refusedFor(e, 'check');
+        // The code is spent: whatever went wrong, this sign-in is over.
+        req.log.warn({ reason: reason(e) }, 'supabase sign-in refused at the check');
+        return oauthRefused(reply);
       }
-      const outcome = await finishSignIn(req, reply, oauthCodeProof(code), (trx) => findOrCreateSupabaseUser(trx, who));
+      const outcome = await finishSignIn(req, reply, oauthProof(code, verifier), (trx) => findOrCreateSupabaseUser(trx, who));
       if (!outcome) return oauthRefused(reply);
-      reply.clearCookie(oauthCookieName, { path: '/' });
       return { ok: true, userId: outcome.userId };
     } finally {
       // Universe's cookie is the only sign-in that counts: end the Supabase
       // session, which also ends its refresh token. A failure is logged; the
       // tokens are dropped here either way and were never sent to anyone.
       await supabase.end(token).catch((e: unknown) => {
-        req.log.warn({ reason: e instanceof SupabaseTokenError ? e.reason : 'error' }, 'supabase session not ended');
+        req.log.warn({ reason: reason(e) }, 'supabase session not ended');
       });
     }
   });
 
-  // Did this Discord or Google sign-in sign this browser in? Asked by the
-  // callback page when the completion's answer was lost: the code is spent
-  // either way, so the only evidence is the session this browser now holds.
-  // Yes only when that session was made by this very code. Changes nothing.
-  app.post('/api/auth/supabase/status', async (req) => {
-    const body = (req.body ?? {}) as { code?: unknown };
-    const code = typeof body.code === 'string' ? body.code : '';
+  // When the completion's answer was lost (T09). The code is spent, so the
+  // page asks here with it; the browser's PKCE secret cookie proves it is
+  // the browser that started that sign-in. Yes when this browser already
+  // holds the session that sign-in made. Otherwise, if that sign-in made a
+  // session in the last ten minutes that never reached this browser (its
+  // cookie was lost on the way), that session is replaced by a new one for
+  // this browser: the same account, the same proof, a cookie this time. No
+  // otherwise, and nothing changes.
+  app.post('/api/auth/supabase/resume', async (req, reply) => {
+    if (!opts.supabase) return { signedIn: false };
+    if (oauthLimit(req, reply)) return reply;
+    const verifier = req.cookies[oauthCookieName];
+    const code = codeOf(req.body);
+    if (!isWellFormedVerifier(verifier) || !code) return { signedIn: false };
+    const proof = oauthProof(code, verifier);
+    const live = (s: { expires_at: string } | undefined) => !!s && new Date(s.expires_at).getTime() > Date.now();
+
     const authToken = req.cookies[AUTH_COOKIE];
-    if (!opts.supabase || !code || !authToken) return { signedIn: false };
-    const session = await db.selectFrom('auth_sessions').select(['user_id', 'expires_at', 'link_hash'])
-      .where('token_hash', '=', hashToken(authToken)).executeTakeFirst();
-    const live = session && new Date(session.expires_at).getTime() > Date.now();
-    if (!live || session.link_hash !== oauthCodeProof(code)) return { signedIn: false };
-    return { signedIn: true, userId: session.user_id };
+    if (authToken) {
+      const held = await db.selectFrom('auth_sessions').select(['user_id', 'expires_at', 'link_hash'])
+        .where('token_hash', '=', hashToken(authToken)).executeTakeFirst();
+      if (held && live(held) && held.link_hash === proof) return { signedIn: true, userId: held.user_id };
+    }
+    const since = new Date(Date.now() - OAUTH_TTL_S * 1000).toISOString();
+    const sessionToken = newToken();
+    // Anything still holding the replaced session is cut (beginRevocation).
+    const revocation = beginRevocation(reply);
+    let resumed: { userId: string } | null;
+    try {
+      resumed = await db.transaction().execute(async (trx) => {
+        const orphan = await trx.selectFrom('auth_sessions').select(['id', 'user_id', 'expires_at', 'token_hash'])
+          .where('link_hash', '=', proof).where('created_at', '>=', since).executeTakeFirst();
+        if (!orphan || !live(orphan)) return null;
+        revocation.add(credentialRoom({ kind: 'session', tokenHash: orphan.token_hash }));
+        const gone = await trx.deleteFrom('auth_sessions').where('id', '=', orphan.id).executeTakeFirst();
+        if (Number(gone.numDeletedRows) !== 1) return null; // another resume won
+        await trx.insertInto('auth_sessions').values({
+          id: newId(), user_id: orphan.user_id, token_hash: hashToken(sessionToken), created_at: now(),
+          expires_at: new Date(Date.now() + SESSION_TTL_MS).toISOString(), link_hash: proof,
+        }).execute();
+        return { userId: orphan.user_id };
+      });
+    } finally {
+      revocation.settled();
+    }
+    if (!resumed) return { signedIn: false };
+    reply.setCookie(AUTH_COOKIE, sessionToken, { ...cookieOptions, maxAge: Math.floor(SESSION_TTL_MS / 1000) });
+    return { signedIn: true, userId: resumed.userId };
   });
 
   // Did this link sign this browser in? Asked by the landing page when the

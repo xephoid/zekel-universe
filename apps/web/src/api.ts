@@ -47,8 +47,8 @@ export const api = {
   startSupabaseSignIn: (provider: 'discord' | 'google') => post<{ url: string }>('/api/auth/supabase/start', { provider }),
   /** Hand the server the one-time code Discord or Google sent back. */
   completeSupabaseSignIn: (code: string) => post<{ ok: true; userId: string }>('/api/auth/supabase/complete', { code }),
-  /** Was this browser's current session made by this code's sign-in? Changes nothing. */
-  supabaseSignInStatus: (code: string) => post<{ signedIn: boolean; userId?: string }>('/api/auth/supabase/status', { code }),
+  /** After a lost answer: did this code's sign-in sign this browser in? The server hands it over if it did. */
+  resumeSupabaseSignIn: (code: string) => post<{ signedIn: boolean; userId?: string }>('/api/auth/supabase/resume', { code }),
 
   games: () => req<GamesResponse>('/api/games'),
   game: (id: string) => req<GameResponse>(`/api/games/${encodeURIComponent(id)}`),

@@ -47,7 +47,8 @@ describe('sign-in through Supabase', () => {
   let exchanges: number;
   let lookups: number;
   let logouts: number;
-  let exchangeDown: boolean;
+  let exchangeDown: number; // 0, or the status Supabase answers the trade with
+  let lookupDown: boolean;
   let logoutFails: boolean;
   let codeSeq = 0;
 
@@ -58,7 +59,7 @@ describe('sign-in through Supabase', () => {
     users = new Map();
     codes = new Map();
     exchanges = 0; lookups = 0; logouts = 0;
-    exchangeDown = false; logoutFails = false;
+    exchangeDown = 0; lookupDown = false; logoutFails = false;
 
     const fetchFn = (async (url: string | URL, init?: RequestInit) => {
       const headers = init?.headers as Record<string, string>;
@@ -66,7 +67,7 @@ describe('sign-in through Supabase', () => {
       const u = String(url);
       if (u === `${PROJECT}/auth/v1/token?grant_type=pkce`) {
         exchanges++;
-        if (exchangeDown) return new Response('{}', { status: 503 });
+        if (exchangeDown) return new Response('{}', { status: exchangeDown });
         const { auth_code, code_verifier } = JSON.parse(String(init?.body)) as { auth_code: string; code_verifier: string };
         const issued = codes.get(auth_code);
         // Supabase: a code trades once, and only with the secret whose hash it was issued for.
@@ -84,6 +85,7 @@ describe('sign-in through Supabase', () => {
       }
       if (u === `${PROJECT}/auth/v1/user`) {
         lookups++;
+        if (lookupDown) throw new TypeError('network down');
         const user = users.get(token);
         return user ? new Response(JSON.stringify(user), { status: 200 }) : new Response('{}', { status: 401 });
       }
@@ -229,7 +231,8 @@ describe('sign-in through Supabase', () => {
     expect(user.display_name).toBe('Ada from Discord');
     expect(logouts).toBe(1);
     expect(users.size).toBe(0); // Supabase no longer knows the token
-    expect(setCookieLine(res, 'universe_oauth')).toMatch(/^universe_oauth=;/);
+    // The secret is left to expire, not cleared: its code is spent.
+    expect(setCookieLine(res, 'universe_oauth')).toBeNull();
   });
 
   it('signing in again reaches the same account, and nothing is recorded twice', async () => {
@@ -361,14 +364,34 @@ describe('sign-in through Supabase', () => {
     });
   });
 
-  it('when Supabase cannot answer the trade, the sign-in can be tried again with the same code', async () => {
+  it('when Supabase is down or busy at the trade, the same code can be tried again', async () => {
+    for (const status of [503, 429]) {
+      const { oauth, code } = await viaDiscord(discordUser());
+      exchangeDown = status;
+      const down = await complete(code, oauth);
+      expect(down.statusCode).toBe(503);
+      expect(down.json().error).toBe('sign_in_unavailable');
+      exchangeDown = 0;
+      expect((await complete(code, oauth)).statusCode).toBe(200);
+    }
+  });
+
+  it('once the code is traded, a failure means starting again, and the Supabase session is still ended', async () => {
     const { oauth, code } = await viaDiscord(discordUser());
-    exchangeDown = true;
-    const down = await complete(code, oauth);
-    expect(down.statusCode).toBe(503);
-    expect(setCookieLine(down, 'universe_oauth')).toBeNull(); // the secret stays
-    exchangeDown = false;
-    expect((await complete(code, oauth)).statusCode).toBe(200);
+    lookupDown = true;
+    const res = await complete(code, oauth);
+    expect(res.statusCode).toBe(401);
+    expect(res.json().error).toBe('sign_in_refused');
+    expect(res.json().message).toMatch(/Start again/);
+    expect(logouts).toBe(1);
+    expect(await db.selectFrom('auth_sessions').select('id').execute()).toEqual([]);
+  });
+
+  it('an older sign-in\'s late return does not spoil a newer one in the same browser', async () => {
+    const older = await viaDiscord(discordUser());
+    const newer = await viaDiscord(discordUser()); // replaces the secret
+    expect((await complete(older.code, newer.oauth)).statusCode).toBe(401);
+    expect((await complete(newer.code, newer.oauth)).statusCode).toBe(200);
   });
 
   it('when Supabase cannot end its session, the sign-in still stands', async () => {
@@ -378,16 +401,52 @@ describe('sign-in through Supabase', () => {
     expect(cookieOf(res, 'universe_auth')).toBeTruthy();
   });
 
-  it('when the answer is lost, the browser can ask whether that code signed it in', async () => {
-    const { oauth, code } = await viaDiscord(discordUser());
-    const res = await complete(code, oauth);
-    const cookie = cookieOf(res, 'universe_auth')!;
-    const status = (c: unknown, k?: string) => post('/api/auth/supabase/status', { code: c }, k);
-    expect((await status(code, cookie)).json()).toEqual({ signedIn: true, userId: res.json().userId });
-    expect((await status('another-code', cookie)).json()).toEqual({ signedIn: false });
-    expect((await status(code)).json()).toEqual({ signedIn: false });
-    const { cookie: otherBrowser } = await emailSignIn('someone-else@example.com');
-    expect((await status(code, otherBrowser)).json()).toEqual({ signedIn: false });
+  describe('when the answer is lost', () => {
+    const resume = (c: unknown, k?: string) => post('/api/auth/supabase/resume', { code: c }, k);
+
+    it('a browser that got its cookie hears yes, and nothing changes', async () => {
+      const { oauth, code } = await viaDiscord(discordUser());
+      const res = await complete(code, oauth);
+      const cookie = cookieOf(res, 'universe_auth')!;
+      const again = await resume(code, join(oauth, cookie));
+      expect(again.json()).toEqual({ signedIn: true, userId: res.json().userId });
+      expect(cookieOf(again, 'universe_auth')).toBeNull();
+      expect(await db.selectFrom('auth_sessions').select('id').execute()).toHaveLength(1);
+    });
+
+    it('a browser whose cookie never arrived gets the sign-in it made, once, and the stranded session goes', async () => {
+      const guestRes = await post('/api/guests', { displayName: 'Guest' });
+      const guestCookie = cookieOf(guestRes, 'universe_guest')!;
+      const { oauth, code } = await viaDiscord(discordUser());
+      const lost = await complete(code, join(oauth, guestCookie)); // its answer, cookie included, never arrives
+      const stranded = await db.selectFrom('auth_sessions').select('token_hash').execute();
+      expect(stranded).toHaveLength(1);
+
+      const res = await resume(code, join(oauth, guestCookie));
+      expect(res.json()).toEqual({ signedIn: true, userId: lost.json().userId });
+      const cookie = cookieOf(res, 'universe_auth')!;
+      expect((await me(cookie)).user?.id).toBe(lost.json().userId);
+      const now = await db.selectFrom('auth_sessions').select('token_hash').execute();
+      expect(now).toHaveLength(1);
+      expect(now[0]!.token_hash).not.toBe(stranded[0]!.token_hash);
+      // Asking again keeps it one session.
+      expect((await resume(code, oauth)).json().signedIn).toBe(true);
+      expect(await db.selectFrom('auth_sessions').select('id').execute()).toHaveLength(1);
+    });
+
+    it('no for anyone else: another browser, no secret, another code, or after ten minutes', async () => {
+      const { oauth, code } = await viaDiscord(discordUser());
+      await complete(code, oauth);
+      const other = await viaDiscord(discordUser({ id: 'sb-other' }));
+      for (const [c, k] of [[code, other.oauth], [code, undefined], ['another-code', oauth]] as const) {
+        const res = await resume(c, k);
+        expect(res.json()).toEqual({ signedIn: false });
+        expect(cookieOf(res, 'universe_auth')).toBeNull();
+      }
+      await db.updateTable('auth_sessions').set({ created_at: new Date(Date.now() - 11 * 60 * 1000).toISOString() }).execute();
+      expect((await resume(code, oauth)).json()).toEqual({ signedIn: false });
+      expect(await db.selectFrom('auth_sessions').select('id').execute()).toHaveLength(1);
+    });
   });
 
   it('a pending email link survives a Discord sign-in in the same browser, and the other way round', async () => {
@@ -403,6 +462,32 @@ describe('sign-in through Supabase', () => {
     expect(emailDone.statusCode).toBe(200);
     expect(setCookieLine(emailDone, 'universe_oauth')).toBeNull();
     expect((await complete(trip.code, trip.oauth)).statusCode).toBe(200);
+  });
+
+  it('with secure cookies, the secret is a __Host- cookie, and the email link\'s cookie is really cleared', async () => {
+    const secure = buildApp({
+      db, engine: new FakeEngine(), mailer, secretKey: 's', appOrigin: ORIGIN, allowedOrigins: [ORIGIN],
+      secureCookies: true, logger: false, supabase: supabaseService({ url: PROJECT, publishableKey: KEY, keys: createLocalJWKSet({ keys: [] }) }),
+    });
+    await secure.fastify.ready();
+    const send = (url: string, payload: object, cookie?: string) => secure.fastify.inject({ method: 'POST', url, headers: { origin: ORIGIN, ...(cookie ? { cookie } : {}) }, payload });
+    const start = await send('/api/auth/supabase/start', { provider: 'discord' });
+    const line = setCookieLine(start, '__Host-universe_oauth')!;
+    expect(line).toMatch(/; Secure/i);
+    expect(line).toMatch(/Path=\//);
+    expect(line).not.toMatch(/Domain=/i);
+    // The email link: its __Host- cookie can only be deleted with the same
+    // attributes, Secure among them, or browsers ignore the deletion.
+    const link = await send('/api/auth/email/link', { email: 'p@example.com' });
+    const signin = cookieOf(link, '__Host-universe_signin')!;
+    const url = /https?:\/\/\S+/.exec(mailer.sent[mailer.sent.length - 1]!.text)![0];
+    const done = await send('/api/auth/email/complete', { token: decodeURIComponent(url.split('#token=')[1]!) }, signin);
+    expect(done.statusCode).toBe(200);
+    const cleared = setCookieLine(done, '__Host-universe_signin')!;
+    expect(cleared).toMatch(/^__Host-universe_signin=;/);
+    expect(cleared).toMatch(/; Secure/i);
+    expect(cleared).toMatch(/Path=\//);
+    await secure.fastify.close();
   });
 
   it('the page security policy is unchanged: the browser never talks to Supabase itself', async () => {
@@ -430,7 +515,7 @@ describe('sign-in through Supabase, not set up', () => {
     expect((await app.fastify.inject({ method: 'GET', url: '/api/auth/providers' })).json()).toEqual({ providers: [] });
     expect((await send('/api/auth/supabase/start', { provider: 'discord' })).statusCode).toBe(404);
     expect((await send('/api/auth/supabase/complete', { code: 'x' })).statusCode).toBe(404);
-    expect((await send('/api/auth/supabase/status', { code: 'x' })).json()).toEqual({ signedIn: false });
+    expect((await send('/api/auth/supabase/resume', { code: 'x' })).json()).toEqual({ signedIn: false });
     await app.fastify.close();
     await database.close();
   });

@@ -20,29 +20,51 @@ export async function startSignIn(provider: SignInProvider, next: string): Promi
   leaveTo(url);
 }
 
-const REFUSED = 'That sign-in did not work. Try again.';
-const UNREACHABLE = 'We could not reach the server to finish signing you in. Check your connection and sign in again.';
+/** Why a sign-in did not finish, for the player. `retry`: the same code
+ *  can be tried again (the server or Supabase did not answer). */
+export class SignInError extends Error {
+  constructor(message: string, readonly retry: boolean) { super(message); }
+}
 
-/** The completion, once per code: React's development double run waits on
- *  the first rather than sending the code twice. */
+const UNREACHABLE = 'We could not reach the server to finish signing you in. Check your connection and try again.';
+
+/** The completion in flight, per code: React's development double run waits
+ *  on the first rather than sending the code twice. A failure lets the same
+ *  code be tried again. */
 let inFlight: { code: string; run: Promise<void> } | null = null;
 
 /** Hand the code to the server, which signs the player in. When the answer
  *  is lost or refused, ask the server whether this code signed this browser
- *  in after all (an earlier answer may have been lost); only that counts.
- *  Throws with a message for the player otherwise. */
+ *  in after all; it hands the sign-in over if so (resume). Throws a
+ *  SignInError otherwise. */
 export function finishSignIn(code: string): Promise<void> {
   if (inFlight?.code === code) return inFlight.run;
   const run = (async () => {
     try {
       await api.completeSupabaseSignIn(code);
     } catch (e) {
-      const made = await api.supabaseSignInStatus(code).then((r) => r.signedIn === true, () => false);
+      const made = await api.resumeSupabaseSignIn(code).then((r) => r.signedIn === true, () => false);
       if (made) return;
-      if (e instanceof ApiRequestError) throw new Error(e.message || REFUSED);
-      throw new Error(UNREACHABLE);
+      if (e instanceof ApiRequestError) throw new SignInError(e.message, e.status >= 500 || e.status === 429);
+      throw new SignInError(UNREACHABLE, true);
     }
   })();
-  inFlight = { code, run };
+  const entry = { code, run };
+  inFlight = entry;
+  run.catch(() => { if (inFlight === entry) inFlight = null; });
   return run;
+}
+
+/** Where to go after signing in: a page of this site only. The address is
+ *  parsed as the browser will read it, so `//other.site`, `/\other.site` and
+ *  full addresses elsewhere all go home instead. */
+export function safeNext(next: string | null): string {
+  if (!next) return '/';
+  try {
+    const url = new URL(next, window.location.origin);
+    if (url.origin !== window.location.origin) return '/';
+    return `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    return '/';
+  }
 }

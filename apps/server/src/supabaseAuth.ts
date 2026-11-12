@@ -133,9 +133,9 @@ export function supabaseService(opts: SupabaseAuthOptions): SupabaseService {
       const res = await call('/token?grant_type=pkce', {
         method: 'POST', body: JSON.stringify({ auth_code: code, code_verifier: verifier }),
       });
-      // A 4xx: the code or secret is wrong, used or expired. A 5xx: Supabase
-      // could not answer, and the same code may still work.
-      if (!res.ok) throw new SupabaseTokenError(`exchange_status_${res.status}`, res.status < 500);
+      // A 4xx: the code or secret is wrong, used or expired. A 429 or a 5xx:
+      // Supabase did not take the code, which may still work later.
+      if (!res.ok) throw new SupabaseTokenError(`exchange_status_${res.status}`, res.status < 500 && res.status !== 429);
       const body = (await res.json().catch(() => null)) as { access_token?: unknown } | null;
       if (!body || typeof body.access_token !== 'string' || !body.access_token) {
         throw new SupabaseTokenError('exchange_no_token');

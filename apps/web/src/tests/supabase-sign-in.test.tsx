@@ -17,7 +17,7 @@ vi.mock('../leave', () => nav);
 
 import { SessionProvider } from '../session';
 import { SignInCallbackPage, SignInPage } from '../pages/SignIn';
-import { finishSignIn } from '../supabaseSignIn';
+import { finishSignIn, safeNext } from '../supabaseSignIn';
 
 const json = (body: unknown, status = 200) =>
   Promise.resolve(new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } }));
@@ -35,11 +35,12 @@ function stubServer(opts: { providers?: string[]; complete?: number; made?: bool
     if (url === '/api/me') return json(GUEST);
     if (url === '/api/auth/providers') return json({ providers: opts.providers ?? ['discord', 'google'] });
     if (url === '/api/auth/supabase/start') return json({ url: 'https://p.supabase.co/auth/v1/authorize?provider=discord' });
-    if (url === '/api/auth/supabase/status') return json({ signedIn: opts.made ?? false });
+    if (url === '/api/auth/supabase/resume') return json({ signedIn: opts.made ?? false });
     if (url === '/api/auth/supabase/complete') {
       const status = opts.complete ?? 200;
       if (status === 0) return Promise.reject(new TypeError('network down'));
-      return status === 200 ? json({ ok: true, userId: 'u' }) : json({ error: 'sign_in_refused', message: 'That sign-in did not work. Try again.' }, status);
+      if (status === 503) return json({ error: 'sign_in_unavailable', message: 'Sign-in is not answering. Try again in a moment.' }, 503);
+      return status === 200 ? json({ ok: true, userId: 'u' }) : json({ error: 'sign_in_refused', message: 'That sign-in did not work. Start again.' }, status);
     }
     return json({ error: 'not_found' }, 404);
   }));
@@ -129,6 +130,21 @@ describe('the callback page', () => {
     expect(completes()).toEqual([]);
   });
 
+  it('when sign-in is only busy, the same code can be tried again from the page', async () => {
+    stubServer({ complete: 503 });
+    window.history.replaceState(null, '', '/auth/callback?code=busy');
+    renderAt('/auth/callback', <SignInCallbackPage />, '/auth/callback');
+    expect(await screen.findByText(/not answering/)).toBeTruthy();
+    stubServer();
+    fireEvent.click(screen.getByText('Try again'));
+    await waitFor(() => expect(nav.reloadAt).toHaveBeenCalledWith('/'));
+    // The busy try, then the retry, both with the same code.
+    expect(completes()).toEqual([
+      { url: '/api/auth/supabase/complete', body: { code: 'busy' } },
+      { url: '/api/auth/supabase/complete', body: { code: 'busy' } },
+    ]);
+  });
+
   it('a refused sign-in says so, links back to sign-in, and goes nowhere', async () => {
     stubServer({ complete: 401 });
     window.history.replaceState(null, '', '/auth/callback?code=c3');
@@ -136,6 +152,20 @@ describe('the callback page', () => {
     const msg = await screen.findByText(/That sign-in did not work/);
     expect(msg.querySelector('a[href="/signin"]')).toBeTruthy();
     expect(nav.reloadAt).not.toHaveBeenCalled();
+  });
+});
+
+describe('where to go after signing in', () => {
+  it('only a page of this site; anything that reads as another site goes home', () => {
+    expect(safeNext('/tables?x=1#y')).toBe('/tables?x=1#y');
+    expect(safeNext(null)).toBe('/');
+    // Written with String.raw so each backslash is really in the address.
+    const bad = [String.raw`//evil.example/x`, String.raw`/\evil.example`, String.raw`/\/evil.example`,
+      String.raw`\\evil.example`, String.raw`\/evil.example`, 'https://evil.example/', 'javascript:alert(1)',
+      '  //evil.example', '\t//evil.example'];
+    for (const b of bad) expect(safeNext(b), b).toBe('/');
+    // A single backslash is a page of this site, as the browser reads it.
+    expect(safeNext(String.raw`\tables`)).toBe('/tables');
   });
 });
 
@@ -149,7 +179,7 @@ describe('the trip (supabaseSignIn.ts)', () => {
   it('a lost answer, when the server says this code did sign the browser in, is a success', async () => {
     stubServer({ complete: 0, made: true });
     await expect(finishSignIn('lost-yes')).resolves.toBeUndefined();
-    expect(calls.find((c) => c.url === '/api/auth/supabase/status')?.body).toEqual({ code: 'lost-yes' });
+    expect(calls.find((c) => c.url === '/api/auth/supabase/resume')?.body).toEqual({ code: 'lost-yes' });
   });
 
   it('a lost answer, when the server says it did not, says the server could not be reached', async () => {
