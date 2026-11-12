@@ -12,7 +12,7 @@ import type { Server as SocketServer, Socket } from 'socket.io';
 import { sql, type Kysely } from 'kysely';
 import type {
   CreateTableRequest, CreateTableResponse, FriendsResponse, GameCatalogEntry, GameReferenceResponse, GameResponse,
-  GamesResponse, InvitesResponse, JoinTableAck, JoinTableMessage, MeResponse, MoveAck, MoveMessage, MyTablesResponse, QueryAck, QueryMessage,
+  ConfigResponse, GamesResponse, InvitesResponse, JoinTableAck, JoinTableMessage, MeResponse, MoveAck, MoveMessage, MyTablesResponse, QueryAck, QueryMessage,
   SeatSummary, TableEventsResponse, TableInvite, TableResponse, TableStatus, TableSummary, UndoAck, UndoMessage, GameUpdate, UpdatesResponse, DesignerResponse, DesignerProfile, DesignersResponse, WatchResponse } from '@universe/shared';
 import { SOCKET_EVENTS } from '@universe/shared';
 import { EngineError } from '@universe/engine-client';
@@ -42,6 +42,7 @@ const GUEST_COOKIE_MAX_AGE_S = Math.floor(GUEST_TTL_MS / 1000);
 
 import { DESIGNERS, ZEKEL_GAMES, ZEKEL_UPDATES } from './storefront.js';
 import { isAdminUser, registerAdmin } from './admin.js';
+import type { AnalyticsConfig } from './analytics.js';
 
 export interface BuildAppOptions {
   db: Kysely<DB>;
@@ -71,6 +72,9 @@ export interface BuildAppOptions {
   /** Sign-in emails whose accounts may use the admin page (/api/admin/*).
    *  Empty: nobody can. */
   adminEmails?: string[];
+  /** PostHog site analytics, handed to the page at /api/config and allowed
+   *  in its Content-Security-Policy. Unset: the page sends nothing. */
+  analytics?: AnalyticsConfig | null;
   /** Test-only: expose the ConsoleMailer's outbox at /api/test/outbox.
    *  Must never be set in production (index.ts enforces). */
   testOutbox?: boolean;
@@ -337,6 +341,10 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     }
   });
 
+  // The page may send events to the analytics host and nowhere else new. It
+  // never loads PostHog's own scripts: script-src stays 'self'.
+  const analyticsOrigin = opts.analytics ? ` ${opts.analytics.host}` : '';
+
   // Security headers on every response; private API answers are never
   // cached by a shared cache. The policy allows the built app's own scripts,
   // inline styles (React style props), same-origin data, and the socket.
@@ -350,7 +358,7 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     } else {
       reply.header('Content-Security-Policy',
         "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; " +
-        "font-src 'self' data:; connect-src 'self' ws: wss:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
+        `font-src 'self' data:; connect-src 'self' ws: wss:${analyticsOrigin}; frame-ancestors 'none'; base-uri 'self'; form-action 'self'`);
     }
   });
 
@@ -388,6 +396,11 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
       return reply.code(503).send({ ok: false });
     }
   });
+
+  // Public settings the page needs at startup. Nothing here is secret.
+  app.get('/api/config', async (): Promise<ConfigResponse> => ({
+    analytics: opts.analytics ? { key: opts.analytics.key, host: opts.analytics.host } : null,
+  }));
 
   // ---- people ------------------------------------------------------------
 

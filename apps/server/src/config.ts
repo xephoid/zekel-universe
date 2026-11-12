@@ -5,6 +5,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { parseAdminEmails } from './admin.js';
+import { parseAnalytics, type AnalyticsConfig } from './analytics.js';
 
 export interface ServerConfig {
   port: number;
@@ -31,6 +32,8 @@ export interface ServerConfig {
   clientIpHeader: string | null;
   /** Sign-in emails whose accounts may use the admin page; empty: nobody. */
   adminEmails: string[];
+  /** PostHog site analytics (POSTHOG_KEY, POSTHOG_HOST); null: off. */
+  analytics: AnalyticsConfig | null;
 }
 
 /** Headers a caller can write or append to themselves; never trusted for a
@@ -140,5 +143,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ServerConfig {
     guestsPerIp: nonNegative(env.GUESTS_PER_IP, 30),
     clientIpHeader: parseClientIpHeader(env.CLIENT_IP_HEADER),
     adminEmails: parseAdminEmails(env.ADMIN_EMAILS),
+    analytics: parseAnalytics(env.POSTHOG_KEY, env.POSTHOG_HOST),
   };
 }

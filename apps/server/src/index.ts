@@ -36,6 +36,7 @@ async function main(): Promise<void> {
     limits: { guestsPerIp: config.guestsPerIp },
     clientIpHeader: config.clientIpHeader,
     adminEmails: config.adminEmails,
+    analytics: config.analytics,
   });
 
   await app.fastify.ready();
