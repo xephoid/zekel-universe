@@ -12,7 +12,7 @@ afterEach(cleanup);
 const game = (over: Partial<GameCatalogEntry>): GameCatalogEntry => ({
   engineGameId: 'warble-way-galaxy', name: 'Warble Way Galaxy', designerName: 'Zekel Games',
   playerCount: '1', minPlayers: 1, maxPlayers: 1, supportsAi: true, playTime: '', tags: [],
-  coverImage: null, coverFocus: null, description: '', rulesUrl: null, visibility: 'public', designerSlug: null,
+  coverImage: null, coverFocus: null, description: '', rulesUrl: null, visibility: 'public', designerSlug: null, screenshots: [], featuredRank: null,
   ...over,
 });
 

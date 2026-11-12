@@ -112,7 +112,11 @@ export function HomePage() {
   }, [session.me, session.signedIn]);
 
   const publicGames = games.filter((g) => g.visibility !== 'unlisted');
-  const featured = publicGames.filter((g) => g.designerName).slice(0, 2);
+  // The admin page sets the featured games and their order; until it has,
+  // the first two games with a designer stand in.
+  const ranked = publicGames.filter((g) => g.featuredRank !== null)
+    .sort((a, b) => (a.featuredRank ?? 0) - (b.featuredRank ?? 0) || a.name.localeCompare(b.name));
+  const featured = ranked.length ? ranked : publicGames.filter((g) => g.designerName).slice(0, 2);
   const newest = [...publicGames].slice(-8).reverse();
   const tags = useMemo(() => [...new Set(publicGames.flatMap((g) => g.tags))].sort(), [publicGames]);
   const browsing = query.trim() !== '' || players !== '' || time !== '' || tag !== '';

@@ -23,7 +23,7 @@ export interface DatabaseClient {
 }
 
 /** Bump when the DDL below changes in a way an existing database cannot absorb. */
-export const SCHEMA_VERSION = 7;
+export const SCHEMA_VERSION = 8;
 
 export function parseDatabaseUrl(url: string): { dialect: DatabaseDialect; target: string } {
   const trimmed = url.trim();
@@ -109,14 +109,33 @@ const TABLES: string[] = [
     cover_image text,
     description text NOT NULL DEFAULT '',
     rules_url text,
-    visibility text NOT NULL DEFAULT 'public'
+    visibility text NOT NULL DEFAULT 'public',
+    designer_slug text,
+    cover_focus text,
+    screenshots text NOT NULL DEFAULT '[]',
+    featured_rank integer
+  )`,
+  `CREATE TABLE IF NOT EXISTS designers (
+    slug text PRIMARY KEY,
+    name text NOT NULL,
+    bio text NOT NULL DEFAULT '',
+    avatar_image text
+  )`,
+  `CREATE TABLE IF NOT EXISTS media (
+    id text PRIMARY KEY,
+    content_type text NOT NULL,
+    data text NOT NULL,
+    byte_size integer NOT NULL,
+    uploaded_by text NOT NULL,
+    created_at text NOT NULL
   )`,
   `CREATE TABLE IF NOT EXISTS game_updates (
     id text PRIMARY KEY,
     game_id text NOT NULL REFERENCES games(engine_game_id),
     title text NOT NULL,
     body text NOT NULL,
-    posted_at text NOT NULL
+    posted_at text NOT NULL,
+    deleted_at text
   )`,
   `CREATE TABLE IF NOT EXISTS tables (
     id text PRIMARY KEY,
@@ -210,6 +229,18 @@ const MIGRATIONS: Record<number, MigrationStep[]> = {
   // A session remembers which sign-in link made it, so a browser whose
   // answer was lost can ask whether that link signed it in.
   7: [addColumn('auth_sessions', 'link_hash', 'text')],
+  // The admin page (T06): storefront copy lives in the database from now on.
+  // Games gain a designer by slug, the cover's focus, screenshots and a
+  // place among the featured; a hidden update keeps its row so the seed
+  // never posts it again. The designers and media tables are new, so the
+  // CREATE TABLE IF NOT EXISTS list above makes them.
+  8: [
+    addColumn('games', 'designer_slug', 'text'),
+    addColumn('games', 'cover_focus', 'text'),
+    addColumn('games', 'screenshots', "text NOT NULL DEFAULT '[]'"),
+    addColumn('games', 'featured_rank', 'integer'),
+    addColumn('game_updates', 'deleted_at', 'text'),
+  ],
 };
 
 async function migrate(db: Kysely<DB>): Promise<void> {

@@ -13,6 +13,7 @@ import { FakeEngine } from './test-engine.js';
 import { TableService } from './tables/service.js';
 import { Realtime } from './realtime.js';
 import { ConsoleMailer } from './email.js';
+import { buildApp } from './app.js';
 
 describe('parseDatabaseUrl', () => {
   it('accepts every documented SQLite form', () => {
@@ -92,6 +93,52 @@ describe('schema 5', () => {
   });
 });
 
+describe('schema 8', () => {
+  it('gives existing games their admin columns and the seed designer, keeping what they say', async () => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'universe-db-'));
+    const file = path.join(dir, 'v7.db');
+    const raw = new Database(file);
+    raw.exec(`CREATE TABLE schema_version (version integer NOT NULL);
+      INSERT INTO schema_version VALUES (7);
+      CREATE TABLE games (engine_game_id text PRIMARY KEY, name text NOT NULL, designer_name text NOT NULL DEFAULT '',
+        player_count text NOT NULL DEFAULT '', min_players integer NOT NULL DEFAULT 1, max_players integer NOT NULL DEFAULT 1,
+        supports_ai integer NOT NULL DEFAULT 1, play_time text NOT NULL DEFAULT '', tags text NOT NULL DEFAULT '[]',
+        cover_image text, description text NOT NULL DEFAULT '', rules_url text, visibility text NOT NULL DEFAULT 'public');
+      CREATE TABLE game_updates (id text PRIMARY KEY, game_id text NOT NULL REFERENCES games(engine_game_id),
+        title text NOT NULL, body text NOT NULL, posted_at text NOT NULL);
+      INSERT INTO games (engine_game_id, name, designer_name, description) VALUES ('fractured-fist', 'FF', 'Zekel Games', 'Written before.');
+      INSERT INTO game_updates VALUES ('u1', 'fractured-fist', 'Old', 'Post.', '2026-01-01T00:00:00.000Z');`);
+    raw.close();
+    const upgraded = await createDatabase(`sqlite:${file}`);
+    try {
+      expect((await upgraded.db.selectFrom('schema_version').select('version').executeTakeFirst())?.version).toBe(SCHEMA_VERSION);
+      const before = await upgraded.db.selectFrom('games').selectAll().executeTakeFirstOrThrow();
+      expect(before.screenshots).toBe('[]');
+      expect(before.featured_rank).toBeNull();
+      expect(before.designer_slug).toBeNull();
+      expect((await upgraded.db.selectFrom('game_updates').selectAll().executeTakeFirstOrThrow()).deleted_at).toBeNull();
+
+      const app = buildApp({
+        db: upgraded.db, engine: new FakeEngine(), mailer: new ConsoleMailer(), secretKey: 's',
+        appOrigin: 'http://localhost:5173', allowedOrigins: ['http://localhost:5173'], secureCookies: false, logger: false,
+      });
+      await app.fastify.ready();
+      await app.refreshCatalog();
+      const after = await upgraded.db.selectFrom('games').selectAll().where('engine_game_id', '=', 'fractured-fist').executeTakeFirstOrThrow();
+      expect(after.designer_slug).toBe('zekel-games');
+      expect(JSON.parse(after.screenshots ?? '[]')).toHaveLength(4);
+      // The copy already in the row is the row's: the seed does not overwrite it.
+      expect(after.description).toBe('Written before.');
+      expect(after.name).toBe('FF');
+      expect((await upgraded.db.selectFrom('designers').select('slug').execute()).map((d) => d.slug)).toEqual(['zekel-games']);
+      await app.fastify.close();
+    } finally {
+      await upgraded.close();
+      rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
+    }
+  });
+});
+
 const PG = process.env.TEST_DATABASE_URL;
 
 describe.skipIf(!PG)('postgres', () => {
@@ -99,7 +146,7 @@ describe.skipIf(!PG)('postgres', () => {
     const database = await createDatabase(PG!);
     const { db } = database;
     // Fresh tables for this run.
-    for (const t of ['notifications', 'table_events', 'invites', 'seats', 'tables', 'game_updates', 'games', 'friendships', 'sign_in_links', 'guests', 'auth_sessions', 'identities', 'users', 'schema_version']) {
+    for (const t of ['notifications', 'table_events', 'invites', 'seats', 'tables', 'game_updates', 'games', 'designers', 'media', 'friendships', 'sign_in_links', 'guests', 'auth_sessions', 'identities', 'users', 'schema_version']) {
       await sql.raw(`DROP TABLE IF EXISTS ${t} CASCADE`).execute(db);
     }
     await database.close();

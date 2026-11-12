@@ -13,7 +13,7 @@ import { sql, type Kysely } from 'kysely';
 import type {
   CreateTableRequest, CreateTableResponse, FriendsResponse, GameCatalogEntry, GameReferenceResponse, GameResponse,
   GamesResponse, InvitesResponse, JoinTableAck, JoinTableMessage, MeResponse, MoveAck, MoveMessage, MyTablesResponse, QueryAck, QueryMessage,
-  SeatSummary, TableEventsResponse, TableInvite, TableResponse, TableStatus, TableSummary, UndoAck, UndoMessage, GameUpdate, UpdatesResponse, DesignerResponse, WatchResponse } from '@universe/shared';
+  SeatSummary, TableEventsResponse, TableInvite, TableResponse, TableStatus, TableSummary, UndoAck, UndoMessage, GameUpdate, UpdatesResponse, DesignerResponse, DesignerProfile, DesignersResponse, WatchResponse } from '@universe/shared';
 import { SOCKET_EVENTS } from '@universe/shared';
 import { EngineError } from '@universe/engine-client';
 
@@ -41,6 +41,7 @@ export const SIGNIN_COOKIE = 'universe_signin';
 const GUEST_COOKIE_MAX_AGE_S = Math.floor(GUEST_TTL_MS / 1000);
 
 import { DESIGNERS, ZEKEL_GAMES, ZEKEL_UPDATES } from './storefront.js';
+import { isAdminUser, registerAdmin } from './admin.js';
 
 export interface BuildAppOptions {
   db: Kysely<DB>;
@@ -67,6 +68,9 @@ export interface BuildAppOptions {
    *  again, so one that only listens still stops after sign-out or expiry
    *  (0 disables the timer; every message is checked regardless). */
   socketRecheckMs?: number;
+  /** Sign-in emails whose accounts may use the admin page (/api/admin/*).
+   *  Empty: nobody can. */
+  adminEmails?: string[];
   /** Test-only: expose the ConsoleMailer's outbox at /api/test/outbox.
    *  Must never be set in production (index.ts enforces). */
   testOutbox?: boolean;
@@ -118,7 +122,7 @@ const ENDED = 'Your session has ended. Sign in again.';
 /** A socket message dropped because its socket never passed its check. */
 class Refused extends Error {}
 
-class HttpError extends Error {
+export class HttpError extends Error {
   constructor(public statusCode: number, public code: string, message?: string) {
     super(message ?? code);
   }
@@ -422,6 +426,7 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
       return {
         user: u ? { id: u.id, displayName: u.display_name, avatarUrl: u.avatar_url, bio: u.bio, createdAt: u.created_at } : null,
         guest: null,
+        isAdmin: u ? await isAdminUser(db, opts.adminEmails ?? [], u.id) : false,
       };
     }
     const g = await db.selectFrom('guests').selectAll().where('id', '=', p.guestId).executeTakeFirst();
@@ -846,11 +851,22 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
 
   // ---- catalog -----------------------------------------------------------------
 
-  function catalogEntry(g: DB['games']): GameCatalogEntry {
+  /** The designers' rows by slug: a small table, read whole. */
+  async function designerMap(): Promise<Map<string, DB['designers']>> {
+    const rows = await db.selectFrom('designers').selectAll().execute();
+    return new Map(rows.map((d) => [d.slug, d]));
+  }
+
+  function designerProfile(d: DB['designers']): DesignerProfile {
+    return { slug: d.slug, name: d.name, bio: d.bio, avatarImage: d.avatar_image };
+  }
+
+  function catalogEntry(g: DB['games'], designers: Map<string, DB['designers']>): GameCatalogEntry {
+    const designer = g.designer_slug ? designers.get(g.designer_slug) : undefined;
     return {
       engineGameId: g.engine_game_id,
       name: g.name,
-      designerName: g.designer_name,
+      designerName: designer?.name ?? g.designer_name,
       playerCount: g.player_count,
       minPlayers: g.min_players,
       maxPlayers: g.max_players,
@@ -858,39 +874,59 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
       playTime: g.play_time,
       tags: parseJson<string[]>(g.tags, []),
       coverImage: g.cover_image,
-      coverFocus: ZEKEL_GAMES[g.engine_game_id]?.coverFocus ?? null,
+      coverFocus: g.cover_focus ?? null,
       description: g.description,
       rulesUrl: g.rules_url,
       visibility: g.visibility === 'unlisted' ? 'unlisted' : 'public',
-      designerSlug: Object.values(DESIGNERS).find((d) => d.name === g.designer_name)?.slug ?? null,
+      designerSlug: designer ? designer.slug : null,
+      screenshots: parseJson<string[]>(g.screenshots ?? '[]', []),
+      featuredRank: g.featured_rank ?? null,
     };
   }
 
-  function updateEntry(u: DB['game_updates'], gameName: string): GameUpdate {
+  async function catalog(): Promise<GameCatalogEntry[]> {
+    const [rows, designers] = await Promise.all([
+      db.selectFrom('games').selectAll().orderBy('name', 'asc').execute(),
+      designerMap(),
+    ]);
+    return rows.map((g) => catalogEntry(g, designers));
+  }
+
+  function updateEntry(u: Pick<DB['game_updates'], 'id' | 'game_id' | 'title' | 'body' | 'posted_at'>, gameName: string): GameUpdate {
     return { id: u.id, gameId: u.game_id, gameName, title: u.title, body: u.body, postedAt: u.posted_at };
   }
 
-  /** Updates newest first, with their game's name; optionally one game's. */
+  /** Updates newest first, with their game's name; optionally one game's.
+   *  An update an admin removed is not listed. */
   async function listUpdates(gameId?: string, limit = 50): Promise<GameUpdate[]> {
     let q = db.selectFrom('game_updates').innerJoin('games', 'games.engine_game_id', 'game_updates.game_id')
       .select(['game_updates.id', 'game_updates.game_id', 'game_updates.title', 'game_updates.body', 'game_updates.posted_at', 'games.name'])
+      .where('game_updates.deleted_at', 'is', null)
       .orderBy('game_updates.posted_at', 'desc').limit(limit);
     if (gameId) q = q.where('game_updates.game_id', '=', gameId);
     const rows = await q.execute();
-    return rows.map((r) => updateEntry({ id: r.id, game_id: r.game_id, title: r.title, body: r.body, posted_at: r.posted_at }, r.name));
+    return rows.map((r) => updateEntry(r, r.name));
   }
 
-  // Refresh the catalog from the engine's list; the extra fields stay local.
+  // Refresh the catalog from the engine's list. The engine owns the player
+  // counts and AI support, so those follow it on every refresh. Everything
+  // a player reads on the storefront (the name, the copy, the art, the
+  // designer, the posts) is the database's from the day a row is made: the
+  // seed in storefront.ts fills a row only when it is new, so an edit on the
+  // admin page survives a restart or a deploy.
   async function refreshCatalog(): Promise<number> {
     const listed = await opts.engine.listGames();
+    for (const d of Object.values(DESIGNERS)) {
+      const have = await db.selectFrom('designers').select('slug').where('slug', '=', d.slug).executeTakeFirst();
+      if (!have) await db.insertInto('designers').values({ slug: d.slug, name: d.name, bio: d.bio, avatar_image: null }).execute();
+    }
     for (const g of listed.games) {
       const playerCount = g.min_players === g.max_players
         ? String(g.min_players)
         : `${g.min_players}–${g.max_players}`;
-      const existing = await db.selectFrom('games').select('engine_game_id')
+      const existing = await db.selectFrom('games').select(['engine_game_id', 'designer_slug'])
         .where('engine_game_id', '=', g.game_id).executeTakeFirst();
       const shared = {
-        name: g.name ?? g.game_id,
         player_count: playerCount,
         min_players: g.min_players,
         max_players: g.max_players,
@@ -901,24 +937,34 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
       if (existing) {
         await db.updateTable('games').set({
           ...shared,
-          ...(own ? { designer_name: designerName, description: own.description, play_time: own.playTime, tags: JSON.stringify(own.tags), cover_image: own.coverImage } : {}),
+          // A row from before schema 8 has no designer slug, cover focus or
+          // screenshots yet; it takes the seed's once.
+          ...(own && existing.designer_slug == null
+            ? { designer_slug: own.designer, cover_focus: own.coverFocus ?? null, screenshots: JSON.stringify(own.screenshots) }
+            : {}),
         }).where('engine_game_id', '=', g.game_id).execute();
       } else {
         await db.insertInto('games').values({
           engine_game_id: g.game_id,
+          name: g.name ?? g.game_id,
           ...shared,
           designer_name: designerName,
+          designer_slug: own?.designer ?? null,
           play_time: own?.playTime ?? '',
           tags: JSON.stringify(own?.tags ?? []),
           cover_image: own?.coverImage ?? null,
+          cover_focus: own?.coverFocus ?? null,
+          screenshots: JSON.stringify(own?.screenshots ?? []),
+          featured_rank: null,
           description: own?.description ?? g.description ?? '',
           rules_url: null,
           visibility: 'public',
         }).execute();
       }
     }
-    // The designer's posts, once each; a game the engine no longer lists
-    // keeps no posts.
+    // The designer's posts, once each: a post an admin removed keeps its
+    // row (deleted_at), so it is never posted again. A game the engine no
+    // longer lists keeps no posts.
     const known = new Set(listed.games.map((g) => g.game_id));
     for (const u of ZEKEL_UPDATES) {
       if (!known.has(u.gameId)) continue;
@@ -944,14 +990,37 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     return { updates: await listUpdates(id) };
   });
 
+  app.get('/api/designers', async (): Promise<DesignersResponse> => {
+    const [designers, games] = await Promise.all([
+      db.selectFrom('designers').selectAll().orderBy('name', 'asc').execute(),
+      catalog(),
+    ]);
+    const listed = games.filter((g) => g.visibility === 'public');
+    return {
+      designers: designers.map((d) => ({
+        ...designerProfile(d),
+        gameCount: listed.filter((g) => g.designerSlug === d.slug).length,
+      })),
+    };
+  });
+
   app.get('/api/designers/:slug', async (req): Promise<DesignerResponse> => {
     const { slug } = req.params as { slug: string };
-    const designer = DESIGNERS[slug];
+    const designer = await db.selectFrom('designers').selectAll().where('slug', '=', slug).executeTakeFirst();
     if (!designer) throw new HttpError(404, 'no_designer');
-    const rows = await db.selectFrom('games').selectAll().where('designer_name', '=', designer.name).orderBy('name', 'asc').execute();
-    const games = rows.map(catalogEntry);
+    const games = (await catalog()).filter((g) => g.designerSlug === slug && g.visibility === 'public');
     const updates = (await listUpdates()).filter((u) => games.some((g) => g.engineGameId === u.gameId));
-    return { designer, games, updates };
+    return { designer: designerProfile(designer), games, updates };
+  });
+
+  registerAdmin(app, {
+    db,
+    adminEmails: opts.adminEmails ?? [],
+    principalOf,
+    catalog,
+    listAllUpdates: () => listUpdates(undefined, 500),
+    designerProfile,
+    HttpError,
   });
 
   // Anyone with a table's link may watch it: the engine's public view (it
@@ -1000,15 +1069,14 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
   });
 
   app.get('/api/games', async (): Promise<GamesResponse> => {
-    const rows = await db.selectFrom('games').selectAll().orderBy('name', 'asc').execute();
-    return { games: rows.map(catalogEntry) };
+    return { games: await catalog() };
   });
 
   app.get('/api/games/:id', async (req): Promise<GameResponse> => {
     const { id } = req.params as { id: string };
     const g = await db.selectFrom('games').selectAll().where('engine_game_id', '=', id).executeTakeFirst();
     if (!g) throw new HttpError(404, 'no_game');
-    return { game: catalogEntry(g) };
+    return { game: catalogEntry(g, await designerMap()) };
   });
 
   app.get('/api/games/:id/reference', async (req): Promise<GameReferenceResponse> => {

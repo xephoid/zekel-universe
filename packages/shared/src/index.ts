@@ -29,6 +29,8 @@ export interface Guest {
 export interface MeResponse {
   user: User | null;
   guest: Guest | null;
+  /** true for a signed-in account listed in the server's ADMIN_EMAILS */
+  isAdmin?: boolean;
 }
 
 // ---- friends ------------------------------------------------------------------
@@ -93,6 +95,10 @@ export interface GameCatalogEntry {
   visibility: 'public' | 'unlisted';
   /** the designer's profile slug, when the designer has a profile */
   designerSlug: string | null;
+  /** image paths for the game page's screenshot strip, in order */
+  screenshots: string[];
+  /** place among the featured games on home, lowest first; null when not featured */
+  featuredRank: number | null;
 }
 
 /** A designer's post about a game: the devlog on the game page, the feed on home. */
@@ -110,11 +116,78 @@ export interface UpdatesResponse {
   updates: GameUpdate[];
 }
 
+/** A designer's profile: the name, the bio, an optional portrait. */
+export interface DesignerProfile {
+  slug: string;
+  name: string;
+  bio: string;
+  avatarImage: string | null;
+}
+
 /** GET /api/designers/:slug */
 export interface DesignerResponse {
-  designer: { slug: string; name: string; bio: string };
+  designer: DesignerProfile;
   games: GameCatalogEntry[];
   updates: GameUpdate[];
+}
+
+/** GET /api/designers */
+export interface DesignersResponse {
+  designers: Array<DesignerProfile & { gameCount: number }>;
+}
+
+// ---- admin --------------------------------------------------------------------
+// The internal page that edits the storefront's database rows (T06). Every
+// route under /api/admin answers only a signed-in account in ADMIN_EMAILS.
+
+/** GET /api/admin/content: every row the admin page edits. */
+export interface AdminContentResponse {
+  games: GameCatalogEntry[];
+  designers: DesignerProfile[];
+  updates: GameUpdate[];
+}
+
+/** PUT /api/admin/games/:id. The engine's own fields (player counts, AI
+ *  support) are not here: the engine owns them. */
+export interface AdminGameEdit {
+  name: string;
+  description: string;
+  playTime: string;
+  tags: string[];
+  coverImage: string | null;
+  coverFocus: string | null;
+  screenshots: string[];
+  designerSlug: string | null;
+  featuredRank: number | null;
+  visibility: 'public' | 'unlisted';
+}
+
+/** POST /api/admin/designers and PUT /api/admin/designers/:slug */
+export interface AdminDesignerEdit {
+  slug?: string; // POST only
+  name: string;
+  bio: string;
+  avatarImage: string | null;
+}
+
+/** POST /api/admin/updates and PUT /api/admin/updates/:id */
+export interface AdminUpdateEdit {
+  gameId: string;
+  title: string;
+  body: string;
+  /** ISO time; omitted on POST means now */
+  postedAt?: string;
+}
+
+/** POST /api/admin/media: one image, base64 */
+export interface AdminMediaUpload {
+  contentType: 'image/png' | 'image/jpeg' | 'image/webp';
+  data: string;
+}
+
+export interface AdminMediaResponse {
+  /** the path to put in an image field: /media/<id> */
+  url: string;
 }
 
 /**

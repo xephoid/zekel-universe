@@ -4,6 +4,7 @@
 
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+import { parseAdminEmails } from './admin.js';
 
 export interface ServerConfig {
   port: number;
@@ -28,6 +29,8 @@ export interface ServerConfig {
   /** A request header the hosting platform writes with the client's
    *  address (Render: cf-connecting-ip). Null: use the socket's peer. */
   clientIpHeader: string | null;
+  /** Sign-in emails whose accounts may use the admin page; empty: nobody. */
+  adminEmails: string[];
 }
 
 /** Headers a caller can write or append to themselves; never trusted for a
@@ -136,5 +139,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ServerConfig {
     turnNudgeSweepMs: nonNegative(env.TURN_NUDGE_SWEEP_MS, 60 * 1000),
     guestsPerIp: nonNegative(env.GUESTS_PER_IP, 30),
     clientIpHeader: parseClientIpHeader(env.CLIENT_IP_HEADER),
+    adminEmails: parseAdminEmails(env.ADMIN_EMAILS),
   };
 }

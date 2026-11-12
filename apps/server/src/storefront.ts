@@ -1,10 +1,13 @@
-// Storefront content the catalog does not get from the engine: the
-// designer of record, the copy written for players (the engine's own
-// descriptions are written for the agent that runs a physical table), and
-// the square cover art served by the web app, the designer's updates, which show as the devlog on a game page and as
-// the feed on the home page. All of it is Zekel Games' own; a designer
-// dashboard that edits it is later work (the brief leaves it a place in the
-// navigation and nothing more).
+// The storefront's starting copy: the designer of record, the copy written
+// for players (the engine's own descriptions are written for the agent that
+// runs a physical table), the square cover art and the screenshots served by
+// the web app, and the designer's updates, which show as the devlog on a game
+// page and as the feed on the home page. All of it is Zekel Games' own.
+//
+// This is a seed, not the live copy: it fills a database row only when the
+// row is new (and gives rows from before schema 8 their designer, cover focus
+// and screenshots once). After that the admin page owns the row; editing
+// this file changes nothing on a running site.
 
 export interface Designer {
   slug: string;
@@ -20,13 +23,18 @@ export const DESIGNERS: Record<string, Designer> = {
   },
 };
 
-export const ZEKEL_GAMES: Record<string, { designer: string; description: string; playTime: string; tags: string[]; coverImage: string; coverFocus?: string }> = {
+/** Four screenshots per game, taken from real games against the AI. */
+const shots = (game: string) => [1, 2, 3, 4].map((n) => `/art/screenshots/${game}-${n}.webp`);
+
+export const ZEKEL_GAMES: Record<string, { designer: string; description: string; playTime: string; tags: string[]; coverImage: string; coverFocus?: string; screenshots: string[] }> = {
   'fractured-fist': {
     designer: 'zekel-games',
     description: "A two-player card fight. Start with a small, weak deck, buy better techniques as you go, and knock your opponent's stamina from 7 to 0. Ten to twenty rounds.",
     playTime: '10–20 min',
     tags: ['deck-building', 'duel', 'two players'],
     coverImage: '/art/covers/fractured-fist.webp',
+
+    screenshots: shots('fractured-fist'),
   },
   'cybernoir-2127': {
     designer: 'zekel-games',
@@ -34,6 +42,8 @@ export const ZEKEL_GAMES: Record<string, { designer: string; description: string
     playTime: '30–45 min',
     tags: ['deduction', 'duel', 'two players'],
     coverImage: '/art/covers/cybernoir-2127.webp',
+
+    screenshots: shots('cybernoir-2127'),
   },
   'warble-way-galaxy': {
     designer: 'zekel-games',
@@ -41,6 +51,8 @@ export const ZEKEL_GAMES: Record<string, { designer: string; description: string
     playTime: '45–90 min',
     tags: ['solo', 'adventure', 'dice'],
     coverImage: '/art/covers/warble-way-galaxy.webp',
+
+    screenshots: shots('warble-way-galaxy'),
     // the captain's face sits high in the square; the wide banner keeps it
     coverFocus: '50% 18%',
   },
@@ -50,6 +62,8 @@ export const ZEKEL_GAMES: Record<string, { designer: string; description: string
     playTime: '90–150 min',
     tags: ['strategy', 'area control', 'hex map'],
     coverImage: '/art/covers/neither-guts-nor-gears.webp',
+
+    screenshots: shots('neither-guts-nor-gears'),
   },
   'adventurer-olympics': {
     designer: 'zekel-games',
@@ -57,6 +71,8 @@ export const ZEKEL_GAMES: Record<string, { designer: string; description: string
     playTime: '30–45 min',
     tags: ['exploration', 'hex map', 'dice'],
     coverImage: '/art/covers/adventurer-olympics.webp',
+
+    screenshots: shots('adventurer-olympics'),
   },
   'word-debauchee': {
     designer: 'zekel-games',
@@ -64,6 +80,8 @@ export const ZEKEL_GAMES: Record<string, { designer: string; description: string
     playTime: '20–40 min',
     tags: ['word game', 'party', 'deduction'],
     coverImage: '/art/covers/word-debauchee.svg',
+
+    screenshots: shots('word-debauchee'),
   },
   'sweetlands-imperium': {
     designer: 'zekel-games',
@@ -71,6 +89,8 @@ export const ZEKEL_GAMES: Record<string, { designer: string; description: string
     playTime: '45–75 min',
     tags: ['area control', 'strategy'],
     coverImage: '/art/covers/sweetlands-imperium.webp',
+
+    screenshots: shots('sweetlands-imperium'),
   },
 };
 
