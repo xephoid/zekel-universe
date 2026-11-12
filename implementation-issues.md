@@ -274,7 +274,7 @@ The glue hard-codes facts the engine owns and will drift from it:
 Sources: [fractured-fist.ts](apps/web/src/glue/fractured-fist.ts),
 [sweetlands-imperium.ts](apps/web/src/glue/sweetlands-imperium.ts),
 [warble-way-galaxy.ts](apps/web/src/glue/warble-way-galaxy.ts),
-[cybernoir-2127.ts](apps/web/src/glue/cybernoir-2127.ts).
+`cybernoir-2127.ts` (since moved to zekel-games, `packages/cybernoir-2127/src/glue/index.ts`).
 
 **Required fix:** Read card names, costs, caps, and thresholds from the
 engine's view or its rules reference data. Where the view lacks a value the
@@ -394,7 +394,7 @@ Sources: [primitives/package.json](packages/primitives/package.json),
 
 Sources: [Table.tsx](apps/web/src/pages/Table.tsx),
 [Setup.tsx](apps/web/src/pages/Setup.tsx), [Game.tsx](apps/web/src/pages/Game.tsx),
-[cybernoir-2127.ts](apps/web/src/glue/cybernoir-2127.ts),
+`cybernoir-2127.ts` (since moved to zekel-games, `packages/cybernoir-2127/src/glue/index.ts`),
 [warble-way-galaxy.ts](apps/web/src/glue/warble-way-galaxy.ts).
 
 ## Milestone assessment

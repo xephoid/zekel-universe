@@ -10,7 +10,9 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { GlueInput, LegalMove } from '@zekel/glue-kit';
+import type { MapData } from '@zekel/primitives';
 import { GLUES, glueFor } from '../glue';
+import { CN_REFERENCE, CN_VIEW } from './fixtures/installed/cybernoir-2127';
 
 afterEach(cleanup);
 
@@ -35,5 +37,17 @@ describe('an installed game', () => {
     expect(container.querySelectorAll('[data-key]').length).toBeGreaterThan(20);
     expect(onMove).not.toHaveBeenCalled();
     expect(onForm).not.toHaveBeenCalled();
+  });
+
+  it('lays out a plan-drawn game from a view: Cybernoir 2127', () => {
+    const glue = glueFor('cybernoir-2127')!;
+    expect(glue).toBe(GLUES['cybernoir-2127']);
+    const input: GlueInput = { view: CN_VIEW, previous: null, legalMoves: [], playerId: 'hak', reference: CN_REFERENCE, seq: 1, engineMove: null, actorPlayerId: null, memory: new Map() };
+    expect(glue.themeFor!(input)).toBe('cn-theme cn-theme-hacker');
+    const plan = glue.plan(input)!;
+    const map = plan.board.find((z) => z.kind === 'map')!.data as MapData;
+    expect(map.nodes.length).toBeGreaterThan(0);
+    expect(map.nodes.every((n) => n.id.startsWith('cn:loc:'))).toBe(true);
+    expect(plan.side.map((z) => z.id)).toContain('cn:hacker');
   });
 });

@@ -119,7 +119,6 @@ const isGameScreen = (spec: string) => isGamePackage(spec) && /^@zekel\/[^/]+\/g
 const GAMES: Record<string, string[]> = {
   'fractured-fist': ['ff', 'fractured-fist'],
   'sweetlands-imperium': ['sl', 'sweetlands-imperium', 'sweetlands-board'],
-  'cybernoir-2127': ['cn', 'cybernoir-2127'],
   'warble-way-galaxy': ['ww', 'warble-way-galaxy'],
   'neither-guts-nor-gears': ['ngg'],
   'adventurer-olympics': ['ao'],
