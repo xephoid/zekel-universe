@@ -1532,5 +1532,33 @@ their own pages.
   With none set it falls back to the first two games that have a designer.
 - **News** is the designers' updates; there is no separate news table.
 - **Every edit is logged** with the admin's account id and what changed.
-- **Still open:** cleaning up uploaded images nothing points at any more, and
-  the phone pass (the navigation bar is too wide at phone width on every page).
+- **Still open:** cleaning up uploaded images nothing points at any more.
+  The navigation bar at phone width is fixed; see §22.
+
+## 22. The site pages on a phone (built 2026-11-11)
+
+The first piece of M6: every page outside a game's table fits 390 px wide.
+The tables are not part of it; each game keeps its own phone layout (only
+Fractured Fist has one) until its turn in M6. The canvas draws no phone
+pages, so the layout below follows the brief's phone rules and the desktop
+look. The check is `e2e/pages-phone.spec.ts` at 390 x 844.
+
+- **One line for "phone": narrower than 640 px**, the same as
+  `table/phone.ts`. All the rules are one block at the end of `app.css`,
+  scoped to the bar and `.page`, so no table screen changes.
+- **The bar takes three rows:** the wordmark and your avatar (or Sign in);
+  Browse, My tables and Designers; then search across the full width. Your
+  name is hidden on screen but kept for screen readers. Nothing goes behind
+  a menu button.
+- **Gutters are 16 px, columns stack:** featured, the designer's games, My
+  tables and the profile's side column go to one column; newest stays two
+  across; setup's option cards go two across; a devlog's date sits above
+  its entry.
+- **A thumb's targets are at least 44 px:** the bar's links, seat and level
+  buttons, the player stepper, small buttons, fields and the back link.
+  Links inside a sentence and the radio inside an option card (the card is
+  the target) are left as they are. Fields use 16 px text so a phone does
+  not zoom in on focus.
+- **Not covered:** `/admin` was not checked on a phone; the `/gallery`
+  parts sheet fits across but its parts keep their own sizes. A phone held
+  sideways (wider than 640 px) gets the desktop pages.

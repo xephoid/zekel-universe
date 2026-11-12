@@ -80,7 +80,7 @@ test('a stranger with a game link is playing in under a minute; browsing, the de
   await page.goBack();
   await page.getByRole('link', { name: 'Zekel Games' }).click();
   await expect(page.getByRole('heading', { name: 'Zekel Games', level: 1 })).toBeVisible();
-  const shelf = page.locator('.newest-grid');
+  const shelf = page.locator('.shelf');
   await expect(shelf.getByRole('link', { name: /Fractured Fist/ })).toBeVisible();
   await expect(shelf.getByRole('link', { name: /Warble Way Galaxy/ })).toBeVisible();
   await expect(page.locator('.update-card')).toHaveCount(4);
