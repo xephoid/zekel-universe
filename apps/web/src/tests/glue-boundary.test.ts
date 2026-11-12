@@ -5,7 +5,9 @@
 // "Its own folder" is the game's own: one game never imports another's
 // files. The list of games (glue/index.ts) is the web app's and is the one
 // file that may be imported from outside; the rest of the app reaches a game
-// only through it. Imports are read from each file's syntax tree, so a
+// only through it. A game that has moved to its own package is installed,
+// and the list imports its screen as `@zekel/<game>/glue`; nothing else in
+// the app may. Imports are read from each file's syntax tree, so a
 // dynamic import() counts like a static one, and an import() of a path worked
 // out at run time is refused, since nobody can say where it goes.
 
@@ -106,6 +108,13 @@ function linksUnder(dir: string, out: string[] = []): string[] {
 
 const ALLOWED_PACKAGES = ['react', 'react-dom', '@zekel/glue-kit', '@zekel/primitives', '@zekel/wire-types', '@zekel/tokens'];
 
+/** The drawing packages, which are not games. */
+const DRAWING = ['glue-kit', 'primitives', 'wire-types', 'tokens'];
+/** An installed game package, by any entry: its screen, its rules, a file. */
+const isGamePackage = (spec: string) => /^@zekel\/[^/]+(\/|$)/.test(spec) && !DRAWING.includes(spec.split('/')[1]!);
+/** The one entry of a game package the web app loads: its screen. */
+const isGameScreen = (spec: string) => isGamePackage(spec) && /^@zekel\/[^/]+\/glue$/.test(spec);
+
 /** Each game's files under glue/: its folder, and its top-level files. */
 const GAMES: Record<string, string[]> = {
   'fractured-fist': ['ff', 'fractured-fist'],
@@ -114,7 +123,6 @@ const GAMES: Record<string, string[]> = {
   'warble-way-galaxy': ['ww', 'warble-way-galaxy'],
   'neither-guts-nor-gears': ['ngg'],
   'adventurer-olympics': ['ao'],
-  'word-debauchee': ['wd'],
 };
 
 const LIST = [path.join(GLUE, 'index'), path.join(GLUE, 'index.ts')];
@@ -174,12 +182,24 @@ describe('the scanner the wall is checked with', () => {
     expect(importsIn("const a = '//'; const m = import('./m'); // import('./n')").specs).toEqual(['./m']);
   });
 
+  it('tells an installed game from the drawing packages, and its screen from the rest of it', () => {
+    expect(isGameScreen('@zekel/word-debauchee/glue')).toBe(true);
+    expect(isGameScreen('@zekel/word-debauchee')).toBe(false);
+    expect(isGameScreen('@zekel/word-debauchee/glue/read')).toBe(false);
+    expect(isGameScreen('@zekel/word-debauchee/engine/apply')).toBe(false);
+    expect(isGamePackage('@zekel/word-debauchee')).toBe(true);
+    expect(isGamePackage('@zekel/word-debauchee/views')).toBe(true);
+    expect(isGamePackage('@zekel/glue-kit')).toBe(false);
+    expect(isGamePackage('@zekel/glue-kit/css')).toBe(false);
+    expect(isGamePackage('react')).toBe(false);
+  });
+
   it('calls only glue/index.ts the list', () => {
     expect(ownerOf(path.join(GLUE, 'index.ts'))).toBe('list');
     expect(ownerOf(path.join(GLUE, 'index'))).toBe('list');
     expect(ownerOf(path.join(GLUE, 'index', 'rogue.ts'))).toBeNull();
     expect(ownerOf(path.join(GLUE, 'index.tsx'))).toBeNull();
-    expect(ownerOf(path.join(GLUE, 'wd', 'index.ts'))).toBe('word-debauchee');
+    expect(ownerOf(path.join(GLUE, 'ao', 'index.ts'))).toBe('adventurer-olympics');
     expect(ownerOf(path.join(GLUE, 'fractured-fist.ts'))).toBe('fractured-fist');
     expect(ownerOf(path.join(SRC, 'pages', 'Table.tsx'))).toBeNull();
     expect(ownerOf(GLUE)).toBeNull();
@@ -215,6 +235,8 @@ describe('the games\' drawing code stays behind its wall', () => {
           // The list names every game; a game names only itself.
           const ok = me === 'list' ? owner !== null && owner !== 'list' : owner === me;
           if (!ok) leaks.push(`${path.relative(SRC, file)} → ${spec}`);
+        } else if (me === 'list' && isGameScreen(spec)) {
+          // The list names an installed game's screen, and only its screen.
         } else if (!ALLOWED_PACKAGES.some((p) => spec === p || spec.startsWith(p + '/'))) {
           leaks.push(`${path.relative(SRC, file)} → ${spec}`);
         }
@@ -231,6 +253,8 @@ describe('the games\' drawing code stays behind its wall', () => {
       if (computed > 0) reaches.push(`${path.relative(SRC, file)} → an import worked out at run time`);
       for (const g of globs) if (touchesGlue(globBase(file, g))) reaches.push(`${path.relative(SRC, file)} → glob ${g}`);
       for (const spec of specs) {
+        // An installed game is reached through the list too, never by name.
+        if (isGamePackage(spec)) reaches.push(`${path.relative(SRC, file)} → ${spec}`);
         if (!spec.startsWith('.')) continue;
         const target = path.resolve(path.dirname(file), spec);
         if (target.startsWith(GLUE + path.sep) && target !== path.join(GLUE, 'index')) reaches.push(`${path.relative(SRC, file)} → ${spec}`);

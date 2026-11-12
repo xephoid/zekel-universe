@@ -6,7 +6,9 @@ FROM node:22-bookworm-slim AS build
 WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@10.19.0 --activate
 
-# Manifests first so the dependency layer caches.
+# Manifests first so the dependency layer caches. Every workspace package
+# is listed, here and in the second stage: a frozen install fails if one the
+# lockfile names is missing (apps/web/src/tests/dockerfile.test.ts checks).
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml tsconfig.base.json ./
 COPY apps/server/package.json apps/server/
 COPY apps/web/package.json apps/web/
@@ -14,6 +16,8 @@ COPY packages/shared/package.json packages/shared/
 COPY packages/tokens/package.json packages/tokens/
 COPY packages/engine-client/package.json packages/engine-client/
 COPY packages/primitives/package.json packages/primitives/
+COPY packages/wire-types/package.json packages/wire-types/
+COPY packages/glue-kit/package.json packages/glue-kit/
 RUN pnpm install --frozen-lockfile
 
 COPY packages ./packages
@@ -35,12 +39,16 @@ COPY packages/shared/package.json packages/shared/
 COPY packages/tokens/package.json packages/tokens/
 COPY packages/engine-client/package.json packages/engine-client/
 COPY packages/primitives/package.json packages/primitives/
+COPY packages/wire-types/package.json packages/wire-types/
+COPY packages/glue-kit/package.json packages/glue-kit/
 RUN pnpm install --frozen-lockfile --prod
 
 COPY --from=build /app/packages/shared/dist packages/shared/dist
 COPY --from=build /app/packages/tokens/dist packages/tokens/dist
 COPY --from=build /app/packages/engine-client/dist packages/engine-client/dist
 COPY --from=build /app/packages/primitives/dist packages/primitives/dist
+COPY --from=build /app/packages/wire-types/dist packages/wire-types/dist
+COPY --from=build /app/packages/glue-kit/dist packages/glue-kit/dist
 COPY --from=build /app/apps/server/dist apps/server/dist
 COPY --from=build /app/apps/web/dist apps/web/dist
 
