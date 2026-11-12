@@ -457,6 +457,89 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
   const signinCookieName = opts.secureCookies ? `__Host-${SIGNIN_COOKIE}` : SIGNIN_COOKIE;
   const signinCookieOptions = { ...cookieOptions, path: '/' };
 
+  /** The account behind an email identity, made if there is none yet. */
+  async function findOrCreateEmailUser(trx: Kysely<DB>, email: string): Promise<string> {
+    const identity = await trx.selectFrom('identities').select('user_id')
+      .where('provider', '=', 'email').where('provider_subject', '=', email).executeTakeFirst();
+    if (identity) return identity.user_id;
+    const userId = newId();
+    await trx.insertInto('users').values({
+      id: userId, display_name: email.split('@')[0] ?? 'Player', avatar_url: null, bio: null, created_at: now(),
+    }).execute();
+    await trx.insertInto('identities').values({
+      id: newId(), user_id: userId, provider: 'email', provider_subject: email,
+    }).execute();
+    return userId;
+  }
+
+  /** The end of every sign-in, whichever way the player proved who they
+   *  are. `claim` runs first inside the transaction and returns the account
+   *  to sign in to, or null to refuse (nothing is then changed).
+   *
+   *  The session this browser was signed in with, if any, ends here: the
+   *  new cookie replaces it, and a socket still holding it (in this tab or
+   *  another of this browser) must not go on acting as that account. Only
+   *  the session in this request is ended; it moves nothing to the new
+   *  account. A guest cookie on this request keeps its seats, its tables and
+   *  its notifications: everything moves to the user. Both credentials'
+   *  sockets are revoked from now, and cut at the end, so they reconnect as
+   *  the user. The auth cookie is set only once everything is written. */
+  async function finishSignIn(
+    req: FastifyRequest, reply: FastifyReply, linkHash: string | null,
+    claim: (trx: Kysely<DB>) => Promise<string | null>,
+  ): Promise<{ userId: string } | null> {
+    const revocation = beginRevocation(reply);
+    let outcome: { userId: string; sessionToken: string } | null;
+    try {
+      const oldAuth = req.cookies[AUTH_COOKIE];
+      const oldHash = oldAuth ? hashToken(oldAuth) : null;
+      if (oldHash) revocation.add(credentialRoom({ kind: 'session', tokenHash: oldHash }));
+
+      const guestToken = req.cookies[GUEST_COOKIE];
+      const guest = guestToken
+        ? await db.selectFrom('guests').select(['id', 'upgraded_to_user_id', 'created_at', 'expires_at'])
+          .where('token_hash', '=', hashToken(guestToken)).executeTakeFirst()
+        : undefined;
+      const upgrading = guest && !guest.upgraded_to_user_id && guestExpiresAt(guest) > Date.now() ? guest : null;
+      if (upgrading) revocation.add(credentialRoom({ kind: 'guest', guestId: upgrading.id }));
+
+      // One transaction: the claim, ending the old session, the guest's
+      // transfer and the new session all happen or none does. A failure
+      // leaves everything as it was, so trying again finishes the job.
+      outcome = await db.transaction().execute(async (trx) => {
+        const userId = await claim(trx);
+        if (!userId) return null;
+
+        if (oldHash) await trx.deleteFrom('auth_sessions').where('token_hash', '=', oldHash).execute();
+        if (upgrading) {
+          // Only a guest still not upgraded moves; a concurrent upgrade won.
+          const marked = await trx.updateTable('guests').set({ upgraded_to_user_id: userId })
+            .where('id', '=', upgrading.id).where('upgraded_to_user_id', 'is', null).executeTakeFirst();
+          if (Number(marked.numUpdatedRows) === 1) {
+            await trx.updateTable('seats').set({ user_id: userId, guest_id: null }).where('guest_id', '=', upgrading.id).execute();
+            await trx.updateTable('tables').set({ host_user_id: userId, host_guest_id: null }).where('host_guest_id', '=', upgrading.id).execute();
+            await trx.updateTable('notifications').set({ user_id: userId, guest_id: null }).where('guest_id', '=', upgrading.id).execute();
+          }
+        }
+
+        // An email-link session remembers which link made it, so a browser
+        // whose answer was lost can ask whether this link signed it in
+        // (link-status below). Other sign-ins record none.
+        const sessionToken = newToken();
+        await trx.insertInto('auth_sessions').values({
+          id: newId(), user_id: userId, token_hash: hashToken(sessionToken), created_at: now(),
+          expires_at: new Date(Date.now() + SESSION_TTL_MS).toISOString(), link_hash: linkHash,
+        }).execute();
+        return { userId, sessionToken };
+      });
+    } finally {
+      revocation.settled();
+    }
+    if (!outcome) return null;
+    reply.setCookie(AUTH_COOKIE, outcome.sessionToken, { ...cookieOptions, maxAge: Math.floor(SESSION_TTL_MS / 1000) });
+    return { userId: outcome.userId };
+  }
+
   app.post('/api/auth/email/link', async (req, reply) => {
     const body = (req.body ?? {}) as { email?: string };
     const email = body.email?.trim().toLowerCase();
@@ -499,84 +582,17 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     const email = token ? await peekSignInLink(db, token, nonce) : null;
     if (!email) return reply.code(401).send({ error: 'invalid_or_expired_token' });
 
-    // The session this browser was signed in with, if any, ends here: the
-    // new cookie replaces it, and a socket still holding it (in this tab or
-    // another of this browser) must not go on acting as that account. Only
-    // the session in this request is ended; it moves nothing to the new
-    // account. Its sockets are revoked from now, and cut at the end.
-    const revocation = beginRevocation(reply);
-    let outcome: { userId: string; sessionToken: string } | null;
-    try {
-      const oldAuth = req.cookies[AUTH_COOKIE];
-      const oldHash = oldAuth ? hashToken(oldAuth) : null;
-      if (oldHash) revocation.add(credentialRoom({ kind: 'session', tokenHash: oldHash }));
-
-      // A guest cookie on this request keeps its seats, its tables and its
-      // notifications: everything moves to the user. The guest's sockets
-      // are revoked too, so they reconnect as the user.
-      const guestToken = req.cookies[GUEST_COOKIE];
-      const guest = guestToken
-        ? await db.selectFrom('guests').select(['id', 'upgraded_to_user_id', 'created_at', 'expires_at'])
-          .where('token_hash', '=', hashToken(guestToken)).executeTakeFirst()
-        : undefined;
-      const upgrading = guest && !guest.upgraded_to_user_id && guestExpiresAt(guest) > Date.now() ? guest : null;
-      if (upgrading) revocation.add(credentialRoom({ kind: 'guest', guestId: upgrading.id }));
-
-      // One transaction: using the link up, the account, ending the old
-      // session, the guest's transfer and the new session all happen or
-      // none does. A failure leaves the link usable, the guest and the old
-      // session as they were, so trying again finishes the job.
-      outcome = await db.transaction().execute(async (trx) => {
-        const consumed = await consumeSignInLink(trx, token, nonce);
-        if (!consumed) return null; // used or expired since the read above
-        // The nonce is spent: this browser's other pending links go with it.
-        await trx.deleteFrom('sign_in_links').where('nonce_hash', '=', hashToken(nonce)).execute();
-
-        // Find or create the user behind this email identity.
-        const identity = await trx.selectFrom('identities').select('user_id')
-          .where('provider', '=', 'email').where('provider_subject', '=', consumed).executeTakeFirst();
-        let userId: string;
-        if (identity) {
-          userId = identity.user_id;
-        } else {
-          userId = newId();
-          await trx.insertInto('users').values({
-            id: userId, display_name: consumed.split('@')[0] ?? 'Player', avatar_url: null, bio: null, created_at: now(),
-          }).execute();
-          await trx.insertInto('identities').values({
-            id: newId(), user_id: userId, provider: 'email', provider_subject: consumed,
-          }).execute();
-        }
-
-        if (oldHash) await trx.deleteFrom('auth_sessions').where('token_hash', '=', oldHash).execute();
-        if (upgrading) {
-          // Only a guest still not upgraded moves; a concurrent upgrade won.
-          const marked = await trx.updateTable('guests').set({ upgraded_to_user_id: userId })
-            .where('id', '=', upgrading.id).where('upgraded_to_user_id', 'is', null).executeTakeFirst();
-          if (Number(marked.numUpdatedRows) === 1) {
-            await trx.updateTable('seats').set({ user_id: userId, guest_id: null }).where('guest_id', '=', upgrading.id).execute();
-            await trx.updateTable('tables').set({ host_user_id: userId, host_guest_id: null }).where('host_guest_id', '=', upgrading.id).execute();
-            await trx.updateTable('notifications').set({ user_id: userId, guest_id: null }).where('guest_id', '=', upgrading.id).execute();
-          }
-        }
-
-        // The session remembers which link made it, so a browser whose answer
-        // was lost can ask whether this link signed it in (link-status below).
-        const sessionToken = newToken();
-        await trx.insertInto('auth_sessions').values({
-          id: newId(), user_id: userId, token_hash: hashToken(sessionToken), created_at: now(),
-          expires_at: new Date(Date.now() + SESSION_TTL_MS).toISOString(), link_hash: linkProof(token),
-        }).execute();
-        return { userId, sessionToken };
-      });
-    } finally {
-      revocation.settled();
-    }
-    // Cookies change only once everything is written: a failed completion
-    // keeps this browser's nonce, so the same link can be tried again.
+    const outcome = await finishSignIn(req, reply, linkProof(token), async (trx) => {
+      const consumed = await consumeSignInLink(trx, token, nonce);
+      if (!consumed) return null; // used or expired since the read above
+      // The nonce is spent: this browser's other pending links go with it.
+      await trx.deleteFrom('sign_in_links').where('nonce_hash', '=', hashToken(nonce)).execute();
+      return findOrCreateEmailUser(trx, consumed);
+    });
+    // A failed completion keeps this browser's nonce, so the same link can
+    // be tried again.
     if (!outcome) return reply.code(401).send({ error: 'invalid_or_expired_token' });
     reply.clearCookie(signinCookieName, { path: '/' });
-    reply.setCookie(AUTH_COOKIE, outcome.sessionToken, { ...cookieOptions, maxAge: Math.floor(SESSION_TTL_MS / 1000) });
     return { ok: true, userId: outcome.userId };
   });
 
