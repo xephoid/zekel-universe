@@ -90,11 +90,12 @@ Discord and Google are live.
 Then a real sign-in with Discord and with Google on staging. That needs the
 setup above done first.
 
-## Open questions
+## Decided (Zeke, 2026-11-12)
 
-1. **Supabase plan.** Free: up to 50,000 players a month, but the project
-   pauses after a week with no use, and sign-in stops until someone restores
-   it. Pro: $25 a month, never pauses. Suggested: free while building, Pro
-   before launch.
-2. **Join accounts by confirmed email?** Suggested: yes, as above.
-3. **Keep Universe's own email link at launch?** Suggested: yes.
+1. **Supabase plan:** free while building, Pro ($25 a month, never pauses)
+   before launch. The free plan pauses a project after a week with no use,
+   and sign-in would stop until someone restored it.
+2. **Accounts join on a confirmed email:** yes, as above. An unconfirmed
+   email always gets a new account.
+3. **Universe's own email link stays at launch:** yes. Moving it to
+   Supabase is decided later.
