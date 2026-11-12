@@ -25,6 +25,7 @@ import {
   SESSION_TTL_MS, sweepExpired,
 } from './auth.js';
 import type { Mailer } from './email.js';
+import { SupabaseTokenError, type SupabaseSignIn } from './supabaseAuth.js';
 import type { EngineService } from './engine.js';
 import { isHostOf, TableError, TableService, type SeatRecord, type TableRecord } from './tables/service.js';
 import { Realtime, MoveError } from './realtime.js';
@@ -71,6 +72,10 @@ export interface BuildAppOptions {
   /** Sign-in emails whose accounts may use the admin page (/api/admin/*).
    *  Empty: nobody can. */
   adminEmails?: string[];
+  /** Sign-in with Discord and Google through Supabase (T09). `check` turns
+   *  the browser's Supabase access token into who signed in, or throws.
+   *  Unset: those buttons are not offered and the route answers 404. */
+  supabase?: { url: string; publishableKey: string; check: (token: string) => Promise<SupabaseSignIn> } | null;
   /** Test-only: expose the ConsoleMailer's outbox at /api/test/outbox.
    *  Must never be set in production (index.ts enforces). */
   testOutbox?: boolean;
@@ -154,6 +159,7 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
   // signs in more than one person.
   const linkLimiter = new RateLimiter(5, 15 * 60 * 1000);
   const linkIpLimiter = new RateLimiter(opts.limits?.linksPerIp ?? 30, 15 * 60 * 1000);
+  const supabaseIpLimiter = new RateLimiter(opts.limits?.linksPerIp ?? 30, 15 * 60 * 1000);
   const guestLimiter = new RateLimiter(opts.limits?.guestsPerIp ?? 30, 15 * 60 * 1000);
   const tableLimiter = new RateLimiter(opts.limits?.tablesPerPrincipal ?? 30, 60 * 60 * 1000);
   const referenceCache = new Map<string, GameReferenceResponse>();
@@ -472,6 +478,40 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     return userId;
   }
 
+  /** The account behind a Supabase sign-in. In order: the account this
+   *  Supabase user already signed in to; else the account that already has
+   *  this email, if Supabase has the email confirmed; else a new one. A
+   *  confirmed email no account holds is recorded as an email identity too,
+   *  so the email link and the admin check (admin.ts) find the account. An
+   *  unconfirmed email is never recorded and never joins an account. */
+  async function findOrCreateSupabaseUser(trx: Kysely<DB>, who: SupabaseSignIn): Promise<string> {
+    const linked = await trx.selectFrom('identities').select('user_id')
+      .where('provider', '=', 'supabase').where('provider_subject', '=', who.subject).executeTakeFirst();
+    const byEmail = who.confirmedEmail
+      ? await trx.selectFrom('identities').select('user_id')
+        .where('provider', '=', 'email').where('provider_subject', '=', who.confirmedEmail).executeTakeFirst()
+      : undefined;
+    let userId = linked?.user_id ?? byEmail?.user_id;
+    if (!userId) {
+      userId = newId();
+      const name = who.displayName ?? who.confirmedEmail?.split('@')[0] ?? 'Player';
+      await trx.insertInto('users').values({
+        id: userId, display_name: name.slice(0, 40), avatar_url: null, bio: null, created_at: now(),
+      }).execute();
+    }
+    if (!linked) {
+      await trx.insertInto('identities').values({
+        id: newId(), user_id: userId, provider: 'supabase', provider_subject: who.subject,
+      }).execute();
+    }
+    if (who.confirmedEmail && !byEmail) {
+      await trx.insertInto('identities').values({
+        id: newId(), user_id: userId, provider: 'email', provider_subject: who.confirmedEmail,
+      }).execute();
+    }
+    return userId;
+  }
+
   /** The end of every sign-in, whichever way the player proved who they
    *  are. `claim` runs first inside the transaction and returns the account
    *  to sign in to, or null to refuse (nothing is then changed).
@@ -593,6 +633,37 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     // be tried again.
     if (!outcome) return reply.code(401).send({ error: 'invalid_or_expired_token' });
     reply.clearCookie(signinCookieName, { path: '/' });
+    return { ok: true, userId: outcome.userId };
+  });
+
+  // Which other ways to sign in this server offers, for the sign-in page.
+  // The publishable key is public by design.
+  app.get('/api/auth/providers', async () => ({
+    supabase: opts.supabase ? { url: opts.supabase.url, publishableKey: opts.supabase.publishableKey } : null,
+  }));
+
+  // Sign-in with Discord or Google (T09). The browser has been to Discord or
+  // Google through Supabase and traded Supabase's one-time code for an
+  // access token (PKCE, so only in the browser that began the sign-in). The
+  // token is checked first (supabaseAuth.ts): a refusal changes nothing,
+  // not this browser's session, its guest seats or its sockets. Then the
+  // sign-in ends as an email link's does (finishSignIn).
+  app.post('/api/auth/supabase/complete', async (req, reply) => {
+    if (!opts.supabase) return reply.code(404).send({ error: 'not_offered' });
+    if (!supabaseIpLimiter.allow(`ip:${clientIp(req)}`)) {
+      return reply.code(429).send({ error: 'too_many_requests', message: 'Try again in a few minutes.' });
+    }
+    const body = (req.body ?? {}) as { accessToken?: unknown };
+    const token = typeof body.accessToken === 'string' ? body.accessToken : '';
+    let who: SupabaseSignIn;
+    try {
+      who = await opts.supabase.check(token);
+    } catch (e) {
+      req.log.warn({ reason: e instanceof SupabaseTokenError ? e.reason : 'error' }, 'supabase sign-in refused');
+      return reply.code(401).send({ error: 'sign_in_refused', message: 'That sign-in did not work. Try again.' });
+    }
+    const outcome = await finishSignIn(req, reply, null, (trx) => findOrCreateSupabaseUser(trx, who));
+    if (!outcome) return reply.code(401).send({ error: 'sign_in_refused', message: 'That sign-in did not work. Try again.' });
     return { ok: true, userId: outcome.userId };
   });
 

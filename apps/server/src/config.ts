@@ -31,6 +31,9 @@ export interface ServerConfig {
   clientIpHeader: string | null;
   /** Sign-in emails whose accounts may use the admin page; empty: nobody. */
   adminEmails: string[];
+  /** Sign-in with Discord and Google through Supabase (T09): the project's
+   *  address and publishable key, or null when not set up. */
+  supabase: { url: string; publishableKey: string } | null;
 }
 
 /** Headers a caller can write or append to themselves; never trusted for a
@@ -140,5 +143,27 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ServerConfig {
     guestsPerIp: nonNegative(env.GUESTS_PER_IP, 30),
     clientIpHeader: parseClientIpHeader(env.CLIENT_IP_HEADER),
     adminEmails: parseAdminEmails(env.ADMIN_EMAILS),
+    supabase: parseSupabase(env.SUPABASE_URL, env.SUPABASE_PUBLISHABLE_KEY),
   };
+}
+
+/** SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY: both or neither. The address
+ *  must be https, except a local one (Supabase's own local stack). */
+export function parseSupabase(rawUrl: string | undefined, rawKey: string | undefined): { url: string; publishableKey: string } | null {
+  const url = (rawUrl ?? '').trim().replace(/\/$/, '');
+  const publishableKey = (rawKey ?? '').trim();
+  if (!url && !publishableKey) return null;
+  if (!url || !publishableKey) {
+    throw new Error('SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY must be set together');
+  }
+  let parsed: URL;
+  try { parsed = new URL(url); } catch { throw new Error(`SUPABASE_URL is not an address: ${JSON.stringify(url)}`); }
+  const local = parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1';
+  if (parsed.protocol !== 'https:' && !(local && parsed.protocol === 'http:')) {
+    throw new Error('SUPABASE_URL must be https');
+  }
+  if (parsed.pathname !== '/' || parsed.search || parsed.hash) {
+    throw new Error('SUPABASE_URL must be the project address only, with no path');
+  }
+  return { url: parsed.origin, publishableKey };
 }
