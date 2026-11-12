@@ -1,7 +1,9 @@
 // The games this Universe can draw: each game's glue module by engine game
 // id. The rules a glue follows are @zekel/glue-kit; this file is only the
-// list. When the games move to their own packages (zekel-games), this
-// becomes "the game packages installed".
+// list. The games are moving to their own packages in zekel-games, where a
+// game's screen is `@zekel/<game>/glue`. Word Debauchee has moved and is
+// installed from npm; the others are still folders beside this file. When
+// all have moved, this is "the game packages installed".
 
 import type { GlueModule } from '@zekel/glue-kit';
 import { fracturedFistGlue } from './fractured-fist';
@@ -10,7 +12,7 @@ import { sweetlandsGlue } from './sweetlands-imperium';
 import { cybernoirGlue } from './cybernoir-2127';
 import { nggGlue } from './ngg';
 import { adventurerOlympicsGlue } from './ao';
-import { wordDebaucheeGlue } from './wd';
+import { wordDebaucheeGlue } from '@zekel/word-debauchee/glue';
 
 export const GLUES: Record<string, GlueModule> = {
   'fractured-fist': fracturedFistGlue,

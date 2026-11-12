@@ -1438,7 +1438,7 @@ rules are the `@zekel/word-debauchee` package in zekel-games; the engine has
 listed it since zekel #144 (merged 2026-11-09).
 
 - **DECIDED: a game-drawn screen, one centered column.** `WdScreen`
-  (`apps/web/src/glue/wd/`) draws the seats, the clues, the letters laid down,
+  (`packages/word-debauchee/src/glue/` in zekel-games, installed here as `@zekel/word-debauchee/glue`) draws the seats, the clues, the letters laid down,
   the build area, the action row and the pool as a keyboard, in the brief's
   own look. There is no theme class and nothing in the side column; the
   table keeps its top bar, the caption, the log and playback. `plan()` still

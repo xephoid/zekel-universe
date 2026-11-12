@@ -87,6 +87,9 @@ importers:
       '@zekel/wire-types':
         specifier: workspace:*
         version: link:../../packages/wire-types
+      '@zekel/word-debauchee':
+        specifier: ^0.1.1
+        version: 0.1.1(@zekel/game-kit@0.1.0)(@zekel/glue-kit@packages+glue-kit)(@zekel/wire-types@packages+wire-types)(react@18.3.1)
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -973,6 +976,29 @@ packages:
 
   '@vitest/utils@2.1.9':
     resolution: {integrity: sha512-v0psaMSkNJ3A2NMrUEHFRzJtDPFn+/VWZ5WxImB21T9fjucJRmS7xCS3ppEnARb9y11OAzaD+P2Ps+b+BGX5iQ==}
+
+  '@zekel/game-kit@0.1.0':
+    resolution: {integrity: sha512-44b/ifoEuGHqOUd0i+l21pwMDu6XvGQyKzuN4vRxGtNuSZm6nGgaaVSefoFf9QKDRQ3PYEdXNpoQTICWf1U4Lg==}
+    engines: {node: '>=22.13.0'}
+
+  '@zekel/word-debauchee@0.1.1':
+    resolution: {integrity: sha512-DrYQ4Zo2JFVM4P+cda1EDBbuu61uirYa38RAGVRM+B+Tn/mkhlpZW54aZBkzADz4mVX4tdhc8QeH2JGbpkPc3g==}
+    engines: {node: '>=22.13.0'}
+    peerDependencies:
+      '@zekel/dev': ^0.1.1
+      '@zekel/game-kit': ^0.1.0
+      '@zekel/glue-kit': ^0.1.0
+      '@zekel/wire-types': ^0.1.0
+      react: ^18.3.1
+    peerDependenciesMeta:
+      '@zekel/dev':
+        optional: true
+      '@zekel/glue-kit':
+        optional: true
+      '@zekel/wire-types':
+        optional: true
+      react:
+        optional: true
 
   abstract-logging@2.0.1:
     resolution: {integrity: sha512-2BjRTZxTPvheOvGbBslFSYOUkr+SjPtOnrLP33f+VIWLzezQpZcqVg7ja3L4dBXmzzgwT+a029jRx5PCi3JuiA==}
@@ -2767,6 +2793,16 @@ snapshots:
       '@vitest/pretty-format': 2.1.9
       loupe: 3.2.1
       tinyrainbow: 1.2.0
+
+  '@zekel/game-kit@0.1.0': {}
+
+  '@zekel/word-debauchee@0.1.1(@zekel/game-kit@0.1.0)(@zekel/glue-kit@packages+glue-kit)(@zekel/wire-types@packages+wire-types)(react@18.3.1)':
+    dependencies:
+      '@zekel/game-kit': 0.1.0
+    optionalDependencies:
+      '@zekel/glue-kit': link:packages/glue-kit
+      '@zekel/wire-types': link:packages/wire-types
+      react: 18.3.1
 
   abstract-logging@2.0.1: {}
 
