@@ -1256,7 +1256,7 @@ registered, with no hidden information.
   engine hex key to flat-top axial is `(q + r, -q)`: a change of drawing
   axes, not a rule.
 - **One icon module**, generated from `AO-Icon.dc.html` by a script, the way
-  `scripts/ngg-icons.mjs` generates the NGnG icons.
+  `scripts/ngg-icons.mjs` generates the NGnG icons (into a zekel-games checkout, where the screen now lives; the script says how).
 - **Exploring is one client stage.** Pick a lit slot, turn the tile, press
   Place: one `explore` move with a slot and a rotation, both always sent.
 

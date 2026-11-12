@@ -1,11 +1,29 @@
-// Writes apps/web/src/glue/ngg/icons.gen.ts from the design canvas's icon
+// Writes Neither Guts nor Gears' icons.gen.ts from the design canvas's icon
 // registry (docs/design/neither-guts-nor-gears/icons.js), so the table draws
-// exactly the marks the canvas draws and the two cannot drift.
+// exactly the marks the canvas draws and the two cannot drift. The canvas is
+// here; the screen that uses the file is in zekel-games, so the output goes
+// into a zekel-games checkout. Run from this repo's root:
 //
-//   node scripts/ngg-icons.mjs
+//   node scripts/ngg-icons.mjs ../zekel-games/packages/neither-guts-nor-gears/src/glue/table/icons.gen.ts
+//
+// (The rulebook page there keeps a smaller hand-kept copy beside it, at
+// src/glue/icons.gen.ts; this does not write that one.)
 
 import { readFileSync, writeFileSync } from 'node:fs';
+import { resolve, sep } from 'node:path';
 import { runInNewContext } from 'node:vm';
+
+// The game's screen lives in zekel-games now, so the file this writes does
+// too. Say where: the path to icons.gen.ts in a zekel-games checkout.
+const out = process.argv[2];
+if (!out || !out.endsWith('icons.gen.ts')) {
+  console.error('usage: node scripts/ngg-icons.mjs <zekel-games>/packages/neither-guts-nor-gears/src/glue/table/icons.gen.ts');
+  process.exit(1);
+}
+if (resolve(out).startsWith(resolve('apps/web/src/glue') + sep)) {
+  console.error('apps/web/src/glue holds only the list of games; write into the zekel-games checkout.');
+  process.exit(1);
+}
 
 const src = readFileSync('docs/design/neither-guts-nor-gears/icons.js', 'utf8');
 const sandbox = { globalThis: {} };
@@ -31,5 +49,6 @@ const lines = [
   '};',
   '',
 ];
-writeFileSync('apps/web/src/glue/ngg/icons.gen.ts', lines.join('\n'));
+writeFileSync(out, lines.join('\n'));
+console.log(`wrote ${out}`);
 console.log(`${Object.keys(paths).length} marks, ${Object.keys(aliases).length} aliases`);

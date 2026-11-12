@@ -33,6 +33,10 @@ describe('Warble Way Galaxy icons', () => {
     expect(MEANINGS.habitat).toBe('ringed');
     expect(MEANINGS.pirate).toBe(MEANINGS.attacker);
     expect(ICON_FILES.skull).toBe('skull-crossed-bones.png');
+    // The full address the screen asks this site for.
+    const { container } = render(<Icon name="skull" />);
+    const st = (container.querySelector('.ww-ic') as HTMLElement).style;
+    expect(st.maskImage || st.webkitMaskImage).toMatch(/^url\("?\/art\/warble-way\/icons\/skull-crossed-bones\.png"?\)$/);
   });
   it('draws the ghost under the icon, both masked with the shape, at the asked size', () => {
     const { container } = render(<Icon name="silo" size={52} label="Ruin" />);
