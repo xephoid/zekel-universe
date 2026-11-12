@@ -269,7 +269,9 @@ export function SignInCallbackPage() {
         const { supabase } = await api.authProviders();
         if (!supabase) throw new Error('Sign-in with Discord or Google is not offered here.');
         await finishSignIn(supabase, code);
-        await session.refresh();
+        // Signed in. A failed refresh of the page's account details is no
+        // reason to say otherwise: the next page loads them again.
+        await session.refresh().catch(() => undefined);
         if (!live) return;
         let next = '/';
         try { next = sessionStorage.getItem(NEXT_KEY) ?? '/'; } catch { /* ignore */ }

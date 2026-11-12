@@ -65,7 +65,7 @@ describe('sign-in through Supabase', () => {
       const user = users.get(token);
       return user ? new Response(JSON.stringify(user), { status: 200 }) : new Response('{}', { status: 401 });
     }) as typeof fetch;
-    const check = supabaseChecker({ url: PROJECT, publishableKey: KEY, keys: createLocalJWKSet({ keys: [jwk] }), fetchFn });
+    const checker = supabaseChecker({ url: PROJECT, publishableKey: KEY, keys: createLocalJWKSet({ keys: [jwk] }), fetchFn });
     const end = supabaseSessionEnder({ url: PROJECT, publishableKey: KEY, fetchFn });
 
     database = await createDatabase(':memory:');
@@ -74,7 +74,7 @@ describe('sign-in through Supabase', () => {
     app = buildApp({
       db, engine: new FakeEngine(), mailer, secretKey: 's', appOrigin: ORIGIN, allowedOrigins: [ORIGIN],
       secureCookies: false, logger: false, adminEmails: [ADMIN],
-      supabase: { url: PROJECT, publishableKey: KEY, check, end },
+      supabase: { url: PROJECT, publishableKey: KEY, check: checker.check, verify: checker.verify, end },
     });
     await app.fastify.ready();
   });
@@ -84,10 +84,12 @@ describe('sign-in through Supabase', () => {
     await database.close();
   });
 
-  /** A token as Supabase would make it; `over` changes any claim. */
+  let sessionSeq = 0;
+  /** A token as Supabase would make it, for a new Supabase session unless
+   *  `over` names one; `over` changes any claim. */
   async function tokenFor(user: FakeUser, over: JWTPayload = {}, key: KeyPair = projectKey, alg = 'ES256'): Promise<string> {
     const nowS = Math.floor(Date.now() / 1000);
-    const token = await new SignJWT({ role: 'authenticated', is_anonymous: false, email: user.email, ...over })
+    const token = await new SignJWT({ role: 'authenticated', is_anonymous: false, email: user.email, session_id: `sess-${++sessionSeq}`, ...over })
       .setProtectedHeader({ alg, kid: 'k1' })
       .setSubject(user.id)
       .setIssuer(typeof over.iss === 'string' ? over.iss : supabaseIssuer(PROJECT))
@@ -106,8 +108,26 @@ describe('sign-in through Supabase', () => {
     return hit ? hit.split(';')[0]! : null;
   }
 
-  const complete = (accessToken: unknown, cookie?: string) => app.fastify.inject({
-    method: 'POST', url: '/api/auth/supabase/complete',
+  /** The sign-in cookie a browser gets when it starts a Discord or Google
+   *  sign-in. */
+  async function started(): Promise<string> {
+    const res = await app.fastify.inject({ method: 'POST', url: '/api/auth/supabase/start', headers: { origin: ORIGIN } });
+    expect(res.statusCode).toBe(200);
+    return cookieOf(res, 'universe_signin')!;
+  }
+
+  /** Complete a sign-in from a browser that started one (unless `start` is
+   *  false), with any other cookies it holds. */
+  const complete = async (accessToken: unknown, cookie?: string, start = true) => {
+    const cookies = [start ? await started() : null, cookie ?? null].filter(Boolean).join('; ');
+    return app.fastify.inject({
+      method: 'POST', url: '/api/auth/supabase/complete',
+      headers: { origin: ORIGIN, ...(cookies ? { cookie: cookies } : {}) }, payload: { accessToken },
+    });
+  };
+
+  const status = (accessToken: unknown, cookie?: string) => app.fastify.inject({
+    method: 'POST', url: '/api/auth/supabase/status',
     headers: { origin: ORIGIN, ...(cookie ? { cookie } : {}) }, payload: { accessToken },
   });
 
@@ -160,11 +180,62 @@ describe('sign-in through Supabase', () => {
     expect(await db.selectFrom('auth_sessions').select('id').execute()).toEqual(sessions);
   });
 
-  it('when Supabase cannot end its session, the sign-in still stands', async () => {
+  it('when Supabase cannot end its session, the sign-in still stands, and the token still signs in once only', async () => {
     endFails = true;
-    const res = await complete(await tokenFor(discordUser()));
+    const token = await tokenFor(discordUser());
+    const res = await complete(token);
     expect(res.statusCode).toBe(200);
     expect(cookieOf(res, 'universe_auth')).toBeTruthy();
+    // Supabase still knows the token, but its session has been used.
+    const sessions = await db.selectFrom('auth_sessions').select('id').execute();
+    const replay = await complete(token);
+    expect(replay.statusCode).toBe(401);
+    expect(cookieOf(replay, 'universe_auth')).toBeNull();
+    expect(await db.selectFrom('auth_sessions').select('id').execute()).toEqual(sessions);
+  });
+
+  it('two uses of one token at the same moment give one sign-in', async () => {
+    endFails = true; // nothing ends the Supabase session in between
+    const token = await tokenFor(discordUser());
+    const [a, b] = await Promise.all([complete(token), complete(token)]);
+    expect([a.statusCode, b.statusCode].sort()).toEqual([200, 401]);
+    expect(await db.selectFrom('auth_sessions').select('id').execute()).toHaveLength(1);
+    expect(await db.selectFrom('supabase_sign_ins').select('session_hash').execute()).toHaveLength(1);
+  });
+
+  it('a new token from the same Supabase session is refused too', async () => {
+    expect((await complete(await tokenFor(discordUser(), { session_id: 'sess-shared' }))).statusCode).toBe(200);
+    const again = await complete(await tokenFor(discordUser(), { session_id: 'sess-shared' }));
+    expect(again.statusCode).toBe(401);
+  });
+
+  it('a browser that did not start a sign-in here is refused before the token is looked at', async () => {
+    const res = await complete(await tokenFor(discordUser()), undefined, false);
+    expect(res.statusCode).toBe(401);
+    expect(res.json().error).toBe('sign_in_wrong_browser');
+    expect(lookups).toBe(0);
+    expect(await db.selectFrom('users').select('id').execute()).toEqual([]);
+  });
+
+  it('the sign-in cookie is spent on success', async () => {
+    const res = await complete(await tokenFor(discordUser()));
+    const set = ([] as unknown[]).concat(res.headers['set-cookie']).map(String);
+    expect(set.some((c) => c.startsWith('universe_signin=;'))).toBe(true);
+  });
+
+  it('when the answer is lost, the browser can ask whether that sign-in signed it in', async () => {
+    const token = await tokenFor(discordUser());
+    const res = await complete(token);
+    const cookie = cookieOf(res, 'universe_auth')!;
+    // Asked after Supabase has ended the session: the signature still holds.
+    expect(logouts).toEqual([token]);
+    expect((await status(token, cookie)).json()).toEqual({ signedIn: true, userId: res.json().userId });
+    // Another token, another browser, or no session: no.
+    expect((await status(await tokenFor(discordUser()), cookie)).json()).toEqual({ signedIn: false });
+    expect((await status(token)).json()).toEqual({ signedIn: false });
+    const { cookie: otherBrowser } = await emailSignIn('someone-else@example.com');
+    expect((await status(token, otherBrowser)).json()).toEqual({ signedIn: false });
+    expect((await status(await tokenFor(discordUser(), {}, otherKey), cookie)).json()).toEqual({ signedIn: false });
   });
 
   it('signing in again reaches the same account, and nothing is recorded twice', async () => {
@@ -268,6 +339,7 @@ describe('sign-in through Supabase', () => {
       users.set(t, discordUser());
       await refused(t);
     });
+    it('a token with no Supabase session id', async () => { await refused(await tokenFor(discordUser(), { session_id: undefined })); });
     it('the token is checked before Supabase is asked about the user', async () => {
       await refused(await tokenFor(discordUser(), {}, otherKey));
       expect(lookups).toBe(0);
@@ -303,6 +375,8 @@ describe('sign-in through Supabase, not set up', () => {
     expect((await app.fastify.inject({ method: 'GET', url: '/api/auth/providers' })).json()).toEqual({ supabase: null });
     const res = await app.fastify.inject({ method: 'POST', url: '/api/auth/supabase/complete', headers: { origin: ORIGIN }, payload: { accessToken: 'x' } });
     expect(res.statusCode).toBe(404);
+    expect((await app.fastify.inject({ method: 'POST', url: '/api/auth/supabase/start', headers: { origin: ORIGIN } })).statusCode).toBe(404);
+    expect((await app.fastify.inject({ method: 'POST', url: '/api/auth/supabase/status', headers: { origin: ORIGIN }, payload: { accessToken: 'x' } })).json()).toEqual({ signedIn: false });
     await app.fastify.close();
     await database.close();
   });

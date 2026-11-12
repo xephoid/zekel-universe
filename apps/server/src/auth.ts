@@ -81,6 +81,8 @@ export async function sweepExpired(db: Kysely<DB>): Promise<void> {
   const cutoff = now();
   await db.deleteFrom('sign_in_links').where('expires_at', '<', cutoff).execute();
   await db.deleteFrom('auth_sessions').where('expires_at', '<', cutoff).execute();
+  const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  await db.deleteFrom('supabase_sign_ins').where('created_at', '<', dayAgo).execute();
 }
 
 /**

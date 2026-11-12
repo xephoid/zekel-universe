@@ -79,6 +79,8 @@ export interface BuildAppOptions {
   supabase?: {
     url: string; publishableKey: string;
     check: (token: string) => Promise<SupabaseSignIn>;
+    /** Signature and claims only, for the status question. */
+    verify: (token: string) => Promise<{ subject: string; sessionId: string }>;
     /** Ends the Supabase session behind a token that has been used. */
     end: (token: string) => Promise<void>;
   } | null;
@@ -126,6 +128,12 @@ function credentialRoom(c: { kind: 'session'; tokenHash: string } | { kind: 'gue
  *  own prefix, so it never equals the link row's own token hash. */
 function linkProof(token: string): string {
   return hashToken(`signin-link:${token}`);
+}
+
+/** The same proof for a Discord or Google sign-in: which Supabase session
+ *  made this Universe session (T09). */
+function supabaseProof(sessionId: string): string {
+  return hashToken(`supabase-session:${sessionId}`);
 }
 
 const ENDED = 'Your session has ended. Sign in again.';
@@ -520,7 +528,8 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
 
   /** The end of every sign-in, whichever way the player proved who they
    *  are. `claim` runs first inside the transaction and returns the account
-   *  to sign in to, or null to refuse (nothing is then changed).
+   *  to sign in to, or null to refuse (nothing is then changed). `linkHash`
+   *  records what made the session, for the status questions.
    *
    *  The session this browser was signed in with, if any, ends here: the
    *  new cookie replaces it, and a socket still holding it (in this tab or
@@ -568,9 +577,9 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
           }
         }
 
-        // An email-link session remembers which link made it, so a browser
-        // whose answer was lost can ask whether this link signed it in
-        // (link-status below). Other sign-ins record none.
+        // The session remembers what made it (the email link, or the
+        // Supabase session), so a browser whose answer was lost can ask
+        // whether that sign-in signed it in (the two status routes).
         const sessionToken = newToken();
         await trx.insertInto('auth_sessions').values({
           id: newId(), user_id: userId, token_hash: hashToken(sessionToken), created_at: now(),
@@ -648,16 +657,34 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
     supabase: opts.supabase ? { url: opts.supabase.url, publishableKey: opts.supabase.publishableKey } : null,
   }));
 
+  // A Discord or Google sign-in begins here, before the page leaves for
+  // Supabase: this browser gets the same sign-in cookie an email link sets
+  // (one random value per browser), and completion below must present it.
+  app.post('/api/auth/supabase/start', async (req, reply) => {
+    if (!opts.supabase) return reply.code(404).send({ error: 'not_offered' });
+    const held = req.cookies[signinCookieName];
+    const nonce = isWellFormedNonce(held) ? held : newToken();
+    reply.setCookie(signinCookieName, nonce, { ...signinCookieOptions, maxAge: Math.floor(LINK_TTL_MS / 1000) });
+    return { ok: true };
+  });
+
   // Sign-in with Discord or Google (T09). The browser has been to Discord or
   // Google through Supabase and traded Supabase's one-time code for an
-  // access token (PKCE, so only in the browser that began the sign-in). The
-  // token is checked first (supabaseAuth.ts): a refusal changes nothing,
-  // not this browser's session, its guest seats or its sockets. Then the
-  // sign-in ends as an email link's does (finishSignIn).
+  // access token (PKCE, so only in the browser that began the sign-in).
+  // Refused before anything changes: a browser that did not start a sign-in
+  // here (no sign-in cookie), and a token that fails the check
+  // (supabaseAuth.ts). A Supabase session signs in once only: its row in
+  // supabase_sign_ins is written in the same transaction as the Universe
+  // session, so two uses of one token, at once or one after the other, give
+  // one sign-in. Then the sign-in ends as an email link's does (finishSignIn).
   app.post('/api/auth/supabase/complete', async (req, reply) => {
     if (!opts.supabase) return reply.code(404).send({ error: 'not_offered' });
     if (!supabaseIpLimiter.allow(`ip:${clientIp(req)}`)) {
       return reply.code(429).send({ error: 'too_many_requests', message: 'Try again in a few minutes.' });
+    }
+    const refused = () => reply.code(401).send({ error: 'sign_in_refused', message: 'That sign-in did not work. Try again.' });
+    if (!isWellFormedNonce(req.cookies[signinCookieName])) {
+      return reply.code(401).send({ error: 'sign_in_wrong_browser', message: 'Start the sign-in again in this browser.' });
     }
     const body = (req.body ?? {}) as { accessToken?: unknown };
     const token = typeof body.accessToken === 'string' ? body.accessToken : '';
@@ -666,19 +693,60 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
       who = await opts.supabase.check(token);
     } catch (e) {
       req.log.warn({ reason: e instanceof SupabaseTokenError ? e.reason : 'error' }, 'supabase sign-in refused');
-      return reply.code(401).send({ error: 'sign_in_refused', message: 'That sign-in did not work. Try again.' });
+      return refused();
     }
-    const outcome = await finishSignIn(req, reply, null, (trx) => findOrCreateSupabaseUser(trx, who));
-    if (!outcome) return reply.code(401).send({ error: 'sign_in_refused', message: 'That sign-in did not work. Try again.' });
-    // The token has done its job: end its Supabase session so it cannot sign
-    // anyone in again. A failure here does not undo this sign-in; the token
-    // is then refused by the five-minute age limit instead.
+    const sessionHash = hashToken(who.sessionId);
+    const used = () => db.selectFrom('supabase_sign_ins').select('session_hash').where('session_hash', '=', sessionHash).executeTakeFirst();
+    if (await used()) return refused();
+    let outcome: { userId: string } | null;
+    try {
+      outcome = await finishSignIn(req, reply, supabaseProof(who.sessionId), async (trx) => {
+        const userId = await findOrCreateSupabaseUser(trx, who);
+        // A second use of this Supabase session fails here, on the primary
+        // key, and the whole transaction with it.
+        await trx.insertInto('supabase_sign_ins').values({ session_hash: sessionHash, user_id: userId, created_at: now() }).execute();
+        return userId;
+      });
+    } catch (e) {
+      if (await used()) return refused(); // another use of the same session won
+      throw e;
+    }
+    if (!outcome) return refused();
+    reply.clearCookie(signinCookieName, { path: '/' });
+    // The token has done its job; ending its Supabase session too means the
+    // token stops working at Supabase as well. A failure here does not undo
+    // this sign-in, and the session's row above already refuses a second
+    // sign-in with it.
     try {
       await opts.supabase.end(token);
     } catch (e) {
       req.log.warn({ reason: e instanceof SupabaseTokenError ? e.reason : 'error' }, 'supabase session not ended');
     }
     return { ok: true, userId: outcome.userId };
+  });
+
+  // Did this Discord or Google sign-in sign this browser in? Asked by the
+  // callback page when the completion's answer was lost. Only the token's
+  // signature and claims are checked (its Supabase session may be ended
+  // already), and the answer is yes only when this browser's session was
+  // made by that token's Supabase session. It changes nothing.
+  app.post('/api/auth/supabase/status', async (req) => {
+    if (!opts.supabase) return { signedIn: false };
+    const body = (req.body ?? {}) as { accessToken?: unknown };
+    const token = typeof body.accessToken === 'string' ? body.accessToken : '';
+    const authToken = req.cookies[AUTH_COOKIE];
+    if (!token || !authToken) return { signedIn: false };
+    let sessionId: string;
+    try {
+      ({ sessionId } = await opts.supabase.verify(token));
+    } catch {
+      return { signedIn: false };
+    }
+    const session = await db.selectFrom('auth_sessions').select(['user_id', 'expires_at', 'link_hash'])
+      .where('token_hash', '=', hashToken(authToken)).executeTakeFirst();
+    const live = session && new Date(session.expires_at).getTime() > Date.now();
+    if (!live || session.link_hash !== supabaseProof(sessionId)) return { signedIn: false };
+    return { signedIn: true, userId: session.user_id };
   });
 
   // Did this link sign this browser in? Asked by the landing page when the

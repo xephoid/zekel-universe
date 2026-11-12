@@ -3,8 +3,11 @@
 // only the one-time code, takes it out of the address bar, trades it once
 // and moves on; a cancelled or failed sign-in says so and goes nowhere.
 // The trip itself (supabaseSignIn.ts) is checked with Supabase's library
-// stood in for: PKCE, nothing read from the address bar by the library,
-// and Supabase's session ended after the server has answered.
+// stood in for: its settings (PKCE, nothing read from the address bar), the
+// code traded once, Supabase's session (this one only) ended after the
+// server has answered, and a lost answer settled by asking the server.
+// That a second browser cannot trade the code is Supabase's PKCE check: it
+// needs a real Supabase project and is not covered here.
 
 import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest';
 import { StrictMode } from 'react';
@@ -85,14 +88,29 @@ describe('the sign-in page', () => {
 });
 
 describe('the callback page', () => {
-  it('trades the code once, clears the address bar and goes where the player was going', async () => {
+  it('hands the code to the trip, clears the address bar and goes where the player was going', async () => {
     stubServer(CFG);
     sessionStorage.setItem('universe:signin:next', '/tables');
     window.history.replaceState(null, '', '/auth/callback?code=one-time&state=x');
     renderAt('/auth/callback', <SignInCallbackPage />, '/auth/callback');
     expect(await screen.findByText('tables page')).toBeTruthy();
-    expect(new Set(trip.finishSignIn.mock.calls.map((c) => JSON.stringify(c)))).toEqual(new Set([JSON.stringify([CFG, 'one-time'])]));
+    // React's development double run calls it at most twice, always with the
+    // code; the trip itself trades a code once (tested below, unmocked).
+    expect(trip.finishSignIn.mock.calls.length).toBeGreaterThanOrEqual(1);
+    expect(trip.finishSignIn.mock.calls.length).toBeLessThanOrEqual(2);
+    for (const call of trip.finishSignIn.mock.calls) expect(call).toEqual([CFG, 'one-time']);
     expect(window.location.search).toBe('');
+  });
+
+  it('a failed refresh of the account details after signing in still moves on', async () => {
+    vi.stubGlobal('fetch', vi.fn((input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url === '/api/auth/providers') return json({ supabase: CFG });
+      return Promise.reject(new TypeError('network down'));
+    }));
+    window.history.replaceState(null, '', '/auth/callback?code=c');
+    renderAt('/auth/callback', <SignInCallbackPage />, '/auth/callback');
+    expect(await screen.findByText('home page')).toBeTruthy();
   });
 
   it('never goes to another site afterwards', async () => {
@@ -148,17 +166,27 @@ describe('the trip (supabaseSignIn.ts)', () => {
   }));
 
   let posted: unknown[];
+  let calls: string[];
   beforeEach(() => {
     posted = [];
+    calls = [];
     sb.exchange.mockReset();
     sb.signOut.mockClear();
-    sb.signInWithOAuth.mockClear();
+    sb.signInWithOAuth.mockReset();
+    sb.signInWithOAuth.mockImplementation(async () => { calls.push('supabase:signInWithOAuth'); return { error: null }; });
   });
 
-  function stubComplete(status: number) {
+  /** The server: completion answers `status` (0: the answer is lost), and
+   *  the status question answers `made`. */
+  function stubComplete(status: number, made = false) {
     vi.stubGlobal('fetch', vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
-      if (String(input) === '/api/auth/supabase/complete') {
+      const url = String(input);
+      calls.push(url);
+      if (url === '/api/auth/supabase/start') return json({ ok: true });
+      if (url === '/api/auth/supabase/status') return json({ signedIn: made });
+      if (url === '/api/auth/supabase/complete') {
         posted.push(JSON.parse(String(init?.body)));
+        if (status === 0) return Promise.reject(new TypeError('network down'));
         return status === 200 ? json({ ok: true, userId: 'u' }) : json({ error: 'sign_in_refused', message: 'That sign-in did not work. Try again.' }, status);
       }
       return json({ error: 'not_found' }, 404);
@@ -167,7 +195,10 @@ describe('the trip (supabaseSignIn.ts)', () => {
 
   it('uses PKCE, reads nothing from the address bar itself, and keeps its secret in this tab only', async () => {
     const real = await vi.importActual<typeof import('../supabaseSignIn')>('../supabaseSignIn');
+    stubComplete(200);
     await real.startSignIn(CFG, 'google', '/');
+    // The browser gets the server's sign-in cookie before it leaves.
+    expect(calls).toEqual(['/api/auth/supabase/start', 'supabase:signInWithOAuth']);
     expect(sb.options.at(-1)).toMatchObject({
       url: 'https://p.supabase.co/auth/v1', flowType: 'pkce', detectSessionInUrl: false,
       autoRefreshToken: false, storage: window.sessionStorage, headers: { apikey: CFG.publishableKey },
@@ -183,6 +214,42 @@ describe('the trip (supabaseSignIn.ts)', () => {
     expect(sb.exchange).toHaveBeenCalledWith('code-1');
     expect(posted).toEqual([{ accessToken: 'tok' }]);
     expect(sb.signOut).toHaveBeenCalledTimes(1);
+    // This Supabase session only, never the player's others.
+    expect(sb.signOut).toHaveBeenCalledWith({ scope: 'local' });
+  });
+
+  it('trades a code once, even when asked twice at the same moment', async () => {
+    const real = await vi.importActual<typeof import('../supabaseSignIn')>('../supabaseSignIn');
+    stubComplete(200);
+    sb.exchange.mockResolvedValue({ data: { session: { access_token: 'tok' } }, error: null });
+    await Promise.all([real.finishSignIn(CFG, 'code-twice'), real.finishSignIn(CFG, 'code-twice')]);
+    expect(sb.exchange).toHaveBeenCalledTimes(1);
+    expect(posted).toEqual([{ accessToken: 'tok' }]);
+  });
+
+  it('a lost answer, when the server says this sign-in did sign the browser in, is a success', async () => {
+    const real = await vi.importActual<typeof import('../supabaseSignIn')>('../supabaseSignIn');
+    stubComplete(0, true);
+    sb.exchange.mockResolvedValue({ data: { session: { access_token: 'tok' } }, error: null });
+    await expect(real.finishSignIn(CFG, 'code-lost')).resolves.toBeUndefined();
+    expect(calls).toContain('/api/auth/supabase/status');
+  });
+
+  it('a lost answer, when the server says it did not, says the server could not be reached', async () => {
+    const real = await vi.importActual<typeof import('../supabaseSignIn')>('../supabaseSignIn');
+    stubComplete(0, false);
+    sb.exchange.mockResolvedValue({ data: { session: { access_token: 'tok' } }, error: null });
+    await expect(real.finishSignIn(CFG, 'code-lost-2')).rejects.toThrow(/could not reach the server/);
+  });
+
+  it('a sign-out error from Supabase does not undo the sign-in', async () => {
+    const real = await vi.importActual<typeof import('../supabaseSignIn')>('../supabaseSignIn');
+    stubComplete(200);
+    sb.exchange.mockResolvedValue({ data: { session: { access_token: 'tok' } }, error: null });
+    sb.signOut.mockImplementationOnce(async () => ({ error: { message: 'session not found' } }) as never);
+    await expect(real.finishSignIn(CFG, 'code-so')).resolves.toBeUndefined();
+    sb.signOut.mockImplementationOnce(async () => { throw new Error('network'); });
+    await expect(real.finishSignIn(CFG, 'code-so-2')).resolves.toBeUndefined();
   });
 
   it('ends Supabase\'s session even when the server refuses, and reports the refusal', async () => {

@@ -38,7 +38,10 @@ async function main(): Promise<void> {
     clientIpHeader: config.clientIpHeader,
     adminEmails: config.adminEmails,
     supabase: config.supabase
-      ? { ...config.supabase, check: supabaseChecker(config.supabase), end: supabaseSessionEnder(config.supabase) }
+      ? (() => {
+          const checker = supabaseChecker(config.supabase);
+          return { ...config.supabase, check: checker.check, verify: checker.verify, end: supabaseSessionEnder(config.supabase) };
+        })()
       : null,
   });
 

@@ -15,7 +15,9 @@ everything it already has: its own accounts, its own sign-in cookie
 limits per IP address. The security work in T34, T35 and T36 stays as it is.
 
 1. The sign-in page gets two buttons, "Sign in with Discord" and "Sign in with
-   Google", shown only when the server offers them. Each calls Supabase's
+   Google", shown only when the server offers them. A button first asks the
+   server for its sign-in cookie (`POST /api/auth/supabase/start`, the same
+   cookie an email link sets), which completion requires. Then it calls Supabase's
    sign-in library (`@supabase/auth-js`, `signInWithOAuth`, PKCE flow), which
    sends the player to Discord or Google and back to a new page,
    `/auth/callback`, with a one-time code.
@@ -26,21 +28,30 @@ limits per IP address. The security work in T34, T35 and T36 stays as it is.
 3. The server checks the token against the Supabase project's public keys
    (the `jose` library, the project's JWKS address, issuer
    `https://<project>.supabase.co/auth/v1`, audience `authenticated`, not
-   expired, made in the last five minutes, not anonymous). Then it asks
+   expired, made in the last five minutes, not anonymous, with a Supabase
+   session id). Then it asks
    Supabase for its record of the user (`GET /auth/v1/user`) for the email and
    whether it is confirmed: the token's own `user_metadata` can be edited by
    the user, so it is never trusted for that.
 4. It finds or makes the Universe account with identity provider `supabase`,
-   subject = the Supabase user id. The `identities` table already fits, with
-   its unique index on (provider, subject), so **no database change is
-   needed** and no version number can clash with T06's version 8.
-5. The rest is what `/api/auth/email/complete` does now, in one transaction:
+   subject = the Supabase user id, in the existing `identities` table.
+5. **A Supabase session signs in once.** The session id's hash goes into a new
+   table, `supabase_sign_ins` (database version 9, after T06's 8), in the same
+   transaction that makes the Universe session. A second use of the same
+   token, at the same moment or later, fails there and changes nothing. Rows
+   are cleared after a day.
+6. The rest is what `/api/auth/email/complete` does now, in one transaction:
    end the browser's old session, move a guest's seats, tables and
    notifications to the account, issue the `universe_auth` cookie, cut the old
    sockets. That code moves into one shared "finish sign-in" function that
    both routes call.
-6. The browser then signs out of Supabase straight away. The Universe cookie
-   is the only sign-in that counts.
+7. The server then ends that Supabase session (`POST /auth/v1/logout`, this
+   session only), and so does the browser (`signOut({ scope: 'local' })`):
+   the player's Supabase sessions elsewhere are left alone. The Universe
+   cookie is the only sign-in that counts.
+8. If the server's answer is lost, the page asks
+   `POST /api/auth/supabase/status` whether this browser's session was made
+   by that token's Supabase session, as the email link's landing page does.
 
 The only new thing the server trusts is "a token signed by our Supabase
 project". Signing keys must be the newer asymmetric kind (the project setting
@@ -103,7 +114,11 @@ Discord and Google are live.
 4. Done: settings, `render.yaml`, `.env.example`, deploy notes.
 5. Done: security review, `docs/security-reviews/2026-11-12-e03e446-change.md`.
    It found one problem, fixed: a used token could sign in again for five
-   minutes; the server now ends its Supabase session once it is used.
+   minutes.
+6. Done: fixes from Codex's review (four findings): a Supabase session signs
+   in once (version 9 table); the sign-in cookie; the browser ends only its
+   own Supabase session; the status question for a lost answer; and tests
+   that prove what they claim. The review is updated to match.
 
 Then a real sign-in with Discord and with Google on staging. That needs the
 setup above done first.

@@ -26,6 +26,8 @@ import { createRemoteJWKSet, jwtVerify, type JWTVerifyGetKey } from 'jose';
 export interface SupabaseSignIn {
   /** Supabase's user id: the identity's subject in Universe. */
   subject: string;
+  /** The Supabase session the token belongs to: it signs in once only. */
+  sessionId: string;
   /** The email, lower case, only when Supabase has it confirmed. */
   confirmedEmail: string | null;
   /** A name to start the account with, from Discord or Google. */
@@ -58,14 +60,24 @@ export function supabaseIssuer(url: string): string {
   return `${url.replace(/\/$/, '')}/auth/v1`;
 }
 
+export interface SupabaseChecker {
+  /** The whole check, for signing in: the signature and claims (fresh, made
+   *  in the last few minutes), then Supabase's own record of the user. */
+  check(token: string): Promise<SupabaseSignIn>;
+  /** The signature and claims only, with no age limit beyond expiry and no
+   *  call to Supabase: for asking afterwards whether a token's sign-in
+   *  signed this browser in. */
+  verify(token: string): Promise<{ subject: string; sessionId: string }>;
+}
+
 /** Returns a checker for this project's tokens. */
-export function supabaseChecker(opts: SupabaseAuthOptions): (token: string) => Promise<SupabaseSignIn> {
+export function supabaseChecker(opts: SupabaseAuthOptions): SupabaseChecker {
   const issuer = supabaseIssuer(opts.url);
   const keys = opts.keys ?? createRemoteJWKSet(new URL(`${issuer}/.well-known/jwks.json`));
   const fetchFn = opts.fetchFn ?? fetch;
   const maxTokenAge = opts.maxTokenAgeS ?? DEFAULT_MAX_TOKEN_AGE_S;
 
-  return async (token: string) => {
+  async function claims(token: string, fresh: boolean): Promise<{ subject: string; sessionId: string }> {
     if (!token || token.length > 8192) throw new SupabaseTokenError('missing_or_oversized');
     let payload;
     try {
@@ -73,15 +85,21 @@ export function supabaseChecker(opts: SupabaseAuthOptions): (token: string) => P
         issuer,
         audience: 'authenticated',
         algorithms: ['ES256', 'RS256'],
-        maxTokenAge,
-        requiredClaims: ['sub', 'exp', 'iat'],
+        ...(fresh ? { maxTokenAge } : {}),
+        requiredClaims: ['sub', 'exp', 'iat', 'session_id'],
       }));
     } catch (e) {
       throw new SupabaseTokenError(`token_rejected: ${(e as { code?: string }).code ?? 'unknown'}`);
     }
     if (payload['role'] !== 'authenticated') throw new SupabaseTokenError('not_authenticated_role');
     if (payload['is_anonymous'] === true) throw new SupabaseTokenError('anonymous_user');
-    const subject = payload.sub!;
+    const sessionId = payload['session_id'];
+    if (typeof sessionId !== 'string' || !sessionId) throw new SupabaseTokenError('no_session_id');
+    return { subject: payload.sub!, sessionId };
+  }
+
+  async function check(token: string): Promise<SupabaseSignIn> {
+    const { subject, sessionId } = await claims(token, true);
 
     // Supabase's own record of the user: the confirmed email lives here.
     let res: Response;
@@ -102,10 +120,13 @@ export function supabaseChecker(opts: SupabaseAuthOptions): (token: string) => P
     const confirmed = !!email && typeof user.email_confirmed_at === 'string' && user.email_confirmed_at !== '';
     return {
       subject,
+      sessionId,
       confirmedEmail: confirmed ? email : null,
       displayName: displayNameOf(user),
     };
-  };
+  }
+
+  return { check, verify: (token) => claims(token, false) };
 }
 
 interface SupabaseUserRecord {

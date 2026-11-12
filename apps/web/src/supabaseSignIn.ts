@@ -6,14 +6,15 @@
 // this tab's sessionStorage, and only that secret can trade the one-time code
 // Discord or Google send back for a token. So a code mailed to someone else
 // cannot sign their browser in. Tokens in the address bar (the older
-// "implicit" flow) are never read. Supabase's own session is ended as soon
-// as the server has signed the player in: Universe's cookie is the only
-// sign-in that counts.
+// "implicit" flow) are never read. Before leaving, the browser also gets the
+// server's sign-in cookie, which completion requires. Supabase's own session
+// (this one only) is ended once the server has answered: Universe's cookie
+// is the only sign-in that counts.
 //
 // Supabase's library loads only when someone uses one of these buttons.
 
 import type { GoTrueClient } from '@supabase/auth-js';
-import { api } from './api';
+import { api, ApiRequestError } from './api';
 
 export type SignInProvider = 'discord' | 'google';
 
@@ -44,6 +45,7 @@ async function clientFor(cfg: SupabaseConfig): Promise<GoTrueClient> {
 /** Start the trip to Discord or Google. The page leaves for Supabase. */
 export async function startSignIn(cfg: SupabaseConfig, provider: SignInProvider, next: string): Promise<void> {
   try { sessionStorage.setItem(NEXT_KEY, next); } catch { /* ignore */ }
+  await api.startSupabaseSignIn();
   const auth = await clientFor(cfg);
   const { error } = await auth.signInWithOAuth({
     provider,
@@ -56,21 +58,31 @@ export async function startSignIn(cfg: SupabaseConfig, provider: SignInProvider,
  *  waits on the first rather than trading the code twice. */
 let inFlight: { code: string; run: Promise<void> } | null = null;
 
+const REFUSED = 'That sign-in did not work. Try again.';
+const UNREACHABLE = 'We could not reach the server to finish signing you in. Check your connection and sign in again.';
+
 /** Trade the one-time code for Supabase's token, have the server sign the
- *  player in, then end Supabase's own session. Throws on any failure. */
+ *  player in, then end Supabase's own session. When the server's answer is
+ *  lost or refused, ask it whether this sign-in signed this browser in after
+ *  all (an earlier answer may have been lost); only that counts. Throws on
+ *  any other failure. */
 export function finishSignIn(cfg: SupabaseConfig, code: string): Promise<void> {
   if (inFlight?.code === code) return inFlight.run;
   const run = (async () => {
     const auth = await clientFor(cfg);
     const { data, error } = await auth.exchangeCodeForSession(code);
-    if (error || !data.session) throw new Error('That sign-in did not work. Try again.');
+    if (error || !data.session) throw new Error(REFUSED);
+    const token = data.session.access_token;
     try {
-      await api.completeSupabaseSignIn(data.session.access_token);
+      await api.completeSupabaseSignIn(token);
+    } catch (e) {
+      const made = await api.supabaseSignInStatus(token).then((r) => r.signedIn === true, () => false);
+      if (!made) throw new Error(e instanceof ApiRequestError && e.status < 500 ? REFUSED : UNREACHABLE);
     } finally {
-      // Supabase's session is not needed either way; ending it on Supabase
-      // too means the token it holds stops working. A failure here does not
-      // undo the Universe sign-in.
-      await auth.signOut().catch(() => undefined);
+      // This Supabase session is not needed either way. Only this one: the
+      // player's sessions elsewhere are left alone. Its result does not
+      // change the Universe sign-in, so an error is ignored.
+      await auth.signOut({ scope: 'local' }).then(() => undefined, () => undefined);
     }
   })();
   inFlight = { code, run };

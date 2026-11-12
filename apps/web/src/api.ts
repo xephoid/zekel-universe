@@ -43,7 +43,11 @@ export const api = {
   signOut: () => post<{ ok: true }>('/api/auth/signout'),
   /** Other ways to sign in this server offers (Discord and Google, through Supabase). */
   authProviders: () => req<{ supabase: { url: string; publishableKey: string } | null }>('/api/auth/providers'),
+  /** Before leaving for Discord or Google: this browser gets its sign-in cookie. */
+  startSupabaseSignIn: () => post<{ ok: true }>('/api/auth/supabase/start'),
   completeSupabaseSignIn: (accessToken: string) => post<{ ok: true; userId: string }>('/api/auth/supabase/complete', { accessToken }),
+  /** Was this browser's current session made by this Supabase token's sign-in? Changes nothing. */
+  supabaseSignInStatus: (accessToken: string) => post<{ signedIn: boolean; userId?: string }>('/api/auth/supabase/status', { accessToken }),
 
   games: () => req<GamesResponse>('/api/games'),
   game: (id: string) => req<GameResponse>(`/api/games/${encodeURIComponent(id)}`),
