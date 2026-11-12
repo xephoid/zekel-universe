@@ -20,25 +20,36 @@ import { ProfilePage } from './pages/Profile';
 import { SignInPage, SignInCompletePage, SignInCallbackPage } from './pages/SignIn';
 import { GalleryPage } from './pages/Gallery';
 import { NotFoundPage } from './pages/NotFound';
+import { PrivacyPolicyPage, TermsOfServicePage, WithFooter } from './pages/Legal';
 
 const router = createBrowserRouter([
-  { path: '/', element: <HomePage /> },
-  { path: '/games/:id', element: <GamePage /> },
-  { path: '/games/:id/setup', element: <SetupPage /> },
-  { path: '/games/:id/rules', element: <RulesPage /> },
-  { path: '/tables', element: <MyTablesPage /> },
-  { path: '/designers', element: <DesignersPage /> },
-  { path: '/designers/:slug', element: <DesignerPage /> },
-  { path: '/table/:id/watch', element: <WatchPage /> },
-  { path: '/table/:id/lobby', element: <LobbyPage /> },
+  // Every page but the game table carries the site footer.
+  {
+    element: <WithFooter />,
+    children: [
+      { path: '/', element: <HomePage /> },
+      { path: '/games/:id', element: <GamePage /> },
+      { path: '/games/:id/setup', element: <SetupPage /> },
+      { path: '/games/:id/rules', element: <RulesPage /> },
+      { path: '/tables', element: <MyTablesPage /> },
+      { path: '/designers', element: <DesignersPage /> },
+      { path: '/designers/:slug', element: <DesignerPage /> },
+      { path: '/table/:id/watch', element: <WatchPage /> },
+      { path: '/table/:id/lobby', element: <LobbyPage /> },
+      { path: '/profile', element: <ProfilePage /> },
+      { path: '/signin', element: <SignInPage /> },
+      { path: '/signin/complete', element: <SignInCompletePage /> },
+      { path: '/auth/callback', element: <SignInCallbackPage /> },
+      { path: '/gallery', element: <GalleryPage /> },
+      { path: '/privacy_policy', element: <PrivacyPolicyPage /> },
+      { path: '/terms_of_service', element: <TermsOfServicePage /> },
+      // The admin page loads on its own: players never download it.
+      { path: '/admin', lazy: () => import('./pages/Admin').then((m) => ({ Component: m.AdminPage })) },
+      { path: '*', element: <NotFoundPage /> },
+    ],
+  },
+  // The table fills the screen: no footer.
   { path: '/table/:id', element: <TablePage /> },
-  { path: '/profile', element: <ProfilePage /> },
-  { path: '/signin', element: <SignInPage /> },
-  { path: '/signin/complete', element: <SignInCompletePage /> },
-  { path: '/auth/callback', element: <SignInCallbackPage /> },
-  { path: '/gallery', element: <GalleryPage /> },
-  // The admin page loads on its own: players never download it.
-  { path: '/admin', lazy: () => import('./pages/Admin').then((m) => ({ Component: m.AdminPage })) },
   // Development only: captured NGnG views, drawn without a game. Loaded
   // lazily inside the dev-only branch, so a production build drops the page
   // and every captured view with it.
@@ -49,7 +60,6 @@ const router = createBrowserRouter([
         { path: '/dev/ww', lazy: () => import('./pages/DevWw').then((m) => ({ Component: m.DevWwPage })) },
       ]
     : []),
-  { path: '*', element: <NotFoundPage /> },
 ]);
 
 // The theme follows the OS unless the person picked one in settings.
