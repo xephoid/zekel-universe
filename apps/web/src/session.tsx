@@ -4,6 +4,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { MeResponse } from '@universe/shared';
 import { api, ensurePrincipal } from './api';
+import { identifyUser } from './analytics';
 
 interface SessionValue {
   me: MeResponse | null;
@@ -36,6 +37,12 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => { void refresh(); }, [refresh]);
+
+  // Analytics knows a signed-in player by account id only; a guest stays
+  // anonymous. Waits for the first answer, so a reload does not look like a
+  // sign-out.
+  const userId = me?.user?.id ?? null;
+  useEffect(() => { if (!loading) identifyUser(userId); }, [loading, userId]);
 
   const value = useMemo<SessionValue>(() => ({
     me, loading, error, refresh,

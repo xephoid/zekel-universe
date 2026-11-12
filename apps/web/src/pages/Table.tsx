@@ -18,6 +18,7 @@ import { useTable } from '../table/useTable';
 import { ActionBar, CaptionWords, CardUpClose, LessonNote, EndPanel, Log, MoveChooser, MoveMenuList, NoticeToast, findCard, lessonsOf, type Lesson, type Notice, Notices } from '../table/parts';
 import { usePhone } from '../table/phone';
 import { api } from '../api';
+import { track } from '../analytics';
 import { useSession } from '../session';
 import { Wordmark } from '../ui';
 
@@ -301,6 +302,24 @@ export function TablePage() {
       setPlayAgainBusy(false);
     }
   }, [table, t.mySeat, nav]);
+
+  // Analytics: a game that ends while this page is open, counted once. A
+  // finished table opened later is not counted again.
+  const sawPlay = useRef(false);
+  const finishSent = useRef(false);
+  useEffect(() => {
+    if (!current || !table) return;
+    if (!current.gameOver) { sawPlay.current = true; return; }
+    if (!sawPlay.current || finishSent.current) return;
+    finishSent.current = true;
+    track('game_finished', {
+      game: table.table.gameId,
+      mode: table.table.mode,
+      seats: table.seats.length,
+      ai_seats: table.seats.filter((s) => s.kind === 'ai').length,
+      table_id: table.table.id,
+    });
+  }, [current, table]);
 
   const result = current?.gameOver ?? table?.table.status === 'finished' ? (current?.gameOver ?? null) : null;
   // What the card says, in one place: the card cuts it to a few lines and the
