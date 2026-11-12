@@ -3,7 +3,8 @@
 Plan for T09, written 2026-11-12 while T06 (the admin page) finished, and
 kept up to date as it was built. Decision D5: Supabase Auth, Discord and
 Google first, email sign-in link second. Code: `apps/server/src/supabaseAuth.ts`
-(the token check), `finishSignIn` and the two routes in `apps/server/src/app.ts`,
+(Supabase's PKCE flow and the token check), `finishSignIn` and the
+`/api/auth/supabase/*` routes in `apps/server/src/app.ts`,
 `apps/web/src/supabaseSignIn.ts` and the callback page in
 `apps/web/src/pages/SignIn.tsx`.
 
@@ -14,49 +15,55 @@ everything it already has: its own accounts, its own sign-in cookie
 (`universe_auth`), guests and their seats, socket checks, sign-out, and the
 limits per IP address. The security work in T34, T35 and T36 stays as it is.
 
-1. The sign-in page gets two buttons, "Sign in with Discord" and "Sign in with
-   Google", shown only when the server offers them. A button first asks the
-   server for its sign-in cookie (`POST /api/auth/supabase/start`, the same
-   cookie an email link sets), which completion requires. Then it calls Supabase's
-   sign-in library (`@supabase/auth-js`, `signInWithOAuth`, PKCE flow), which
-   sends the player to Discord or Google and back to a new page,
-   `/auth/callback`, with a one-time code.
-2. That page trades the code for Supabase's access token (only this browser
-   can: it holds the PKCE secret from step 1) and sends the token to a new
-   server route, `POST /api/auth/supabase/complete`. A token in the address
-   bar is never read.
-3. The server checks the token against the Supabase project's public keys
-   (the `jose` library, the project's JWKS address, issuer
+**The server runs Supabase's PKCE flow itself, so no Supabase token ever
+reaches the browser,** and the browser needs no Supabase library.
+
+1. The sign-in page shows "Sign in with Discord" and "Sign in with Google"
+   when `GET /api/auth/providers` lists them.
+2. A button calls `POST /api/auth/supabase/start`. The server makes a PKCE
+   secret, keeps it in this browser in an HttpOnly cookie (`universe_oauth`,
+   ten minutes; page scripts cannot read it), and answers with Supabase's
+   authorize address, which carries only the secret's hash. The page goes
+   there.
+3. Discord or Google send the player back through Supabase to `/auth/callback`
+   with a one-time code. The page clears it from the address bar and sends it
+   to `POST /api/auth/supabase/complete`. A token in the address bar is never
+   read.
+4. The server trades the code and the cookie's secret for Supabase's tokens
+   (`POST /auth/v1/token?grant_type=pkce`). Supabase accepts a code once, and
+   only with the secret whose hash it was issued for, so a code is useless in
+   any other browser.
+5. The server checks the access token anyway: the project's public key (the
+   `jose` library, ES256 or RS256 only), issuer
    `https://<project>.supabase.co/auth/v1`, audience `authenticated`, not
-   expired, made in the last five minutes, not anonymous, with a Supabase
-   session id). Then it asks
+   expired, made in the last five minutes, not anonymous. Then it asks
    Supabase for its record of the user (`GET /auth/v1/user`) for the email and
    whether it is confirmed: the token's own `user_metadata` can be edited by
    the user, so it is never trusted for that.
-4. It finds or makes the Universe account with identity provider `supabase`,
-   subject = the Supabase user id, in the existing `identities` table.
-5. **A Supabase session signs in once.** The session id's hash goes into a new
-   table, `supabase_sign_ins` (database version 9, after T06's 8), in the same
-   transaction that makes the Universe session. A second use of the same
-   token, at the same moment or later, fails there and changes nothing. Rows
-   are cleared after a day.
-6. The rest is what `/api/auth/email/complete` does now, in one transaction:
-   end the browser's old session, move a guest's seats, tables and
-   notifications to the account, issue the `universe_auth` cookie, cut the old
-   sockets. That code moves into one shared "finish sign-in" function that
-   both routes call.
-7. The server then ends that Supabase session (`POST /auth/v1/logout`, this
-   session only), and so does the browser (`signOut({ scope: 'local' })`):
-   the player's Supabase sessions elsewhere are left alone. The Universe
-   cookie is the only sign-in that counts.
-8. If the server's answer is lost, the page asks
-   `POST /api/auth/supabase/status` whether this browser's session was made
-   by that token's Supabase session, as the email link's landing page does.
+6. It finds or makes the Universe account (identity provider `supabase`,
+   subject = the Supabase user id, in the existing `identities` table) and
+   ends the sign-in as an email link does, in one transaction: end the
+   browser's old session, move a guest's seats, tables and notifications to
+   the account, issue the `universe_auth` cookie, cut the old sockets. That
+   code is one shared function, `finishSignIn`, used by both routes.
+7. The server ends that Supabase session (`POST /auth/v1/logout`, this
+   session only), which ends its refresh token too, and drops the tokens.
+   They were never sent anywhere.
+8. The page then loads the next page afresh, so every part of the app starts
+   again as the new account.
+9. If the server's answer is lost, the page asks
+   `POST /api/auth/supabase/status` whether this browser's session was made by
+   that code, as the email link's landing page does. If the cookie itself was
+   lost on the way, there is no session to find, and the player clicks the
+   button again.
 
-The only new thing the server trusts is "a token signed by our Supabase
-project". Signing keys must be the newer asymmetric kind (the project setting
-"JWT signing keys"): with the old shared secret there are no public keys to
-check against.
+Signing keys must be the newer asymmetric kind (the project setting "JWT
+signing keys"): with the old shared secret there are no public keys, and
+every sign-in is refused.
+
+The email link's own cookie (`universe_signin`) is separate and untouched:
+a pending email link and a Discord or Google sign-in in the same browser do
+not interfere.
 
 ## Existing accounts and the admin page
 
@@ -78,13 +85,11 @@ Discord and Google are live.
 ## Settings
 
 - `SUPABASE_URL` (the project address) and `SUPABASE_PUBLISHABLE_KEY`, both
-  or neither, on the server only. The sign-in page gets them from
-  `GET /api/auth/providers` while running, so the same build works on
-  staging and production. The publishable key is public by design.
+  or neither, on the server only; the browser never needs either. The
+  publishable key is public by design. No Supabase secret key is used.
 - Listed in `render.yaml` (typed into Render) and `.env.example`. Values live
   in Render, never in the repository.
-- The page's security policy (`connect-src`) gains the project address when
-  it is set.
+- No database change, and no change to the page's security policy.
 
 ## Set up outside the code (Zeke's accounts)
 
@@ -99,26 +104,19 @@ Discord and Google are live.
 4. Copy the project address and publishable key into Render's
    `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` (staging first).
 
-## Steps, one commit each
+## How it was built
 
-1. Done: "finish sign-in" moved out of `/api/auth/email/complete` into a
-   shared function. No change in behaviour.
-2. Done: the server route and the token check. Tests use a key pair made in
-   the test (no network). Refused, with nothing changed: no token, another
-   key, another project, another audience, expired, older than five minutes,
-   anonymous, unknown to Supabase, Supabase's record for someone else,
-   unsigned. Accepted: a new account; a returning one; joining an email
-   account on a confirmed email only; the admin check; a guest's move; the
-   old session ended.
-3. Done: the two buttons and the `/auth/callback` page, with page tests.
-4. Done: settings, `render.yaml`, `.env.example`, deploy notes.
-5. Done: security review, `docs/security-reviews/2026-11-12-e03e446-change.md`.
-   It found one problem, fixed: a used token could sign in again for five
-   minutes.
-6. Done: fixes from Codex's review (four findings): a Supabase session signs
-   in once (version 9 table); the sign-in cookie; the browser ends only its
-   own Supabase session; the status question for a lost answer; and tests
-   that prove what they claim. The review is updated to match.
+1. "Finish sign-in" moved out of `/api/auth/email/complete` into a shared
+   function. No change in behaviour.
+2. First version: the browser ran the PKCE flow with Supabase's library and
+   sent the access token to the server.
+3. The buttons and the `/auth/callback` page; settings and deploy notes.
+4. A security review (`docs/security-reviews/2026-11-12-e03e446-change.md`)
+   and two rounds of review by Codex (GPT, read-only) found that a token in
+   the browser could be used more than once or by someone else, and that the
+   page could show a working sign-in as failed. Rather than guard the token,
+   the server now runs the flow, as above, and the first version's extra
+   table and browser library are gone.
 
 Then a real sign-in with Discord and with Google on staging. That needs the
 setup above done first.

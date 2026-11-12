@@ -53,16 +53,6 @@ export interface SignInLinksTable {
   nonce_hash: string | null;
 }
 
-/** Supabase sign-ins already used (T09): one row per Supabase session, so
- *  a session's token signs in to Universe once only. Kept a day, far longer
- *  than any token it could come from. */
-export interface SupabaseSignInsTable {
-  /** sha256 of the token's session_id claim. */
-  session_hash: string;
-  user_id: string;
-  created_at: string;
-}
-
 export interface FriendshipsTable {
   id: string;
   requester_id: string;
@@ -202,7 +192,6 @@ export interface DB {
   auth_sessions: AuthSessionsTable;
   guests: GuestsTable;
   sign_in_links: SignInLinksTable;
-  supabase_sign_ins: SupabaseSignInsTable;
   friendships: FriendshipsTable;
   games: GamesTable;
   game_updates: GameUpdatesTable;

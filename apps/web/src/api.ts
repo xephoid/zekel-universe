@@ -42,12 +42,13 @@ export const api = {
   signInLinkStatus: (token: string) => post<{ signedIn: boolean; userId?: string }>('/api/auth/email/link-status', { token }),
   signOut: () => post<{ ok: true }>('/api/auth/signout'),
   /** Other ways to sign in this server offers (Discord and Google, through Supabase). */
-  authProviders: () => req<{ supabase: { url: string; publishableKey: string } | null }>('/api/auth/providers'),
-  /** Before leaving for Discord or Google: this browser gets its sign-in cookie. */
-  startSupabaseSignIn: () => post<{ ok: true }>('/api/auth/supabase/start'),
-  completeSupabaseSignIn: (accessToken: string) => post<{ ok: true; userId: string }>('/api/auth/supabase/complete', { accessToken }),
-  /** Was this browser's current session made by this Supabase token's sign-in? Changes nothing. */
-  supabaseSignInStatus: (accessToken: string) => post<{ signedIn: boolean; userId?: string }>('/api/auth/supabase/status', { accessToken }),
+  authProviders: () => req<{ providers: Array<'discord' | 'google'> }>('/api/auth/providers'),
+  /** Start a Discord or Google sign-in: the server keeps its secret in a cookie and answers where to go. */
+  startSupabaseSignIn: (provider: 'discord' | 'google') => post<{ url: string }>('/api/auth/supabase/start', { provider }),
+  /** Hand the server the one-time code Discord or Google sent back. */
+  completeSupabaseSignIn: (code: string) => post<{ ok: true; userId: string }>('/api/auth/supabase/complete', { code }),
+  /** Was this browser's current session made by this code's sign-in? Changes nothing. */
+  supabaseSignInStatus: (code: string) => post<{ signedIn: boolean; userId?: string }>('/api/auth/supabase/status', { code }),
 
   games: () => req<GamesResponse>('/api/games'),
   game: (id: string) => req<GameResponse>(`/api/games/${encodeURIComponent(id)}`),

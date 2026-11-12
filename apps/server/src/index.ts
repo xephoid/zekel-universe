@@ -5,7 +5,7 @@ import { createDatabase } from './db/index.js';
 import { EngineClient } from '@universe/engine-client';
 import { ConsoleMailer, ResendMailer } from './email.js';
 import { buildApp } from './app.js';
-import { supabaseChecker, supabaseSessionEnder } from './supabaseAuth.js';
+import { supabaseService } from './supabaseAuth.js';
 import { createSocketServer } from './sockets.js';
 
 async function main(): Promise<void> {
@@ -37,12 +37,7 @@ async function main(): Promise<void> {
     limits: { guestsPerIp: config.guestsPerIp },
     clientIpHeader: config.clientIpHeader,
     adminEmails: config.adminEmails,
-    supabase: config.supabase
-      ? (() => {
-          const checker = supabaseChecker(config.supabase);
-          return { ...config.supabase, check: checker.check, verify: checker.verify, end: supabaseSessionEnder(config.supabase) };
-        })()
-      : null,
+    supabase: config.supabase ? supabaseService(config.supabase) : null,
   });
 
   await app.fastify.ready();

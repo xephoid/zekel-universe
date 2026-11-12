@@ -9,7 +9,10 @@ import { api, ApiRequestError } from '../api';
 import { useSession } from '../session';
 import { Nav } from './Nav';
 import { Wordmark } from '../ui';
-import { finishSignIn, NEXT_KEY, startSignIn, type SignInProvider, type SupabaseConfig } from '../supabaseSignIn';
+import { finishSignIn, NEXT_KEY, startSignIn, type SignInProvider } from '../supabaseSignIn';
+import { reloadAt } from '../leave';
+
+const PROVIDER_NAMES: Record<SignInProvider, string> = { discord: 'Discord', google: 'Google' };
 
 export function SignInPage() {
   const [email, setEmail] = useState('');
@@ -19,21 +22,20 @@ export function SignInPage() {
   const session = useSession();
   const next = params.get('next') ?? '/';
   const forFriends = /friends=1/.test(next);
-  const [supabase, setSupabase] = useState<SupabaseConfig | null>(null);
+  const [providers, setProviders] = useState<SignInProvider[]>([]);
   const [leaving, setLeaving] = useState<SignInProvider | null>(null);
 
   useEffect(() => {
     let live = true;
-    api.authProviders().then((r) => { if (live) setSupabase(r.supabase); }).catch(() => undefined);
+    api.authProviders().then((r) => { if (live) setProviders(r.providers); }).catch(() => undefined);
     return () => { live = false; };
   }, []);
 
   async function go(provider: SignInProvider) {
-    if (!supabase) return;
     setErr(null);
     setLeaving(provider);
     try {
-      await startSignIn(supabase, provider, next);
+      await startSignIn(provider, next);
     } catch (e) {
       setLeaving(null);
       setErr(e instanceof Error ? e.message : String(e));
@@ -60,19 +62,18 @@ export function SignInPage() {
           <div>
             <h1>{forFriends ? 'Sign in to play with friends' : 'Sign in'}</h1>
             <p className="muted" style={{ marginTop: 6, lineHeight: 1.5 }}>
-              No password. {supabase ? 'Use Discord or Google, or we' : 'We'} email you a link; opening it signs you in{next !== '/' ? ' and brings you straight back' : ''}.
+              No password. {providers.length > 0 ? 'Use Discord or Google, or we' : 'We'} email you a link; opening it signs you in{next !== '/' ? ' and brings you straight back' : ''}.
               {!session.signedIn && ' The games you played as a guest come with you.'}
             </p>
           </div>
           {session.signedIn && <p>You are signed in as <strong>{session.displayName}</strong>. <Link to="/profile">Profile</Link></p>}
-          {supabase && !sent && (
+          {providers.length > 0 && !sent && (
             <div className="stack" style={{ gap: 8 }}>
-              <button className="btn" type="button" disabled={leaving !== null} onClick={() => void go('discord')}>
-                {leaving === 'discord' ? 'Going to Discord…' : 'Sign in with Discord'}
-              </button>
-              <button className="btn" type="button" disabled={leaving !== null} onClick={() => void go('google')}>
-                {leaving === 'google' ? 'Going to Google…' : 'Sign in with Google'}
-              </button>
+              {providers.map((p) => (
+                <button key={p} className="btn" type="button" disabled={leaving !== null} onClick={() => void go(p)}>
+                  {leaving === p ? `Going to ${PROVIDER_NAMES[p]}…` : `Sign in with ${PROVIDER_NAMES[p]}`}
+                </button>
+              ))}
             </div>
           )}
           {sent ? (
@@ -242,14 +243,12 @@ export function SignInCompletePage() {
 
 /** Where Discord or Google send the player back, through Supabase, with a
  *  one-time code in the address (`?code=`), or `?error=` when the player
- *  said no. The code leaves the address bar at once; this browser trades it
- *  for a token with the secret it kept when the trip began, and the server
- *  signs the player in. Nothing else in the address is read. */
+ *  said no. The code leaves the address bar at once and goes to the server,
+ *  which trades it with the secret this browser's cookie holds. Nothing else
+ *  in the address is read. Once signed in, the next page loads afresh, so
+ *  every part of the app starts again as the new account. */
 export function SignInCallbackPage() {
-  const nav = useNavigate();
-  const session = useSession();
   const [err, setErr] = useState<string | null>(null);
-
   // What the address said, read once when the page first draws: React keeps
   // it through its development double run, after the address bar is cleared.
   const [{ code, refused }] = useState(() => {
@@ -266,18 +265,13 @@ export function SignInCallbackPage() {
     }
     void (async () => {
       try {
-        const { supabase } = await api.authProviders();
-        if (!supabase) throw new Error('Sign-in with Discord or Google is not offered here.');
-        await finishSignIn(supabase, code);
-        // Signed in. A failed refresh of the page's account details is no
-        // reason to say otherwise: the next page loads them again.
-        await session.refresh().catch(() => undefined);
+        await finishSignIn(code);
         if (!live) return;
         let next = '/';
         try { next = sessionStorage.getItem(NEXT_KEY) ?? '/'; } catch { /* ignore */ }
-        nav(next.startsWith('/') && !next.startsWith('//') ? next : '/', { replace: true });
+        reloadAt(next.startsWith('/') && !next.startsWith('//') ? next : '/');
       } catch (e) {
-        if (live) setErr(e instanceof ApiRequestError || e instanceof Error ? e.message : String(e));
+        if (live) setErr(e instanceof Error ? e.message : String(e));
       }
     })();
     return () => { live = false; };

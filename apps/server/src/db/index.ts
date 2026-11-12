@@ -23,7 +23,7 @@ export interface DatabaseClient {
 }
 
 /** Bump when the DDL below changes in a way an existing database cannot absorb. */
-export const SCHEMA_VERSION = 9;
+export const SCHEMA_VERSION = 8;
 
 export function parseDatabaseUrl(url: string): { dialect: DatabaseDialect; target: string } {
   const trimmed = url.trim();
@@ -114,11 +114,6 @@ const TABLES: string[] = [
     cover_focus text,
     screenshots text NOT NULL DEFAULT '[]',
     featured_rank integer
-  )`,
-  `CREATE TABLE IF NOT EXISTS supabase_sign_ins (
-    session_hash text PRIMARY KEY,
-    user_id text NOT NULL REFERENCES users(id),
-    created_at text NOT NULL
   )`,
   `CREATE TABLE IF NOT EXISTS designers (
     slug text PRIMARY KEY,
@@ -246,10 +241,6 @@ const MIGRATIONS: Record<number, MigrationStep[]> = {
     addColumn('games', 'featured_rank', 'integer'),
     addColumn('game_updates', 'deleted_at', 'text'),
   ],
-  // Sign-in with Discord and Google (T09): the supabase_sign_ins table is
-  // new, so the CREATE TABLE IF NOT EXISTS list above makes it. No column
-  // changes.
-  9: [],
 };
 
 async function migrate(db: Kysely<DB>): Promise<void> {

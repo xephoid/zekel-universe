@@ -139,30 +139,6 @@ describe('schema 8', () => {
   });
 });
 
-describe('schema 9', () => {
-  it('a version 8 database gains the table of used Supabase sign-ins and keeps its accounts', async () => {
-    const dir = mkdtempSync(path.join(tmpdir(), 'universe-db-'));
-    const file = path.join(dir, 'v8.db');
-    // A current database taken back to version 8: the new table removed.
-    const fresh = await createDatabase(`sqlite:${file}`);
-    await fresh.db.insertInto('users').values({ id: 'u1', display_name: 'Kept', avatar_url: null, bio: null, created_at: '2026-01-01T00:00:00.000Z' }).execute();
-    await fresh.close();
-    const raw = new Database(file);
-    raw.exec('DROP TABLE supabase_sign_ins; UPDATE schema_version SET version = 8;');
-    raw.close();
-    const upgraded = await createDatabase(`sqlite:${file}`);
-    try {
-      expect((await upgraded.db.selectFrom('schema_version').select('version').executeTakeFirst())?.version).toBe(9);
-      await upgraded.db.insertInto('supabase_sign_ins').values({ session_hash: 'h', user_id: 'u1', created_at: '2026-01-01T00:00:00.000Z' }).execute();
-      await expect(upgraded.db.insertInto('supabase_sign_ins').values({ session_hash: 'h', user_id: 'u1', created_at: '2026-01-01T00:00:00.000Z' }).execute()).rejects.toThrow();
-      expect((await upgraded.db.selectFrom('users').select('display_name').executeTakeFirstOrThrow()).display_name).toBe('Kept');
-    } finally {
-      await upgraded.close();
-      rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
-    }
-  });
-});
-
 const PG = process.env.TEST_DATABASE_URL;
 
 describe.skipIf(!PG)('postgres', () => {
