@@ -48,6 +48,10 @@ while CI is turned off. Deploy by hand from the dashboard.
      update this value after the first deploy if it differs.
    - `RESEND_API_KEY`: the Resend key.
    - `EMAIL_FROM`: an address on the verified domain.
+   - `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`: the Supabase project's
+     address and publishable key, for sign-in with Discord and Google. Leave
+     both empty to offer only the email link. Setting up the project, the
+     Discord app and the Google client: `docs/auth-supabase-plan.md`.
 3. Apply. Render generates `SECRET_KEY` and the engine's `MCP_BEARER_TOKEN`,
    and copies the token into Universe's `ENGINE_TOKEN`. Nobody needs to see
    either value.
@@ -70,6 +74,8 @@ Run these against production (`<site>` below is the host in
   sign-in link text.
 - Sign in by email link in one browser; opening the same link in a second
   browser is refused (SEC-03-F11).
+- When Supabase is set: sign in with Discord and with Google. Each lands back
+  signed in; the sign-in page's address bar holds no code afterwards.
 - Two visitors on different networks each get their own guest budget
   (SEC-16-F13). Record this in the security review: it rests on Render's
   statement that all traffic reaches the service through Cloudflare, which
