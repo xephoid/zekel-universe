@@ -52,10 +52,10 @@ export function Nav() {
         />
       </form>
       {signedIn ? (
-        <Link to="/profile" className="who"><Avatar name={displayName || 'You'} size={32} />{displayName || 'Profile'}</Link>
+        <Link to="/profile" className="who"><Avatar name={displayName || 'You'} size={32} /><span className="who-name">{displayName || 'Profile'}</span></Link>
       ) : (
         <>
-          {displayName && <span className="who muted"><Avatar name={displayName} size={32} />{displayName}</span>}
+          {displayName && <span className="who muted"><Avatar name={displayName} size={32} /><span className="who-name">{displayName}</span></span>}
           <Link to="/signin" className="who signin">Sign in</Link>
         </>
       )}
