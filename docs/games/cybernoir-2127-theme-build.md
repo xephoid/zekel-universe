@@ -1,5 +1,7 @@
 # Cybernoir 2127 — the rain and neon theme, what to build
 
+> **Moved 2026-11-12.** Cybernoir's glue (`glue/cybernoir-2127.ts` and `glue/cn/` below) now lives with the game in zekel-games, `packages/cybernoir-2127/src/glue/`, and is installed here as `@zekel/cybernoir-2127/glue`. The paths in this record are where it was built.
+
 Started 2026-10-02. Written for whoever implements the theme on the Cybernoir
 table. The design is in
 [`docs/design/cybernoir-rain-neon/`](../design/cybernoir-rain-neon/README.md);

@@ -75,6 +75,9 @@ importers:
       '@universe/shared':
         specifier: workspace:*
         version: link:../../packages/shared
+      '@zekel/cybernoir-2127':
+        specifier: ^0.1.3
+        version: 0.1.3(@zekel/game-kit@0.1.0)(@zekel/glue-kit@packages+glue-kit)(@zekel/primitives@packages+primitives)(@zekel/wire-types@packages+wire-types)
       '@zekel/glue-kit':
         specifier: workspace:*
         version: link:../../packages/glue-kit
@@ -976,6 +979,25 @@ packages:
 
   '@vitest/utils@2.1.9':
     resolution: {integrity: sha512-v0psaMSkNJ3A2NMrUEHFRzJtDPFn+/VWZ5WxImB21T9fjucJRmS7xCS3ppEnARb9y11OAzaD+P2Ps+b+BGX5iQ==}
+
+  '@zekel/cybernoir-2127@0.1.3':
+    resolution: {integrity: sha512-or8MO6yi2XSV/xj445cYTaPDJChv1CXR5fB0b0Z37C5vFV9+3QrKePKo8ulLO0cOrfyqhNDFRhX3ABSa3qKoiQ==}
+    engines: {node: '>=22.13.0'}
+    peerDependencies:
+      '@zekel/dev': ^0.1.1
+      '@zekel/game-kit': ^0.1.0
+      '@zekel/glue-kit': ^0.1.0
+      '@zekel/primitives': ^0.1.0
+      '@zekel/wire-types': ^0.1.0
+    peerDependenciesMeta:
+      '@zekel/dev':
+        optional: true
+      '@zekel/glue-kit':
+        optional: true
+      '@zekel/primitives':
+        optional: true
+      '@zekel/wire-types':
+        optional: true
 
   '@zekel/game-kit@0.1.0':
     resolution: {integrity: sha512-44b/ifoEuGHqOUd0i+l21pwMDu6XvGQyKzuN4vRxGtNuSZm6nGgaaVSefoFf9QKDRQ3PYEdXNpoQTICWf1U4Lg==}
@@ -2793,6 +2815,14 @@ snapshots:
       '@vitest/pretty-format': 2.1.9
       loupe: 3.2.1
       tinyrainbow: 1.2.0
+
+  '@zekel/cybernoir-2127@0.1.3(@zekel/game-kit@0.1.0)(@zekel/glue-kit@packages+glue-kit)(@zekel/primitives@packages+primitives)(@zekel/wire-types@packages+wire-types)':
+    dependencies:
+      '@zekel/game-kit': 0.1.0
+    optionalDependencies:
+      '@zekel/glue-kit': link:packages/glue-kit
+      '@zekel/primitives': link:packages/primitives
+      '@zekel/wire-types': link:packages/wire-types
 
   '@zekel/game-kit@0.1.0': {}
 

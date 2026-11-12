@@ -1,5 +1,7 @@
 # Cybernoir 2127 — what to build
 
+> **Moved 2026-11-12.** Cybernoir's glue (`glue/cybernoir-2127.ts` and `glue/cn/` below) now lives with the game in zekel-games, `packages/cybernoir-2127/src/glue/`, and is installed here as `@zekel/cybernoir-2127/glue`. The paths in this record are where it was built.
+
 Started 2026-09-21, built out 2026-09-22. Written for whoever implements
 the Cybernoir table, and kept as the record of what was done and what was not.
 
@@ -38,7 +40,7 @@ same way. Nothing below is a guess about how it looks.
 
 ## What is wrong today
 
-[`apps/web/src/glue/cybernoir-2127.ts`](../../apps/web/src/glue/cybernoir-2127.ts)
+`apps/web/src/glue/cybernoir-2127.ts` (now `packages/cybernoir-2127/src/glue/index.ts` in zekel-games)
 emits a map, a jail track, an evidence row, a NOT-token pool and two tableaux,
 and lets the generic layout place them. In a turn-7 position the board column is
 833 px of content in a 635 px column, so:
