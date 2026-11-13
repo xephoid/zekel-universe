@@ -272,12 +272,16 @@ label.option-card { position: relative; padding-right: 40px; }
 .shots .shot:hover { transform: translateY(-2px); box-shadow: var(--shadow-card); }
 .shots .shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
 /* the screenshot viewer: a sheet over the game page, previous and next either side */
-.sheet.shot-viewer { max-width: min(1200px, 100%); padding: 18px 20px 20px; overflow: hidden; }
+/* The picture gets only the height left after the heading and the arrows,
+   however tall it is and however long the name, so the arrows never leave
+   the dialog: the sheet's rows are the heading and the stage, and the stage
+   shrinks to fit the sheet's 90dvh. */
+.sheet.shot-viewer { max-width: min(1200px, 100%); max-height: 90dvh; padding: 18px 20px 20px; overflow: hidden; display: grid; grid-template-rows: auto minmax(0, 1fr); }
 .sheet.shot-viewer h2 { font-size: 18px; margin-bottom: 12px; }
 .shot-viewer .shot-count { font: 500 13px var(--font-mono); color: var(--fg-muted); margin-left: 6px; }
-.shot-stage { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; }
-.shot-frame { overflow: hidden; border-radius: 8px; background: var(--chip); display: grid; place-items: center; touch-action: pan-y; user-select: none; }
-.shot-frame img { display: block; max-width: 100%; max-height: calc(90vh - 110px); object-fit: contain; }
+.shot-stage { display: grid; grid-template-columns: auto 1fr auto; grid-template-rows: minmax(0, 1fr); align-items: center; gap: 12px; min-height: 0; }
+.shot-frame { overflow: hidden; border-radius: 8px; background: var(--chip); display: flex; align-items: center; justify-content: center; height: 100%; min-height: 0; touch-action: pan-y; user-select: none; }
+.shot-frame img { display: block; max-width: 100%; max-height: 100%; min-height: 0; object-fit: contain; }
 .shot-frame img.in-next { animation: shot-in-next var(--motion-normal) var(--motion-easing); }
 .shot-frame img.in-prev { animation: shot-in-prev var(--motion-normal) var(--motion-easing); }
 @keyframes shot-in-next { from { transform: translateX(40%); opacity: 0; } to { transform: none; opacity: 1; } }
@@ -288,11 +292,11 @@ label.option-card { position: relative; padding-right: 40px; }
 @media (max-width: 640px) {
   .sheet-backdrop:has(.shot-viewer) { padding: 8px; }
   .sheet.shot-viewer { padding: 14px 12px 12px; }
-  .shot-stage { grid-template-columns: 1fr 1fr; }
+  .shot-stage { grid-template-columns: 1fr 1fr; grid-template-rows: minmax(0, 1fr) auto; }
   .shot-frame { grid-column: 1 / -1; grid-row: 1; }
+  .shot-nav { grid-row: 2; }
   .shot-nav.prev { justify-self: start; }
   .shot-nav.next { justify-self: end; }
-  .shot-frame img { max-height: calc(100dvh - 160px); }
 }
 /* the admin page: a list on the left, the form for the picked row on the right */
 .admin-split { display: grid; grid-template-columns: 260px 1fr; gap: 28px; align-items: start; }
