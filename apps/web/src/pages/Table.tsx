@@ -385,7 +385,7 @@ export function TablePage() {
         {phone && plan?.statusShort && <span className="round-tag" aria-hidden="true"><span>{plan.statusShort}</span></span>}
         <span className="spacer center">
           <span className={`turn-pill${yourTurn ? ' mine' : ''}`} aria-live="polite">
-            <span className="dot" />{turnLabel}
+            <span className="dot" /><span className="turn-text">{turnLabel}</span>
           </span>
         </span>
         <div className="actions">

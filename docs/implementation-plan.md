@@ -1563,6 +1563,21 @@ look. The check is `e2e/pages-phone.spec.ts` at 390 x 844.
   parts sheet fits across but its parts keep their own sizes. A phone held
   sideways (wider than 640 px) gets the desktop pages.
 
+**The table shell on a phone (2026-11-12).** A phone audit of the seven
+launch games on production found three things the shell itself got wrong in
+every game with a phone layout. All three are rules under
+`.table-shell.phone`; the desktop table is unchanged. The check is
+`e2e/phone-table-fixes.spec.ts`, which fails on the code before the change.
+
+- **The turn pill says the whole instruction.** It was cut to one line with
+  an ellipsis ("Your turn · play three c…"); it now takes up to two lines in
+  smaller type inside the 54 px bar.
+- **The rules lesson leaves the board its room.** More and Got it sit on the
+  title's row at 44 px, and the first sentence keeps to two lines until More
+  opens the rest. The lesson still shows its first sentence, as on desktop.
+- **The engine's move list is thumb-sized:** every row and its summary at
+  least 44 px tall (they were 24 px).
+
 ## 23. Site analytics (decided 2026-10-16 and 2026-11-11, built 2026-11-11)
 
 Launch task T07, first half. Decision D4 (2026-10-16): one PostHog project for

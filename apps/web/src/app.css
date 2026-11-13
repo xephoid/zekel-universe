@@ -595,7 +595,10 @@ label.option-card { position: relative; padding-right: 40px; }
 .table-shell.phone .table-topbar :is(.brand, .divider, .title-art, .round-note, .actions) { display: none !important; }
 .table-shell.phone .table-topbar .title { white-space: nowrap; }
 .table-shell.phone .table-topbar .spacer.center { justify-content: flex-end; min-width: 0; }
-.table-shell.phone .turn-pill { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+/* the turn says what to do, so it may take two lines rather than lose its end */
+.table-shell.phone .turn-pill { max-width: 100%; padding: 4px 10px; font-size: 12px; line-height: 1.25; }
+.table-shell.phone .turn-pill .dot { flex: none; }
+.table-shell.phone .turn-pill .turn-text { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
 .table-shell.phone .table-menu-btn {
   display: grid; place-items: center; width: 44px; height: 44px; flex: none; padding: 0; cursor: pointer;
   background: transparent; color: var(--fg); border: 1.5px solid var(--border); border-radius: 6px;
@@ -613,6 +616,17 @@ label.option-card { position: relative; padding-right: 40px; }
 .table-shell.phone[data-motion="reduced"] .sheet { animation-name: zk-fadein; }
 .table-shell.phone .sheet .close { min-width: 44px; min-height: 44px; }
 .table-shell.phone .toast { bottom: 110px; max-width: calc(100% - 32px); }
+/* the lesson leaves the board as much room as it can: its buttons share the
+   title's row, its sentence keeps to two lines until More */
+.table-shell.phone .lesson-note { margin: 0 12px 8px; padding: 4px 4px 8px 12px; display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 6px; row-gap: 0; align-items: center; }
+.table-shell.phone .lesson-head { grid-column: 1; grid-row: 1; min-width: 0; }
+.table-shell.phone .lesson-actions { grid-column: 2; grid-row: 1; }
+.table-shell.phone .lesson-actions .btn { min-height: 44px; min-width: 44px; }
+.table-shell.phone .lesson-gist { grid-column: 1 / -1; grid-row: 2; padding-right: 8px; }
+.table-shell.phone .lesson-gist:not(.open) { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+/* the engine's move list is pressed with a thumb too */
+.table-shell.phone .move-menu summary { min-height: 44px; display: flex; align-items: center; }
+.table-shell.phone .move-menu button { min-height: 44px; width: 100%; padding: 8px 6px; }
 .menu-sheet { display: flex; flex-direction: column; gap: 14px; }
 .menu-sheet h2 { margin: 0; }
 .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
