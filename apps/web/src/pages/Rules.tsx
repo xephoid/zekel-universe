@@ -1,10 +1,13 @@
 // The rules, as the engine states them, on their own page so a game page
 // can link to them (and a designer may also link a rulebook elsewhere).
+// A game that ships a rulebook page (glue/index.ts, RULEBOOKS) shows that
+// instead, with the plain text still one click away below it.
 
-import { useEffect, useState } from 'react';
+import { Component, useEffect, useState, type ReactNode } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import type { GameCatalogEntry, GameReferenceResponse } from '@universe/shared';
 import { api, ApiRequestError } from '../api';
+import { rulebookFor } from '../glue';
 import { Nav } from './Nav';
 
 export interface RulesSection {
@@ -83,6 +86,14 @@ function RulesBody({ rules }: { rules: string }) {
   );
 }
 
+/** Draws a game's rulebook page; if it fails while drawing, shows `fallback` instead. */
+class RulebookGuard extends Component<{ fallback: ReactNode; children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  componentDidCatch(error: unknown) { console.error('The rulebook page failed to draw; showing the plain rules.', error); }
+  render() { return this.state.failed ? this.props.fallback : this.props.children; }
+}
+
 export function RulesPage() {
   const { id = '' } = useParams();
   const [game, setGame] = useState<GameCatalogEntry | null>(null);
@@ -93,18 +104,37 @@ export function RulesPage() {
     api.reference(id).then(setReference).catch((e) => setErr(e instanceof ApiRequestError ? e.message : (e as Error).message));
   }, [id]);
 
+  const rulebook = rulebookFor(id);
+  const Book = rulebook && rulebook.ready(reference) ? rulebook.Page : null;
+
   return (
     <div>
       <Nav />
-      <div className="page narrow stack" style={{ paddingTop: 28 }}>
+      <div className={`page ${Book ? 'rules-wide' : 'narrow'} stack`} style={{ paddingTop: 28 }}>
         <Link to={`/games/${id}`} className="crumb">‹ {game?.name ?? 'The game'}</Link>
         <h1>{game ? `${game.name}: the rules` : 'The rules'}</h1>
         {err && <p className="error">{err}</p>}
         {game?.rulesUrl && <p><a href={game.rulesUrl} target="_blank" rel="noreferrer">The printed rulebook</a></p>}
-        {reference ? (
+        {reference && Book ? (
+          <>
+            <RulebookGuard key={id} fallback={<RulesBody rules={reference.rules} />}>
+              <div className="rules-book">
+                <Book reference={reference} />
+              </div>
+              <details className="rules-plain-toggle">
+                <summary>The rules as plain text</summary>
+                <RulesBody rules={reference.rules} />
+              </details>
+            </RulebookGuard>
+          </>
+        ) : reference ? (
           <RulesBody rules={reference.rules} />
         ) : !err ? <p className="muted">Loading…</p> : null}
-        <p className="muted" style={{ fontSize: 13, marginTop: 20 }}>These rules are the engine's own text: the same rules the table enforces.</p>
+        <p className="muted" style={{ fontSize: 13, marginTop: 20 }}>
+          {Book
+            ? "The rulebook is drawn from the engine's own data, and the plain text is the engine's own words: the same rules the table enforces."
+            : "These rules are the engine's own text: the same rules the table enforces."}
+        </p>
       </div>
     </div>
   );
