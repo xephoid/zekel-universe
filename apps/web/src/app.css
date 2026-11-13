@@ -268,8 +268,32 @@ label.option-card { position: relative; padding-right: 40px; }
 .game-hero-left .gpcover.large .initial { font-size: 120px; letter-spacing: -0.04em; }
 .shots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
 .shots div { aspect-ratio: 4 / 3; border-radius: 6px; background: var(--chip); border: 1px solid var(--line); display: grid; place-items: center; font: 500 10px var(--font-mono); color: var(--fg-muted); }
-.shots .shot { aspect-ratio: 4 / 3; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); background: var(--chip); display: block; }
+.shots .shot { aspect-ratio: 4 / 3; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); background: var(--chip); display: block; width: 100%; padding: 0; cursor: zoom-in; transition: transform var(--motion-fast), box-shadow var(--motion-fast); }
+.shots .shot:hover { transform: translateY(-2px); box-shadow: var(--shadow-card); }
 .shots .shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* the screenshot viewer: a sheet over the game page, previous and next either side */
+.sheet.shot-viewer { max-width: min(1200px, 100%); padding: 18px 20px 20px; overflow: hidden; }
+.sheet.shot-viewer h2 { font-size: 18px; margin-bottom: 12px; }
+.shot-viewer .shot-count { font: 500 13px var(--font-mono); color: var(--fg-muted); margin-left: 6px; }
+.shot-stage { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; }
+.shot-frame { overflow: hidden; border-radius: 8px; background: var(--chip); display: grid; place-items: center; touch-action: pan-y; user-select: none; }
+.shot-frame img { display: block; max-width: 100%; max-height: calc(90vh - 110px); object-fit: contain; }
+.shot-frame img.in-next { animation: shot-in-next var(--motion-normal) var(--motion-easing); }
+.shot-frame img.in-prev { animation: shot-in-prev var(--motion-normal) var(--motion-easing); }
+@keyframes shot-in-next { from { transform: translateX(40%); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes shot-in-prev { from { transform: translateX(-40%); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .shot-frame img.in-next, .shot-frame img.in-prev { animation: none; } }
+.shot-nav { width: 44px; height: 44px; padding: 0; font-size: 24px; line-height: 1; border-radius: 50%; }
+/* On a phone the picture takes the full width and the arrows sit under it. */
+@media (max-width: 640px) {
+  .sheet-backdrop:has(.shot-viewer) { padding: 8px; }
+  .sheet.shot-viewer { padding: 14px 12px 12px; }
+  .shot-stage { grid-template-columns: 1fr 1fr; }
+  .shot-frame { grid-column: 1 / -1; grid-row: 1; }
+  .shot-nav.prev { justify-self: start; }
+  .shot-nav.next { justify-self: end; }
+  .shot-frame img { max-height: calc(100dvh - 160px); }
+}
 /* the admin page: a list on the left, the form for the picked row on the right */
 .admin-split { display: grid; grid-template-columns: 260px 1fr; gap: 28px; align-items: start; }
 @media (max-width: 800px) { .admin-split { grid-template-columns: 1fr; } }
