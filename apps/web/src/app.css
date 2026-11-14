@@ -62,6 +62,12 @@ p { margin: 0; }
 
 .page { padding: 32px 40px 56px; max-width: 1440px; margin: 0 auto; animation: zk-fadein .25s ease-out; }
 .page.narrow { max-width: 760px; }
+/* The rules page with a game's rulebook: as wide as the rulebook's own page. */
+.page.rules-wide { max-width: 980px; }
+/* A rulebook never pushes the page sideways: on a very narrow phone, anything
+   wider than the screen scrolls inside the book. */
+.rules-book { min-width: 0; max-width: 100%; overflow-x: auto; }
+@media (max-width: 480px) { .page.rules-wide { padding-left: 8px; padding-right: 8px; } }
 
 /* The site footer sits at the bottom of short pages and after long ones. */
 .site { min-height: 100%; display: flex; flex-direction: column; }
@@ -489,6 +495,8 @@ label.option-card { position: relative; padding-right: 40px; }
 
 .rules-text { font-size: 14px; line-height: 1.5; background: var(--bg-raised); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; overflow-wrap: anywhere; }
 .rules-plain { white-space: pre-wrap; }
+.rules-plain-toggle summary { cursor: pointer; font-weight: 600; padding: 8px 0; }
+.rules-plain-toggle[open] summary { margin-bottom: 8px; }
 .rules-toc { font-size: 13px; background: var(--bg-raised); border-left: 3px solid var(--line); border-radius: 8px; padding: 10px 14px 10px 18px; margin: 0 0 4px 4px; }
 .rules-toc ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
 .rules-toc a { color: var(--fg-muted); text-decoration: none; }
