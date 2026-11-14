@@ -108,6 +108,69 @@ describe('the rules page and a game\'s rulebook', () => {
     }
   });
 
+  // Each list stays nonempty but loses or breaks an entry. The game's reader
+  // fills those gaps with defaults, so the page must refuse them itself.
+  describe('data that keeps its lists but loses or breaks an entry', () => {
+    const fresh = () => structuredClone(neitherGutsNorGears.getReferenceData()) as Record<string, any>;
+    const ready = (data: unknown) => RULEBOOKS['neither-guts-nor-gears']!.ready(
+      { gameId: 'neither-guts-nor-gears', rules: RULES, referenceData: data, moveSchema: null, optionsSchema: null } as never);
+    const breaks: Array<[string, (d: Record<string, any>) => void]> = [
+      ['a map layout reduced to [{}]', (d) => { d.maps['3-4p'] = [{}]; }],
+      ['one tile emptied', (d) => { d.maps['2p'][3] = {}; }],
+      ['one tile with no coordinates', (d) => { delete d.maps['5-6p'][0].c; }],
+      ['one tile with no resource', (d) => { delete d.maps['2p'][0].resource; }],
+      ['a start tile lost', (d) => { d.maps['5-6p'] = d.maps['5-6p'].filter((t: any) => t.start == null || t.start !== 1); }],
+      ['a deck card missing copies', (d) => { delete d.battle_deck[0].copies; }],
+      ['a deck card with zero copies', (d) => { d.battle_deck[2].copies = 0; }],
+      ['a deck card emptied', (d) => { d.battle_deck[1] = {}; }],
+      ['a unit missing dmg', (d) => { delete d.robot_units.find((u: any) => u.init !== null).dmg; }],
+      ['a unit with no name', (d) => { delete d.wizard_units[0].name; }],
+      ['a unit with no cost', (d) => { d.wizard_units[1].cost = {}; }],
+      ['a treaty missing its culture', (d) => { delete d.treaties[0].cultureIncome; }],
+      ['the Evo Angel missing its stats', (d) => { delete d.heroes.find((h: any) => h.category === 'evo-angel').stats; }],
+      ['the rulebook words missing players_by_layout', (d) => { delete d.rulebook.players_by_layout; }],
+      ['one layout missing from players_by_layout', (d) => { delete d.rulebook.players_by_layout['5-6p']; }],
+      ['the rulebook words missing a victory paragraph', (d) => { delete d.rulebook.victory.economic; }],
+      ['the round stack cards emptied', (d) => { d.rulebook.round.stack.cards = []; }],
+      ['a setup piece with no count', (d) => { delete d.rulebook.setup.wizard.pieces[0].count; }],
+      ['a component with no name', (d) => { delete d.rulebook.components[0].name; }],
+      ['the paying example figure gone', (d) => { delete d.rulebook.paying.example.figure; }],
+      ['the treaty chart with a row missing a column', (d) => { delete d.rulebook.treaties.chart[0].hands; }],
+      ['a win number written as text', (d) => { d.victory.culture_target_by_player_count['3'] = '105'; }],
+      ['the tech target gone', (d) => { delete d.victory.tech_target; }],
+    ];
+
+    it('accepts the game\'s own data whole', () => {
+      expect(ready(fresh())).toBe(true);
+    });
+
+    it.each(breaks)('refuses %s', (_name, breakIt) => {
+      const data = fresh();
+      breakIt(data);
+      expect(ready(data)).toBe(false);
+    });
+
+    it('refuses rather than throws on odd values', () => {
+      for (const odd of [null, undefined, 7, 'x', [], { rulebook: null }, { ...fresh(), maps: [] }, { ...fresh(), wizard_units: {} }]) {
+        expect(() => ready(odd)).not.toThrow();
+        expect(ready(odd)).toBe(false);
+      }
+    });
+
+    it('shows the plain text for a map layout reduced to [{}] or a deck card missing copies', async () => {
+      for (const [name, breakIt] of breaks.slice(0, 1).concat(breaks.filter(([n]) => n === 'a deck card missing copies'))) {
+        const data = fresh();
+        breakIt(data);
+        stubServer('neither-guts-nor-gears', data);
+        const { container, unmount } = open('neither-guts-nor-gears');
+        await waitFor(() => expect(screen.getByRole('heading', { level: 2, name: 'Overview' })).toBeTruthy());
+        expect(container.querySelector('.ngg-rulebook'), name).toBeNull();
+        expect(container.querySelector('details.rules-plain-toggle'), name).toBeNull();
+        unmount();
+      }
+    });
+  });
+
   it('shows the plain text, open, when the rulebook page fails while drawing', async () => {
     const saved = RULEBOOKS['word-debauchee'];
     const quiet = vi.spyOn(console, 'error').mockImplementation(() => {});
