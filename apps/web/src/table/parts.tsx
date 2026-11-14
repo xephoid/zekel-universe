@@ -131,7 +131,7 @@ export function LessonNote({ lessons, onDismiss }: { lessons: Lesson[]; onDismis
         <span className="lesson-title">{lesson.title}</span>
         {lessons.length > 1 && <span className="lesson-count">1 of {lessons.length}</span>}
       </div>
-      <p className="lesson-gist">{open ? lesson.text : gist}</p>
+      <p className={`lesson-gist${open ? ' open' : ''}`}>{open ? lesson.text : gist}</p>
       <div className="lesson-actions">
         {rest !== '' && (
           <button className="btn secondary small" aria-expanded={open} onClick={() => setOpen(!open)}>
