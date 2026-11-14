@@ -1,5 +1,5 @@
 // The game page, as the canvas draws it: the cover with four screenshot
-// slots, the name, the designer (a link to their profile), the chips, the
+// slots (pressing one opens the viewer over the page), the name, the designer (a link to their profile), the chips, the
 // description, Play now and Play with friends, and the devlog below.
 
 import { useEffect, useState } from 'react';
@@ -10,6 +10,7 @@ import { useSession } from '../session';
 import { Nav } from './Nav';
 import { DevlogItem } from './Home';
 import { Cover, playersLabel } from '../ui';
+import { ShotViewer } from './ShotViewer';
 
 export function GamePage() {
   const { id = '' } = useParams();
@@ -17,6 +18,8 @@ export function GamePage() {
   const [game, setGame] = useState<GameCatalogEntry | null>(null);
   const [updates, setUpdates] = useState<GameUpdate[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  // The screenshot open in the viewer, if one is.
+  const [shotAt, setShotAt] = useState<number | null>(null);
   useEffect(() => {
     api.game(id).then((r) => setGame(r.game)).catch((e) => setErr((e as Error).message));
     api.gameUpdates(id).then((r) => setUpdates(r.updates)).catch(() => setUpdates([]));
@@ -40,9 +43,9 @@ export function GamePage() {
             {game.screenshots.length > 0 ? (
               <div className="shots" aria-label="Screenshots">
                 {game.screenshots.map((src, i) => (
-                  <a key={src + i} href={src} target="_blank" rel="noreferrer" className="shot">
+                  <button key={src + i} type="button" className="shot" onClick={() => setShotAt(i)} aria-haspopup="dialog">
                     <img src={src} alt={`${game.name}, screenshot ${i + 1}`} />
-                  </a>
+                  </button>
                 ))}
               </div>
             ) : (
@@ -84,6 +87,9 @@ export function GamePage() {
             : updates.map((u) => <DevlogItem key={u.id} u={u} />)}
         </div>
       </div>
+      {shotAt !== null && (
+        <ShotViewer name={game.name} shots={game.screenshots} start={shotAt} onClose={() => setShotAt(null)} />
+      )}
     </div>
   );
 }
