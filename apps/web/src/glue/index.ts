@@ -53,6 +53,14 @@ export const RULEBOOKS: Record<string, RulebookPage> = {
  * draw as the full reference. The page is shown only when the raw data holds
  * every part it draws, each part whole: a wrong number is worse than the
  * plain text. This check reads the raw data, not the reader's output.
+ *
+ * Checking entries one by one cannot see a whole entry that went missing (a
+ * tile, a hero). For that the game says how many each list holds:
+ * `rulebook.counts`, written by the game from its own catalogues (zekel-games
+ * main, after 0.1.4). Every list must hold exactly that many. Data with no
+ * counts, from a games server older than that, shows the plain text. Once the
+ * installed reader makes the same checks itself (it does on zekel-games main),
+ * this function can shrink to `readNggRulebook(raw) !== null`.
  */
 function nggRulebookReady(reference: GameReferenceResponse | null): boolean {
   const raw = reference?.referenceData;
@@ -69,6 +77,7 @@ const str: Check = (x) => typeof x === 'string' && x.trim().length > 0;
 const num: Check = (x) => typeof x === 'number' && Number.isFinite(x);
 const pos: Check = (x) => num(x) && (x as number) > 0;
 const bool: Check = (x) => typeof x === 'boolean';
+const count: Check = (x) => Number.isInteger(x) && (x as number) > 0;
 /** A nonempty list, every entry passing. */
 const list = (each: Check): Check => (x) => Array.isArray(x) && x.length > 0 && x.every(each);
 /** An object holding every named field, each passing. */
@@ -76,6 +85,8 @@ const shape = (fields: Record<string, Check>): Check => (x) => obj(x) && Object.
 const NGG_LAYOUTS = ['2p', '3-4p', '5-6p'] as const;
 const byLayout = (each: Check): Check => shape(Object.fromEntries(NGG_LAYOUTS.map((k) => [k, each])));
 const either = (...fs: Check[]): Check => (x) => fs.some((f) => f(x));
+/** Exactly `n` entries, every one passing: the list arrived whole. */
+const whole = (x: unknown, n: number, each: Check) => Array.isArray(x) && x.length === n && x.every(each);
 
 const pieces = list(shape({ icon: str, count: pos, name: str }));
 const faction = shape({ faction: str, factions: str, pieces, note: str });
@@ -101,6 +112,8 @@ const rulebookText = shape({
   battle: shape({ title: str, intro: str, ladder_title: str, example: shape({ title: str, units: list(str), steps: list(str) }) }),
   treaties: shape({ intro: str, chart: list(shape({ treaty: str, allies: bool, collection: bool, hands: bool, victory: bool })) }),
   units: shape({ note: str }),
+  // How many entries each list beside the rulebook holds, from the game's own catalogues.
+  counts: shape({ tiles: byLayout(count), wizard_units: count, robot_units: count, treaties: count, battle_deck: count, heroes: count }),
 });
 const tile = shape({ c: num, r: num, resource: str, label: str, start: (x) => x === undefined || x === null || pos(x) });
 /** A unit fights with all three numbers or none (a collector, a token). */
@@ -109,9 +122,11 @@ const unit: Check = (u) => obj(u)
   && obj(u['cost']) && Object.keys(u['cost']).length > 0 && Object.values(u['cost']).every(pos)
   && (['init', 'dmg', 'def'].every((k) => u[k] === null) || ['init', 'dmg', 'def'].every((k) => num(u[k]) && (u[k] as number) >= 0));
 const treaty = shape({ name: str, cultureIncome: pos, breakingCondition: str });
-const battleCard = shape({ label: str, effect: str, copies: (x) => pos(x) && Number.isInteger(x) });
+const battleCard = shape({ label: str, effect: str, copies: count });
+/** The hero the battle ladder draws with its own stat line; the reader finds it by this category. */
+const LADDER_HERO = 'evo-angel';
 const hero: Check = (h) => obj(h) && str(h['name']) && str(h['category'])
-  && (h['category'] !== 'evo-angel' || shape({ init: num, dmg: num, def: num })(h['stats']));
+  && (h['category'] !== LADDER_HERO || shape({ init: num, dmg: num, def: num })(h['stats']));
 const COUNTS = ['2', '3', '4', '5', '6'];
 const perCount = (each: Check): Check => shape(Object.fromEntries(COUNTS.map((n) => [n, each])));
 const victory = shape({
@@ -126,21 +141,26 @@ const victory = shape({
 /** The raw reference data holds every part the rulebook page draws, each whole. */
 function nggDataWhole(raw: unknown): boolean {
   if (!obj(raw) || !rulebookText(raw['rulebook']) || !victory(raw['victory'])) return false;
-  if (!list(unit)(raw['wizard_units']) || !list(unit)(raw['robot_units'])) return false;
-  if (!list(treaty)(raw['treaties']) || !list(battleCard)(raw['battle_deck']) || !list(hero)(raw['heroes'])) return false;
+  const text = raw['rulebook'] as { players_by_layout: Record<string, number[]>; counts: NggCounts };
+  const n = text.counts;
+  if (!whole(raw['wizard_units'], n.wizard_units, unit) || !whole(raw['robot_units'], n.robot_units, unit)) return false;
+  if (!whole(raw['treaties'], n.treaties, treaty) || !whole(raw['battle_deck'], n.battle_deck, battleCard)) return false;
+  if (!whole(raw['heroes'], n.heroes, hero)) return false;
+  // The ladder's hero row needs its hero there, not just the right number of heroes.
+  if (!(raw['heroes'] as Array<Record<string, unknown>>).some((h) => h['category'] === LADDER_HERO)) return false;
   const maps = raw['maps'];
   if (!obj(maps)) return false;
-  const players = (raw['rulebook'] as { players_by_layout: Record<string, number[]> }).players_by_layout;
   return NGG_LAYOUTS.every((k) => {
     const tiles = maps[k];
-    if (!list(tile)(tiles)) return false;
+    if (!whole(tiles, n.tiles[k], tile)) return false;
     const ts = tiles as Array<{ c: number; r: number; start?: number | null }>;
     // No two tiles on one spot, and one start tile per seat the map holds.
     const spots = new Set(ts.map((t) => `${t.c},${t.r}`));
     const starts = ts.filter((t) => t.start != null).length;
-    return spots.size === ts.length && starts === Math.max(...players[k]!);
+    return spots.size === ts.length && starts === Math.max(...text.players_by_layout[k]!);
   });
 }
+type NggCounts = { tiles: Record<(typeof NGG_LAYOUTS)[number], number>; wizard_units: number; robot_units: number; treaties: number; battle_deck: number; heroes: number };
 
 export function rulebookFor(gameId: string): RulebookPage | null {
   return RULEBOOKS[gameId] ?? null;

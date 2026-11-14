@@ -15,6 +15,22 @@ import { RULEBOOKS } from '../glue';
 const json = (body: unknown, status = 200) =>
   Promise.resolve(new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } }));
 
+/**
+ * The game's reference data as a games server on zekel-games main sends it:
+ * the installed 0.1.4 package's data plus `rulebook.counts`, which main adds
+ * from the game's own catalogues. 0.1.4 does not have it yet, so the counts
+ * here are taken from the complete 0.1.4 lists.
+ */
+function gameData(): Record<string, any> {
+  const d = structuredClone(neitherGutsNorGears.getReferenceData()) as Record<string, any>;
+  d.rulebook.counts = {
+    tiles: { '2p': d.maps['2p'].length, '3-4p': d.maps['3-4p'].length, '5-6p': d.maps['5-6p'].length },
+    wizard_units: d.wizard_units.length, robot_units: d.robot_units.length,
+    treaties: d.treaties.length, battle_deck: d.battle_deck.length, heroes: d.heroes.length,
+  };
+  return d;
+}
+
 const RULES = '## Overview\n\nThe engine\'s own words.\n\n## Setup\n\nLay out the map.';
 
 function stubServer(gameId: string, referenceData: unknown) {
@@ -46,7 +62,7 @@ describe('the rules page and a game\'s rulebook', () => {
   });
 
   it('shows the rulebook when the game has one and its data carries it, with the plain text below', async () => {
-    stubServer('neither-guts-nor-gears', neitherGutsNorGears.getReferenceData());
+    stubServer('neither-guts-nor-gears', gameData());
     const { container } = open('neither-guts-nor-gears');
     await waitFor(() => expect(container.querySelector('.ngg-rulebook')).not.toBeNull());
     expect(screen.getByRole('heading', { level: 2, name: 'Four ways to win' })).toBeTruthy();
@@ -82,7 +98,7 @@ describe('the rules page and a game\'s rulebook', () => {
   });
 
   it('shows the plain text when the data has a rulebook but is missing the win numbers or maps', async () => {
-    const full = neitherGutsNorGears.getReferenceData() as Record<string, unknown>;
+    const full = gameData() as Record<string, unknown>;
     for (const drop of ['victory', 'maps', 'treaties']) {
       const { [drop]: _gone, ...rest } = full;
       stubServer('neither-guts-nor-gears', rest);
@@ -111,7 +127,7 @@ describe('the rules page and a game\'s rulebook', () => {
   // Each list stays nonempty but loses or breaks an entry. The game's reader
   // fills those gaps with defaults, so the page must refuse them itself.
   describe('data that keeps its lists but loses or breaks an entry', () => {
-    const fresh = () => structuredClone(neitherGutsNorGears.getReferenceData()) as Record<string, any>;
+    const fresh = gameData;
     const ready = (data: unknown) => RULEBOOKS['neither-guts-nor-gears']!.ready(
       { gameId: 'neither-guts-nor-gears', rules: RULES, referenceData: data, moveSchema: null, optionsSchema: null } as never);
     const breaks: Array<[string, (d: Record<string, any>) => void]> = [
@@ -138,6 +154,20 @@ describe('the rules page and a game\'s rulebook', () => {
       ['the treaty chart with a row missing a column', (d) => { delete d.rulebook.treaties.chart[0].hands; }],
       ['a win number written as text', (d) => { d.victory.culture_target_by_player_count['3'] = '105'; }],
       ['the tech target gone', (d) => { delete d.victory.tech_target; }],
+      // A whole entry gone, every other entry still whole: only the game's counts can tell.
+      ['a non-start tile removed', (d) => { d.maps['3-4p'].splice(d.maps['3-4p'].findIndex((t: any) => t.start == null), 1); }],
+      ['the Evo Angel removed, other heroes kept', (d) => { d.heroes = d.heroes.filter((h: any) => h.category !== 'evo-angel'); }],
+      ['the Evo Angel swapped for a copy of another hero', (d) => {
+        const i = d.heroes.findIndex((h: any) => h.category === 'evo-angel');
+        d.heroes[i] = structuredClone(d.heroes.find((h: any) => h.category !== 'evo-angel'));
+      }],
+      ['a unit removed', (d) => { d.robot_units.pop(); }],
+      ['a treaty removed', (d) => { d.treaties.shift(); }],
+      ['a deck card removed', (d) => { d.battle_deck.pop(); }],
+      ['an extra tile added', (d) => { d.maps['2p'].push({ ...d.maps['2p'][0], c: 99, r: 99, start: null }); }],
+      ['no counts (a games server older than the counts)', (d) => { delete d.rulebook.counts; }],
+      ['a count missing for one layout', (d) => { delete d.rulebook.counts.tiles['5-6p']; }],
+      ['a count of zero', (d) => { d.rulebook.counts.heroes = 0; }],
     ];
 
     it('accepts the game\'s own data whole', () => {
@@ -157,17 +187,19 @@ describe('the rules page and a game\'s rulebook', () => {
       }
     });
 
-    it('shows the plain text for a map layout reduced to [{}] or a deck card missing copies', async () => {
-      for (const [name, breakIt] of breaks.slice(0, 1).concat(breaks.filter(([n]) => n === 'a deck card missing copies'))) {
-        const data = fresh();
-        breakIt(data);
-        stubServer('neither-guts-nor-gears', data);
-        const { container, unmount } = open('neither-guts-nor-gears');
-        await waitFor(() => expect(screen.getByRole('heading', { level: 2, name: 'Overview' })).toBeTruthy());
-        expect(container.querySelector('.ngg-rulebook'), name).toBeNull();
-        expect(container.querySelector('details.rules-plain-toggle'), name).toBeNull();
-        unmount();
-      }
+    const SHOWN_PLAIN = [
+      'a map layout reduced to [{}]', 'a deck card missing copies',
+      'a non-start tile removed', 'the Evo Angel removed, other heroes kept',
+    ];
+    it.each(SHOWN_PLAIN)('shows the plain text for %s', async (name) => {
+      const breakIt = breaks.find(([n]) => n === name)![1];
+      const data = fresh();
+      breakIt(data);
+      stubServer('neither-guts-nor-gears', data);
+      const { container } = open('neither-guts-nor-gears');
+      await waitFor(() => expect(screen.getByRole('heading', { level: 2, name: 'Overview' })).toBeTruthy());
+      expect(container.querySelector('.ngg-rulebook')).toBeNull();
+      expect(container.querySelector('details.rules-plain-toggle')).toBeNull();
     });
   });
 
