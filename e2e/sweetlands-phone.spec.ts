@@ -81,7 +81,7 @@ async function expectTopBarOneLine(page: Page): Promise<void> {
 /** Every control the person presses is at least 44 px, except the marks and pieces on the board. */
 async function expectTouchTargets(page: Page): Promise<void> {
   const small = await page.evaluate(() =>
-    [...document.querySelectorAll('.table-topbar button, .table-topbar a, .sl-screen button, .menu-sheet button, .menu-sheet a')]
+    [...document.querySelectorAll('.table-topbar button, .table-topbar a, .sl-screen button, .sl-screen summary, .menu-sheet button, .menu-sheet a, .menu-sheet summary')]
       .filter((el) => !el.closest('.sl-board-fit'))
       // half a pixel of slack: a sheet still sliding up has a fractional
       // transform, and a 44 px row then measures 43.9999
@@ -184,6 +184,13 @@ test('Sweetlands on a phone: the board stays in view, nothing runs off the edge,
     await expect(now.locator('h2').first()).not.toHaveText(title, { timeout: 30_000 });
   }
   await expect(now.getByRole('heading', { name: 'Play one card' })).toBeVisible({ timeout: 30_000 });
+  // The secret goals from setup stay readable: in the menu's Players tab.
+  await page.getByRole('button', { name: /^Scores/ }).click();
+  // (the one kept and the one passed from the left: there may be two)
+  const secrets = page.getByRole('dialog', { name: 'Menu' }).locator('.sl-secret');
+  await expect(secrets.first()).toContainText(/^Your secret goal: ./);
+  await page.getByRole('dialog', { name: 'Menu' }).getByRole('button', { name: 'Close', exact: true }).first().click();
+  await expect(page.getByRole('dialog', { name: 'Menu' })).toBeHidden();
   await expectFits(page);
   await expectBoardInView(page);
   await shot(page, '5-play-one-card');
