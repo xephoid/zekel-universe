@@ -82,8 +82,10 @@ function renderTable() {
 }
 
 describe('the phone frame for a game-drawn screen', () => {
+  let sock: FakeSocket;
   beforeEach(() => {
-    useFakeSocket(new FakeSocket() as never);
+    sock = new FakeSocket();
+    useFakeSocket(sock as never);
     vi.stubGlobal('fetch', vi.fn((input: RequestInfo | URL) => fakeFetch(String(input))));
     GLUES['fake-phone'] = FAKE;
     lastProps = null;
@@ -125,6 +127,8 @@ describe('the phone frame for a game-drawn screen', () => {
     await act(async () => { fireEvent.click(within(menu).getByRole('button', { name: 'Close' })); });
     expect(screen.queryByRole('dialog', { name: 'Menu' })).toBeNull();
     await waitFor(() => expect(lastProps!.menuSlot ?? null).toBeNull());
+    // Opening and closing the menu sends nothing: the table was only joined.
+    expect(sock.emitted.map((e) => e.event).filter((e) => e !== 'join_table')).toEqual([]);
   });
 
   it('gives the screen neither the menu nor its place off a phone', async () => {
