@@ -37,11 +37,11 @@ icons already used by the app).
 |---|---|---|
 | `Table.dc.html` | The whole table on your turn: players and pieces on the left, the board in the middle, your hand below it, the turn panel and color guide on the right. Interactive. | Chosen, built |
 | `First-Game.dc.html` | The "How to play" page: how to score, the three pieces, moving by color, the four steps of a turn, the six color actions. | Chosen, built |
-| `Phone-Table.dc.html` | The phone (390 × 844) on your turn: the top bar on one line, the score chips, the five zoom buttons, the board, the turn panel, the hand. Interactive: everything below opens from here. | Chosen |
-| `Phone-Choose.dc.html` | The phone with a card picked: numbered outlines on the board and the six choices as a two-column grid in the turn panel. | Chosen |
-| `Phone-Zoom.dc.html` | The phone with a piece picked: the board zoomed to double size on the land it lands in; "Move and battle" and "Just move". | Chosen |
-| `Phone-Battle.dc.html` | The phone in a battle: both sides' sugar cubes and the Roll button in the space under the board; the board stays in view. | Chosen |
-| `Phone-Menu.dc.html` | The phone with the menu open: the Players and How to play tabs and the table's buttons, in a sheet that stops under the board. | Chosen |
+| `Phone-Table.dc.html` | The phone (390 × 844) on your turn: the top bar on one line, the score chips, the five zoom buttons, the board, the turn panel, the hand. Interactive: everything below opens from here. | Chosen, built |
+| `Phone-Choose.dc.html` | The phone with a card picked: numbered outlines on the board and the six choices as a two-column grid in the turn panel. | Chosen, built |
+| `Phone-Zoom.dc.html` | The phone with a piece picked: the board zoomed to double size on the land it lands in; "Move and battle" and "Just move". | Chosen, built |
+| `Phone-Battle.dc.html` | The phone in a battle: both sides' sugar cubes and the Roll button in the space under the board; the board stays in view. | Chosen, built |
+| `Phone-Menu.dc.html` | The phone with the menu open: the Players and How to play tabs and the table's buttons, in a sheet that stops under the board. | Chosen, built |
 | `canvas.json` | The canvas layout. | — |
 
 ## Decisions the owner made in this pass (2026-10-08 to 2026-10-13)

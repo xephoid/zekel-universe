@@ -10,7 +10,9 @@ over the rulebook. The desktop candy table is built
 1 to 9, and `docs/implementation-plan.md` section 19); this pass lays the same
 screen out for a phone. It moves no rule and adds no move.
 
-Nothing is built yet.
+Built 2026-11-15 (T44); the record is in `docs/implementation-plan.md`
+section 19, "The phone". The layout ships with `@zekel/sweetlands-imperium`
+0.1.6.
 
 ## Why
 

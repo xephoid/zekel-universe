@@ -1560,6 +1560,49 @@ The design canvas is `docs/design/sweetlands-candy/`; what to build is
   capture, the engine picks the target itself (zekel `choices.ts`,
   "capture-target"), so the player is not asked which piece to take.
 
+### The phone (T44, built 2026-11-15)
+
+The boards are the five `Phone-*` files in `docs/design/sweetlands-candy/`;
+what to build is `docs/games/sweetlands-phone-build.md`. The acceptance check
+is `e2e/sweetlands-phone.spec.ts` at 390 x 844. The layout lives with the game
+in zekel-games (`packages/sweetlands-imperium/src/glue/`) and ships as
+`@zekel/sweetlands-imperium` 0.1.6; Universe uses it once that is published
+and the lockfile moves to it.
+
+- **The opt in and the top bar.** `sweetlandsGlue.phone` is set. The plan
+  gives `titleShort` ("Sweetlands", a new optional `TablePlan` field) and
+  `statusShort` ("R3", "Setup"). The turn pill stays the table's own label,
+  on one line, giving way with an ellipsis.
+- **A place in the menu for the screen.** `GameScreenProps.menuSlot` is a
+  portal target at the top of the open phone menu, and `openMenu` opens it
+  (glue-kit 0.1.1; both optional). The screen puts there what its side
+  column holds on a desktop: a Players tab (each seat's card, the secret
+  goals, each piece with a Find button that rings it and zooms to its land)
+  and a How to play tab (moving by color, the six colors, how to win, and
+  the whole page). The score chips open it on Players; the menu button on
+  whichever tab was last open. Because the screen's part is portaled from
+  the screen, React gives its key presses to the screen, not the Sheet; the
+  table closes the menu on Escape from it with a native listener on the slot.
+- **The board is never covered.** The menu sheet and the game's own choice
+  sheets (the trade-in, a form such as the Cheesecake's "any treat") stop
+  under the board (`--sl-under-board`, measured by the screen). The How to
+  play page is the one full sheet, since nothing can be played while it is
+  open. A battle takes the place of the turn panel and hand, never the board.
+- **Zoom by land.** Five buttons: All, Yours and the other three lands. A
+  land doubles the board on its middle and never shows past the board's
+  edge; choosing a numbered option zooms to where the piece lands, the
+  castle to All; putting the card back zooms out; a sent move keeps the zoom
+  so the piece is seen landing.
+- **A card's choices** are a two-column grid of 44 px buttons, each named by
+  the engine's whole sentence, with the destination in a word; the board
+  numbers the same options. The trade-in button moves from the hand's title
+  row into the panel.
+- **Still open:** an engine defect found by the acceptance run: the move list
+  offers "Play green: move <piece> and take the green action", but the
+  engine plays any green move with `takeAction` as "discard for unlimited
+  plays, no move", so the player is told a piece moves and it does not. The
+  spec avoids green cards until zekel-games fixes it.
+
 ## 20. Word Debauchee (decided 2026-11-09)
 
 The design canvas is `docs/design/word-debauchee/` (start with its README). The
