@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adventurer Olympics on a phone, menu</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#2b2233}a:hover{color:#e0762b}
+@keyframes aop-sheet{from{transform:translateY(60px);opacity:.4}to{transform:translateY(0);opacity:1}}
+</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;overflow:hidden;position:relative;background:#fbf3e0;color:#2b2233;font-family:'Fredoka',sans-serif" data-screen-label="Phone, menu">
+  <div aria-hidden="true" style="position:absolute;inset:0;display:flex;flex-direction:column;pointer-events:none">
+    <div style="height:54px;flex:none;box-sizing:border-box;display:flex;align-items:center;gap:8px;padding:0 6px 0 12px;background:#fff7e6;border-bottom:3px solid #2b2233">
+      <span style="flex:1;min-width:0;font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Adventurer Olympics</span>
+      <span style="flex:none;padding:2px 8px;border-radius:8px;background:#f3e6c8;border:2px solid #2b2233;font-size:13px;font-weight:700">R7</span>
+      <span style="flex:none;display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;background:#ffe0cc;color:#7a2e12;border:2.5px solid #2b2233;font-size:13px;font-weight:700;white-space:nowrap"><span style="width:10px;height:10px;border-radius:50%;background:#e8483d;border:2px solid #2b2233"></span>Your turn</span>
+      <span style="flex:none;width:44px;height:44px;box-sizing:border-box;border-radius:11px;border:2.5px solid #2b2233;background:#fff7e6"></span>
+    </div>
+    <div style="flex:1;min-height:0">
+      <dc-import name="Phone-Map" w="390" h="790" hex-size="26" steps="0" pad="{{ mapPad }}" hint-size="390px,790px"></dc-import>
+    </div>
+  </div>
+  <div style="position:absolute;inset:0;background:rgba(43,34,51,.45)"></div>
+
+  <section role="dialog" aria-label="Menu" style="position:absolute;left:0;right:0;top:70px;bottom:0;box-sizing:border-box;background:#fff7e6;border-top:3px solid #2b2233;border-radius:20px 20px 0 0;box-shadow:0 -5px 0 rgba(43,34,51,.2);display:flex;flex-direction:column;animation:aop-sheet .3s cubic-bezier(.2,.8,.2,1) both">
+    <div style="display:flex;justify-content:center;padding-top:8px"><span style="width:44px;height:5px;border-radius:3px;background:rgba(43,34,51,.25)"></span></div>
+    <div style="display:flex;align-items:center;gap:10px;padding:4px 10px 8px 16px">
+      <span style="font-size:22px;font-weight:700">Menu</span>
+      <span style="flex:1"></span>
+      <a href="Phone-Table.dc.html" aria-label="Close, back to the map" style="width:44px;height:44px;flex:none;box-sizing:border-box;display:grid;place-items:center;border-radius:11px;border:2.5px solid #2b2233;background:#fff7e6;text-decoration:none"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4L4 16" stroke="#2b2233" stroke-width="2.8" stroke-linecap="round"></path></svg></a>
+    </div>
+    <div style="flex:1;min-height:0;overflow:auto;padding:0 12px 16px;display:flex;flex-direction:column;gap:10px">
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
+        <sc-for list="{{ buttons }}" as="b" hint-placeholder-count="4">
+          <button type="button" style="height:50px;border-radius:13px;border:2.5px solid #2b2233;background:#fff7e6;color:#2b2233;font:700 16px 'Fredoka',sans-serif;cursor:pointer;box-shadow:3px 4px 0 rgba(43,34,51,.16)">{{ b }}</button>
+        </sc-for>
+      </div>
+
+      <section aria-label="Last move" style="padding:10px 12px;border-radius:14px 9px 16px 10px/10px 16px 9px 14px;background:#fbf3e0;border:2.5px solid #2b2233;display:flex;flex-direction:column;gap:10px">
+        <span style="font-size:15px;font-weight:700;color:#5c4f66">Last move</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <dc-import name="AO-Icon" icon="ranger" size="44" tint="#ffc83d" hint-size="44px,44px"></dc-import>
+          <div style="font-size:16px;line-height:1.35">Yellow walked 2 hexes and stopped.</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div role="group" aria-label="How fast the other players' turns play" style="display:flex;gap:2px;padding:2px;border-radius:11px;background:#f3e6c8;border:2px solid #2b2233">
+            <sc-for list="{{ paces }}" as="pc" hint-placeholder-count="3">
+              <button type="button" onClick="{{ pc.pick }}" aria-pressed="{{ pc.on }}" style="height:42px;min-width:48px;padding:0 9px;border-radius:9px;border:0;background:{{ pc.bg }};color:#2b2233;font:600 14px 'Fredoka',sans-serif;cursor:pointer">{{ pc.label }}</button>
+            </sc-for>
+          </div>
+          <button type="button" style="flex:1;height:46px;border-radius:12px;border:2.5px solid #2b2233;background:#fff7e6;color:#2b2233;font:700 15px 'Fredoka',sans-serif;cursor:pointer">Replay</button>
+        </div>
+      </section>
+
+      <div style="display:flex;flex-direction:column">
+        <span style="font-size:15px;font-weight:700;color:#5c4f66">Table log</span>
+        <ul style="margin:4px 0 0;padding:0;list-style:none">
+          <sc-for list="{{ log }}" as="l" hint-placeholder-count="6">
+            <li style="display:flex;gap:10px;font-size:15px;line-height:1.35;padding:8px 0;border-top:2px dashed rgba(43,34,51,.15)">
+              <span style="flex:none;margin-top:4px;width:12px;height:12px;box-sizing:border-box;border-radius:50%;background:{{ l.color }};border:2px solid #2b2233"></span>
+              <span>{{ l.text }}</span>
+            </li>
+          </sc-for>
+        </ul>
+      </div>
+
+      <button type="button" style="height:50px;flex:none;border-radius:13px;border:2.5px solid #b3261e;background:#fff7e6;color:#b3261e;font:700 16px 'Fredoka',sans-serif;cursor:pointer">Leave the table</button>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+// The menu, the same frame Fractured Fist and Cybernoir use on a phone: undo, rules,
+// settings, share, the last move with its pace and replay, the log, and leave.
+const PACES = [['Slower',0.6],['Normal',1],['Faster',1.8]];
+class Component extends DCLogic {
+  constructor(p){ super(p); this.state = {pace:1}; }
+  renderVals(){
+    const s = this.state;
+    return {
+      mapPad:{top:0, bottom:200},
+      buttons:['Undo','Rules','Settings','Share'],
+      paces:PACES.map((p)=> ({label:p[0], on:s.pace === p[1], bg:s.pace === p[1] ? '#fff7e6' : 'transparent', pick:()=> this.setState({pace:p[1]})})),
+      log:[
+        {color:'#e8483d', text:'Your turn. Movement 3: take up to 3 steps.'},
+        {color:'#ffc83d', text:'Yellow walked 2 hexes and stopped.'},
+        {color:'#c9bcd6', text:'Round 7. Turn order: Yellow 9, You 8, Purple 6, Blue 4.'},
+        {color:'#9b5de5', text:'Purple walked off the City.'},
+        {color:'#3d8bfd', text:'Blue placed tile 2 and put a coin on its centre.'},
+        {color:'#e8483d', text:'You beat the Goblin. The Little Monster is done.'}
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

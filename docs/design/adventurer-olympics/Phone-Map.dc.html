@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Adventurer Olympics phone map</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+@keyframes aop-drop{0%{transform:translateY(-30px) scale(1.3);opacity:0}60%{opacity:1}80%{transform:translateY(2px) scale(.94)}100%{transform:translateY(0) scale(1);opacity:1}}
+@keyframes aop-pulse{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.14);opacity:.45}}
+@keyframes aop-ghost{0%,100%{opacity:.6}50%{opacity:.95}}
+@keyframes aop-tile{0%{transform:translate(-60px,-160px) scale(.6);opacity:0}40%{opacity:1}100%{transform:translate(0,0) scale(1);opacity:1}}
+@keyframes aop-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+</style>
+</helmet>
+<div style="position:relative;width:{{ w }}px;height:{{ h }}px;overflow:hidden;background:#e9dcbc;font-family:'Fredoka',sans-serif" data-screen-label="Phone map">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><filter id="aop-hexwob" x="-8%" y="-8%" width="116%" height="116%"><feTurbulence type="fractalNoise" baseFrequency="0.07" numOctaves="2" seed="3"></feTurbulence><feDisplacementMap in="SourceGraphic" scale="1.8"></feDisplacementMap></filter></defs></svg>
+
+  <sc-for list="{{ hexes }}" as="hx" hint-placeholder-count="40">
+    <button type="button" onClick="{{ hx.go }}" aria-label="{{ hx.label }}" style="position:absolute;left:{{ hx.x }}px;top:{{ hx.y }}px;width:{{ hw }}px;height:{{ hh }}px;padding:0;border:0;background:transparent;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);cursor:{{ hx.cursor }};opacity:{{ hx.op }};transition:left .35s cubic-bezier(.2,.8,.2,1),top .35s cubic-bezier(.2,.8,.2,1);animation:{{ hx.anim }}">
+      <svg viewBox="0 0 100 86.6" width="{{ hw }}" height="{{ hh }}" preserveAspectRatio="none" style="position:absolute;left:0;top:0" aria-hidden="true"><polygon points="25,0.8 75,0.8 99.2,43.3 75,85.8 25,85.8 0.8,43.3" fill="{{ hx.fill }}" stroke="{{ hx.edge }}" stroke-width="{{ hx.sw }}" stroke-linejoin="round" filter="url(#aop-hexwob)"></polygon></svg>
+      <span style="position:absolute;left:{{ hx.dx }}px;top:{{ hx.dy }}px;width:11px;height:11px;border-radius:50%;background:{{ hx.dot }};border:2px solid {{ hx.dotEdge }};box-sizing:border-box"></span>
+    </button>
+  </sc-for>
+
+  <sc-for list="{{ ghosts }}" as="g" hint-placeholder-count="0">
+    <button type="button" onClick="{{ g.pick }}" aria-label="{{ g.label }}" style="position:absolute;left:{{ g.x }}px;top:{{ g.y }}px;width:{{ hw }}px;height:{{ hh }}px;padding:0;border:0;background:#ff8a3d;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);cursor:pointer;animation:aop-ghost 1.6s ease-in-out infinite">
+      <span style="position:absolute;inset:3px;background:#ffe0cc;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);display:flex;align-items:center;justify-content:center;font:700 12px 'Fredoka',sans-serif;color:#7a2e12">{{ g.text }}</span>
+    </button>
+  </sc-for>
+
+  <sc-for list="{{ badges }}" as="b" hint-placeholder-count="20">
+    <div title="{{ b.title }}" style="position:absolute;left:{{ b.x }}px;top:{{ b.y }}px;width:{{ isz }}px;height:{{ isz }}px;pointer-events:none;transition:left .35s cubic-bezier(.2,.8,.2,1),top .35s cubic-bezier(.2,.8,.2,1)">
+      <sc-if value="{{ b.trig }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:-4px;border-radius:50%;border:3px solid #ff8a3d;background:rgba(255,138,61,.2);animation:aop-pulse 1.3s ease-in-out infinite"></div>
+      </sc-if>
+      <sc-if value="{{ b.focus }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:-7px;border-radius:50%;border:3.5px solid #ff8a3d;background:rgba(255,243,176,.7)"></div>
+      </sc-if>
+      <div style="position:absolute;inset:0;opacity:{{ b.op }}">
+        <dc-import name="AO-Icon" icon="{{ b.icon }}" size="{{ isz }}" rot="{{ b.rot }}" hint-size="34px,34px"></dc-import>
+      </div>
+    </div>
+  </sc-for>
+
+  <sc-for list="{{ tokens }}" as="t" hint-placeholder-count="12">
+    <div style="position:absolute;left:{{ t.x }}px;top:{{ t.y }}px;width:{{ csz }}px;height:{{ csz }}px;pointer-events:none;animation:{{ t.anim }};transition:left .35s cubic-bezier(.2,.8,.2,1),top .35s cubic-bezier(.2,.8,.2,1)">
+      <dc-import name="AO-Icon" icon="coin" size="{{ csz }}" tint="{{ t.color }}" flat="{{ true }}" hint-size="18px,18px"></dc-import>
+    </div>
+  </sc-for>
+
+  <sc-for list="{{ standees }}" as="p" hint-placeholder-count="4">
+    <div title="{{ p.label }}" style="position:absolute;left:{{ p.x }}px;top:{{ p.y }}px;width:{{ psz }}px;height:{{ psz }}px;pointer-events:none;transition:left .34s cubic-bezier(.2,.8,.2,1),top .34s cubic-bezier(.2,.8,.2,1)">
+      <div style="width:{{ psz }}px;height:{{ psz }}px;animation:{{ p.bob }}">
+        <dc-import name="AO-Icon" icon="{{ p.icon }}" size="{{ psz }}" tint="{{ p.color }}" hint-size="42px,42px"></dc-import>
+      </div>
+    </div>
+  </sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"w":{"editor":"int","default":390},"h":{"editor":"int","default":600},"hexSize":{"editor":"float","default":26},"steps":{"editor":"int","default":3},"showSlots":{"editor":"boolean","default":false},"focus":{"editor":"text","default":""},"pos":{"editor":null},"extraTokens":{"editor":null},"extraTiles":{"editor":null},"pending":{"editor":null},"freshTok":{"editor":"text","default":""},"pad":{"editor":null},"onHex":{"editor":null},"onSlot":{"editor":null},"$preview":{"width":390,"height":600}}'>
+// The Adventurer Olympics map, sized for a phone. Every phone board mounts it with
+// <dc-import name="Phone-Map" …>. It holds the demo position (round 7, you are Red,
+// the same table as Main.dc.html, except Purple has walked off the City onto the
+// hex beside it) and draws
+// what the board passes in: where everyone stands, extra coins and tiles, a tile
+// being placed, the slots you could explore into, one icon picked out.
+// onHex(key, {icon, done}) fires only for a hex you could step onto.
+const R3 = Math.sqrt(3);
+const DIRS = [[0,-1],[1,-1],[1,0],[0,1],[-1,1],[-1,0]];
+const DN = ['N','NE','SE','S','SW','NW'];
+// The side between outer hex i and i+1; the tile across it sits at a + 2b, as the engine's
+// hexMap.ts (tileCenter) does: SE–S → (1, 2). Same rule as Main.dc.html in the repo.
+function slotOff(i){ const a = DIRS[i % 6], b = DIRS[(i + 1) % 6]; return [a[0] + 2 * b[0], a[1] + 2 * b[1]]; }
+function K(q, r){ return q + ',' + r; }
+const TILES = {
+  1:{SW:'city',NE:'dungeon'}, 2:{NW:'clubs',N:'dungeon',S:'little'}, 3:{NW:'big',NE:'hearts',SW:'city'},
+  4:{SW:'little',NE:'big'}, 5:{SW:'little'}, 6:{N:'little',S:'big',SW:'star'},
+  7:{NW:'dungeon',S:'diamonds',NE:'little',SE:'little'}, 8:{NW:'little',N:'spades',NE:'dungeon'},
+  9:{N:'little',S:'city'}, 10:{SW:'little',NE:'little',SE:'dungeon'}
+};
+const NAMES = {city:'City',dungeon:'Dungeon',little:'Little Monster',big:'Big Monster',hearts:'Heart rune',spades:'Spade rune',diamonds:'Diamond rune',clubs:'Club rune',star:'Star rune'};
+const LAND = ['#c8e6a0','#bfe39a','#d2eaa8','#c3e0a4','#cfe6b0','#d8e8a0','#c6e3ac','#bddf9c','#d0e4a4','#c9e8b0'];
+const PC = {red:'#e8483d', blue:'#3d8bfd', yellow:'#ffc83d', purple:'#9b5de5'};
+const ARCH = {red:'fighter', blue:'wizard', yellow:'ranger', purple:'rogue'};
+const SEAT = {red:'You', blue:'Blue', yellow:'Yellow', purple:'Purple'};
+const DEMO = {
+  tiles:[{n:5,c:[0,0],k:0},{n:3,c:[2,-3],k:0},{n:7,c:[1,2],k:0},{n:1,c:[-3,1],k:0},{n:9,c:[3,-1],k:0},{n:2,c:[-1,-2],k:1}],
+  tokens:[
+    {h:'2,-3',p:'blue'},{h:'1,2',p:'red'},{h:'-3,1',p:'yellow'},{h:'3,-1',p:'purple'},{h:'-1,-2',p:'blue'},
+    {h:'-1,1',p:'red'},{h:'1,-2',p:'blue'},{h:'2,1',p:'red'},{h:'-2,0',p:'yellow'},{h:'3,-2',p:'purple'},
+    {h:'3,-4',p:'blue'},{h:'-1,-3',p:'yellow'},{h:'1,3',p:'red'},{h:'0,2',p:'red'},{h:'-4,2',p:'red'}
+  ],
+  pos:{red:[1,1], blue:[2,-2], yellow:[-3,0], purple:[4,-2]}
+};
+
+class Component extends DCLogic {
+  renderVals(){
+    const pr = this.props, W = Number(pr.w) || 390, H = Number(pr.h) || 600, S = Number(pr.hexSize) || 26;
+    const pad = pr.pad || {top:0, bottom:0};
+    const pos = Object.assign({}, DEMO.pos, pr.pos || {});
+    const pending = pr.pending || null;
+    const tiles = DEMO.tiles.concat(pr.extraTiles || []).concat(pending ? [Object.assign({pending:true}, pending)] : []);
+    const tokens = DEMO.tokens.concat(pr.extraTokens || []);
+    const map = {};
+    tiles.forEach((t, ti)=>{
+      map[K(t.c[0], t.c[1])] = {q:t.c[0], r:t.c[1], ti:ti, dir:-1, icon:null};
+      for (let d = 0; d < 6; d++){
+        const pd = (d - (t.k || 0) + 6) % 6, q = t.c[0] + DIRS[d][0], r = t.c[1] + DIRS[d][1];
+        map[K(q, r)] = {q:q, r:r, ti:ti, dir:d, icon:TILES[t.n][DN[pd]] || null};
+      }
+    });
+    const done = {}; tokens.forEach((t)=>{ if (map[t.h] && map[t.h].icon) done[t.h] = t.p; });
+    const occ = {}; Object.keys(pos).forEach((c)=>{ if (c !== 'red') occ[K(pos[c][0], pos[c][1])] = c; });
+    const P = (q, r)=> [1.5 * S * q, R3 * S * (r + q / 2)];
+    let a = 1e9, b = -1e9, c = 1e9, e = -1e9;
+    Object.keys(map).forEach((k)=>{ const p = P(map[k].q, map[k].r); a = Math.min(a, p[0]); b = Math.max(b, p[0]); c = Math.min(c, p[1]); e = Math.max(e, p[1]); });
+    const usableTop = pad.top || 0, usableH = H - usableTop - (pad.bottom || 0);
+    const ox = W / 2 - (a + b) / 2, oy = usableTop + usableH / 2 - (c + e) / 2;
+    const at = (q, r)=>{ const p = P(q, r); return [ox + p[0], oy + p[1]]; };
+    const hw = 2 * S, hh = +(R3 * S).toFixed(2);
+
+    const steps = Number(pr.steps) || 0, legal = {};
+    if (steps > 0) DIRS.forEach((d)=>{ const k = K(pos.red[0] + d[0], pos.red[1] + d[1]); if (map[k] && !occ[k] && !(map[k].ti === tiles.length - 1 && pending)) legal[k] = 1; });
+    const pendIdx = pending ? tiles.length - 1 : -1;
+    const onHex = pr.onHex;
+
+    const hexes = Object.keys(map).map((k)=>{
+      const hx = map[k], p = at(hx.q, hx.r), isL = !!legal[k], pend = hx.ti === pendIdx, trig = isL && hx.icon && !done[k];
+      return {
+        x:+(p[0] - S).toFixed(1), y:+(p[1] - hh / 2).toFixed(1), dx:S - 5.5, dy:hh / 2 - 5.5,
+        fill:isL ? '#fff3b0' : LAND[tiles[hx.ti].n - 1], edge:pend ? '#ff8a3d' : '#2b2233', sw:pend ? 6 : 3.5,
+        dot:isL && !trig ? '#ff8a3d' : 'transparent', dotEdge:isL && !trig ? '#2b2233' : 'transparent',
+        cursor:isL ? 'pointer' : 'default', op:pend ? 0.95 : 1, anim:pend ? 'aop-tile .45s cubic-bezier(.2,.8,.2,1) both' : 'none',
+        label:(hx.icon ? NAMES[hx.icon] + (done[k] ? ', done' : '') : 'Empty hex') + (isL ? (trig ? '. Step here to start it.' : '. Step here.') : ''),
+        go:()=>{ if (isL && onHex) onHex(k, {icon:hx.icon, done:!!done[k]}); }
+      };
+    });
+    const isz = Math.round(S * 1.32), csz = Math.round(S * 0.72), psz = Math.round(S * 1.68);
+    // A standee on an icon steps to the left half of the hex; the icon and its coin move right.
+    const shared = {}; Object.keys(pos).forEach((col)=>{ const k = K(pos[col][0], pos[col][1]); if (map[k] && map[k].icon) shared[k] = 1; });
+    const badges = [];
+    Object.keys(map).forEach((k)=>{
+      const hx = map[k]; if (!hx.icon) return;
+      const p = at(hx.q, hx.r);
+      const sx = shared[k] ? S * 0.34 : 0;
+      badges.push({x:+(p[0] - isz / 2 + sx).toFixed(1), y:+(p[1] - isz / 2 - 2).toFixed(1), icon:hx.icon, op:done[k] ? 0.45 : 1, rot:((hx.q * 5 + hx.r * 3) % 7) - 3,
+        trig:!!legal[k] && !done[k], focus:pr.focus === k, title:NAMES[hx.icon] + (done[k] ? ' · done by ' + SEAT[done[k]] : '')});
+    });
+    const coins = tokens.map((t)=>{
+      const hx = map[t.h], p = at(hx.q, hx.r), centre = hx.dir < 0;
+      const sx = shared[t.h] ? S * 0.3 : 0;
+      return {x:+(p[0] + (centre ? -csz / 2 : S * 0.12 + sx)).toFixed(1), y:+(p[1] + (centre ? -csz / 2 : S * 0.06)).toFixed(1), color:PC[t.p], anim:pr.freshTok && pr.freshTok === t.h ? 'aop-drop .5s cubic-bezier(.2,.8,.2,1) .35s both' : 'none'};
+    });
+    const standees = ['red','blue','yellow','purple'].map((col)=>{
+      const p = at(pos[col][0], pos[col][1]), sx = shared[K(pos[col][0], pos[col][1])] ? -S * 0.5 : 0;
+      return {x:+(p[0] - psz / 2 + sx).toFixed(1), y:+(p[1] - psz * 0.82).toFixed(1), icon:ARCH[col], color:PC[col], label:SEAT[col], bob:col === 'red' && steps > 0 ? 'aop-bob 1.2s ease-in-out infinite' : 'none'};
+    });
+    const ghosts = [];
+    if (pr.showSlots){
+      const h = map[K(pos.red[0], pos.red[1])];
+      if (h && h.dir >= 0){
+        const t = tiles[h.ti];
+        [h.dir, (h.dir + 5) % 6].forEach((i)=>{
+          const o = slotOff(i), cc = [t.c[0] + o[0], t.c[1] + o[1]];
+          if (tiles.some((x)=> x.c[0] === cc[0] && x.c[1] === cc[1])) return;
+          [[0,0]].concat(DIRS).forEach((d, j)=>{
+            const p = at(cc[0] + d[0], cc[1] + d[1]);
+            ghosts.push({x:+(p[0] - S).toFixed(1), y:+(p[1] - hh / 2).toFixed(1), text:j === 0 ? 'Here!' : '', label:'Put the tile in this slot', pick:()=>{ if (pr.onSlot) pr.onSlot(cc); }});
+          });
+        });
+      }
+    }
+    return {w:W, h:H, hw:hw, hh:hh, isz:isz, csz:csz, psz:psz, hexes:hexes, badges:badges, tokens:coins, standees:standees, ghosts:ghosts};
+  }
+}
+</script>
+</body>
+</html>

@@ -60,6 +60,75 @@
             "title": "End of game: the quests are scored",
             "page": "table"
         },
+        "Phone-Table.dc.html": {
+            "x": 0,
+            "y": 2960,
+            "w": 390,
+            "h": 844,
+            "title": "Phone \u00b7 your turn, map in view",
+            "is_interactive": true,
+            "page": "table"
+        },
+        "Phone-Test.dc.html": {
+            "x": 470,
+            "y": 2960,
+            "w": 390,
+            "h": 844,
+            "title": "Phone \u00b7 a test: step, Draw, Roll",
+            "is_interactive": true,
+            "page": "table"
+        },
+        "Phone-Test-Done.dc.html": {
+            "x": 940,
+            "y": 2960,
+            "w": 390,
+            "h": 844,
+            "title": "Phone \u00b7 where the card and coin go",
+            "page": "table"
+        },
+        "Phone-Explore.dc.html": {
+            "x": 1410,
+            "y": 2960,
+            "w": 390,
+            "h": 844,
+            "title": "Phone \u00b7 exploring: flip, pick a slot",
+            "is_interactive": true,
+            "page": "table"
+        },
+        "Phone-Explore-Turn.dc.html": {
+            "x": 1880,
+            "y": 2960,
+            "w": 390,
+            "h": 844,
+            "title": "Phone \u00b7 exploring: turn and place",
+            "page": "table"
+        },
+        "Phone-Sheet.dc.html": {
+            "x": 2350,
+            "y": 2960,
+            "w": 390,
+            "h": 844,
+            "title": "Phone \u00b7 adventurer, everyone, quests",
+            "is_interactive": true,
+            "page": "table"
+        },
+        "Phone-Menu.dc.html": {
+            "x": 2820,
+            "y": 2960,
+            "w": 390,
+            "h": 844,
+            "title": "Phone \u00b7 menu, last move and log",
+            "is_interactive": true,
+            "page": "table"
+        },
+        "Phone-Map.dc.html": {
+            "x": 3290,
+            "y": 2960,
+            "w": 390,
+            "h": 600,
+            "title": "Phone map component",
+            "page": "table"
+        },
         "Icons-Runes.dc.html": {
             "x": 0,
             "y": 0,
@@ -120,8 +189,25 @@
         "Icons-Context.dc.html",
         "Icons-Monsters.dc.html",
         "Icons-Companions.dc.html",
-        "AO-Icon.dc.html"
+        "AO-Icon.dc.html",
+        "Phone-Map.dc.html",
+        "Phone-Table.dc.html",
+        "Phone-Test.dc.html",
+        "Phone-Test-Done.dc.html",
+        "Phone-Explore.dc.html",
+        "Phone-Explore-Turn.dc.html",
+        "Phone-Sheet.dc.html",
+        "Phone-Menu.dc.html"
     ],
-    "notes": {},
+    "notes": {
+        "phone": {
+            "x": 0,
+            "y": 2700,
+            "text": "On a phone",
+            "kind": "title1",
+            "maxW": 3680,
+            "page": "table"
+        }
+    },
     "designSystems": []
 }
