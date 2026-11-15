@@ -95,6 +95,24 @@ describe('a hex board', () => {
     expect(parseFloat(hexOf('Centre').style.width)).toBeCloseTo(60);
   });
 
+  it('minRadius keeps a hex big enough to tap: past the room the board scrolls instead of shrinking', () => {
+    // 600 x 400 of room; a wide row of hexes would fit at a small radius.
+    const wide = board({
+      nodes: Array.from({ length: 40 }, (_, i) => ({ id: `h${i}`, label: `Hex ${i}`, x: 0, y: 0, hex: { q: i, r: -Math.floor(i / 2) } })),
+    });
+    const { rerender } = render(<MapPart id="m" data={wide} />);
+    const fitted = parseFloat(hexOf('Hex 0').style.width) / 2;
+    expect(fitted).toBeLessThan(26);
+    rerender(<MapPart id="m" data={{ ...wide, hex: { orientation: 'flat', minRadius: 26 } }} />);
+    expect(parseFloat(hexOf('Hex 0').style.width)).toBeCloseTo(52);
+    expect(parseFloat(hexOf('Hex 0').style.height)).toBeGreaterThanOrEqual(44);
+    // zoom still enlarges from there; a map that fits bigger is not shrunk.
+    rerender(<MapPart id="m" data={{ ...wide, hex: { orientation: 'flat', minRadius: 26, zoom: 1.5 } }} />);
+    expect(parseFloat(hexOf('Hex 0').style.width)).toBeCloseTo(78);
+    rerender(<MapPart id="m" data={{ ...board(), hex: { orientation: 'flat', minRadius: 26, maxRadius: 40 } }} />);
+    expect(parseFloat(hexOf('Centre').style.width)).toBeCloseTo(80);
+  });
+
   it('a token piece lies on the hex; a figure stands on it', () => {
     const data = board();
     data.nodes[0] = { ...data.nodes[0]!, pieces: [{ label: 'coin:c', artUrl: 'data:,c', kind: 'token' }, { label: 'fig', artUrl: 'data:,f' }] };

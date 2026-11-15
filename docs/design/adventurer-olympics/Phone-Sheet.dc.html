@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adventurer Olympics on a phone, your adventurer and the quests</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#2b2233}a:hover{color:#e0762b}
+@keyframes aop-sheet{from{transform:translateY(60px);opacity:.4}to{transform:translateY(0);opacity:1}}
+</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;overflow:hidden;position:relative;background:#fbf3e0;color:#2b2233;font-family:'Fredoka',sans-serif" data-screen-label="Phone, adventurer and quests sheet">
+
+  <!-- the table, behind the sheet -->
+  <div aria-hidden="true" style="position:absolute;inset:0;display:flex;flex-direction:column;pointer-events:none">
+    <div style="height:54px;flex:none;box-sizing:border-box;display:flex;align-items:center;gap:8px;padding:0 6px 0 12px;background:#fff7e6;border-bottom:3px solid #2b2233">
+      <span style="flex:1;min-width:0;font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Adventurer Olympics</span>
+      <span style="flex:none;padding:2px 8px;border-radius:8px;background:#f3e6c8;border:2px solid #2b2233;font-size:13px;font-weight:700">R7</span>
+      <span style="flex:none;display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;background:#ffe0cc;color:#7a2e12;border:2.5px solid #2b2233;font-size:13px;font-weight:700;white-space:nowrap"><span style="width:10px;height:10px;border-radius:50%;background:#e8483d;border:2px solid #2b2233"></span>Your turn</span>
+      <span style="flex:none;width:44px;height:44px;box-sizing:border-box;border-radius:11px;border:2.5px solid #2b2233;background:#fff7e6"></span>
+    </div>
+    <div style="flex:1;min-height:0">
+      <dc-import name="Phone-Map" w="390" h="790" hex-size="26" steps="0" pad="{{ mapPad }}" hint-size="390px,790px"></dc-import>
+    </div>
+  </div>
+  <div style="position:absolute;inset:0;background:rgba(43,34,51,.45)"></div>
+
+  <section role="dialog" aria-label="Your adventurer, everyone and the quests" style="position:absolute;left:0;right:0;top:70px;bottom:0;box-sizing:border-box;background:#fff7e6;border-top:3px solid #2b2233;border-radius:20px 20px 0 0;box-shadow:0 -5px 0 rgba(43,34,51,.2);display:flex;flex-direction:column;animation:aop-sheet .3s cubic-bezier(.2,.8,.2,1) both">
+    <div style="display:flex;justify-content:center;padding-top:8px"><span style="width:44px;height:5px;border-radius:3px;background:rgba(43,34,51,.25)"></span></div>
+    <div style="display:flex;align-items:center;gap:10px;padding:4px 10px 8px 16px">
+      <span style="font-size:22px;font-weight:700">{{ heading }}</span>
+      <span style="flex:1"></span>
+      <a href="Phone-Table.dc.html" aria-label="Close, back to the map" style="width:44px;height:44px;flex:none;box-sizing:border-box;display:grid;place-items:center;border-radius:11px;border:2.5px solid #2b2233;background:#fff7e6;text-decoration:none"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4L4 16" stroke="#2b2233" stroke-width="2.8" stroke-linecap="round"></path></svg></a>
+    </div>
+    <div role="tablist" aria-label="What to show" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:0 12px 10px">
+      <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
+        <button type="button" role="tab" aria-selected="{{ t.on }}" onClick="{{ t.pick }}" style="height:44px;border-radius:12px;border:2.5px solid #2b2233;background:{{ t.bg }};color:#2b2233;font:700 16px 'Fredoka',sans-serif;cursor:pointer;box-shadow:{{ t.shadow }}">{{ t.label }}</button>
+      </sc-for>
+    </div>
+
+    <div style="flex:1;min-height:0;overflow:auto;padding:0 12px 16px">
+
+      <!-- ===== you ===== -->
+      <sc-if value="{{ isYou }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <dc-import name="AO-Icon" icon="fighter" size="64" tint="#e8483d" hint-size="64px,64px"></dc-import>
+            <div style="flex:1;display:flex;flex-direction:column">
+              <span style="font-size:20px;font-weight:700;line-height:1.1">You · Fighter</span>
+              <span style="font-size:14px;color:#5c4f66">Red · 4 coins left</span>
+            </div>
+            <span title="Quest points" style="display:flex;align-items:center;gap:2px;padding:2px 10px 2px 3px;border-radius:999px;background:#ffe0cc;border:2px solid #2b2233;font-size:18px;font-weight:700"><dc-import name="AO-Icon" icon="quest" size="26" hint-size="26px,26px"></dc-import>1</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <sc-for list="{{ stats }}" as="st" hint-placeholder-count="3">
+              <div style="height:46px;box-sizing:border-box;display:flex;align-items:center;gap:8px;padding:0 12px 0 6px;border-radius:12px;background:{{ st.bg }};border:2px solid #2b2233">
+                <dc-import name="AO-Icon" icon="{{ st.icon }}" size="30" hint-size="30px,30px"></dc-import>
+                <span style="font-size:17px;font-weight:600;flex:1">{{ st.name }}</span>
+                <span style="font-size:13px;color:#5c4f66">{{ st.note }}</span>
+                <span style="font-size:24px;font-weight:700;min-width:18px;text-align:right">{{ st.v }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="padding:10px 12px;border-radius:14px 9px 16px 10px/10px 16px 9px 14px;background:#fbf3e0;border:2px solid #2b2233;display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;align-items:center;gap:6px">
+              <span style="font-size:16px;font-weight:700">This turn</span>
+              <span style="flex:1"></span>
+              <dc-import name="AO-Icon" icon="mov" size="22" hint-size="22px,22px"></dc-import>
+              <span style="width:14px;height:14px;border-radius:50%;box-sizing:border-box;background:#ff8a3d;border:2.5px solid #2b2233"></span>
+              <span style="width:14px;height:14px;border-radius:50%;box-sizing:border-box;background:#ff8a3d;border:2.5px solid #2b2233"></span>
+              <span style="width:14px;height:14px;border-radius:50%;box-sizing:border-box;background:#ff8a3d;border:2.5px solid #2b2233"></span>
+              <span style="font-size:14px;font-weight:600;color:#5c4f66">3 of 3</span>
+            </div>
+            <ol style="margin:0;padding:0 0 0 20px;font-size:14px;line-height:1.4">
+              <li>Walk up to 3 steps, or don't move at all.</li>
+              <li>Step onto an open icon and its test starts. Your turn ends after it.</li>
+              <li>Or explore from an edge hex with a step left. That ends your turn too.</li>
+            </ol>
+          </div>
+          <div style="display:flex;gap:12px">
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <span style="font-size:14px;font-weight:600;color:#5c4f66">Companions 2</span>
+              <div style="display:flex;gap:6px">
+                <sc-for list="{{ comps }}" as="c" hint-placeholder-count="2">
+                  <div title="{{ c.title }}" style="width:78px;height:104px;box-sizing:border-box;border-radius:9px 6px 10px 7px/7px 10px 6px 9px;background:#fff7e6;border:2.5px solid #2b2233;box-shadow:3px 4px 0 rgba(43,34,51,.16);overflow:hidden;display:flex;flex-direction:column;align-items:center;transform:rotate({{ c.tilt }}deg)">
+                    <div style="height:12px;width:100%;flex:none;background:#5aa9e6;border-bottom:2px solid #2b2233"></div>
+                    <dc-import name="AO-Icon" icon="{{ c.art }}" size="50" hint-size="50px,50px"></dc-import>
+                    <div style="font-size:10px;font-weight:700;line-height:1;white-space:nowrap">{{ c.name }}</div>
+                    <span style="display:inline-flex;align-items:center;margin-top:3px;padding:0 4px 0 0;border-radius:999px;background:{{ c.bg }};border:1.5px solid #2b2233;font-size:11px;font-weight:700"><dc-import name="AO-Icon" icon="{{ c.icon }}" size="13" hint-size="13px,13px"></dc-import>+1</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <span style="font-size:14px;font-weight:600;color:#5c4f66">Monsters 2</span>
+              <div style="position:relative;width:70px;height:104px">
+                <div style="position:absolute;inset:0;border-radius:9px;background:#fff7e6;border:2.5px solid #2b2233;transform:rotate(-7deg);display:flex;align-items:flex-start;justify-content:flex-start;overflow:hidden"><dc-import name="AO-Icon" icon="slime" size="30" hint-size="30px,30px"></dc-import></div>
+                <div style="position:absolute;inset:0;border-radius:9px 6px 10px 7px/7px 10px 6px 9px;background:#fff7e6;border:2.5px solid #2b2233;box-shadow:3px 4px 0 rgba(43,34,51,.16);overflow:hidden;display:flex;flex-direction:column;align-items:center">
+                  <div style="height:12px;width:100%;flex:none;background:#8fd14f;border-bottom:2px solid #2b2233"></div>
+                  <dc-import name="AO-Icon" icon="goblin" size="54" hint-size="54px,54px"></dc-import>
+                  <div style="font-size:11px;font-weight:700">Goblin</div>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <span style="font-size:14px;font-weight:600;color:#5c4f66">Runes 1</span>
+              <div title="Diamond rune" style="width:70px;height:104px;box-sizing:border-box;border-radius:9px 6px 10px 7px/7px 10px 6px 9px;background:#fff7e6;border:2.5px solid #2b2233;box-shadow:3px 4px 0 rgba(43,34,51,.16);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px">
+                <dc-import name="AO-Icon" icon="diamonds" size="52" hint-size="52px,52px"></dc-import>
+                <span style="font-size:11px;font-weight:700">Diamond</span>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <div aria-label="4 of 10 coins left" style="display:flex;gap:3px">
+              <sc-for list="{{ coins }}" as="cn" hint-placeholder-count="10">
+                <div style="width:22px;height:22px;position:relative">
+                  <sc-if value="{{ cn.on }}" hint-placeholder-val="{{ true }}"><dc-import name="AO-Icon" icon="coin" size="22" tint="#e8483d" hint-size="22px,22px"></dc-import></sc-if>
+                  <sc-if value="{{ cn.off }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;inset:3px;border-radius:50%;border:2px dashed rgba(43,34,51,.3)"></span></sc-if>
+                </div>
+              </sc-for>
+            </div>
+            <span style="font-size:14px;color:#5c4f66">Tiles explored <b style="color:#2b2233">1</b> · Dungeons done <b style="color:#2b2233">1</b></span>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ===== everyone ===== -->
+      <sc-if value="{{ isAll }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <span style="font-size:15px;font-weight:700;color:#5c4f66">Turn order · round 7</span>
+          <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px">
+            <sc-for list="{{ order }}" as="o" hint-placeholder-count="4">
+              <div style="height:44px;box-sizing:border-box;display:flex;align-items:center;gap:4px;padding:0 5px;border-radius:11px;background:{{ o.bg }};border:2.5px solid {{ o.border }}">
+                <span style="width:22px;height:22px;flex:none;box-sizing:border-box;border-radius:50%;background:{{ o.color }};border:2px solid #2b2233;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ o.place }}</span>
+                <span style="font-size:13px;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ o.name }}</span>
+                <span style="font-size:12px;color:#5c4f66">{{ o.roll }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <sc-for list="{{ seats }}" as="s" hint-placeholder-count="3">
+            <div style="border-radius:14px 9px 16px 10px/10px 16px 9px 14px;background:#fff7e6;border:2.5px solid #2b2233;box-shadow:3px 4px 0 rgba(43,34,51,.16);padding:8px 10px 8px 4px;display:flex;gap:6px;align-items:center">
+              <dc-import name="AO-Icon" icon="{{ s.icon }}" size="58" tint="{{ s.color }}" hint-size="58px,58px"></dc-import>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
+                <div style="display:flex;align-items:center;gap:6px">
+                  <span style="font-weight:700;font-size:17px">{{ s.name }}</span>
+                  <span style="font-size:11px;padding:0 6px;border-radius:6px;background:#e3ecff;color:#1f3f8a;font-weight:600;border:1.5px solid #2b2233">AI</span>
+                  <span style="font-size:13px;color:#5c4f66">{{ s.arch }}</span>
+                  <span title="Quest points" style="margin-left:auto;display:flex;align-items:center;font-size:16px;font-weight:700"><dc-import name="AO-Icon" icon="quest" size="20" hint-size="20px,20px"></dc-import>{{ s.qp }}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600">
+                  <sc-for list="{{ s.stats }}" as="st" hint-placeholder-count="3">
+                    <span title="{{ st.name }}" style="display:inline-flex;align-items:center;gap:2px"><dc-import name="AO-Icon" icon="{{ st.icon }}" size="20" hint-size="20px,20px"></dc-import>{{ st.v }}</span>
+                  </sc-for>
+                  <span style="margin-left:auto;display:flex;gap:1px">
+                    <sc-for list="{{ s.arts }}" as="a" hint-placeholder-count="1"><dc-import name="AO-Icon" icon="{{ a }}" size="24" hint-size="24px,24px"></dc-import></sc-for>
+                  </span>
+                </div>
+                <span style="font-size:13px;color:#5c4f66">{{ s.counts }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- ===== quests ===== -->
+      <sc-if value="{{ isQuests }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <span style="font-size:15px;font-weight:700;color:#5c4f66">5 quests in play · each is worth 1 point</span>
+          <sc-for list="{{ quests }}" as="q" hint-placeholder-count="5">
+            <div style="min-height:60px;box-sizing:border-box;display:flex;align-items:center;gap:8px;padding:4px 10px 4px 4px;border-radius:12px;background:#fff7e6;border:2px solid #2b2233">
+              <dc-import name="AO-Icon" icon="quest" size="38" hint-size="38px,38px"></dc-import>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+                <span style="font-size:16px;font-weight:700;line-height:1.2">{{ q.name }}</span>
+                <span style="font-size:13px;color:#5c4f66;line-height:1.25">{{ q.kind }}</span>
+              </div>
+              <span style="flex:none;display:flex;align-items:center;gap:5px;font-size:14px;font-weight:700;padding:3px 10px;border-radius:999px;background:{{ q.bg }};border:1.5px solid #2b2233;white-space:nowrap">
+                <sc-if value="{{ q.hasDot }}" hint-placeholder-val="{{ false }}"><span style="width:10px;height:10px;border-radius:50%;background:{{ q.dot }};border:1.5px solid #2b2233"></span></sc-if>{{ q.tag }}
+              </span>
+            </div>
+          </sc-for>
+          <div style="font-size:14px;color:#5c4f66;line-height:1.4;padding:2px 2px 0">The first three go to whoever does it first. The last two are scored at the end, and only strictly the most wins one.</div>
+        </div>
+      </sc-if>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"tab":{"editor":"enum","options":["you","everyone","quests"],"default":"you"},"$preview":{"width":390,"height":844}}'>
+// What the desktop side column and your board held, in one sheet over the map:
+// you (stats, this turn's steps, companions, monsters, runes, coins), everyone
+// (turn order and the other seats) and the quests. Opened from the "You" row at the
+// bottom of the phone table; the cross takes you back to the map.
+const PC = {red:'#e8483d', blue:'#3d8bfd', yellow:'#ffc83d', purple:'#9b5de5'};
+const TABS = [['you','You'],['everyone','Everyone'],['quests','Quests']];
+const HEAD = {you:'Your adventurer', everyone:'Everyone', quests:'Quests'};
+class Component extends DCLogic {
+  constructor(p){ super(p); this.state = {tab:null}; }
+  renderVals(){
+    const tab = this.state.tab || this.props.tab || 'you';
+    const st = (c, s, m)=> [{name:'Charisma', icon:'cha', v:c}, {name:'Strength', icon:'str', v:s}, {name:'Movement', icon:'mov', v:m}];
+    return {
+      mapPad:{top:0, bottom:200},
+      heading:HEAD[tab],
+      tabs:TABS.map((t)=> ({label:t[1], on:tab === t[0], bg:tab === t[0] ? '#ff8a3d' : '#fff7e6', shadow:tab === t[0] ? '3px 4px 0 rgba(43,34,51,.16)' : 'none', pick:()=> this.setState({tab:t[0]})})),
+      isYou:tab === 'you', isAll:tab === 'everyone', isQuests:tab === 'quests',
+      stats:[{name:'Charisma', icon:'cha', v:2, note:'+1 from friends', bg:'#ffd6e0'}, {name:'Strength', icon:'str', v:1, note:'to start', bg:'#ffe0b8'}, {name:'Movement', icon:'mov', v:3, note:'+1 from friends', bg:'#d6ecff'}],
+      comps:[{art:'pseudodragon', name:'Pseudodragon', icon:'cha', bg:'#ffd6e0', tilt:-3, title:'Pseudodragon (Companion 3): +1 Charisma'}, {art:'broom', name:'Magic Broom', icon:'mov', bg:'#d6ecff', tilt:2, title:'Magic Broom (Companion 10): +1 Movement'}],
+      coins:[0,1,2,3,4,5,6,7,8,9].map((i)=> ({on:i < 4, off:i >= 4})),
+      order:[['yellow','Yellow',9],['red','You',8],['purple','Purple',6],['blue','Blue',4]].map((o, i)=> ({place:i + 1, name:o[1], roll:o[2], color:PC[o[0]], bg:o[0] === 'red' ? '#ffe0cc' : '#fff7e6', border:o[0] === 'red' ? '#ff8a3d' : 'rgba(43,34,51,.3)'})),
+      seats:[
+        {name:'Yellow', arch:'Ranger', icon:'ranger', color:PC.yellow, qp:0, stats:st(1,1,2), arts:['clubs'], counts:'Friends 0 · Monsters 1 · Tiles 1 · Coins 7'},
+        {name:'Purple', arch:'Rogue', icon:'rogue', color:PC.purple, qp:0, stats:st(1,1,2), arts:[], counts:'Friends 0 · Monsters 1 · Tiles 1 · Coins 8'},
+        {name:'Blue', arch:'Wizard', icon:'wizard', color:PC.blue, qp:0, stats:st(1,2,2), arts:['hearts'], counts:'Friends 1 · Monsters 0 · Tiles 2 · Coins 6'}
+      ],
+      quests:[
+        {name:'Recruit 2 companions', kind:'First to do it · claimed', tag:'You', hasDot:true, dot:PC.red, bg:'#ffe0cc'},
+        {name:'Explore 3 tiles', kind:'First to do it · closest: Blue', tag:'2 of 3', hasDot:false, dot:'', bg:'#f3e6c8'},
+        {name:'Complete 2 dungeons', kind:'First to do it · closest: You, Yellow', tag:'1 of 2', hasDot:false, dot:'', bg:'#f3e6c8'},
+        {name:'Most Little Monsters', kind:'End of game · a tie scores nothing', tag:'You lead, 2', hasDot:true, dot:PC.red, bg:'#f3e6c8'},
+        {name:'Most runes', kind:'End of game · a tie scores nothing', tag:'Tied at 1', hasDot:false, dot:'', bg:'#f3e6c8'}
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

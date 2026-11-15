@@ -46,6 +46,25 @@ describe('motion origins', () => {
     expect((ghosts(container)[0] as HTMLElement).style.transform).toContain('translate(-360px');
   });
 
+  it('a mark marked data-flip-ghost that takes over a card\'s id flies as a ghost too, not inside its box', () => {
+    // Adventurer Olympics on a phone: the drawn card leaves, and the small
+    // pile on the "You" button carries the same id.
+    const { container, rerender } = render(
+      <FlipRoot viewKey={1}><div className="zk-card" data-flip-id="little-3" data-x="40" /></FlipRoot>,
+    );
+    rerender(
+      <FlipRoot viewKey={2}><span className="ao-catch-card" data-flip-id="little-3" data-flip-ghost="" data-x="300" /></FlipRoot>,
+    );
+    expect(ghosts(container)).toHaveLength(1);
+    expect((ghosts(container)[0] as HTMLElement).style.transform).toContain('translate(-260px');
+    // The same move without the mark slides in its own box.
+    cleanup();
+    const plain = render(<FlipRoot viewKey={1}><div className="zk-card" data-flip-id="x" data-x="40" /></FlipRoot>);
+    plain.rerender(<FlipRoot viewKey={2}><span data-flip-id="x" data-x="300" /></FlipRoot>);
+    expect(ghosts(plain.container)).toHaveLength(0);
+    expect((plain.container.querySelector('[data-flip-id="x"]') as HTMLElement).style.transform).toContain('translate(-260px');
+  });
+
   it('slides a plain part in its own box, and drops one with no origin on the table', () => {
     const { container, rerender } = render(
       <FlipRoot viewKey={1}><div data-flip-id="a" data-x="0" /></FlipRoot>,

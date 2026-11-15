@@ -335,6 +335,11 @@ export interface GlueModule {
    *  map), instead of the table putting it above the board or in the side
    *  column. */
   placesCaption?: boolean;
+  /** On a phone the menu sheet shows the last move as well, though the screen
+   *  places the caption card itself (placesCaption): for a game whose
+   *  approved phone menu has it (Adventurer Olympics). Without it a screen
+   *  that places its caption keeps it out of the menu (Warble Way Galaxy). */
+  captionInPhoneMenu?: boolean;
   /** The caption card (the last move and playback) goes in the side column,
    *  just above the log, instead of above the board, as it does beside a
    *  game-drawn screen: for a board whose map needs the height. */

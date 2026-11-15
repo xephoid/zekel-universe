@@ -186,7 +186,9 @@ export function FlipRoot({ viewKey, reducedMotion, children, className, style }:
           fade(el, ms, ease);
           continue;
         }
-        if (el.classList.contains('zk-card')) fly(root, el, rect, `translate(${dx}px, ${dy}px)`, ms, ease, flying);
+        // A card, or a mark that asks to fly as a ghost, flies over the
+        // table, so a box that clips or scrolls (a sheet) cannot cut it off.
+        if (el.classList.contains('zk-card') || el.dataset.flipGhost !== undefined) fly(root, el, rect, `translate(${dx}px, ${dy}px)`, ms, ease, flying);
         else slide(el, `translate(${dx}px, ${dy}px)`, ms, ease);
         continue;
       }

@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adventurer Olympics on a phone, a test</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#2b2233}a:hover{color:#e0762b}
+@keyframes aop-rise{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes aop-fly{0%{transform:translate(-120px,-300px) rotate(-14deg) scale(.4);opacity:0}35%{opacity:1}100%{transform:translate(0,0) rotate(0) scale(1);opacity:1}}
+@keyframes aop-tumble{0%{transform:translate(-40px,-30px) rotate(-220deg)}70%{transform:translate(3px,2px) rotate(8deg)}100%{transform:translate(0,0) rotate(0)}}
+@keyframes aop-home{0%{transform:translate(97px,-186px) rotate(8deg) scale(.4);opacity:0}25%{opacity:1}100%{transform:translate(0,0) rotate(-6deg) scale(.7);opacity:1}}
+@keyframes aop-trail{from{stroke-dashoffset:420}to{stroke-dashoffset:0}}
+@keyframes aop-glow{0%,100%{box-shadow:0 0 0 0 rgba(255,138,61,0)}50%{box-shadow:0 0 0 5px rgba(255,138,61,.45)}}
+</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;overflow:hidden;position:relative;display:flex;flex-direction:column;background:#fbf3e0;color:#2b2233;font-family:'Fredoka',sans-serif" data-screen-label="Phone, a test">
+
+  <div style="height:54px;flex:none;box-sizing:border-box;display:flex;align-items:center;gap:8px;padding:0 6px 0 12px;background:#fff7e6;border-bottom:3px solid #2b2233">
+    <span style="flex:1;min-width:0;font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Adventurer Olympics</span>
+    <span style="flex:none;padding:2px 8px;border-radius:8px;background:#f3e6c8;border:2px solid #2b2233;font-size:13px;font-weight:700">R7</span>
+    <span style="flex:none;display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;background:#ffe0cc;color:#7a2e12;border:2.5px solid #2b2233;font-size:13px;font-weight:700;white-space:nowrap"><span style="width:10px;height:10px;border-radius:50%;background:#e8483d;border:2px solid #2b2233"></span>{{ pillText }}</span>
+    <a href="Phone-Menu.dc.html" aria-label="Menu: undo, rules, settings, last move, log" style="flex:none;width:44px;height:44px;box-sizing:border-box;display:grid;place-items:center;border-radius:11px;border:2.5px solid #2b2233;background:#fff7e6;text-decoration:none"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M3 6h16M3 11h16M3 16h16" stroke="#2b2233" stroke-width="2.8" stroke-linecap="round"></path></svg></a>
+  </div>
+
+  <div style="height:46px;flex:none;box-sizing:border-box;display:flex;align-items:center;gap:8px;padding:0 10px;background:#fbf3e0;border-bottom:3px solid #2b2233">
+    <sc-for list="{{ decks }}" as="d" hint-placeholder-count="4">
+      <div title="{{ d.title }}" style="display:flex;align-items:center;gap:4px">
+        <div style="width:24px;height:32px;box-sizing:border-box;border-radius:5px;background:{{ d.color }};border:2px solid #2b2233;display:flex;align-items:center;justify-content:center;box-shadow:{{ d.glow }}">
+          <dc-import name="AO-Icon" icon="{{ d.icon }}" size="20" hint-size="20px,20px"></dc-import>
+        </div>
+        <span style="font-size:16px;font-weight:700">{{ d.count }}</span>
+      </div>
+    </sc-for>
+    <div style="display:flex;align-items:center;gap:4px">
+      <div style="width:28px;height:24px;background:#2b2233;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);position:relative"><span style="position:absolute;inset:2px;background:#bfe39a;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">?</span></div>
+      <span style="font-size:16px;font-weight:700">4</span>
+    </div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:1px">
+      <span style="font-size:12px;font-weight:600;color:#5c4f66;margin-right:2px">Free</span>
+      <dc-import name="AO-Icon" icon="spades" size="24" hint-size="24px,24px"></dc-import>
+      <dc-import name="AO-Icon" icon="star" size="24" hint-size="24px,24px"></dc-import>
+    </div>
+  </div>
+
+  <!-- the map stays in view above the test -->
+  <div style="flex:1;min-height:0;position:relative">
+    <dc-import name="Phone-Map" w="390" h="{{ mapH }}" hex-size="{{ mapS }}" steps="0" pos="{{ pos }}" focus="{{ focus }}" extra-tokens="{{ extraTokens }}" fresh-tok="{{ freshTok }}" hint-size="390px,350px"></dc-import>
+    <sc-if value="{{ done }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;left:50%;top:10px;transform:translateX(-50%);width:362px;box-sizing:border-box;padding:6px 14px;border-radius:999px;background:#fff7e6;border:2.5px solid #2b2233;font-size:14px;font-weight:600;text-align:center;box-shadow:3px 4px 0 rgba(43,34,51,.16)">The Fairy joins you. Your coin is on the City.</div>
+    </sc-if>
+  </div>
+
+  <!-- the test sheet: step, Draw, Roll, result -->
+  <sc-if value="{{ testing }}" hint-placeholder-val="{{ true }}">
+    <div role="dialog" aria-label="City, make a friend" style="height:394px;flex:none;box-sizing:border-box;padding:8px 14px 14px;background:#fff7e6;border-top:3px solid #2b2233;border-radius:20px 20px 0 0;box-shadow:0 -5px 0 rgba(43,34,51,.16);display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;justify-content:center"><span style="width:44px;height:5px;border-radius:3px;background:rgba(43,34,51,.25)"></span></div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <dc-import name="AO-Icon" icon="city" size="42" hint-size="42px,42px"></dc-import>
+        <div style="font-size:21px;font-weight:700">City · make a friend</div>
+      </div>
+      <ol aria-label="The steps of a test" style="margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px">
+        <sc-for list="{{ beats }}" as="bt" hint-placeholder-count="4">
+          <li style="height:32px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:4px;border-radius:10px;border:2px solid {{ bt.border }};background:{{ bt.bg }};color:{{ bt.fg }};font-size:14px;font-weight:700">
+            <sc-if value="{{ bt.tick }}" hint-placeholder-val="{{ false }}"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></sc-if>{{ bt.name }}
+          </li>
+        </sc-for>
+      </ol>
+      <div style="display:flex;gap:12px;align-items:flex-start;flex:1;min-height:0">
+        <div style="flex:none;width:112px;height:158px;position:relative">
+          <sc-if value="{{ noCard }}" hint-placeholder-val="{{ true }}">
+            <div style="position:absolute;inset:0;box-sizing:border-box;border-radius:12px;border:3px dashed rgba(43,34,51,.25);display:flex;align-items:center;justify-content:center;text-align:center;font-size:14px;color:#5c4f66;padding:8px">The card lands here</div>
+          </sc-if>
+          <sc-if value="{{ hasCard }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;inset:0;box-sizing:border-box;border-radius:12px 8px 13px 9px/9px 13px 8px 12px;background:#fff7e6;border:3px solid #2b2233;box-shadow:3px 4px 0 rgba(43,34,51,.16);overflow:hidden;display:flex;flex-direction:column;animation:{{ cardAnim }}">
+              <div style="height:26px;flex:none;background:#5aa9e6;border-bottom:2.5px solid #2b2233;display:flex;align-items:center;justify-content:space-between;padding:0 4px 0 7px"><span style="font-size:11px;font-weight:600">Companion 9</span><span style="width:28px;height:28px;box-sizing:border-box;border-radius:50%;background:#ffd95e;border:2.5px solid #2b2233;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;margin-top:14px">4</span></div>
+              <div style="flex:1;display:flex;align-items:center;justify-content:center;background:#fdeef2"><dc-import name="AO-Icon" icon="fairy" size="70" hint-size="70px,70px"></dc-import></div>
+              <div style="padding:3px 4px 6px;display:flex;flex-direction:column;align-items:center;gap:3px;border-top:2px solid rgba(43,34,51,.12)"><div style="font-size:14px;font-weight:700">Fairy</div><span style="display:inline-flex;align-items:center;gap:1px;padding:0 5px 0 1px;border-radius:999px;background:#ffd6e0;border:2px solid #2b2233;font-size:12px;font-weight:700"><dc-import name="AO-Icon" icon="cha" size="14" hint-size="14px,14px"></dc-import>+3</span></div>
+            </div>
+          </sc-if>
+        </div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:10px">
+          <div style="font-size:16px;line-height:1.38">{{ text }}</div>
+          <sc-if value="{{ rolled }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;gap:8px">
+              <sc-for list="{{ dice }}" as="die" hint-placeholder-count="2">
+                <div style="width:44px;height:44px;box-sizing:border-box;padding:5px;border-radius:12px;background:#ffffff;border:3px solid #2b2233;box-shadow:2px 3px 0 rgba(43,34,51,.2);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px;animation:aop-tumble .55s cubic-bezier(.2,.8,.2,1) both">
+                  <sc-for list="{{ die.cells }}" as="cell" hint-placeholder-count="9"><span style="display:flex;align-items:center;justify-content:center"><span style="width:7px;height:7px;border-radius:50%;background:{{ cell.bg }}"></span></span></sc-for>
+                </div>
+              </sc-for>
+              <span style="font-size:28px;font-weight:700;color:#3f8a22">= 5</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{ rolled }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:13px;line-height:1.35;color:#5c4f66">Short of 4, the Fairy would slide under the deck and the City would stay open.</div>
+          </sc-if>
+        </div>
+      </div>
+      <button type="button" onClick="{{ act }}" style="height:52px;flex:none;border-radius:14px;border:3px solid #2b2233;background:#ff8a3d;color:#2b2233;font:700 18px 'Fredoka',sans-serif;cursor:pointer;box-shadow:3px 4px 0 rgba(43,34,51,.16)">{{ btn }}</button>
+    </div>
+  </sc-if>
+
+  <!-- after the test: the dock comes back, the card flies home -->
+  <sc-if value="{{ done }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:none;box-sizing:border-box;padding:8px 10px 12px;background:#fff7e6;border-top:3px solid #2b2233;display:flex;flex-direction:column;gap:8px;position:relative">
+      <a href="Phone-Sheet.dc.html" aria-label="Open your adventurer, companions and quests" style="min-height:52px;box-sizing:border-box;display:flex;align-items:center;gap:6px;padding:2px 10px 2px 2px;border-radius:14px;border:2.5px solid #2b2233;background:#ffe0cc;color:#2b2233;text-decoration:none">
+        <dc-import name="AO-Icon" icon="fighter" size="44" tint="#e8483d" hint-size="44px,44px"></dc-import>
+        <span style="font-size:16px;font-weight:700;margin-right:2px">You</span>
+        <span title="Charisma, up from 2" style="display:inline-flex;align-items:center;gap:1px;padding:1px 6px 1px 2px;border-radius:999px;background:#ffd6e0;border:2px solid #2b2233;font-size:15px;font-weight:700;animation:aop-glow 1s ease-in-out .7s 2"><dc-import name="AO-Icon" icon="cha" size="20" hint-size="20px,20px"></dc-import>5</span>
+        <span title="Strength" style="display:inline-flex;align-items:center;gap:1px;padding:1px 6px 1px 2px;border-radius:999px;background:#ffe0b8;border:2px solid #2b2233;font-size:15px;font-weight:700"><dc-import name="AO-Icon" icon="str" size="20" hint-size="20px,20px"></dc-import>1</span>
+        <span title="Movement" style="display:inline-flex;align-items:center;gap:1px;padding:1px 6px 1px 2px;border-radius:999px;background:#d6ecff;border:2px solid #2b2233;font-size:15px;font-weight:700"><dc-import name="AO-Icon" icon="mov" size="20" hint-size="20px,20px"></dc-import>3</span>
+        <span title="Coins left" style="display:inline-flex;align-items:center;gap:1px;font-size:15px;font-weight:700"><dc-import name="AO-Icon" icon="coin" size="18" tint="#e8483d" hint-size="18px,18px"></dc-import>3</span>
+        <span title="Quest points" style="display:inline-flex;align-items:center;font-size:15px;font-weight:700"><dc-import name="AO-Icon" icon="quest" size="20" hint-size="20px,20px"></dc-import>1</span>
+        <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" style="margin-left:auto;flex:none"><path d="M4 11l5-5 5 5" fill="none" stroke="#2b2233" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      </a>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="flex:none;display:flex;align-items:center;gap:3px;padding-right:2px">
+          <dc-import name="AO-Icon" icon="mov" size="26" hint-size="26px,26px"></dc-import>
+          <span style="width:16px;height:16px;border-radius:50%;box-sizing:border-box;border:2.5px solid #2b2233"></span>
+          <span style="width:16px;height:16px;border-radius:50%;box-sizing:border-box;border:2.5px solid #2b2233"></span>
+          <span style="width:16px;height:16px;border-radius:50%;box-sizing:border-box;border:2.5px solid #2b2233"></span>
+        </div>
+        <button type="button" disabled="{{ true }}" title="Your turn is over" style="flex:1;height:48px;border-radius:13px;border:2.5px solid rgba(43,34,51,.2);background:#f3e6c8;color:#5c4f66;font:700 16px 'Fredoka',sans-serif;cursor:not-allowed">Explore</button>
+        <a href="Phone-Table.dc.html" style="flex:1;height:48px;box-sizing:border-box;border-radius:13px;border:3px solid #2b2233;background:#ff8a3d;color:#2b2233;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;text-decoration:none;box-shadow:3px 4px 0 rgba(43,34,51,.16)">End turn</a>
+      </div>
+    </div>
+  </sc-if>
+  <!-- where the card goes: from the City down into your row -->
+  <sc-if value="{{ done }}" hint-placeholder-val="{{ false }}">
+    <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none">
+      <svg width="390" height="844" viewBox="0 0 390 844" style="position:absolute;left:0;top:0">
+        <path d="M318 492 Q330 640 122 732" fill="none" stroke="#ff8a3d" stroke-width="3.5" stroke-dasharray="6 7" stroke-linecap="round" style="animation:aop-trail .7s ease-out both"></path>
+        <path d="M134 718 L120 733 L140 738" fill="none" stroke="#ff8a3d" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+      <div style="position:absolute;left:193px;top:636px;width:56px;height:80px;box-sizing:border-box;border-radius:8px;background:#fff7e6;border:2.5px solid #2b2233;box-shadow:3px 4px 0 rgba(43,34,51,.2);overflow:hidden;display:flex;flex-direction:column;align-items:center;animation:aop-home .7s cubic-bezier(.3,.7,.3,1) both;transform:rotate(-6deg) scale(.7)">
+        <div style="height:10px;width:100%;flex:none;background:#5aa9e6;border-bottom:2px solid #2b2233"></div>
+        <dc-import name="AO-Icon" icon="fairy" size="44" hint-size="44px,44px"></dc-import>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"stage":{"editor":"enum","options":["draw","roll","result","done"],"default":"draw"},"$preview":{"width":390,"height":844}}'>
+// A test on a phone: you stepped onto the City, so the test sheet rises over the bottom
+// of the screen and the map stays in view above it, the City picked out. Draw, then Roll:
+// both are buttons the player presses. The beats strip says where you are. On "done" the
+// sheet goes, the Fairy flies down into your row and your coin drops onto the City.
+// The dice are fixed at 3 + 2 for the demo; in the game the engine rolls when you press Roll.
+const PIPS = {1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
+const ORDER = ['draw','roll','result','done'];
+class Component extends DCLogic {
+  constructor(p){ super(p); this.state = {stage:null}; }
+  stage(){ return this.state.stage || this.props.stage || 'draw'; }
+  renderVals(){
+    const st = this.stage(), i = ORDER.indexOf(st), done = st === 'done';
+    const beat = (name, n)=>{ const past = i > n || done, now = i === n; return {name:name, tick:past, bg:now ? '#ff8a3d' : past ? '#d9f0c0' : '#fbf3e0', border:now || past ? '#2b2233' : 'rgba(43,34,51,.25)', fg:now || past ? '#2b2233' : '#5c4f66'}; };
+    const texts = {
+      draw:'You stepped onto the City. Draw the top Companion card, then roll dice equal to your Charisma (2).',
+      roll:'The Fairy needs 4 or more. Roll 2 dice, your Charisma, and add up the pips.',
+      result:'3 + 2 = 5. The Fairy joins you! Her +3 Charisma counts for the rest of the game, and your coin goes on the City.'
+    };
+    const btns = {draw:'Draw a Companion card', roll:'Roll 2 dice', result:'Keep her and end turn'};
+    return {
+      testing:!done, done:done, pillText:done ? 'Turn over' : 'Your turn',
+      mapH:done ? 613 : 350, mapS:done ? 26 : 22, pos:{red:[3,0]}, focus:done ? '' : '3,0',
+      extraTokens:done ? [{h:'3,0', p:'red'}] : [], freshTok:done ? '3,0' : '',
+      decks:[{icon:'cha', color:'#5aa9e6', count:i >= 1 ? 12 : 13, title:'Companion deck', glow:st === 'draw' ? '0 0 0 4px rgba(255,138,61,.55)' : '2px 2px 0 rgba(43,34,51,.18)'},
+        {icon:'dungeon', color:'#9d8fc2', count:24, title:'Dungeon deck', glow:'2px 2px 0 rgba(43,34,51,.18)'},
+        {icon:'little', color:'#8fd14f', count:8, title:'Little Monster deck', glow:'2px 2px 0 rgba(43,34,51,.18)'},
+        {icon:'big', color:'#ff7a59', count:12, title:'Big Monster deck', glow:'2px 2px 0 rgba(43,34,51,.18)'}],
+      beats:[beat('Step', -1), beat('Draw', 0), beat('Roll', 1), beat('Result', 2)],
+      noCard:st === 'draw', hasCard:st === 'roll' || st === 'result', cardAnim:st === 'roll' ? 'aop-fly .45s cubic-bezier(.2,.8,.2,1) both' : 'none',
+      rolled:st === 'result', text:texts[st] || '', btn:btns[st] || '',
+      dice:[3,2].map((n)=> ({cells:[0,1,2,3,4,5,6,7,8].map((c)=> ({bg:PIPS[n].indexOf(c) >= 0 ? '#2b2233' : 'transparent'}))})),
+      act:()=> this.setState({stage:ORDER[Math.min(ORDER.length - 1, i + 1)]})
+    };
+  }
+}
+</script>
+</body>
+</html>
