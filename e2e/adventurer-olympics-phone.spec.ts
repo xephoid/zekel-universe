@@ -90,7 +90,7 @@ type Did = 'draw' | 'roll' | 'place' | 'slot' | 'step' | 'button' | null;
 async function takeTurnStep(page: Page, seen: Set<string>): Promise<Did> {
   const scr = page.locator('.ao-screen.phone');
   const button = (name: string | RegExp) => scr.getByRole('button', { name, exact: typeof name === 'string' });
-  const test = page.getByRole('region', { name: 'The test' });
+  const test = page.getByRole('region', { name: 'The test', exact: true });
   // Draw and Roll are pressed only when they are there. "Roll 2 dice" is also
   // the roll for turn order, so look at which sheet is up, not at the label.
   for (const [name, did] of [[/^Draw a card$/, 'draw'], [/^Turn over a tile$/, 'draw'], [/^Roll \d (die|dice)$/, 'roll']] as const) {

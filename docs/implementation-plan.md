@@ -1440,7 +1440,10 @@ zekel-games. The desktop table does not change.
   sheet is closed), and the card flies into it. The result's own copy of a
   card you keep has no flip id, so the card has one place to go; someone
   else's kept card has no pile on a phone, so it lands on the result's copy,
-  as on a desktop. A stat that
+  as on a desktop. On a phone the result stays over the map even when the
+  next panel is already up (a Dungeon's second fight, the roll for turn
+  order), so that copy is always there. With Everyone or Quests showing in
+  the adventurer sheet, your pile moves onto the You tab. A stat that
   changed glows in the row.
 - **The caption** sits over the top of the map while the others play and
   gives way on your turn; the menu shows the last move whenever the game is
@@ -1468,7 +1471,7 @@ zekel-games. The desktop table does not change.
   varies; the unit tests cover every state on captured views. Not checked in
   a browser: the setup sheet (it appears at the table only with a friend
   seated), a forced explore, a Dungeon chain and the end screen.
-- **Checks.** zekel-games: `ao-phone.test.tsx` (31) beside the existing AO
+- **Checks.** zekel-games: `ao-phone.test.tsx` (33) beside the existing AO
   tests, and its full suite. Universe: `table-phone-menu.test.tsx`, the new
   `minRadius` case in `hexmap.test.tsx`, the web suite, and the phone,
   desktop, Fractured Fist phone and Warble Way specs against a local engine
