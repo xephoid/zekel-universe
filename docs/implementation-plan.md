@@ -1443,7 +1443,10 @@ zekel-games. The desktop table does not change.
   as on a desktop. On a phone the result stays over the map even when the
   next panel is already up (a Dungeon's second fight, the roll for turn
   order), so that copy is always there. With Everyone or Quests showing in
-  the adventurer sheet, your pile moves onto the You tab. A stat that
+  the adventurer sheet, your pile moves onto the You tab. The pile's marks are
+  `data-flip-ghost`, and the motion root now flies such a mark over the
+  table when it takes over a card's id, not only when it is new, so a sheet
+  that scrolls cannot clip the flight (a change in Universe's primitives). A stat that
   changed glows in the row.
 - **The caption** sits over the top of the map while the others play and
   gives way on your turn; the menu shows the last move whenever the game is
