@@ -22,9 +22,11 @@ export function Sheet({ title, onClose, children, className, heading }: {
 
   useEffect(() => {
     opener.current = document.activeElement;
-    // The first thing worth acting on, else the dialog itself.
+    // The first thing worth acting on, else the dialog itself. A control the
+    // page took out of the Tab order (tabindex="-1", a tab not selected) is
+    // not a stop, here or in the trap below.
     const first = box.current?.querySelector<HTMLElement>(
-      'input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]):not(.close), [href], [tabindex]:not([tabindex="-1"])',
+      ':is(input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]):not(.close), [href], [tabindex]):not([tabindex="-1"])',
     );
     (first ?? box.current)?.focus();
     return () => {
@@ -37,7 +39,7 @@ export function Sheet({ title, onClose, children, className, heading }: {
     if (e.key === 'Escape') { e.stopPropagation(); onClose(); return; }
     if (e.key !== 'Tab') return;
     const focusable = [...(box.current?.querySelectorAll<HTMLElement>(
-      'input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])',
+      ':is(input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [href], [tabindex]):not([tabindex="-1"])',
     ) ?? [])].filter((el) => el.offsetParent !== null || el === document.activeElement);
     if (focusable.length === 0) { e.preventDefault(); return; }
     const first = focusable[0]!;

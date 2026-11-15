@@ -377,6 +377,10 @@ export interface MapData {
     /** The largest a hex may be drawn, as its radius in pixels: a small map
      *  stays at the board's own scale instead of growing to fill the room. */
     maxRadius?: number;
+    /** The smallest a hex may be drawn, as its radius in pixels, so a hex
+     *  stays big enough to tap (a phone): a map too big for the room at that
+     *  size scrolls instead of shrinking. Applied before zoom. */
+    minRadius?: number;
     /** Drawn this many times the fitted size (1 = fit); past the room the
      *  board scrolls. */
     zoom?: number;

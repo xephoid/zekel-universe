@@ -910,9 +910,11 @@ function HexMap({ id, data, lit, onSelect, className, style }: PrimitiveProps<Ma
   const spanX = maxX - minX, spanY = maxY - minY;
   const fill = data.fill;
   // The hex radius in pixels: as large as the board allows, the whole map in
-  // view, never past maxRadius; zoom enlarges it and the board then scrolls.
+  // view, never past maxRadius nor under minRadius (where the board scrolls
+  // rather than draw a hex too small to tap); zoom enlarges it and the board
+  // then scrolls.
   const fit = size.w > 0 ? (fill ? Math.min(size.w / spanX, size.h / spanY) : size.w / spanX) : 0;
-  const s = Math.min(fit, data.hex?.maxRadius ?? Infinity) * (data.hex?.zoom ?? 1);
+  const s = fit > 0 ? Math.max(Math.min(fit, data.hex?.maxRadius ?? Infinity), data.hex?.minRadius ?? 0) * (data.hex?.zoom ?? 1) : 0;
   const ox = Math.max(0, (size.w - spanX * s) / 2) - minX * s;
   const oy = (fill ? Math.max(0, (size.h - spanY * s) / 2) : 0) - minY * s;
   const at = (i: number) => ({ x: ox + centres[i]!.x * s, y: oy + centres[i]!.y * s });

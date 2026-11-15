@@ -347,9 +347,11 @@ export function TablePage() {
 
   // A game-drawn screen keeps the last move and the playback speed in the side
   // column, just above the log; any other table shows them over the board.
-  // On a phone there is no side column: they are in the menu sheet.
+  // On a phone there is no side column: they are in the menu sheet, and also
+  // there for a screen that places its own when its glue asks
+  // (captionInPhoneMenu).
   const captionInSide = (!!glue?.Screen || !!glue?.captionInSide) && sideOpen && !glue?.placesCaption && !phone;
-  const captionInMenu = phone && !glue?.placesCaption;
+  const captionInMenu = phone && (!glue?.placesCaption || !!glue?.captionInPhoneMenu);
   const share = () => { void navigator.clipboard?.writeText(`${window.location.origin}/table/${id}/watch`); setShared(true); };
   const captionCard = (
     <div className={`caption-card${state.done ? '' : ' pending'}`} aria-live="polite">
