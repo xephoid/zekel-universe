@@ -20,12 +20,61 @@
       "w": 1200,
       "h": 920,
       "title": "First game — the whole game on one page"
+    },
+    "Phone-Table.dc.html": {
+      "x": 0,
+      "y": 1400,
+      "w": 390,
+      "h": 844,
+      "title": "Phone — your turn (tap around)",
+      "is_interactive": true
+    },
+    "Phone-Choose.dc.html": {
+      "x": 470,
+      "y": 1400,
+      "w": 390,
+      "h": 844,
+      "title": "Phone — a card picked"
+    },
+    "Phone-Zoom.dc.html": {
+      "x": 940,
+      "y": 1400,
+      "w": 390,
+      "h": 844,
+      "title": "Phone — piece picked, zoomed to its land"
+    },
+    "Phone-Battle.dc.html": {
+      "x": 1410,
+      "y": 1400,
+      "w": 390,
+      "h": 844,
+      "title": "Phone — battle"
+    },
+    "Phone-Menu.dc.html": {
+      "x": 1880,
+      "y": 1400,
+      "w": 390,
+      "h": 844,
+      "title": "Phone — the menu (players, how to play)"
     }
   },
   "order": [
     "Table.dc.html",
-    "First-Game.dc.html"
+    "First-Game.dc.html",
+    "Phone-Table.dc.html",
+    "Phone-Choose.dc.html",
+    "Phone-Zoom.dc.html",
+    "Phone-Battle.dc.html",
+    "Phone-Menu.dc.html"
   ],
-  "notes": {},
+  "notes": {
+    "phones": {
+      "kind": "title1",
+      "x": 0,
+      "y": 1100,
+      "text": "On a phone",
+      "maxW": 2270
+    }
+  },
   "designSystems": []
 }
