@@ -37,7 +37,7 @@ function FakeScreen(props: GameScreenProps) {
   return (
     <div className="fake-screen">
       {props.openMenu && <button type="button" onClick={props.openMenu}>Scores</button>}
-      {props.menuSlot && createPortal(<p>The game’s own part of the menu</p>, props.menuSlot)}
+      {props.menuSlot && createPortal(<><p>The game’s own part of the menu</p><button type="button">The game’s own button</button></>, props.menuSlot)}
     </div>
   );
 }
@@ -129,6 +129,18 @@ describe('the phone frame for a game-drawn screen', () => {
     await waitFor(() => expect(lastProps!.menuSlot ?? null).toBeNull());
     // Opening and closing the menu sends nothing: the table was only joined.
     expect(sock.emitted.map((e) => e.event).filter((e) => e !== 'join_table')).toEqual([]);
+  });
+
+  it('closes the menu on Escape from the screen’s own controls in it', async () => {
+    setPhone(true);
+    renderTable();
+    await screen.findByText('Scores');
+    await act(async () => { fireEvent.click(screen.getByText('Scores')); });
+    const menu = await screen.findByRole('dialog', { name: 'Menu' });
+    const own = await within(menu).findByRole('button', { name: 'The game’s own button' });
+    own.focus();
+    await act(async () => { fireEvent.keyDown(own, { key: 'Escape' }); });
+    expect(screen.queryByRole('dialog', { name: 'Menu' })).toBeNull();
   });
 
   it('gives the screen neither the menu nor its place off a phone', async () => {

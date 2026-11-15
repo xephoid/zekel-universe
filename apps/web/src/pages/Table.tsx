@@ -120,6 +120,17 @@ export function TablePage() {
   useEffect(() => { if (!phone) setMenuOpen(false); }, [phone]);
   // A strike starting (or replayed from the menu) is the thing to watch.
   useEffect(() => { if (moment) setMenuOpen(false); }, [moment]);
+  // What a game-drawn screen puts in the menu is portaled there from the
+  // screen, so React hands its key presses to the screen, not to the Sheet.
+  // Escape from one of those controls still closes the menu. (Tab needs
+  // nothing: the slot sits between the Close button and the table's own
+  // buttons, so it is never at the edge of the Sheet's trap.)
+  useEffect(() => {
+    if (!menuSlot) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { e.stopPropagation(); setMenuOpen(false); } };
+    menuSlot.addEventListener('keydown', onKey);
+    return () => menuSlot.removeEventListener('keydown', onKey);
+  }, [menuSlot]);
   const myPlayerId = current?.playerId ?? null;
   const legalMoves: LegalMove[] = state.done && current?.yourTurn ? current.legalMoves : [];
   const unavailable = useMemo(() => (state.done && current?.yourTurn ? current.unavailable ?? [] : []), [state.done, current]);
