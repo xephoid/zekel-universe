@@ -1378,6 +1378,120 @@ the same call Fractured Fist's arcade theme made (§17).
   fit the board. The table tells a screen whether a seat is the AI
   (`GameScreenProps.seatKind`).
 
+### The phone (built 2026-11-13, not yet reviewed or merged)
+
+The boards are the eight `Phone-*` files in `docs/design/adventurer-olympics/`
+(approved 2026-11-12); what to build is
+`docs/games/adventurer-olympics-phone-build.md`. That guide was written
+before the screen moved to zekel-games, so its paths under
+`apps/web/src/glue/ao/` are now `packages/adventurer-olympics/src/glue/` in
+zekel-games. The desktop table does not change.
+
+- **Where the code is.** The phone layout is in zekel-games (`AoScreen.tsx`,
+  `ao-screen.css`, `index.ts`). Universe changes three shared things:
+  `GlueModule.captionInPhoneMenu` (glue-kit), the menu sheet honouring it
+  (`Table.tsx`), and `MapData.hex.minRadius` (primitives). The Adventurer
+  Olympics glue states `captionInPhoneMenu` and `minRadius` before the
+  published `@zekel/glue-kit` and `@zekel/primitives` carry them; a table or
+  primitives build without them ignores them. Both packages need a release
+  before the glue can type them plainly.
+- **The glue.** `phone: true`; `statusShort` is "R" and the round; on a phone
+  `yourTurnLabel` is just "Your turn" (the steps are the pips).
+- **The bottom of the screen.** The "You" row is one button ("Your
+  adventurer, companions and quests") that opens the adventurer sheet: the
+  table's `Sheet`, titled "Your adventurer", with tabs You, Everyone and
+  Quests. You is your board's stats card and holdings, with "This turn": the
+  step pips and your board's own hint, read from the view. The board's three
+  lines about what a turn may do are left out: they restate rules, and the
+  engine is their one source. Everyone and Quests are the side column's
+  parts, drawn under `.ao-sheet-part` rather than `.ao-side`. The tabs follow
+  the ARIA tabs pattern: one tab stop, the arrow keys, Home and End; all three
+  panels are mounted and the two not shown are `hidden`. For that, the shared
+  `Sheet` (glue-kit) now leaves controls with `tabindex="-1"` out of its focus
+  trap and its first focus; before, Tab could leave the sheet past an
+  unselected tab. Every game's sheets use the trap. The action row is the step pips,
+  Explore and End turn; "Stay and try again" takes a row of its own above
+  them when the engine lists it.
+- **Hex size.** The boards' radius, 28 px (a hex 48 px tall), and never under
+  26 px (45 px tall). The map primitive had a cap (`maxRadius`) but no
+  floor, so a late-game map fitted into 390 px would have drawn hexes too
+  small to tap. `hex.minRadius` is the floor: past it the map scrolls inside
+  itself rather than shrink. The cost: Fit no longer fits a very large map
+  whole.
+- **The Key button** has the visible name "Key" (the spec asks for it) and
+  "What the icons are" as its title; the board labelled it the other way.
+- **The panels as bottom sheets.** A test or a roll (anyone's, as the desktop
+  shows them) and your own exploring, "Any rune" and setup rise in the
+  dock's place. The sheet rises by growing from about the dock's height to its
+  own, so the map, which takes the height left, eases down with it; under
+  reduced motion it fades instead. A test has the beats strip (Step,
+  Draw, Roll, Result) and the tested icon picked out with a ring.
+- **How a test went shows over the bottom of the map, with the dock back at
+  once,** not in the sheet. On the real engine the roll and its result are one
+  event, so this is the moment a kept card must fly; the "You" row carries a
+  small pile with the flip ids of everything you keep (while the adventurer
+  sheet is closed), and the card flies into it. The result's own copy of a
+  kept card has no flip id, so the card has one place to go. A stat that
+  changed glows in the row.
+- **The caption** sits over the top of the map while the others play and
+  gives way on your turn; the menu shows the last move whenever the game is
+  on (`captionInPhoneMenu`).
+- **The menu's log lines** are 44 px tall on this table only; the frame's log
+  is shared, and the Fractured Fist and Cybernoir phone menus still have
+  18 px lines.
+- **A rules lesson** stays in the flow under the board (so it covers
+  nothing), with 44 px buttons. It costs the map about 100 px until
+  dismissed.
+- **Changed in the spec.** `e2e/adventurer-olympics-phone.spec.ts` is the
+  guide's spec with these changes. The game opens with the roll for turn
+  order, in its own sheet, so the spec presses "Roll 2 dice" until the first
+  turn with End turn before it checks the resting layout (the guide's spec
+  checked it at the first "Your turn", which is that roll). On that first
+  sheet it holds the sheet's animation at its start and end and checks the
+  map is more than 40 px taller at the start. It steps onto a lit icon when
+  there is one, else the first lit hex, instead of a random one. It checks
+  touch targets and no scrolling in every state it meets (the turn-order
+  sheet, each tab of the adventurer sheet, the menu, a test, both stages of
+  exploring, "Any rune" if it comes up), the tabs from the keyboard (arrows,
+  Home, Tab and Shift+Tab staying in the sheet), and that
+  every glowing slot can be scrolled into the map and is 44 px tall. The
+  engine still shuffles and rolls for real, so which states a game reaches
+  varies; the unit tests cover every state on captured views. Not checked in
+  a browser: the setup sheet (it appears at the table only with a friend
+  seated), a forced explore, a Dungeon chain and the end screen.
+- **Checks.** zekel-games: `ao-phone.test.tsx` (27) beside the existing AO
+  tests, and its full suite. Universe: `table-phone-menu.test.tsx`, the new
+  `minRadius` case in `hexmap.test.tsx`, the web suite, and the phone,
+  desktop, Fractured Fist phone and Warble Way specs against a local engine
+  serving zekel-games, with the local Adventurer Olympics build installed in
+  place of the published one.
+- **Release order (nothing is published yet).** Universe installs the
+  published `@zekel/adventurer-olympics` 0.1.3, which has no phone layout, so
+  the two halves reach production in this order:
+  1. Merge the Universe half. With 0.1.3 installed nothing changes for this
+     game (its glue does not say `phone`), and the new optional fields change
+     nothing for the others.
+  2. Merge the zekel-games half and publish `@zekel/adventurer-olympics`
+     0.1.4 from it.
+  3. In Universe, raise `apps/web`'s dependency to `^0.1.4`, refresh the
+     lockfile, and run the phone and desktop specs on what is installed.
+
+  Universe's own glue-kit and primitives ship inside Universe, so step 3
+  needs no other release. glue-kit's next release (0.1.1) is shared with
+  T44's frame changes; neither task bumps it alone. Publishing `@zekel/glue-kit` and
+  `@zekel/primitives` is only so zekel-games can type the two new fields
+  (and so its `/dev` pages honour `minRadius`). In the other order (0.1.4
+  against a Universe without step 1) the phone layout works but the menu has
+  no last move and hexes have no minimum size. Until step 3, the local check
+  is: build zekel-games, and put that build of the package in place of the
+  installed one in Universe's `node_modules` (renaming the original aside;
+  pnpm's store links those files to other checkouts), then build the web app.
+- **Still open.**
+  - The engine's "Real cards and dice" lesson still appears at a digital
+    table (above).
+  - zekel-games' unit tests run against the published primitives, so they
+    check the hex cap but not the floor; the floor is checked in Universe.
+
 
 ## 19. Sweetlands Imperium's candy theme (decided 2026-10-13)
 
