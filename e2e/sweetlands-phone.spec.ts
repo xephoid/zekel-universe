@@ -81,7 +81,7 @@ async function expectTopBarOneLine(page: Page): Promise<void> {
 /** Every control the person presses is at least 44 px, except the marks and pieces on the board. */
 async function expectTouchTargets(page: Page): Promise<void> {
   const small = await page.evaluate(() =>
-    [...document.querySelectorAll('.table-topbar button, .table-topbar a, .sl-screen button, .sl-screen summary, .menu-sheet button, .menu-sheet a, .menu-sheet summary')]
+    [...document.querySelectorAll('.table-topbar button, .table-topbar a, .sl-screen :is(button, summary, label, select), .menu-sheet :is(button, a, summary)')]
       .filter((el) => !el.closest('.sl-board-fit'))
       // half a pixel of slack: a sheet still sliding up has a fractional
       // transform, and a 44 px row then measures 43.9999
@@ -194,6 +194,30 @@ test('Sweetlands on a phone: the board stays in view, nothing runs off the edge,
   await expectFits(page);
   await expectBoardInView(page);
   await shot(page, '5-play-one-card');
+
+  // When the deal gives the Cheesecake a treat card, its "any treat" choice
+  // opens a form: every choice in it is 44 px, and it stops under the board.
+  const treat = page.locator('.sl-card.playable.treat').first();
+  if (await treat.count() > 0) {
+    await treat.click();
+    const anyTreat = now.locator('.sl-option', { hasText: /any treat/ });
+    if (await anyTreat.count() > 0) {
+      await anyTreat.first().click();
+      await now.getByRole('button', { name: 'Choose the treat' }).click();
+      const form = page.getByRole('dialog', { name: 'Which treat space?' });
+      await expect(form).toBeVisible();
+      await page.waitForTimeout(500); // let it finish rising
+      await expectBoardInView(page);
+      await expectFits(page);
+      await expectTouchTargets(page);
+      await shot(page, '5b-treat-form');
+      console.log('TREAT FORM CHECKED');
+      await form.getByRole('button', { name: 'Close', exact: true }).first().click();
+      await expect(form).toBeHidden();
+    }
+    await treat.click(); // put it back
+    await expect(page.locator('.sl-card[aria-pressed="true"]')).toHaveCount(0);
+  }
 
   // Pick a card: the choices are a grid of 44 px buttons in the engine's words, numbered on the board too.
   const hand = await page.locator('.sl-card').count();
