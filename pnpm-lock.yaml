@@ -97,8 +97,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/primitives
       '@zekel/sweetlands-imperium':
-        specifier: ^0.1.3
-        version: 0.1.3(@zekel/game-kit@0.1.0)(@zekel/glue-kit@packages+glue-kit)(@zekel/primitives@packages+primitives)(@zekel/wire-types@packages+wire-types)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^0.1.6
+        version: 0.1.6(@zekel/game-kit@0.1.0)(@zekel/glue-kit@packages+glue-kit)(@zekel/primitives@packages+primitives)(@zekel/wire-types@packages+wire-types)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@zekel/tokens':
         specifier: workspace:*
         version: link:../../packages/tokens
@@ -1111,8 +1111,8 @@ packages:
       react-dom:
         optional: true
 
-  '@zekel/sweetlands-imperium@0.1.3':
-    resolution: {integrity: sha512-Eo730EnGXYl4UYVQZYJoIsSmRnU/ubOyCk5s3m8nEgJHzgVgPEIkk/dZvL6aSaIaY6vFMSkB/459OTs9UY6t9g==}
+  '@zekel/sweetlands-imperium@0.1.6':
+    resolution: {integrity: sha512-MLiJEqC2GNEJYY4XlyDOqgYjS7QijKqIKO/LQiWStu7Q4Rt+EBn1hgGwLH3F01bpknDD3tujHFIpaSJqEAG5+Q==}
     engines: {node: '>=22.13.0'}
     peerDependencies:
       '@zekel/dev': ^0.1.1
@@ -3068,7 +3068,7 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@zekel/sweetlands-imperium@0.1.3(@zekel/game-kit@0.1.0)(@zekel/glue-kit@packages+glue-kit)(@zekel/primitives@packages+primitives)(@zekel/wire-types@packages+wire-types)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@zekel/sweetlands-imperium@0.1.6(@zekel/game-kit@0.1.0)(@zekel/glue-kit@packages+glue-kit)(@zekel/primitives@packages+primitives)(@zekel/wire-types@packages+wire-types)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@zekel/game-kit': 0.1.0
     optionalDependencies:

@@ -160,6 +160,9 @@ export interface TablePlan {
   palette: Palette;
   /** the game's display name for the top bar */
   title: string;
+  /** the title on a phone's top bar, when the full one does not fit beside
+   *  the round, the turn and the menu button ("Sweetlands") */
+  titleShort?: string;
   /** a small picture beside the title in the top bar (the game's mark) */
   titleArt?: string;
   /** one line for the turn indicator, e.g. "Round 3 · Technique phase" */
@@ -320,6 +323,13 @@ export interface GameScreenProps {
    *  game whose glue has a phone layout (GlueModule.phone). The side column
    *  is gone then, so sideSlot is absent. */
   phone?: boolean;
+  /** On a phone, while the table's menu sheet is open: a place at the top of
+   *  the sheet for what the screen's side column holds on a desktop (a
+   *  portal target). Absent off a phone and while the menu is closed. */
+  menuSlot?: HTMLElement | null;
+  /** On a phone: open the table's menu sheet (from the screen's own button,
+   *  such as the score chips). Absent off a phone. */
+  openMenu?: () => void;
   /** Whether a seat is a person or the AI, from its engine player id; absent
    *  where the seats are not known (a preview). */
   seatKind?: (playerId: string) => 'human' | 'ai' | null;

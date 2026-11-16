@@ -95,6 +95,8 @@ export function TablePage() {
   const [benchSlot, setBenchSlot] = useState<HTMLDivElement | null>(null);
   /** the top of the side column, where a game-drawn screen may put its standings */
   const [sideSlot, setSideSlot] = useState<HTMLDivElement | null>(null);
+  /** the top of the phone's open menu sheet, where a game-drawn screen may put its side column */
+  const [menuSlot, setMenuSlot] = useState<HTMLDivElement | null>(null);
   const [playAgainBusy, setPlayAgainBusy] = useState(false);
   const [showEnd, setShowEnd] = useState(true);
   /** a moment playing over the board; `resolve` lets the held event land */
@@ -118,6 +120,17 @@ export function TablePage() {
   useEffect(() => { if (!phone) setMenuOpen(false); }, [phone]);
   // A strike starting (or replayed from the menu) is the thing to watch.
   useEffect(() => { if (moment) setMenuOpen(false); }, [moment]);
+  // What a game-drawn screen puts in the menu is portaled there from the
+  // screen, so React hands its key presses to the screen, not to the Sheet.
+  // Escape from one of those controls still closes the menu. (Tab needs
+  // nothing: the slot sits between the Close button and the table's own
+  // buttons, so it is never at the edge of the Sheet's trap.)
+  useEffect(() => {
+    if (!menuSlot) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { e.stopPropagation(); setMenuOpen(false); } };
+    menuSlot.addEventListener('keydown', onKey);
+    return () => menuSlot.removeEventListener('keydown', onKey);
+  }, [menuSlot]);
   const myPlayerId = current?.playerId ?? null;
   const legalMoves: LegalMove[] = state.done && current?.yourTurn ? current.legalMoves : [];
   const unavailable = useMemo(() => (state.done && current?.yourTurn ? current.unavailable ?? [] : []), [state.done, current]);
@@ -382,7 +395,7 @@ export function TablePage() {
         <Link to="/" className="brand" aria-label="zekel home" style={{ textDecoration: 'none', display: 'inline-flex' }}><Wordmark size={24} /></Link>
         <span className="divider" />
         {plan?.titleArt && <img className="title-art" src={plan.titleArt} alt="" width={30} height={30} />}
-        <span className="title">{plan?.title ?? table?.table.gameName ?? 'Table'}</span>
+        <span className="title">{(phone && plan?.titleShort) || (plan?.title ?? table?.table.gameName ?? 'Table')}</span>
         {plan?.status && <span className="round-note" aria-hidden="true">{plan.status}</span>}
         {phone && plan?.statusShort && <span className="round-tag" aria-hidden="true"><span>{plan.statusShort}</span></span>}
         <span className="spacer center">
@@ -434,6 +447,8 @@ export function TablePage() {
                 benchSlot={benchSlot}
                 sideSlot={sideOpen && !phone ? sideSlot : null}
                 phone={phone}
+                menuSlot={phone && menuOpen ? menuSlot : null}
+                openMenu={phone ? () => setMenuOpen(true) : undefined}
               />
             : plan
             ? <BoardZones zones={plan.board} lit={lit} onSelect={onSelect} />
@@ -520,6 +535,7 @@ export function TablePage() {
 
       {menuOpen && (
         <Sheet title="Menu" className="menu-sheet" onClose={() => setMenuOpen(false)}>
+          {glue?.Screen && <div className="menu-game" ref={setMenuSlot} />}
           <div className="menu-grid">
             <button className="chip-btn" onClick={() => { setMenuOpen(false); void undo(); }} disabled={!table || table.table.status !== 'playing'}>Undo</button>
             <button className="chip-btn" onClick={() => { setMenuOpen(false); setSheet('rules'); }}>Rules</button>
