@@ -114,7 +114,8 @@ describe('schema 8', () => {
       expect((await upgraded.db.selectFrom('schema_version').select('version').executeTakeFirst())?.version).toBe(SCHEMA_VERSION);
       const before = await upgraded.db.selectFrom('games').selectAll().executeTakeFirstOrThrow();
       expect(before.screenshots).toBe('[]');
-      expect(before.featured_rank).toBeNull();
+      // Schema 9: with no featured place set, the first game with a designer takes place 1.
+      expect(before.featured_rank).toBe(1);
       expect(before.designer_slug).toBeNull();
       expect((await upgraded.db.selectFrom('game_updates').selectAll().executeTakeFirstOrThrow()).deleted_at).toBeNull();
 
@@ -136,6 +137,49 @@ describe('schema 8', () => {
       await upgraded.close();
       rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
     }
+  });
+});
+
+describe('schema 9', () => {
+  async function upgradeFrom8(games: Array<{ id: string; name: string; designer: string; rank: number | null; visibility?: string }>) {
+    const dir = mkdtempSync(path.join(tmpdir(), 'universe-db-'));
+    const file = path.join(dir, 'v8.db');
+    const made = await createDatabase(`sqlite:${file}`);
+    for (const g of games) {
+      await made.db.insertInto('games').values({
+        engine_game_id: g.id, name: g.name, designer_name: g.designer, player_count: '2', min_players: 2, max_players: 2,
+        supports_ai: 1, play_time: '', tags: '[]', cover_image: null, description: '', rules_url: null,
+        visibility: g.visibility ?? 'public', featured_rank: g.rank,
+      }).execute();
+    }
+    await made.db.updateTable('schema_version').set({ version: 8 }).execute();
+    await made.close();
+    const upgraded = await createDatabase(`sqlite:${file}`);
+    const rows = await upgraded.db.selectFrom('games').select(['engine_game_id', 'featured_rank']).orderBy('engine_game_id').execute();
+    const version = (await upgraded.db.selectFrom('schema_version').select('version').executeTakeFirst())?.version;
+    await upgraded.close();
+    rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
+    return { version, ranks: Object.fromEntries(rows.map((r) => [r.engine_game_id, r.featured_rank])) };
+  }
+
+  it('gives the two games home used to stand in places 1 and 2 when none is featured', async () => {
+    const { version, ranks } = await upgradeFrom8([
+      { id: 'c', name: 'Charlie', designer: 'Zekel Games', rank: null },
+      { id: 'a', name: 'Alpha', designer: 'Zekel Games', rank: null },
+      { id: 'n', name: 'Aardvark', designer: '', rank: null },
+      { id: 'u', name: 'Able', designer: 'Zekel Games', rank: null, visibility: 'unlisted' },
+      { id: 'd', name: 'Delta', designer: 'Zekel Games', rank: null },
+    ]);
+    expect(version).toBe(SCHEMA_VERSION);
+    expect(ranks).toEqual({ a: 1, c: 2, d: null, n: null, u: null });
+  });
+
+  it('leaves the places alone when an admin has set any', async () => {
+    const { ranks } = await upgradeFrom8([
+      { id: 'a', name: 'Alpha', designer: 'Zekel Games', rank: null },
+      { id: 'c', name: 'Charlie', designer: 'Zekel Games', rank: 3 },
+    ]);
+    expect(ranks).toEqual({ a: null, c: 3 });
   });
 });
 

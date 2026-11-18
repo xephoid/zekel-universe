@@ -159,9 +159,17 @@ function GameForm({ game, designers, onSaved }: { game: GameCatalogEntry; design
             <option value="">None</option>
             {designers.map((d) => <option key={d.slug} value={d.slug}>{d.name}</option>)}
           </select></label>
-        <label className="field"><span className="label">Featured place</span>
-          <input type="number" min={1} max={99} step={1} value={edit.featuredRank ?? ''} placeholder="Not featured"
-            onChange={(e) => set('featuredRank', e.target.value === '' ? null : Number(e.target.value))} /></label>
+        <div className="field">
+          <label className="label" htmlFor="featured-place">Featured place</label>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <input id="featured-place" type="number" min={1} max={99} step={1} style={{ flex: 1, minWidth: 0 }}
+              value={edit.featuredRank ?? ''} placeholder="Not featured"
+              onChange={(e) => set('featuredRank', e.target.value === '' ? null : Number(e.target.value))} />
+            {edit.featuredRank !== null && (
+              <button type="button" className="btn small secondary" onClick={() => set('featuredRank', null)}>Unfeature</button>
+            )}
+          </div>
+        </div>
         <label className="field"><span className="label">Listed</span>
           <select value={edit.visibility} onChange={(e) => set('visibility', e.target.value as AdminGameEdit['visibility'])}>
             <option value="public">Public</option>

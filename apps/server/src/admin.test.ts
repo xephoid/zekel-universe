@@ -191,6 +191,51 @@ describe('admin', () => {
     expect((await send('PUT', '/api/admin/games/nope', boss, ffEdit())).statusCode).toBe(404);
   });
 
+  it('a new database features the games that have a designer, once', async () => {
+    const games = (await send('GET', '/api/games')).json<GamesResponse>().games;
+    expect(games.find((g) => g.engineGameId === 'fractured-fist')!.featuredRank).toBe(1);
+    expect(games.find((g) => g.engineGameId === 'trio')!.featuredRank).toBeNull();
+  });
+
+  it('an empty featured place unfeatures a game for good, and the others keep their order (T47)', async () => {
+    const boss = await signIn(ADMIN);
+    const trio = (over: Partial<AdminGameEdit>) => ffEdit({ name: 'Trio', designerSlug: null, coverImage: null, coverFocus: null, ...over });
+    const rank = async (id: string) =>
+      (await db.selectFrom('games').select('featured_rank').where('engine_game_id', '=', id).executeTakeFirstOrThrow()).featured_rank;
+    const storefront = async () => (await send('GET', '/api/games')).json<GamesResponse>().games
+      .filter((g) => g.featuredRank !== null).sort((a, b) => a.featuredRank! - b.featuredRank!).map((g) => g.engineGameId);
+
+    // Set: Fractured Fist 2, Trio 5.
+    expect((await send('PUT', '/api/admin/games/fractured-fist', boss, ffEdit({ featuredRank: 2 }))).statusCode).toBe(200);
+    expect((await send('PUT', '/api/admin/games/trio', boss, trio({ featuredRank: 5 }))).statusCode).toBe(200);
+    expect(await storefront()).toEqual(['fractured-fist', 'trio']);
+
+    // Clear Fractured Fist: empty in the database, gone from the storefront,
+    // and Trio is still featured at its own place.
+    expect((await send('PUT', '/api/admin/games/fractured-fist', boss, ffEdit({ featuredRank: null }))).statusCode).toBe(200);
+    expect(await rank('fractured-fist')).toBeNull();
+    expect(await rank('trio')).toBe(5);
+    expect(await storefront()).toEqual(['trio']);
+    const ff = (await send('GET', '/api/games/fractured-fist')).json<GameResponse>().game;
+    expect(ff.featuredRank).toBeNull();
+    // The admin page reads it back as not featured.
+    const content = (await send('GET', '/api/admin/content', boss)).json<AdminContentResponse>();
+    expect(content.games.find((g) => g.engineGameId === 'fractured-fist')!.featuredRank).toBeNull();
+
+    // Reorder what is left: Fractured Fist back at 1, ahead of Trio.
+    expect((await send('PUT', '/api/admin/games/fractured-fist', boss, ffEdit({ featuredRank: 1 }))).statusCode).toBe(200);
+    expect(await storefront()).toEqual(['fractured-fist', 'trio']);
+    expect((await send('PUT', '/api/admin/games/trio', boss, trio({ featuredRank: null }))).statusCode).toBe(200);
+    expect(await storefront()).toEqual(['fractured-fist']);
+
+    // Unfeature the last one too: nothing is featured, and a restart (a
+    // catalog refresh) does not put the first-fill places back.
+    expect((await send('PUT', '/api/admin/games/fractured-fist', boss, ffEdit({ featuredRank: null }))).statusCode).toBe(200);
+    await app.refreshCatalog();
+    expect(await storefront()).toEqual([]);
+    expect(await rank('fractured-fist')).toBeNull();
+  });
+
   it('an unlisted game leaves the designer page but keeps its own page', async () => {
     const boss = await signIn(ADMIN);
     await send('PUT', '/api/admin/games/fractured-fist', boss, ffEdit({ visibility: 'unlisted' }));

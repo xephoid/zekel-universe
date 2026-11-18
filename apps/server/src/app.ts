@@ -18,7 +18,7 @@ import { SOCKET_EVENTS } from '@universe/shared';
 import { EngineError } from '@universe/engine-client';
 
 import type { DB } from './db/schema.js';
-import { parseJson } from './db/index.js';
+import { featureFirstTwo, parseJson } from './db/index.js';
 import { newId, newToken, hashToken, now, type Principal } from './identity.js';
 import {
   consumeSignInLink, peekSignInLink, GUEST_TTL_MS, guestExpiresAt, isWellFormedNonce, issueSignInLink, LINK_TTL_MS, RateLimiter,
@@ -1093,6 +1093,7 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
   // admin page survives a restart or a deploy.
   async function refreshCatalog(): Promise<number> {
     const listed = await opts.engine.listGames();
+    const firstFill = !(await db.selectFrom('games').select('engine_game_id').executeTakeFirst());
     for (const d of Object.values(DESIGNERS)) {
       const have = await db.selectFrom('designers').select('slug').where('slug', '=', d.slug).executeTakeFirst();
       if (!have) await db.insertInto('designers').values({ slug: d.slug, name: d.name, bio: d.bio, avatar_image: null }).execute();
@@ -1139,6 +1140,8 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
         }).execute();
       }
     }
+    // A brand-new database starts with two featured games; see featureFirstTwo.
+    if (firstFill) await featureFirstTwo(db);
     // The designer's posts, once each: a post an admin removed keeps its
     // row (deleted_at), so it is never posted again. A game the engine no
     // longer lists keeps no posts.
