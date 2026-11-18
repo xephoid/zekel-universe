@@ -3,12 +3,13 @@
 // TEST_DATABASE_URL points at one (docker compose brings one up).
 
 import { describe, it, expect } from 'vitest';
-import { sql } from 'kysely';
+import { sql, type Kysely } from 'kysely';
+import type { DB } from './db/schema.js';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import Database from 'better-sqlite3';
-import { createDatabase, parseDatabaseUrl, SCHEMA_VERSION } from './db/index.js';
+import { createDatabase, featureFirstTwo, parseDatabaseUrl, SCHEMA_VERSION } from './db/index.js';
 import { FakeEngine } from './test-engine.js';
 import { TableService } from './tables/service.js';
 import { Realtime } from './realtime.js';
@@ -180,6 +181,113 @@ describe('schema 9', () => {
       { id: 'c', name: 'Charlie', designer: 'Zekel Games', rank: 3 },
     ]);
     expect(ranks).toEqual({ a: null, c: 3 });
+  });
+
+  type Row = { id: string; name: string; rank: number | null };
+  async function addGames(db: Kysely<DB>, games: Row[]) {
+    for (const g of games) {
+      await db.insertInto('games').values({
+        engine_game_id: g.id, name: g.name, designer_name: 'Zekel Games', player_count: '2', min_players: 2, max_players: 2,
+        supports_ai: 1, play_time: '', tags: '[]', cover_image: null, description: '', rules_url: null,
+        visibility: 'public', featured_rank: g.rank,
+      }).execute();
+    }
+  }
+  const ranksOf = async (db: Kysely<DB>) => Object.fromEntries(
+    (await db.selectFrom('games').select(['engine_game_id', 'featured_rank']).orderBy('engine_game_id').execute())
+      .map((r) => [r.engine_game_id, r.featured_rank]));
+  const appOn = async (db: Kysely<DB>) => {
+    const app = buildApp({
+      db, engine: new FakeEngine(), mailer: new ConsoleMailer(), secretKey: 's',
+      appOrigin: 'http://localhost:5173', allowedOrigins: ['http://localhost:5173'], secureCookies: false, logger: false,
+    });
+    await app.fastify.ready();
+    return app;
+  };
+
+  it('an upgrade that fails part-way leaves no place and schema 8, and the next start does it whole', async () => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'universe-db-'));
+    const file = path.join(dir, 'v8.db');
+    try {
+      const made = await createDatabase(`sqlite:${file}`);
+      await addGames(made.db, [{ id: 'a', name: 'Alpha', rank: null }, { id: 'c', name: 'Charlie', rank: null }]);
+      await made.db.updateTable('schema_version').set({ version: 8 }).execute();
+      await made.close();
+      // The second place fails, as a crash between the two would.
+      const raw = new Database(file);
+      raw.exec(`CREATE TRIGGER boom BEFORE UPDATE OF featured_rank ON games WHEN NEW.featured_rank = 2
+        BEGIN SELECT RAISE(ABORT, 'boom'); END;`);
+      raw.close();
+      await expect(createDatabase(`sqlite:${file}`)).rejects.toThrow(/boom/);
+      const after = new Database(file);
+      expect(after.prepare('SELECT engine_game_id, featured_rank FROM games ORDER BY engine_game_id').all())
+        .toEqual([{ engine_game_id: 'a', featured_rank: null }, { engine_game_id: 'c', featured_rank: null }]);
+      expect(after.prepare('SELECT version FROM schema_version').get()).toEqual({ version: 8 });
+      after.exec('DROP TRIGGER boom');
+      after.close();
+      const retried = await createDatabase(`sqlite:${file}`);
+      expect(await ranksOf(retried.db)).toEqual({ a: 1, c: 2 });
+      expect((await retried.db.selectFrom('schema_version').select('version').executeTakeFirst())?.version).toBe(SCHEMA_VERSION);
+      await retried.close();
+    } finally {
+      rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
+    }
+  });
+
+  it('featureFirstTwo a second time changes nothing', async () => {
+    const database = await createDatabase(':memory:');
+    try {
+      await addGames(database.db, [{ id: 'a', name: 'Alpha', rank: null }, { id: 'b', name: 'Bravo', rank: null }, { id: 'c', name: 'Charlie', rank: null }]);
+      await featureFirstTwo(database.db);
+      expect(await ranksOf(database.db)).toEqual({ a: 1, b: 2, c: null });
+      await database.db.updateTable('games').set({ featured_rank: 7 }).where('engine_game_id', '=', 'a').execute();
+      await featureFirstTwo(database.db);
+      expect(await ranksOf(database.db)).toEqual({ a: 7, b: 2, c: null });
+    } finally {
+      await database.close();
+    }
+  });
+
+  it('a first catalog fill that fails part-way leaves no games, and the next fill features the first two', async () => {
+    const database = await createDatabase(':memory:');
+    const app = await appOn(database.db);
+    try {
+      await sql.raw(`CREATE TRIGGER boom BEFORE INSERT ON games WHEN NEW.engine_game_id = 'trio'
+        BEGIN SELECT RAISE(ABORT, 'boom'); END`).execute(database.db);
+      await expect(app.refreshCatalog()).rejects.toThrow(/boom/);
+      expect(await ranksOf(database.db)).toEqual({});
+      await sql.raw('DROP TRIGGER boom').execute(database.db);
+      await app.refreshCatalog();
+      // Fractured Fist is the fake engine's one game with a designer.
+      expect(await ranksOf(database.db)).toEqual({ 'fractured-fist': 1, trio: null });
+    } finally {
+      await app.fastify.close();
+      await database.close();
+    }
+  });
+
+  it('once an admin has cleared every place, a restart features nothing again', async () => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'universe-db-'));
+    const file = path.join(dir, 'live.db');
+    try {
+      const first = await createDatabase(`sqlite:${file}`);
+      let app = await appOn(first.db);
+      await app.refreshCatalog();
+      expect(await ranksOf(first.db)).toEqual({ 'fractured-fist': 1, trio: null });
+      await first.db.updateTable('games').set({ featured_rank: null }).execute(); // what the admin's Unfeature writes
+      await app.fastify.close();
+      await first.close();
+
+      const second = await createDatabase(`sqlite:${file}`); // a restart: schema checks, then a catalog refresh
+      app = await appOn(second.db);
+      await app.refreshCatalog();
+      await app.refreshCatalog();
+      expect(await ranksOf(second.db)).toEqual({ 'fractured-fist': null, trio: null });
+      await app.fastify.close();
+      await second.close();
+    } finally {
+      rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
+    }
   });
 });
 

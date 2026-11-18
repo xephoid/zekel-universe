@@ -236,6 +236,32 @@ describe('admin', () => {
     expect(await rank('fractured-fist')).toBeNull();
   });
 
+  it('unfeature clears only the featured place, at once, and only for an admin (T47)', async () => {
+    const boss = await signIn(ADMIN);
+    expect((await send('PUT', '/api/admin/games/fractured-fist', boss, ffEdit({ name: 'Fist, saved', featuredRank: 3 }))).statusCode).toBe(200);
+    const before = await db.selectFrom('games').selectAll().where('engine_game_id', '=', 'fractured-fist').executeTakeFirstOrThrow();
+
+    // Nobody but an admin, and not from another origin.
+    expect((await send('DELETE', '/api/admin/games/fractured-fist/featured')).statusCode).toBe(401);
+    const someone = await signIn('someone@example.com');
+    expect((await send('DELETE', '/api/admin/games/fractured-fist/featured', someone)).statusCode).toBe(403);
+    const foreign = await app.fastify.inject({
+      method: 'DELETE', url: '/api/admin/games/fractured-fist/featured', headers: { origin: 'https://evil.example', cookie: boss },
+    });
+    expect(foreign.statusCode).toBe(403);
+    expect((await db.selectFrom('games').select('featured_rank').where('engine_game_id', '=', 'fractured-fist').executeTakeFirstOrThrow()).featured_rank).toBe(3);
+    expect((await send('DELETE', '/api/admin/games/nope/featured', boss)).statusCode).toBe(404);
+
+    // The admin's clear: the place is NULL, every other column as it was.
+    expect((await send('DELETE', '/api/admin/games/fractured-fist/featured', boss)).statusCode).toBe(200);
+    const after = await db.selectFrom('games').selectAll().where('engine_game_id', '=', 'fractured-fist').executeTakeFirstOrThrow();
+    expect(after).toEqual({ ...before, featured_rank: null });
+    const games = (await send('GET', '/api/games')).json<GamesResponse>().games;
+    expect(games.find((g) => g.engineGameId === 'fractured-fist')!.featuredRank).toBeNull();
+    // Clearing again is harmless.
+    expect((await send('DELETE', '/api/admin/games/fractured-fist/featured', boss)).statusCode).toBe(200);
+  });
+
   it('an unlisted game leaves the designer page but keeps its own page', async () => {
     const boss = await signIn(ADMIN);
     await send('PUT', '/api/admin/games/fractured-fist', boss, ffEdit({ visibility: 'unlisted' }));

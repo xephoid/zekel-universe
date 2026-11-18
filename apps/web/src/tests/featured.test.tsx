@@ -1,7 +1,7 @@
 // Featured games (T47): home shows only the games with a featured place,
 // lowest first, and draws no Featured row when none has one; the admin page
-// can take a game's place away (the Unfeature button, or an empty field),
-// and saving sends an empty place to the server.
+// takes a game's place away at once (the Unfeature button, or an emptied
+// field) without saving the rest of the form.
 
 import { describe, expect, it, afterEach, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
@@ -71,47 +71,84 @@ describe('home', () => {
 });
 
 describe('the admin page', () => {
-  function renderAdmin(saves: unknown[]) {
+  type Call = { method: string; url: string; body?: { featuredRank: number | null; name: string } };
+  function renderAdmin(calls: Call[], opts: { failClear?: boolean } = {}) {
     let games = [game('ff', 'Fractured Fist', 1), game('cn', 'Cybernoir 2127', 2)];
     vi.stubGlobal('fetch', vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
       const url = String(input);
-      if (url === '/api/me') return json({ user: { id: 'u', displayName: 'Boss', avatarUrl: null, bio: null, createdAt: '' }, guest: null, admin: true });
+      const method = init?.method ?? 'GET';
+      if (url === '/api/me') return json({ user: { id: 'u', displayName: 'Boss', avatarUrl: null, bio: null, createdAt: '' }, guest: null, isAdmin: true });
       if (url === '/api/admin/content') return json({ games, designers: [{ slug: 'zekel-games', name: 'Zekel Games', bio: '', avatarImage: null }], updates: [] });
-      if (url.startsWith('/api/admin/games/') && init?.method === 'PUT') {
-        const body = JSON.parse(String(init.body));
-        saves.push(body);
+      const featured = /^\/api\/admin\/games\/([^/]+)\/featured$/.exec(url);
+      if (featured && method === 'DELETE') {
+        calls.push({ method, url });
+        if (opts.failClear) return json({ error: 'server_error', message: 'Something went wrong on the server.' }, 500);
+        games = games.map((g) => (g.engineGameId === featured[1] ? { ...g, featuredRank: null } : g));
+        return json({ ok: true });
+      }
+      if (url.startsWith('/api/admin/games/') && method === 'PUT') {
+        const body = JSON.parse(String(init!.body));
+        calls.push({ method, url, body });
         const id = decodeURIComponent(url.split('/').pop()!);
-        games = games.map((g) => (g.engineGameId === id ? { ...g, featuredRank: body.featuredRank } : g));
+        games = games.map((g) => (g.engineGameId === id ? { ...g, name: body.name, featuredRank: body.featuredRank } : g));
         return json({ ok: true });
       }
       return json({ error: 'not_found' }, 404);
     }));
     return render(<SessionProvider><MemoryRouter><AdminPage /></MemoryRouter></SessionProvider>);
   }
+  const listRow = (name: string) => screen.getAllByRole('button').find((b) => b.textContent?.startsWith(name))!;
 
-  it('Unfeature empties the place, and saving sends an empty place', async () => {
-    const saves: Array<{ featuredRank: number | null }> = [];
-    renderAdmin(saves);
+  it('Unfeature saves at once, sends only the place, and leaves other edits unsaved', async () => {
+    const calls: Call[] = [];
+    renderAdmin(calls);
     const field = (await screen.findByLabelText(/Featured place/)) as HTMLInputElement;
     expect(field.value).toBe('1');
+    const name = screen.getByLabelText('Name') as HTMLInputElement;
+    fireEvent.change(name, { target: { value: 'Half-typed name' } });
     fireEvent.click(screen.getByRole('button', { name: 'Unfeature' }));
+    await screen.findByText(/^Unfeatured\./);
+    // One DELETE of the place; no Save of the form.
+    expect(calls).toEqual([{ method: 'DELETE', url: '/api/admin/games/ff/featured' }]);
     expect(field.value).toBe('');
     expect(screen.queryByRole('button', { name: 'Unfeature' })).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Save Fractured Fist' }));
-    await waitFor(() => expect(saves).toHaveLength(1));
-    expect(saves[0]!.featuredRank).toBeNull();
-    // The list beside the form reads the saved row back.
-    expect(await screen.findByText(/^Not featured/)).toBeTruthy();
-    expect(screen.getByText(/^Featured 2/)).toBeTruthy();
+    // The list reads the cleared row back; the half-typed name stays in the form, unsaved.
+    await waitFor(() => expect(listRow('Fractured Fist').textContent).toContain('Not featured'));
+    expect(listRow('Cybernoir 2127').textContent).toContain('Featured 2');
+    expect(name.value).toBe('Half-typed name');
   });
 
-  it('an emptied field saves as not featured too', async () => {
-    const saves: Array<{ featuredRank: number | null }> = [];
-    renderAdmin(saves);
+  it('emptying the field saves the clear at once too', async () => {
+    const calls: Call[] = [];
+    renderAdmin(calls);
     const field = (await screen.findByLabelText(/Featured place/)) as HTMLInputElement;
     fireEvent.change(field, { target: { value: '' } });
+    await screen.findByText(/^Unfeatured\./);
+    expect(calls).toEqual([{ method: 'DELETE', url: '/api/admin/games/ff/featured' }]);
+    await waitFor(() => expect(listRow('Fractured Fist').textContent).toContain('Not featured'));
+  });
+
+  it('a failed clear says so and keeps the place', async () => {
+    const calls: Call[] = [];
+    renderAdmin(calls, { failClear: true });
+    const field = (await screen.findByLabelText(/Featured place/)) as HTMLInputElement;
+    fireEvent.click(screen.getByRole('button', { name: 'Unfeature' }));
+    expect((await screen.findByRole('alert')).textContent).toMatch(/Not unfeatured/);
+    expect(field.value).toBe('1');
+    expect(screen.getByRole('button', { name: 'Unfeature' })).toBeTruthy();
+    expect(screen.queryByText(/^Unfeatured\./)).toBeNull();
+    expect(listRow('Fractured Fist').textContent).toContain('Featured 1');
+  });
+
+  it('Save still sends the whole form, with the place typed', async () => {
+    const calls: Call[] = [];
+    renderAdmin(calls);
+    const field = (await screen.findByLabelText(/Featured place/)) as HTMLInputElement;
+    fireEvent.change(field, { target: { value: '4' } });
     fireEvent.click(screen.getByRole('button', { name: 'Save Fractured Fist' }));
-    await waitFor(() => expect(saves).toHaveLength(1));
-    expect(saves[0]!.featuredRank).toBeNull();
+    await waitFor(() => expect(calls).toHaveLength(1));
+    expect(calls[0]!.method).toBe('PUT');
+    expect(calls[0]!.body!.featuredRank).toBe(4);
+    await waitFor(() => expect(listRow('Fractured Fist').textContent).toContain('Featured 4'));
   });
 });

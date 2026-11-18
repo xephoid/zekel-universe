@@ -154,6 +154,17 @@ export function registerAdmin(app: FastifyInstance, deps: AdminDeps): void {
     return { ok: true };
   });
 
+  // Unfeature a game (T47): writes only its featured place, so the admin
+  // page can clear it at once without saving the rest of a half-edited form.
+  app.delete('/api/admin/games/:id/featured', async (req) => {
+    const adminId = await requireAdmin(req);
+    const { id } = req.params as { id: string };
+    const res = await db.updateTable('games').set({ featured_rank: null }).where('engine_game_id', '=', id).executeTakeFirst();
+    if (Number(res.numUpdatedRows) === 0) throw new HttpError(404, 'no_game');
+    audit(req, adminId, 'game.unfeature', id);
+    return { ok: true };
+  });
+
   // ---- designers ---------------------------------------------------------------
 
   function designerFields(b: Partial<AdminDesignerEdit>) {

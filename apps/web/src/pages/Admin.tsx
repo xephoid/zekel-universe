@@ -124,8 +124,23 @@ function GameForm({ game, designers, onSaved }: { game: GameCatalogEntry; design
   const [edit, setEdit] = useState<AdminGameEdit>(() => toEdit(game));
   const [tagsText, setTagsText] = useState(game.tags.join(', '));
   const save = useSave();
-  const set = <K extends keyof AdminGameEdit>(k: K, v: AdminGameEdit[K]) => { setEdit((e) => ({ ...e, [k]: v })); save.reset(); };
+  const unfeature = useSave();
+  const set = <K extends keyof AdminGameEdit>(k: K, v: AdminGameEdit[K]) => {
+    setEdit((e) => ({ ...e, [k]: v })); save.reset(); unfeature.reset();
+  };
   const shots = edit.screenshots;
+  // Clearing the featured place saves at once, and only the place: the rest
+  // of the form stays as typed, unsaved (T47). When the server refuses, the
+  // field gets back the place it had, so the page never shows a game as
+  // unfeatured that is still featured.
+  const clearPlace = async () => {
+    const before = edit.featuredRank;
+    setEdit((e) => ({ ...e, featuredRank: null }));
+    save.reset();
+    if (game.featuredRank === null) return; // not featured on the server: nothing to clear there
+    if (await unfeature.run(() => api.admin.unfeatureGame(game.engineGameId))) onSaved();
+    else setEdit((e) => ({ ...e, featuredRank: before }));
+  };
   const moveShot = (i: number, d: -1 | 1) => {
     const next = [...shots];
     const [s] = next.splice(i, 1);
@@ -164,11 +179,18 @@ function GameForm({ game, designers, onSaved }: { game: GameCatalogEntry; design
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <input id="featured-place" type="number" min={1} max={99} step={1} style={{ flex: 1, minWidth: 0 }}
               value={edit.featuredRank ?? ''} placeholder="Not featured"
-              onChange={(e) => set('featuredRank', e.target.value === '' ? null : Number(e.target.value))} />
+              onChange={(e) => {
+                // An empty value with bad input ("-", "e") is half-typed, not a clear.
+                if (e.target.value === '') { if (!e.target.validity.badInput) void clearPlace(); return; }
+                set('featuredRank', Number(e.target.value));
+              }} />
             {edit.featuredRank !== null && (
-              <button type="button" className="btn small secondary" onClick={() => set('featuredRank', null)}>Unfeature</button>
+              <button type="button" className="btn small secondary" disabled={unfeature.saving} onClick={() => void clearPlace()}>Unfeature</button>
             )}
           </div>
+          {unfeature.saving && <span className="note">Unfeaturing…</span>}
+          {unfeature.error && <span className="error" role="alert" style={{ fontSize: 13 }}>Not unfeatured: {unfeature.error}</span>}
+          {unfeature.saved && <span className="note" role="status">Unfeatured. Players see it on their next page load.</span>}
         </div>
         <label className="field"><span className="label">Listed</span>
           <select value={edit.visibility} onChange={(e) => set('visibility', e.target.value as AdminGameEdit['visibility'])}>

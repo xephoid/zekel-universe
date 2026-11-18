@@ -1702,11 +1702,16 @@ their own pages.
   images only, and the host's disk does not survive a deploy.
 - **Featured.** Home shows the games with a featured place, lowest first;
   the places need not run 1, 2, 3. An empty place means not featured: the
-  admin page's Unfeature button (or an emptied field) clears it, and with
-  none set home draws no Featured row. A new database gives the first two
-  games that have a designer places 1 and 2 when the catalog first fills,
-  and schema 9 did the same once for a database with no place set (T47:
-  home used to fall back to those two, which put an unfeatured game back).
+  admin page's Unfeature button (or an emptied field) clears it at once,
+  without Save, and writes only the place
+  (`DELETE /api/admin/games/:id/featured`), so other edits in the form stay
+  unsaved. With none set home draws no Featured row. A new database gives
+  the first two games that have a designer places 1 and 2 when the catalog
+  first fills, and schema 9 did the same once for a database with no place
+  set; each runs in one transaction with the work around it, so a crash
+  leaves no half-set places, and neither runs again after an admin has
+  cleared the places (T47: home used to fall back to those two, which put
+  an unfeatured game back).
 - **News** is the designers' updates; there is no separate news table.
 - **Every edit is logged** with the admin's account id and what changed.
 - **Still open:** cleaning up uploaded images nothing points at any more.
