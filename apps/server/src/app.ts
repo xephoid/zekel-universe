@@ -18,7 +18,7 @@ import { SOCKET_EVENTS } from '@universe/shared';
 import { EngineError } from '@universe/engine-client';
 
 import type { DB } from './db/schema.js';
-import { parseJson } from './db/index.js';
+import { assignFirstTwo, parseJson } from './db/index.js';
 import { newId, newToken, hashToken, now, type Principal } from './identity.js';
 import {
   consumeSignInLink, peekSignInLink, GUEST_TTL_MS, guestExpiresAt, isWellFormedNonce, issueSignInLink, LINK_TTL_MS, RateLimiter,
@@ -1097,48 +1097,56 @@ export function buildApp(opts: BuildAppOptions): UniverseApp {
       const have = await db.selectFrom('designers').select('slug').where('slug', '=', d.slug).executeTakeFirst();
       if (!have) await db.insertInto('designers').values({ slug: d.slug, name: d.name, bio: d.bio, avatar_image: null }).execute();
     }
-    for (const g of listed.games) {
-      const playerCount = g.min_players === g.max_players
-        ? String(g.min_players)
-        : `${g.min_players}–${g.max_players}`;
-      const existing = await db.selectFrom('games').select(['engine_game_id', 'designer_slug'])
-        .where('engine_game_id', '=', g.game_id).executeTakeFirst();
-      const shared = {
-        player_count: playerCount,
-        min_players: g.min_players,
-        max_players: g.max_players,
-        supports_ai: g.supports_ai ? 1 : 0,
-      };
-      const own = ZEKEL_GAMES[g.game_id];
-      const designerName = own ? DESIGNERS[own.designer]?.name ?? '' : '';
-      if (existing) {
-        await db.updateTable('games').set({
-          ...shared,
-          // A row from before schema 8 has no designer slug, cover focus or
-          // screenshots yet; it takes the seed's once.
-          ...(own && existing.designer_slug == null
-            ? { designer_slug: own.designer, cover_focus: own.coverFocus ?? null, screenshots: JSON.stringify(own.screenshots) }
-            : {}),
-        }).where('engine_game_id', '=', g.game_id).execute();
-      } else {
-        await db.insertInto('games').values({
-          engine_game_id: g.game_id,
-          name: g.name ?? g.game_id,
-          ...shared,
-          designer_name: designerName,
-          designer_slug: own?.designer ?? null,
-          play_time: own?.playTime ?? '',
-          tags: JSON.stringify(own?.tags ?? []),
-          cover_image: own?.coverImage ?? null,
-          cover_focus: own?.coverFocus ?? null,
-          screenshots: JSON.stringify(own?.screenshots ?? []),
-          featured_rank: null,
-          description: own?.description ?? g.description ?? '',
-          rules_url: null,
-          visibility: 'public',
-        }).execute();
+    // The games' rows and, on a brand-new database, its first two featured
+    // places go in one transaction: a crash part-way leaves the table empty,
+    // so the next start is a first fill again and the places are not lost.
+    await db.transaction().execute(async (trx) => {
+      const firstFill = !(await trx.selectFrom('games').select('engine_game_id').executeTakeFirst());
+      for (const g of listed.games) {
+        const playerCount = g.min_players === g.max_players
+          ? String(g.min_players)
+          : `${g.min_players}–${g.max_players}`;
+        const existing = await trx.selectFrom('games').select(['engine_game_id', 'designer_slug'])
+          .where('engine_game_id', '=', g.game_id).executeTakeFirst();
+        const shared = {
+          player_count: playerCount,
+          min_players: g.min_players,
+          max_players: g.max_players,
+          supports_ai: g.supports_ai ? 1 : 0,
+        };
+        const own = ZEKEL_GAMES[g.game_id];
+        const designerName = own ? DESIGNERS[own.designer]?.name ?? '' : '';
+        if (existing) {
+          await trx.updateTable('games').set({
+            ...shared,
+            // A row from before schema 8 has no designer slug, cover focus or
+            // screenshots yet; it takes the seed's once.
+            ...(own && existing.designer_slug == null
+              ? { designer_slug: own.designer, cover_focus: own.coverFocus ?? null, screenshots: JSON.stringify(own.screenshots) }
+              : {}),
+          }).where('engine_game_id', '=', g.game_id).execute();
+        } else {
+          await trx.insertInto('games').values({
+            engine_game_id: g.game_id,
+            name: g.name ?? g.game_id,
+            ...shared,
+            designer_name: designerName,
+            designer_slug: own?.designer ?? null,
+            play_time: own?.playTime ?? '',
+            tags: JSON.stringify(own?.tags ?? []),
+            cover_image: own?.coverImage ?? null,
+            cover_focus: own?.coverFocus ?? null,
+            screenshots: JSON.stringify(own?.screenshots ?? []),
+            featured_rank: null,
+            description: own?.description ?? g.description ?? '',
+            rules_url: null,
+            visibility: 'public',
+          }).execute();
+        }
       }
-    }
+      // A brand-new database starts with two featured games; see assignFirstTwo.
+      if (firstFill) await assignFirstTwo(trx);
+    });
     // The designer's posts, once each: a post an admin removed keeps its
     // row (deleted_at), so it is never posted again. A game the engine no
     // longer lists keeps no posts.

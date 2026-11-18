@@ -23,7 +23,7 @@ export interface DatabaseClient {
 }
 
 /** Bump when the DDL below changes in a way an existing database cannot absorb. */
-export const SCHEMA_VERSION = 8;
+export const SCHEMA_VERSION = 9;
 
 export function parseDatabaseUrl(url: string): { dialect: DatabaseDialect; target: string } {
   const trimmed = url.trim();
@@ -241,7 +241,41 @@ const MIGRATIONS: Record<number, MigrationStep[]> = {
     addColumn('games', 'featured_rank', 'integer'),
     addColumn('game_updates', 'deleted_at', 'text'),
   ],
+  // Home used to fill an empty Featured row with the first two games that
+  // have a designer, which put a game the admin had just unfeatured straight
+  // back (T47). Now home shows only games with a featured place, so a
+  // database with none set gets those same two as its places 1 and 2, once.
+  // The places and the version move together in one transaction: a crash
+  // part-way leaves neither, and the next start tries again from scratch.
+  9: [async (db) => {
+    await db.transaction().execute(async (trx) => {
+      await assignFirstTwo(trx);
+      await trx.updateTable('schema_version').set({ version: 9 }).execute();
+    });
+  }],
 };
+
+/** Give the first two listed games with a designer, by name, featured places
+ *  1 and 2, unless some game already has a place. Called only on the schema 9
+ *  upgrade and when the catalog first fills an empty games table, each inside
+ *  the transaction that does that work, so it never runs after an admin has
+ *  cleared the places: from then on an empty place means not featured.
+ *  The caller supplies the transaction. */
+export async function assignFirstTwo(trx: Kysely<DB>): Promise<void> {
+  const set = await trx.selectFrom('games').select('engine_game_id').where('featured_rank', 'is not', null).executeTakeFirst();
+  if (set) return;
+  const pick = await trx.selectFrom('games').select('engine_game_id')
+    .where('visibility', '!=', 'unlisted').where('designer_name', '!=', '')
+    .orderBy('name', 'asc').limit(2).execute();
+  for (const [i, g] of pick.entries()) {
+    await trx.updateTable('games').set({ featured_rank: i + 1 }).where('engine_game_id', '=', g.engine_game_id).execute();
+  }
+}
+
+/** assignFirstTwo in a transaction of its own: both places or neither. */
+export async function featureFirstTwo(db: Kysely<DB>): Promise<void> {
+  await db.transaction().execute((trx) => assignFirstTwo(trx));
+}
 
 async function migrate(db: Kysely<DB>): Promise<void> {
   // A database from before the schema_version table exists cannot be

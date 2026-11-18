@@ -107,6 +107,9 @@ export const api = {
     content: () => req<AdminContentResponse>('/api/admin/content'),
     saveGame: (id: string, body: AdminGameEdit) =>
       req<{ ok: true }>(`/api/admin/games/${encodeURIComponent(id)}`, { method: 'PUT', body: JSON.stringify(body) }),
+    /** Clear only a game's featured place, at once (the rest of the form stays unsaved). */
+    unfeatureGame: (id: string) =>
+      req<{ ok: true }>(`/api/admin/games/${encodeURIComponent(id)}/featured`, { method: 'DELETE' }),
     createDesigner: (body: AdminDesignerEdit) => post<{ ok: true; slug: string }>('/api/admin/designers', body),
     saveDesigner: (slug: string, body: AdminDesignerEdit) =>
       req<{ ok: true }>(`/api/admin/designers/${encodeURIComponent(slug)}`, { method: 'PUT', body: JSON.stringify(body) }),

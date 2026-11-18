@@ -52,6 +52,13 @@ function timeBucket(playTime: string): 'short' | 'medium' | 'long' | null {
 }
 const TIME_LABEL = { short: 'Up to 30 min', medium: '30–60 min', long: 'Over an hour' } as const;
 
+/** The games with a featured place, lowest place first (ties by name). The
+ *  places need not run 1, 2, 3: unfeaturing one leaves the others in order. */
+export function featuredGames(games: GameCatalogEntry[]): GameCatalogEntry[] {
+  return games.filter((g) => g.featuredRank !== null)
+    .sort((a, b) => (a.featuredRank ?? 0) - (b.featuredRank ?? 0) || a.name.localeCompare(b.name));
+}
+
 function GameCard({ g, featured }: { g: GameCatalogEntry; featured?: boolean }) {
   return (
     <Link to={`/games/${g.engineGameId}`} className={`card game-card ${featured ? 'featured-card' : 'newest-card'}`}>
@@ -112,11 +119,9 @@ export function HomePage() {
   }, [session.me, session.signedIn]);
 
   const publicGames = games.filter((g) => g.visibility !== 'unlisted');
-  // The admin page sets the featured games and their order; until it has,
-  // the first two games with a designer stand in.
-  const ranked = publicGames.filter((g) => g.featuredRank !== null)
-    .sort((a, b) => (a.featuredRank ?? 0) - (b.featuredRank ?? 0) || a.name.localeCompare(b.name));
-  const featured = ranked.length ? ranked : publicGames.filter((g) => g.designerName).slice(0, 2);
+  // The admin page sets the featured games and their order. A game with no
+  // featured place is not featured, so with none set the row is not drawn.
+  const featured = featuredGames(publicGames);
   const newest = [...publicGames].slice(-8).reverse();
   const tags = useMemo(() => [...new Set(publicGames.flatMap((g) => g.tags))].sort(), [publicGames]);
   const browsing = query.trim() !== '' || players !== '' || time !== '' || tag !== '';
@@ -214,11 +219,11 @@ export function HomePage() {
         ) : (
           <div className="two-col">
             <div className="stack" style={{ gap: 36, minWidth: 0 }}>
-              {(featured.length > 0 || publicGames.length > 0) && (
+              {featured.length > 0 && (
                 <section>
                   <div className="row-head"><h2>Featured</h2></div>
                   <div className="featured-grid">
-                    {(featured.length ? featured : publicGames.slice(0, 2)).map((g) => <GameCard key={g.engineGameId} g={g} featured />)}
+                    {featured.map((g) => <GameCard key={g.engineGameId} g={g} featured />)}
                   </div>
                 </section>
               )}

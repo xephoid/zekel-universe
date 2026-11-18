@@ -51,9 +51,13 @@ test('a stranger with a game link is playing in under a minute; browsing, the de
   await expect(watcher.locator('.zk-lit')).toHaveCount(0);
 
   // Home: search and browse.
+  // The Featured row is drawn only when a listed game has a featured place
+  // (none is a valid state since T47), so expect what the API says.
+  const listed = (await (await page.request.get('/api/games')).json()).games as Array<{ visibility: string; featuredRank: number | null }>;
+  const featuredRows = listed.some((g) => g.visibility !== 'unlisted' && g.featuredRank !== null) ? 1 : 0;
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Featured' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Updates' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Featured' })).toHaveCount(featuredRows);
   // (Scoped to the results: this guest's own table sits in My tables above.)
   const results = page.locator('.browse');
   await page.getByRole('searchbox', { name: 'Search games' }).fill('candy');
@@ -68,7 +72,8 @@ test('a stranger with a game link is playing in under a minute; browsing, the de
   await expect(results.getByRole('link', { name: /Fractured Fist/ })).toBeVisible();
   await expect(results.getByRole('link', { name: /Cybernoir 2127/ })).toBeVisible();
   await page.getByRole('button', { name: 'Clear' }).click();
-  await expect(page.getByRole('heading', { name: 'Featured' })).toBeVisible();
+  await expect(results.getByRole('heading', { name: 'Newest' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Featured' })).toHaveCount(featuredRows);
 
   // The game page: the devlog, the rules page, the designer profile.
   await page.getByRole('link', { name: /Sweetlands Imperium/ }).first().click();
@@ -83,7 +88,11 @@ test('a stranger with a game link is playing in under a minute; browsing, the de
   const shelf = page.locator('.shelf');
   await expect(shelf.getByRole('link', { name: /Fractured Fist/ })).toBeVisible();
   await expect(shelf.getByRole('link', { name: /Warble Way Galaxy/ })).toBeVisible();
-  await expect(page.locator('.update-card')).toHaveCount(4);
+  // One card per post the designer has (the seed's, in storefront.ts); read
+  // from the API so a new seeded post does not break this check.
+  const posts = (await (await page.request.get('/api/designers/zekel-games')).json()).updates as unknown[];
+  expect(posts.length).toBeGreaterThan(0);
+  await expect(page.locator('.update-card')).toHaveCount(posts.length);
   // The designers' place in the navigation.
   await page.locator('.topnav').getByRole('link', { name: 'Designers' }).click();
   await expect(page.getByRole('heading', { name: 'Designers' })).toBeVisible();
