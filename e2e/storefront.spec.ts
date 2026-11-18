@@ -83,7 +83,11 @@ test('a stranger with a game link is playing in under a minute; browsing, the de
   const shelf = page.locator('.shelf');
   await expect(shelf.getByRole('link', { name: /Fractured Fist/ })).toBeVisible();
   await expect(shelf.getByRole('link', { name: /Warble Way Galaxy/ })).toBeVisible();
-  await expect(page.locator('.update-card')).toHaveCount(4);
+  // One card per post the designer has (the seed's, in storefront.ts); read
+  // from the API so a new seeded post does not break this check.
+  const posts = (await (await page.request.get('/api/designers/zekel-games')).json()).updates as unknown[];
+  expect(posts.length).toBeGreaterThan(0);
+  await expect(page.locator('.update-card')).toHaveCount(posts.length);
   // The designers' place in the navigation.
   await page.locator('.topnav').getByRole('link', { name: 'Designers' }).click();
   await expect(page.getByRole('heading', { name: 'Designers' })).toBeVisible();
