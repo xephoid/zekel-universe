@@ -91,8 +91,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/glue-kit
       '@zekel/neither-guts-nor-gears':
-        specifier: ^0.1.4
-        version: 0.1.4(@zekel/game-kit@0.1.0)(@zekel/glue-kit@packages+glue-kit)(@zekel/wire-types@packages+wire-types)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^0.1.6
+        version: 0.1.6(@zekel/game-kit@0.1.0)(@zekel/glue-kit@packages+glue-kit)(@zekel/wire-types@packages+wire-types)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@zekel/primitives':
         specifier: workspace:*
         version: link:../../packages/primitives
@@ -1089,8 +1089,8 @@ packages:
     resolution: {integrity: sha512-44b/ifoEuGHqOUd0i+l21pwMDu6XvGQyKzuN4vRxGtNuSZm6nGgaaVSefoFf9QKDRQ3PYEdXNpoQTICWf1U4Lg==}
     engines: {node: '>=22.13.0'}
 
-  '@zekel/neither-guts-nor-gears@0.1.4':
-    resolution: {integrity: sha512-aUz0rbK2l+wEutPij279nvzN1+DSO7M9T3GUWw3WTylv2s9szQDiEc0DI4XULFpmFfFxtHMip0Ltj7rXGZGDyA==}
+  '@zekel/neither-guts-nor-gears@0.1.6':
+    resolution: {integrity: sha512-fU5MtWubPCvcGzMkkabn84wmmfu7o13biEyOoJG0xHB4ip1Vfq6kcSNanB7NbN+I2BXzmFqMpYpsyrEK5qrWIw==}
     engines: {node: '>=22.13.0'}
     peerDependencies:
       '@zekel/dev': ^0.1.1
@@ -3059,7 +3059,7 @@ snapshots:
 
   '@zekel/game-kit@0.1.0': {}
 
-  '@zekel/neither-guts-nor-gears@0.1.4(@zekel/game-kit@0.1.0)(@zekel/glue-kit@packages+glue-kit)(@zekel/wire-types@packages+wire-types)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@zekel/neither-guts-nor-gears@0.1.6(@zekel/game-kit@0.1.0)(@zekel/glue-kit@packages+glue-kit)(@zekel/wire-types@packages+wire-types)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@zekel/game-kit': 0.1.0
     optionalDependencies:
